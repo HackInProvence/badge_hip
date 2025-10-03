@@ -1,0 +1,73 @@
+; FIXME: license, for now defaults to Copyright (C) Miaou 2025
+
+.program libcicada
+.side_set 1 opt ; FIXME: can get one more bit without opt
+
+;.lang_opt python sideset_init = 1  ; we could generate the python, but this requires an additional target in the CMakeLists and calling pioasm manually
+
+; We want:
+; - configurable durations (configurable freqs)
+; - number of repetitions
+; - silences
+
+; x and y are 32 bits
+
+; Let's start with 200kHz, so that a bit is 5µs
+; 19/38 bits (19 0, 19 1) produces 5263 Hz
+; 20 bits -> 5.000 kHz
+; 21      -> 4.761
+; 22      -> 4.545
+; 23      -> 4.348
+; ... 31 needs 5 bits
+
+; FIXME: this program cannot pull more than 8 bits, while spec says we can
+;  Make a test program in C to see if it is the compiler or the state machine
+decode:
+    out x, 8  ; Half wave length
+    mov isr, x  ; Use ISR as third scratch register
+    out y, 8  ; Number of repetitions
+    ;set y, 31
+    ;jmp !x, 'silence'
+
+oscillate_1:
+    jmp x--, oscillate_1  side 1
+
+    mov x, isr
+oscillate_0:
+    jmp x--, oscillate_0  side 0
+
+    mov x, isr
+    jmp y--, oscillate_1
+    jmp decode
+
+silence:
+    jmp y--, silence  side 0 [7]
+    jmp decode
+
+
+% c-sdk {
+#include "hardware/clocks.h"
+static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = libcicada_program_get_default_config(offset);
+
+    // side should output on pin
+    sm_config_set_sideset_pin_base(&c, pin);
+    // Set this pin's GPIO function (connect PIO to the pad)
+    pio_gpio_init(pio, pin);
+    // Set the pin direction to output at the PIO
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    // For OUT: shift right, autopull and use all 32 bits
+    sm_config_set_out_shift(&c, true, true, 32);
+
+    //// Lengthen the TX FIFO (4 to 8), but no RX anymore
+    //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    // Set the frequency of the SM
+    float div = clock_get_hz(clk_sys) / 200000;
+    sm_config_set_clkdiv(&c, div);
+
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
