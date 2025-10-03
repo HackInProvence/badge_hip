@@ -47,15 +47,21 @@ int main() {
     //uint8_t pio_sm_get_pc (PIO pio, uint sm)
 
     // 8bit blob (space harrier), but at 9600 (debug)
-    while(true) {
+    while(false) {
         //pio_sm_put_blocking(pio, sm, cica_word(cica_note(11, 255), cica_note(20, 255)));
         //pio_sm_put_blocking(pio, sm, 23 | (2000<<16));
-        pio_sm_put_blocking(pio, sm, 12 | (13<<16));
-        //sleep_ms(100);
-        pio_sm_put_blocking(pio, sm, 32 | (6<<16));
+        //pio_sm_put_blocking(pio, sm, 11 | (4<<16));
+        //pio_sm_put_blocking(pio, sm, 11 | (13<<16));
+        //pio_sm_put_blocking(pio, sm, 31 | (6<<16));
     }
 
-    // Pseudo mario ring
+    // Should produce 5263 Hz for 0.100 seconds and a pause of 1.000 secondes
+    while (true) {
+        pio_sm_put_blocking(pio, sm, 10 | (525<<16));
+        pio_sm_put_blocking(pio, sm, 0 | (12499<<16));
+    }
+
+    // Pseudo mario coin
     while(false) {
         pio_sm_put_blocking(pio, sm, 59 | (200<<16));
         pio_sm_put_blocking(pio, sm, 39 | (900<<16));

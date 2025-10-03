@@ -21,41 +21,49 @@
 ; ... 31 needs 5 bits
 
 ; To have good timing, knowing that the loop consumes x+1 cycles,
-;  we add preamble of 3 cycles, and postamble of 4 cycles, leaving time to cover all cases
-; side = 1     ------------------------
-; side = 0 ----                        --------------------
+;  we add preamble of 3 cycles, and postamble of 5 cycles, leaving time to cover all cases
+; side = 1     -------------------------
+; side = 0 ----                         --------------------
 ;              === preamble
 ;                 <==x+1 cycles===>
-;                        postamble ====
+;                        postamble =====
+
+; With clk the frequency of the PIO:
+;  freq = clk/(2*(x+9)) in Hz,
+;  duration = (y+1)*2*(x+9)/clk in seconds.
+; To produce a sound of freq and duration:
+;  x = clk/(2*f) - 9
+;  y = duration*freq - 1
+; To silence:
+;  x = 0
+;  duration = (16*(y+1)+3)/clk hence y = (duration*clk-3)/16 - 1
 decode:
     out x, 16       side 0 ; Half wave length, leave side=0 to not activate the buzzer
-    ;nop side 1 [4]
-    ;nop side 0 [4]
-    ;nop side 1 [4]
-    ;nop side 0 [4]
-    ;jmp !x, silence side 0  TODO
+    jmp !x, silence side 0
     out y, 16       side 1 ; Number of repetitions, set side=1 because we won't block here
     mov isr, x      side 1 ; Use ISR as third scratch register
     jmp up          side 1 ; pin=1 for 3
 
 preup: ; come from down (repetitions)
-    nop             side 0 [1]  ; pin=0 for 3 +x+1 +4 (end of postamble)
+    nop             side 0 [2]  ; pin=0 for 3 +x+1 +5 (end of postamble)
     nop             side 1 [2]  ; pin=1 for 3 (preamble)
 up:
     jmp x--, up     side 1      ; pin=1 for 3 +x+1
     mov x, isr      side 1      ; pin=1 for 3 +x+1 +1
-    nop             side 1 [2]  ; pin=1 for 3 +x+1 +4
+    nop             side 1 [3]  ; pin=1 for 3 +x+1 +5
 
-    nop             side 0 [2]  ; pin=0 for 3
+    nop             side 0 [2]  ; pin=0 for 3 (preamble)
 down:
     jmp x--, down   side 0      ; pin=0 for 3 +x+1
 
     mov x, isr      side 0      ; pin=0 for 3 +x+1 +1
     jmp y--, preup  side 0      ; pin=0 for 3 +x+1 +2
-    jmp decode      side 0      ; pin=0 for 3 +x+1 +3 will go to +4 with the first decode
+    jmp decode      side 0      ; pin=0 for 3 +x+1 +3 will go to +5
 
 silence:
-    jmp y--, silence  side 0 [7]
+    out y, 16       side 0 ; Number of repetitions
+siloop:
+    jmp y--, siloop side 0 [15] ; 16*(y+1) + 3
     jmp decode      side 0
 
 
@@ -78,7 +86,7 @@ static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pi
     //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     // Set the frequency of the SM
-    float div = clock_get_hz(clk_sys) / 9600;
+    float div = clock_get_hz(clk_sys) / 200000;  // TODO put this clock in a define
     sm_config_set_clkdiv(&c, div);
 
     // Load our configuration, and jump to the start of the program
