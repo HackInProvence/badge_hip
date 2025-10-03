@@ -1,7 +1,7 @@
 ; FIXME: license, for now defaults to Copyright (C) Miaou 2025
 
 .program libcicada
-.side_set 1 opt ; FIXME: can get one more bit without opt
+.side_set 1
 
 ;.lang_opt python sideset_init = 1  ; we could generate the python, but this requires an additional target in the CMakeLists and calling pioasm manually
 
@@ -20,29 +20,43 @@
 ; 23      -> 4.348
 ; ... 31 needs 5 bits
 
-; FIXME: this program cannot pull more than 8 bits, while spec says we can
-;  Make a test program in C to see if it is the compiler or the state machine
+; To have good timing, knowing that the loop consumes x+1 cycles,
+;  we add preamble of 3 cycles, and postamble of 4 cycles, leaving time to cover all cases
+; side = 1     ------------------------
+; side = 0 ----                        --------------------
+;              === preamble
+;                 <==x+1 cycles===>
+;                        postamble ====
 decode:
-    out x, 8  ; Half wave length
-    mov isr, x  ; Use ISR as third scratch register
-    out y, 8  ; Number of repetitions
-    ;set y, 31
-    ;jmp !x, 'silence'
+    out x, 16       side 0 ; Half wave length, leave side=0 to not activate the buzzer
+    ;nop side 1 [4]
+    ;nop side 0 [4]
+    ;nop side 1 [4]
+    ;nop side 0 [4]
+    ;jmp !x, silence side 0  TODO
+    out y, 16       side 1 ; Number of repetitions, set side=1 because we won't block here
+    mov isr, x      side 1 ; Use ISR as third scratch register
+    jmp up          side 1 ; pin=1 for 3
 
-oscillate_1:
-    jmp x--, oscillate_1  side 1
+preup: ; come from down (repetitions)
+    nop             side 0 [1]  ; pin=0 for 3 +x+1 +4 (end of postamble)
+    nop             side 1 [2]  ; pin=1 for 3 (preamble)
+up:
+    jmp x--, up     side 1      ; pin=1 for 3 +x+1
+    mov x, isr      side 1      ; pin=1 for 3 +x+1 +1
+    nop             side 1 [2]  ; pin=1 for 3 +x+1 +4
 
-    mov x, isr
-oscillate_0:
-    jmp x--, oscillate_0  side 0
+    nop             side 0 [2]  ; pin=0 for 3
+down:
+    jmp x--, down   side 0      ; pin=0 for 3 +x+1
 
-    mov x, isr
-    jmp y--, oscillate_1
-    jmp decode
+    mov x, isr      side 0      ; pin=0 for 3 +x+1 +1
+    jmp y--, preup  side 0      ; pin=0 for 3 +x+1 +2
+    jmp decode      side 0      ; pin=0 for 3 +x+1 +3 will go to +4 with the first decode
 
 silence:
     jmp y--, silence  side 0 [7]
-    jmp decode
+    jmp decode      side 0
 
 
 % c-sdk {
@@ -64,7 +78,7 @@ static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pi
     //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     // Set the frequency of the SM
-    float div = clock_get_hz(clk_sys) / 200000;
+    float div = clock_get_hz(clk_sys) / 9600;
     sm_config_set_clkdiv(&c, div);
 
     // Load our configuration, and jump to the start of the program

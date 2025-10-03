@@ -13,7 +13,7 @@ int main() {
     uint offset;
 
     stdio_usb_init();
-    //
+
     // This will find a free pio and state machine for our program and load it for us
     // We use pio_claim_free_sm_and_add_program_for_gpio_range so we can address gpios >= 32 if needed and supported by the hardware
     bool success = pio_claim_free_sm_and_add_program_for_gpio_range(
@@ -26,7 +26,7 @@ int main() {
 
     libcicada_program_init(pio, sm, offset, LIBCICADA_BUZZ_PIN);
     printf("offset: %d\n", offset);
-    float div = clock_get_hz(clk_sys) / 200000;
+    float div = clock_get_hz(clk_sys) / 200000;  /* Not used, just for debug */
     printf("CPU %d Hz, div SM %f\n", clock_get_hz(clk_sys), div);
 
     // Set the state machine running
@@ -45,6 +45,22 @@ int main() {
     //bool pio_sm_is_exec_stalled (PIO pio, uint sm);
     //uint pio_sm_get_tx_fifo_level (PIO pio, uint sm);
     //uint8_t pio_sm_get_pc (PIO pio, uint sm)
+
+    // 8bit blob (space harrier), but at 9600 (debug)
+    while(true) {
+        //pio_sm_put_blocking(pio, sm, cica_word(cica_note(11, 255), cica_note(20, 255)));
+        //pio_sm_put_blocking(pio, sm, 23 | (2000<<16));
+        pio_sm_put_blocking(pio, sm, 12 | (13<<16));
+        //sleep_ms(100);
+        pio_sm_put_blocking(pio, sm, 32 | (6<<16));
+    }
+
+    // Pseudo mario ring
+    while(false) {
+        pio_sm_put_blocking(pio, sm, 59 | (200<<16));
+        pio_sm_put_blocking(pio, sm, 39 | (900<<16));
+        sleep_ms(1000);
+    }
 
 #define LEN 5
     for (int i=0; ; ++i) {

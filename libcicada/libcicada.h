@@ -5,8 +5,8 @@
 
 // FIXME: where to put that...
 #ifndef LIBCICADA_BUZZ_PIN
-#warning "Set LIBCICADA_BUZZ_PIN with cmake -D, defaults to 10"
-#define LIBCICADA_BUZZ_PIN 10
+#warning "Set LIBCICADA_BUZZ_PIN with cmake -D, defaults to 28"
+#define LIBCICADA_BUZZ_PIN 28
 #endif
 
 
