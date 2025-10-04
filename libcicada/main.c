@@ -1,6 +1,7 @@
 /* FIXME: license, for now defaults to Copyright (C) Miaou 2025 */
 
 #include <stdio.h>
+#include <stdlib.h> // rand
 #include "pico/stdlib.h"
 
 #include "libcicada.h"
@@ -24,61 +25,41 @@ int main() {
     );
     hard_assert(success);
 
+    // Setup the state machine and run it
     libcicada_program_init(pio, sm, offset, LIBCICADA_BUZZ_PIN);
-    printf("offset: %d\n", offset);
-    float div = clock_get_hz(clk_sys) / 200000;  /* Not used, just for debug */
-    printf("CPU %d Hz, div SM %f\n", clock_get_hz(clk_sys), div);
-
-    // Set the state machine running
-    printf("PC: %d\n", pio_sm_get_pc(pio, sm));
     pio_sm_set_enabled(pio, sm, true);
 
-    printf("PC: %d\n", pio_sm_get_pc(pio, sm));
-    //pio_sm_put/*_blocking*/(pio, sm, 0x80A0C0FF);  // Placed in the OSR as is represented here
-    //pio_sm_put_blocking(pio, sm, 0x80A0C0FF);
-    printf("put\n");
-    printf("PC: %d\n", pio_sm_get_pc(pio, sm));
-    sleep_ms(500);
-    printf("PC: %d\n", pio_sm_get_pc(pio, sm));
-
-    //bool pio_sm_is_tx_fifo_full (PIO pio, uint sm);
-    //bool pio_sm_is_exec_stalled (PIO pio, uint sm);
-    //uint pio_sm_get_tx_fifo_level (PIO pio, uint sm);
-    //uint8_t pio_sm_get_pc (PIO pio, uint sm)
-
-    // 8bit blob (space harrier), but at 9600 (debug)
-    while(false) {
-        //pio_sm_put_blocking(pio, sm, cica_word(cica_note(11, 255), cica_note(20, 255)));
-        //pio_sm_put_blocking(pio, sm, 23 | (2000<<16));
-        //pio_sm_put_blocking(pio, sm, 11 | (4<<16));
-        //pio_sm_put_blocking(pio, sm, 11 | (13<<16));
-        //pio_sm_put_blocking(pio, sm, 31 | (6<<16));
-    }
-
-    // Should produce 5263 Hz for 0.100 seconds and a pause of 1.000 secondes
-    while (true) {
-        pio_sm_put_blocking(pio, sm, 10 | (525<<16));
-        pio_sm_put_blocking(pio, sm, 0 | (12499<<16));
-    }
-
-    // Pseudo mario coin
-    while(false) {
-        pio_sm_put_blocking(pio, sm, 59 | (200<<16));
-        pio_sm_put_blocking(pio, sm, 39 | (900<<16));
-        sleep_ms(1000);
-    }
-
 #define LEN 5
-    for (int i=0; ; ++i) {
-        // Silence is max 255*8 * 5µs = 10ms
-        pio_sm_put_blocking(pio, sm, cica_word(cica_note(23, LEN), cica_note(22, LEN)));
-        pio_sm_put_blocking(pio, sm, cica_word(cica_note(19, LEN), cica_note(19, LEN)));
+    /*for (int i=0; ; ++i) {
+        // Silence is max 256*16 * 5µs = 20ms
+        pio_sm_put_blocking(pio, sm, cica_word(cica_note(10, LEN), cica_note(13, LEN)));
+        pio_sm_put_blocking(pio, sm, cica_word(cica_note(11, LEN), cica_note(12, LEN)));
         //pio_sm_put_blocking(pio, sm, cica_work(cica_silence(255), cica_silence(255)));
-        pio_sm_put_blocking(pio, sm, cica_word(cica_silence(0), cica_silence(30)));
+        //pio_sm_put_blocking(pio, sm, cica_word(cica_silence(0), cica_silence(30)));
 
-        if ((i%30) == 0) {
+        if ((i%20) == 0) {
             for (int j=0; j<6; ++j)
                 pio_sm_put_blocking(pio, sm, cica_word(cica_silence(255), cica_silence(255)));
+        }
+    }*/
+    for (int i=0;;++i) {
+        // With len 5, notes are around 1ms long each, so a word covers around 4ms...
+        //  So we need to do this 250 times per second
+        // And filling the FIFO (4 words) covers us for 12 more ms so we "only" need to do this @ 63 fps
+        pio_sm_put_blocking(pio, sm, cica_word(
+            cica_note(9+rand()%6, LEN),
+            cica_note(11+rand()%4, LEN),
+            cica_note(8+rand()%2, LEN),
+            cica_note(10+rand()%6, LEN)
+        ));
+
+        if ((i%35) == 0) {
+            pio_sm_put_blocking(pio, sm, cica_word(
+                cica_silence(15),
+                cica_silence(15),
+                cica_silence(15),
+                cica_silence(15)
+            ));
         }
     }
 }

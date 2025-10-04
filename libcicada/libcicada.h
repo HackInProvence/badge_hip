@@ -10,9 +10,10 @@
 #endif
 
 
-uint16_t cica_note(uint8_t note, uint8_t len);
-uint16_t cica_silence(uint8_t len);
-uint32_t cica_word(uint16_t note_a, uint16_t note_b);
+// TODO: Doc, see .pio for now...
+uint8_t cica_note(uint8_t note, uint8_t len);
+uint8_t cica_silence(uint8_t len);
+uint32_t cica_word(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 
 
 #endif /* LIBCICADA_H */

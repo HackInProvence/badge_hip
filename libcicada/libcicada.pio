@@ -1,5 +1,8 @@
 ; FIXME: license, for now defaults to Copyright (C) Miaou 2025
 
+; The rate at which the machine runs
+.define PUBLIC CLOCK 200000
+
 .program libcicada
 .side_set 1
 
@@ -18,7 +21,21 @@
 ; 21      -> 4.761
 ; 22      -> 4.545
 ; 23      -> 4.348
-; ... 31 needs 5 bits
+
+; With clk the frequency of the PIO:
+;  freq = clk/(2*(x+9)) in Hz,
+;  duration = (y+1)*2*(x+9)/clk in seconds.
+; To produce a sound of freq and duration:
+;  x = clk/(2*f) - 9
+;  y = duration*freq - 1
+; To stay silent:
+;  x = 0
+;  duration ~ 512*(y+1)/clk ~= (y+1)*2.56ms (< 41ms)
+;  hence y = (duration*clk)/512 - 1 (must be < 16)
+
+; With 4 bits for x: we can go from clk/(2*(15+9))=4.2kHz to clk/(2*(1+9))=10kHz
+; With 4 bits for y and x=11 (5kHz): we can go from 0.2ms to 3.2ms
+; We can stack 4 (x,y) per FIFO word and 4 others in the queue.
 
 ; To have good timing, knowing that the loop consumes x+1 cycles,
 ;  we add preamble of 3 cycles, and postamble of 5 cycles, leaving time to cover all cases
@@ -27,20 +44,10 @@
 ;              === preamble
 ;                 <==x+1 cycles===>
 ;                        postamble =====
-
-; With clk the frequency of the PIO:
-;  freq = clk/(2*(x+9)) in Hz,
-;  duration = (y+1)*2*(x+9)/clk in seconds.
-; To produce a sound of freq and duration:
-;  x = clk/(2*f) - 9
-;  y = duration*freq - 1
-; To silence:
-;  x = 0
-;  duration = (16*(y+1)+3)/clk hence y = (duration*clk-3)/16 - 1
 decode:
-    out x, 16       side 0 ; Half wave length, leave side=0 to not activate the buzzer
+    out x, 4        side 0 ; Half wave length, leave side=0 to not activate the buzzer
     jmp !x, silence side 0
-    out y, 16       side 1 ; Number of repetitions, set side=1 because we won't block here
+    out y, 4        side 1 ; Number of repetitions, set side=1 because we won't block here
     mov isr, x      side 1 ; Use ISR as third scratch register
     jmp up          side 1 ; pin=1 for 3
 
@@ -61,9 +68,15 @@ down:
     jmp decode      side 0      ; pin=0 for 3 +x+1 +3 will go to +5
 
 silence:
-    out y, 16       side 0 ; Number of repetitions
-siloop:
-    jmp y--, siloop side 0 [15] ; 16*(y+1) + 3
+    out y, 4        side 0      ; Number of repetitions
+    mov isr, y      side 0      ; Keep y to be able to repeat this subloop
+    set x, 31       side 0      ; Also loop 32 times to lengthen silences to 2.56ms per y
+silx:
+    mov y, isr      side 0
+sily:
+    jmp y--, sily   side 0 [15] ; ~ 16*(y+1)*32 = 512*(y+1)
+    jmp x--, silx   side 0
+    irq 0           side 0      ; Notify the core that we finished waiting in silence
     jmp decode      side 0
 
 
@@ -86,7 +99,7 @@ static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pi
     //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     // Set the frequency of the SM
-    float div = clock_get_hz(clk_sys) / 200000;  // TODO put this clock in a define
+    float div = clock_get_hz(clk_sys) / CLOCK;
     sm_config_set_clkdiv(&c, div);
 
     // Load our configuration, and jump to the start of the program
