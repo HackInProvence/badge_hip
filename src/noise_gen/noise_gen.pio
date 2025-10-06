@@ -1,9 +1,9 @@
 ; FIXME: license, for now defaults to Copyright (C) Miaou 2025
 
 ; The rate at which the machine runs
-.define PUBLIC CLOCK 200000
+.define PUBLIC NOISE_GEN_CLOCK 200000
 
-.program libcicada
+.program noise_gen
 .side_set 1
 
 ;.lang_opt python sideset_init = 1  ; we could generate the python, but this requires an additional target in the CMakeLists and calling pioasm manually
@@ -86,8 +86,8 @@ sily:
 
 % c-sdk {
 #include "hardware/clocks.h"
-static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pin) {
-    pio_sm_config c = libcicada_program_get_default_config(offset);
+static inline void noise_gen_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = noise_gen_program_get_default_config(offset);
 
     // side should output on pin
     sm_config_set_sideset_pin_base(&c, pin);
@@ -103,7 +103,7 @@ static inline void libcicada_program_init(PIO pio, uint sm, uint offset, uint pi
     //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
 
     // Set the frequency of the SM
-    float div = clock_get_hz(clk_sys) / CLOCK;
+    float div = clock_get_hz(clk_sys) / NOISE_GEN_CLOCK;
     sm_config_set_clkdiv(&c, div);
 
     // Load our configuration, and jump to the start of the program

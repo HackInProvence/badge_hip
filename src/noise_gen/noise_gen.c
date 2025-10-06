@@ -6,7 +6,7 @@
 #include "hardware/gpio.h"
 #include "pico/rand.h"
 
-#include "libcicada.h"
+#include "noise_gen.h"
 
 
 // Configured state machine which runs our program
@@ -21,7 +21,7 @@ static uint rem_rand_bits = 0;
 // Refills the program's FIFO when needed
 // Called by interrupts
 //typedef void(* irq_handler_t) (void)
-void libcicada_fill_fifo() {
+void noise_gen_cicada() {
     // We can't be blocking here, but we should have time to do a get_rand (<20µs according to doc)
 
     // while or if is the same here, as exiting this without filling the FIFO will call this method again...
@@ -63,7 +63,7 @@ void libcicada_fill_fifo() {
 }
 
 
-void libcicada_setup(PIO pio, uint sm, irq_handler_t sound_gen) {
+void noise_gen_setup(PIO pio, uint sm, irq_handler_t sound_gen) {
     int8_t irq_pio;
     pio = pio;
     sm = sm;
@@ -100,16 +100,16 @@ void libcicada_setup(PIO pio, uint sm, irq_handler_t sound_gen) {
 }
 
 
-void libcicada_init_play(void)
+void noise_gen_init_play(void)
 {
     uint offset;
 
     // This will find a free pio and state machine for our program and load it for us
     // We use pio_claim_free_sm_and_add_program_for_gpio_range so we can address gpios >= 32 if needed and supported by the hardware
     bool success = pio_claim_free_sm_and_add_program_for_gpio_range(
-        &libcicada_program,
+        &noise_gen_program,
         &pio, &sm, &offset,
-        LIBCICADA_BUZZ_PIN, 1 /* count */,
+        NOISE_GEN_BUZZ_PIN, 1 /* count */,
         true  /* bool set_gpio_base */
     );
     hard_assert(success);
@@ -118,15 +118,15 @@ void libcicada_init_play(void)
     (void) get_rand_64();
 
     // Setup the state machine now because we need pio and sm for interrupts
-    libcicada_program_init(pio, sm, offset, LIBCICADA_BUZZ_PIN);
+    noise_gen_program_init(pio, sm, offset, NOISE_GEN_BUZZ_PIN);
 
-    libcicada_setup(pio, sm, libcicada_fill_fifo);
-    libcicada_set_enabled(true);
+    noise_gen_setup(pio, sm, noise_gen_cicada);
+    noise_gen_set_enabled(true);
 }
 
 
-void libcicada_set_enabled(bool enabled) {
+void noise_gen_set_enabled(bool enabled) {
     if (enabled)
-        pio_gpio_init(pio, LIBCICADA_BUZZ_PIN);  /* In case the GPIO was set to PWM for other uses */
+        pio_gpio_init(pio, NOISE_GEN_BUZZ_PIN);  /* In case the GPIO was set to PWM for other uses */
     pio_sm_set_enabled(pio, sm, enabled);
 }

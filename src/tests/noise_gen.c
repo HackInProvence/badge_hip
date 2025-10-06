@@ -4,16 +4,16 @@
 
 #include "pico/stdlib.h"
 
-#include "libcicada.h"
+#include "noise_gen.h"
 
 
 int main() {
     stdio_usb_init();
-    libcicada_init_play();
+    noise_gen_init_play();
     while(true) {
         sleep_ms(2000);
-        libcicada_set_enabled(false);
+        noise_gen_set_enabled(false);
         sleep_ms(1000);
-        libcicada_set_enabled(true);
+        noise_gen_set_enabled(true);
     }
 }

@@ -1,0 +1,28 @@
+# FIXME: license, for now defaults to Copyright (C) Miaou 2025
+
+# Use with cmake -DPICO_BOARD=pico_w
+#  or cmake -DPICO_PLATFORM=rp2040
+#  or cmake -DPICO_NO_FLASH=1
+#  -Gninja -DCMAKE_BUILD_TYPE=Debug
+# SDK is in $PICO_SDK_PATH
+
+cmake_minimum_required(VERSION 3.13)
+include(src/pico_sdk_import.cmake)
+project(secsea C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
+#set(PICO_BOARD pico)
+#set(PICO_BOOT_STAGE2_FILE ${PICO_SDK_PATH}/src/rp2040/boot_stage2/boot2_generic_03h.S)
+
+# If you want debug output from USB (pass -DPICO_STDIO_USB=1) this ensures you don't lose any debug output while USB is set up
+if (NOT DEFINED PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
+    set(PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 3000)
+endif()
+
+pico_sdk_init()
+
+# Set the optimization level
+#set(CMAKE_C_FLAGS_RELEASE "-O1")
+
+add_subdirectory(src)
