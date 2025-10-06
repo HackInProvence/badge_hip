@@ -44,6 +44,11 @@
 ;              === preamble
 ;                 <==x+1 cycles===>
 ;                        postamble =====
+; first preamble (first 1): decode y, save x, start up
+; 1 -> 0: postamble resets x, preamble unused
+; 0 -> 1: postamble resets x and jumps, preamble unused
+; last 0: postamble resets x + decode next x
+; silences are flat 0 and don't require precise timings
 decode:
     out x, 4        side 0 ; Half wave length, leave side=0 to not activate the buzzer
     jmp !x, silence side 0
@@ -57,7 +62,7 @@ preup: ; come from down (repetitions)
 up:
     jmp x--, up     side 1      ; pin=1 for 3 +x+1
     mov x, isr      side 1      ; pin=1 for 3 +x+1 +1
-    nop             side 1 [3]  ; pin=1 for 3 +x+1 +5
+    nop             side 1 [3]  ; pin=1 for 3 +x+1 +5 (postamble)
 
     nop             side 0 [2]  ; pin=0 for 3 (preamble)
 down:
@@ -76,7 +81,6 @@ silx:
 sily:
     jmp y--, sily   side 0 [15] ; ~ 16*(y+1)*32 = 512*(y+1)
     jmp x--, silx   side 0
-    irq 0           side 0      ; Notify the core that we finished waiting in silence
     jmp decode      side 0
 
 

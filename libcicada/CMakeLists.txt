@@ -37,8 +37,9 @@ pico_generate_pio_header(test_cicada ${CMAKE_CURRENT_LIST_DIR}/libcicada.pio)
 pico_add_extra_outputs(test_cicada)
 
 target_link_libraries(test_cicada PRIVATE
+    hardware_pio
+    pico_rand
     pico_stdlib
-    hardware_pio  # ?
 )
 
 # enable usb output, disable uart output
