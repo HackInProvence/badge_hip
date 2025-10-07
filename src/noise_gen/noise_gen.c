@@ -9,6 +9,7 @@
 #include "hardware/gpio.h"
 #include "pico/rand.h"
 
+#include "badge_pinout.h"
 #include "noise_gen.h"
 
 
@@ -112,7 +113,7 @@ void noise_gen_init_play(void)
     bool success = pio_claim_free_sm_and_add_program_for_gpio_range(
         &noise_gen_program,
         &pio, &sm, &offset,
-        NOISE_GEN_BUZZ_PIN, 1 /* count */,
+        BADGE_BUZZER, 1 /* count */,
         true  /* bool set_gpio_base */
     );
     hard_assert(success);
@@ -121,7 +122,7 @@ void noise_gen_init_play(void)
     (void) get_rand_64();
 
     // Setup the state machine now because we need pio and sm for interrupts
-    noise_gen_program_init(pio, sm, offset, NOISE_GEN_BUZZ_PIN);
+    noise_gen_program_init(pio, sm, offset, BADGE_BUZZER);
 
     noise_gen_setup(pio, sm, noise_gen_cicada);
     noise_gen_set_enabled(true);
@@ -130,6 +131,6 @@ void noise_gen_init_play(void)
 
 void noise_gen_set_enabled(bool enabled) {
     if (enabled)
-        pio_gpio_init(pio, NOISE_GEN_BUZZ_PIN);  /* In case the GPIO was set to PWM for other uses */
+        pio_gpio_init(pio, BADGE_BUZZER);  /* In case the GPIO was set to PWM for other uses */
     pio_sm_set_enabled(pio, sm, enabled);
 }

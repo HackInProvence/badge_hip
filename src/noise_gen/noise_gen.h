@@ -6,12 +6,6 @@
 #ifndef _NOISE_GEN_H
 #define _NOISE_GEN_H
 
-// TODO: move me to the board definition
-#ifndef NOISE_GEN_BUZZ_PIN
-#warning "Set NOISE_GEN_BUZZ_PIN with cmake -D, defaults to 28"
-#define NOISE_GEN_BUZZ_PIN 28
-#endif
-
 #include "noise_gen.pio.h"
 
 
