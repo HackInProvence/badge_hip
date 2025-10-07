@@ -3,20 +3,21 @@
 # To view a copy of this license,
 # visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-# Use with cmake -DPICO_BOARD=pico_w
-#  or cmake -DPICO_PLATFORM=rp2040
+# Use with cmake -DPICO_BOARD=pico_w or badge
 #  or cmake -DPICO_NO_FLASH=1
 #  -Gninja -DCMAKE_BUILD_TYPE=Debug
 # SDK is in $PICO_SDK_PATH
 
 cmake_minimum_required(VERSION 3.13)
+
+# Tell the SDK where to find our board header (badge_secsea),
+#  but leave the choice between using it or not (mainly because I develop on pico_w for now...)
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src)
 include(src/pico_sdk_import.cmake)
+
 project(secsea C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
-
-#set(PICO_BOARD pico)
-#set(PICO_BOOT_STAGE2_FILE ${PICO_SDK_PATH}/src/rp2040/boot_stage2/boot2_generic_03h.S)
 
 # If you want debug output from USB (pass -DPICO_STDIO_USB=1) this ensures you don't lose any debug output while USB is set up
 if (NOT DEFINED PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
