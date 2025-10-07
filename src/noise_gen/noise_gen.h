@@ -1,4 +1,7 @@
-/* FIXME: license, for now defaults to Copyright (C) Miaou 2025 */
+/* badge_secsea © 2025 by Hack In Provence is licensed under
+ * Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+ * To view a copy of this license,
+ * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 #ifndef _NOISE_GEN_H
 #define _NOISE_GEN_H
