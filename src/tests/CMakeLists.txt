@@ -14,6 +14,22 @@ pico_enable_stdio_usb(test_noise_gen 1)
 pico_enable_stdio_uart(test_noise_gen 0)
 
 
+# Test music
+
+add_executable(test_music)
+target_sources(test_music PRIVATE music.c)
+pico_add_extra_outputs(test_music)
+
+target_link_libraries(test_music PRIVATE
+    pico_stdlib
+    music
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_music 1)
+pico_enable_stdio_uart(test_music 0)
+
+
 ## Test template
 #
 #add_executable(test_template)

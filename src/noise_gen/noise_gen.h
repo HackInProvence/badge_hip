@@ -15,7 +15,9 @@ void noise_gen_init_play(void);
 /* \brief Enable/suspend sound effects.
  *
  * You can use the GPIO for other purposes when not \p enabled,
- * and this call will re-assign the GPIO to the PIO when \p enabled.*/
+ * and this call will re-assign the GPIO to the PIO when \p enabled.
+ *
+ * As noise generation and music share the same buzzer, they should not be both enabled. */
 void noise_gen_set_enabled(bool enabled);
 
 /* \brief Configure the sound engine to tell which PIO and sound generation function to use and setups IRQ.

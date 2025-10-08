@@ -159,7 +159,7 @@ On peut les flasher et bidouiller leur `main` pour tester divers paramètres, aj
 Les modules développés dans ce projet font l'hypothèse que **le logiciel ne bloque jamais**.
 Comme il n'y a pas d'OS pour gérer la bascule entre plusieurs tâche,
 c'est de *la responsabilité de chaque module de rendre la main régulièrement*.
-Il est interdit par exemple d'utiliser les fonctions `*_blocking` comme `pio_sm_put_blocking`.
+Il est interdit par exemple d'utiliser les fonctions `*_blocking` comme `pio_sm_put_blocking` ou `sleep_ms`.
 
 Le but est que la fonction `main` boucle sur les actions courantes à traiter pour chaque module,
 et que chaque module puisse réagir aux événements entre 50 et 100 fois par secondes au moins.
