@@ -15,6 +15,11 @@
 
 # Hardware
 
+La conception est faite sous KiCad.
+Les fichiers projets seront dans le dossier `hardware`.
+
+Pour l'instant, on trouve le fichier `ProPrj_*.pdf` qui donne le schéma électrique du badge.
+
 
 # Software
 
