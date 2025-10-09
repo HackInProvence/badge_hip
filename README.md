@@ -1,6 +1,6 @@
 # Badge SecSea 2025
 
-![](imgs/badge_HIP_secsea.webp)
+![](imgs/badge_front.webp)
 
 - base RP2040 (Raspberry Pi Pico),
 - flash 16Mo,
@@ -191,4 +191,3 @@ L'idée est d'ajouter des bibliothèques pour chaque nouveau module, comme conse
 C'est une bibliothèque au sens CMake, c'est à dire une `INTERFACE` et le code de l'application utilisera cette interface pour trouver le code à utiliser pour votre module.
 C'est comme ça que fonctionne le SDK, et seul les abstractions nécessaires au projet sont compilées.
 Ce n'est donc pas une bibliothèque au sens C/C++ (code précompilé et assemblé dans un `.so` ou une `.dll`).
-
