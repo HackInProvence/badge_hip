@@ -240,7 +240,16 @@ et presser le bout du jack contre le pin 28.
 
 **Attention** : ne pas mettre les écouteurs dans les oreilles, le volume est très fort.
 
-Pour tester ce montage, allez voir les deux exécutables de test : `tests/noise_gen.c` et `tests/music.c`.
+Pour tester ce montage, allez voir les deux exécutables de test : [`tests/noise_gen.c`](../src/tests/noise_gen.c) et [`tests/music.c`](../src/tests/music.c).
+
+Pour la musique, imaginez comment modifier la lib pour passer une callback dans `userdata` géré par `alarm`.
+Ainsi, on peut compter les notes, et laisser la possibilité de synchroniser d'autres éléments avec le son :
+
+- les LEDs,
+- les paroles sur l'UART.
+
+Concevez un système similaire pour `noise_gen`.
+Il s'agît surtout de séparer les silences des bruits...
 
 
 ## Pilotage de LEDs (WS2812)
@@ -252,19 +261,36 @@ Vous pouvez cependant utiliser *VSYS* ou une alimentation externe.
 Comme chaque LED consomme de l'ordre de 80mA, et que l'USB fournit 500mA mais que le pico peut en consommer 100,
 il est préférable de **ne pas dépasser 5 LEDs**.
 
-TODO
+Basez-vous sur l'[exemple Pico WS2812](https://github.com/raspberrypi/pico-examples/blob/master/pio/ws2812/ws2812.c).
+Notez également que la bibliothèque `pico/status_led` du SDK sait piloter une WS2812.
+
+Commencez par comprendre comment fonctionne le C.
+Dans un premier temps, supposez que la machine à état définie dans le fichier `.pio` est une boîte noire qui prend ses données quelque part et les pousse vers le ruban de LED.
+Notez une fonction `pio_sm_put_blocking`, il s'agît de la fonction poussant les données au PIO.
+
+Remplacez la boucle `while` par un code plus simple permettant de régler la couleur de 2 LEDs.
+Essayez divers couleurs.
+Essayez de faire "vibrer" les yeux de la cigale.
+
+Idéalement, avec le son émit par `noise_gen`...
 
 
 ## Pilotage écran e-Paper
 
-TODO
+Je n'ai pas encore trouvé de bibliothèque pour piloter l'écran depuis le RP2040 en C.
+
+Il existe cependant des solutions Arduino qui devraient fonctionner,
+comme celle présentée [sur le site du constructeur](https://www.waveshare.com/wiki/1.54inch_e-Paper_Module_Manual).
+A tester !
 
 
 ## Pilotage RF (CC1101)
 
 Le module RF CC1101 est configurable en SPI.
 
-TODO
+De la même manière, il existe plusieurs bibliothèques, mais pas en C pour le RP2040.
+A tester, comprendre, et réaliser un premier exemple,
+idéalement accompagné d'un flipper !
 
 
 ## Challenge Ph0wn 2025
