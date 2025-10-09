@@ -14,6 +14,7 @@
 #define NEVEGONA {NOTE_D5, 1.f/4}, {NOTE_E5, 1.f/4}, {NOTE_G5, 1.f/4}, {NOTE_E5, 1.f/4}
 const Note rick[] = {
     // TODO: *60/114
+    SIL, SIL, /* FIXME: trying to fix some delays */
     // Never gonna
     NEVEGONA,
     // give you up Never gonna
@@ -36,18 +37,23 @@ const Note rick[] = {
     {}
 };
 
-void printstatus(void);
 int main() {
     stdio_usb_init();
 
     music_init();
-    printf("init\n");
-    music_set_melody(rick, 35.);
-    printf("set\n");
-    music_set_enabled(true);
-    printf("play rick=%p\n", rick);
+
+    bool enab = music_set_enabled(true);
+    printf("first enab %d\n", enab);  /* Should be false */
+
+    /* FIXME: the first notes are skipped/too fast... */
+    music_set_melody(rick, 114.);
+    enab = music_set_enabled(true);
+
+    printf("queue & enab %d\n", enab);  /* Should be true */
     while (true) {
-        printstatus();
         sleep_ms(300);
+        printf("is_playing %d\n", music_is_playing());
+        if(! music_is_playing())
+            music_set_melody(rick, 114.);  /* We don't need enable() */
     }
 }

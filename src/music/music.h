@@ -18,16 +18,20 @@ void music_init(void);
  * You can use the GPIO for other purposes when not \p enabled,
  * and this call will re-assign the GPIO to the PWM when \p enabled.
  *
- * As noise generation and music share the same buzzer, they should not be both enabled. */
-void music_set_enabled(bool enabled);
+ * As noise generation and music share the same buzzer, they should not be both enabled.
+ *
+ * To enable, there must be queued notes. */
+bool music_set_enabled(bool enabled);
 
-/* \brief Replace the current melody and queue this one instead (play it if music is enabled)
+/* \brief Replace the current melody and queue this one instead.
+ *
+ * Enables the melody if disabled.
  *
  * \param notes (borrowed) Must be ended by a 0-note which cancels the melody
  * \param beat In beats per minutes */
 void music_set_melody(const Note *notes, float beat);
 
-bool music_is_empty(void);
+bool music_is_playing(void);
 
 
 /* ------ DEFINITIONS OF THE NOTES ------ */

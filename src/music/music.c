@@ -39,41 +39,56 @@ int64_t next_note(alarm_id_t id, void *user_data) {
 
     // Compute how long this silence or note lasts
     // (a 0 duration also cancels the timer)
-    return -(int64_t)(1e6f * cur_notes->duration * cur_beat/60.f);
+    return -(int64_t)(1e6f * cur_notes->duration * 60.f/cur_beat);
 }
 
 
 void music_init(void) {
+    if (slice_num != -1)
+        return; // Already initialized
+
     // Get the slice and configure it
     slice_num = pwm_gpio_to_slice_num(BADGE_BUZZER);
     float div = clock_get_hz(clk_sys) / TARGET_PWM_HZ;
-    printf("div=%f\n", div);
+    //printf("div=%f\n", div);
     pwm_set_clkdiv(slice_num, div);
 }
 
-void music_set_enabled(bool enabled){
+/* Handles the alarms to resume or pause the player, returns whether the alarm was set */
+bool _resume(bool enabled) {
     if (enabled) {
-        gpio_set_function(BADGE_BUZZER, GPIO_FUNC_PWM);
+        if (! cur_notes)
+            return false;  /* Nothging to play, next_note(NULL) would fail */
         if (aid)
             cancel_alarm(aid);
-        aid = add_alarm_in_us(0, next_note, NULL, true); /* TODO: test aid > 0 */
+        aid = add_alarm_in_us(0, next_note, NULL, true);
     } else {
         if (aid)
             cancel_alarm(aid);
         aid = 0;
     }
+    return aid > 0;
+}
+
+bool music_set_enabled(bool enabled){
+    if (enabled)
+        gpio_set_function(BADGE_BUZZER, GPIO_FUNC_PWM);
+    bool res = _resume(enabled);
     pwm_set_enabled(slice_num, enabled);
+    return res;
 }
 
 void music_set_melody(const Note *notes, float beat) {
+    if (! notes)
+        return;
+
     cur_beat = beat;
     cur_notes = notes;
+    if (! aid) {
+        music_set_enabled(true);  /* TODO: test the returned value? */
+    }
 }
 
-bool music_is_empty(void) {
-    return cur_notes == NULL;
-}
-
-void printstatus(void) {
-    printf("cur_notes=%p, alarm_id = %u\n", cur_notes, aid);
+bool music_is_playing(void) {
+    return cur_notes != NULL && aid != 0;
 }
