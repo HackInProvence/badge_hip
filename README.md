@@ -98,12 +98,12 @@ Ce dépôt contient le code de l'application du badge et ses dépendances suppl�
 ### Ligne de commande
 
 ```bash
-export PICO_SDK_PATH="$PWD/pico/pico-sdk"  # A remplacer par votre chemin d'installation
-cd src
+export PICO_SDK_PATH="$PWD/pico-sdk"  # A remplacer par votre chemin d'installation
+cd pico-examples
 mkdir -p build
 cd build
 cmake .. -DPICO_BOARD=pico_w  # Pour l'instant je travaille sur une pico_w
-cmake -Gninja --build . --target all
+cmake -GNinja --build . --target all
 ```
 
 Pour flasher, commencer par booter le badge en mode flash :
