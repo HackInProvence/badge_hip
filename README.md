@@ -102,8 +102,8 @@ export PICO_SDK_PATH="$PWD/pico-sdk"  # A remplacer par votre chemin d'installat
 cd pico-examples
 mkdir -p build
 cd build
-cmake .. -DPICO_BOARD=pico_w  # Pour l'instant je travaille sur une pico_w
-cmake -GNinja --build . --target all
+cmake .. -GNinja -DPICO_BOARD=pico_w  # Pour l'instant je travaille sur une pico_w
+cmake --build . --target all
 ```
 
 Pour flasher, commencer par booter le badge en mode flash :
