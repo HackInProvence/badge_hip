@@ -13,10 +13,12 @@
 int main() {
     stdio_usb_init();
     noise_gen_init_play();
-    //while(true) {
+    noise_gen_set_enabled(true);
+    while(true) {
     //    sleep_ms(2000);
     //    noise_gen_set_enabled(false);
-    //    sleep_ms(1000);
-    //    noise_gen_set_enabled(true);
-    //}
+        // FIXME: does not stay enabled
+        sleep_ms(1000);
+        noise_gen_set_enabled(true);
+    }
 }
