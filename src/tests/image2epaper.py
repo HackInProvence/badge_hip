@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+
+# badge_secsea © 2025 by Hack In Provence is licensed under
+# Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+# To view a copy of this license,
+# visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+"""
+Small script to convert source images to C-source buffers that can be compiled and directly sent to the e-Paper module.
+"""
+
+import argparse
+import os
+import sys
+
+try:
+    from PIL import Image
+except ImportError:
+    print("This script requires the PIL library")
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Convert images using PIL to C source')
+    parser.add_argument('image', help='path to source image')
+    parser.add_argument('--output', '-o', nargs='?', default=None, help='output to this instead of stdout')
+    args = parser.parse_args()
+
+    eprint = lambda *args, **kwargs: print(*args, file=sys.stderr, **kwargs)
+    if args.image == args.output:
+        eprint('output should not be the same file as input')  # Avoids overwrites
+        sys.exit(1)
+
+    # Avoid special chars for the name of the buffer, but please don't push it (é is alnum for python but might not work in names)
+    buffer_name,_ = os.path.splitext(os.path.basename(args.image))
+    buffer_name = ''.join(c if c.isalnum() else '_' for c in buffer_name)
+    if buffer_name[0].isnumeric():
+        buffer_name = '_'+buffer_name
+    eprint('buffer name will be', buffer_name)
+
+    header_name = f'_{buffer_name.upper()}_H'
+
+    img = Image.open(args.image)
+    if img.palette is None or len(img.palette.colors) not in (2, 4):
+        eprint('input image should be 2 or 4 colors (Palette mode or Indexed colors)')
+        sys.exit(1)
+
+    # Check that colors in palette are sorted by grayness
+    pal = img.palette
+    ml = len(pal.mode)
+    colors = [sum(pal.palette[i:i+ml]) for i in range(0, len(pal.palette), ml)]
+    if colors != sorted(colors):
+        eprint('WARNING: palette of the input image is not sorted by increasing whiteness; rendering may end up very strange')
+
+    pixels = img.load()
+
+    # Pack bits (8 bits per bytes instead of 1 pixel per byte)
+    width,height = img.size
+    if width != 200 or height != 200:  # We do this script only for this screen after all...
+        print('Image should be 200x200')
+    w8 = width//8 + (1 if width%8 else 0)
+    # Split the image in 2 planes: the MSB (put in the Red RAM) and LSB (put in B/W RAM)
+    bufs = [bytearray(w8*height), bytearray(w8*height)]
+    for j in range(height):
+        for i in range(width):
+            msb = pixels[i,j]>>1
+            lsb = pixels[i,j]&1
+            bufs[0][j*w8 + i//8] |= lsb << (7-(i%8))
+            bufs[1][j*w8 + i//8] |= msb << (7-(i%8))
+
+    # Open destination on last minute to avoid overwrites
+    if args.output is None:
+        dest = sys.stdout
+    else:
+        dest = open(args.output, 'w')  # Yes, we don't close it, such rebels!
+        eprint('write to file', args.output)
+    fprint = lambda *args, **kwargs: print(*args, file=dest, **kwargs)
+
+    fprint(rf'''
+/* badge_secsea © 2025 by Hack In Provence is licensed under
+ * Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.
+ * To view a copy of this license,
+ * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
+
+#ifndef {header_name}
+#define {header_name}
+
+#include <stddef.h>
+'''.strip())
+
+    # Only output the LSB plane when we have 2 colors
+    if len(pal.colors) == 2:
+        fprint()
+        fprint(f'/* {parser.prog} transformed {args.image} in 1 plane */')
+        fprint(f'const uint8_t {buffer_name}[] = \\')
+        for j in range(0, w8*height, 16):
+            line = ''.join(f'\\x{v:02X}' for v in bufs[0][j: j+16])
+            fprint(f'    "{line}" \\')
+        fprint(';')
+    else:
+        fprint()
+        fprint(f'/* {parser.prog} transformed {args.image} in 2 planes */')
+        fprint(f'const uint8_t {buffer_name}_lsb[] = \\')
+        for j in range(0, w8*height, 16):
+            line = ''.join(f'\\x{v:02X}' for v in bufs[0][j: j+16])
+            fprint(f'    "{line}" \\')
+        fprint(';')
+        fprint(f'const uint8_t {buffer_name}_msb[] = \\')
+        for j in range(0, w8*height, 16):
+            line = ''.join(f'\\x{v:02X}' for v in bufs[1][j: j+16])
+            fprint(f'    "{line}" \\')
+        fprint(';')
+
+    fprint(f'\n#endif /* {header_name} */')

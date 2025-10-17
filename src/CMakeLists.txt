@@ -1,4 +1,5 @@
 add_subdirectory(noise_gen)
 add_subdirectory(music)
+add_subdirectory(screen)
 #add_subdirectory(template)
 add_subdirectory(tests)

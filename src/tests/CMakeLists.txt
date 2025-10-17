@@ -30,6 +30,24 @@ pico_enable_stdio_usb(test_music 1)
 pico_enable_stdio_uart(test_music 0)
 
 
+# Test screen
+
+add_executable(test_screen)
+target_sources(test_screen PRIVATE screen.c)
+pico_add_extra_outputs(test_screen)
+
+target_link_libraries(test_screen PRIVATE
+    hardware_gpio
+    hardware_spi
+    pico_stdlib
+    screen
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_screen 1)
+pico_enable_stdio_uart(test_screen 0)
+
+
 ## Test template
 #
 #add_executable(test_template)

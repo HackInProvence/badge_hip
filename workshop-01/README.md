@@ -283,6 +283,23 @@ Il existe cependant des solutions Arduino qui devraient fonctionner,
 comme celle présentée [sur le site du constructeur](https://www.waveshare.com/wiki/1.54inch_e-Paper_Module_Manual).
 A tester !
 
+Mapping des pins pour le prg Arduino et vérif.
+Il faut suivre dans les sources les `#define` dans les sources du projet Arduino + les headers d'adaptation pour le RP2040 + vérif la spec RP2040 éventuellement...
+
+- VCC -> 3V3 plutôt que VSYS qui est à 5V
+- GND
+- DIN -> 19 : la lib n'utilise que Tx, donc MOSI, qui est `PIN_SPI0_MOSI = 19` (c'est bien ce pin sur le RP2040)
+- SCK -> 18 : `PIN_SPI0_SCK = 18` (ou 22 d'après la datasheet, mais c'est 18 qui est set par la lib sur cette fonction)
+- CS -> 17 : `PIN_SPI0_SS = 17` (pourquoi `_SS` ? parce que SSPFSSOUT),
+  attention dans `EpdIF`, on bagote le CS à la main, et ce n'est pas le bon pin dans le epdif.h
+  -> il faut ne pas utiliser ce pin, car `spi_` du RP2040 s'occupe du CS,
+  -> mais comme epdif s'en sert, il faut ne rien mettre dessus.
+- DC -> 9 : `DC_PIN` dans `epdif.h`
+- RST -> 8 : `RST_PIN` dans `epdif.h`
+- BUSY -> 7 : `BUSY_PIN` dans `epdif.h`
+
+Il semble qu'on soit en frame format Motorola avec SPO=0 et SPH=0.
+
 
 ## Pilotage RF (CC1101)
 
