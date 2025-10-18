@@ -18,22 +18,6 @@
 #include "badge_pinout.h"
 #include "screen.h"
 
-// Redefine pins to be compatible with Arduino program
-#undef BADGE_SPI0_TX_MOSI_SCREEN
-#undef BADGE_SPI0_RX_MISO
-#undef BADGE_SPI0_SCK_SCREEN
-#undef BADGE_SPI0_CSn
-#undef BADGE_SCREEN_BUSY
-#undef BADGE_SCREEN_DC
-#undef BADGE_SCREEN_RST
-#define BADGE_SPI0_TX_MOSI_SCREEN 19
-#define BADGE_SPI0_RX_MISO 20
-#define BADGE_SPI0_SCK_SCREEN 18
-#define BADGE_SPI0_CSn 17
-#define BADGE_SCREEN_BUSY 7
-#define BADGE_SCREEN_DC 9
-#define BADGE_SCREEN_RST 8
-
 
 /* Development functions to test the SPI library */
 void init(void) {
