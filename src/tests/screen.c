@@ -56,6 +56,7 @@ const uint8_t ws_1681_times[159] = \
 #include "text_bw.h"
 #include "grad_4g.h"
 #include "secsea_4g.h"
+#include "notif_4g.h"
 
 
 int main() {
@@ -65,10 +66,7 @@ int main() {
     printf("Boot sequence\n");
     while(! screen_boot())
         tight_loop_contents();
-    printf("Started\n");
-    while(screen_busy())
-        tight_loop_contents();
-    printf("Available\n");
+    printf("Ready\n");
 
     //read_all();
     //screen_push_ws(ws_1681_bw_full);
@@ -93,21 +91,25 @@ int main() {
     //push_image(hip_bw);
     //printf("done\n");
 
+    size_t len = screen_set_image_position(0, 0, 200, 200);
+    printf("image should be of size %d\n", len);
+
     printf("push b/w image\n");
     //screen_push_ws(ws_1681_times);
-    screen_set_image_1plane(text_bw, 5000, true);
+    screen_show_image_bw(text_bw);
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");
-    sleep_ms(5000);
 
+    sleep_ms(2000);
     printf("push 4g image\n");
     screen_push_ws(screen_ws_1681_4grays);
     while(screen_busy())
         tight_loop_contents();
     //push_images(text_bw, squares_bw); /* LSB, MSB */
     //push_images(grad_4g_lsb, grad_4g_msb);
-    screen_set_image_2planes(secsea_4g_lsb, secsea_4g_msb, 5000, false);
+    screen_push_rams(secsea_4g_lsb, secsea_4g_msb, 5000);
+    screen_show_rams();
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");
@@ -115,6 +117,16 @@ int main() {
     sleep_ms(2000);
     printf("clear to white\n");
     screen_clear(1);  // Clear to white before sleep
+    while(screen_busy())
+        tight_loop_contents();
+    printf("done\n");
+
+    sleep_ms(2000);
+    printf("push subimage\n");
+    len = screen_set_image_position(48, 68, 168, 168);
+    screen_push_ws(screen_ws_1681_4grays);
+    screen_push_rams(notif_4g_lsb, notif_4g_msb, len);
+    screen_show_rams();
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");

@@ -19,7 +19,8 @@ typedef enum {
     STATE_SLEEP = 1, /* Or boot */
     STATE_HWRESET = 2,  /* Hardware reset ongoing */
     STATE_SWRESET = 3,  /* Software reset ongoing */
-    STATE_READY = 4,  /* You can send commands (if not busy) */
+    STATE_SETUP = 4,  /* Does a BUSY operation */
+    STATE_READY = 5,  /* You can send commands (if not busy) */
 } state_t;
 static state_t state = STATE_UNINIT;
 static absolute_time_t state_ts = 0;  /* Last time the state changed */
@@ -78,7 +79,7 @@ static void setup(void) {
     send("\x11\x00", 2);
     /* The Power On Reset window to the ram is weird: 176*296, we have a 200x200 screen */
     send("\x44\x18\x00", 3);  /* Set RAM-X start/end (x8 -> (0x18=24, (24+1)*8 = 200) */
-    send("\x45\xC7\x00\x00\x00", 5);  /* Set RAM-X start/end (x8 -> (0xC7=199, 199+1 = 200) */
+    send("\x45\xC7\x00\x00\x00", 5);  /* Set RAM-Y start/end (x8 -> (0xC7=199, 199+1 = 200) */
     /* Set RAM counters to be to the top line and column */
     send("\x4E\x18", 2);
     send("\x4F\xC7\x00", 2);
@@ -133,10 +134,17 @@ bool screen_boot(void) {
         break;
     case STATE_SWRESET:
         /* SWRESET is sent, now wait for busy to be low */
-        if (! gpio_get(BADGE_SCREEN_BUSY)) {
-            state = STATE_READY;
+        if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
+            state = STATE_SETUP;
             state_ts = get_absolute_time();
             setup();
+        }
+        break;
+    case STATE_SETUP:
+        /* Wait for setup: load LUT with temperature reading */
+        if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
+            state = STATE_READY;
+            state_ts = get_absolute_time();
         }
         break;
     default:
@@ -184,8 +192,6 @@ void screen_clear(bool bit) {
     send("\x22\xC7", 2);
     send("\x20", 1);
 
-    /* Don't forget to reset to normal afterwards -> this is probably not taken into account because*/
-    send("\x21\x00", 2);
 }
 
 
@@ -200,48 +206,101 @@ void screen_deep_sleep(void) {
 }
 
 
-void screen_set_image_1plane(const uint8_t *img, size_t len, bool push_lut) {
-    if(screen_busy())
-        return;
+size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
+    if (screen_busy())
+        return -1;
 
-    /* Should push the LUT that display B/W */
-    if (push_lut)
-        screen_push_ws(screen_ws_1681_bw);
+    /* Swap min/max if needed */
+    uint8_t o;
+    if(x0 > x1) {
+        o = x1; x1 = x0; x0 = o;
+    }
+    if(y0 > y1) {
+        o = y1; y1 = y0; y0 = o;
+    }
 
-    gpio_put(BADGE_SCREEN_DC, 0);  /* Low for commands, high for data */
-    spi_write_blocking(spi0, "\x24", 1);  /* B/W RAM */
-    gpio_put(BADGE_SCREEN_DC, 1);
-    spi_write_blocking(spi0, img, len);
+    /* Bind values to [0..200] */
+    /* x1,y1 include the last line/column, but the screen commands excludes them */
+    x0 = x0 >= 200 ? 25 : x0/8;
+    x1 = x1 >= 200 ? 24 : (x1%8 == 0 ? x1/8-1 : x1/8-1);
+    y0 = y0 >= 200 ? 200 : y0;
+    y1 = y1 >= 200 ? 199 : y1-1;
 
-    while (gpio_get(BADGE_SCREEN_BUSY)) ;  /* FIXME: does it stay busy? */
+    uint64_t cmd;
+    /* Set RAM-X start/end (give end first because we give data in reverse order, see setup) */
+    cmd = 0x44 | (x1 << 8) | (x0 << 16);
+    send((uint8_t *)&cmd, 3);  /* Don't pass pointers to local variables when the callee may borrow them... */
 
-    /* Configure then Activate */
-    send("\x22\xC7", 2);  /* 0xCF is display mode 2 */
-    send("\x20", 1);
+    /* Set RAM-Y start/end, this time on 9 bits (we only use 8 of them) */
+    cmd = 0x45 | (y1 << 8) | (y0 << 24);
+    send((uint8_t *)&cmd, 5);
+
+    /* Set RAM counters to be to the top line and column */
+    cmd = 0x4E | (x1 << 8);
+    send((uint8_t *)&cmd, 2);
+    cmd = 0x4F | (y1 << 8);  /* Again y1 is on 2 bytes but we use only the first */
+    send((uint8_t *)&cmd, 3);
+
+    return (y1-y0+1)*(x1-x0+1);
 }
 
 
-void screen_set_image_2planes(const uint8_t *lsb, const uint8_t *msb, size_t len, bool push_lut) {
+void screen_show_image_bw(const uint8_t *img) {
     if(screen_busy())
         return;
 
-    /* Should push the LUT that display 4 gray levels */
-    if (push_lut)
-        screen_push_ws(screen_ws_1681_4grays);
+    /* Automatic function that does the manual commands */
+    screen_set_image_position(0, 0, 200, 200);
+    screen_push_ws(screen_ws_1681_bw);
+    screen_push_rams(img, NULL, 5000);
+    screen_show_rams();
+}
 
-    gpio_put(BADGE_SCREEN_DC, 0);  /* Low for commands, high for data */
-    spi_write_blocking(spi0, "\x24", 1);  /* B/W RAM */
-    gpio_put(BADGE_SCREEN_DC, 1);
-    spi_write_blocking(spi0, lsb, len);
 
-    while (gpio_get(BADGE_SCREEN_BUSY)) ;  /* FIXME: does it stay busy? */
+void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb) {
+    if(screen_busy())
+        return;
 
-    gpio_put(BADGE_SCREEN_DC, 0);
-    spi_write_blocking(spi0, "\x26", 1);  /* RED RAM */
-    gpio_put(BADGE_SCREEN_DC, 1);
-    spi_write_blocking(spi0, msb, len);
+    /* Automatic function that does the manual commands */
+    screen_set_image_position(0, 0, 200, 200);
+    screen_push_ws(screen_ws_1681_4grays);
+    screen_push_rams(lsb, msb, 5000);
+    screen_show_rams();
+}
 
-    while (gpio_get(BADGE_SCREEN_BUSY)) ;  /* FIXME: does it stay busy? */
+
+void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
+    if(screen_busy())
+        return;
+
+    /* Configure RAM bypass to use only the pushed planes */
+    uint16_t cmd = 0x21;
+    if(! lsb)
+        cmd |= (0x05 << 8);  /* Bypass B/W bank */
+    if(! msb)
+        cmd |= (0x50 << 8);  /* Bypass RED bank */
+    send((uint8_t *)&cmd, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
+
+    /* Push the image */
+    if(lsb) {
+        gpio_put(BADGE_SCREEN_DC, 0);  /* Low for commands, high for data */
+        spi_write_blocking(spi0, "\x24", 1);  /* B/W RAM */
+        gpio_put(BADGE_SCREEN_DC, 1);
+        spi_write_blocking(spi0, lsb, len);
+    }
+
+    if(msb) {
+        gpio_put(BADGE_SCREEN_DC, 0);
+        spi_write_blocking(spi0, "\x26", 1);  /* RED RAM */
+        gpio_put(BADGE_SCREEN_DC, 1);
+        spi_write_blocking(spi0, msb, len);
+    }
+}
+
+
+void screen_show_rams(void) {
+    if(screen_busy())
+        return;
 
     /* Configure then Activate */
     /* 0xC7 seems the normal mode for our target */
@@ -261,7 +320,6 @@ void screen_push_ws(const uint8_t *luts) {
     spi_write_blocking(spi0, "\x32", 1);
     gpio_put(BADGE_SCREEN_DC, 1);
     spi_write_blocking(spi0, luts, 153);
-    while (gpio_get(BADGE_SCREEN_BUSY)) ;  /* FIXME: does it stay busy? */
 
     /* Then EOPT, VGH, VSH1, VSH2, VSL, VCOM */
     /* Put the command in a 4 bytes int, as the longest command has 3 params */

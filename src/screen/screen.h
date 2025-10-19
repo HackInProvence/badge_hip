@@ -22,6 +22,24 @@
  * You have to put the RX pin to another GPIO function so that it does not short circuit the TX pin while reading.
  *
  * You can compile images using the image2epaper.py script.
+ *
+ * The usual use of this library is:
+ * - screen_init(),
+ * - call screen_boot() regularly until it returns true (~15ms),
+ * - now you can push an image:
+ *   - set the image position with screen_set_image_position(),
+ *   - use one of the screen_show_image_* functions,
+ *   - or manually screen_set_ws() to load some waveform settings to choose your color mode and refresh style
+ *     (black and white, or 4 grays, partial/full refresh, ...),
+ *     then screen_push_rams() to load the image in the RAM banks,
+ *     then screen_show_rams() to actually show your image,
+ *   - wait for screen_busy() to go low (~1s)
+ * - either push another image
+ * - or go screen_deep_sleep() -> call screen_boot() to reset and push other images.
+ *
+ * NOTE: the datasheet recommends to deep sleep as soon as possible,
+ *  and to screen_clear() before going for longer sleeps (days),
+ *  and to not refresh the screen too much (> 3 minutes between refreshes (!!!)).
  * */
 
 #ifndef _SCREEN_H
@@ -56,6 +74,7 @@ void screen_border(uint8_t color);
 /** \brief Show a uniform image. Clear to white before storing the screen for long times (days).
  *
  * The screen must not be busy.
+ * This keeps the screen busy for a while.
  *
  * Bypasses the RAM content to display \param on the whole bit but uses the current LUTs,
  * which may change the color if you pushed another LUT beforehand.
@@ -71,31 +90,76 @@ void screen_clear(bool bit);
  * After being asleep, the screen will stay busy and needs to be reset and booted again, see \ref screen_boot. */
 void screen_deep_sleep(void);
 
-/** \brief Push an image with 1 bit plane (black and white).
+/** \brief Set the screen position of the next image
  *
- * The image size depends on the currently selected window size.
- * Bytes are always packed 8bits per byte, where a bit is a pixel
- * (1 for white, 0 for black with the recommended waveform settings).
+ * The screen must not be busy.
  *
- * \param img       The image.
- * \param len       The image buffer length, in bytes (<= 5000).
- * \param push_lut  Push factory waveform settings beforehand (leave it true).
- */
-void screen_set_image_1plane(const uint8_t *img, size_t len, bool push_lut);
+ * The (0,0) origin is in the lower right angle.
+ * The X coordinates can only be controlled by increments of 8 (0*8 to 25*8=200).
+ * The Y coordinates are in [0..200].
+ *
+ * The x1 and y1 coordinate include the last line/column (x1 = x0+image_width).
+ *
+ * To show the fullscreen, use (0, 0, 200, 200).
+ * Remember that pushing a partial image does not overwrite the RAM outside of the selected window,
+ * which will be displayed on the next screen_show_rams()...
+ *
+ * \return The number of bytes of the bitplane to push (image size = (y1-y0)*((x1-x0)//8))
+ * \return SIZE_T_MAX when the screen is busy */
+size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
 
-/** \brief Push an image with 2 bit planes (4 grays).
+/** \brief Show the image fullscreen with 2 colors (black and white).
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while.
+ *
+ * Bytes are always packed 8bits per byte, where a bit is a pixel
+ * (1 for white, 0 for black).
+ *
+ * \param img   The image buffer, which must be of size 5000 (=200*(200/8)) */
+void screen_show_image_bw(const uint8_t *img);
+
+/** \brief Show the image fullscreen with 4 colors (4 gray levels).
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while.
+ *
+ * Bytes are always packed 8bits per byte, where a bit is a pixel.
+ * The image is organized in 2 planes: one is the most significant bit (\param MSB) of the pixel color,
+ * the other is the least significant bit (\param LSB).
+ * They form a color between 00 for black to 11 for white.
+ *
+ * \param lsb   The image LSB plane, which must be of size 5000 (=200*(200/8))
+ * \param lsb   The image MSB plane, which must be of size 5000 */
+void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
+
+/** \brief Push an image with 2 bit planes.
+ *
+ * The screen must not be busy.
  *
  * The image size depends on the currently selected window size.
- * Bytes are always packed 8bits per byte, where a bit is a pixel
- * (00 for black to 11 for white with the recommended waveform settings).
+ * The image is organized in 2 planes: one is the most significant bit (\param MSB) of the pixel color,
+ * the other is the least significant bit (\param LSB).
+ * The LUT decides what is done with these information (nothing, black, white, gray, ...).
  *
- * \param lsb       The least significant bitplane of the image.
- * \param msb       The most significant bitplane of the image.
+ * When pushing NULL to a plane, it's use will be deactivated (RAM will be bypassed to 0).
+ *
+ * Use with \ref screen_push_ws and \ref screen_show_rams.
+ *
+ * \param lsb       The least significant bitplane of the image (or NULL).
+ * \param msb       The most significant bitplane of the image (or NULL).
  * \param len       The length of both planes, in bytes (<= 5000).
  * \param push_lut  Push factory waveform settings beforehand (leave it true).
  */
-void screen_set_image_2planes(const uint8_t *lsb, const uint8_t *msb, size_t len, bool push_lut);
+void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len);
 
+/** \brief Actually show the image in RAM using the current waveform settings pushed to screen.
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while.
+ *
+ * Use with \ref screen_push_ws and \ref screen_push_rams. */
+void screen_show_rams(void);
 
 /** \brief Advanced/Hack: push a new Waveform Settings to the screen.
  *
