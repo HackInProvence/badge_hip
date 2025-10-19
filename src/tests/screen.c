@@ -20,14 +20,6 @@
 
 
 
-/*static*/ void send(const uint8_t *cmd, size_t len);
-
-void deep_sleep(void) {
-    send("\x10\x01", 2);  /* 0x01 or 0x03...*/
-    //gpio_put(BADGE_SCREEN_RST, 0);  /* Not clear whether this is useful or not */
-}
-
-
 // Waveform settings, showing grays
 const uint8_t ws_1681_times[159] = \
     "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* black */ \
@@ -66,20 +58,17 @@ const uint8_t ws_1681_times[159] = \
 #include "secsea_4g.h"
 
 
-extern uint8_t state;
-extern absolute_time_t state_ts;
 int main() {
     stdio_usb_init();
 
     screen_init();
     printf("Boot sequence\n");
-    //while(! screen_boot())
-    //    tight_loop_contents();
-    while(! screen_boot()) {
-        printf("state %" PRIu8 " since %" PRIu64 "ms\n", state, absolute_time_diff_us(state_ts, get_absolute_time())/1000);
-        sleep_ms(250);
-    }
+    while(! screen_boot())
+        tight_loop_contents();
     printf("Started\n");
+    while(screen_busy())
+        tight_loop_contents();
+    printf("Available\n");
 
     //read_all();
     //screen_push_ws(ws_1681_bw_full);
@@ -114,6 +103,8 @@ int main() {
 
     printf("push 4g image\n");
     screen_push_ws(screen_ws_1681_4grays);
+    while(screen_busy())
+        tight_loop_contents();
     //push_images(text_bw, squares_bw); /* LSB, MSB */
     //push_images(grad_4g_lsb, grad_4g_msb);
     screen_set_image_2planes(secsea_4g_lsb, secsea_4g_msb, 5000, false);
@@ -128,7 +119,7 @@ int main() {
         tight_loop_contents();
     printf("done\n");
 
-    deep_sleep();
+    screen_deep_sleep();
     sleep_ms(1000);
     printf("Screen sleeping, after 1s BUSY = %d\n\n", gpio_get(BADGE_SCREEN_BUSY));
 }

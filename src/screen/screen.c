@@ -21,12 +21,12 @@ typedef enum {
     STATE_SWRESET = 3,  /* Software reset ongoing */
     STATE_READY = 4,  /* You can send commands (if not busy) */
 } state_t;
-/*static*/ state_t state = STATE_UNINIT;
-/*static*/ absolute_time_t state_ts = 0;  /* Last time the state changed */
+static state_t state = STATE_UNINIT;
+static absolute_time_t state_ts = 0;  /* Last time the state changed */
 
 
 /* Send data on the SPI but don't wait for BUSY to be LOW */
-/*static*/ void send(const uint8_t *cmd, size_t len) {
+static void send(const uint8_t *cmd, size_t len) {
     if(! cmd || len == 0)
         return;
 
@@ -99,7 +99,6 @@ static void setup(void) {
 }
 
 
-#include <stdio.h>
 bool screen_boot(void) {
     if (state == STATE_UNINIT)
         return false;
@@ -150,7 +149,7 @@ bool screen_boot(void) {
 
 
 bool screen_busy(void) {
-    return (state >= STATE_READY) && (! gpio_get(BADGE_SCREEN_BUSY));
+    return (state < STATE_READY) || gpio_get(BADGE_SCREEN_BUSY);
 }
 
 
@@ -166,6 +165,9 @@ void screen_border(uint8_t color) {
 
 
 void screen_clear(bool bit) {
+    if (screen_busy())
+        return;
+
     /* RAM bypass configuration. 4 bits per RAM bank. LSB for black and white, MSB for red bank.
      * RRRR WWWW
      *  ^    ^ bypass RAM when 1 (read 0)
@@ -182,8 +184,19 @@ void screen_clear(bool bit) {
     send("\x22\xC7", 2);
     send("\x20", 1);
 
-    /* Don't forget to reset to normal afterwards */
+    /* Don't forget to reset to normal afterwards -> this is probably not taken into account because*/
     send("\x21\x00", 2);
+}
+
+
+void screen_deep_sleep(void) {
+    if (screen_busy())
+        return;
+
+    /* After that, the screen keeps the BADGE_SCREEN_BUSY pin high until hard reset */
+    send("\x10\x01", 2);  /* 0x01 or 0x03... */
+    state = STATE_SLEEP;
+    state_ts = get_absolute_time();
 }
 
 

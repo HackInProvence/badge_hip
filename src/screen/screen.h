@@ -42,7 +42,7 @@ bool screen_boot(void);
 /** \brief Tells whether the screen is busy for now.
  *
  * The screen cannot receive commands while busy.
- * Also returns false when the screen is not ready (\ref screen_boot). */
+ * Also returns true when the screen is not ready (\ref screen_boot). */
 bool screen_busy(void);
 
 /** \brief Sets the border color.
@@ -63,6 +63,13 @@ void screen_border(uint8_t color);
  * \param bit   The color, 0 for black, 1 for white.
  * */
 void screen_clear(bool bit);
+
+/** \brief Put the screen in deep sleep mode. Should be done after pushing images.
+ *
+ * The screen must not be busy.
+ *
+ * After being asleep, the screen will stay busy and needs to be reset and booted again, see \ref screen_boot. */
+void screen_deep_sleep(void);
 
 /** \brief Push an image with 1 bit plane (black and white).
  *
