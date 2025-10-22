@@ -57,6 +57,7 @@ const uint8_t ws_1681_times[159] = \
 #include "grad_4g.h"
 #include "secsea_4g.h"
 #include "notif_4g.h"
+#include "companion.h"
 
 
 int main() {
@@ -68,28 +69,7 @@ int main() {
         tight_loop_contents();
     printf("Ready\n");
 
-    //read_all();
-    //screen_push_ws(ws_1681_bw_full);
-
-    //printf("clear to black\n");
-    //img_const(0);  // black
-    //printf("done\n");
-    /* Test all 0x21 (bypass ram) */
-    //for(size_t i=0; i<16; ++i) {
-    //    uint8_t flag = i | (i<<4);
-    //    printf("0x%02X\n", flag);
-    //    img_const(0, flag);
-    //    sleep_ms(5000);
-    //}
-
-    ////sleep_ms(1000);
-    //printf("push image\n");
-    //push_image(secsea_bw);
-    //printf("done\n");
-    //sleep_ms(2000);
-    //printf("push image\n");
-    //push_image(hip_bw);
-    //printf("done\n");
+    //read_all(); /* TODO */
 
     size_t len = screen_set_image_position(0, 0, 200, 200);
     printf("image should be of size %d\n", len);
@@ -97,6 +77,8 @@ int main() {
     printf("push b/w image\n");
     //screen_push_ws(ws_1681_times);
     screen_show_image_bw(text_bw);
+    //screen_show_image_bw(hip_bw);
+    //screen_show_image_bw(secsea_bw);
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");
@@ -104,10 +86,8 @@ int main() {
     sleep_ms(2000);
     printf("push 4g image\n");
     screen_push_ws(screen_ws_1681_4grays);
-    while(screen_busy())
-        tight_loop_contents();
-    //push_images(text_bw, squares_bw); /* LSB, MSB */
-    //push_images(grad_4g_lsb, grad_4g_msb);
+    //screen_push_rams(text_bw, squares_bw); /* LSB, MSB */
+    //screen_push_rams(grad_4g_lsb, grad_4g_msb);
     screen_push_rams(secsea_4g_lsb, secsea_4g_msb, 5000);
     screen_show_rams();
     while(screen_busy())
@@ -115,18 +95,21 @@ int main() {
     printf("done\n");
 
     sleep_ms(2000);
-    printf("clear to white\n");
-    screen_clear(1);  // Clear to white before sleep
+    printf("push subimage\n");
+    screen_push_ws(screen_ws_1681_4grays);
+    //len = screen_set_image_position(48, 68, 168, 168);
+    //screen_push_rams(notif_4g_lsb, notif_4g_msb, len);
+    len = screen_set_image_position(32, 25, 32+companion_width*8, 25+companion_height);
+    screen_push_rams(companion_lsb, companion_msb, len);
+    screen_show_rams();
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");
 
+    /* It was tested that the screen is cleared then something else can be drawn */
     sleep_ms(2000);
-    printf("push subimage\n");
-    len = screen_set_image_position(48, 68, 168, 168);
-    screen_push_ws(screen_ws_1681_4grays);
-    screen_push_rams(notif_4g_lsb, notif_4g_msb, len);
-    screen_show_rams();
+    printf("clear to white\n");
+    screen_clear(1);  // Clear to white before sleep
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");

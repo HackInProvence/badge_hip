@@ -40,6 +40,13 @@
  * NOTE: the datasheet recommends to deep sleep as soon as possible,
  *  and to screen_clear() before going for longer sleeps (days),
  *  and to not refresh the screen too much (> 3 minutes between refreshes (!!!)).
+ *
+ * TODO:
+ * - text -> probably too complex, we will send pre-rendered images,
+ * - have a ws that uses the RED ram as a mask to NOT update some pixels (overlay),
+ * - try to have more gray levels (uses the DONTOUCH mask).
+ * - have a ws that refresh a zone of the RAM (uses the RED mask to not touch the rest), so that a previous black can be canceled,
+ *   then push the new image for that zone and draw it quicker/without traces
  * */
 
 #ifndef _SCREEN_H
@@ -78,6 +85,7 @@ void screen_border(uint8_t color);
  *
  * Bypasses the RAM content to display \param on the whole bit but uses the current LUTs,
  * which may change the color if you pushed another LUT beforehand.
+ * Does not clear the RAM, so clearing before subimage blitting may result in the previous image showing again.
  *
  * \param bit   The color, 0 for black, 1 for white.
  * */
