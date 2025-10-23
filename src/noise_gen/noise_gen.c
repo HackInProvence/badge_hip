@@ -7,6 +7,7 @@
 
 #include "hardware/irq.h"
 #include "hardware/gpio.h"
+#include "pico/binary_info.h"
 #include "pico/rand.h"
 
 #include "badge_pinout.h"
@@ -107,6 +108,9 @@ void noise_gen_setup(PIO pio, uint sm, irq_handler_t sound_gen) {
 void noise_gen_init_play(void)
 {
     uint offset;
+
+    // Declare our GPIO usages
+    bi_decl_if_func_used(bi_1pin_with_func(BADGE_BUZZER, GPIO_FUNC_PIO0));
 
     // This will find a free pio and state machine for our program and load it for us
     // We use pio_claim_free_sm_and_add_program_for_gpio_range so we can address gpios >= 32 if needed and supported by the hardware

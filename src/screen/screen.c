@@ -43,9 +43,9 @@ static void send(const uint8_t *cmd, size_t len) {
 void screen_init(void) {
     // Declare our GPIO usages
     bi_decl_if_func_used(bi_4pins_with_func(BADGE_SPI0_TX_MOSI_SCREEN, BADGE_SPI0_RX_MISO, BADGE_SPI0_SCK_SCREEN, BADGE_SPI0_CSn, GPIO_FUNC_SPI));
-    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_DC, "e-Paper"));
-    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_BUSY, "e-Paper"));
-    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_RST, "e-Paper"));
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_DC, "e-Paper D/C"));
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_BUSY, "e-Paper BUSY"));
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_RST, "e-Paper RST"));
 
     // Init SPI
     spi_init(spi0, 2000*1000);  /* Should go up to 20 MHz in write, but 2.5 in read */

@@ -6,6 +6,7 @@
 #include "hardware/clocks.h"
 #include "hardware/gpio.h"
 #include "hardware/pwm.h"
+#include "pico/binary_info.h"
 #include "pico/time.h"
 
 #include "badge_pinout.h"
@@ -47,6 +48,9 @@ void music_init(void) {
     if (slice_num != -1)
         return; // Already initialized
 
+    // Declare our GPIO usages
+    bi_decl_if_func_used(bi_1pin_with_func(BADGE_BUZZER, GPIO_FUNC_PWM));
+
     // Get the slice and configure it
     slice_num = pwm_gpio_to_slice_num(BADGE_BUZZER);
     float div = clock_get_hz(clk_sys) / TARGET_PWM_HZ;
@@ -84,6 +88,7 @@ void music_set_melody(const Note *notes, float beat) {
 
     cur_beat = beat;
     cur_notes = notes;
+    /* FIXME: add an option to enable or not */
     if (! aid) {
         music_set_enabled(true);  /* TODO: test the returned value? */
     }
