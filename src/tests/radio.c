@@ -26,7 +26,7 @@
 const uint8_t conf_am270_async[] = {
     0x02, 0x0D, /* GD0 conf: async serial mode */
     //0x01, 0x2E, /* GD1 */
-    //0x00, 0x29, /* GD2 */
+    0x00, 0x0E, /* GD2: carrier sense */
     /* ADC_RETENTION to be able to filter RX bandwidth < 325kHz on wakeup
      * 0 dB RX attenuation,
      * 33/32 FIFO threshold */
@@ -44,7 +44,8 @@ const uint8_t conf_am270_async[] = {
     0x18, 0x18, /* MCSM0: ... + pin radio control option */
     0x19, 0x18, /* FOCCFG: frequency offset compensation */
     0x1D, 0x40, /* AGCCTRL0: small dead zone*/
-    0x1C, 0x00, /* AGCCTRL1: carrier sense -8 dB */
+    //0x1C, 0x00, /* AGCCTRL1: carrier sense absolute at MAGN_TARGET */
+    0x1C, 0x38, /* AGCCTRL1: carrier sense relative 6db, absolute disabled */
     0x1B, 0x03, /* AGCCTRL2: 33 dB target on digital filter channel */
     0x20, 0xFB, /* WORCTRL: WakeOnRadio, event timeout and max timeout */
     0x22, 0x11, /* FREND0: use index PATABLE[1] when ASK encodes a '1' */
@@ -55,18 +56,69 @@ const uint8_t conf_am270_async[] = {
 };
 
 
+/** \brief SPI read/write pulling CSn down for the whole transaction, \p response can be NULL
+ *
+ * We chose to block until the \p len bytes are written, as the communication is fast (~1MHz) */
+void send(const uint8_t *data, uint8_t *response, size_t len) {
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    if (response)
+        spi_write_read_blocking(spi1, data, response, len);
+    else
+        spi_write_blocking(spi1, data, len);
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
+
+#define READ(reg) ((reg) | 0x80)
+#define BURST(reg) ((reg) | 0x40)
+
+
+/** \brief Helper to burst read registers */
+void burst_read(uint8_t reg, uint8_t *response, size_t len) {
+    uint8_t cmd = BURST(READ(reg));
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    spi_write_blocking(spi1, &cmd, 1);
+    spi_read_blocking(spi1, 0x00, response, len);
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
+
+
+const char *states[] = {
+    "IDLE",
+    "RX",
+    "TX",
+    "FSTXON",
+    "CALIBRATE",
+    "SETTLING",
+    "RXFIFO_OVERFLOW",
+    "TXFIFO_UNDERFLOW",
+};
+
+static size_t _printf_status(uint8_t status) {
+    return printf(
+        "status = 0x%02x: %sready, state 0b%03b (%s), %d TX FIFO bytes avail\n",
+        status,
+        status_nrdy(status) ? "NOT " : "",
+        status_state(status), states[status_state(status)],
+        status_fifo_bytes(status)
+    );
+}
+
 uint8_t print_status(void) {
     uint8_t status;
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_read_blocking(spi1, "\x3D", &status, 1);  /* NOOP (in write mode, so FIFO is the TX one) */
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    printf("status = 0x%02x: %sready, state 0b%03b, %d FIFO bytes avail\n",
-            status,
-            status_nrdy(status) ? "NOT " : "",
-            status_state(status),
-            status_fifo_bytes(status)
-    );
+    send("\x3D", &status, 1);  /* NOOP (in write mode, so FIFO is the TX one) */
+    _printf_status(status);
     return status;
+}
+
+void wait_state(uint8_t tgt) {
+    uint8_t old_status = 0, status = 0;
+    do {
+        send("\x3D", &status, 1);
+        if (status != old_status) {
+            _printf_status(status);
+            old_status = status;
+        }
+    } while (status_state(status) != tgt);
 }
 
 
@@ -90,103 +142,87 @@ int main() {
 
     radio_init();
     gpio_init(BADGE_RADIO_GDO0);
-    //gpio_set_input_enabled(BADGE_RADIO_GDO0, true);
     gpio_init(BADGE_RADIO_GDO2);
-    //gpio_set_input_enabled(BADGE_RADIO_GDO2, true);
-    printf("inputs %d, %d\n", BADGE_RADIO_GDO0, BADGE_RADIO_GDO2);
 
     print_status();
 
     // Try asynch serial mode: GDO0 becomes our TX line (usually an Output of the radio, but here becomes an input)
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, conf_am270_async, sizeof(conf_am270_async));
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    sleep_ms(1);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    //spi_write_blocking(spi1, "\x3E\x50", 2); /* PATABLE: PWR 0db */
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    sleep_ms(1);
+    send(conf_am270_async, NULL, sizeof(conf_am270_async));
+    //send("\x3E\x50", 2); /* PATABLE: PWR 0db */
 
-    print_status();
     printf("configured, read configuration back\n");
+    print_status();
     uint8_t cfg[0x30];
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, "\xC0", 1); // Burst + Read register
-    spi_read_blocking(spi1, 0x00, (uint8_t *)&cfg, 0x30);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+    burst_read(0x00, cfg, 0x30);
     for(size_t i=0; i<0x30; ++i) {
         printf("%02x ", cfg[i]);
         if ((i+1)%8 == 0) {
             printf("\n");
         }
     }
-    print_status();
-
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, "\xFE", 1); // Burst + Read PATABLE
-    spi_read_blocking(spi1, 0x00, (uint8_t *)&cfg, 0x08);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    for(size_t i=0; i<0x08; ++i)
+    burst_read(0x3E, cfg, 8);  /* PATABLE */
+    for(size_t i=0; i<8; ++i)
         printf("%02x ", cfg[i]);
     printf("\n");
     print_status();
 
-    // TODO: putting in TX mode fails, but why ? Could we still read something? Did the GDOx configuration succeeded?
-    // Emit 5ms pulses 10 times per sec
-    sleep_ms(1);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, "\x35", 1);  /* Put in TX mode */
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    sleep_ms(1);
-    //uint8_t old_status = print_status();
-    //uint8_t status = old_status;
-    //while (status == old_status && status_state(status) != 0b010) {
-    //    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    //    spi_write_read_blocking(spi1, "\x3D", &status, 1);
-    //    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    //    if (status != old_status)
-    //        print_status();
-    //}
+    //// Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
+    //send("\x35", NULL, 1);
+    //wait_state(0b010);  /* FIXME: replace magic numbers by name */
 
-    gpio_init(BADGE_RADIO_GDO0);
-    gpio_put(BADGE_RADIO_GDO0, 1);
-    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_OUT);
-
-    printf("start\n");
-    for(uint i=0; i<30; ++i) {
-        gpio_put(BADGE_RADIO_GDO0, 0);
-        sleep_ms(5);
-        gpio_put(BADGE_RADIO_GDO0, 1);
-        sleep_ms(100);
-        print_status();
-    }
-
-    //// Try to read
     //gpio_init(BADGE_RADIO_GDO0);
-    //spi_write_blocking(spi1, "\x34", 1);
-    //uint8_t old_status = print_status();
-    //uint8_t status = old_status;
-    //while (status == old_status && status_state(status) != 0b001) {
-    //    spi_write_read_blocking(spi1, "\x3D", &status, 1);
-    //    if (status != old_status)
-    //        print_status();
-    //}
+    //gpio_put(BADGE_RADIO_GDO0, 1);
+    //gpio_set_dir(BADGE_RADIO_GDO0, GPIO_OUT);
 
     //printf("start\n");
-    ////for(int i=0; i<100; ++i) {
-    //while(true) {
-    //    while(! gpio_get(BADGE_RADIO_GDO0));
-    //    while(gpio_get(BADGE_RADIO_GDO0));
-    //    //printf("01");
+    //for(uint i=0; i<30; ++i) {
+    //    gpio_put(BADGE_RADIO_GDO0, 0);
+    //    sleep_ms(5);
+    //    gpio_put(BADGE_RADIO_GDO0, 1);
+    //    sleep_ms(95);
+    //    print_status();
     //}
+
+    // Try to read
+    gpio_init(BADGE_RADIO_GDO0);
+    send("\x34", NULL, 1);
+    wait_state(0b001);  /* FIXME: replace magic numbers by name */
+
+    printf("start\n");
+    int8_t prev_sig = -1;
+    absolute_time_t prev_ts = get_absolute_time();
+    uint64_t lengths[64];
+    size_t cur_len = 0;
+    //for(int i=0; i<5; ++i) {
+    while(cur_len < sizeof(lengths)/sizeof(lengths[0])) {
+        /* Wait for carrier sense */
+        bool cs = gpio_get(BADGE_RADIO_GDO2);
+        if (!cs) {
+            prev_sig = -1;
+            continue;
+        }
+
+        /* We have signal */
+        bool sig = gpio_get(BADGE_RADIO_GDO0);
+        if(prev_sig != sig) {
+            absolute_time_t now = get_absolute_time();
+            if (prev_sig != -1) {
+                lengths[cur_len] = absolute_time_diff_us(prev_ts, now) | ((uint64_t)(prev_sig) << 63);
+                ++cur_len;
+            }
+            prev_sig = sig;
+            prev_ts = now;
+        }
+    }
+    // Show a trace
+    for (size_t i=0; i<sizeof(lengths)/sizeof(lengths[0]); ++i) {
+        printf("%d for % 7" PRIu64 "\n", (uint8_t)(lengths[i] >> 63), lengths[i] & 0x7fFFffFF);
+    }
 
     printf("wait\n");
     sleep_ms(3000);
     printf("stop\n");
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, "\x36", 1);  /* Return to IDLE */
-    spi_write_blocking(spi1, "\x39", 1);  /* Power down mode */
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-    sleep_us(100);  /* Have to wait ~100µ before we see the chip powered down */
+    send("\x36\x39", NULL, 2); /* Return to IDLE, then power down */
+    sleep_us(100);  /* Have to wait ~100µ before we see the chip powers down */
     print_status();
 }
