@@ -3,6 +3,12 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
+/** \file screen.h
+ *
+ * \brief Template API:
+ *
+ * */
+
 #ifndef _TEMPLATE_H
 #define _TEMPLATE_H
 

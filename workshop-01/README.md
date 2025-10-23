@@ -309,6 +309,18 @@ De la même manière, il existe plusieurs bibliothèques, mais pas en C pour le 
 A tester, comprendre, et réaliser un premier exemple,
 idéalement accompagné d'un flipper !
 
+Pinout du module de test (E07-M1101D) :
+
+- (pin proto) -> (rôle) -> (pin pico)
+- 1 -> GND
+- 2 -> VCC (3V3)
+- 3 -> GD0 -> 22
+- 4 -> SPI1 CSn -> 25 mais pas exposé sur le pico, on choisit 13
+- 5 -> SPI1 SCK -> 26
+- 6 -> SPI1 MOSI -> 27
+- 7 -> SPI1 MISO/GD1 -> 24 mais pas exposé, 28 (override buzzer)
+- 8 -> GD2 -> 23 mais pas exposé, 21
+
 
 ## Challenge Ph0wn 2025
 

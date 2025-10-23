@@ -17,7 +17,7 @@
 pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
-//#define RASPBERRYPI_PICO_W
+#define BADGE_SECSEA
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
