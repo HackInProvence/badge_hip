@@ -52,7 +52,9 @@ const uint8_t conf_am270_async[] = {
     0x21, 0xB6,  /* FREND1: RX current configuration */
     /* This does not make sense, it does not access the PATABLE: "0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00"
      * 0x3E writes PATABLE[0]
-     * 0x7E writes PATABLE[0:8] in burst mode */
+     * 0x7E writes PATABLE[0:8] in burst mode
+     * I checked that my CC1101 *does not* accept setting the PATABLE with 0x00, 0x00 then the PATABLE
+     * but it does work with 0x3E and 0x7E... */
 };
 
 
@@ -122,6 +124,110 @@ void wait_state(uint8_t tgt) {
 }
 
 
+void print_configuration(void) {
+    uint8_t cfg[0x30];
+    size_t i,j;
+
+    //print_status();
+    printf("current configuration:\n");
+    burst_read(0x00, cfg, 0x30);
+
+    /* Print table header */
+    printf("    ");
+    for (i=0; i<16; ++i)
+        printf("%02x ", i);
+    printf("\n");
+
+    /* Print memory content with first column for current line */
+    for (j=0; j<3; ++j) {
+        printf("%02x: ", j*16);
+        for(size_t i=0; i<16; ++i)
+            printf("%02x ", cfg[j*16+i]);
+        printf("\n");
+    }
+
+    printf("PATABLE:\n    ");
+    burst_read(0x3E, cfg, 8);  /* PATABLE */
+    for(size_t i=0; i<8; ++i)
+        printf("%02x ", cfg[i]);
+    printf("\n");
+
+    print_status();
+}
+
+
+/** Pulses a TX on 933.92 with OOK (PWM 5% duty on 100ms cycle)
+ * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
+void tx_pulses(void) {
+    send(conf_am270_async, NULL, sizeof(conf_am270_async));
+    //send("\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00", NULL, 10);  /* Done by flipper but does not work */
+    //send("\x3E\x50", NULL 2);  /* PATABLE: PWR 0db (C0 for maximal power, C6 by default, which is less power) */
+    print_configuration();
+
+    // Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
+    send("\x35", NULL, 1);
+    wait_state(0b010);  /* FIXME: replace magic numbers by name */
+
+    gpio_init(BADGE_RADIO_GDO0);
+    gpio_put(BADGE_RADIO_GDO0, 1);
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_OUT);
+
+    printf("start\n");
+    for(uint i=0; i<30; ++i) {
+        gpio_put(BADGE_RADIO_GDO0, 0);
+        sleep_ms(5);
+        gpio_put(BADGE_RADIO_GDO0, 1);
+        sleep_ms(95);
+        print_status();
+    }
+}
+
+
+/** Put the CC1101 in RX mode and print the first bits received with high enough RSSI.
+ * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
+void rx_times(void) {
+    send(conf_am270_async, NULL, sizeof(conf_am270_async));
+    print_configuration();
+
+    gpio_init(BADGE_RADIO_GDO0);
+    send("\x34", NULL, 1);  /* Go to RX mode */
+    wait_state(0b001);  /* FIXME: replace magic numbers by name */
+
+    printf("start\n");
+
+    int8_t prev_sig = -1;
+    absolute_time_t prev_ts = get_absolute_time();
+    uint64_t lengths[64];  /* The first bit of each int is used to store the signal value */
+    size_t cur_len = 0;
+
+    while(cur_len < sizeof(lengths)/sizeof(lengths[0])) {
+        /* Wait for carrier sense */
+        bool cs = gpio_get(BADGE_RADIO_GDO2);
+        if (!cs) {
+            prev_sig = -1;
+            continue;
+        }
+
+        /* We have signal */
+        bool sig = gpio_get(BADGE_RADIO_GDO0);
+        if(prev_sig != sig) {
+            absolute_time_t now = get_absolute_time();
+            if (prev_sig != -1) {
+                lengths[cur_len] = absolute_time_diff_us(prev_ts, now) | ((uint64_t)(prev_sig) << 63);
+                ++cur_len;
+            }
+            prev_sig = sig;
+            prev_ts = now;
+        }
+    }
+
+    /* Show a trace */
+    for (size_t i=0; i<sizeof(lengths)/sizeof(lengths[0]); ++i) {
+        printf("%d for % 7" PRIu64 "\n", (uint8_t)(lengths[i] >> 63), lengths[i] & 0x7fFFffFF);
+    }
+}
+
+
 int main() {
     stdio_usb_init();
 
@@ -146,83 +252,16 @@ int main() {
 
     print_status();
 
-    // Try asynch serial mode: GDO0 becomes our TX line (usually an Output of the radio, but here becomes an input)
-    send(conf_am270_async, NULL, sizeof(conf_am270_async));
-    //send("\x3E\x50", 2); /* PATABLE: PWR 0db */
+    tx_pulses();
+    //rx_times();
 
-    printf("configured, read configuration back\n");
-    print_status();
-    uint8_t cfg[0x30];
-    burst_read(0x00, cfg, 0x30);
-    for(size_t i=0; i<0x30; ++i) {
-        printf("%02x ", cfg[i]);
-        if ((i+1)%8 == 0) {
-            printf("\n");
-        }
-    }
-    burst_read(0x3E, cfg, 8);  /* PATABLE */
-    for(size_t i=0; i<8; ++i)
-        printf("%02x ", cfg[i]);
-    printf("\n");
-    print_status();
-
-    //// Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
-    //send("\x35", NULL, 1);
-    //wait_state(0b010);  /* FIXME: replace magic numbers by name */
-
-    //gpio_init(BADGE_RADIO_GDO0);
-    //gpio_put(BADGE_RADIO_GDO0, 1);
-    //gpio_set_dir(BADGE_RADIO_GDO0, GPIO_OUT);
-
-    //printf("start\n");
-    //for(uint i=0; i<30; ++i) {
-    //    gpio_put(BADGE_RADIO_GDO0, 0);
-    //    sleep_ms(5);
-    //    gpio_put(BADGE_RADIO_GDO0, 1);
-    //    sleep_ms(95);
-    //    print_status();
-    //}
-
-    // Try to read
-    gpio_init(BADGE_RADIO_GDO0);
-    send("\x34", NULL, 1);
-    wait_state(0b001);  /* FIXME: replace magic numbers by name */
-
-    printf("start\n");
-    int8_t prev_sig = -1;
-    absolute_time_t prev_ts = get_absolute_time();
-    uint64_t lengths[64];
-    size_t cur_len = 0;
-    //for(int i=0; i<5; ++i) {
-    while(cur_len < sizeof(lengths)/sizeof(lengths[0])) {
-        /* Wait for carrier sense */
-        bool cs = gpio_get(BADGE_RADIO_GDO2);
-        if (!cs) {
-            prev_sig = -1;
-            continue;
-        }
-
-        /* We have signal */
-        bool sig = gpio_get(BADGE_RADIO_GDO0);
-        if(prev_sig != sig) {
-            absolute_time_t now = get_absolute_time();
-            if (prev_sig != -1) {
-                lengths[cur_len] = absolute_time_diff_us(prev_ts, now) | ((uint64_t)(prev_sig) << 63);
-                ++cur_len;
-            }
-            prev_sig = sig;
-            prev_ts = now;
-        }
-    }
-    // Show a trace
-    for (size_t i=0; i<sizeof(lengths)/sizeof(lengths[0]); ++i) {
-        printf("%d for % 7" PRIu64 "\n", (uint8_t)(lengths[i] >> 63), lengths[i] & 0x7fFFffFF);
-    }
-
+    /* Shutdown */
     printf("wait\n");
-    sleep_ms(3000);
+    sleep_ms(2000);  /* When out of TX mode, it still emits around the frequency here, but it's okay we are not in IDLE */
+
     printf("stop\n");
     send("\x36\x39", NULL, 2); /* Return to IDLE, then power down */
     sleep_us(100);  /* Have to wait ~100µ before we see the chip powers down */
     print_status();
+    /* Bringing CSn to 0 again will wake up the chip */
 }
