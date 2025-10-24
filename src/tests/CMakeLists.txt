@@ -65,6 +65,20 @@ target_link_libraries(test_radio PRIVATE
 pico_enable_stdio_usb(test_radio 1)
 pico_enable_stdio_uart(test_radio 0)
 
+add_executable(radio_calibrate)
+target_sources(radio_calibrate PRIVATE radio_calibrate.c)
+pico_add_extra_outputs(radio_calibrate)
+
+target_link_libraries(radio_calibrate PRIVATE
+    hardware_gpio
+    pico_stdlib
+    pico_time
+    radio
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_radio 1)
+pico_enable_stdio_uart(test_radio 0)
 
 ## Test template
 #
