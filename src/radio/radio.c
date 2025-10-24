@@ -35,6 +35,17 @@ void radio_init(void) {
 }
 
 
+void radio_boot(void) {
+    /* (automatic) boot procedure:
+     * - set CSn to low,
+     * - wait for SO to go high -> takes 3µs, is this length measurable ? */
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    while(gpio_get(BADGE_SPI1_RX_MISO_RADIO_SO))
+        tight_loop_contents();
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
+
+
 /** \brief SPI read/write pulling CSn down for the whole transaction, \p response can be NULL
  *
  * We chose to block until the \p len bytes are written, as the communication is fast (~1MHz)

@@ -286,22 +286,10 @@ void tx_chat_flipper(const uint8_t *msg) {
 int main() {
     stdio_usb_init();
 
-    /* (automatic) boot procedure:
-     * - set CSn to low,
-     * - wait for SO to go high -> takes 3µs, is this length noise? */
-    gpio_init(BADGE_SPI1_RX_MISO_RADIO_SO);
-    gpio_init(BADGE_SPI1_CSn_RADIO);
-
-    absolute_time_t t0 = get_absolute_time();
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    gpio_set_dir(BADGE_SPI1_CSn_RADIO, GPIO_OUT);
-    while(gpio_get(BADGE_SPI1_RX_MISO_RADIO_SO))
-        tight_loop_contents();
-    absolute_time_t t1 = get_absolute_time();
-    printf("\nCC1101 booted in %" PRIu64 "µs\n", absolute_time_diff_us(t0, t1));
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
-
+    printf("init\n");
     radio_init();
+    printf("boot\n");
+    radio_boot();
     gpio_init(BADGE_RADIO_GDO0);
     gpio_init(BADGE_RADIO_GDO2);
 
@@ -340,4 +328,12 @@ int main() {
     sleep_us(100);  /* Have to wait ~100µ before we see the chip powers down */
     print_status();
     /* Bringing CSn to 0 again will wake up the chip */
+    sleep_ms(1000);
+    printf("reboot\n");
+    radio_boot();
+    print_status();
+    sleep_ms(1000);
+    printf("restop\n");
+    uint8_t cmd = CC1101_SPWD;
+    radio_send(&cmd, NULL, 1);
 }

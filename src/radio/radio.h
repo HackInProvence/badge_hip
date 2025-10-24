@@ -3,7 +3,7 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/** \file screen.h
+/** \file radio.h
  *
  * \brief Radio API:
  *
@@ -29,6 +29,9 @@
 
 /** \brief Initialize the radio library for write operations. */
 void radio_init(void);
+
+/** \brief Boot the radio module (or wake from deep sleep) */
+void radio_boot(void);
 
 /** \brief Sets the frequency (in Hz) of the transmission
  *
