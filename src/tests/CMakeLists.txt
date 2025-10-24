@@ -56,7 +56,6 @@ pico_add_extra_outputs(test_radio)
 
 target_link_libraries(test_radio PRIVATE
     hardware_gpio
-    hardware_spi
     pico_stdlib
     pico_time
     radio
