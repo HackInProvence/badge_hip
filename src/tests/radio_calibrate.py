@@ -10,13 +10,34 @@ Try to calibrate the CC1101 crystal using the serial port.
 The radio_calibrate program must be flashed on the device.
 Requires pyserial.
 
+Manual:
+- flash the radio_calibrate.uf2 image on the pico/badge,
+- reboot it but while connected in USB (ground 3V3_EN on the pico),
+- wait for a reasonably long time (10s, 100s),
+- start this script, which should connect to the pico with UART over USB,
+- Ctrl-C as soon as the first status line appears
+- "In 0.60050011s (0.60000200s on pico), rate is 25.996640818 MHz (25.997476167 on pico)"
+-                                                                  ^^^^^^^^^^^^--- best estimate (by the pico)
+- either change it in src/radio/radio.h:CC1101_fXOSC and recompile,
+- or use the test_radio.dis image to locate radio_set_frequency:
+  - the constant @<radio_set_frequency+0x30> is the CC1101_fXOSC,
+  - this gives you the offset of the constant (26MHz == 0x018cba80, or 25.997640 == 0x018cb148) -> 0x10006824 for instance,
+  - subtract 0x10000000 and you have the index in the .bin file, but not in the UF2 file,
+  - using your favorite hexeditor, search for it in the uf2 file, it should be 4-bytes aligned and in little endian,
+    and the function around it should be the same as in the .bin or in the .dis.
+  - xxd src/tests/test_radio.uf2 | sed 's/80ba 8c01/48b1 8c01/' | xxd -r - src/tests/test_radio.uf2
+                                                    ^^^^^^^^^---new value
+                                          ^^^^^^^^^-------------old value
+
 Conclusions:
 - the pico time is accurate (at least it does not deviate from my laptop clock),
 - when connecting to the serial to read the frequency, it slows down;
   this may be caused by the UART that may have a higher priority interrupt than our GPIO counter
-  -> we should use core 1 to count!
-- we can read the most precise value by flashing the radio_calibrate.uf2, rebooting the pico,
-  waiting (> 10s ?), then connecting with UART (once connected, even if disconnected, the value drifts).
+  -> we should use core 1 to count! -> THIS WORKS BETTER, but it still drifts low when we connect with UART...
+- without multi-core, we can read the most precise value by flashing the radio_calibrate.uf2, rebooting the pico,
+  waiting (> 10s ?), then connecting with UART (once connected, even if disconnected, the value drifts) -> 29_997_640 Hz
+- the python value oscillates because it depends on the serial module,
+  but it is a mean over the whole time the script runs, so it should stabilize -> 29_997_100 Hz
 """
 
 import time
@@ -47,7 +68,7 @@ if __name__ == '__main__':
                 if not l:
                     print('nothing received, ended?')
                     break
-                if b'GDO0' in l:
+                if b'GDO0' in l or b'started' in l:
                     continue
                 ts = time.time()  # Our ts
                 data.append([ts]+list(map(int,l.decode().split(','))))

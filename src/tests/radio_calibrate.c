@@ -3,7 +3,9 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/** \brief Program to "calibrate" the CC1101 crystal from the CPU crystal */
+/** \brief Program to "calibrate" the CC1101 crystal from the CPU crystal
+ *
+ * See radio_calibrate.py */
 
 
 // Include sys/types.h before inttypes.h to work around issue with
@@ -13,6 +15,7 @@
 #include <stdio.h>
 
 #include "hardware/gpio.h"
+#include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
@@ -23,9 +26,23 @@ void radio_send(const uint8_t *data, uint8_t *response, size_t len);
 
 
 static uint64_t rises = 0;
+static absolute_time_t t0 = 0;
 
 void counter(uint gpio, uint32_t events) {
     ++rises;
+}
+
+
+void setup_counter(void) {
+    /* Set up the IRQ on this core so that it is never "interrupted" by anything else */
+
+    /* Set up the interrupt on rising edges of GDO0 to count and start counting */
+    t0 = get_absolute_time();
+    gpio_set_irq_enabled_with_callback(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE, true, &counter);
+
+    /* What happens if we exit this function? */
+    while(true)
+        tight_loop_contents();
 }
 
 
@@ -42,9 +59,13 @@ int main() {
     uint16_t cmd = CC1101_IOCFG0 | (0x3D<<8);  /* 96 times divider (the CPU does not handle 64 or lower dividers) */
     radio_send((uint8_t *)&cmd, NULL, 2);
 
-    /* Set up the interrupt on rising edges of GDO0 to count and start counting */
-    absolute_time_t t0 = get_absolute_time(), last = t0, now;
-    gpio_set_irq_enabled_with_callback(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE, true, &counter);
+    /* Set up the interrupt on the other core, so that the UART does not interrupt the interrupt */
+    multicore_launch_core1(setup_counter);
+    while(0 == t0)
+        tight_loop_contents();  /* The other core may take time to boot */
+    printf("core 1 started\n");
+
+    absolute_time_t last = t0;
     while(true) {
         absolute_time_t now = get_absolute_time();
         uint64_t dt = absolute_time_diff_us(last, now);

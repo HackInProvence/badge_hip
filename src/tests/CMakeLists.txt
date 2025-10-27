@@ -71,6 +71,7 @@ pico_add_extra_outputs(radio_calibrate)
 
 target_link_libraries(radio_calibrate PRIVATE
     hardware_gpio
+    pico_multicore
     pico_stdlib
     pico_time
     radio

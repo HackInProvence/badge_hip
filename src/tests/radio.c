@@ -145,7 +145,8 @@ void tx_pulses(void) {
     print_configuration();
 
     // Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
-    radio_send("\x35", NULL, 1);
+    uint8_t cmd = CC1101_STX;
+    radio_send(&cmd, NULL, 1);
     wait_state(0b010);  /* FIXME: replace magic numbers by name */
 
     gpio_init(BADGE_RADIO_GDO0);
@@ -160,6 +161,10 @@ void tx_pulses(void) {
         sleep_ms(95);
         print_status();
     }
+
+    cmd = CC1101_SIDLE;
+    radio_send(&cmd, NULL, 1);
+    wait_state(0b000);
 }
 
 
@@ -242,12 +247,15 @@ const uint8_t conf_gfsk999[] = {
 
 /** \brief msg must be \0 terminated */
 void tx_chat_flipper(const uint8_t *msg) {
+    /* Maybe someone else, like rx_pulses did not reset the direction of this pin... */
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+
     /* 800µs per byte */
     radio_send(conf_gfsk999, NULL, sizeof(conf_gfsk999));
     radio_set_frequency(433920000);
     print_configuration();
 
-    /* we send data in 63 bytes blocks to simplify the transmission (no interrupt, use GD0 to follow the current packet status) */
+    /* We send data in 63 bytes blocks to simplify the transmission (no interrupt, use GD0 to follow the current packet status) */
     size_t len = strlen(msg);
     size_t block_len;
     uint8_t tx[66];  /* Group the flush + burst write FIFO in a single SPI write */
@@ -262,16 +270,15 @@ void tx_chat_flipper(const uint8_t *msg) {
         tx[1] = CC1101_BURST(CC1101_TXFIFO);
         tx[2] = block_len;  /* We are in variable length: the first byte in the FIFO must be the length */
         radio_send(tx, NULL, block_len+3);
-
         print_status();
+
         tx[0] = CC1101_STX;
         radio_send(tx, NULL, 1);
-        print_status();
+        wait_state(0b010);  /* FIXME: magic */
 
         /* Wait for GD0 to go high (preamble+sync has been sent) */
         while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
             tight_loop_contents();
-        print_status();
 
         /* Wait for GD0 to go low (packet has been sent) */
         while(gpio_get(BADGE_RADIO_GDO0))
@@ -284,6 +291,7 @@ void tx_chat_flipper(const uint8_t *msg) {
 
 
 int main() {
+    uint8_t cmd[2];
     stdio_usb_init();
 
     printf("init\n");
@@ -295,8 +303,15 @@ int main() {
 
     print_status();
 
-    //tx_pulses();
+    tx_pulses();
     //rx_times();
+
+    /* We need a reset between changing modes, otherwise some of the conf makes it never go out of calibrating */
+    cmd[0] = CC1101_SRES;
+    printf("reset\n");
+    radio_send(cmd, NULL, 1);
+    wait_state(0);
+
     tx_chat_flipper("Badge SecSea joined chat.\n");
     sleep_ms(3000);
     tx_chat_flipper("Badge SecSea: Hey, how are you?\n");
@@ -324,7 +339,8 @@ int main() {
     sleep_ms(2000);  /* When out of TX mode, it still emits around the frequency here, but it's okay we are not in IDLE */
 
     printf("stop\n");
-    radio_send("\x36\x39", NULL, 2); /* Return to IDLE, then power down */
+    cmd[0] = CC1101_SPWD;
+    radio_send(cmd, NULL, 1);
     sleep_us(100);  /* Have to wait ~100µ before we see the chip powers down */
     print_status();
     /* Bringing CSn to 0 again will wake up the chip */
@@ -334,6 +350,6 @@ int main() {
     print_status();
     sleep_ms(1000);
     printf("restop\n");
-    uint8_t cmd = CC1101_SPWD;
-    radio_send(&cmd, NULL, 1);
+    cmd[0] = CC1101_SPWD;
+    radio_send(cmd, NULL, 1);
 }

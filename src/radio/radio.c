@@ -40,7 +40,7 @@ void radio_boot(void) {
      * - set CSn to low,
      * - wait for SO to go high -> takes 3µs, is this length measurable ? */
     gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    while(gpio_get(BADGE_SPI1_RX_MISO_RADIO_SO))
+    while(gpio_get(BADGE_SPI1_RX_MISO_RADIO_SO))  /* Works fine, even though the pin has the SPI function */
         tight_loop_contents();
     gpio_put(BADGE_SPI1_CSn_RADIO, 1);
 }

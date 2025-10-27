@@ -9,6 +9,10 @@
  *
  * TODO:
  * - homogeneize static functions and their names with other libs (send is send in screen but radio_send here),
+ * - decide whether print_status and its could be macros could be useful for others (e.g. debug),
+ * - decide radio_burst_read,
+ * - provide a state_then_wait or accessors to change states,
+ * - lock on a messaging protocol and provide methods for that.
  * */
 
 #ifndef _RADIO_H
@@ -24,6 +28,8 @@
 #define BADGE_SPI1_CSn_RADIO 13
 #define BADGE_SPI1_RX_MISO_RADIO_SO 28
 #define BADGE_RADIO_GDO2 21
+// Also add our custom fXOSC
+#define CC1101_fXOSC 25997640
 #endif
 
 
@@ -40,8 +46,10 @@ void radio_boot(void);
 void radio_set_frequency(uint32_t freq_hz);
 
 
-/** \brief Define the CC1101 cristal frequency, which we guess for now (between 26 and 27MHz) */
-#define CC1101_fXOSC 25997000
+#ifndef CC1101_fXOSC
+/** \brief Define the CC1101 cristal frequency, which we can calibrate with radio_calibrate.c and .py */
+#define CC1101_fXOSC 26000000
+#endif
 
 /* Register access type: default is write single byte, but these sets byte to change the access
  * CC1101_READ to read a byte instead of write,
