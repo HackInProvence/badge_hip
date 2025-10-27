@@ -18,7 +18,7 @@
 #define BADGE_SCREEN_DC 8
 #define BADGE_SCREEN_BUSY 9
 #define BADGE_SCREEN_RST 10
-//#define BADGE_GPIO11 11
+#define BADGE_LED 11
 #define BADGE_UART0_TX 12
 #define BADGE_UART0_RX 13
 #define BADGE_BUTTON_B 14
@@ -36,6 +36,6 @@
 #define BADGE_SPI1_SCK_RADIO 26
 #define BADGE_SPI1_TX_MOSI_RADIO_SI 27
 #define BADGE_BUZZER 28
-#define BADGE_LED 29
+#define BADGE_VBAT 29
 
 #endif /* _BADGE_PINOUT_H */

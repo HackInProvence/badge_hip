@@ -44,9 +44,10 @@
  * TODO:
  * - text -> probably too complex, we will send pre-rendered images,
  * - have a ws that uses the RED ram as a mask to NOT update some pixels (overlay),
- * - try to have more gray levels (uses the DONTOUCH mask).
+ * - try to have more gray levels (uses the DONTOUCH mask),
  * - have a ws that refresh a zone of the RAM (uses the RED mask to not touch the rest), so that a previous black can be canceled,
- *   then push the new image for that zone and draw it quicker/without traces
+ *   then push the new image for that zone and draw it quicker/without traces,
+ * - replace all magic numbers (...).
  * */
 
 #ifndef _SCREEN_H
