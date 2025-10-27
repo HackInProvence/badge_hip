@@ -1,4 +1,5 @@
 # Add libraries projects
+add_subdirectory(btns)
 add_subdirectory(leds)
 add_subdirectory(music)
 add_subdirectory(noise_gen)

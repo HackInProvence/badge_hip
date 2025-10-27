@@ -99,6 +99,22 @@ pico_enable_stdio_usb(test_leds 1)
 pico_enable_stdio_uart(test_leds 0)
 
 
+# Test btns
+
+add_executable(test_btns)
+target_sources(test_btns PRIVATE btns.c)
+pico_add_extra_outputs(test_btns)
+
+target_link_libraries(test_btns PRIVATE
+    pico_stdlib
+    btns
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_btns 1)
+pico_enable_stdio_uart(test_btns 0)
+
+
 ## Test template
 #
 #add_executable(test_template)
