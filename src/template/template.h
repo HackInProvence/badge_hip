@@ -3,7 +3,7 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/** \file screen.h
+/** \file template.h
  *
  * \brief Template API:
  *

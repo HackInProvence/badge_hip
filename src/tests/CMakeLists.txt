@@ -115,6 +115,22 @@ pico_enable_stdio_usb(test_btns 1)
 pico_enable_stdio_uart(test_btns 0)
 
 
+# Test logs
+
+add_executable(test_log)
+target_sources(test_log PRIVATE log.c)
+pico_add_extra_outputs(test_log)
+
+target_link_libraries(test_log PRIVATE
+    pico_stdlib
+    log
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_log 1)
+pico_enable_stdio_uart(test_log 0)
+
+
 ## Test template
 #
 #add_executable(test_template)
