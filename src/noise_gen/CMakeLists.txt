@@ -1,9 +1,10 @@
 add_library(noise_gen INTERFACE)
 target_sources(noise_gen INTERFACE ${CMAKE_CURRENT_LIST_DIR}/noise_gen.c)
-target_include_directories(noise_gen SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR} "..")
+target_include_directories(noise_gen SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 pico_generate_pio_header(noise_gen ${CMAKE_CURRENT_LIST_DIR}/noise_gen.pio)
 
 target_link_libraries(noise_gen INTERFACE
+    badge
     hardware_pio
     pico_rand
 )

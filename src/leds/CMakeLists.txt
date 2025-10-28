@@ -1,9 +1,10 @@
 add_library(leds INTERFACE)
 target_sources(leds INTERFACE ${CMAKE_CURRENT_LIST_DIR}/leds.c)
-target_include_directories(leds SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR} "..")
+target_include_directories(leds SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 pico_generate_pio_header(leds ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 
 target_link_libraries(leds INTERFACE
+    badge
     hardware_pio
 )
 

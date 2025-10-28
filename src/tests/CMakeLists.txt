@@ -5,6 +5,7 @@ target_sources(test_noise_gen PRIVATE noise_gen.c)
 pico_add_extra_outputs(test_noise_gen)
 
 target_link_libraries(test_noise_gen PRIVATE
+    badge
     pico_stdlib
     noise_gen
 )
@@ -21,6 +22,7 @@ target_sources(test_music PRIVATE music.c)
 pico_add_extra_outputs(test_music)
 
 target_link_libraries(test_music PRIVATE
+    badge
     pico_stdlib
     music
 )
@@ -57,6 +59,7 @@ target_sources(test_radio PRIVATE radio.c)
 pico_add_extra_outputs(test_radio)
 
 target_link_libraries(test_radio PRIVATE
+    badge
     hardware_gpio
     pico_stdlib
     pico_time
@@ -72,6 +75,7 @@ target_sources(radio_calibrate PRIVATE radio_calibrate.c)
 pico_add_extra_outputs(radio_calibrate)
 
 target_link_libraries(radio_calibrate PRIVATE
+    badge
     hardware_gpio
     pico_multicore
     pico_stdlib
@@ -91,6 +95,7 @@ target_sources(test_leds PRIVATE leds.c)
 pico_add_extra_outputs(test_leds)
 
 target_link_libraries(test_leds PRIVATE
+    badge
     hardware_pio
     pico_stdlib
     leds
@@ -108,6 +113,7 @@ target_sources(test_btns PRIVATE btns.c)
 pico_add_extra_outputs(test_btns)
 
 target_link_libraries(test_btns PRIVATE
+    badge
     pico_stdlib
     btns
 )
@@ -124,6 +130,7 @@ target_sources(test_log PRIVATE log.c)
 pico_add_extra_outputs(test_log)
 
 target_link_libraries(test_log PRIVATE
+    badge
     pico_stdlib
     log
 )
@@ -140,6 +147,7 @@ pico_enable_stdio_uart(test_log 0)
 #pico_add_extra_outputs(test_template)
 #
 #target_link_libraries(test_template PRIVATE
+#    badge
 #    pico_stdlib
 #    template
 #)
