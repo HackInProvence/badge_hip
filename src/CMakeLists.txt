@@ -1,6 +1,8 @@
 # This is to be able to include the pinout from libraries
 add_library(badge INTERFACE)
 target_include_directories(badge SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+# To be overriden in tests, to be able to test the static things, also see src/tests/tests.h
+target_compile_definitions(badge INTERFACE STATIC=static)
 
 # Add libraries projects
 add_subdirectory(btns)
