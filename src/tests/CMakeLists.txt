@@ -37,6 +37,8 @@ target_sources(test_screen PRIVATE screen.c)
 pico_add_extra_outputs(test_screen)
 
 target_link_libraries(test_screen PRIVATE
+    badge
+    badge_images
     hardware_gpio
     hardware_spi
     pico_stdlib
