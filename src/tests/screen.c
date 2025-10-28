@@ -15,9 +15,9 @@
 #include "pico/time.h"
 
 #include "badge_pinout.h"
+#include "log.h"
 #include "screen.h"
-
-
+#include "tests.h"
 
 
 // Waveform settings, showing grays
@@ -60,59 +60,97 @@ const uint8_t ws_1681_times[159] = \
 #include "companion.h"
 
 
-int main() {
-    stdio_usb_init();
 
-    screen_init();
-    printf("Boot sequence\n");
-    while(! screen_boot())
-        tight_loop_contents();
-    printf("Ready\n");
+void test_read_all(void) {
+    /* TODO: read everything that can be read from the screen memory */
+}
 
-    //read_all(); /* TODO */
 
-    size_t len = screen_set_image_position(0, 0, 200, 200);
-    printf("image should be of size %d\n", len);
+void test_show_bw_images(void) {
+    printf("push b/w images\n");
 
-    printf("push b/w image\n");
-    //screen_push_ws(ws_1681_times);
-    screen_show_image_bw(text_bw);
-    //screen_show_image_bw(hip_bw);
-    //screen_show_image_bw(secsea_bw);
-    while(screen_busy())
-        tight_loop_contents();
-    printf("done\n");
+#define _show_bw(ptr) { \
+    absolute_time_t t0, now; \
+    printf("- " #ptr ":"); \
+    t0 = get_absolute_time(); \
+    screen_show_image_bw(ptr); \
+    while(screen_busy()) \
+        tight_loop_contents(); \
+    now = get_absolute_time(); \
+    printf(" done, took %" PRIu64 "µs\n", absolute_time_diff_us(t0, now)); \
+    sleep_ms(1000); \
+}
+    _show_bw(text_bw)
+    _show_bw(hip_bw)
+    _show_bw(secsea_bw)
+}
 
-    sleep_ms(2000);
+void test_show_4g_images(void) {
     printf("push 4g image\n");
-    screen_push_ws(screen_ws_1681_4grays);
-    //screen_push_rams(text_bw, squares_bw); /* LSB, MSB */
-    //screen_push_rams(grad_4g_lsb, grad_4g_msb);
-    screen_push_rams(secsea_4g_lsb, secsea_4g_msb, 5000);
-    screen_show_rams();
-    while(screen_busy())
-        tight_loop_contents();
-    printf("done\n");
 
-    sleep_ms(2000);
-    printf("push subimage\n");
+#define _show_4g(lsb, msb) { \
+    absolute_time_t t0, now; \
+    printf("- " #lsb ", " #msb ":"); \
+    t0 = get_absolute_time(); \
+    screen_show_image_4g(lsb, msb); \
+    while(screen_busy()) \
+        tight_loop_contents(); \
+    now = get_absolute_time(); \
+    printf(" done, took %" PRIu64 "µs\n", absolute_time_diff_us(t0, now)); \
+    sleep_ms(1000); \
+}
+    _show_4g(text_bw, squares_bw)
+    _show_4g(grad_4g_lsb, grad_4g_msb)
+    _show_4g(secsea_4g_lsb, secsea_4g_msb)
+}
+
+
+void test_subimage(void) {
+    /* We see the previous image, even if the screen was cleared.
+     * This is EXPECTED. */
+    size_t len;
+    printf("push subimage:");
     screen_push_ws(screen_ws_1681_4grays);
-    //len = screen_set_image_position(48, 68, 168, 168);
-    //screen_push_rams(notif_4g_lsb, notif_4g_msb, len);
-    len = screen_set_image_position(32, 25, 32+companion_width*8, 25+companion_height);
+    len = screen_set_image_position(48, 68, 168, 168);
+    screen_push_rams(notif_4g_lsb, notif_4g_msb, len);
+    len = screen_set_image_position(32, 18, 32+companion_width*8, 18+companion_height);
     screen_push_rams(companion_lsb, companion_msb, len);
     screen_show_rams();
     while(screen_busy())
         tight_loop_contents();
-    printf("done\n");
-
-    /* It was tested that the screen is cleared then something else can be drawn */
+    printf(" done\n");
     sleep_ms(2000);
+}
+
+
+void test_clear(void) {
     printf("clear to white\n");
-    screen_clear(1);  // Clear to white before sleep
+    screen_clear(1);  /* Tests showed that normal draws can occur after this one */
     while(screen_busy())
         tight_loop_contents();
     printf("done\n");
+}
+
+
+int main() {
+    stdio_usb_init();
+    log_set_level(LOG_LEVEL_INFO);
+
+    screen_init();
+    printf("boot sequence\n");
+    while(! screen_boot())
+        tight_loop_contents();
+
+    size_t len = screen_clear_image_position();
+    printf("fullscreen images should be of size %d\n", len);
+
+    //test_read_all();
+    //test_show_bw_images();
+    //test_show_4g_images();
+    test_subimage();
+
+    /* Clear to white before going to sleep */
+    test_clear();
 
     screen_deep_sleep();
     sleep_ms(1000);

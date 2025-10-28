@@ -44,6 +44,7 @@ target_link_libraries(test_screen PRIVATE
     hardware_gpio
     hardware_spi
     pico_stdlib
+    log
     screen
 )
 

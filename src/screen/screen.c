@@ -4,12 +4,18 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIu64
+#include <sys/types.h>
+#include <inttypes.h>
+
 #include "hardware/gpio.h"
 #include "hardware/spi.h"
 #include "pico/binary_info.h"
 #include "pico/time.h"
 
 #include "badge_pinout.h"
+#include "log.h"
 #include "screen.h"
 
 
@@ -22,12 +28,12 @@ typedef enum {
     STATE_SETUP = 4,  /* Does a BUSY operation */
     STATE_READY = 5,  /* You can send commands (if not busy) */
 } state_t;
-static state_t state = STATE_UNINIT;
-static absolute_time_t state_ts = 0;  /* Last time the state changed */
+STATIC state_t state = STATE_UNINIT;
+STATIC absolute_time_t state_ts = 0;  /* Last time the state changed */
 
 
 /* Send data on the SPI but don't wait for BUSY to be LOW */
-static void send(const uint8_t *cmd, size_t len) {
+STATIC void send(const uint8_t *cmd, size_t len) {
     if(! cmd || len == 0)
         return;
 
@@ -65,11 +71,12 @@ void screen_init(void) {
 
     state = STATE_SLEEP;
     state_ts = get_absolute_time();
+    log_info("screen init ok");
 }
 
 
 /* Sets up some common parameters on the screen, must be STATE_READY and not busy */
-static void setup(void) {
+STATIC void setup(void) {
     /* Driver output control */
     send("\x01\xC7\x00\x00", 4);  /* Driver output control: 199+1 lines, no gate interlacing */
 
@@ -114,6 +121,7 @@ bool screen_boot(void) {
         if (absolute_time_diff_us(state_ts, now) >= 10000) {
             /* Starts HW RESET by pulling its pin down */
             gpio_put(BADGE_SCREEN_RST, 0);
+            log_info("boot: SLEEP lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
             state = STATE_HWRESET;
             state_ts = get_absolute_time();
         }
@@ -127,6 +135,7 @@ bool screen_boot(void) {
             if (! gpio_get(BADGE_SCREEN_BUSY)) {
                 /* Now send a command to the screen and wait for busy to be low */
                 send("\x12", 1);
+                log_info("boot: HWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
                 state = STATE_SWRESET;
                 state_ts = get_absolute_time();
             }
@@ -135,6 +144,7 @@ bool screen_boot(void) {
     case STATE_SWRESET:
         /* SWRESET is sent, now wait for busy to be low */
         if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
+            log_info("boot: SWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
             state = STATE_SETUP;
             state_ts = get_absolute_time();
             setup();
@@ -143,6 +153,7 @@ bool screen_boot(void) {
     case STATE_SETUP:
         /* Wait for setup: load LUT with temperature reading */
         if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
+            log_info("boot: SETUP lasted %" PRIu64 "µs, now ready", absolute_time_diff_us(state_ts, now));
             state = STATE_READY;
             state_ts = get_absolute_time();
         }
@@ -162,8 +173,10 @@ bool screen_busy(void) {
 
 
 void screen_border(uint8_t color) {
-    if (screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_border() called but screen is busy");
         return;
+    }
 
     /* Put the command in a 2 bytes int
      * bit 2 = follow LUT, bit 1-0 = LUTx */
@@ -173,8 +186,10 @@ void screen_border(uint8_t color) {
 
 
 void screen_clear(bool bit) {
-    if (screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_clear() called but screen is busy");
         return;
+    }
 
     /* RAM bypass configuration. 4 bits per RAM bank. LSB for black and white, MSB for red bank.
      * RRRR WWWW
@@ -196,19 +211,24 @@ void screen_clear(bool bit) {
 
 
 void screen_deep_sleep(void) {
-    if (screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_deep_sleep() called but screen is busy");
         return;
+    }
 
     /* After that, the screen keeps the BADGE_SCREEN_BUSY pin high until hard reset */
     send("\x10\x01", 2);  /* 0x01 or 0x03... */
     state = STATE_SLEEP;
     state_ts = get_absolute_time();
+    log_info("screen put asleep");
 }
 
 
 size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
-    if (screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_set_image_position() called but screen is busy");
         return -1;
+    }
 
     /* Swap min/max if needed */
     uint8_t o;
@@ -246,32 +266,38 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 
 
 void screen_show_image_bw(const uint8_t *img) {
-    if(screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_show_image_bw() called but screen is busy");
         return;
+    }
 
     /* Automatic function that does the manual commands */
-    screen_set_image_position(0, 0, 200, 200);
+    screen_clear_image_position();
     screen_push_ws(screen_ws_1681_bw);
-    screen_push_rams(img, NULL, 5000);
+    screen_push_rams(img, NULL, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
     screen_show_rams();
 }
 
 
 void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb) {
-    if(screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_show_image_4g() called but screen is busy");
         return;
+    }
 
     /* Automatic function that does the manual commands */
-    screen_set_image_position(0, 0, 200, 200);
+    screen_clear_image_position();
     screen_push_ws(screen_ws_1681_4grays);
-    screen_push_rams(lsb, msb, 5000);
+    screen_push_rams(lsb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
     screen_show_rams();
 }
 
 
 void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
-    if(screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_push_rams() called but screen is busy");
         return;
+    }
 
     /* Configure RAM bypass to use only the pushed planes */
     uint16_t cmd = 0x21;
@@ -299,8 +325,10 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
 
 
 void screen_show_rams(void) {
-    if(screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_show_rams() called but screen is busy");
         return;
+    }
 
     /* Configure then Activate */
     /* 0xC7 seems the normal mode for our target */
@@ -312,8 +340,10 @@ void screen_show_rams(void) {
 
 
 void screen_push_ws(const uint8_t *luts) {
-    if (screen_busy())
+    if (screen_busy()) {
+        log_warning("screen_push_ws() called but screen is busy");
         return;
+    }
 
     /* First 153 are the LUT + similar parameters */
     gpio_put(BADGE_SCREEN_DC, 0);  /* Low for commands, high for data */

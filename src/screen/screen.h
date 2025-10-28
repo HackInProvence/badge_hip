@@ -18,8 +18,12 @@
  * If image transfer is not quick enough, we can use DMA with SPI DREQ to transfer data to the screen.
  * However, be aware that the D/C pin must be low when pushing the first byte, then it must be kept high.
  *
- * Another note is that the MOSI/RX and MISO/TX pins are a single pin of the e-Paper device (DIN).
- * You have to put the RX pin to another GPIO function so that it does not short circuit the TX pin while reading.
+ * Most of the commands require the screen to not be busy, which means that it must be booted
+ * and not currently working. Few of the commands take time (e.g. rendering) and the documentation of the functions
+ * explain when to be not busy and whether the screen will be busy afterwards.
+ *
+ * Another note is that the MOSI/TX and MISO/RX pins are a single pin of the e-Paper device (DIN).
+ * You have to put the TX pin to another GPIO function so that it does not overwrite the RX pin while reading.
  *
  * You can compile images using the image2epaper.py script.
  *
@@ -37,14 +41,19 @@
  * - either push another image
  * - or go screen_deep_sleep() -> call screen_boot() to reset and push other images.
  *
+ * You can find the whole datasheet/documentation of the screen by either searching for ePaper waveshare 1\"54
+ * or by searching for the datasheet of the SSD1681, which is the controller of this ePaper model.
+ *
  * NOTE: the datasheet recommends to deep sleep as soon as possible,
  *  and to screen_clear() before going for longer sleeps (days),
  *  and to not refresh the screen too much (> 3 minutes between refreshes (!!!)).
  *
  * TODO:
  * - text -> probably too complex, we will send pre-rendered images,
- * - have a ws that uses the RED ram as a mask to NOT update some pixels (overlay),
- * - try to have more gray levels (uses the DONTOUCH mask),
+ * - ~~have a ws that uses the RED ram as a mask to NOT update some pixels (overlay)~~
+ *   have a ws that does not change pixels that are equals in both RAMs, and update the others
+ *   -> have a "rolling frame" and show the diffs,
+ * - try to have more gray levels (try to adjust the FR[n]),
  * - have a ws that refresh a zone of the RAM (uses the RED mask to not touch the rest), so that a previous black can be canceled,
  *   then push the new image for that zone and draw it quicker/without traces,
  * - replace all magic numbers (...).
@@ -53,16 +62,20 @@
 #ifndef _SCREEN_H
 #define _SCREEN_H
 
+#define SCREEN_HEIGHT 200
+#define SCREEN_WIDTH 200
 
 /** \brief Initialize the screen library for write operations. */
 void screen_init(void);
 
 /** \brief Boots the screen (hard reset, soft reset, setup).
  *
- * Must be called regularly (e.g. 100Hz) until it returns true.
+ * Booting is a long process (~21ms) and this function goes through the steps to boot.
+ * This function does not block more than hundreds of µs to send commands through the SPI,
+ * hence it must be called regularly (e.g. 100Hz) until it returns true.
  * Must be called after \ref screen_init.
  *
- * \return true when ready. */
+ * \return true when ready, after at least 4 calls. */
 bool screen_boot(void);
 
 /** \brief Tells whether the screen is busy for now.
@@ -82,7 +95,7 @@ void screen_border(uint8_t color);
 /** \brief Show a uniform image. Clear to white before storing the screen for long times (days).
  *
  * The screen must not be busy.
- * This keeps the screen busy for a while.
+ * This keeps the screen busy for a while (~1.8s).
  *
  * Bypasses the RAM content to display \param on the whole bit but uses the current LUTs,
  * which may change the color if you pushed another LUT beforehand.
@@ -96,8 +109,37 @@ void screen_clear(bool bit);
  *
  * The screen must not be busy.
  *
- * After being asleep, the screen will stay busy and needs to be reset and booted again, see \ref screen_boot. */
+ * After being asleep, the screen will stay busy and needs to be booted again, see \ref screen_boot. */
 void screen_deep_sleep(void);
+
+/** \brief Show the image fullscreen with 2 colors (black and white).
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while (~1.8s).
+ *
+ * The screen will be cleared before showing your image.
+ *
+ * Bytes are always packed 8bits per byte, where a bit is a pixel
+ * (1 for white, 0 for black).
+ *
+ * \param img   The image buffer, which must be of size 5000 (=200*(200/8)) */
+void screen_show_image_bw(const uint8_t *img);
+
+/** \brief Show the image fullscreen with 4 colors (4 gray levels).
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while (~1.9s).
+ *
+ * The screen will be cleared before showing your image.
+ *
+ * Bytes are always packed 8bits per byte, where a bit is a pixel.
+ * The image is organized in 2 planes: one is the most significant bit (\param MSB) of the pixel color,
+ * the other is the least significant bit (\param LSB).
+ * They form a color between 00 for black to 11 for white.
+ *
+ * \param lsb   The image LSB plane, which must be of size 5000 (=200*(200/8))
+ * \param lsb   The image MSB plane, which must be of size 5000 */
+void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
 
 /** \brief Set the screen position of the next image
  *
@@ -109,40 +151,19 @@ void screen_deep_sleep(void);
  *
  * The x1 and y1 coordinate include the last line/column (x1 = x0+image_width).
  *
- * To show the fullscreen, use (0, 0, 200, 200).
+ * To show the fullscreen, use the macro screen_clear_image_position().
  * Remember that pushing a partial image does not overwrite the RAM outside of the selected window,
  * which will be displayed on the next screen_show_rams()...
+ *
+ * There may be a bug/feature when you push too much data to the window,
+ * it will leak on lines with y < y0.
  *
  * \return The number of bytes of the bitplane to push (image size = (y1-y0)*((x1-x0)//8))
  * \return SIZE_T_MAX when the screen is busy */
 size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
+#define screen_clear_image_position() screen_set_image_position(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-/** \brief Show the image fullscreen with 2 colors (black and white).
- *
- * The screen must not be busy.
- * This keeps the screen busy for a while.
- *
- * Bytes are always packed 8bits per byte, where a bit is a pixel
- * (1 for white, 0 for black).
- *
- * \param img   The image buffer, which must be of size 5000 (=200*(200/8)) */
-void screen_show_image_bw(const uint8_t *img);
-
-/** \brief Show the image fullscreen with 4 colors (4 gray levels).
- *
- * The screen must not be busy.
- * This keeps the screen busy for a while.
- *
- * Bytes are always packed 8bits per byte, where a bit is a pixel.
- * The image is organized in 2 planes: one is the most significant bit (\param MSB) of the pixel color,
- * the other is the least significant bit (\param LSB).
- * They form a color between 00 for black to 11 for white.
- *
- * \param lsb   The image LSB plane, which must be of size 5000 (=200*(200/8))
- * \param lsb   The image MSB plane, which must be of size 5000 */
-void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
-
-/** \brief Push an image with 2 bit planes.
+/** \brief Low level: push an image with 2 bit planes in the current screen position.
  *
  * The screen must not be busy.
  *
@@ -162,7 +183,7 @@ void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
  */
 void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len);
 
-/** \brief Actually show the image in RAM using the current waveform settings pushed to screen.
+/** \brief Low level: actually show the image in RAM using the current waveform settings pushed to screen.
  *
  * The screen must not be busy.
  * This keeps the screen busy for a while.
@@ -170,7 +191,7 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len);
  * Use with \ref screen_push_ws and \ref screen_push_rams. */
 void screen_show_rams(void);
 
-/** \brief Advanced/Hack: push a new Waveform Settings to the screen.
+/** \brief Low level: push a new Waveform Settings to the screen.
  *
  * You should read the SSD1681 datasheet to understand how to program the waveform settings.
  * It is meant to be able to develop new LUT and enhance your display.
@@ -184,15 +205,21 @@ void screen_show_rams(void);
 void screen_push_ws(const uint8_t *luts);
 
 
-/** Waveform settings, taken from the Arduino "test suite"
- * 2 colors, only uses the B/W RAM, 0 = black, 1 = white */
+/** Waveform settings, taken from the Arduino "test suite".
+ * 2 colors, only uses the B/W RAM, 0 = black, 1 = white.
+ * 3 steps: show image inversed, clear black/white trice, show your image (~1.8s) */
 extern const uint8_t screen_ws_1681_bw[];
 
-/* Homemade to get 4 colors instead of 2.
+/** Homemade waveform settings to get 4 colors instead of 2.
  * You have now 2 bit planes per pixels!
  * You must use the RED RAM for the MSB of the pixel, and the B/W RAM for the LSB.
- * 00 is black, 01 is dark, 10 is light, 11 is white*/
+ * 00 is black, 01 is dark, 10 is light, 11 is white
+ * 3 steps: show image inversed, clear black/white trice, show your image (~1.9s) */
 extern const uint8_t screen_ws_1681_4grays[];
+
+/** Homemade waveform settings which whiten pixels 10 and darken pixels 01,
+ * but leave untouched pixels 00 and 11. */
+extern const uint8_t screen_ws_1681_diff[];
 
 
 #endif /* _SCREEN_H */

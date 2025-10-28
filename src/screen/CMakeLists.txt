@@ -7,4 +7,5 @@ target_link_libraries(screen INTERFACE
     hardware_gpio
     hardware_spi
     pico_time
+    log
 )
