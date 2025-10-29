@@ -54,7 +54,7 @@ void screen_init(void) {
     bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_RST, "e-Paper RST"));
 
     // Init SPI
-    spi_init(spi0, 2000*1000);  /* Should go up to 20 MHz in write, but 2.5 in read */
+    spi_init(spi0, 20*1000*1000);  /* Should go up to 20 MHz in write, but 2.5 in read */
     gpio_set_function(BADGE_SPI0_TX_MOSI_SCREEN, GPIO_FUNC_SPI);
     gpio_set_function(BADGE_SPI0_RX_MISO, GPIO_FUNC_SPI);
     gpio_set_function(BADGE_SPI0_SCK_SCREEN, GPIO_FUNC_SPI);
@@ -399,8 +399,8 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\xA0\x48\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* darker */ \
     "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* lighter */ \
     "\x54\x48\xA8\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* white */ \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
-    "\x01\x02\x00\x09\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* VCOM = DVCOM */ \
+    "\x01\x02\x00\x09\x00\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
     "\x08\x01\x00\x08\x01\x00\x02" \
     "\x01\x02\x00\x09\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
@@ -413,7 +413,7 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x22"  /* EOPT, 0x22 = normal */         \
+    "\x22"  /* EOPT, 0x22 = normal -> relights the grays, necessary for the gray levels */ \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \
@@ -421,4 +421,30 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\x32"  /*  VSL, 0x32 == -15V */          \
     "\x20"; /* VCOM, 0x20 == -0.8V */
 
-
+/* This one only uses 1 group to darken or lighten a fixed number of times based on B/W != RED */
+const uint8_t screen_ws_1681_diff[159] = \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
+    "\xA0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
+    "\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 10 = darker */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 11 = no touch */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+    "\x04\x04\x00\x00\x00\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x00"  /* EOPT, 0x22 = normal */         \
+    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
+    "\x41"  /* VSH1, 0x41 == 15V */           \
+    /* This LUT never uses VSH2 */            \
+    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\x32"  /*  VSL, 0x32 == -15V */          \
+    "\x20"; /* VCOM, 0x20 == -0.8V */

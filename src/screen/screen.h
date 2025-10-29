@@ -222,4 +222,65 @@ extern const uint8_t screen_ws_1681_4grays[];
 extern const uint8_t screen_ws_1681_diff[];
 
 
+typedef enum {
+    SSD1681_DRIVER_CTRL = 0x01,
+    SSD1681_GATE_CTRL = 0x03,
+    SSD1681_SOURCE_CTRL = 0x04,
+    //SSD1681_CODE_SETTING_PROGRAM = 0x08,
+    //SSD1681_CODE_SETTING_WRITE = 0x09,
+    //SSD1681_CODE_SETTING_READ = 0x0A,
+    SSD1681_BOOSTER_CTRL = 0x0C,
+    SSD1681_DEEP_SLEEP = 0x10,
+    SSD1681_DATA_ENTRY = 0x11,
+    SSD1681_SWRESET = 0x12,
+    SSD1681_HV_DETECT = 0x14,
+    SSD1681_VCI_DETECT = 0x15,
+    SSD1681_TEMP_CTRL = 0x18,
+    SSD1681_TEMP_WRITE = 0x1A,
+    SSD1681_TEMP_READ = 0x1B,
+    SSD1681_TEMP_WRITE_EXT = 0x1C,
+    SSD1681_ACTIVATE = 0x20,
+    SSD1681_DISPLAY_CTRL1 = 0x21,
+    /* CTRL2 flags, 8 bits, what is done by ACTIVATE:
+     * 0x80: enable clock,
+     * 0x40: enable analog,
+     * 0x20: load temp,
+     * 0x10: load LUT,
+     * 0x08: for display mode 2 instead of display mode 1,
+     * 0x04: do display,
+     * 0x02: disable analog after activation,
+     * 0x01: disable clock after activation */
+    SSD1681_DISPLAY_CTRL2 = 0x22,
+    SSD1681_RAM0_WRITE = 0x24,  /* LSB bank, aka black/white */
+    SSD1681_RAM1_WRITE = 0x26,  /* MSB bank, aka red */
+    SSD1681_RAM_READ = 0x27,
+    SSD1681_VCOM_SENSE = 0x28,
+    SSD1681_VCOM_DURATION = 0x29,
+    SSD1681_VCOM_OTP = 0x2A,
+    SSD1681_VCOM_GLITCH = 0x2B,
+    SSD1681_VCOM_CTRL = 0x2C,
+    SSD1681_OTP_READ = 0x2D,
+    SSD1681_UID_READ = 0x2E,
+    SSD1681_STATUS = 0x2F,
+    SSD1681_OTP_WS_WRITE = 0x30,
+    SSD1681_OTP_WS_LOAD = 0x31,
+    SSD1681_WS_WRITE = 0x32,
+    SSD1681_CRC_CALC = 0x34,
+    SSD1681_CRC_READ = 0x35,
+    SSD1681_OTP_SELECT = 0x36,
+    SSD1681_DISPLAY_OPTION = 0x37,
+    SSD1681_UID_WRITE = 0x38,
+    SSD1681_OTP_MODE = 0x39,
+    SSD1681_BORDER_CTRL = 0x3C,
+    SSD1681_EOPT_CTRL = 0x3F,
+    SSD1681_RAM_SELECT = 0x41,  /* Which bank for next READ */
+    SSD1681_RAM_XRANGE = 0x41,
+    SSD1681_RAM_YRANGE = 0x45,
+    SSD1681_RAM2_PATTERN = 0x46,
+    SSD1681_RAM1_PATTERN = 0x47,
+    SSD1681_RAM_XSTART = 0x4E,
+    SSD1681_RAM_YSTART = 0x4F,
+    SSD1681_NOP = 0x7F,
+} screen_register_t;
+
 #endif /* _SCREEN_H */
