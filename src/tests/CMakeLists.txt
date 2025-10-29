@@ -1,3 +1,10 @@
+# All tests should link to this virtual library to redefine STATIC variables (see badge_defs.h)
+add_library(badge_tests INTERFACE)
+target_include_directories(badge_tests SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+target_compile_definitions(badge_tests INTERFACE STATIC=)
+target_link_libraries(badge_tests INTERFACE badge)
+
+
 # Test noise_gen
 
 add_executable(test_noise_gen)
@@ -39,7 +46,7 @@ target_sources(test_screen PRIVATE screen.c)
 pico_add_extra_outputs(test_screen)
 
 target_link_libraries(test_screen PRIVATE
-    badge
+    badge_tests
     badge_images
     hardware_gpio
     hardware_spi

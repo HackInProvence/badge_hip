@@ -17,7 +17,6 @@
 #include "badge_pinout.h"
 #include "log.h"
 #include "screen.h"
-#include "tests.h"
 
 
 // Waveform settings, showing grays
