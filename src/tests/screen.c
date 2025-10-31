@@ -373,10 +373,21 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
 
 #include "hip_anim.h"
 
+#include "pico/binary_info.h"
 
 int main() {
     stdio_usb_init();
     log_set_level(LOG_LEVEL_INFO);
+
+    /* Explicitly set the SPI chip select to output Y0 */
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SPI0_CS_A0, "SPI0: Chip Select A0"));
+    gpio_init(BADGE_SPI0_CS_A0);
+    gpio_put(BADGE_SPI0_CS_A0, 0);
+    gpio_set_dir(BADGE_SPI0_CS_A0, true);
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SPI0_CS_A1, "SPI0: Chip Select A1"));
+    gpio_init(BADGE_SPI0_CS_A1);
+    gpio_put(BADGE_SPI0_CS_A1, 0);
+    gpio_set_dir(BADGE_SPI0_CS_A1, true);
 
     screen_init();
     printf("boot sequence\n");
@@ -387,9 +398,9 @@ int main() {
     printf("fullscreen images should be of size %d\n", len);
 
     //test_read_all();
-    //test_show_bw_images();
-    //test_show_4g_images();
-    //test_subimage();
+    test_show_bw_images();
+    test_show_4g_images();
+    test_subimage();
     //test_enable_once();
 
     //test_clear(); sleep_ms(1000);
@@ -404,8 +415,8 @@ int main() {
     ////sleep_ms(1000);
     //test_roll();
 
-    test_clear();
-    test_anim(hip_anim, hip_anim_n_frames);
+    //test_clear();
+    //test_anim(hip_anim, hip_anim_n_frames);
 
     /* Clear to white before going to sleep */
     //test_clear();
