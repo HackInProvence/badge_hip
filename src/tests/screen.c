@@ -233,11 +233,17 @@ void test_roll(void) {
     absolute_time_t t0 = get_absolute_time(), t1;
     for(size_t t=0; t<200; ++t) {
         /* For each timestep, draw the image */
+        /* Naive loop took 4.5ms !!! -> divisions are not cheap
+         * Now takes 1.7ms */
         for(size_t j=0; j<200; ++j) {
-            for(size_t i=0; i<25; ++i) {
-                size_t k = i/5+1;
-                next[j*SCREEN_WIDTH/8 + i] = (j/k == t%(200/k)) ? 0x00:0xFF;
-                //next[j*SCREEN_WIDTH/8 + i] = (j/10==t-1 || j/10==t || j/10==t+1) ? 0x00:0xFF;
+            size_t j8 = j*SCREEN_WIDTH/8;
+            for(size_t k=0; k<5; ++k) {
+                size_t v = (j/k == t%(200/k)) ? 0x00:0xFF;
+                size_t k5 = j8 + 5*k;
+                for(size_t i=0; i<5; ++i) {
+                    next[k5 + i] = v;
+                    //next[j*SCREEN_WIDTH/8 + i] = (j/10==t-1 || j/10==t || j/10==t+1) ? 0x00:0xFF;
+                }
             }
         }
 
@@ -248,7 +254,7 @@ void test_roll(void) {
         send(cmd, 2);
         cmd[0] = SSD1681_ACTIVATE;
         send(cmd, 1);
-        time_busy("frame"); /* 13s for the 200 frames, but each frame lasts 5.7ms, so it should be 1.2s */
+        //time_busy("frame");  /* 5.0ms per FR @200Hz, as expected */
         while(screen_busy())
             tight_loop_contents();
         o = prev;
@@ -258,12 +264,114 @@ void test_roll(void) {
     }
     t1 = get_absolute_time();
     /* With SPI @20MHz, and only 1 FR @175Hz, takes 3.3s for 200 images, hence 61fps! */
+    /* With SPI @20MHz, and only 1 FR @200Hz, takes 3.1s for 200 images, hence 64fps! */
     printf("push+draw 200 images took %" PRIu64 "µs\n", absolute_time_diff_us(t0, t1));
 
     screen_end_multiframe();
     while(screen_busy())
         tight_loop_contents();
 }
+
+
+/* 30 fps means a budget of 33.3ms - 6.1ms to send an image, leaving 27.2ms hence 5.4 ticks @200Hz or 4.1 @150Hz (better ON time) */
+const uint8_t ws_30fps[159] = \
+    "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
+    "\x02\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
+    "\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 10 = darker */ \
+    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 11 = relight white */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* VCOM = DVCOM */ \
+    "\x00\x00\x00\x00\x03\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
+    "\x00\x00\x00\x00\x01\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x66\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x07"  /* EOPT, 0x22 = normal */         \
+    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
+    "\x41"  /* VSH1, 0x41 == 15V */           \
+    /* This LUT never uses VSH2 */            \
+    "\xA8"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\x32"  /*  VSL, 0x32 == -15V */          \
+    "\x20"; /* VCOM, 0x20 == -0.8V */
+
+/* 20 fps means a budget of 50.0ms - 6.1ms to send an image, leaving 43.9ms hence 8.8 ticks @200Hz (any other freq has the same ON time) */
+const uint8_t ws_20fps[159] = \
+    "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
+    "\x02\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
+    "\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 10 = darker */ \
+    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 11 = relight white */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* VCOM = DVCOM */ \
+    "\x00\x00\x00\x00\x07\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
+    "\x00\x00\x00\x00\x01\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x88\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x07"  /* EOPT, 0x22 = normal */         \
+    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
+    "\x41"  /* VSH1, 0x41 == 15V */           \
+    /* This LUT never uses VSH2 */            \
+    "\xA8"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\x32"  /*  VSL, 0x32 == -15V */          \
+    "\x20"; /* VCOM, 0x20 == -0.8V */
+
+void test_anim(const uint8_t * const * frames, size_t n_frames) {
+    const uint8_t *prev, *next, *o;
+
+    /* Now go to animation mode */
+    screen_clear_image_position();
+    screen_push_ws(ws_20fps);
+    screen_start_multiframe();
+    while(screen_busy())
+        tight_loop_contents();
+
+    /* FIXME: we have to share the palette between all frames to be able to have white layers */
+
+    /* We always want to "just draw" TODO push to API */
+    uint8_t cmd[2] = {SSD1681_DISPLAY_CTRL2, 0x04};
+    send(cmd, 2);
+
+    absolute_time_t t0 = get_absolute_time(), t1;
+    prev = frames[0];  /* There won't be a diff here, but we cleared the screen */
+    for(size_t i=0; i<n_frames; ++i) {
+        /* Show the image and swap buffer */
+        next = frames[i];
+        screen_push_rams(next, prev, 5000);  /* 49ms @ 2MHz, 6.1ms @ 20MHz */
+        cmd[0] = SSD1681_ACTIVATE;
+        send(cmd, 1);
+        //time_busy("frame");
+        while(screen_busy())
+            tight_loop_contents();
+        o = prev;
+        prev = next;
+        next = o;
+        //if (i==11)
+        //    sleep_ms(1000);
+    }
+    t1 = get_absolute_time();
+    screen_end_multiframe();
+    while(screen_busy())
+        tight_loop_contents();
+
+    uint64_t diff = absolute_time_diff_us(t0, t1);
+    printf("push+draw 21 images took %" PRIu64 "µs, %f fps\n", diff, 22e6f/(float)(diff));
+}
+
+#include "hip_anim.h"
 
 
 int main() {
@@ -284,17 +392,20 @@ int main() {
     //test_subimage();
     //test_enable_once();
 
-    test_clear(); sleep_ms(1000);
-    //uint8_t buf[5000];
-    //memset(buf, 0xFF, 2500);
-    //memset(buf+2500, 0x00, 2500);
-    //screen_show_image_bw(buf);
-    ////screen_push_rams(buf, buf, 5000);
-    ////screen_show_rams();
-    //while(screen_busy())
-    //    tight_loop_contents();
-    //sleep_ms(1000);
-    test_roll();
+    //test_clear(); sleep_ms(1000);
+    ////uint8_t buf[5000];
+    ////memset(buf, 0xFF, 2500);
+    ////memset(buf+2500, 0x00, 2500);
+    ////screen_show_image_bw(buf);
+    //////screen_push_rams(buf, buf, 5000);
+    //////screen_show_rams();
+    ////while(screen_busy())
+    ////    tight_loop_contents();
+    ////sleep_ms(1000);
+    //test_roll();
+
+    test_clear();
+    test_anim(hip_anim, hip_anim_n_frames);
 
     /* Clear to white before going to sleep */
     //test_clear();
