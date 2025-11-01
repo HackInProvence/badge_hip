@@ -20,6 +20,12 @@
 #include "screen.h"
 
 
+/* The send() macro enables writing send(CMD, ARG1, ARG2) but we can't have it in the header nor include it from here,
+ * so you have to copy-paste it to use it in tests... */
+#define UINT8_LIT(...) (uint8_t[]){__VA_ARGS__}
+#define send(...) _send(UINT8_LIT(__VA_ARGS__), sizeof(UINT8_LIT(__VA_ARGS__))/sizeof(uint8_t))
+
+
 // Waveform settings, showing grays
 const uint8_t ws_1681_times[159] = \
     "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* black */ \
@@ -135,24 +141,24 @@ void test_clear(void) {
 void test_enable_once(void) {
     /* There seems to be interactions with the previous LUT and/or image:
      * the image lightens a little when enabling clocks, but that depends on the previous image */
-    send("\x3F\x07", 2);
+    send(SSD1681_EOPT_CTRL, 0x07);
 
     /* Time how long to enable + disable */
-    send("\x22\xC3", 2);
-    send("\x20", 1);
+    send(SSD1681_DISPLAY_CTRL2, 0xC3);
+    send(SSD1681_ACTIVATE);
     time_busy("enable+disable clocks");
     sleep_ms(1000);
 
     /* Tested: we can, and the effective frame rate is now guided by chosen FR and repetitions */
-    send("\x22\xC0", 2);  /* Enable clock and analog -> should be disabled at some point in the near future */
-    send("\x20", 1);
+    send(SSD1681_DISPLAY_CTRL2, 0xC0);
+    send(SSD1681_ACTIVATE);
     time_busy("enable clocks");
 
     /* Here we can do other things like draw an image,
      * and this time it respects the FR[n] of the successive groups... */
 
-    send("\x22\x03", 2); /* Disable clock and analog */
-    send("\x20", 1);
+    send(SSD1681_DISPLAY_CTRL2, 0x03);
+    send(SSD1681_ACTIVATE);
     time_busy("disable clocks");
 }
 
@@ -166,12 +172,8 @@ void screen_start_multiframe(void) {
     /* if (state FIXME
     state = ; */
 
-    uint8_t cmd[2];
-    cmd[0] = SSD1681_DISPLAY_CTRL2;
-    cmd[1] = 0xC0;  /* enable clock and analog */
-    send(cmd, 2);
-    cmd[0] = SSD1681_ACTIVATE;
-    send(cmd, 1);
+    send(SSD1681_DISPLAY_CTRL2, 0xC0);
+    send(SSD1681_ACTIVATE);
 }
 
 /* makes it busy, lasts 140ms */
@@ -183,12 +185,8 @@ void screen_end_multiframe(void) {
     /* if (state FIXME
     state = ; */
 
-    uint8_t cmd[2];
-    cmd[0] = SSD1681_DISPLAY_CTRL2;
-    cmd[1] = 0x03;  /* disable clock and analog */
-    send(cmd, 2);
-    cmd[0] = SSD1681_ACTIVATE;
-    send(cmd, 1);
+    send(SSD1681_DISPLAY_CTRL2, 0x03);
+    send(SSD1681_ACTIVATE);
 }
 
 const uint8_t ws_roll[159] = \
@@ -250,10 +248,8 @@ void test_roll(void) {
         /* Show the image and swap buffer */
         screen_push_rams(next, prev, 5000);  /* 49ms @ 2MHz, 6.1ms @ 20MHz */
         //screen_show_rams();
-        uint8_t cmd[2] = {SSD1681_DISPLAY_CTRL2, 0x04};
-        send(cmd, 2);
-        cmd[0] = SSD1681_ACTIVATE;
-        send(cmd, 1);
+        send(SSD1681_DISPLAY_CTRL2, 0x04);
+        send(SSD1681_ACTIVATE);
         //time_busy("frame");  /* 5.0ms per FR @200Hz, as expected */
         while(screen_busy())
             tight_loop_contents();
@@ -332,7 +328,6 @@ const uint8_t ws_20fps[159] = \
 
 void test_anim(const uint8_t * const * frames, size_t n_frames) {
     const uint8_t *prev, *next, *o;
-    uint8_t cmd[5];
 
     /* Booster Soft Start Control
      * -> should only impact phase 1 to 3 (are these groups 0 to 2 ? or just 3 phases of the booster?)
@@ -351,24 +346,19 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
         tight_loop_contents();
 
     /* We always want to "just draw" TODO move to screen API */
-    cmd[0] = SSD1681_DISPLAY_CTRL2;
-    cmd[1] = 0x04;
-    send(cmd, 2);
+    send(SSD1681_DISPLAY_CTRL2, 0x04);
 
     /* The first image is special because it has no prev, but we have to be sure it is drawn correctly.
      * To do so, we configure the RAM RED (which stores prev) to read as inverse */
     prev = frames[0];
-    cmd[0] = SSD1681_DISPLAY_CTRL1;
-    cmd[1] = 0x80;  /* Inverse RED, normal B/W */
-    send(cmd, 2);
+    send(SSD1681_DISPLAY_CTRL1, 0x80);  /* Inverse RED, normal B/W */
 
     absolute_time_t t0 = get_absolute_time(), t1;
     for(size_t i=0; i<n_frames; ++i) {
         /* Show the image and swap buffer */
         next = frames[i];
         screen_push_rams(next, prev, 5000);  /* 49ms @ 2MHz, 6.1ms @ 20MHz */
-        cmd[0] = SSD1681_ACTIVATE;
-        send(cmd, 1);
+        send(SSD1681_ACTIVATE);
         //time_busy("frame");
         while(screen_busy())
             tight_loop_contents();
@@ -384,11 +374,8 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
             ;//sleep_ms(100);
 
         /* Reset the trick used for the first image to obtain the inverse */
-        if(i == 0) {
-            cmd[0] = SSD1681_DISPLAY_CTRL1;
-            cmd[1] = 0x00;
-            send(cmd, 2);
-        }
+        if(i == 0)
+            send(SSD1681_DISPLAY_CTRL1, 0x00);
     }
     t1 = get_absolute_time();
     screen_end_multiframe();

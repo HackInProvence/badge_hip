@@ -274,7 +274,7 @@ typedef enum {
     SSD1681_BORDER_CTRL = 0x3C,
     SSD1681_EOPT_CTRL = 0x3F,
     SSD1681_RAM_SELECT = 0x41,  /* Which bank for next READ */
-    SSD1681_RAM_XRANGE = 0x41,
+    SSD1681_RAM_XRANGE = 0x44,
     SSD1681_RAM_YRANGE = 0x45,
     SSD1681_RAM2_PATTERN = 0x46,
     SSD1681_RAM1_PATTERN = 0x47,
@@ -282,5 +282,10 @@ typedef enum {
     SSD1681_RAM_YSTART = 0x4F,
     SSD1681_NOP = 0x7F,
 } screen_register_t;
+
+
+/** Internal util made accessible to tests, see also the send(...) macro */
+STATIC void _send(const uint8_t *, size_t);
+
 
 #endif /* _SCREEN_H */

@@ -33,7 +33,7 @@ STATIC absolute_time_t state_ts = 0;  /* Last time the state changed */
 
 
 /* Send data on the SPI but don't wait for BUSY to be LOW */
-STATIC void send(const uint8_t *cmd, size_t len) {
+STATIC void _send(const uint8_t *cmd, size_t len) {
     if(! cmd || len == 0)
         return;
 
@@ -44,6 +44,11 @@ STATIC void send(const uint8_t *cmd, size_t len) {
         spi_write_blocking(spi0, (cmd+1), len-1);
     }
 }
+
+/* The send() macro enables writing send(CMD, ARG1, ARG2) but we can't have it in the header nor include it from here,
+ * so you have to copy-paste it to use it in tests... */
+#define UINT8_LIT(...) (uint8_t[]){__VA_ARGS__}
+#define send(...) _send(UINT8_LIT(__VA_ARGS__), sizeof(UINT8_LIT(__VA_ARGS__))/sizeof(uint8_t))
 
 
 void screen_init(void) {
@@ -89,28 +94,28 @@ void screen_init(void) {
 /* Sets up some common parameters on the screen, must be STATE_READY and not busy */
 STATIC void setup(void) {
     /* Driver output control */
-    send("\x01\xC7\x00\x00", 4);  /* Driver output control: 199+1 lines, no gate interlacing */
+    send(SSD1681_DRIVER_CTRL, 0xC7, 0x00, 0x00);  /* 199+1 lines, no gate interlacing */
 
     /* Image orientation control: our up direction is toward the flexible connector,
      * which is the lowest Y coordinate, so we have to configure the RAM reading with decreasing X and Y */
-    /* Data entry mode, x and y auto decrement; NOTE POR is 0x01, not 0x03!!! */
-    send("\x11\x00", 2);
+    send(SSD1681_DATA_ENTRY, 0);/* x and y auto decrement; NOTE POR is 0x01, not 0x03!!! */
+
     /* The Power On Reset window to the ram is weird: 176*296, we have a 200x200 screen */
-    send("\x44\x18\x00", 3);  /* Set RAM-X start/end (x8 -> (0x18=24, (24+1)*8 = 200) */
-    send("\x45\xC7\x00\x00\x00", 5);  /* Set RAM-Y start/end (x8 -> (0xC7=199, 199+1 = 200) */
+    send(SSD1681_RAM_XRANGE, 0x18, 0x00);  /* Set RAM-X start/end (*8) -> 0x18=24, (24+1)*8 = 200 */
+    send(SSD1681_RAM_YRANGE, 0xC7, 0x00, 0x00, 0x00);  /* Set RAM-Y start/end -> 0xC7=199, 199+1 = 200 */
     /* Set RAM counters to be to the top line and column */
-    send("\x4E\x18", 2);
-    send("\x4F\xC7\x00", 2);
+    send(SSD1681_RAM_XSTART, 0x18);
+    send(SSD1681_RAM_YSTART, 0xC7, 0x00);
 
     /* Border WaveForm */
-    send("\x3C\x07", 2);  /* bit 2 = follow LUT, bit 1-0 = LUTx */
+    send(SSD1681_BORDER_CTRL, 0x07);  /* bit 2 = follow LUT, bit 1-0 = LUTx */
 
     /* Use internal temp sensor instead of external */
-    send("\x18\x80", 2);
+    send(SSD1681_TEMP_CTRL, 0x80);
 
     /* Load internal Waveform Settings for display mode 1 using temp */
-    send("\x22\xB1", 2);
-    send("\x20", 1);
+    send(SSD1681_DISPLAY_CTRL2, 0xB1);
+    send(SSD1681_ACTIVATE);
 
     /* Can we display something without customized LUT ? Yes. */
 
@@ -145,7 +150,7 @@ bool screen_boot(void) {
              * Tests showed that BUSY is high for 1.2ms on cold boot */
             if (! gpio_get(BADGE_SCREEN_BUSY)) {
                 /* Now send a command to the screen and wait for busy to be low */
-                send("\x12", 1);
+                send(SSD1681_SWRESET);
                 log_info("boot: HWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
                 state = STATE_SWRESET;
                 state_ts = get_absolute_time();
@@ -191,8 +196,7 @@ void screen_border(uint8_t color) {
 
     /* Put the command in a 2 bytes int
      * bit 2 = follow LUT, bit 1-0 = LUTx */
-    uint16_t cmd = 0x3C | ((4 | (color & 3)) << 8);
-    send((uint8_t *)&cmd, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
+    send(SSD1681_BORDER_CTRL, 4 | (color & 3));
 }
 
 
@@ -212,11 +216,11 @@ void screen_clear(bool bit) {
     // 66 to BB -> inverse
     // CC,EE -> black
     // DD,FF -> white
-    uint16_t cmd = 0x21 | ((0x44 | (bit ? 0x11 : 0x00)) << 8);
-    send((const uint8_t *)&cmd, 2);
+    send(SSD1681_DISPLAY_CTRL1, 0x44 | (bit ? 0x11 : 0x00));
 
-    send("\x22\xC7", 2);
-    send("\x20", 1);
+    /* Do start drawing */
+    send(SSD1681_DISPLAY_CTRL2, 0xC7);
+    send(SSD1681_ACTIVATE);
 
 }
 
@@ -228,7 +232,7 @@ void screen_deep_sleep(void) {
     }
 
     /* After that, the screen keeps the BADGE_SCREEN_BUSY pin high until hard reset */
-    send("\x10\x01", 2);  /* 0x01 or 0x03... */
+    send(SSD1681_DEEP_SLEEP, 0x01);  /* 0x01 or 0x03... */
     state = STATE_SLEEP;
     state_ts = get_absolute_time();
     log_info("screen put asleep");
@@ -253,24 +257,15 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
     /* Bind values to [0..200] */
     /* x1,y1 include the last line/column, but the screen commands excludes them */
     x0 = x0 >= 200 ? 25 : x0/8;
-    x1 = x1 >= 200 ? 24 : (x1%8 == 0 ? x1/8-1 : x1/8-1);
+    x1 = x1 >= 200 ? 24 : (x1%8 == 0 ? x1/8-1 : x1/8-1); /* FIXME: this is the same value in both cases */
     y0 = y0 >= 200 ? 200 : y0;
     y1 = y1 >= 200 ? 199 : y1-1;
 
-    uint64_t cmd;
-    /* Set RAM-X start/end (give end first because we give data in reverse order, see setup) */
-    cmd = 0x44 | (x1 << 8) | (x0 << 16);
-    send((uint8_t *)&cmd, 3);  /* Don't pass pointers to local variables when the callee may borrow them... */
-
-    /* Set RAM-Y start/end, this time on 9 bits (we only use 8 of them) */
-    cmd = 0x45 | (y1 << 8) | (y0 << 24);
-    send((uint8_t *)&cmd, 5);
-
-    /* Set RAM counters to be to the top line and column */
-    cmd = 0x4E | (x1 << 8);
-    send((uint8_t *)&cmd, 2);
-    cmd = 0x4F | (y1 << 8);  /* Again y1 is on 2 bytes but we use only the first */
-    send((uint8_t *)&cmd, 3);
+    send(SSD1681_RAM_XRANGE, x1, x0);  /* Set RAM-X start/end (*8) -> 0x18=24, (24+1)*8 = 200 */
+    send(SSD1681_RAM_YRANGE, y1, 0, y0, 0);  /* Set RAM-Y start/end -> 0xC7=199, 199+1 = 200 */
+    /* Because of our data entry used to display the image upside (see setup()), set RAM counters to be to the top line and column */
+    send(SSD1681_RAM_XSTART, x1);
+    send(SSD1681_RAM_YSTART, y1, 0);
 
     return (y1-y0+1)*(x1-x0+1);
 }
@@ -312,12 +307,7 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
 
     /* FIXME: this should be in another function */
     /* Configure RAM bypass to use only the pushed planes */
-    //uint8_t cmd[2] = {SSD1681_DISPLAY_CTRL1};
-    //if(! lsb)
-    //    cmd[1] = 0x05;  /* Bypass B/W bank */
-    //if(! msb)
-    //    cmd[1] = 0x50;  /* Bypass RED bank */
-    //send((uint8_t *)&cmd, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
+    //send(SSD1681_DISPLAY_CTRL1, (lsb ? 0x00:0x05) /* Bypass B/W bank */ | (msb ? 0x00:0x50) /* Bypass RED bank */);
 
     /* Push the image */
     if(lsb) {
@@ -346,8 +336,8 @@ void screen_show_rams(void) {
     /* 0xC7 seems the normal mode for our target */
     /* 0xF7 (load temperature) on the b version (Red) */
     /* 0xCF for the partial image (display mode 2) */
-    send("\x22\xC7", 2);
-    send("\x20", 1);
+    send(SSD1681_DISPLAY_CTRL2, 0xC7);
+    send(SSD1681_ACTIVATE);
 }
 
 
@@ -365,15 +355,10 @@ void screen_push_ws(const uint8_t *luts) {
 
     /* Then EOPT, VGH, VSH1, VSH2, VSL, VCOM */
     /* Put the command in a 4 bytes int, as the longest command has 3 params */
-    uint32_t buf;
-    buf = 0x3F | (luts[153]<<8);  /* EOPT */
-    send((const uint8_t *)&buf, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
-    buf = 0x03 | (luts[154]<<8);  /* VGH */
-    send((const uint8_t *)&buf, 2);
-    buf = 0x04 | (luts[155]<<8) | (luts[156]<<16) | (luts[157]<<24);  /* VSH1, VSH2, VSL */
-    send((const uint8_t *)&buf, 4);
-    buf = 0x2C | (luts[158]<<8);  /* VCOM */
-    send((const uint8_t *)&buf, 2);
+    send(SSD1681_EOPT_CTRL, luts[153]);
+    send(SSD1681_GATE_CTRL, luts[154]);
+    send(SSD1681_SOURCE_CTRL, luts[155], luts[156], luts[157]);
+    send(SSD1681_VCOM_CTRL, luts[158]);
 
     /* Then configure soft booster start !! TODO */
 }
