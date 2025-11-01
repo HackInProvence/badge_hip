@@ -172,7 +172,7 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
  * the other is the least significant bit (\param LSB).
  * The LUT decides what is done with these information (nothing, black, white, gray, ...).
  *
- * When pushing NULL to a plane, it's use will be deactivated (RAM will be bypassed to 0).
+ * FIXME: the following is disabled for not: When pushing NULL to a plane, it's use will be deactivated (RAM will be bypassed to 0).
  *
  * Use with \ref screen_push_ws and \ref screen_show_rams.
  *

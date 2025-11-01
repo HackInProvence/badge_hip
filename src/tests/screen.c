@@ -302,25 +302,26 @@ const uint8_t ws_30fps[159] = \
     "\x20"; /* VCOM, 0x20 == -0.8V */
 
 /* 20 fps means a budget of 50.0ms - 6.1ms to send an image, leaving 43.9ms hence 8.8 ticks @200Hz (any other freq has the same ON time) */
+/* TODO -> currently this targets 14ms */
 const uint8_t ws_20fps[159] = \
-    "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
-    "\x02\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
-    "\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 10 = darker */ \
-    "\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 11 = relight white */ \
+    "\x00\x00\x00\x00\x00\x00\x02\x10\x00\x00\x00\x00" /* 00 = redark */ \
+    "\x12\x02\x00\x00\x00\x00\x12\x12\x00\x00\x00\x00" /* 01 = lighter */ \
+    "\x21\x01\x00\x00\x00\x00\x21\x21\x00\x00\x00\x00" /* 10 = darker */ \
+    "\x00\x00\x00\x00\x00\x00\x01\x20\x00\x00\x00\x00" /* 11 = relight white */ \
     "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* VCOM = DVCOM */ \
-    "\x00\x00\x00\x00\x07\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
-    "\x00\x00\x00\x00\x01\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x02\x00\x00\x01\x00\x00" /* group6 */ \
+    "\x00\x02\x00\x00\x08\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x88\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x01\x00\x00\x00\x00\x00\x00" /* 11A=1 !! */
+    "\x88\x88\x88\x88\x88\x88" "\x00\x00\x00" \
     "\x07"  /* EOPT, 0x22 = normal */         \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
@@ -331,6 +332,16 @@ const uint8_t ws_20fps[159] = \
 
 void test_anim(const uint8_t * const * frames, size_t n_frames) {
     const uint8_t *prev, *next, *o;
+    uint8_t cmd[5];
+
+    /* Booster Soft Start Control
+     * -> should only impact phase 1 to 3 (are these groups 0 to 2 ? or just 3 phases of the booster?)
+     * Default values: 8B 9C 96 0F
+     * - phase 1: 8B -> strength 1, min off time 8.4
+     * - phase 2: 9C -> strength 2, min off time 9.8
+     * - phase 3: 96 -> strength 2, min off time 3.9
+     * - duration: 0F -> phase 1: 40ms, phase 2: 40ms, phase 3: 10ms */
+    //send((uint8_t[]){SSD1681_BOOSTER_CTRL, 0xF4, 0x9C, 0x96, 0x0F}, 5);
 
     /* Now go to animation mode */
     screen_clear_image_position();
@@ -339,14 +350,19 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
     while(screen_busy())
         tight_loop_contents();
 
-    /* FIXME: we have to share the palette between all frames to be able to have white layers */
+    /* We always want to "just draw" TODO move to screen API */
+    cmd[0] = SSD1681_DISPLAY_CTRL2;
+    cmd[1] = 0x04;
+    send(cmd, 2);
 
-    /* We always want to "just draw" TODO push to API */
-    uint8_t cmd[2] = {SSD1681_DISPLAY_CTRL2, 0x04};
+    /* The first image is special because it has no prev, but we have to be sure it is drawn correctly.
+     * To do so, we configure the RAM RED (which stores prev) to read as inverse */
+    prev = frames[0];
+    cmd[0] = SSD1681_DISPLAY_CTRL1;
+    cmd[1] = 0x80;  /* Inverse RED, normal B/W */
     send(cmd, 2);
 
     absolute_time_t t0 = get_absolute_time(), t1;
-    prev = frames[0];  /* There won't be a diff here, but we cleared the screen */
     for(size_t i=0; i<n_frames; ++i) {
         /* Show the image and swap buffer */
         next = frames[i];
@@ -359,8 +375,20 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
         o = prev;
         prev = next;
         next = o;
-        //if (i==11)
-        //    sleep_ms(1000);
+        /* FIXME: this shows:
+         * - with EOPT = 0x07, the colors are still controlled after the frame is finished,
+         * - except when there is a phase that set them to VSS.
+         * -> TODO: test other values of EOPT
+         * -> TODO: test with other booster control values, or putting the 00 group BEFORE the color groups */
+        if ((i%10) == 7)
+            ;//sleep_ms(100);
+
+        /* Reset the trick used for the first image to obtain the inverse */
+        if(i == 0) {
+            cmd[0] = SSD1681_DISPLAY_CTRL1;
+            cmd[1] = 0x00;
+            send(cmd, 2);
+        }
     }
     t1 = get_absolute_time();
     screen_end_multiframe();
@@ -368,7 +396,7 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
         tight_loop_contents();
 
     uint64_t diff = absolute_time_diff_us(t0, t1);
-    printf("push+draw 21 images took %" PRIu64 "µs, %f fps\n", diff, 22e6f/(float)(diff));
+    printf("push+draw %d images took %" PRIu64 "µs, %f fps\n", n_frames, diff, n_frames * 1e6f/(float)(diff));
 }
 
 #include "hip_anim.h"
@@ -377,6 +405,11 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
 int main() {
     stdio_usb_init();
     log_set_level(LOG_LEVEL_INFO);
+
+    ///* Test that the screen also work with CSn always low */
+    //gpio_init(BADGE_SPI0_CSn);
+    //gpio_put(BADGE_SPI0_CSn, 0);
+    //gpio_set_dir(BADGE_SPI0_CSn, true);
 
     screen_init();
     printf("boot sequence\n");

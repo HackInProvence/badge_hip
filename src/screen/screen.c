@@ -72,6 +72,17 @@ void screen_init(void) {
     state = STATE_SLEEP;
     state_ts = get_absolute_time();
     log_info("screen init ok");
+
+    /* Explicitly set the SPI chip select to output Y0 */
+    /* TODO: move this to somewhere else because it will necessary create surprises here */
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SPI0_CS_A0, "SPI0: Chip Select A0"));
+    gpio_init(BADGE_SPI0_CS_A0);
+    gpio_put(BADGE_SPI0_CS_A0, 0);
+    gpio_set_dir(BADGE_SPI0_CS_A0, true);
+    bi_decl_if_func_used(bi_1pin_with_name(BADGE_SPI0_CS_A1, "SPI0: Chip Select A1"));
+    gpio_init(BADGE_SPI0_CS_A1);
+    gpio_put(BADGE_SPI0_CS_A1, 0);
+    gpio_set_dir(BADGE_SPI0_CS_A1, true);
 }
 
 
@@ -299,13 +310,14 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
         return;
     }
 
+    /* FIXME: this should be in another function */
     /* Configure RAM bypass to use only the pushed planes */
-    uint16_t cmd = 0x21;
-    if(! lsb)
-        cmd |= (0x05 << 8);  /* Bypass B/W bank */
-    if(! msb)
-        cmd |= (0x50 << 8);  /* Bypass RED bank */
-    send((uint8_t *)&cmd, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
+    //uint8_t cmd[2] = {SSD1681_DISPLAY_CTRL1};
+    //if(! lsb)
+    //    cmd[1] = 0x05;  /* Bypass B/W bank */
+    //if(! msb)
+    //    cmd[1] = 0x50;  /* Bypass RED bank */
+    //send((uint8_t *)&cmd, 2);  /* Don't pass pointers to local variables when the callee may borrow them... */
 
     /* Push the image */
     if(lsb) {
