@@ -26,35 +26,6 @@
 #define send(...) _send(UINT8_LIT(__VA_ARGS__), sizeof(UINT8_LIT(__VA_ARGS__))/sizeof(uint8_t))
 
 
-// Waveform settings, showing grays
-const uint8_t ws_1681_times[159] = \
-    "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* black */ \
-    "\x40\x48\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* darker */ \
-    "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* lighter */ \
-    "\x40\x48\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* white */ \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
-    "\x0A\x00\x00\x00\x00\x00\x00" \
-    "\x08\x01\x00\x08\x01\x00\x02" \
-    "\x01\x40\x00\x00\x00\x00\x0E" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x22"  /* EOPT, 0x22 = normal */         \
-    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
-    "\x41"  /* VSH1, 0x41 == 15V */           \
-    /* This LUT never uses VSH2 */            \
-    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
-    "\x32"  /*  VSL, 0x32 == -15V */          \
-    "\x20"; /* VCOM, 0x20 == -0.8V */
-
-
 #include "hip_bw.h"
 #include "secsea_bw.h"
 
@@ -176,7 +147,7 @@ void screen_start_multiframe(void) {
     send(SSD1681_ACTIVATE);
 }
 
-/* makes it busy, lasts 140ms */
+/* makes it busy, lasts 140ms, beware that using other screen_show_image_ functions in multiframe mode freezes the module in busy */
 void screen_end_multiframe(void) {
     if (screen_busy()) {
         log_warning("screen_end_multiframe() called but screen is busy");
@@ -270,6 +241,7 @@ void test_roll(void) {
 
 
 /* 30 fps means a budget of 33.3ms - 6.1ms to send an image, leaving 27.2ms hence 5.4 ticks @200Hz or 4.1 @150Hz (better ON time) */
+/* TODO: we have to set a VSS phase, so take this into account in the ticks computations */
 const uint8_t ws_30fps[159] = \
     "\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
     "\x02\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
@@ -287,9 +259,9 @@ const uint8_t ws_30fps[159] = \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x66\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x07"  /* EOPT, 0x22 = normal */         \
+    "\x01\x00\x00\x00\x00\x00\x00"  /* 11A=1, stabilizes to VSS before power off */ \
+    "\x66\x22\x22\x22\x22\x28" "\x00\x00\x00" \
+    "\x07"  /* EOPT, 0x22 = normal -> 0x07 helps if there is another image, as 0x22 flashes white on enable analog... */ \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \
@@ -316,9 +288,9 @@ const uint8_t ws_20fps[159] = \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x01\x00\x00\x00\x00\x00\x00" /* 11A=1 !! */
+    "\x01\x00\x00\x00\x00\x00\x00"  /* 11A=1, stabilizes to VSS before power off */ \
     "\x88\x88\x88\x88\x88\x88" "\x00\x00\x00" \
-    "\x07"  /* EOPT, 0x22 = normal */         \
+    "\x07"  /* EOPT, 0x22 = normal -> 0x07 helps if there is another image, as 0x22 flashes white on enable analog... */ \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \
@@ -389,6 +361,83 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
 #include "hip_anim.h"
 
 
+void test_zones44(const uint8_t *ws0, const uint8_t *ws1, const uint8_t *ws2) {
+    uint8_t msb[5000], lsb[5000];
+    const uint8_t w8 = SCREEN_WIDTH/8;
+
+    /* Prepare 4 bands on lsb */
+    /* Prepare 2 bands on msb to have 4 colors or 4 diffs combined with lsb */
+    for (size_t j=0; j<SCREEN_HEIGHT; ++j) {
+        for (size_t i=0; i<w8; ++i) {
+            if ((i/(w8/4))%2) {
+                /* Second and fourth quarters are white */
+                lsb[j*w8+i] = 0xFF;
+            } else {
+                /* First and third quarters are black */
+                lsb[j*w8+i] = 0x00;
+            }
+            if (i/(w8/2)%2) {
+                /* Second half is white */
+                msb[j*w8+i] = 0xFF;
+            } else {
+                /* First half is black */
+                msb[j*w8+i] = 0x00;
+            }
+        }
+    }
+
+    /* Setup multi-frame push */
+    screen_start_multiframe();
+    while(screen_busy())
+        tight_loop_contents();
+    send(SSD1681_DISPLAY_CTRL2, 0x04);
+
+    /* Split the screen in 4 horizontal bands.
+     * Note: we can only restrict drawing to the lower part of the screen,
+     *  so we start by ws0, draw the before image, draw with ws0, set the drawing zone to 3/4,
+     *  draw the before image, draw ws1, ...,
+     *  draw the 4g reference on the last 1/4 */
+
+    const uint8_t *wss[] = {ws0, ws1, ws2};
+    for (size_t i=0; i<3; ++i) {
+        if (! wss[i])
+            continue;
+
+        /* Set the active zone to the remaining quarters */
+        send(SSD1681_DRIVER_CTRL, (SCREEN_HEIGHT*(4-i))/4-1, 0, 0);
+
+        /* Push with B/W waveform as a reset: 2 vertical bands */
+        //screen_show_image_bw(msb); -> Can't use this one because we are in multi-frame mode, and exiting twice is bugged in the SSD1681
+        screen_push_ws(screen_ws_1681_bw);
+        screen_push_rams(msb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+        send(SSD1681_ACTIVATE);
+        while(screen_busy())
+            tight_loop_contents();
+
+        /* Push the 4 test bands and WS and redraw */
+        screen_push_ws(wss[i]);
+        screen_push_rams(lsb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+        send(SSD1681_ACTIVATE);
+        time_busy("nth band");
+    }
+
+    /* Push a 4g on the last quarter */
+    send(SSD1681_DRIVER_CTRL, 50-1, 0, 0);
+    screen_push_ws(screen_ws_1681_4grays);
+    screen_push_rams(lsb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+    send(SSD1681_ACTIVATE);
+    time_busy("reference band");
+
+    screen_end_multiframe();
+    while(screen_busy())
+        tight_loop_contents();
+
+    /* Reset the driver control for whole screen */
+    send(SSD1681_DRIVER_CTRL, 200-1, 0, 0);
+    printf("exiting\n");
+}
+
+
 int main() {
     stdio_usb_init();
     log_set_level(LOG_LEVEL_INFO);
@@ -412,6 +461,7 @@ int main() {
     //test_subimage();
     //test_enable_once();
 
+    /* test_roll is the PoC that shows that we CAN display multiple images per second */
     //test_clear(); sleep_ms(1000);
     ////uint8_t buf[5000];
     ////memset(buf, 0xFF, 2500);
@@ -424,8 +474,13 @@ int main() {
     ////sleep_ms(1000);
     //test_roll();
 
-    test_clear();
-    test_anim(hip_anim, hip_anim_n_frames);
+    /* Animation is not that good */
+    //test_clear();
+    //test_anim(hip_anim, hip_anim_n_frames);
+
+    /* Bench test some WS to improve animations */
+    //test_zones44(NULL, NULL, NULL);
+    test_zones44(ws_30fps, ws_20fps, NULL);
 
     /* Clear to white before going to sleep */
     //test_clear();

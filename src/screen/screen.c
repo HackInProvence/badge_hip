@@ -381,9 +381,9 @@ const uint8_t screen_ws_1681_bw[159] = \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x22"  /* EOPT, 0x22 = normal */         \
+    "\x01\x00\x00\x00\x00\x00\x00"  /* 11A=1, stabilizes to VSS before power off */ \
+    "\x22\x22\x22\x22\x22\x28" "\x00\x00\x00" \
+    "\x07"  /* EOPT, 0x22 = normal -> 0x07 helps if there is another image, as 0x22 flashes white on enable analog... */ \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \
@@ -408,37 +408,9 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
     "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x22"  /* EOPT, 0x22 = normal -> relights the grays, necessary for the gray levels */ \
-    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
-    "\x41"  /* VSH1, 0x41 == 15V */           \
-    /* This LUT never uses VSH2 */            \
-    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
-    "\x32"  /*  VSL, 0x32 == -15V */          \
-    "\x20"; /* VCOM, 0x20 == -0.8V */
-
-/* This one only uses 1 group to darken or lighten a fixed number of times based on B/W != RED */
-const uint8_t screen_ws_1681_diff[159] = \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
-    "\xA0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
-    "\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 10 = darker */ \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 11 = no touch */ \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
-    "\x04\x04\x00\x00\x00\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
-    "\x00"  /* EOPT, 0x22 = normal */         \
+    "\x01\x00\x00\x00\x00\x00\x00"  /* 11A=1, stabilizes to VSS before power off */ \
+    "\x22\x22\x22\x22\x22\x28" "\x00\x00\x00" \
+    "\x07"  /* EOPT, 0x07 = keep before power off */ \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \

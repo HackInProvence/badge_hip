@@ -217,10 +217,6 @@ extern const uint8_t screen_ws_1681_bw[];
  * 3 steps: show image inversed, clear black/white trice, show your image (~1.9s) */
 extern const uint8_t screen_ws_1681_4grays[];
 
-/** Homemade waveform settings which whiten pixels 10 and darken pixels 01,
- * but leave untouched pixels 00 and 11. */
-extern const uint8_t screen_ws_1681_diff[];
-
 
 typedef enum {
     SSD1681_DRIVER_CTRL = 0x01,
