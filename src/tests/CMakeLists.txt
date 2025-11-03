@@ -39,7 +39,7 @@ pico_enable_stdio_usb(test_music 1)
 pico_enable_stdio_uart(test_music 0)
 
 
-# Test screen
+# Tests for screen
 
 add_executable(test_screen)
 target_sources(test_screen PRIVATE screen.c)
@@ -58,6 +58,24 @@ target_link_libraries(test_screen PRIVATE
 # enable usb output, disable uart output
 pico_enable_stdio_usb(test_screen 1)
 pico_enable_stdio_uart(test_screen 0)
+
+add_executable(test_wss)  # Improve fast colors
+target_sources(test_wss PRIVATE test_wss.c)
+pico_add_extra_outputs(test_wss)
+
+target_link_libraries(test_wss PRIVATE
+    badge_tests
+    badge_images
+    hardware_gpio
+    hardware_spi
+    pico_stdlib
+    log
+    screen
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_wss 1)
+pico_enable_stdio_uart(test_wss 0)
 
 
 # Test radio

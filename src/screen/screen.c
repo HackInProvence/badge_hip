@@ -420,7 +420,7 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
     "\x41"  /* VSH1, 0x41 == 15V */           \
     /* This LUT never uses VSH2 */            \
-    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\xA8"  /* VSH2, 0x00 == ???, POR is 5V */\
     "\x32"  /*  VSL, 0x32 == -15V */          \
     "\x20"; /* VCOM, 0x20 == -0.8V */
 
