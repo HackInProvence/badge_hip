@@ -27,6 +27,7 @@ typedef enum {
     STATE_SWRESET = 3,  /* Software reset ongoing */
     STATE_SETUP = 4,  /* Does a BUSY operation */
     STATE_READY = 5,  /* You can send commands (if not busy) */
+    STATE_MULTIFRAME = 6,  /* You can send some commands (or exit the mode) */
 } state_t;
 STATIC state_t state = STATE_UNINIT;
 STATIC absolute_time_t state_ts = 0;  /* Last time the state changed */
@@ -219,9 +220,7 @@ void screen_clear(bool bit) {
     send(SSD1681_DISPLAY_CTRL1, 0x44 | (bit ? 0x11 : 0x00));
 
     /* Do start drawing */
-    send(SSD1681_DISPLAY_CTRL2, 0xC7);
-    send(SSD1681_ACTIVATE);
-
+    screen_show_rams();
 }
 
 
@@ -255,7 +254,7 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
     }
 
     /* Bind values to [0..200] */
-    /* x1,y1 include the last line/column, but the screen commands excludes them */
+    /* x1,y1 includethe last line/column, but the screen commands excludes them */
     x0 = x0 >= 200 ? 25 : x0/8;
     x1 = x1 >= 200 ? 24 : (x1%8 == 0 ? x1/8-1 : x1/8-1); /* FIXME: this is the same value in both cases */
     y0 = y0 >= 200 ? 200 : y0;
@@ -330,6 +329,13 @@ void screen_show_rams(void) {
     if (screen_busy()) {
         log_warning("screen_show_rams() called but screen is busy");
         return;
+    }
+
+    /* Protects against a known bug where being in multiframe mode and calling end_multiframe
+     * after having already disabled the analog+clocks will freeze the SSD1681 in busy mode. */
+    if (state == STATE_MULTIFRAME) {
+        log_warning("screen_show_rams() called but screen was in multiframe mode; now in normal mode (next screen_end_multiframe will fail)");
+        state = STATE_READY;
     }
 
     /* Configure then Activate */
@@ -417,3 +423,50 @@ const uint8_t screen_ws_1681_4grays[159] = \
     "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
     "\x32"  /*  VSL, 0x32 == -15V */          \
     "\x20"; /* VCOM, 0x20 == -0.8V */
+
+
+void screen_start_multiframe(void) {
+    if (screen_busy()) {
+        log_warning("screen_start_multiframe() called but screen is busy");
+        return;
+    }
+
+    /* Not busy implies STATE_READY or above */
+    if (state != STATE_READY) {
+        log_warning("screen_start_multiframe() called but screen is not in the right state," \
+                    " for example already started a multiframe (now is %d instead of %d)", state, STATE_READY);
+    }
+
+    send(SSD1681_DISPLAY_CTRL2, 0xC0);
+    send(SSD1681_ACTIVATE);
+    state = STATE_MULTIFRAME;
+}
+
+void screen_draw_multiframe(void) {
+    if (screen_busy()) {
+        log_warning("screen_draw_multiframe() called but screen is busy");
+        return;
+    }
+
+    if (state != STATE_MULTIFRAME) {
+        log_warning("screen_draw_multiframe() called but screen is not currently in multiframe mode");
+    }
+
+    send(SSD1681_DISPLAY_CTRL2, 0x04);
+    send(SSD1681_ACTIVATE);
+}
+
+void screen_end_multiframe(void) {
+    if (screen_busy()) {
+        log_warning("screen_end_multiframe() called but screen is busy");
+        return;
+    }
+
+    if (state != STATE_MULTIFRAME) {
+        log_warning("screen_end_multiframe() called but screen is not currently in multiframe mode");
+    }
+
+    send(SSD1681_DISPLAY_CTRL2, 0x03);
+    send(SSD1681_ACTIVATE);
+    state = STATE_READY;
+}

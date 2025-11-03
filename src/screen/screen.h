@@ -217,6 +217,36 @@ extern const uint8_t screen_ws_1681_bw[];
  * 3 steps: show image inversed, clear black/white trice, show your image (~1.9s) */
 extern const uint8_t screen_ws_1681_4grays[];
 
+/* \brief Low level: enter the multiframe mode described below.
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while (~.0905s).
+ *
+ * In this mode, you can screen_push_rams(), screen_push_ws() between frames, then screen_draw_multiframe(), and screen_end_multiframe().
+ * You cannot use screen_show_image_* functions before calling screen_end_multiframe()
+ * (in which case the library goes back to non multiframe mode to avoid a known bug in the SSD1681,
+ *  so the next call to screen_end_multiframe will do nothing to avoid the freeze).
+ *
+ * It is intended to use with animation WS that are fast (multi-fps).
+ *
+ * \warning You should not stay in this mode for too long, as the voltage booster and clock are enabled in this mode,
+ *          and the SSD1681 seems not designed for that. */
+void screen_start_multiframe(void);
+
+/* \brief Low level: draw an image when using the multiframe mode (see \ref screen_start_multiframe).
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while (depends on the chosen WS).
+ *
+ * Draw the image from \ref screen_push_rams. */
+void screen_draw_multiframe(void);
+
+/* \brief Low level: end the multiframe mode described in \ref screen_start_multiframe.
+ *
+ * The screen must not be busy.
+ * This keeps the screen busy for a while (~.140s). */
+void screen_end_multiframe(void);
+
 
 typedef enum {
     SSD1681_DRIVER_CTRL = 0x01,

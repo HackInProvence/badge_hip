@@ -134,32 +134,6 @@ void test_enable_once(void) {
 }
 
 
-/* makes it busy, lasts 90.5ms */
-void screen_start_multiframe(void) {
-    if (screen_busy()) {
-        log_warning("screen_start_multiframe() called but screen is busy");
-        return;
-    }
-    /* if (state FIXME
-    state = ; */
-
-    send(SSD1681_DISPLAY_CTRL2, 0xC0);
-    send(SSD1681_ACTIVATE);
-}
-
-/* makes it busy, lasts 140ms, beware that using other screen_show_image_ functions in multiframe mode freezes the module in busy */
-void screen_end_multiframe(void) {
-    if (screen_busy()) {
-        log_warning("screen_end_multiframe() called but screen is busy");
-        return;
-    }
-    /* if (state FIXME
-    state = ; */
-
-    send(SSD1681_DISPLAY_CTRL2, 0x03);
-    send(SSD1681_ACTIVATE);
-}
-
 const uint8_t ws_roll[159] = \
     "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 00 = no touch */ \
     "\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* 01 = lighter */ \
@@ -218,9 +192,7 @@ void test_roll(void) {
 
         /* Show the image and swap buffer */
         screen_push_rams(next, prev, 5000);  /* 49ms @ 2MHz, 6.1ms @ 20MHz */
-        //screen_show_rams();
-        send(SSD1681_DISPLAY_CTRL2, 0x04);
-        send(SSD1681_ACTIVATE);
+        screen_draw_multiframe();
         //time_busy("frame");  /* 5.0ms per FR @200Hz, as expected */
         while(screen_busy())
             tight_loop_contents();
@@ -317,9 +289,6 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
     while(screen_busy())
         tight_loop_contents();
 
-    /* We always want to "just draw" TODO move to screen API */
-    send(SSD1681_DISPLAY_CTRL2, 0x04);
-
     /* The first image is special because it has no prev, but we have to be sure it is drawn correctly.
      * To do so, we configure the RAM RED (which stores prev) to read as inverse */
     prev = frames[0];
@@ -330,7 +299,7 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
         /* Show the image and swap buffer */
         next = frames[i];
         screen_push_rams(next, prev, 5000);  /* 49ms @ 2MHz, 6.1ms @ 20MHz */
-        send(SSD1681_ACTIVATE);
+        screen_draw_multiframe();
         //time_busy("frame");
         while(screen_busy())
             tight_loop_contents();
@@ -410,14 +379,14 @@ void test_zones44(const uint8_t *ws0, const uint8_t *ws1, const uint8_t *ws2) {
         //screen_show_image_bw(msb); -> Can't use this one because we are in multi-frame mode, and exiting twice is bugged in the SSD1681
         screen_push_ws(screen_ws_1681_bw);
         screen_push_rams(msb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
-        send(SSD1681_ACTIVATE);
+        screen_draw_multiframe();
         while(screen_busy())
             tight_loop_contents();
 
         /* Push the 4 test bands and WS and redraw */
         screen_push_ws(wss[i]);
         screen_push_rams(lsb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
-        send(SSD1681_ACTIVATE);
+        screen_draw_multiframe();
         time_busy("nth band");
     }
 
@@ -425,7 +394,7 @@ void test_zones44(const uint8_t *ws0, const uint8_t *ws1, const uint8_t *ws2) {
     send(SSD1681_DRIVER_CTRL, 50-1, 0, 0);
     screen_push_ws(screen_ws_1681_4grays);
     screen_push_rams(lsb, msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
-    send(SSD1681_ACTIVATE);
+    screen_draw_multiframe();
     time_busy("reference band");
 
     screen_end_multiframe();
@@ -456,10 +425,10 @@ int main() {
     printf("fullscreen images should be of size %d\n", len);
 
     //test_read_all();
-    //test_show_bw_images();
-    //test_show_4g_images();
-    //test_subimage();
-    //test_enable_once();
+    test_show_bw_images();
+    test_show_4g_images();
+    test_subimage();
+    test_enable_once();
 
     /* test_roll is the PoC that shows that we CAN display multiple images per second */
     //test_clear(); sleep_ms(1000);
@@ -475,12 +444,13 @@ int main() {
     //test_roll();
 
     /* Animation is not that good */
-    //test_clear();
-    //test_anim(hip_anim, hip_anim_n_frames);
+    test_clear();
+    test_anim(hip_anim, hip_anim_n_frames);
 
     /* Bench test some WS to improve animations */
     //test_zones44(NULL, NULL, NULL);
-    test_zones44(ws_30fps, ws_20fps, NULL);
+    //test_zones44(ws_30fps, ws_20fps, NULL);
+    /* See other program -> test_wss */
 
     /* Clear to white before going to sleep */
     //test_clear();
