@@ -227,7 +227,8 @@ extern const uint8_t screen_ws_1681_4grays[];
  * (in which case the library goes back to non multiframe mode to avoid a known bug in the SSD1681,
  *  so the next call to screen_end_multiframe will do nothing to avoid the freeze).
  *
- * It is intended to use with animation WS that are fast (multi-fps).
+ * It is intended to use with animation WS that are fast (multi-fps):
+ * \ref screen_ws_30fps (not good), \ref screen_ws_20fps (not good), \ref screen_ws_10fps (good).
  *
  * \warning You should not stay in this mode for too long, as the voltage booster and clock are enabled in this mode,
  *          and the SSD1681 seems not designed for that. */
@@ -246,6 +247,24 @@ void screen_draw_multiframe(void);
  * The screen must not be busy.
  * This keeps the screen busy for a while (~.140s). */
 void screen_end_multiframe(void);
+
+/** \brief Advanced: homemade waveform settings to use with \screen_start_multiframe.
+ *
+ * Using 2 bit planes (lsb = next image, msb = previous image), draws the difference between images.
+ * Targets an 30 frames per second budget, including the time required to push the image with SPI @20MHz. */
+extern const uint8_t screen_ws_30fps[];
+
+/** \brief Advanced: homemade waveform settings to use with \screen_start_multiframe.
+ *
+ * Using 2 bit planes (lsb = next image, msb = previous image), draws the difference between images.
+ * Targets an 20 frames per second budget, including the time required to push the image with SPI @20MHz. */
+extern const uint8_t screen_ws_20fps[];
+
+/** \brief Advanced: homemade waveform settings to use with \screen_start_multiframe.
+ *
+ * Using 2 bit planes (lsb = next image, msb = previous image), draws the difference between images.
+ * Targets an 10 frames per second budget, including the time required to push the image with SPI @20MHz. */
+extern const uint8_t screen_ws_10fps[];
 
 
 typedef enum {

@@ -212,36 +212,7 @@ void test_roll(void) {
 }
 
 
-/* 20 fps means a budget of 50.0ms - 6.1ms to send an image, leaving 43.9ms hence 8.8 ticks @200Hz (any other freq has the same ON time) */
-/* TODO -> currently this targets 14ms */
-const uint8_t ws_20fps[159] = \
-    "\x00\x00\x00\x00\x00\x00\x02\x10\x00\x00\x00\x00" /* 00 = redark */ \
-    "\x12\x02\x00\x00\x00\x00\x12\x12\x00\x00\x00\x00" /* 01 = lighter */ \
-    "\x21\x01\x00\x00\x00\x00\x21\x21\x00\x00\x00\x00" /* 10 = darker */ \
-    "\x00\x00\x00\x00\x00\x00\x01\x20\x00\x00\x00\x00" /* 11 = relight white */ \
-    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* VCOM = DVCOM */ \
-    "\x00\x00\x00\x00\x00\x00\x00" /* TP[0A], TP[0B], SR[0AB], TP[0C], TP[0D], SR[0CD], RP[0] */ \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x02\x00\x00\x01\x00\x00" /* group6 */ \
-    "\x00\x02\x00\x00\x08\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x00\x00\x00\x00\x00\x00\x00" \
-    "\x01\x00\x00\x00\x00\x00\x00"  /* 11A=1, stabilizes to VSS before power off */ \
-    "\x88\x88\x88\x88\x88\x88" "\x00\x00\x00" \
-    "\x07"  /* EOPT, 0x22 = normal -> 0x07 helps if there is another image, as 0x22 flashes white on enable analog... */ \
-    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
-    "\x41"  /* VSH1, 0x41 == 15V */           \
-    /* This LUT never uses VSH2 */            \
-    "\xA8"  /* VSH2, 0x00 == ???, POR is 5V */\
-    "\x32"  /*  VSL, 0x32 == -15V */          \
-    "\x20"; /* VCOM, 0x20 == -0.8V */
-
-void test_anim(const uint8_t * const * frames, size_t n_frames) {
+void test_anim(const uint8_t * const * frames, size_t n_frames, const uint8_t *ws) {
     const uint8_t *prev, *next, *o;
 
     /* Booster Soft Start Control
@@ -255,7 +226,7 @@ void test_anim(const uint8_t * const * frames, size_t n_frames) {
 
     /* Now go to animation mode */
     screen_clear_image_position();
-    screen_push_ws(ws_20fps);
+    screen_push_ws(ws);
     screen_start_multiframe();
     while(screen_busy())
         tight_loop_contents();
@@ -340,7 +311,9 @@ int main() {
     /* Animation is not that good */
     /* See other program designed to improve this -> test_wss */
     test_clear();
-    test_anim(hip_anim, hip_anim_n_frames);
+    test_anim(hip_anim, hip_anim_n_frames, screen_ws_30fps);
+    test_anim(hip_anim, hip_anim_n_frames, screen_ws_20fps);
+    test_anim(hip_anim, hip_anim_n_frames, screen_ws_10fps);
 
     /* Clear to white before going to sleep */
     //test_clear();
