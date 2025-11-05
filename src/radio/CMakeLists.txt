@@ -8,3 +8,11 @@ target_link_libraries(radio INTERFACE
     hardware_spi
     pico_time
 )
+
+# Use cmake -DCC1101_fXOSC to specify your custom frequency
+if (NOT CC1101_fXOSC)
+    message("BADGE: using CC1101 frequency from ${PICO_BOARD}.h")
+else()
+    message("BADGE: using CC1101 frequnecy ${CC1101_fXOSC}")
+    target_compile_definitions(radio INTERFACE CC1101_fXOSC=${CC1101_fXOSC})
+endif()

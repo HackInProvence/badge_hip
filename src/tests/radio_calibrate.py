@@ -18,7 +18,7 @@ Manual:
 - Ctrl-C as soon as the first status line appears
 - "In 0.60050011s (0.60000200s on pico), rate is 25.996640818 MHz (25.997476167 on pico)"
 -                                                                  ^^^^^^^^^^^^--- best estimate (by the pico)
-- either change it in src/radio/radio.h:CC1101_fXOSC and recompile,
+- either change it with -DCC1101_fXOSC= (frequency in Hz) in the cmake command and rebuild and recompile,
 - or use the test_radio.dis image to locate radio_set_frequency:
   - the constant @<radio_set_frequency+0x30> is the CC1101_fXOSC,
   - this gives you the offset of the constant (26MHz == 0x018cba80, or 25.997640 == 0x018cb148) -> 0x10006824 for instance,
