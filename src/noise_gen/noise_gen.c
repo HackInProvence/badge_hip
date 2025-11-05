@@ -10,8 +10,8 @@
 #include "pico/binary_info.h"
 #include "pico/rand.h"
 
-#include "badge_pinout.h"
 #include "noise_gen.h"
+#include "pinouts.h"
 
 
 // Configured state machine which runs our program

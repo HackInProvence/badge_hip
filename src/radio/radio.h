@@ -18,7 +18,7 @@
 #ifndef _RADIO_H
 #define _RADIO_H
 
-#include "badge_pinout.h"
+#include "pinouts.h"
 
 // Redefine pins while we test on Pico W because some pins are not exposed (23 for GD0 and 24,25 for SPI1)
 #ifndef BADGE_SECSEA

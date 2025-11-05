@@ -7,8 +7,8 @@
 #include "hardware/gpio.h"
 #include "pico/binary_info.h"
 
-#include "badge_pinout.h"
 #include "btns.h"
+#include "pinouts.h"
 
 
 void btns_init(void) {

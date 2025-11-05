@@ -9,8 +9,8 @@
 #include "pico/binary_info.h"
 #include "pico/time.h"
 
-#include "badge_pinout.h"
 #include "music.h"
+#include "pinouts.h"
 
 
 static uint slice_num = -1;

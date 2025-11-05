@@ -9,15 +9,31 @@
 // Defines pins for our board, as well as mem size and so on...
 // -----------------------------------------------------
 
-#ifndef _BOARD_BADGE_H
-#define _BOARD_BADGE_H
+// -----------------------------------------------------
+// NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
+//       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
+// -----------------------------------------------------
 
-#include "badge_pinout.h"
+// This header may be included by other board headers as "badge_secsea.h"
+
+
+#ifndef _BADGE_SECSEA_H
+#define _BADGE_SECSEA_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define BADGE_SECSEA
+
+// We need our pinout, but we gathered pinouts of different boards in the same header,
+//  so we need to know who we are beforehand.
+#include "pinouts.h"
+
+// --- Radio ---
+// Radio may need calibration, which you can provide with -DCC1101_fXOSC at cmake time (see src/tests/radio_calibrate.py)
+#ifndef CC1101_fXOSC
+#define CC1101_fXOSC 27000000
+#endif
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -101,4 +117,4 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 //#define PICO_VSYS_PIN 29
 //#endif
 
-#endif /* _BOARD_BADGE_H */
+#endif /* _BADGE_SECSEA_H */

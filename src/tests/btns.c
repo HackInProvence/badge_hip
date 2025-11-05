@@ -8,8 +8,8 @@
 
 #include "pico/stdlib.h"
 
-#include "badge_pinout.h"
 #include "btns.h"
+#include "pinouts.h"
 
 
 int main() {

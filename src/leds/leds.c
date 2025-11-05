@@ -7,8 +7,8 @@
 #include "hardware/pio.h"
 #include "pico/binary_info.h"
 
-#include "badge_pinout.h"
 #include "leds.h"
+#include "pinouts.h"
 
 
 /* Configured state machine which runs our program */

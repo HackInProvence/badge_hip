@@ -15,8 +15,8 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
-#include "badge_pinout.h"
 #include "log.h"
+#include "pinouts.h"
 #include "screen.h"
 
 
