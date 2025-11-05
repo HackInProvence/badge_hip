@@ -4,8 +4,8 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 // -----------------------------------------------------
-// Configure pins and defaults for the badge, as well as mem size and so on...
-// Should not be included manually but using -DPICO_BOARD=badge_secsea while configuring cmake
+// Configures MY PROTOTYPE which is not completely pin-compatible with the final badge.
+// Should not be included manually but using -DPICO_BOARD=badge_proto while configuring cmake
 // Inspired from pico-sdk/src/boards/include/boards/pico_w.h
 // -----------------------------------------------------
 
@@ -14,16 +14,14 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "badge_secsea.h"
 
-
-#ifndef _BADGE_SECSEA_H
-#define _BADGE_SECSEA_H
+#ifndef _BADGE_PROTO_H
+#define _BADGE_PROTO_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
-#define BADGE_SECSEA
+#define BADGE_PROTO
 
 // We need our pinout, but we gathered pinouts of different boards in the same header,
 //  so we need to know who we are beforehand.
@@ -32,19 +30,19 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // --- Radio ---
 // Radio may need calibration, which you can provide with -DCC1101_fXOSC at cmake time (see src/tests/radio_calibrate.py)
 #ifndef CC1101_fXOSC
-#define CC1101_fXOSC 27000000
+#define CC1101_fXOSC 25997640
 #endif
 
 // --- UART ---
-#ifndef PICO_DEFAULT_UART
-#define PICO_DEFAULT_UART 0
-#endif
-#ifndef PICO_DEFAULT_UART_TX_PIN
-#define PICO_DEFAULT_UART_TX_PIN BADGE_UART0_TX
-#endif
-#ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN BADGE_UART0_RX
-#endif
+//#ifndef PICO_DEFAULT_UART
+//#define PICO_DEFAULT_UART 0
+//#endif
+//#ifndef PICO_DEFAULT_UART_TX_PIN
+//#define PICO_DEFAULT_UART_TX_PIN BADGE_UART0_TX
+//#endif
+//#ifndef PICO_DEFAULT_UART_RX_PIN
+//#define PICO_DEFAULT_UART_RX_PIN BADGE_UART0_RX
+//#endif
 //#define PICO_DEFAULT_UART_BAUD_RATE xxx
 
 // --- LED ---
@@ -117,4 +115,4 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 //#define PICO_VSYS_PIN 29
 //#endif
 
-#endif /* _BADGE_SECSEA_H */
+#endif /* _BADGE_PROTO_H */
