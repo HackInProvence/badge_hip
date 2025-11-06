@@ -42,7 +42,7 @@ int main() {
             if (state != RECEIVING) {
                 state = RECEIVING;
                 state_ts = now;
-                leds_anim_ook(ORANGE, 50000);
+                leds_anim_ook(ORANGE, 80000);
             }
             printf("%02X", ret);
         } else {
