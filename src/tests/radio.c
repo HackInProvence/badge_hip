@@ -15,17 +15,9 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+#include "log.h"
 #include "radio.h"
 
-
-/* TODO: when it is decided whether radio_send functions are static or not, change that (non static -> in .h, static -> find another solution...) */
-void radio_send(const uint8_t *data, uint8_t *response, size_t len);
-void radio_burst_read(uint8_t reg, uint8_t *response, size_t len);
-
-
-#define status_nrdy(status) (status >> 7)
-#define status_state(status) ((status >> 4) & 0x7)
-#define status_fifo_bytes(status) (status & 0xf)
 
 /* Test configuration found on https://github.com/jamisonderek/flipper-zero-tutorials/wiki/Sub-GHz
  * This uses asynch serial mode/operation, and downgrades features (no FIFO, no whitening, no interleave, no FEC, no Manchester, no MSK) */
@@ -64,91 +56,17 @@ const uint8_t conf_am270_async[] = {
 };
 
 
-const char *states[] = {
-    "IDLE",
-    "RX",
-    "TX",
-    "FSTXON",
-    "CALIBRATE",
-    "SETTLING",
-    "RXFIFO_OVERFLOW",
-    "TXFIFO_UNDERFLOW",
-};
-
-static size_t _printf_status(uint8_t status) {
-    return printf(
-        "status = 0x%02x: %sready, state 0b%03b (%s), %d TX FIFO bytes avail\n",
-        status,
-        status_nrdy(status) ? "NOT " : "",
-        status_state(status), states[status_state(status)],
-        status_fifo_bytes(status)
-    );
-}
-
-uint8_t print_status(void) {
-    uint8_t status;
-    radio_send("\x3D", &status, 1);  /* NOOP (in write mode, so FIFO is the TX one) */
-    _printf_status(status);
-    return status;
-}
-
-void wait_state(uint8_t tgt) {
-    uint8_t old_status = 0, status = 0;
-    do {
-        radio_send("\x3D", &status, 1);
-        if (status != old_status) {
-            _printf_status(status);
-            old_status = status;
-        }
-    } while (status_state(status) != tgt);
-}
-
-
-void print_configuration(void) {
-    uint8_t cfg[0x30];
-    size_t i,j;
-
-    //print_status();
-    printf("current configuration:\n");
-    radio_burst_read(0x00, cfg, 0x30);
-
-    /* Print table header */
-    printf("    ");
-    for (i=0; i<16; ++i)
-        printf("% 2x ", i);
-    printf("\n");
-
-    /* Print memory content with first column for current line */
-    for (j=0; j<3; ++j) {
-        printf("%02x: ", j*16);
-        for(size_t i=0; i<16; ++i)
-            printf("%02x ", cfg[j*16+i]);
-        printf("\n");
-    }
-
-    printf("PATABLE:\n    ");
-    radio_burst_read(0x3E, cfg, 8);  /* PATABLE */
-    for(size_t i=0; i<8; ++i)
-        printf("%02x ", cfg[i]);
-    printf("\n");
-
-    print_status();
-}
-
-
 /** Pulses a TX on 933.92 with OOK (PWM 5% duty on 100ms cycle)
  * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
 void tx_pulses(void) {
-    radio_send(conf_am270_async, NULL, sizeof(conf_am270_async));
-    //radio_send("\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00", NULL, 10);  /* Done by flipper but does not work */
-    //radio_send("\x3E\x50", NULL 2);  /* PATABLE: PWR 0db (C0 for maximal power, C6 by default, which is less power) */
+    ccsend(conf_am270_async, NULL, sizeof(conf_am270_async));
+    //ccsend("\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00", NULL, 10);  /* Done by flipper but does not work */
+    //ccsend("\x3E\x50", NULL 2);  /* PATABLE: PWR 0db (C0 for maximal power, C6 by default, which is less power) */
     radio_set_frequency(433920000);
-    print_configuration();
+    print_cc_configuration();
 
     // Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
-    uint8_t cmd = CC1101_STX;
-    radio_send(&cmd, NULL, 1);
-    wait_state(0b010);  /* FIXME: replace magic numbers by name */
+    radio_wait_state(CC1101_STATE_TX, true);
 
     gpio_init(BADGE_RADIO_GDO0);
     gpio_put(BADGE_RADIO_GDO0, 1);
@@ -160,24 +78,21 @@ void tx_pulses(void) {
         sleep_ms(5);
         gpio_put(BADGE_RADIO_GDO0, 1);
         sleep_ms(95);
-        print_status();
+        log_cc_status();
     }
 
-    cmd = CC1101_SIDLE;
-    radio_send(&cmd, NULL, 1);
-    wait_state(0b000);
+    radio_wait_state(CC1101_STATE_IDLE, true);
 }
 
 
 /** Put the CC1101 in RX mode and print the first bits received with high enough RSSI.
  * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
 void rx_times(void) {
-    radio_send(conf_am270_async, NULL, sizeof(conf_am270_async));
-    print_configuration();
+    ccsend(conf_am270_async, NULL, sizeof(conf_am270_async));
+    print_cc_configuration();
 
     gpio_init(BADGE_RADIO_GDO0);
-    radio_send("\x34", NULL, 1);  /* Go to RX mode */
-    wait_state(0b001);  /* FIXME: replace magic numbers by name */
+    radio_wait_state(CC1101_STATE_RX, true);
 
     printf("start\n");
 
@@ -214,47 +129,15 @@ void rx_times(void) {
 }
 
 
-/** \brief Default configuration for the flipper chat app.
- *
- * There is no specific configuration found in https://github.com/twisted-pear/esubghz_chat/blob/main/esubghz_chat.c,
- * but the enter_chat function calls subghz_tx_rx_worker, which sets up a GFSK by default,
- * see subghz_device_cc1101_preset_gfsk_9_99kb_async_regs in https://github.com/flipperdevices/flipperzero-firmware/blob/dev/lib/subghz/devices/cc1101_configs.c
- *
- * This uses the packet mode of the CC1101
- *
- * 999 = 9.99kbps */
-const uint8_t conf_gfsk999[] = {
-    CC1101_IOCFG0, 0x06, /* GDO0 = packet being received */
-    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */
-    CC1101_SYNC1, 0x46, /* Sync word MSB */
-    CC1101_SYNC0, 0x4C, /* Sync work LSB */
-    //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
-    CC1101_PKTCTRL0, 0x05, /* no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word) */
-    CC1101_ADDR, 0x00, /* no packet filtration */
-    CC1101_FSCTRL1, 0x06, /* IF frequency */
-    CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
-    CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
-    CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
-    CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz */
-    CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
-    CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
-    CC1101_AGCCTRL2, 0x43,
-    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense */
-    CC1101_AGCCTRL0, 0x91,
-    CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
-    /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
-};
-
-
 /** \brief msg must be \0 terminated */
 void tx_chat_flipper(const uint8_t *msg) {
     /* Maybe someone else, like rx_pulses did not reset the direction of this pin... */
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
     /* 800µs per byte */
-    radio_send(conf_gfsk999, NULL, sizeof(conf_gfsk999));
+    ccsend(radio_preset_gfsk999, NULL, radio_preset_gfsk999_len);
     radio_set_frequency(433920000);
-    print_configuration();
+    print_cc_configuration();
 
     /* We send data in 63 bytes blocks to simplify the transmission (no interrupt, use GD0 to follow the current packet status) */
     size_t len = strlen(msg);
@@ -265,17 +148,15 @@ void tx_chat_flipper(const uint8_t *msg) {
         block_len = len > 63 ? 63 : len;  /* 64-1 for the length */
         memcpy(tx+3, msg, block_len);
         printf("send block (len %d)\n", block_len);
-        print_status();
+        log_cc_status();
 
         tx[0] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
         tx[1] = CC1101_BURST(CC1101_TXFIFO);
         tx[2] = block_len;  /* We are in variable length: the first byte in the FIFO must be the length */
-        radio_send(tx, NULL, block_len+3);
-        print_status();
+        ccsend(tx, NULL, block_len+3);
+        log_cc_status();
 
-        tx[0] = CC1101_STX;
-        radio_send(tx, NULL, 1);
-        wait_state(0b010);  /* FIXME: magic */
+        radio_wait_state(CC1101_STATE_TX, true);
 
         /* Wait for GD0 to go high (preamble+sync has been sent) */
         while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
@@ -284,7 +165,7 @@ void tx_chat_flipper(const uint8_t *msg) {
         /* Wait for GD0 to go low (packet has been sent) */
         while(gpio_get(BADGE_RADIO_GDO0))
             tight_loop_contents();
-        print_status();
+        log_cc_status();
 
         len -= block_len;
     }
@@ -294,6 +175,7 @@ void tx_chat_flipper(const uint8_t *msg) {
 int main() {
     uint8_t cmd[2];
     stdio_usb_init();
+    log_set_level(LOG_LEVEL_INFO);
 
     printf("init\n");
     radio_init();
@@ -302,7 +184,7 @@ int main() {
     gpio_init(BADGE_RADIO_GDO0);
     gpio_init(BADGE_RADIO_GDO2);
 
-    print_status();
+    log_cc_status();
 
     tx_pulses();
     //rx_times();
@@ -310,8 +192,8 @@ int main() {
     /* We need a reset between changing modes, otherwise some of the conf makes it never go out of calibrating */
     cmd[0] = CC1101_SRES;
     printf("reset\n");
-    radio_send(cmd, NULL, 1);
-    wait_state(0);
+    ccsend(cmd, NULL, 1);
+    radio_wait_state(CC1101_STATE_IDLE, false);
 
     tx_chat_flipper("Badge SecSea joined chat.\n");
     sleep_ms(3000);
@@ -341,16 +223,17 @@ int main() {
 
     printf("stop\n");
     cmd[0] = CC1101_SPWD;
-    radio_send(cmd, NULL, 1);
+    ccsend(cmd, NULL, 1);
     sleep_us(100);  /* Have to wait ~100µ before we see the chip powers down */
-    print_status();
+    log_cc_status();
+
     /* Bringing CSn to 0 again will wake up the chip */
     sleep_ms(1000);
     printf("reboot\n");
     radio_boot();
-    print_status();
+    log_cc_status();
     sleep_ms(1000);
     printf("restop\n");
     cmd[0] = CC1101_SPWD;
-    radio_send(cmd, NULL, 1);
+    ccsend(cmd, NULL, 1);
 }

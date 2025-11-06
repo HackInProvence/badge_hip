@@ -21,9 +21,6 @@
 
 #include "radio.h"
 
-/* TODO: when it is decided whether radio_send functions are static or not, change that (non static -> in .h, static -> find another solution...) */
-void radio_send(const uint8_t *data, uint8_t *response, size_t len);
-
 
 static uint64_t rises = 0;
 static absolute_time_t t0 = 0;
@@ -57,7 +54,7 @@ int main() {
 
     /* Set up the CC1101 to output some divider of fXOSC */
     uint16_t cmd = CC1101_IOCFG0 | (0x3D<<8);  /* 96 times divider (the CPU does not handle 64 or lower dividers) */
-    radio_send((uint8_t *)&cmd, NULL, 2);
+    ccsend((uint8_t *)&cmd, NULL, 2);
 
     /* Set up the interrupt on the other core, so that the UART does not interrupt the interrupt */
     multicore_launch_core1(setup_counter);

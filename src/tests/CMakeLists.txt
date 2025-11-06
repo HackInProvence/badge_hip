@@ -85,10 +85,11 @@ target_sources(test_radio PRIVATE radio.c)
 pico_add_extra_outputs(test_radio)
 
 target_link_libraries(test_radio PRIVATE
-    badge
+    badge_tests
     hardware_gpio
     pico_stdlib
     pico_time
+    log
     radio
 )
 

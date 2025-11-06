@@ -4,11 +4,36 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 
+#include <stdio.h>  /* This uses printf because of the print_cc_ function */
+
 #include "hardware/gpio.h"
 #include "hardware/spi.h"
 #include "pico/binary_info.h"
 
+#include "log.h"
 #include "radio.h"
+
+
+/** \brief SPI read/write pulling CSn down for the whole transaction, \p response can be NULL
+ *
+ * We chose to block until the \p len bytes are written, as the communication is fast (~1MHz) */
+STATIC void ccsend(const uint8_t *data, uint8_t *response, size_t len) {
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    if (response)
+        spi_write_read_blocking(spi1, data, response, len);
+    else
+        spi_write_blocking(spi1, data, len);
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
+
+/** \brief Helper to burst read registers */
+STATIC void ccread_burst(uint8_t reg, uint8_t *response, size_t len) {
+    uint8_t cmd = CC1101_BURST(CC1101_READ(reg));
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    spi_write_blocking(spi1, &cmd, 1);
+    spi_read_blocking(spi1, 0x00, response, len);
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
 
 
 void radio_init(void) {
@@ -46,28 +71,67 @@ void radio_boot(void) {
 }
 
 
-/** \brief SPI read/write pulling CSn down for the whole transaction, \p response can be NULL
- *
- * We chose to block until the \p len bytes are written, as the communication is fast (~1MHz)
- *
- * TODO: static or not? */
-void radio_send(const uint8_t *data, uint8_t *response, size_t len) {
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    if (response)
-        spi_write_read_blocking(spi1, data, response, len);
-    else
-        spi_write_blocking(spi1, data, len);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+const char *STATE_NAMES[] = {
+    "IDLE",
+    "RX",
+    "TX",
+    "FSTXON",
+    "CALIBRATE",
+    "SETTLING",
+    "RXFIFO_OVERFLOW",
+    "TXFIFO_UNDERFLOW",
+};
+
+#define status_nrdy(status) (status >> 7)
+#define status_state(status) ((status >> 4) & 0x7)
+#define status_fifo_bytes(status) (status & 0xf)
+
+static void _log_status(uint8_t status) {
+    log_info(
+        "status = 0x%02x: %sready, state 0b%03b (%s), %d TX FIFO bytes avail",
+        status,
+        status_nrdy(status) ? "NOT " : "",
+        status_state(status), STATE_NAMES[status_state(status)],
+        status_fifo_bytes(status)
+    );
 }
 
-/** \brief Helper to burst read registers
- * TODO: static or not ?*/
-void radio_burst_read(uint8_t reg, uint8_t *response, size_t len) {
-    uint8_t cmd = CC1101_BURST(CC1101_READ(reg));
-    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, &cmd, 1);
-    spi_read_blocking(spi1, 0x00, response, len);
-    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+STATIC uint8_t log_cc_status(void) {
+    uint8_t status;
+    uint8_t cmd = CC1101_SNOP;
+    ccsend(&cmd, &status, 1);  /* NOOP (in write mode, so FIFO is the TX one) */
+    _log_status(status);
+    return status;
+}
+
+void print_cc_configuration(void) {
+    uint8_t cfg[0x30];
+    size_t i,j;
+
+    printf("current configuration:\n");
+    ccread_burst(0x00, cfg, 0x30);
+
+    /* Print table header */
+    printf("    ");
+    for (i=0; i<16; ++i)
+        printf("% 2x ", i);
+    printf("\n");
+
+    /* Print memory content with first column for current line */
+    for (j=0; j<3; ++j) {
+        printf("%02x: ", j*16);
+        for(size_t i=0; i<16; ++i)
+            printf("%02x ", cfg[j*16+i]);
+        printf("\n");
+    }
+
+    printf("PATABLE:\n    ");
+    ccread_burst(0x3E, cfg, 8);  /* PATABLE */
+    for(size_t i=0; i<8; ++i)
+        printf("%02x ", cfg[i]);
+    printf("\n");
+
+    log_cc_status();
 }
 
 
@@ -84,7 +148,66 @@ void radio_set_frequency(uint32_t freq_hz) {
         (setting >> 8) & 0xFF,  /* FREQ1 */
          setting & 0xFF,        /* FREQ0 */
     };
-    radio_send((uint8_t *)&cmd, NULL, 4);
+    ccsend((uint8_t *)&cmd, NULL, 4);
 }
 
 
+void radio_wait_state(radio_state_t target_state, bool do_change) {
+    uint8_t old_status = 0, status = 0;
+    uint8_t cmd;
+
+    /* Some states can't be reached "on demand" */
+    if (do_change && target_state <= CC1101_STATE_FSTXON) {
+        switch(target_state) {
+        case CC1101_STATE_IDLE:
+            cmd = CC1101_SIDLE;
+            break;
+        case CC1101_STATE_RX:
+            cmd = CC1101_SRX;
+            break;
+        case CC1101_STATE_TX:
+            cmd = CC1101_STX;
+            break;
+        case CC1101_STATE_FSTXON:
+            cmd = CC1101_SFSTXON;
+            break;
+        }
+        ccsend(&cmd, NULL, 1);
+    }
+
+    /* Now wait...
+     * FIXME: add a timeout
+     * TODO: measure the times it takes to calibrate and settle */
+    cmd = CC1101_SNOP;
+    do {
+        ccsend(&cmd, &status, 1);
+        if (status != old_status) {
+            _log_status(status);
+            old_status = status;
+        }
+    } while (status_state(status) != target_state);
+}
+
+
+const uint8_t radio_preset_gfsk999[] = {
+    CC1101_IOCFG0, 0x06, /* GDO0 = packet being received */
+    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */
+    CC1101_SYNC1, 0x46, /* Sync word MSB */
+    CC1101_SYNC0, 0x4C, /* Sync work LSB */
+    //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
+    CC1101_PKTCTRL0, 0x05, /* no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word) */
+    CC1101_ADDR, 0x00, /* no packet filtration */
+    CC1101_FSCTRL1, 0x06, /* IF frequency */
+    CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
+    CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
+    CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
+    CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz */
+    CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
+    CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
+    CC1101_AGCCTRL2, 0x43,
+    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense */
+    CC1101_AGCCTRL0, 0x91,
+    CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
+    /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
+};
+const size_t radio_preset_gfsk999_len = sizeof(radio_preset_gfsk999);

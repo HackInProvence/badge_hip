@@ -5,13 +5,14 @@
 
 /** \file radio.h
  *
- * \brief Radio API:
+ * \brief Radio API: interfaces with the CC1101 which controls the radio.
+ *
+ * Typical usage: \ref radio_init followed by \ref radio_boot, then \ref radio_set_frequency.
+ * Then push your packet-mode configuration (TODO), then your data (TODO), then \ref radio_wait_state(TX or RX, true).
  *
  * TODO:
- * - homogenize static functions and their names with other libs (send is send in screen but radio_send here),
- * - decide whether print_status and its could be macros could be useful for others (e.g. debug),
- * - decide radio_burst_read,
- * - provide a state_then_wait or accessors to change states,
+ * - decide whether print_cc_ function worth linking printf (it should except no log),
+ * - accessors to push configuration and data to send, access to received bytes and quality indicators,
  * - lock on a messaging protocol and provide methods for that.
  * */
 
@@ -38,11 +39,43 @@ void radio_init(void);
 /** \brief Boot the radio module (or wake from deep sleep) */
 void radio_boot(void);
 
+/** \brief Power down / deep sleep the radio module */
+void radio_power_down(void);
+
 /** \brief Sets the frequency (in Hz) of the transmission
  *
  * Must be < 1.6GHz.
  * Floored to the closest CC1101_fXOSC/65536. */
 void radio_set_frequency(uint32_t freq_hz);
+
+
+/** Internal state value (returned in the status byte) */
+typedef enum {
+    CC1101_STATE_IDLE = 0b000,
+    CC1101_STATE_RX = 0b001,
+    CC1101_STATE_TX = 0b010,
+    CC1101_STATE_FSTXON = 0b011,
+    CC1101_STATE_CALIBRATE = 0b100,
+    CC1101_STATE_SETTLING = 0b101,
+    CC1101_STATE_RXFIFO_OVERFLOW = 0b110,
+    CC1101_STATE_TXFIFO_UNDERFLOW = 0b111,
+} radio_state_t;
+
+/** \brief Wait for the internal state to be ready, and optionally also emit the command to change state */
+void radio_wait_state(radio_state_t target_state, bool do_change);
+
+
+/** \brief Default configuration for the flipper chat app.
+ *
+ * There is no specific configuration found in https://github.com/twisted-pear/esubghz_chat/blob/main/esubghz_chat.c,
+ * but the enter_chat function calls subghz_tx_rx_worker, which sets up a GFSK by default,
+ * see subghz_device_cc1101_preset_gfsk_9_99kb_async_regs in https://github.com/flipperdevices/flipperzero-firmware/blob/dev/lib/subghz/devices/cc1101_configs.c
+ *
+ * This uses the packet mode of the CC1101
+ *
+ * 999 = 9.99kbps */
+extern const uint8_t radio_preset_gfsk999[];
+extern const size_t radio_preset_gfsk999_len;
 
 
 /* Register access type: default is write single byte, but these sets byte to change the access
@@ -51,7 +84,7 @@ void radio_set_frequency(uint32_t freq_hz);
 #define CC1101_READ(reg) ((reg) | 0x80)
 #define CC1101_BURST(reg) ((reg) | 0x40)
 
-/* Names of registers */
+/** Names of registers */
 typedef enum {
     CC1101_IOCFG2 = 0x00,
     CC1101_IOCFG1 = 0x01,
@@ -135,5 +168,13 @@ typedef enum {
     CC1101_RCCTRL1_STATUS = 0x3C,
     CC1101_RCCTRL0_STATUS = 0x3D,
 } radio_register_t;
+
+
+/** Internal util/debug made accessible to tests */
+STATIC void ccsend(const uint8_t *, uint8_t *, size_t);
+STATIC void ccread_burst(uint8_t, uint8_t *, size_t);
+STATIC uint8_t log_cc_status(void);
+STATIC void print_cc_configuration(void);
+
 
 #endif /* _RADIO_H */
