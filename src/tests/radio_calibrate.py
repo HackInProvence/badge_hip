@@ -34,6 +34,7 @@ Conclusions:
 - when connecting to the serial to read the frequency, it slows down;
   this may be caused by the UART that may have a higher priority interrupt than our GPIO counter
   -> we should use core 1 to count! -> THIS WORKS BETTER, but it still drifts low when we connect with UART...
+  -> this may also be caused by USB CDC handler which sets up a task according to pico_stdio_usb...
 - without multi-core, we can read the most precise value by flashing the radio_calibrate.uf2, rebooting the pico,
   waiting (> 10s ?), then connecting with UART (once connected, even if disconnected, the value drifts) -> 29_997_640 Hz
 - the python value oscillates because it depends on the serial module,

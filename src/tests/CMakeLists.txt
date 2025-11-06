@@ -78,7 +78,7 @@ pico_enable_stdio_usb(test_wss 1)
 pico_enable_stdio_uart(test_wss 0)
 
 
-# Test radio
+# Tests radio
 
 add_executable(test_radio)
 target_sources(test_radio PRIVATE radio.c)
@@ -110,8 +110,25 @@ target_link_libraries(radio_calibrate PRIVATE
 )
 
 # enable usb output, disable uart output
-pico_enable_stdio_usb(test_radio 1)
-pico_enable_stdio_uart(test_radio 0)
+pico_enable_stdio_usb(radio_calibrate 1)
+pico_enable_stdio_uart(radio_calibrate 0)
+
+add_executable(radio_source)
+target_sources(radio_source PRIVATE radio_source.c)
+pico_add_extra_outputs(radio_source)
+
+target_link_libraries(radio_source PRIVATE
+    badge_tests
+    hardware_gpio
+    pico_stdlib
+    pico_time
+    leds
+    radio
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(radio_calibrate 1)
+pico_enable_stdio_uart(radio_calibrate 0)
 
 
 # Test leds
