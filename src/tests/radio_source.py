@@ -24,7 +24,7 @@ def wait_open(target):
         for p in serial.tools.list_ports.comports():
             if target == p.device:
                 print('open', p.device)
-                return serial.Serial(p.device, 115200, timeout=.1)
+                return serial.Serial(p.device, 115200, timeout=.1, write_timeout=1.)
         time.sleep(.1)
 
 
@@ -49,6 +49,7 @@ if __name__ == '__main__':
                     if i%128 == 0:
                         print()
                     ser.write(bytes([i%256]))
+                    #print('.', end='', flush=True)  # To be able to see when this waits
                     i += 1
     except serial.SerialException:
         print('\nconnection lost')

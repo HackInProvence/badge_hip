@@ -11,7 +11,7 @@
 #include "radio.h"
 
 #define ORANGE LED_RGB(255, 64, 0)
-#define GREEN LED_RGB(0, 64, 0)
+#define GREEN LED_RGB(0, 16, 0)
 
 typedef enum {
     BOOT,
@@ -45,6 +45,7 @@ int main() {
                 leds_anim_ook(ORANGE, 80000);
             }
             printf("%02X", ret);
+            //sleep_ms(1000);  /* Is there a buffer? What happens? The sender waits */
         } else {
             if (state == RECEIVING && absolute_time_diff_us(state_ts, now) > 50000) {
                 state = WAITING;
