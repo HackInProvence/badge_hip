@@ -121,9 +121,11 @@ target_sources(test_leds PRIVATE leds.c)
 pico_add_extra_outputs(test_leds)
 
 target_link_libraries(test_leds PRIVATE
-    badge
+    badge_tests
     hardware_pio
     pico_stdlib
+    pico_time
+    log
     leds
 )
 

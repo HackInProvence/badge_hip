@@ -6,6 +6,8 @@ pico_generate_pio_header(leds ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 target_link_libraries(leds INTERFACE
     badge
     hardware_pio
+    pico_time
+    log
 )
 
 ## Additionally generate python and hex (where?) pioasm outputs for inclusion in the RP2040 datasheet
