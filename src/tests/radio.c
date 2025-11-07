@@ -131,7 +131,7 @@ void rx_times(void) {
 
 /** \brief msg must be \0 terminated */
 void tx_chat_flipper(const uint8_t *msg) {
-    /* Maybe someone else, like rx_pulses did not reset the direction of this pin... */
+    /* Maybe someone else, like rx_pulses, did not reset the direction of this pin... */
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
     /* 800µs per byte */

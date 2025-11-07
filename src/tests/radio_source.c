@@ -7,6 +7,7 @@
 
 #include "pico/stdlib.h"
 
+#include "log.h"
 #include "leds.h"
 #include "radio.h"
 
@@ -21,10 +22,58 @@ typedef enum {
 } state_t;
 
 static state_t state = BOOT;
-absolute_time_t state_ts = 0;
+static absolute_time_t state_ts = 0;
+static uint8_t buffer[66];  /* First byte is the length (including the first byte), second byte is command, then the payload */
+static size_t i_buffer = 0;
+static bool valid_buffer = false;
+
+
+void process_packet(void) {
+    /* The sender (our stdin) can wait for us to finish our task */
+    uint8_t len = buffer[0];
+    uint8_t cmd = buffer[1];
+    uint8_t *payload = &buffer[2];
+
+    switch(cmd) {
+    case 0xD0:  /* Choose commands that cannot be written easily with a keyboard in minicom... */
+        /* Pass config */
+        log_info("write given registers");
+        ccsend(payload, NULL, len-2);
+        break;
+    case 0xD1:
+        /* Set frequency */
+        uint32_t freq = *(uint32_t *)payload;
+        log_info("set frequency to %d", freq);
+        radio_set_frequency(freq);
+        break;
+    case 0xD2:
+        /* Pass packet then send */
+        buffer[0] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
+        buffer[1] = CC1101_BURST(CC1101_TXFIFO);
+        /* FIXME? this overwrites the length given by the sender */
+        buffer[2] = len-3;  /* We are in variable length: the first byte in the FIFO must be the length of the rest of the payload (63 max) */
+        ccsend(buffer, NULL, len);
+        radio_wait_state(CC1101_STATE_TX, true);
+
+        /* FIXME: this expects that GDO0 is correctly set up */
+        /* Wait for GD0 to go high (preamble+sync has been sent) */
+        while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
+            tight_loop_contents();
+
+        /* Wait for GD0 to go low (packet has been sent) */
+        while(gpio_get(BADGE_RADIO_GDO0))
+            tight_loop_contents();
+        break;
+    default:
+        log_warning("unknown command received: %02X", cmd);
+        break;
+    }
+}
+
 
 int main() {
     stdio_usb_init();
+    log_set_level(LOG_LEVEL_INFO);
     radio_init();
     radio_boot();
     leds_init(NULL);
@@ -36,21 +85,42 @@ int main() {
     state = RECEIVING;
     state_ts = get_absolute_time();
     while(true) {
-        int ret = stdio_getchar_timeout_us(50000);
+        int ch = stdio_getchar_timeout_us(50000);
         absolute_time_t now = get_absolute_time();
-        if (ret >= 0) {
+        if (ch >= 0) {
             if (state != RECEIVING) {
                 state = RECEIVING;
                 state_ts = now;
                 leds_anim_ook(ORANGE, 80000);
+                i_buffer = 0;
+                valid_buffer = true;
             }
-            printf("%02X", ret);
+            if (valid_buffer) {
+                buffer[i_buffer] = ch;
+                ++i_buffer;
+                if (buffer[0] > sizeof(buffer)) {
+                    log_warning("invalid size packet announced, dropping and wait for end of stream");
+                    valid_buffer = false;  /* We just wait that the current stream stops */
+                    i_buffer = 0;
+                }
+                if (valid_buffer && i_buffer == buffer[0]) {
+                    log_info("received %d bytes", i_buffer);
+                    process_packet();
+                    i_buffer = 0;
+                }
+            }
+            //printf("%02X", ch);
             //sleep_ms(1000);  /* Is there a buffer? What happens? The sender waits */
         } else {
             if (state == RECEIVING && absolute_time_diff_us(state_ts, now) > 50000) {
                 state = WAITING;
                 state_ts = now;
                 leds_anim_fixed(0);
+                if (valid_buffer && i_buffer) {
+                    log_warning("dropping incomplete packet, expected %d, received %d before timeout", buffer[0], i_buffer);
+                    valid_buffer = false;
+                    i_buffer = 0;
+                }
             } else if (state == WAITING && absolute_time_diff_us(state_ts, now) > 1000000) {
                 state = WAITING_LONG;
                 state_ts = now;
