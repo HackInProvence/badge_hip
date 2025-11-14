@@ -42,11 +42,18 @@ void radio_boot(void);
 /** \brief Power down / deep sleep the radio module */
 void radio_power_down(void);
 
-/** \brief Sets the frequency (in Hz) of the transmission
+/** \brief Sets the frequency (in Hz) of the transmission using calibrated crystal frequency.
  *
  * Must be < 1.6GHz.
  * Floored to the closest CC1101_fXOSC/65536. */
 void radio_set_frequency(uint32_t freq_hz);
+
+/** \brief Sets the data rate (in bauds, see datasheet for acceptable values) using calibrated crystal frequency.
+ *
+ * Must be < 1.6MHz.
+ * Flooring depends on compatible exponent.
+ * Logs the effective baud rate. */
+void radio_set_baud_rate(uint32_t rate_bauds);
 
 
 /** Internal state value (returned in the status byte) */
@@ -61,6 +68,9 @@ typedef enum {
     CC1101_STATE_TXFIFO_UNDERFLOW = 0b111,
 } radio_state_t;
 
+/** \brief Get the current state of the radio */
+radio_state_t radio_state(void);
+
 /** \brief Wait for the internal state to be ready, and optionally also emit the command to change state */
 void radio_wait_state(radio_state_t target_state, bool do_change);
 
@@ -74,8 +84,8 @@ void radio_wait_state(radio_state_t target_state, bool do_change);
  * This uses the packet mode of the CC1101
  *
  * 999 = 9.99kbps */
-extern const uint8_t radio_preset_gfsk999[];
-extern const size_t radio_preset_gfsk999_len;
+extern const uint8_t radio_preset_gfsk[];
+extern const size_t radio_preset_gfsk_len;
 
 
 /* Register access type: default is write single byte, but these sets byte to change the access
@@ -173,7 +183,7 @@ typedef enum {
 /** Internal util/debug made accessible to tests */
 STATIC void ccsend(const uint8_t *, uint8_t *, size_t);
 STATIC void ccread_burst(uint8_t, uint8_t *, size_t);
-STATIC uint8_t log_cc_status(void);
+STATIC void log_cc_status(void);
 STATIC void print_cc_configuration(void);
 
 

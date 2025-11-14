@@ -3,7 +3,7 @@
 # To view a copy of this license,
 # visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-# Use with cmake -DPICO_BOARD=pico_w or badge
+# Use with cmake -DPICO_BOARD=badge_secsea or badge_proto or badge_radio
 #  or cmake -DPICO_NO_FLASH=1
 #  -Gninja -DCMAKE_BUILD_TYPE=Debug
 # SDK is in $PICO_SDK_PATH

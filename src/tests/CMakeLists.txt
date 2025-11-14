@@ -128,8 +128,8 @@ target_link_libraries(radio_source PRIVATE
 )
 
 # enable usb output, disable uart output
-pico_enable_stdio_usb(radio_calibrate 1)
-pico_enable_stdio_uart(radio_calibrate 0)
+pico_enable_stdio_usb(radio_source 1)
+pico_enable_stdio_uart(radio_source 0)
 
 
 # Test leds

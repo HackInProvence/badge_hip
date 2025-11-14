@@ -57,12 +57,19 @@ void process_packet(void) {
 
         /* FIXME: this expects that GDO0 is correctly set up */
         /* Wait for GD0 to go high (preamble+sync has been sent) */
+        /* FIXME: we could be async on this to continue receiving data on UART while we send this */
         while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
             tight_loop_contents();
 
         /* Wait for GD0 to go low (packet has been sent) */
         while(gpio_get(BADGE_RADIO_GDO0))
             tight_loop_contents();
+        break;
+    case 0xD3:
+        /* Set baud rate */
+        uint32_t rate = *(uint32_t *)payload;
+        log_info("set baud rate to %d", rate);
+        radio_set_baud_rate(rate);
         break;
     default:
         log_warning("unknown command received: %02X", cmd);

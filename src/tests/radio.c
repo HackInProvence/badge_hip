@@ -37,8 +37,9 @@ const uint8_t conf_am270_async[] = {
     0x14, 0x00, /* MDMCFG0: channel spacing, TODO kHz */
     0x13, 0x00, /* MDMCFG1: no FEC, no preamble bits */
     0x12, 0x30, /* MDMCFG2: enable DC filter, ASK/OOK, Manchester disabled, no preamble/sync */
-    0x11, 0x32, /* MDMCFG3: data rate mantissa */
-    0x10, 0x67, /* MDMCFG4: channel bandwidth (271kHz) + data rate exponent 3.8 kHz */
+    //0x11, 0x32, /* MDMCFG3: data rate mantissa -> use radio_set_baud_rate */
+    //0x10, 0x67, /* MDMCFG4: channel bandwidth (271kHz) + data rate exponent 3793 Hz */
+    0x10, 0x60, /* MDMCFG4: channel bandwidth (271kHz) */
     0x18, 0x18, /* MCSM0: ... + pin radio control option */
     0x19, 0x18, /* FOCCFG: frequency offset compensation */
     0x1D, 0x40, /* AGCCTRL0: small dead zone*/
@@ -63,6 +64,7 @@ void tx_pulses(void) {
     //ccsend("\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00", NULL, 10);  /* Done by flipper but does not work */
     //ccsend("\x3E\x50", NULL 2);  /* PATABLE: PWR 0db (C0 for maximal power, C6 by default, which is less power) */
     radio_set_frequency(433920000);
+    radio_set_baud_rate(3795);
     print_cc_configuration();
 
     // Put the CC1101 in TX mode (asynch serial) then emit 5ms pulses 10 times per sec
@@ -89,6 +91,8 @@ void tx_pulses(void) {
  * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
 void rx_times(void) {
     ccsend(conf_am270_async, NULL, sizeof(conf_am270_async));
+    radio_set_frequency(433920000);
+    radio_set_baud_rate(3795);
     print_cc_configuration();
 
     gpio_init(BADGE_RADIO_GDO0);
@@ -134,9 +138,10 @@ void tx_chat_flipper(const uint8_t *msg) {
     /* Maybe someone else, like rx_pulses, did not reset the direction of this pin... */
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
-    /* 800µs per byte */
-    ccsend(radio_preset_gfsk999, NULL, radio_preset_gfsk999_len);
+    /* 800µs per byte (without preamble) */
+    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
     radio_set_frequency(433920000);
+    radio_set_baud_rate(9995);  /* Closest is 9991 or 9992 */
     print_cc_configuration();
 
     /* We send data in 63 bytes blocks to simplify the transmission (no interrupt, use GD0 to follow the current packet status) */
@@ -172,10 +177,73 @@ void tx_chat_flipper(const uint8_t *msg) {
 }
 
 
+/* Receive FSK-transmitted data (preset radio_preset_gfsk used by radio_source) */
+void rx_fsk_printf(void) {
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
+    radio_set_frequency(433920000);
+    radio_set_baud_rate(9995);
+    print_cc_configuration();
+
+    uint8_t recv[64];  /* FIFO = len+payload+RSSI+LQI with this config */
+    printf("wait for RX...\n");
+    while (true) {
+        if (radio_state() != CC1101_STATE_RX)
+            radio_wait_state(CC1101_STATE_RX, true);
+
+        /* Wait for GD0 to go high (preamble+sync has been received)
+         * -> implements a timeout but it should be reliable:
+         * - for now, don't use MCSM2.RX_TIME, the timeout is the previous loop reaching 0, so the state should always stay to RX
+         * - it is recommended to have an interrupt approach and configure GDO0 to 0x06 and wait for the pin to go high */
+        //uint64_t timeout = 10000000;
+        while(! gpio_get(BADGE_RADIO_GDO0) /*&& --timeout*/) /* FIXME: we still have to check, some times, that we didn't overflow or something... */
+            tight_loop_contents();
+
+        printf("GDO0 high ");
+
+        /* Wait for GD0 to go low (packet has been sent) */
+        while(gpio_get(BADGE_RADIO_GDO0))
+            tight_loop_contents();
+
+        printf("low ");
+
+        /* Maybe we timed out instead of receiving something -> ... */
+        //if (timeout == 0) {
+        //    printf("timed out\n");
+        //    continue;
+        //}
+
+        /* We received something... */
+        uint8_t n;
+        ccread_burst(CC1101_RXBYTES, &n, 1);
+        if (n>>7) {
+            printf("RX overflow\n");
+            recv[0] = CC1101_SFRX;
+            ccsend(recv, NULL, 1);
+            continue;
+        }
+        printf("received %02d bytes ", n-2);
+        ccread_burst(CC1101_RXFIFO, recv, n);
+        int16_t rssi = (int8_t)recv[n-2];
+        rssi -= 74;  /* According to CC1101 datasheet */
+        uint8_t lqi = recv[n-1];
+        bool crc_ok = lqi >> 7;
+        lqi = lqi & 0x7f;
+        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, ", rssi, lqi, crc_ok);
+        int8_t eoff;
+        ccread_burst(CC1101_FREQEST, &eoff, 1);
+        printf("est. freq. %" PRIi64 " Hz (%d): ", ((int64_t)(eoff)*CC1101_fXOSC)>>14, (int)eoff);
+        for (size_t i=0; i<n-2; ++i)
+            printf("%02x ", recv[i]);
+        printf("\n");
+    }
+}
+
+
 int main() {
     uint8_t cmd[2];
     stdio_usb_init();
-    log_set_level(LOG_LEVEL_INFO);
+    //log_set_level(LOG_LEVEL_INFO);
 
     printf("init\n");
     radio_init();
@@ -186,36 +254,38 @@ int main() {
 
     log_cc_status();
 
-    tx_pulses();
-    //rx_times();
+    //tx_pulses();
+    ////rx_times();
 
-    /* We need a reset between changing modes, otherwise some of the conf makes it never go out of calibrating */
-    cmd[0] = CC1101_SRES;
-    printf("reset\n");
-    ccsend(cmd, NULL, 1);
-    radio_wait_state(CC1101_STATE_IDLE, false);
+    ///* We need a reset between changing modes, otherwise some of the conf makes it never go out of calibrating */
+    //cmd[0] = CC1101_SRES;
+    //printf("reset\n");
+    //ccsend(cmd, NULL, 1);
+    //radio_wait_state(CC1101_STATE_IDLE, false);
 
-    tx_chat_flipper("Badge SecSea joined chat.\n");
-    sleep_ms(3000);
-    tx_chat_flipper("Badge SecSea: Hey, how are you?\n");
-    sleep_ms(2000);
-    tx_chat_flipper("Badge SecSea: Ouais ?\n");
-    sleep_ms(2000);
-    tx_chat_flipper("Badge SecSea: pas tres locace dis donc...\n");
-    sleep_ms(2000);
-    tx_chat_flipper("Badge SecSea: ...\n");
-    sleep_ms(2000);
-    tx_chat_flipper("Badge SecSea: Never\n");
-    sleep_ms(300);
-    tx_chat_flipper("Badge SecSea: gonna\n");
-    sleep_ms(300);
-    tx_chat_flipper("Badge SecSea: let\n");
-    sleep_ms(500);
-    tx_chat_flipper("Badge SecSea: you\n");
-    sleep_ms(500);
-    tx_chat_flipper("Badge SecSea: doooown!\n");
-    sleep_ms(3000);
-    tx_chat_flipper("Badge SecSea left chat.\n");
+    //tx_chat_flipper("Badge SecSea joined chat.\n");
+    //sleep_ms(3000);
+    ////tx_chat_flipper("Badge SecSea: Hey, how are you?\n");
+    ////sleep_ms(2000);
+    ////tx_chat_flipper("Badge SecSea: Ouais ?\n");
+    ////sleep_ms(2000);
+    ////tx_chat_flipper("Badge SecSea: pas tres locace dis donc...\n");
+    ////sleep_ms(2000);
+    ////tx_chat_flipper("Badge SecSea: ...\n");
+    ////sleep_ms(2000);
+    ////tx_chat_flipper("Badge SecSea: Never\n");
+    ////sleep_ms(300);
+    ////tx_chat_flipper("Badge SecSea: gonna\n");
+    ////sleep_ms(300);
+    ////tx_chat_flipper("Badge SecSea: let\n");
+    ////sleep_ms(500);
+    ////tx_chat_flipper("Badge SecSea: you\n");
+    ////sleep_ms(500);
+    ////tx_chat_flipper("Badge SecSea: doooown!\n");
+    ////sleep_ms(3000);
+    ////tx_chat_flipper("Badge SecSea left chat.\n");
+
+    rx_fsk_printf();
 
     /* Shutdown */
     printf("wait\n");

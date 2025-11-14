@@ -96,12 +96,9 @@ static void _log_status(uint8_t status) {
     );
 }
 
-STATIC uint8_t log_cc_status(void) {
-    uint8_t status;
-    uint8_t cmd = CC1101_SNOP;
-    ccsend(&cmd, &status, 1);  /* NOOP (in write mode, so FIFO is the TX one) */
+STATIC void log_cc_status(void) {
+    radio_state_t status = radio_state();
     _log_status(status);
-    return status;
 }
 
 void print_cc_configuration(void) {
@@ -148,7 +145,39 @@ void radio_set_frequency(uint32_t freq_hz) {
         (setting >> 8) & 0xFF,  /* FREQ1 */
          setting & 0xFF,        /* FREQ0 */
     };
-    ccsend((uint8_t *)&cmd, NULL, 4);
+    ccsend(cmd, NULL, 4);
+}
+
+
+void radio_set_baud_rate(uint32_t rate_bauds) {
+    /* Recover the part of MDMCFG4 that would be overwritten */
+    uint8_t pad[3] = {CC1101_READ(CC1101_MDMCFG4)};
+    ccread_burst(CC1101_READ(CC1101_MDMCFG4), pad+1, 1);
+
+    /* Now prepare the new settings (current MDMCFG4 is already inplace in pad[1]) */
+    pad[0] = CC1101_BURST(CC1101_MDMCFG4);
+    pad[1] &= 0xF0;
+    /* Rdata = (256+mantissa)*2^exp * fXOSC/2^28
+     * Rdata*2^28/fXOSC = (256+mantissa)*2^exp */
+    uint64_t conf = rate_bauds;
+    conf <<= 28;
+    conf /= CC1101_fXOSC;
+    size_t mag = 63-__builtin_clzll(conf);
+    //log_info("conf=%llu, 0x%016llx, mag=%d\n", conf, conf, mag);
+    pad[1] |= (mag-8) & 0x0F;
+    conf >>= mag-8;
+    pad[2] = conf-256;
+    //log_info("mantissa=%d, exp=%d\n", mantissa, exp);
+    log_info("radio: closest baud rate = %lld bps", ((uint64_t)((256+pad[2])*(1<<(pad[1]&0x0F)))*CC1101_fXOSC)>>28);
+    ccsend(pad, NULL, 3);
+}
+
+
+radio_state_t radio_state(void) {
+    uint8_t status;
+    uint8_t cmd = CC1101_SNOP;
+    ccsend(&cmd, &status, 1);
+    return status;
 }
 
 
@@ -189,25 +218,27 @@ void radio_wait_state(radio_state_t target_state, bool do_change) {
 }
 
 
-const uint8_t radio_preset_gfsk999[] = {
-    CC1101_IOCFG0, 0x06, /* GDO0 = packet being received */
+const uint8_t radio_preset_gfsk[] = {
+    CC1101_IOCFG0, 0x06, /* GDO0 = packet being transmitted or received */
     CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */
     CC1101_SYNC1, 0x46, /* Sync word MSB */
     CC1101_SYNC0, 0x4C, /* Sync work LSB */
     //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
+    /*CC1101_PKTCTRL1 -> default value **includes** the 2 status bytes... so the max received FIFO size is 62 */
     CC1101_PKTCTRL0, 0x05, /* no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word) */
     CC1101_ADDR, 0x00, /* no packet filtration */
     CC1101_FSCTRL1, 0x06, /* IF frequency */
-    CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
-    CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
+    CC1101_MDMCFG4, 0xC0, /* Channel bandwidth: 203kHz */
+    //CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
+    //CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
     CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
     CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz */
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
-    CC1101_AGCCTRL2, 0x43,
-    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense */
+    CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */
+    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense to 33 dB (??) */
     CC1101_AGCCTRL0, 0x91,
     CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
     /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
 };
-const size_t radio_preset_gfsk999_len = sizeof(radio_preset_gfsk999);
+const size_t radio_preset_gfsk_len = sizeof(radio_preset_gfsk);
