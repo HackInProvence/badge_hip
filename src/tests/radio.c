@@ -242,7 +242,7 @@ void rx_fsk_printf(void) {
 const uint8_t fsk_full_rx[] = {
     CC1101_IOCFG0, 0x01, /* GDO0 = FIFO threshold or end of packet (not sure EOPacket reached with length mode = infinite) */
     CC1101_IOCFG2, 0x0E, /* GDO2 = carrier sense */
-    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 4 RX FIFO threshold */
+    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 32 RX FIFO threshold */
     CC1101_SYNC1, 0xAA, /* Sync word MSB */
     CC1101_SYNC0, 0xAA, /* Sync work LSB */
     //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
@@ -362,6 +362,72 @@ void rx_fsk_raw_printf(void) {
 }
 
 
+static absolute_time_t t_rise = 0, t_fall = 0;
+static uint32_t count = 0;
+static bool raised = false;
+void carrier_event(uint gpio, uint32_t events) {
+    absolute_time_t now = get_absolute_time();
+
+    if (events & GPIO_IRQ_EDGE_RISE) {
+        t_rise = now;
+        raised = true;
+    } else if (events & GPIO_IRQ_EDGE_FALL) {
+        t_fall = now;
+        ++count;
+        raised = false;
+    }
+}
+
+/* Set up an IRQ to watch carrier sense */
+void rx_watch_CS(void) {
+    gpio_init(BADGE_RADIO_GDO0);
+    gpio_init(BADGE_RADIO_GDO2);
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+    gpio_set_dir(BADGE_RADIO_GDO2, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &carrier_event);
+    ccsend(fsk_full_rx, NULL, sizeof(fsk_full_rx));
+    radio_set_frequency(868925000);
+    radio_set_baud_rate(19500);
+    print_cc_configuration();
+
+    radio_wait_state(CC1101_STATE_RX, true);
+
+    /* Just ... wait to be interrupted, and printf a status */
+    uint32_t prev_count = 0;
+    bool shown = false;
+    uint8_t n;
+    uint8_t recv[65];
+    while(true) {
+        if (raised && ! shown) {
+            printf("high ");
+            shown = true;
+        //} else if(prev_count != count) {
+        } else if(! raised && shown) {
+            ccread_burst(CC1101_RXBYTES, &n, 1);
+            ccread_burst(CC1101_RXFIFO, recv, n);  /* We can't SFRX in RX mode */
+            printf("down in %.02f ms (count %02d, flushed %02d bytes FIFO)\n", absolute_time_diff_us(t_rise, t_fall)/1000.f, count, n);
+            prev_count = count;
+            shown = false;
+        } else if (gpio_get(BADGE_RADIO_GDO0)) {
+            ccread_burst(CC1101_RXBYTES, &n, 1);
+            ccread_burst(CC1101_RXFIFO, recv, n);
+            printf("flushed %02d bytes from FIFO\n", n);
+        } else if (!shown) {
+            //sleep_ms(300);
+            ccread_burst(CC1101_RXBYTES, &n, 1);
+            //printf("alive, RX FIFO %d bytes\n", n&0x7f);
+            if (n&0x7f) {
+                ccread_burst(CC1101_RXFIFO, recv, n);
+                printf("RX was not empty (flushed %02d bytes)\n", n);
+            } else if (n>>7) {
+                printf("RX FIFO overflow (probably dead now)\n");
+                /* We could SFRX to IDLE and re-RX... */
+            }
+        }
+    }
+}
+
+
 int main() {
     uint8_t cmd[2];
     stdio_usb_init();
@@ -408,7 +474,8 @@ int main() {
     ////tx_chat_flipper("Badge SecSea left chat.\n");
 
     //rx_fsk_printf();
-    rx_fsk_raw_printf();
+    //rx_fsk_raw_printf();
+    rx_watch_CS();
 
     /* Shutdown */
     printf("wait\n");
