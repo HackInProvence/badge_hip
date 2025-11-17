@@ -229,13 +229,135 @@ void rx_fsk_printf(void) {
         uint8_t lqi = recv[n-1];
         bool crc_ok = lqi >> 7;
         lqi = lqi & 0x7f;
-        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, ", rssi, lqi, crc_ok);
         int8_t eoff;
         ccread_burst(CC1101_FREQEST, &eoff, 1);
-        printf("est. freq. %" PRIi64 " Hz (%d): ", ((int64_t)(eoff)*CC1101_fXOSC)>>14, (int)eoff);
+        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz: ", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
         for (size_t i=0; i<n-2; ++i)
             printf("%02x ", recv[i]);
         printf("\n");
+    }
+}
+
+
+const uint8_t fsk_full_rx[] = {
+    CC1101_IOCFG0, 0x01, /* GDO0 = FIFO threshold or end of packet (not sure EOPacket reached with length mode = infinite) */
+    CC1101_IOCFG2, 0x0E, /* GDO2 = carrier sense */
+    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 4 RX FIFO threshold */
+    CC1101_SYNC1, 0xAA, /* Sync word MSB */
+    CC1101_SYNC0, 0xAA, /* Sync work LSB */
+    //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
+    /*CC1101_PKTCTRL1 -> default value **includes** the 2 status bytes... so the max received FIFO size is 62 */
+    CC1101_PKTCTRL1, 0x00, /* no status bytes appended */
+    CC1101_PKTCTRL0, 0x02, /* no whitening, use FIFOs, without CRC, infinite packet length (first byte after sync word) */
+    CC1101_ADDR, 0x00, /* no packet filtration */
+    CC1101_FSCTRL1, 0x06, /* IF frequency */
+    CC1101_MDMCFG4, 0xC0, /* Channel bandwidth: 203kHz */
+    CC1101_MDMCFG2, 0x04, /* Modulation: FSK, no manchester, without preamble/sync but carrier-sense */
+    CC1101_MDMCFG1, 0x72, /* 24 preamble bytes, default channel spacing */
+    CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz FIXME: should this be handled with data rate??? */
+    CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
+    CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
+    CC1101_AGCCTRL2, 0x43,
+    CC1101_AGCCTRL1, 0x47, /* Relative carrier sense disabled, but absolute carrier sense, 7db above MAGN_TARGET */
+    CC1101_AGCCTRL0, 0x91,
+    CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
+    /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
+};
+
+/* Receive FSK-transmitted data without CRC or length */
+void rx_fsk_raw_printf(void) {
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+    gpio_set_dir(BADGE_RADIO_GDO2, GPIO_IN);
+    ccsend(fsk_full_rx, NULL, sizeof(fsk_full_rx));
+    radio_set_frequency(868925000);
+    radio_set_baud_rate(19500);
+    print_cc_configuration();
+
+    uint8_t recv[65];
+    printf("wait for RX...\n");
+    uint8_t buf[1024];  /* stores multi-part packets */
+    size_t buf_i = 0;
+    absolute_time_t t0 = get_absolute_time(), now;
+    while (true) {
+        if (radio_state() != CC1101_STATE_RX)
+            radio_wait_state(CC1101_STATE_RX, true);
+
+        /* For now, don't use MCSM2.RX_TIME, the timeout is the previous loop reaching 0, so the state should always stay to RX. */
+        /* GDO0 = RX FIFO threshold
+         * GDO2 = carrier sense */
+        //uint64_t timeout = 10000000;
+        while(! (gpio_get(BADGE_RADIO_GDO2) || gpio_get(BADGE_RADIO_GDO0))) /*|| (--timeout == 0) */ {
+            //tight_loop_contents();
+            /* Polling degrades RX quality but we are in the debug phase */
+            uint8_t n;
+            sleep_us(500);
+            ccread_burst(CC1101_RXBYTES, &n, 1);
+            if (n) {
+                printf("FIFO not empty ");
+                break;
+            }
+            /* Delimit packet by waiting for no CS long enough, and print them */
+            if(buf_i > 0) {
+                now = get_absolute_time();
+                if (absolute_time_diff_us(t0, now) > 10000) {  /* ~100 symbols */
+                    printf("delimited packet: ");
+                    for (size_t i=0; i<buf_i; ++i)
+                        printf("%02x ", buf[i]);
+                    printf("\n");
+                    buf_i = 0;
+                }
+            }
+        }
+
+        t0 = get_absolute_time();  /* last received byte timestamp */
+        if (gpio_get(BADGE_RADIO_GDO2))
+            printf("carrier sense  ");
+        else if (gpio_get(BADGE_RADIO_GDO0))
+            printf("FIFO threshold ");
+
+        /* TODO: carrier sens does not always de-asserts, so we can't rely on it...
+         *  We should maybe rely on GDO0 = 0x01 -> FIFO >= threshold or EOPacket reached.
+         *  Moreover, the received bits are not synced and there is always some issue so we must find a strategy:
+         *  - find a sync byte/word (while we don't know if there is one, we could use SYNC1=SYNC0=0xAA,
+         *    but we risk missing out the first 2 bits of the message (1 in 4),
+         *  - find the length of the preamble, or the signal start indication,
+         *  - find something else, like printing the packet shifted by 0 to 7 bits...
+         *  - find out why carrier sense does not always de-asserts. */
+        ///* Wait for GD0 to go low (packet has been sent) */
+        //while(gpio_get(BADGE_RADIO_GDO2))
+        //    tight_loop_contents();
+
+        /* Maybe we timed out instead of receiving something -> ... */
+        //if (timeout == 0) {
+        //    printf("timed out\n");
+        //    continue;
+        //}
+
+        /* We received something... */
+        uint8_t n;
+        ccread_burst(CC1101_RXBYTES, &n, 1);
+        bool of = n>>7;
+        n &= 0x7f;
+        printf("received %02d bytes ", n);
+
+        ccread_burst(CC1101_FREQEST, recv, 3);  /* FREQEST then LQI then RSSI */
+        int8_t eoff = recv[0];
+        bool crc_ok = recv[1] >> 7;
+        uint8_t lqi = recv[1] & 0x7f;
+        int16_t rssi = recv[2];
+        rssi -= 74;  /* According to CC1101 datasheet */
+        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz\n", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
+
+        /* Add data to our current buffer, but don't overflow */
+        ccread_burst(CC1101_RXFIFO, recv, n);
+        for (size_t i=0; i<n && buf_i<sizeof(buf);)
+            buf[buf_i++] = recv[i++];
+
+        if (of) {
+            printf(" overflow");
+            //recv[0] = CC1101_SFRX;
+            //ccsend(recv, NULL, 1);
+        }
     }
 }
 
@@ -285,7 +407,8 @@ int main() {
     ////sleep_ms(3000);
     ////tx_chat_flipper("Badge SecSea left chat.\n");
 
-    rx_fsk_printf();
+    //rx_fsk_printf();
+    rx_fsk_raw_printf();
 
     /* Shutdown */
     printf("wait\n");
