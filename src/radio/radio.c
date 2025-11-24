@@ -206,7 +206,8 @@ void radio_wait_state(radio_state_t target_state, bool do_change) {
 
     /* Now wait...
      * FIXME: add a timeout
-     * TODO: measure the times it takes to calibrate and settle */
+     * TODO: measure the times it takes to calibrate and settle
+     * FIXME: some state are not waitable (SFRX) */
     cmd = CC1101_SNOP;
     do {
         ccsend(&cmd, &status, 1);

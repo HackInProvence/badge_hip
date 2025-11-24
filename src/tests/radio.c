@@ -240,21 +240,23 @@ void rx_fsk_printf(void) {
 
 
 const uint8_t fsk_full_rx[] = {
-    CC1101_IOCFG0, 0x01, /* GDO0 = FIFO threshold or end of packet (not sure EOPacket reached with length mode = infinite) */
     CC1101_IOCFG2, 0x0E, /* GDO2 = carrier sense */
+    CC1101_IOCFG0, 0x00, /* GDO0 = FIFO threshold or end of packet (not sure EOPacket reached with length mode = infinite) FIXME: 0x01 does not deasserts when below threshold, but 0x00 does not asserts on EOPacket */
     CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 32 RX FIFO threshold */
-    CC1101_SYNC1, 0xAA, /* Sync word MSB */
-    CC1101_SYNC0, 0xAA, /* Sync work LSB */
+    CC1101_SYNC1, 0x46, /* Sync word MSB */
+    CC1101_SYNC0, 0x4C, /* Sync work LSB -> consumes 16 bits of the preamble and display the rest */
     //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
     /*CC1101_PKTCTRL1 -> default value **includes** the 2 status bytes... so the max received FIFO size is 62 */
-    CC1101_PKTCTRL1, 0x00, /* no status bytes appended */
-    CC1101_PKTCTRL0, 0x02, /* no whitening, use FIFOs, without CRC, infinite packet length (first byte after sync word) */
+    //CC1101_PKTLEN, 0xFF,
+    CC1101_PKTCTRL1, 0x40, /* 2*4 preamble bits to gate sync word, no status bytes appended, no addr check */
+    CC1101_PKTCTRL0, 0x02, /* no whitening, use FIFOs, without CRC, infinite packet length */
     CC1101_ADDR, 0x00, /* no packet filtration */
     CC1101_FSCTRL1, 0x06, /* IF frequency */
     CC1101_MDMCFG4, 0xC0, /* Channel bandwidth: 203kHz */
-    CC1101_MDMCFG2, 0x04, /* Modulation: FSK, no manchester, without preamble/sync but carrier-sense */
-    CC1101_MDMCFG1, 0x72, /* 24 preamble bytes, default channel spacing */
+    CC1101_MDMCFG2, 0x06, /* Modulation: FSK, no manchester, with preamble/sync and carrier-sense */
+    CC1101_MDMCFG1, 0x72, /* 24 preamble bytes (TX only?), default channel spacing */
     CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz FIXME: should this be handled with data rate??? */
+    //CC1101_MCSM2, 0x1F, /* Immediately auto-end RX with CS FIXME: changed by the code */
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
     CC1101_AGCCTRL2, 0x43,
@@ -362,13 +364,41 @@ void rx_fsk_raw_printf(void) {
 }
 
 
+static uint8_t buffer[1024+64];
+static size_t buf_i = 0;
+void read_fifo(bool incl_last) {
+    /* We should not read more than n-1 bytes because there is a bug that would duplicate the last byte,
+     *  except when we know that the receive operation is finished (which is suggested to be done with packet sizes...) */
+    //printf("read_fifo(n=");
+    uint8_t n;
+    ccread_burst(CC1101_RXBYTES, &n, 1);
+    if (n>>7)
+        panic("RX overflow from read_fifo, buf_i=%d\n", buf_i);
+    if (n==0) {
+        //printf("0),");
+        return;
+    }
+    //printf("%d,to_read=", n);
+    if (! incl_last)
+        --n;
+    size_t to_read = buf_i+n > 1024 ? 1024-buf_i : n;
+    //printf("%d).", to_read);
+    if (to_read)
+        ccread_burst(CC1101_RXFIFO, buffer+buf_i, to_read);
+    if (n-to_read)
+        ccread_burst(CC1101_RXFIFO, buffer+1024, n-to_read);  /* Flushes remaining bytes to avoid RX overflow which would stall the radio */
+    buf_i += to_read;
+}
+
 static absolute_time_t t_rise = 0, t_fall = 0;
 static uint32_t count = 0;
 static bool raised = false;
-void carrier_event(uint gpio, uint32_t events) {
+void radio_events(uint gpio, uint32_t events) {
     absolute_time_t now = get_absolute_time();
 
-    if (events & GPIO_IRQ_EDGE_RISE) {
+    if (gpio == BADGE_RADIO_GDO0) {
+        read_fifo(false);
+    } else if (events & GPIO_IRQ_EDGE_RISE) {
         t_rise = now;
         raised = true;
     } else if (events & GPIO_IRQ_EDGE_FALL) {
@@ -378,52 +408,94 @@ void carrier_event(uint gpio, uint32_t events) {
     }
 }
 
-/* Set up an IRQ to watch carrier sense */
+
+/* Set up an IRQ to watch carrier sense.
+ * It's hard to receive packets of unknown lengths with the CC1101,
+ *  as the reception correctly starts with CS being high, but it does not end with CS being low again... */
 void rx_watch_CS(void) {
     gpio_init(BADGE_RADIO_GDO0);
     gpio_init(BADGE_RADIO_GDO2);
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
     gpio_set_dir(BADGE_RADIO_GDO2, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &carrier_event);
     ccsend(fsk_full_rx, NULL, sizeof(fsk_full_rx));
+    //ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len); //ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00}, NULL, 4);
     radio_set_frequency(868925000);
-    radio_set_baud_rate(19500);
+    radio_set_baud_rate(38500);
     print_cc_configuration();
+    gpio_set_irq_callback(radio_events);  /* There is a single callback for all GPIO events */
+    gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE                     , true);
+    gpio_set_irq_enabled(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+    irq_set_enabled(IO_IRQ_BANK0, true);
 
+    ccsend((uint8_t[]){CC1101_BURST(CC1101_SYNC1), 0xFF, 0x66}, NULL, 3);
     radio_wait_state(CC1101_STATE_RX, true);
 
     /* Just ... wait to be interrupted, and printf a status */
-    uint32_t prev_count = 0;
     bool shown = false;
     uint8_t n;
     uint8_t recv[65];
+    bool warn = false;
+    absolute_time_t t0 = get_absolute_time(), now;
     while(true) {
+        now = get_absolute_time();
         if (raised && ! shown) {
             printf("high ");
             shown = true;
+            /* Putting this here marks the risk that we miss the raise event,
+             *  but putting it in the IRQ risks being too slow
+             *  (and risk interrupting some other SPI operation) */
+            //ccsend((uint8_t[]){CC1101_MCSM2, 0x17}, NULL, 2);  /* Go back to IDLE on end of carrier sense -> only works when nothing was received yet... */
         //} else if(prev_count != count) {
         } else if(! raised && shown) {
-            ccread_burst(CC1101_RXBYTES, &n, 1);
-            ccread_burst(CC1101_RXFIFO, recv, n);  /* We can't SFRX in RX mode */
-            printf("down in %.02f ms (count %02d, flushed %02d bytes FIFO)\n", absolute_time_diff_us(t_rise, t_fall)/1000.f, count, n);
-            prev_count = count;
+            read_fifo(true);
+            printf("down, packet % 3d, len % 4d, in % 7.02f ms: ", count, buf_i, absolute_time_diff_us(t_rise, t_fall)/1000.f);
+            for (size_t i=0; i<buf_i; ++i)
+                printf("%02x ", buffer[i]);
+            printf("\n");
+            buf_i = 0;
             shown = false;
-        } else if (gpio_get(BADGE_RADIO_GDO0)) {
-            ccread_burst(CC1101_RXBYTES, &n, 1);
-            ccread_burst(CC1101_RXFIFO, recv, n);
-            printf("flushed %02d bytes from FIFO\n", n);
+            warn = false;
+            ///* When using CS + sync bytes, the reception of bytes continues after CS is cleared...
+            // * To avoid that, we reset to RX (and flush by the way)
+            // * FIXME: it's a bit too long to do that here, as the next transmission has started
+            // * -> no, this is how it should be done, even in non-infinite packet mode... */
+            radio_wait_state(CC1101_STATE_IDLE, true);
+            //ccsend((uint8_t[]){CC1101_SFRX, CC1101_MCSM2, 0x07}, NULL, 3);  /* Don't terminate RX base on CS (yet) -> only works when nothing was received yet... */
+            ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
+            radio_wait_state(CC1101_STATE_RX, true);
         } else if (!shown) {
-            //sleep_ms(300);
             ccread_burst(CC1101_RXBYTES, &n, 1);
-            //printf("alive, RX FIFO %d bytes\n", n&0x7f);
-            if (n&0x7f) {
+            if (n>>7) {
+                printf("RX FIFO overflow, re-RX...\n");
+                /* We SFRX to IDLE and re-RX... */
+                recv[0] = CC1101_SFRX;
+                ccsend(recv, NULL, 1);
+                radio_wait_state(CC1101_STATE_IDLE, false);
+                radio_wait_state(CC1101_STATE_RX, true);
+                buf_i = 0;
+                //sleep_ms(1000);
+                //ccread_burst(CC1101_RXBYTES, recv, 1);
+                //printf("in FIFO: %d\n", recv[0]);
+            } else if (n&0x7f) {
                 ccread_burst(CC1101_RXFIFO, recv, n);
-                printf("RX was not empty (flushed %02d bytes)\n", n);
-            } else if (n>>7) {
-                printf("RX FIFO overflow (probably dead now)\n");
-                /* We could SFRX to IDLE and re-RX... */
+                printf("RX was not empty (flush %02d bytes) -> flush & restart\n", n);
+                //sleep_ms(300); /* kill switch */
+                //buf_i = 0;
+                //print_cc_configuration();
+                radio_wait_state(CC1101_STATE_IDLE, true);
+                recv[0] = CC1101_SFRX;
+                ccsend(recv, NULL, 1);
+                radio_wait_state(CC1101_STATE_RX, true);
+                //panic("kill");
             }
         }
+        if (! warn && buf_i==1024) {
+            printf("!!buf overflow!! ");
+            warn = true;
+        }/* else if (! warn && absolute_time_diff_us(t0, now) > 1000000) {
+            log_cc_status();
+            warn = true;
+        }*/
     }
 }
 
