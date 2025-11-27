@@ -26,6 +26,7 @@ static absolute_time_t state_ts = 0;
 static uint8_t buffer[66];  /* First byte is the length (including the first byte), second byte is command, then the payload */
 static size_t i_buffer = 0;
 static bool valid_buffer = false;
+static uint8_t send_mode = 1;  /* Corresponds to PKTCTRL0.LENGTH_CONFIG */
 
 
 void process_packet(void) {
@@ -39,6 +40,15 @@ void process_packet(void) {
         /* Pass config */
         log_info("write given registers");
         ccsend(payload, NULL, len-2);
+        for (size_t i=0; i<len-3; i+=2) {
+            if (payload[i] != CC1101_PKTCTRL0)
+                continue;
+            uint8_t new_mode = payload[i+1] & 0x03;
+            if (new_mode != send_mode) {
+                log_info("change packet length mode to %d", new_mode);
+                send_mode = new_mode;
+            }
+        }
         break;
     case 0xD1:
         /* Set frequency */
@@ -48,10 +58,21 @@ void process_packet(void) {
         break;
     case 0xD2:
         /* Pass packet then send */
+        switch(send_mode) {
+        case 0:  /* Fixed length, write length to PKTLEN, then write the packet */
+            buffer[0] = CC1101_PKTLEN;
+            buffer[1] = len-2;
+            ccsend(buffer, NULL, 2);
+            break;
+        case 1:  /* Variable length: the first byte in the FIFO must be the length of the rest of the payload (63 max) */
+            buffer[2] = len-3;
+            break;
+        default:
+            log_warning("unsupported packet length mode: %d", send_mode);
+            break;
+        }
         buffer[0] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
         buffer[1] = CC1101_BURST(CC1101_TXFIFO);
-        /* FIXME? this overwrites the length given by the sender */
-        buffer[2] = len-3;  /* We are in variable length: the first byte in the FIFO must be the length of the rest of the payload (63 max) */
         ccsend(buffer, NULL, len);
         radio_wait_state(CC1101_STATE_TX, true);
 

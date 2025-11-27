@@ -60,6 +60,26 @@ PRESETS = {
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
+    'fskrawFF66': bytes([
+        0x02, 0x06,  # CC1101_IOCFG0: GDO0 = packet being received
+        0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
+        0x04, 0xFF,  # CC1101_SYNC1: Sync word MSB
+        0x05, 0x66,  # CC1101_SYNC0: Sync work LSB
+        #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
+        0x08, 0x00,  # CC1101_PKTCTRL0: no whitening, use FIFOs, no CRC, fixed packet length (set PKTLEN!!)
+        0x09, 0x00,  # CC1101_ADDR: no packet filtration
+        0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
+        0x10, 0xC0,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
+        0x12, 0x02,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, 16/16 sync word bits
+        0x13, 0x72,  # CC1101_MDMCFG1: 24 preamble bytes
+        0x15, 0x34,  # CC1101_DEVIATN: Deviation = 19.04kHz
+        0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
+        0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
+        0x1B, 0x43,  # CC1101_AGCCTRL2
+        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1D, 0x91,  # CC1101_AGCCTRL0
+        0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
+    ]),
 }
 
 
@@ -84,6 +104,8 @@ if __name__ == '__main__':
     parser.add_argument('--baud-rate', '-b', default=None, type=int, help='push a baud rate beforehand')
     parser.add_argument('--packet-size', '-s', default=63, type=int,
                         help='split the input in payloads of this size (60 max for the Flipper SubGHz Enhanced Chat App)')
+    parser.add_argument('--fixed-length', '-l', action='store_true',
+                        help='you are using a preset that does not use variable length mode, so we don\'t push another placeholder byte to the radio')
     args = parser.parse_args()
 
     with wait_open(args.tty) as ser:
@@ -100,12 +122,19 @@ if __name__ == '__main__':
         while 'data':
             c = sys.stdin.buffer.read(1)  # Maybe we could read more at a time
             buf += c
-            if not c and buf or len(buf) == args.packet_size:  # Divide by packets of 63 max
-                payload = bytes([
-                    len(buf)+3,  # Total length of packet: header (2 bytes) + 1 byte for length of buffer (overwritten by RaSo)
-                    0xD2,  # Command
-                    len(buf),  # Placeholder, overwritten by RaSo
-                ]) + bytes(buf)
+            if not c and buf or len(buf) == args.packet_size:  # Divide by packets of xx max
+                # Handle variable packet length mode: the length is the first byte
+                if not args.fixed_length:
+                    payload = bytes([
+                        len(buf)+3,  # Total length of packet: header (2 bytes) + 1 byte for length of buffer (overwritten by RaSo)
+                        0xD2,  # Command
+                        len(buf),  # Placeholder, overwritten by RaSo
+                    ]) + bytes(buf)
+                else:
+                    payload = bytes([
+                        len(buf)+2,  # Total length of packet: header (2 bytes)
+                        0xD2,  # Command
+                    ]) + bytes(buf)
                 print('Sending', payload.hex())
                 ser.write(payload)
                 buf.clear()
