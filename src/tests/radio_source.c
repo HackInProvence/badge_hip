@@ -23,24 +23,28 @@ typedef enum {
 
 static state_t state = BOOT;
 static absolute_time_t state_ts = 0;
-static uint8_t buffer[66];  /* First byte is the length (including the first byte), second byte is command, then the payload */
+static uint8_t buffer[65537];  /* First 2 bytes are the length of remainder (len(payload)+1), third byte is the command, then the payload */
 static size_t i_buffer = 0;
 static bool valid_buffer = false;
 static uint8_t send_mode = 1;  /* Corresponds to PKTCTRL0.LENGTH_CONFIG */
 
 
+void emit_buffer(void); /* Split the packet emission from process_packet */
 void process_packet(void) {
     /* The sender (our stdin) can wait for us to finish our task */
-    uint8_t len = buffer[0];
-    uint8_t cmd = buffer[1];
-    uint8_t *payload = &buffer[2];
+    if (*(uint16_t *)buffer < 1)  /* We should be able to at least decode the command */
+        return;
+    uint16_t len = *(uint16_t *)buffer-1;  /* Length of the payload */
+    uint8_t cmd = buffer[2];
+    uint8_t *payload = &buffer[3];
 
     switch(cmd) {
     case 0xD0:  /* Choose commands that cannot be written easily with a keyboard in minicom... */
         /* Pass config */
-        log_info("write given registers");
-        ccsend(payload, NULL, len-2);
-        for (size_t i=0; i<len-3; i+=2) {
+        log_info("write %d registers", len/2);
+        ccsend(payload, NULL, len);
+        /* Detect the length mode in the pushed config */
+        for (size_t i=0; i<len-1; i+=2) {
             if (payload[i] != CC1101_PKTCTRL0)
                 continue;
             uint8_t new_mode = payload[i+1] & 0x03;
@@ -49,53 +53,126 @@ void process_packet(void) {
                 send_mode = new_mode;
             }
         }
+        /* Asserts our needed config was not replaced */
+        ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07}, NULL, 4);
         break;
     case 0xD1:
         /* Set frequency */
-        uint32_t freq = *(uint32_t *)payload;
-        log_info("set frequency to %d", freq);
-        radio_set_frequency(freq);
+        if(len == 4) {
+            uint32_t freq = *(uint32_t *)payload;
+            log_info("set frequency to %d", freq);
+            radio_set_frequency(freq);
+        } else
+            log_warning("expecting 7 bytes for frequency command, received %d", len+3);
         break;
     case 0xD2:
-        /* Pass packet then send */
-        switch(send_mode) {
-        case 0:  /* Fixed length, write length to PKTLEN, then write the packet */
-            buffer[0] = CC1101_PKTLEN;
-            buffer[1] = len-2;
-            ccsend(buffer, NULL, 2);
-            break;
-        case 1:  /* Variable length: the first byte in the FIFO must be the length of the rest of the payload (63 max) */
-            buffer[2] = len-3;
-            break;
-        default:
-            log_warning("unsupported packet length mode: %d", send_mode);
-            break;
-        }
-        buffer[0] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
-        buffer[1] = CC1101_BURST(CC1101_TXFIFO);
-        ccsend(buffer, NULL, len);
-        radio_wait_state(CC1101_STATE_TX, true);
-
-        /* FIXME: this expects that GDO0 is correctly set up */
-        /* Wait for GD0 to go high (preamble+sync has been sent) */
-        /* FIXME: we could be async on this to continue receiving data on UART while we send this */
-        while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
-            tight_loop_contents();
-
-        /* Wait for GD0 to go low (packet has been sent) */
-        while(gpio_get(BADGE_RADIO_GDO0))
-            tight_loop_contents();
+        emit_buffer();
         break;
     case 0xD3:
         /* Set baud rate */
-        uint32_t rate = *(uint32_t *)payload;
-        log_info("set baud rate to %d", rate);
-        radio_set_baud_rate(rate);
+        if(len == 4) {
+            uint32_t rate = *(uint32_t *)payload;
+            log_info("set baud rate to %d", rate);
+            radio_set_baud_rate(rate);
+        } else
+            log_warning("expecting 7 bytes for baud rate command, received %d", len+3);
         break;
     default:
         log_warning("unknown command received: %02X", cmd);
         break;
     }
+}
+
+
+void emit_buffer(void) {
+    uint16_t len = *(uint16_t *)buffer-1;  /* Length of the payload */
+    uint8_t *payload = &buffer[3];
+    uint8_t pktctrl0;
+
+    /* Save the current value of pktctrl0 to be able to change the length mode on the fly */
+    ccread_burst(CC1101_PKTCTRL0, &pktctrl0, 1);
+    pktctrl0 &= 0x7C;  /* send_mode is the remaining 2 bits */
+
+    /* Point of no return: reuse the buffer to write registers */
+    switch(send_mode) {
+    case 0:  /* Fixed length, write length to PKTLEN, then write the packet
+              * FIXME: maybe could be merged with infinite packet length mode */
+        if (len > 255) {
+            log_warning("cannot send more than 255 bytes in send_mode=fixed length");
+            return;
+        }
+        buffer[0] = CC1101_PKTLEN;
+        buffer[1] = len & 0xFF;
+        ccsend(buffer, NULL, 2);
+        break;
+    case 1:  /* Variable length: the first byte in the FIFO must be the length of the rest of the payload (255 max) */
+        if (len > 255) {
+            log_warning("cannot send more than 255 bytes in send_mode=variable length");
+            return;
+        }
+        payload[0] = len & 0xFF;  /* First payload byte is reserved for length, and this should be anticipated by the sender */
+        break;
+    case 2:  /* Infinite length mode: we have to set PKTLEN to length%256 and switch to fixed length at the right time */
+        if (len < 256) {
+            /* FIXME: this is because of the first fill of the TX FIFO: we should put it in fixed length when < 255 */
+            log_warning("infinite length does not support this few bytes for now (%d < 256)", len);
+            return;
+        }
+        buffer[0] = CC1101_PKTLEN;
+        buffer[1] = len&0xFF;
+        ccsend(buffer, NULL, 2);
+        break;
+    default:
+        log_warning("unsupported packet length mode: %d", send_mode);
+        break;
+    }
+
+    /* Flush then fill the FIFO with some data before putting the radio in TX mode */
+    buffer[1] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
+    buffer[2] = CC1101_BURST(CC1101_TXFIFO);  /* payload starts on buffer[3] so we prefix it with command for the radio then burst send it */
+    uint16_t sent = len > 32 ? 32 : len;  /* Keep track of how many we sent */
+    ccsend(&buffer[1], NULL, sent+2);
+
+    radio_wait_state(CC1101_STATE_TX, true);
+
+    /* Now split into pieces that won't overflow the TX FIFO */
+    bool changed_mode = false;
+    while(sent < len) {
+        /* Change the length mode if needed (don't forget to restore it afterwards) */
+        /*if (len-sent < 255 && !changed_mode) {  FIXME: this is how I understood the spec but it does not work */
+        if ((len>>8) == (sent>>8) && !changed_mode) {  /* Only loop when reaching 0%256 */
+            changed_mode = true;
+            buffer[0] = CC1101_PKTCTRL0;
+            buffer[1] = pktctrl0 | 0;  /* mode 0 == fixed length ; PKTLEN has already been set */
+            ccsend(buffer, NULL, 2);
+            //printf("changed mode\n");
+        }
+
+        /* Fill the TX FIFO if under threshold */
+        /* FIXME: we could be async on this to continue receiving data on UART while we send this */
+        if(! gpio_get(BADGE_RADIO_GDO2)) {
+            buffer[0] = CC1101_TXFIFO;
+            buffer[1] = payload[sent];
+            ccsend(buffer, NULL, 2);
+            ++sent;
+            //printf("%d, ", sent);
+        }
+
+        ///* Wait for GD0 to go high (preamble+sync has been sent) */
+        //while(! gpio_get(BADGE_RADIO_GDO0))  /* FIXME: timeout */
+        //    tight_loop_contents();
+        //}
+    }
+
+    /* Wait for GD0 to go low (packet has been sent) */
+    printf("packet pushed\n");
+    while(gpio_get(BADGE_RADIO_GDO0))
+        tight_loop_contents();
+
+    /* Restore the length mode */
+    buffer[0] = CC1101_PKTCTRL0;
+    buffer[1] = pktctrl0 | send_mode;
+    ccsend(buffer, NULL, 2);
 }
 
 
@@ -107,11 +184,12 @@ int main() {
     leds_init(NULL);
     leds_anim_fixed(GREEN);
 
-    /* First version will be an hex echoer which blinks */
     /* You can also connect to the pico through /dev/serial/by-id/usb-Raspberry_Pi_Pico_E66164084315472C-if00 */
     /* You can also connect to the pico through /dev/serial/by-id/usb-Raspberry_Pi_Pico_5044340588A7511C-if00 */
     state = RECEIVING;
     state_ts = get_absolute_time();
+    /* Config requirements: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
+    ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07}, NULL, 4);
     while(true) {
         int ch = stdio_getchar_timeout_us(50000);
         absolute_time_t now = get_absolute_time();
@@ -121,33 +199,40 @@ int main() {
                 state_ts = now;
                 leds_anim_ook(ORANGE, 80000);
                 i_buffer = 0;
+                buffer[0] = buffer[1] = 0;
                 valid_buffer = true;
             }
             if (valid_buffer) {
                 buffer[i_buffer] = ch;
                 ++i_buffer;
-                if (buffer[0] > sizeof(buffer)) {
-                    log_warning("invalid size packet announced, dropping and wait for end of stream");
-                    valid_buffer = false;  /* We just wait that the current stream stops */
-                    i_buffer = 0;
-                }
-                if (valid_buffer && i_buffer == buffer[0]) {
-                    log_info("received %d bytes", i_buffer);
-                    process_packet();
-                    i_buffer = 0;
+                if (i_buffer >= 2) {
+                    uint16_t *payload_len = (uint16_t *)buffer;
+                    if (*payload_len+2 > sizeof(buffer)) {
+                        log_warning("invalid size packet announced, dropping and wait for end of stream");
+                        valid_buffer = false;  /* We just wait that the current stream stops */
+                        i_buffer = 0;
+                        buffer[0] = buffer[1] = 0;
+                    }
+                    if (valid_buffer && i_buffer == *payload_len+2) {
+                        log_info("received %d bytes -> process", i_buffer);
+                        process_packet();
+                        i_buffer = 0;
+                        buffer[0] = buffer[1] = 0;
+                    }
                 }
             }
             //printf("%02X", ch);
-            //sleep_ms(1000);  /* Is there a buffer? What happens? The sender waits */
+            //sleep_ms(1000);  /* Is there a buffer on the link? What happens? -> the sender waits if the byte is not consumed by us */
         } else {
             if (state == RECEIVING && absolute_time_diff_us(state_ts, now) > 50000) {
                 state = WAITING;
                 state_ts = now;
                 leds_anim_fixed(0);
                 if (valid_buffer && i_buffer) {
-                    log_warning("dropping incomplete packet, expected %d, received %d before timeout", buffer[0], i_buffer);
+                    log_warning("dropping incomplete packet, expected %d, received %d before timeout", (*(uint16_t *)buffer)+2, i_buffer);
                     valid_buffer = false;
                     i_buffer = 0;
+                    buffer[0] = buffer[1] = 0;
                 }
             } else if (state == WAITING && absolute_time_diff_us(state_ts, now) > 1000000) {
                 state = WAITING_LONG;
