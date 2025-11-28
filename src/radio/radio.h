@@ -162,27 +162,28 @@ typedef enum {
     CC1101_PATABLE = 0x3E,
     CC1101_TXFIFO = 0x3F,
     CC1101_RXFIFO = 0x3F,  /* Use with CC1101_READ() only */
-    /* These registers can only be accessed with READ(BURST()) */
-    CC1101_PARTNUM = 0x30,
-    CC1101_VERSION = 0x31,
-    CC1101_FREQEST = 0x32,
-    CC1101_LQI = 0x33,
-    CC1101_RSSI = 0x34,
-    CC1101_MARCSTATE = 0x35,
-    CC1101_WORTIME1 = 0x36,
-    CC1101_WORTIME0 = 0x37,
-    CC1101_PKTSTATUS = 0x38,
-    CC1101_VCO_VC_DAC = 0x39,
-    CC1101_TXBYTES = 0x3A,
-    CC1101_RXBYTES = 0x3B,
-    CC1101_RCCTRL1_STATUS = 0x3C,
-    CC1101_RCCTRL0_STATUS = 0x3D,
+    /* These registers cannot be accessed with burst read and are read-only */
+    CC1101_PARTNUM = 0xF0,
+    CC1101_VERSION = 0xF1,
+    CC1101_FREQEST = 0xF2,
+    CC1101_LQI = 0xF3,
+    CC1101_RSSI = 0xF4,
+    CC1101_MARCSTATE = 0xF5,
+    CC1101_WORTIME1 = 0xF6,
+    CC1101_WORTIME0 = 0xF7,
+    CC1101_PKTSTATUS = 0xF8,
+    CC1101_VCO_VC_DAC = 0xF9,
+    CC1101_TXBYTES = 0xFA,
+    CC1101_RXBYTES = 0xFB,
+    CC1101_RCCTRL1_STATUS = 0xFC,
+    CC1101_RCCTRL0_STATUS = 0xFD,
 } radio_register_t;
 
 
 /** Internal util/debug made accessible to tests */
 STATIC void ccsend(const uint8_t *, uint8_t *, size_t);
 STATIC void ccread_burst(uint8_t, uint8_t *, size_t);
+STATIC uint8_t ccread_status_reg(uint8_t reg);
 STATIC void log_cc_status(void);
 STATIC void print_cc_configuration(void);
 

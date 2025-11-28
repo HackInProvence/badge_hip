@@ -342,11 +342,11 @@ void rx_fsk_raw_printf(void) {
         n &= 0x7f;
         printf("received %02d bytes ", n);
 
-        ccread_burst(CC1101_FREQEST, recv, 3);  /* FREQEST then LQI then RSSI */
-        int8_t eoff = recv[0];
-        bool crc_ok = recv[1] >> 7;
-        uint8_t lqi = recv[1] & 0x7f;
-        int16_t rssi = recv[2];
+        int8_t eoff = ccread_status_reg(CC1101_FREQEST);
+        uint8_t lqi = ccread_status_reg(CC1101_LQI);
+        bool crc_ok = lqi >> 7;
+        lqi &= 0x7f;
+        int16_t rssi = ccread_status_reg(CC1101_RSSI);
         rssi -= 74;  /* According to CC1101 datasheet */
         printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz\n", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
 
@@ -448,10 +448,14 @@ void rx_watch_CS(void) {
         //} else if(prev_count != count) {
         } else if(! raised && shown) {
             read_fifo(true);
+            int8_t eoff = ccread_status_reg(CC1101_FREQEST);
+            uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
+            int16_t rssi = ccread_status_reg(CC1101_RSSI)-74;
             printf("down, packet % 3d, len % 4d, in % 7.02f ms: ", count, buf_i, absolute_time_diff_us(t_rise, t_fall)/1000.f);
             for (size_t i=0; i<buf_i; ++i)
                 printf("%02x ", buffer[i]);
             printf("\n");
+            printf("  RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz\n", rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
             buf_i = 0;
             shown = false;
             warn = false;

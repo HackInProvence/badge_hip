@@ -26,13 +26,25 @@ STATIC void ccsend(const uint8_t *data, uint8_t *response, size_t len) {
     gpio_put(BADGE_SPI1_CSn_RADIO, 1);
 }
 
-/** \brief Helper to burst read registers */
+/** \brief Helper to burst read registers
+ *
+ * \warning Status bytes (strobes+burst) cannot be accessed in burst mode */
 STATIC void ccread_burst(uint8_t reg, uint8_t *response, size_t len) {
-    uint8_t cmd = CC1101_BURST(CC1101_READ(reg));
+    reg = CC1101_BURST(CC1101_READ(reg));
     gpio_put(BADGE_SPI1_CSn_RADIO, 0);
-    spi_write_blocking(spi1, &cmd, 1);
+    spi_write_blocking(spi1, &reg, 1);
     spi_read_blocking(spi1, 0x00, response, len);
     gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+}
+
+/** \brief Reads a status register: cannot be read in bursts */
+STATIC uint8_t ccread_status_reg(uint8_t reg) {
+    uint8_t response;
+    gpio_put(BADGE_SPI1_CSn_RADIO, 0);
+    spi_write_blocking(spi1, &reg, 1);
+    spi_read_blocking(spi1, 0x00, &response, 1);
+    gpio_put(BADGE_SPI1_CSn_RADIO, 1);
+    return response;
 }
 
 
@@ -123,7 +135,7 @@ void print_cc_configuration(void) {
     }
 
     printf("PATABLE:\n    ");
-    ccread_burst(0x3E, cfg, 8);  /* PATABLE */
+    ccread_burst(CC1101_PATABLE, cfg, 8);  /* PATABLE */
     for(size_t i=0; i<8; ++i)
         printf("%02x ", cfg[i]);
     printf("\n");
@@ -152,7 +164,7 @@ void radio_set_frequency(uint32_t freq_hz) {
 void radio_set_baud_rate(uint32_t rate_bauds) {
     /* Recover the part of MDMCFG4 that would be overwritten */
     uint8_t pad[3] = {CC1101_READ(CC1101_MDMCFG4)};
-    ccread_burst(CC1101_READ(CC1101_MDMCFG4), pad+1, 1);
+    ccread_burst(CC1101_MDMCFG4, pad+1, 1);
 
     /* Now prepare the new settings (current MDMCFG4 is already inplace in pad[1]) */
     pad[0] = CC1101_BURST(CC1101_MDMCFG4);
