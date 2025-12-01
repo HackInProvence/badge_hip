@@ -408,6 +408,37 @@ void radio_events(uint gpio, uint32_t events) {
     }
 }
 
+/* Wait for a end of packet then decorticate an UART 8N1 */
+static uint8_t uart[0x1f+3];
+static size_t uart_length = 0;
+void parse_buffer_uart(void) {
+    /* The payload format is 8N1: 0 ........ 1, and we are misaligned,
+     *  because the sync word is FF 33 which is encoded as 0 11111111 1 0 11001100 1
+     *  and our sync word is     FF 66 which is               11111111   01100110 */
+    /* Then we also have to reverse the bitorder, because UART is LSB */
+    uart_length = 0;
+    for (size_t i=0; i/8 < buf_i; ++i) {
+        uint8_t bit = buffer[(i+2)/8] >> (7-((i+2)%8)) & 0x01;  /* MSB order */
+        switch(i%10) {
+        case 0:  /* Expects the 0 in 0........1 */
+            if(bit)
+                return;
+            uart[uart_length] = 0;
+            break;
+        case 9:  /* Expects the 1 in 0........1 */
+            if(!bit)
+                return;
+            ++uart_length;
+            break;
+        default:  /* Swap bit order as UART is LSB */
+            size_t i_decode = (i%10)-1;
+            uart[uart_length] |= (bit << i_decode);
+            //printf("bit %d: %d, uart[%d]=%d (%d)\n", i,bit,uart_length,uart[uart_length],i_decode);
+            break;
+        }
+    }
+}
+
 
 /* Set up an IRQ to watch carrier sense.
  * It's hard to receive packets of unknown lengths with the CC1101,
@@ -456,6 +487,13 @@ void rx_watch_CS(void) {
                 printf("%02x ", buffer[i]);
             printf("\n");
             printf("  RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz\n", rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
+            parse_buffer_uart();
+            if (uart_length) {
+                printf("                                        decode: ");
+                for (size_t i=0; i<uart_length; ++i)
+                    printf("%02x ", uart[i]);
+                printf("\n                            (probable) seq_num: %02x %02x\n", uart[uart_length-10], uart[uart_length-9]);
+            }
             buf_i = 0;
             shown = false;
             warn = false;
