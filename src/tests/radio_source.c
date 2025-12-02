@@ -34,6 +34,7 @@
 
 /* When changing BUFFER_TX_LENGTH, for now radio_source.py has no mean to know that and its assert on size might be wrong */
 #define BUFFER_TX_LENGTH 65535
+#define BUFFER_RX_LENGTH 65535
 
 
 /** RaSo states: focused on the state of the USB link */
@@ -55,6 +56,16 @@ static size_t i_tx = 0;  /* Index to write to buffer_tx when receiving data from
 static uint8_t send_mode = 1;  /* Mirrors PKTCTRL0.LENGTH_CONFIG */
 /* Config requirements when sending: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
 static const uint8_t config_tx[] = {CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07};
+
+/* RX side */
+static uint8_t buffer_rx[BUFFER_RX_LENGTH+64]; /* +64 to be able to flush the RX FIFO in cases of overflow */
+static size_t i_rx = 0;
+static absolute_time_t t_rise = 0, t_fall = 0;  /* Measure reception time */
+//static uint32_t count = 0;
+static bool carrier_sense = false;
+static bool packet_rx = false;
+/* Config requirements when receiving: IOCFG2 is carrier sense, IOCFG1 is MISO, IOCFG0 is RX FIFO over threshold, FIFOTHR is 32 */
+static const uint8_t config_rx[] = {CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00, 0x07};
 
 
 void emit_buffer(void); /* Split the packet emission from process_packet */
@@ -201,8 +212,85 @@ void emit_buffer(void) {
     while(gpio_get(BADGE_RADIO_GDO0))
         tight_loop_contents();
     log_info("packet aired");
-
 }
+
+
+void read_rx_fifo(bool incl_last) {
+    /* We should not read more than n-1 bytes because there is a bug that would duplicate the last byte,
+     *  except when we know that the receive operation is finished (which is suggested to be done with packet sizes, and we do it with CS...) */
+    //printf("read_rx_fifo(n=");
+    uint8_t n;
+    ccread_burst(CC1101_RXBYTES, &n, 1);
+    if (n>>7)
+        panic("RX overflow from read_rx_fifo, i_rx=%d\n", i_rx);
+    if (n==0) {
+        //printf("0),");
+        return;
+    }
+    //printf("%d,to_read=", n);
+    if (! incl_last)
+        --n;
+    size_t to_read = i_rx+n > BUFFER_RX_LENGTH ? BUFFER_RX_LENGTH-i_rx : n;
+    //printf("%d).", to_read);
+    if (to_read)
+        ccread_burst(CC1101_RXFIFO, buffer_rx+i_rx, to_read);
+    if (n-to_read)
+        /* FIXME: signal buffer overflow */
+        ccread_burst(CC1101_RXFIFO, buffer_rx+BUFFER_RX_LENGTH, n-to_read);  /* Flushes remaining bytes to avoid RX overflow which would stall the radio */
+    i_rx += to_read;
+}
+
+/* IRQ based reception of packets, mea */
+void radio_events(uint gpio, uint32_t events) {
+    /* FIXME: this enables being able to asynch send packets, but for now, only asynch RX */
+    if (stradio != CC1101_STATE_RX)
+        return;
+
+    absolute_time_t now = get_absolute_time();
+
+    if (gpio == BADGE_RADIO_GDO0) {
+        /* FIXME: don't block here, only flag */
+        read_rx_fifo(false);
+    } else if (events & GPIO_IRQ_EDGE_RISE) {
+        t_rise = now;
+        carrier_sense = true;
+    } else if (events & GPIO_IRQ_EDGE_FALL) {
+        t_fall = now;
+        carrier_sense = false;
+        packet_rx = true;
+    }
+}
+
+///* Wait for a end of packet then decorticate an UART 8N1 */
+//static uint8_t uart[0x1f+3];
+//static size_t uart_length = 0;
+//void parse_buffer_uart(void) {
+//    /* The payload format is 8N1: 0 ........ 1, and we are misaligned,
+//     *  because the sync word is FF 33 which is encoded as 0 11111111 1 0 11001100 1
+//     *  and our sync word is     FF 66 which is               11111111   01100110 */
+//    /* Then we also have to reverse the bitorder, because UART is LSB */
+//    uart_length = 0;
+//    for (size_t i=0; i/8 < i_rx; ++i) {
+//        uint8_t bit = buffer_rx[(i+2)/8] >> (7-((i+2)%8)) & 0x01;  /* MSB order */
+//        switch(i%10) {
+//        case 0:  /* Expects the 0 in 0........1 */
+//            if(bit)
+//                return;
+//            uart[uart_length] = 0;
+//            break;
+//        case 9:  /* Expects the 1 in 0........1 */
+//            if(!bit)
+//                return;
+//            ++uart_length;
+//            break;
+//        default:  /* Swap bit order as UART is LSB */
+//            size_t i_decode = (i%10)-1;
+//            uart[uart_length] |= (bit << i_decode);
+//            //printf("bit %d: %d, uart[%d]=%d (%d)\n", i,bit,uart_length,uart[uart_length],i_decode);
+//            break;
+//        }
+//    }
+//}
 
 
 int main() {
@@ -211,6 +299,8 @@ int main() {
     while(true) {
         int ch;
         absolute_time_t now = get_absolute_time();
+
+        /* Handle USB to TX direction */
         switch(straso) {
         case BOOT:
             /* All inits */
@@ -224,6 +314,18 @@ int main() {
             straso = USB_IN_WAIT;
             straso_ts = now;
             leds_anim_breath(BLUE, 3000000);
+
+            /* Set up an IRQ to watch carrier sense.
+             * It's hard to receive packets of unknown lengths with the CC1101,
+             *  as the reception correctly starts with CS being high, but it does not end with CS being low again...
+             * We need to go back to IDLE when reception is done */
+            stradio = CC1101_STATE_RX;
+            ccsend(config_rx, NULL, sizeof(config_rx));
+            gpio_set_irq_callback(radio_events);  /* There is a single callback for all GPIO events */
+            gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE                     , true);
+            gpio_set_irq_enabled(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+            irq_set_enabled(IO_IRQ_BANK0, true);
+            radio_wait_state(stradio, true);
 
             log_info("booted, waiting for packets on USB or on air");
             break;
@@ -287,6 +389,35 @@ int main() {
         case RADIO_TX:
             /* For now, packet processing is not asynch, so this state is transient */
             break;
+        }
+
+        /* Handle RX to USB direction */
+        /* Note: if you want fail-safes and debug code, see tests/radio.c on the parent commit of this one */
+        if (packet_rx) {
+            /* Carrier sense went down, we finished receiving a packet */
+            read_rx_fifo(true);
+
+            int8_t eoff = ccread_status_reg(CC1101_FREQEST);
+            uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
+            int16_t rssi = ccread_status_reg(CC1101_RSSI)-74;
+            printf("down, len % 4d, in % 7.02f ms: ", i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
+            for (size_t i=0; i<i_rx; ++i)
+                printf("%02x ", buffer_rx[i]);
+            printf("\n");
+            printf("  RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz\n", rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
+
+            i_rx = 0;
+            packet_rx = false;
+
+            /* RX termination based on CS seems to only works when nothing was received yet... */
+            //ccsend((uint8_t[]){CC1101_SFRX, CC1101_MCSM2, 0x07}, NULL, 3);
+
+            /* When using CS, the reception of bytes continues after CS is cleared...
+             * To avoid that, we reset to RX (and flush by the way)
+             * It's a bit too long to do that here, as the next transmission may have started */
+            radio_wait_state(CC1101_STATE_IDLE, true);
+            ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
+            radio_wait_state(CC1101_STATE_RX, true);
         }
     }
 }

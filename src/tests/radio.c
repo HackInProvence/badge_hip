@@ -177,7 +177,7 @@ void tx_chat_flipper(const uint8_t *msg) {
 }
 
 
-/* Receive FSK-transmitted data (preset radio_preset_gfsk used by radio_source) */
+/* Receive FSK-transmitted data, max 64 bytes (preset radio_preset_gfsk used by radio_source) */
 void rx_fsk_printf(void) {
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
     ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
@@ -364,184 +364,6 @@ void rx_fsk_raw_printf(void) {
 }
 
 
-static uint8_t buffer[1024+64];
-static size_t buf_i = 0;
-void read_fifo(bool incl_last) {
-    /* We should not read more than n-1 bytes because there is a bug that would duplicate the last byte,
-     *  except when we know that the receive operation is finished (which is suggested to be done with packet sizes...) */
-    //printf("read_fifo(n=");
-    uint8_t n;
-    ccread_burst(CC1101_RXBYTES, &n, 1);
-    if (n>>7)
-        panic("RX overflow from read_fifo, buf_i=%d\n", buf_i);
-    if (n==0) {
-        //printf("0),");
-        return;
-    }
-    //printf("%d,to_read=", n);
-    if (! incl_last)
-        --n;
-    size_t to_read = buf_i+n > 1024 ? 1024-buf_i : n;
-    //printf("%d).", to_read);
-    if (to_read)
-        ccread_burst(CC1101_RXFIFO, buffer+buf_i, to_read);
-    if (n-to_read)
-        ccread_burst(CC1101_RXFIFO, buffer+1024, n-to_read);  /* Flushes remaining bytes to avoid RX overflow which would stall the radio */
-    buf_i += to_read;
-}
-
-static absolute_time_t t_rise = 0, t_fall = 0;
-static uint32_t count = 0;
-static bool raised = false;
-void radio_events(uint gpio, uint32_t events) {
-    absolute_time_t now = get_absolute_time();
-
-    if (gpio == BADGE_RADIO_GDO0) {
-        read_fifo(false);
-    } else if (events & GPIO_IRQ_EDGE_RISE) {
-        t_rise = now;
-        raised = true;
-    } else if (events & GPIO_IRQ_EDGE_FALL) {
-        t_fall = now;
-        ++count;
-        raised = false;
-    }
-}
-
-/* Wait for a end of packet then decorticate an UART 8N1 */
-static uint8_t uart[0x1f+3];
-static size_t uart_length = 0;
-void parse_buffer_uart(void) {
-    /* The payload format is 8N1: 0 ........ 1, and we are misaligned,
-     *  because the sync word is FF 33 which is encoded as 0 11111111 1 0 11001100 1
-     *  and our sync word is     FF 66 which is               11111111   01100110 */
-    /* Then we also have to reverse the bitorder, because UART is LSB */
-    uart_length = 0;
-    for (size_t i=0; i/8 < buf_i; ++i) {
-        uint8_t bit = buffer[(i+2)/8] >> (7-((i+2)%8)) & 0x01;  /* MSB order */
-        switch(i%10) {
-        case 0:  /* Expects the 0 in 0........1 */
-            if(bit)
-                return;
-            uart[uart_length] = 0;
-            break;
-        case 9:  /* Expects the 1 in 0........1 */
-            if(!bit)
-                return;
-            ++uart_length;
-            break;
-        default:  /* Swap bit order as UART is LSB */
-            size_t i_decode = (i%10)-1;
-            uart[uart_length] |= (bit << i_decode);
-            //printf("bit %d: %d, uart[%d]=%d (%d)\n", i,bit,uart_length,uart[uart_length],i_decode);
-            break;
-        }
-    }
-}
-
-
-/* Set up an IRQ to watch carrier sense.
- * It's hard to receive packets of unknown lengths with the CC1101,
- *  as the reception correctly starts with CS being high, but it does not end with CS being low again... */
-void rx_watch_CS(void) {
-    gpio_init(BADGE_RADIO_GDO0);
-    gpio_init(BADGE_RADIO_GDO2);
-    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
-    gpio_set_dir(BADGE_RADIO_GDO2, GPIO_IN);
-    ccsend(fsk_full_rx, NULL, sizeof(fsk_full_rx));
-    //ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len); //ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00}, NULL, 4);
-    radio_set_frequency(868925000);
-    radio_set_baud_rate(38500);
-    print_cc_configuration();
-    gpio_set_irq_callback(radio_events);  /* There is a single callback for all GPIO events */
-    gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE                     , true);
-    gpio_set_irq_enabled(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-    irq_set_enabled(IO_IRQ_BANK0, true);
-
-    ccsend((uint8_t[]){CC1101_BURST(CC1101_SYNC1), 0xFF, 0x66}, NULL, 3);
-    radio_wait_state(CC1101_STATE_RX, true);
-
-    /* Just ... wait to be interrupted, and printf a status */
-    bool shown = false;
-    uint8_t n;
-    uint8_t recv[65];
-    bool warn = false;
-    absolute_time_t t0 = get_absolute_time(), now;
-    while(true) {
-        now = get_absolute_time();
-        if (raised && ! shown) {
-            printf("high ");
-            shown = true;
-            /* Putting this here marks the risk that we miss the raise event,
-             *  but putting it in the IRQ risks being too slow
-             *  (and risk interrupting some other SPI operation) */
-            //ccsend((uint8_t[]){CC1101_MCSM2, 0x17}, NULL, 2);  /* Go back to IDLE on end of carrier sense -> only works when nothing was received yet... */
-        //} else if(prev_count != count) {
-        } else if(! raised && shown) {
-            read_fifo(true);
-            int8_t eoff = ccread_status_reg(CC1101_FREQEST);
-            uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
-            int16_t rssi = ccread_status_reg(CC1101_RSSI)-74;
-            printf("down, packet % 3d, len % 4d, in % 7.02f ms: ", count, buf_i, absolute_time_diff_us(t_rise, t_fall)/1000.f);
-            for (size_t i=0; i<buf_i; ++i)
-                printf("%02x ", buffer[i]);
-            printf("\n");
-            printf("  RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz\n", rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
-            parse_buffer_uart();
-            if (uart_length) {
-                printf("                                        decode: ");
-                for (size_t i=0; i<uart_length; ++i)
-                    printf("%02x ", uart[i]);
-                printf("\n                            (probable) seq_num: %02x %02x\n", uart[uart_length-10], uart[uart_length-9]);
-            }
-            buf_i = 0;
-            shown = false;
-            warn = false;
-            ///* When using CS + sync bytes, the reception of bytes continues after CS is cleared...
-            // * To avoid that, we reset to RX (and flush by the way)
-            // * FIXME: it's a bit too long to do that here, as the next transmission has started
-            // * -> no, this is how it should be done, even in non-infinite packet mode... */
-            radio_wait_state(CC1101_STATE_IDLE, true);
-            //ccsend((uint8_t[]){CC1101_SFRX, CC1101_MCSM2, 0x07}, NULL, 3);  /* Don't terminate RX base on CS (yet) -> only works when nothing was received yet... */
-            ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
-            radio_wait_state(CC1101_STATE_RX, true);
-        } else if (!shown) {
-            ccread_burst(CC1101_RXBYTES, &n, 1);
-            if (n>>7) {
-                printf("RX FIFO overflow, re-RX...\n");
-                /* We SFRX to IDLE and re-RX... */
-                recv[0] = CC1101_SFRX;
-                ccsend(recv, NULL, 1);
-                radio_wait_state(CC1101_STATE_IDLE, false);
-                radio_wait_state(CC1101_STATE_RX, true);
-                buf_i = 0;
-                //sleep_ms(1000);
-                //ccread_burst(CC1101_RXBYTES, recv, 1);
-                //printf("in FIFO: %d\n", recv[0]);
-            } else if (n&0x7f) {
-                ccread_burst(CC1101_RXFIFO, recv, n);
-                printf("RX was not empty (flush %02d bytes) -> flush & restart\n", n);
-                //sleep_ms(300); /* kill switch */
-                //buf_i = 0;
-                //print_cc_configuration();
-                radio_wait_state(CC1101_STATE_IDLE, true);
-                recv[0] = CC1101_SFRX;
-                ccsend(recv, NULL, 1);
-                radio_wait_state(CC1101_STATE_RX, true);
-                //panic("kill");
-            }
-        }
-        if (! warn && buf_i==1024) {
-            printf("!!buf overflow!! ");
-            warn = true;
-        }/* else if (! warn && absolute_time_diff_us(t0, now) > 1000000) {
-            log_cc_status();
-            warn = true;
-        }*/
-    }
-}
-
-
 int main() {
     uint8_t cmd[2];
     stdio_usb_init();
@@ -587,9 +409,9 @@ int main() {
     ////sleep_ms(3000);
     ////tx_chat_flipper("Badge SecSea left chat.\n");
 
-    //rx_fsk_printf();
+    rx_fsk_printf();
     //rx_fsk_raw_printf();
-    rx_watch_CS();
+    //rx_watch_CS(); -> moved to RaSo
 
     /* Shutdown */
     printf("wait\n");
