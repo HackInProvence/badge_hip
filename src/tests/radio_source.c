@@ -3,6 +3,23 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
+/** \file radio.h
+ *
+ * \brief RAdio SOurce: USB <-> CC1101 bridge.
+ *
+ * See radio_source.py to interact with this firmware.
+ *
+ * Designed to expose a CC1101 on USB tty for transmitting packets over the air.
+ * Now extended to also receive data on RF and forward it to USB tty.
+ *
+ * LED color:
+ * - blue breathing: wait for packet (from USB to be aired, from air to USB),
+ * - light blue: receiving something on USB,
+ * - pink: airing something,
+ * - green to red: RSSI from best to worst.
+ *
+ * The CC1101 has its own states, but we also need a state machine to handle data on USB tty. */
+
 #include <stdio.h>
 
 #include "pico/stdlib.h"
@@ -11,22 +28,25 @@
 #include "leds.h"
 #include "radio.h"
 
-#define ORANGE LED_RGB(255, 64, 0)
-#define GREEN LED_RGB(0, 16, 0)
+#define SKY LED_RGB(0, 128, 255)
+#define BLUE LED_RGB(0, 0, 32)
+#define PINK LED_RGB(255, 0, 255)
 
+
+/** RaSo states: focused on the state of the USB link */
 typedef enum {
     BOOT,
-    RECEIVING,
-    WAITING,
-    WAITING_LONG,
-} state_t;
+    USB_IN_WAIT,
+    USB_IN_VALID,
+    RADIO_TX,
+} raso_state_t;
 
-static state_t state = BOOT;
-static absolute_time_t state_ts = 0;
+static raso_state_t straso = BOOT;
+static radio_state_t stradio = CC1101_STATE_IDLE;
+static absolute_time_t straso_ts = 0;
 static uint8_t buffer[65537];  /* First 2 bytes are the length of remainder (len(payload)+1), third byte is the command, then the payload */
 static size_t i_buffer = 0;
-static bool valid_buffer = false;
-static uint8_t send_mode = 1;  /* Corresponds to PKTCTRL0.LENGTH_CONFIG */
+static uint8_t send_mode = 1;  /* Mirrors PKTCTRL0.LENGTH_CONFIG */
 
 
 void emit_buffer(void); /* Split the packet emission from process_packet */
@@ -140,7 +160,7 @@ void emit_buffer(void) {
     while(sent < len) {
         /* Change the length mode if needed (don't forget to restore it afterwards) */
         /*if (len-sent < 255 && !changed_mode) {  FIXME: this is how I understood the spec but it does not work */
-        if ((len>>8) == (sent>>8) && !changed_mode) {  /* Only loop when reaching 0%256 */
+        if ((len>>8) == (sent>>8) && !changed_mode) {  /* Only change mode when reaching 0%256 */
             changed_mode = true;
             buffer[0] = CC1101_PKTCTRL0;
             buffer[1] = pktctrl0 | 0;  /* mode 0 == fixed length ; PKTLEN has already been set */
@@ -165,9 +185,9 @@ void emit_buffer(void) {
     }
 
     /* Wait for GD0 to go low (packet has been sent) */
-    printf("packet pushed\n");
     while(gpio_get(BADGE_RADIO_GDO0))
         tight_loop_contents();
+    log_info("packet aired\n");
 
     /* Restore the length mode */
     buffer[0] = CC1101_PKTCTRL0;
@@ -177,68 +197,85 @@ void emit_buffer(void) {
 
 
 int main() {
-    stdio_usb_init();
-    log_set_level(LOG_LEVEL_INFO);
-    radio_init();
-    radio_boot();
-    leds_init(NULL);
-    leds_anim_fixed(GREEN);
-
     /* You can also connect to the pico through /dev/serial/by-id/usb-Raspberry_Pi_Pico_E66164084315472C-if00 */
     /* You can also connect to the pico through /dev/serial/by-id/usb-Raspberry_Pi_Pico_5044340588A7511C-if00 */
-    state = RECEIVING;
-    state_ts = get_absolute_time();
-    /* Config requirements: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
-    ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07}, NULL, 4);
     while(true) {
-        int ch = stdio_getchar_timeout_us(50000);
+        int ch;
         absolute_time_t now = get_absolute_time();
-        if (ch >= 0) {
-            if (state != RECEIVING) {
-                state = RECEIVING;
-                state_ts = now;
-                leds_anim_ook(ORANGE, 80000);
-                i_buffer = 0;
-                buffer[0] = buffer[1] = 0;
-                valid_buffer = true;
+        switch(straso) {
+        case BOOT:
+            stdio_usb_init();
+            log_set_level(LOG_LEVEL_INFO);
+            radio_init();
+            radio_boot();
+            leds_init(NULL);
+            leds_anim_breath(BLUE, 3000000);
+            straso = USB_IN_WAIT;
+            straso_ts = now;
+            /* Config requirements: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
+            ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07}, NULL, 4);
+            log_info("booted, waiting for packets on USB");
+            break;
+        case USB_IN_WAIT:
+            ch = stdio_getchar_timeout_us(0);
+            /* Prepare to receive something, only when we are here since a long time
+             *  (otherwise we are waiting for an invalid stream to stop) */
+            if(ch >= 0 && absolute_time_diff_us(straso_ts, now) > 50000) {
+                straso = USB_IN_VALID;
+                straso_ts = now;
+                leds_anim_ook(SKY, 80000);
+                i_buffer = 1;
+                buffer[0] = ch;
+                buffer[1] = 0;
+            } else {
+                /* Stay in wait */
             }
-            if (valid_buffer) {
+            break;
+        case USB_IN_VALID:
+            ch = stdio_getchar_timeout_us(0);
+            if(ch >= 0) {
+                straso_ts = now;
                 buffer[i_buffer] = ch;
                 ++i_buffer;
                 if (i_buffer >= 2) {
                     uint16_t *payload_len = (uint16_t *)buffer;
                     if (*payload_len+2 > sizeof(buffer)) {
-                        log_warning("invalid size packet announced, dropping and wait for end of stream");
-                        valid_buffer = false;  /* We just wait that the current stream stops */
+                        log_warning("announced packet too large, dropping and wait for end of stream");
+                        /* We just wait that the current stream stops */
+                        straso = USB_IN_WAIT;
+                        leds_anim_breath(BLUE, 3000000);
                         i_buffer = 0;
                         buffer[0] = buffer[1] = 0;
                     }
-                    if (valid_buffer && i_buffer == *payload_len+2) {
-                        log_info("received %d bytes -> process", i_buffer);
+                    if (i_buffer == *payload_len+2) {
+                        log_info("process packet of %d bytes", i_buffer);
+                        straso = RADIO_TX;
+                        leds_anim_ook(PINK, 80000);
                         process_packet();
+                        straso = USB_IN_VALID;
+                        straso_ts = get_absolute_time();  /* process_ may have taken time */
+                        leds_anim_ook(SKY, 80000);
                         i_buffer = 0;
                         buffer[0] = buffer[1] = 0;
+                        /* We can now receive the next packet and stay in USB_IN_VALID */
                     }
                 }
-            }
-            //printf("%02X", ch);
-            //sleep_ms(1000);  /* Is there a buffer on the link? What happens? -> the sender waits if the byte is not consumed by us */
-        } else {
-            if (state == RECEIVING && absolute_time_diff_us(state_ts, now) > 50000) {
-                state = WAITING;
-                state_ts = now;
-                leds_anim_fixed(0);
-                if (valid_buffer && i_buffer) {
+            } else if(absolute_time_diff_us(straso_ts, now) > 50000) {
+                straso = USB_IN_WAIT;
+                straso_ts = now;
+                leds_anim_breath(BLUE, 3000000);
+                /* When i_buffer==0, we are here just after a processed packet, so don't warn */
+                if (i_buffer) {
+                    /* This log is partially false when i_buffer == 1, but in this case buffer[1] == 0, so it is not that false... */
                     log_warning("dropping incomplete packet, expected %d, received %d before timeout", (*(uint16_t *)buffer)+2, i_buffer);
-                    valid_buffer = false;
                     i_buffer = 0;
                     buffer[0] = buffer[1] = 0;
                 }
-            } else if (state == WAITING && absolute_time_diff_us(state_ts, now) > 1000000) {
-                state = WAITING_LONG;
-                state_ts = now;
-                leds_anim_fixed(GREEN);
             }
+            break;
+        case RADIO_TX:
+            /* For now, packet processing is not asynch, so this state is transient */
+            break;
         }
     }
 }
