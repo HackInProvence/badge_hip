@@ -50,6 +50,7 @@ typedef struct {
     absolute_time_t tref;
     uint64_t period;  /* in µs */
     //uint16_t param;
+    //uint64_t phase;  /* in µs between eyes */
 } leds_anim_t;
 
 
@@ -84,6 +85,7 @@ void leds_cancel_anim(bool leds_off);
 
 /** Internal util made accessible to tests */
 STATIC void push_led(uint32_t grbw);
+uint8_t clamp2byte(float f);  /* TODO: move to utils or something, or prefix with leds_ */
 
 
 #endif /* _LEDS_H */

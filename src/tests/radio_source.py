@@ -7,6 +7,7 @@
 
 """
 Send data to the radio source module to be aired.
+Also receive data on the selected canal.
 """
 
 
@@ -19,10 +20,10 @@ import serial.tools.list_ports
 
 
 PRESETS = {
-    # NOTE: DON'T PUSH 0x00..0x03
+    # NOTE: DON'T PUSH 0x00 to 0x03 (IOCFGx and FIFO_THRESH)
     # NOTE: use either VARIABLE or INFINITE packet length (see CC1101_PKTCTRL0.LENGTH_CONFIG)
+    # NOTE: MDMCFG2.SYNC_MODE should be *at least* carrier sense (bit 2 set)
     'gfsk': bytes([
-        0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
         #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
@@ -42,10 +43,8 @@ PRESETS = {
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
     'fsk': bytes([
-        0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
-        #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
         0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word)
         0x09, 0x00,  # CC1101_ADDR: no packet filtration
         0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
@@ -62,15 +61,13 @@ PRESETS = {
     ]),
     # Sends 24 preamble bytes + FF66 as sync then your packet (< 255)
     'fskrawFF66': bytes([
-        0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
         0x04, 0xFF,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x66,  # CC1101_SYNC0: Sync work LSB
-        #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
-        0x08, 0x00,  # CC1101_PKTCTRL0: no whitening, use FIFOs, no CRC, fixed packet length
+        0x08, 0x02,  # CC1101_PKTCTRL0: no whitening, use FIFOs, no CRC, infinite packet length
         0x09, 0x00,  # CC1101_ADDR: no packet filtration
         0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
         0x10, 0xC0,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
-        0x12, 0x02,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, 16/16 sync word bits
+        0x12, 0x06,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, 16/16 sync word bits + carrier-sense
         0x13, 0x72,  # CC1101_MDMCFG1: 24 preamble bytes
         0x15, 0x34,  # CC1101_DEVIATN: Deviation = 19.04kHz
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
@@ -81,20 +78,21 @@ PRESETS = {
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
     # Does not send preamble nor sync but you can do it yourself (length up to 64k)
+    # On the RX side, you will be misaligned because we don't expect a preamble -> use a profile like fskrawFF66 once you know the sync word.
     'fskrawer': bytes([
-        0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
-        #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
+        0x07, 0x40,  # CC1101_PKTCTRL1: 2*4 preamble bits to gate sync word, no status bytes appended, no addr check
         0x08, 0x02,  # CC1101_PKTCTRL0: no whitening, use FIFOs, no CRC, infinite packet length
         0x09, 0x00,  # CC1101_ADDR: no packet filtration
         0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
         0x10, 0xC0,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
-        0x12, 0x00,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, no preamble/sync
-        #0x13, 0x02,  # CC1101_MDMCFG1: 0 preamble bytes
+        #0x12, 0x00,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, no preamble/sync nor carrier-sense -> without carrier-sense, we receive garbage!
+        0x12, 0x04,  # CC1101_MDMCFG2: Modulation: 2-FSK, no manchester, no preamble/sync but carrier-sense -> you will be misaligned
+        #0x13, 0x02,  # CC1101_MDMCFG1: 0 preamble bytes when TX? interacts with MDMCFG2?
         0x15, 0x34,  # CC1101_DEVIATN: Deviation = 19.04kHz
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
         0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
         0x1B, 0x43,  # CC1101_AGCCTRL2
-        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1C, 0x47,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense, 7db above MAGN_TARGET
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),

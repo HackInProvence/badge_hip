@@ -47,7 +47,7 @@ uint8_t clamp2byte(float f) {
 
 
 /* The IRQ handler that does the animations, minimal work should be done here.
- * We don't care about the argument, we only have one repeating time, and it's global. */
+ * We don't care about the rt argument, we only have one repeating timer, and it's global. */
 bool change_leds(repeating_timer_t *rt) {
     /* Compute LED colors and push them (non blocking, we are in an IRQ...) */
     uint64_t diff_us = absolute_time_diff_us(animation.tref, get_absolute_time());
@@ -85,7 +85,7 @@ bool change_leds(repeating_timer_t *rt) {
             break;
         case LED_BREATH:
             f = (float)(diff_us)/(float)(animation.period);
-            f = cosf((2*M_PI)*f)*.4f+.6f;
+            f = cosf((2*M_PI)*f)*.45f+.55f;
             r = LED_RGB_R(animation.color) * f;
             g = LED_RGB_G(animation.color) * f;
             b = LED_RGB_B(animation.color) * f;

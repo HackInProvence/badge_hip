@@ -122,6 +122,7 @@ target_link_libraries(radio_source PRIVATE
     badge_tests
     hardware_gpio
     pico_stdlib
+    pico_sync
     pico_time
     leds
     radio
