@@ -71,7 +71,9 @@ typedef enum {
 /** \brief Get the current state of the radio */
 radio_state_t radio_state(void);
 
-/** \brief Wait for the internal state to be ready, and optionally also emit the command to change state */
+/** \brief Wait for the internal state to be ready, and optionally also emit the command to change state.
+ *
+ * Can only \param do_change when \param target_state is IDLE, RX, TX, or FSTXON. */
 void radio_wait_state(radio_state_t target_state, bool do_change);
 
 

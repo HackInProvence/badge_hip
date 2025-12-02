@@ -214,6 +214,9 @@ void radio_wait_state(radio_state_t target_state, bool do_change) {
             break;
         }
         ccsend(&cmd, NULL, 1);
+    } else if (do_change) {
+        log_warning("cannot do_change to state %s, would dead lock, ignoring command", STATE_NAMES[status_state(status)]);
+        return;
     }
 
     /* Now wait...
