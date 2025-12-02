@@ -69,6 +69,8 @@ void radio_init(void) {
     gpio_set_dir(BADGE_SPI1_CSn_RADIO, GPIO_OUT);
     gpio_init(BADGE_RADIO_GDO0);
     gpio_init(BADGE_RADIO_GDO2);
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+    gpio_set_dir(BADGE_RADIO_GDO2, GPIO_IN);
 }
 
 

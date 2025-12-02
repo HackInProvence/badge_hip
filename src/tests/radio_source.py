@@ -19,7 +19,8 @@ import serial.tools.list_ports
 
 
 PRESETS = {
-    # DON'T PUSH 0x00..0x03
+    # NOTE: DON'T PUSH 0x00..0x03
+    # NOTE: use either VARIABLE or INFINITE packet length (see CC1101_PKTCTRL0.LENGTH_CONFIG)
     'gfsk': bytes([
         0x03, 0x47,  # CC1101_FIFOTHR: ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
@@ -119,15 +120,12 @@ if __name__ == '__main__':
     parser.add_argument('--preset', '-p ', default=None, choices=PRESETS.keys(), help='push a configuration beforehand')
     parser.add_argument('--frequency', '-f', default=None, type=int, help='push a frequency beforehand')
     parser.add_argument('--baud-rate', '-b', default=None, type=int, help='push a baud rate beforehand')
-    parser.add_argument('--packet-size', '-s', default=63, type=int,
-                        help='split the input in payloads of this size (60 max for the Flipper SubGHz Enhanced Chat App)')
-    parser.add_argument('--fixed-length', '-l', action='store_true',
-                        help='you are using a preset that does not use variable length mode, so we don\'t push another placeholder byte to the radio')
-    parser.add_argument('--infinite-length', '-L', action='store_true',
-                        help='the so-called infinite length mode, ignore -s and push the whole content once')
+    parser.add_argument('--packet-size', '-s', default=-1, type=int,
+                        help='split the input in payloads of this size (e.g. 60 max for the Flipper SubGHz Enhanced Chat App), '+
+                             '-1 means "infinite length mode"')
+    parser.add_argument('--variable-length', '-l', action='store_true',
+                        help='you are using a preset that use variable length mode, so we push a placeholder byte to the radio to set the length')
     args = parser.parse_args()
-
-    assert not (args.fixed_length and args.infinite_length)
 
     with wait_open(args.tty) as ser:
         print('waiting', ser.in_waiting, 'bytes to be read')
@@ -140,16 +138,18 @@ if __name__ == '__main__':
             ser.write(bytes([5, 0, 0xD3])+args.baud_rate.to_bytes(4, 'little'))
 
         buf = bytearray()
+        max_size = 255 if args.variable_length else 65535-1
         while 'data':
             c = sys.stdin.buffer.read(1)  # Maybe we could read more at a time
             buf += c
-            if (not c and buf) or (not args.infinite_length and len(buf) == args.packet_size):  # Divide by packets of xx max
+            assert len(buf) <= max_size, 'cannot send packets bigger than 255 bytes in variable length mode and 64k-2 otherwise'
+            if (not c and buf) or len(buf) == args.packet_size:  # Divide by packets of xx max
                 # Handle variable packet length mode: the length is the first byte
-                if not (args.fixed_length or args.infinite_length):
+                if args.variable_length:
                     payload = (
                         (len(buf)+2).to_bytes(2, 'little') +  # Length of payload: our buffer + 1 command + 1 prefix for variable length mode
                         b'\xD2' +  # Command
-                        b'\xff'  # Placeholder, overwritten by RaSo
+                        b'\xff'  # Placeholder, overwritten by RaSo, length of the packet
                     )
                 else:
                     payload = (len(buf)+1).to_bytes(2, 'little') + b'\xD2'
