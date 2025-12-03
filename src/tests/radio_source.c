@@ -481,11 +481,11 @@ int main() {
 
                 int8_t eoff = ccread_status_reg(CC1101_FREQEST);
                 uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
-                printf("packet received, len % 4d, in % 7.02f ms: ", i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
+                printf("new packet, RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz, len % 4d, in % 7.02f ms,\ncontent: ",
+                        rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14, i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
                 for (size_t i=0; i<i_rx; ++i)
                     printf("%02x ", buffer_rx[i]);
                 printf("\n");
-                printf("  RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz\n", rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
 
                 /* Reset buffer state */
                 i_rx = 0;
@@ -507,9 +507,9 @@ int main() {
         if (st_raso == RADIO_RECEIVING) {  /* FIXME: inverse all tests to avoid lhs wrongly set */
             /* If receiving with known RSSI: fixed red to green */
             if (rssi > INT16_MIN) {
-                float f = rssi+74;
+                float f = rssi;
                 f = (f + 80.f)/90.f;  /* -80 = RED, +10 = GREEN */
-                f = fmaxf(1.f, fminf(0.f, f));
+                f = fminf(1.f, fmaxf(0.f, f));
                 uint8_t r = clamp2byte(cosf(f*M_PI/2.f));
                 uint8_t g = clamp2byte(cosf((f-1)*M_PI/2.f));
                 led.color = LED_RGB(r,g,0);
