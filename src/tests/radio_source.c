@@ -202,7 +202,7 @@ void emit_buffer(void) {
     buffer_tx[1] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
     buffer_tx[2] = CC1101_BURST(CC1101_TXFIFO);
     /* Pre-fill the buffer_tx with some data */
-    sent = len > 32 ? 32 : len;
+    sent = len > 32 ? 32 : len-1;  /* len-1 to be sure to enter the while loop and go to fixed length mode */
     ccsend(&buffer_tx[1], NULL, sent+2);
 
     /* Start sending what's in the TX FIFO and continue until the packet is completely sent */
