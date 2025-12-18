@@ -215,6 +215,10 @@ void emit_buffer(void) {
     /* Start sending what's in the TX FIFO and continue until the packet is completely sent */
     radio_wait_state(CC1101_STATE_TX, true);
 
+    /* Wait for GDO0 to be asserted, meaning we sent the preamble/syncword */
+    while(! gpio_get(BADGE_RADIO_GDO0))
+        tight_loop_contents();
+
     /* Now split into pieces that won't overflow the TX FIFO */
     while(sent < len) {
         /* Change the length mode if needed */
