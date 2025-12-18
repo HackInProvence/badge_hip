@@ -23,18 +23,18 @@ PRESETS = {
     # NOTE: DON'T PUSH 0x00 to 0x03 (IOCFGx and FIFO_THRESH)
     # NOTE: use either VARIABLE or INFINITE packet length (see CC1101_PKTCTRL0.LENGTH_CONFIG)
     # NOTE: MDMCFG2.SYNC_MODE should be *at least* carrier sense (bit 2 set)
-    # Use with -l
     'gfsk': bytes([
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
         #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
-        0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word)
+        0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (adds a length byte after sync word)
         0x09, 0x00,  # CC1101_ADDR: no packet filtration
         0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
         0x10, 0xC0,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
         #0x10, 0xC8,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
         #0x11, 0x93,  # CC1101_MDMCFG3: Data rate: 9.992kbps
         0x12, 0x12,  # CC1101_MDMCFG2: Modulation: GSK, no manchester, 16/16 sync word bits
+        0x13, 0x22,  # CC1101_MDMCFG1: 4 preamble bytes by default
         0x15, 0x34,  # CC1101_DEVIATN: Deviation = 19.04kHz
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
         0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
@@ -43,11 +43,10 @@ PRESETS = {
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
-    # Use with -l
     'fsk': bytes([
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
-        0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word)
+        0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (adds a length byte after sync word)
         0x09, 0x00,  # CC1101_ADDR: no packet filtration
         0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
         0x10, 0xC0,  # CC1101_MDMCFG4: Channel bandwidth: 203kHz
@@ -122,13 +121,11 @@ if __name__ == '__main__':
     parser.add_argument('--baud-rate', '-b', default=None, type=int, help='push a baud rate beforehand')
     parser.add_argument('--packet-size', '-s', default=-1, type=int,
                         help='split the input in payloads of this size (e.g. 60 max for the Flipper SubGHz Enhanced Chat App), '+
-                             '-1 means "infinite length mode"')
-    parser.add_argument('--variable-length', '-l', action='store_true',
-                        help='you are using a preset that use variable length mode, so we push a placeholder byte to the radio to set the length')
+                             '-1 means "infinite length mode", expects the radio to have been configured to handle that mode')
     args = parser.parse_args()
 
     with wait_open(args.tty) as ser:
-        print('waiting', ser.in_waiting, 'bytes to be read')
+        #print('waiting', ser.in_waiting, 'bytes to be read')
         if args.preset is not None:
             preset = PRESETS[args.preset]
             ser.write((len(preset)+1).to_bytes(2, 'little') +b'\xD0'+preset)
@@ -138,22 +135,14 @@ if __name__ == '__main__':
             ser.write(bytes([5, 0, 0xD3])+args.baud_rate.to_bytes(4, 'little'))
 
         buf = bytearray()
-        max_size = 255 if args.variable_length else 65535-1
         while 'data':
             c = sys.stdin.buffer.read(1)  # Maybe we could read more at a time
             buf += c
-            assert len(buf) <= max_size, 'cannot send packets bigger than 255 bytes in variable length mode and 64k-2 otherwise'
+            # We don't know if the radio was put in fixed, variable, or infinite mode, and this message may be inaccurate
+            #  (see the firmware logs)
+            assert len(buf) <= 65535, 'cannot send packets bigger than 64k'
             if (not c and buf) or len(buf) == args.packet_size:  # Divide by packets of xx max
-                # Handle variable packet length mode: the length is the first byte
-                if args.variable_length:
-                    payload = (
-                        (len(buf)+2).to_bytes(2, 'little') +  # Length of payload: our buffer + 1 command + 1 prefix for variable length mode
-                        b'\xD2' +  # Command
-                        b'\xff'  # Placeholder, overwritten by RaSo, length of the packet
-                    )
-                else:
-                    payload = (len(buf)+1).to_bytes(2, 'little') + b'\xD2'
-                payload += bytes(buf)
+                payload = (len(buf)+1).to_bytes(2, 'little') + b'\xD2' + bytes(buf)
                 print('Sending', payload.hex())
                 ser.write(payload)
                 buf.clear()

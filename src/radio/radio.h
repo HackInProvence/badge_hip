@@ -164,7 +164,8 @@ typedef enum {
     CC1101_PATABLE = 0x3E,
     CC1101_TXFIFO = 0x3F,
     CC1101_RXFIFO = 0x3F,  /* Use with CC1101_READ() only */
-    /* These registers cannot be accessed with burst read and are read-only */
+    /* These registers cannot be accessed with burst read and are read-only
+     * -> use ccread_status_reg */
     CC1101_PARTNUM = 0xF0,
     CC1101_VERSION = 0xF1,
     CC1101_FREQEST = 0xF2,

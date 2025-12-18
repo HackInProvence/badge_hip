@@ -168,7 +168,8 @@ void emit_buffer(void) {
 
     /* Save the current value of pktctrl0 to be able to change the length mode on the fly */
     ccread_burst(CC1101_PKTCTRL0, &pktctrl0, 1);
-    pktctrl0 &= 0x7C;  /* send_mode is the remaining 2 bits */
+    log_info("pktctrl0 %02x", pktctrl0);
+    pktctrl0 &= 0x7C;  /* send_mode is the last 2 bits, first bit is unused */
 
     /* Point of no return: reuse the buffer to write registers */
     switch(send_mode) {
@@ -180,8 +181,12 @@ void emit_buffer(void) {
             log_warning("cannot send more than 255 bytes in send_mode=variable length");
             return;
         }
+        /* Move payload base to 1 to the left, to be able to write the length (overwrites buffer_tx[2] which is the command) */
+        --payload;
         payload[0] = len & 0xFF;  /* First payload byte is reserved for length, and this should be anticipated by the sender */
         changed_mode = true;  /* Prevent change mode to fixed length -> keep variable length mode */
+        ++len;  /* We now have to send the length byte too */
+        log_info("variable length mode, len adjusted %d", len);
         break;
     case 2:  /* Infinite length mode: we have to set PKTLEN to length%256 and switch to fixed length at the right time */
         buffer_tx[0] = CC1101_PKTLEN;
@@ -198,12 +203,14 @@ void emit_buffer(void) {
     }
 
     /* Flush then fill the FIFO with some data before putting the radio in TX mode */
-    /* payload starts on buffer_tx[3] so we prefix it with command for the radio then burst send it */
-    buffer_tx[1] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
-    buffer_tx[2] = CC1101_BURST(CC1101_TXFIFO);
+    /* payload starts on buffer_tx[3] or [2] so we prefix it with command for the radio then burst send it */
+    /* The starting point depends on length mode (variable length -> buffer_tx[2] is the first byte, otherwise buffer_tx[3]) */
+    *(payload-2) = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
+    *(payload-1) = CC1101_BURST(CC1101_TXFIFO);
     /* Pre-fill the buffer_tx with some data */
     sent = len > 32 ? 32 : len-1;  /* len-1 to be sure to enter the while loop and go to fixed length mode */
-    ccsend(&buffer_tx[1], NULL, sent+2);
+    ccsend(payload-2, NULL, sent+2);
+    log_info("wrote %02x %02x %02x %02x... sent %d", *(payload-2), *(payload-1), payload[0], payload[1], sent);
 
     /* Start sending what's in the TX FIFO and continue until the packet is completely sent */
     radio_wait_state(CC1101_STATE_TX, true);
@@ -239,6 +246,15 @@ void emit_buffer(void) {
     while(gpio_get(BADGE_RADIO_GDO0))
         tight_loop_contents();
     log_info("packet aired");
+    log_info("sent %d", sent);
+
+    len = ccread_status_reg(CC1101_TXBYTES);
+    if (len&0x80)
+        // FIXME: go to IDLE
+        log_warning("TX underflow -> \"panic\"");
+    len &= 0x7F;
+    if (len)
+        log_warning("remaining %d bytes in TXFIFO", len);
 
     /* We should be IDLE here, because either variable packet or fixed packet length made the radio disable itself */
 }
