@@ -215,7 +215,8 @@ void emit_buffer(void) {
          *  but it seems that we have to wait for sent%256 <= len%256 on the last slice (when sent/256 == len/256) */
         /* This also works for packet length < 256, even if sent < 32,
          *  and set changed_mode=true for variable length mode to avoid changing mode */
-        if ((len>>8) == (sent>>8) && !changed_mode) {
+        //if ((len>>8) == (sent>>8) && !changed_mode) {
+        if (len-sent < 32 && !changed_mode) {
             changed_mode = true;
             buffer_tx[0] = CC1101_PKTCTRL0;
             buffer_tx[1] = pktctrl0 | 0;  /* mode 0 == fixed length ; PKTLEN has already been set */

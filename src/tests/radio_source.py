@@ -23,6 +23,7 @@ PRESETS = {
     # NOTE: DON'T PUSH 0x00 to 0x03 (IOCFGx and FIFO_THRESH)
     # NOTE: use either VARIABLE or INFINITE packet length (see CC1101_PKTCTRL0.LENGTH_CONFIG)
     # NOTE: MDMCFG2.SYNC_MODE should be *at least* carrier sense (bit 2 set)
+    # Use with -l
     'gfsk': bytes([
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
@@ -42,6 +43,7 @@ PRESETS = {
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
+    # Use with -l
     'fsk': bytes([
         0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB

@@ -60,6 +60,7 @@ const uint8_t conf_am270_async[] = {
 /** Pulses a TX on 933.92 with OOK (PWM 5% duty on 100ms cycle)
  * Uses the asynch serial mode, which is the usual mode for the Sub-GHz apps on the flipper (RAW read, RAW send) */
 void tx_pulses(void) {
+    printf("5%% pulses on 433.92Mhz\n");
     ccsend(conf_am270_async, NULL, sizeof(conf_am270_async));
     //ccsend("\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00", NULL, 10);  /* Done by flipper but does not work */
     //ccsend("\x3E\x50", NULL 2);  /* PATABLE: PWR 0db (C0 for maximal power, C6 by default, which is less power) */
@@ -136,6 +137,7 @@ void rx_times(void) {
 /** \brief msg must be \0 terminated */
 void tx_chat_flipper(const uint8_t *msg) {
     /* Maybe someone else, like rx_pulses, did not reset the direction of this pin... */
+    printf("chat with flipper: \"%s\"", msg);
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
     /* 800µs per byte (without preamble) */
