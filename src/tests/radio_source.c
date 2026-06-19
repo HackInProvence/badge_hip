@@ -20,7 +20,12 @@
  * - white: receiving, but RSSI unknown yet (if you see it, means the sync word has not been received),
  * - quick rainbow: error on USB receiving end.
  *
- * The CC1101 has its own states, but we also need a state machine to handle data on USB tty. */
+ * The CC1101 has its own states, but we also need a state machine to handle data on USB tty.
+ *
+ * Quick description of the UART protocol:
+ * - 2 bytes for length (little endian) -> length is the rest of the packet (includes the command but not the length),
+ * - 1 byte for command,
+ * - (len-1) payload bytes */
 
 #include <math.h>
 #include <stdio.h>
@@ -168,7 +173,7 @@ void emit_buffer(void) {
 
     /* Save the current value of pktctrl0 to be able to change the length mode on the fly */
     ccread_burst(CC1101_PKTCTRL0, &pktctrl0, 1);
-    log_info("pktctrl0 %02x", pktctrl0);
+    //log_info("pktctrl0 %02x", pktctrl0);
     pktctrl0 &= 0x7C;  /* send_mode is the last 2 bits, first bit is unused */
 
     /* Point of no return: reuse the buffer to write registers */
@@ -186,7 +191,7 @@ void emit_buffer(void) {
         payload[0] = len & 0xFF;  /* First payload byte is reserved for length, and this should be anticipated by the sender */
         changed_mode = true;  /* Prevent change mode to fixed length -> keep variable length mode */
         ++len;  /* We now have to send the length byte too */
-        log_info("variable length mode, len adjusted %d", len);
+        //log_info("variable length mode, len adjusted %d", len);
         break;
     case 2:  /* Infinite length mode: we have to set PKTLEN to length%256 and switch to fixed length at the right time */
         buffer_tx[0] = CC1101_PKTLEN;
@@ -210,7 +215,7 @@ void emit_buffer(void) {
     /* Pre-fill the buffer_tx with some data */
     sent = len > 32 ? 32 : len-1;  /* len-1 to be sure to enter the while loop and go to fixed length mode */
     ccsend(payload-2, NULL, sent+2);
-    log_info("wrote %02x %02x %02x %02x... sent %d", *(payload-2), *(payload-1), payload[0], payload[1], sent);
+    //log_info("wrote %02x %02x %02x %02x... sent %d", *(payload-2), *(payload-1), payload[0], payload[1], sent);
 
     /* Start sending what's in the TX FIFO and continue until the packet is completely sent */
     radio_wait_state(CC1101_STATE_TX, true);
@@ -249,8 +254,7 @@ void emit_buffer(void) {
     /* Wait for GD0 to go low (packet has been sent) */
     while(gpio_get(BADGE_RADIO_GDO0))
         tight_loop_contents();
-    log_info("packet aired");
-    log_info("sent %d", sent);
+    log_info("packet aired, send %d bytes", sent);
 
     len = ccread_status_reg(CC1101_TXBYTES);
     if (len&0x80)
@@ -358,9 +362,20 @@ int main() {
     leds_init(NULL);
     critical_section_init(&cs_update_st_raso);
 
+    /* The radio should already be in the IDLE state,
+     *  but pushing the reset button does not reset its state */
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
+
+    /* Push sensible defaults for when there is no USB to push new commands (test nomad)
+     * (this pushes IOCFG and FIFTHR but they will overridden by config_rx) */
+    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
+
     /* Initialize radio to receive */
     ccsend(config_rx, NULL, sizeof(config_rx));
-    ccsend((uint8_t[]){CC1101_MDMCFG2, 0x06}, NULL, 2);  /* Pushes a sensible default for MDMCFG2.SYNC_MODE (uses carrier sense and preamble+sync) */
+    radio_set_frequency(433920000);
+    radio_set_baud_rate(9999);
+
     st_raso = RADIO_WAIT;  /* Can't be interrupted: no IRQ yet */
     st_tx_ts = get_absolute_time();
 
@@ -390,16 +405,15 @@ int main() {
             switch(st_tx) {
             case WAITING:
                 ch = stdio_getchar_timeout_us(0);
-                /* Prepare to receive something, only when we are here since a long time
-                 *  (otherwise we are waiting for an invalid stream to stop) */
                 if(ch >= 0 && absolute_time_diff_us(st_tx_ts, now) > 50000) {
+                    /* Received something and its been a while we didn't, so it's the start of a new packet */
                     st_tx = FILLING;
                     st_tx_ts = now;
                     i_tx = 1;
                     buffer_tx[0] = ch;
                     buffer_tx[1] = 0;
                 } else if (ch >= 0) {
-                    /* Still in the same stream, we have to wait longer between chars */
+                    /* Consider we are still in the same stream, we have to wait longer between chars */
                     st_tx_ts = now;
                 }
                 break;
@@ -407,14 +421,14 @@ int main() {
                 ch = stdio_getchar_timeout_us(0);
                 if(ch >= 0) {
                     st_tx_ts = now;
-                    buffer_tx[i_tx] = ch;
-                    ++i_tx;
+                    buffer_tx[i_tx++] = ch;
                     if (i_tx >= 2) {
+                        /* TODO: see if clarifications in SWIM serial2swim work and report them here */
                         uint16_t *payload_len = (uint16_t *)buffer_tx;
                         if (*payload_len+2 > sizeof(buffer_tx)) {
                             log_warning("announced USB packet too large, dropping and wait for end of stream");
                             /* We just wait that the current stream stops */
-                            st_raso = WAITING;
+                            st_raso = WAITING;  /* FIXME: st_tx??? */
                             i_tx = 0;
                             buffer_tx[0] = buffer_tx[1] = 0;
                         }
