@@ -50,13 +50,14 @@
  *
  * TODO:
  * - text -> probably too complex, we will send pre-rendered images,
- * - ~~have a ws that uses the RED ram as a mask to NOT update some pixels (overlay)~~
- *   have a ws that does not change pixels that are equals in both RAMs, and update the others
- *   -> have a "rolling frame" and show the diffs,
- * - try to have more gray levels (try to adjust the FR[n]),
- * - have a ws that refresh a zone of the RAM (uses the RED mask to not touch the rest), so that a previous black can be canceled,
- *   then push the new image for that zone and draw it quicker/without traces,
- * - replace all magic numbers (...).
+ * - try to have more gray levels and only push these new levels, but keeping pixels to VSS make them vulnerable to corruption
+ *   (e.g. by light that might shine on the screen),
+ * - replace all magic numbers (...),
+ * - for animations, develop a 15fps version which should bridge the "not clear enough" of 20fps and "not fast enough" of 10fps,
+ * - for animations, push the given WS versions to little more extent by only pushing the new image:
+ *   this requires that B/W ram and RED ram are alternatively considered new/old then old/new,
+ *   so we need different WS for odd and even images;
+ *   however, we would gain 6.1ms/2 because we only push 1 image, (3ms is 10% the budget of 30fps).
  * */
 
 #ifndef _SCREEN_H

@@ -53,6 +53,8 @@ STATIC void _send(const uint8_t *cmd, size_t len) {
 
 
 void screen_init(void) {
+    /* FIXME: avoid re-init */
+
     // Declare our GPIO usages
     bi_decl_if_func_used(bi_4pins_with_func(BADGE_SPI0_TX_MOSI_SCREEN, BADGE_SPI0_RX_MISO, BADGE_SPI0_SCK_SCREEN, BADGE_SPI0_CSn, GPIO_FUNC_SPI));
     bi_decl_if_func_used(bi_1pin_with_name(BADGE_SCREEN_DC, "e-Paper D/C"));
@@ -138,7 +140,7 @@ bool screen_boot(void) {
         if (absolute_time_diff_us(state_ts, now) >= 10000) {
             /* Starts HW RESET by pulling its pin down */
             gpio_put(BADGE_SCREEN_RST, 0);
-            log_info("boot: SLEEP lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
+            log_info("screen boot: SLEEP lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
             state = STATE_HWRESET;
             state_ts = get_absolute_time();
         }
@@ -152,7 +154,7 @@ bool screen_boot(void) {
             if (! gpio_get(BADGE_SCREEN_BUSY)) {
                 /* Now send a command to the screen and wait for busy to be low */
                 send(SSD1681_SWRESET);
-                log_info("boot: HWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
+                log_info("screen boot: HWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
                 state = STATE_SWRESET;
                 state_ts = get_absolute_time();
             }
@@ -161,7 +163,7 @@ bool screen_boot(void) {
     case STATE_SWRESET:
         /* SWRESET is sent, now wait for busy to be low */
         if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
-            log_info("boot: SWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
+            log_info("screen boot: SWRESET lasted %" PRIu64 "µs", absolute_time_diff_us(state_ts, now));
             state = STATE_SETUP;
             state_ts = get_absolute_time();
             setup();
@@ -170,7 +172,7 @@ bool screen_boot(void) {
     case STATE_SETUP:
         /* Wait for setup: load LUT with temperature reading */
         if (gpio_get(BADGE_SCREEN_BUSY) == 0) {
-            log_info("boot: SETUP lasted %" PRIu64 "µs, now ready", absolute_time_diff_us(state_ts, now));
+            log_info("screen boot: SETUP lasted %" PRIu64 "µs, now ready", absolute_time_diff_us(state_ts, now));
             state = STATE_READY;
             state_ts = get_absolute_time();
         }
