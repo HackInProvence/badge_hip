@@ -23,38 +23,75 @@ Pour l'instant, on trouve le fichier `ProPrj_*.pdf` qui donne le schéma électr
 
 # Software
 
-Basé sur le pico SDK, écrit en C, compilé via cmake + make/ninja.
+Le logiciel du badge est construit sur le [pico SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html#sdk-setup) écrit en C et compilé via cmake + make/ninja.
+Il devrait être accessible pré-compilé dans les [releases](../../releases), au format uf2.
+
+Pour compiler le badge, il faut donc commencer par installer le pico SDK.
+3 options détaillées dans la suite du document :
+
+- [utiliser VS Code](#installation-via-vscode), fonctionne sous Linux et Windows via PlatformIO qui s'occupe d'installer le SDK,
+  mais son aspect magique le rend difficile à debug en cas de problème d'installation,
+- [installer le SDK sur votre machine](#installation-via-pico-setup) avec le script `pico_setup.sh` qui utilise `apt` donc réservé aux Debian et dérivés (Ubuntu, Kali, Mint, ...),
+- [utiliser un docker](#todo).
 
 
 ## Pico C SDK
 
+
+### Pourquoi ?
+
 Le pico SDK est similaire à l'approche bare-metal.
 Ce sont des fonctions C réalisant une abstraction pour accéder aux fonctionnalités du RP2040 plus facilement.
+Elles sont groupées en bibliothèques cmake, et importées au cas par cas pour chaque exécutable les utilisant.
 
 Pourquoi abstraire ?
+
+Le RP2040 possède de nombreuses fonctionnalités matérielles ayant chacune un fonctionnement qui lui est propre.
 Par exemple, le PWM fonctionne en 2 blocs de 8 tranches, et chaque tranche contrôle 2 sorties.
 On peut régler l'activation, le mode (output ou input), la fréquence et le duty cycle de chaque GPIO via des `registres`
 (par exemple le bit 0 de l'octet `0x40050000` active ou désactive la tranche des pins 0 et 1).
 De son côté, le SDK fournit la fonction `pwm_set_enabled` qu'on peut appeler pour effectuer cette écriture.
 Le SDK fournit les abstractions pour accélérer un peu le travail sur le RP2040
 (et les faire correctement avec par exemple dans le cas précédent ne pas modifier les autres bits du registre),
-et rendre les choses (un peu) plus lisibles.
+et rend le code plus lisible.
 
-Le SDK ne constitue pas un OS : il n'y a pas de notion de process, thread, tâches concurrentes, mémoire virtuelle, système de fichier, droits d'accès...
+*Le SDK ne constitue pas un OS* : il n'y a pas de notion de process, thread, tâches concurrentes, mémoire virtuelle, système de fichier, droits d'accès...
 
-Le SDK et les exemples peuvent suffire à piloter nos périphériques.
+Le SDK et les exemples suffisent le plus souvent à piloter nos périphériques.
 C'est le cas si on utilise le buzzer pour faire un son régulier (via PWM, comme une mélodie),
 piloter les LEDs via le protocole WS2812 ([example pio/ws2812](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812)),
 utiliser le SPI (pour le CC1101 et l'écran).
-Mais ce ne sera pas le cas pour tout, comme par exemple faire un son de cigale plus réaliste ou afficher quelques chose sur l'écran.
+Mais ce ne sera pas le cas pour tout, comme par exemple faire un son de cigale plus réaliste, afficher une image sur l'écran, envoyer un paquet via la radio...
 
-Le SDK est à installer.
-Le [document getting started](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf) détaille les étapes pour VSCode,
-**en particulier si vous êtes sous Windows**.
+
+### Installation via VSCode
+
+Le [document getting started](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf) détaille les étapes pour VSCode.
 
 Une fois ces étapes suivies, installez l'extension **CMake Tools**, puis configurez l'extension **Raspberry Pi Pico** pour activer "Use CMake Tools".
 
-Les étapes pour une installation manuelle sont les suivantes (il faut un gestionnaire de paquet type `apt`, donc Debian/Ubuntu...) :
+Ouvrez ensuite le git du projet.
+Il devrait vous demander "*Voulez-vous l'importer en tant que projet Raspberry Pi Pico ?*" auquel il faut répondre Oui.
+
+Sur la page d'import, sélectionner "Enable CMake-Tools extension integration",
+puis cliquez sur Import.
+VSCode devrait télécharger 1 ou 2Go qui contiennent le SDK et PlatformIO.
+Une fois installé, il redémarre.
+
+Pour compiler, sélectionner le logo Pico dans la barre de gauche, puis Project -> Compile Project.
+Il vous demandera quel binaire compiler, choisissez `test_noise_gen`.
+
+Pour flasher, commencer par booter le badge en mode flash :
+tenir le bouton BOOTLOAD du badge enfoncer et brancher le badge en USB.
+Au bout d'une ou deux secondes, on peut lâcher le bouton (un "stockage de masse" a dû apparaître dans les périphériques).
+
+Pour flasher, sélectionner Project -> Run Project.
+
+Pour changer d'exécutable à compiler/flasher, cliquez sur l'icone CMake Tools dans la barre de gauche,
+puis Project Status -> Launch -> test_noise_gen [cliquez sur le crayon], puis choisissez un autre exécutable dans le menu qui s'affiche en haut.
+
+
+### Installation via pico_setup
 
 ```bash
 cd ~/Downloads
@@ -67,9 +104,18 @@ chmod +x pico_setup.sh
 export PICO_SDK_PATH="$PWD/pico/pico-sdk"
 ```
 
-En cas de doutes, problèmes, questions supplémentaires, la [doc en ligne](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) apporte des liens supplémentaires.
+En cas de doutes, problèmes, questions supplémentaires,
+la [doc en ligne](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) apporte des liens supplémentaires.
 
-La documentation du SDK est accessible sous au moins 3 formes :
+
+### Installation via docker
+
+Cette installation utilise une image docker pour la compilation.
+
+
+### Documentation du SDK
+
+Accessible sous au moins 3 formes :
 
 - le [PDF](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) téléchargeable,
   plus pratique pour la présentation des sections,
@@ -118,29 +164,6 @@ picotool reboot
 ```
 
 Sinon, copier directement le fichier `build/*.uf2` vers le "stockage de masse" et débrancher le badge.
-
-
-### VSCode
-
-Dans VSCode, ouvrez le git du projet.
-Il devrait vous demander "*Voulez-vous l'importer en tant que projet Raspberry Pi Pico ?*" auquel il faut répondre Oui.
-
-Sur la page d'import, sélectionner "Enable CMake-Tools extension integration",
-puis cliquez sur Import.
-VSCode devrait télécharger 1 ou 2Go qui contiennent le SDK et PlatformIO.
-Une fois installé, il redémarre.
-
-Pour compiler, sélectionner le logo Pico dans la barre de gauche, puis Project -> Compile Project.
-Il vous demandera quel binaire compiler, choisissez `test_noise_gen`.
-
-Pour flasher, commencer par booter le badge en mode flash :
-tenir le bouton BOOTLOAD du badge enfoncer et brancher le badge en USB.
-Au bout d'une ou deux secondes, on peut lâcher le bouton (un "stockage de masse" a dû apparaître dans les périphériques).
-
-Pour flasher, sélectionner Project -> Run Project.
-
-Pour changer d'exécutable à compiler/flasher, cliquez sur l'icone CMake Tools dans la barre de gauche,
-puis Project Status -> Launch -> test_noise_gen [cliquez sur le crayon], puis choisissez un autre exécutable dans le menu qui s'affiche en haut.
 
 
 ## Architecture logicielle
