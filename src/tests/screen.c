@@ -32,6 +32,7 @@
 #include "squares_bw.h"
 #include "text_bw.h"
 #include "grad_4g.h"
+#include "hip_4g.h"
 #include "secsea_4g.h"
 #include "notif_4g.h"
 #include "companion.h"
@@ -78,6 +79,7 @@ void test_show_4g_images(void) {
     _show_4g(text_bw, squares_bw)
     _show_4g(grad_4g_lsb, grad_4g_msb)
     _show_4g(secsea_4g_lsb, secsea_4g_msb)
+    _show_4g(hip_4g_lsb, hip_4g_msb)
 }
 
 
@@ -292,7 +294,7 @@ int main() {
     //test_read_all();
     test_show_bw_images();
     test_show_4g_images();
-    test_subimage();
+    test_subimage();  /* FIXME: we don't handle correctly cases where x%8 != 0 */
     test_enable_once();
 
     /* test_roll is the PoC that shows that we CAN display multiple images per second */
