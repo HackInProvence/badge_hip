@@ -32,7 +32,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // --- Radio ---
 // Radio may need calibration, which you can provide with -DCC1101_fXOSC at cmake time (see src/tests/radio_calibrate.py)
 #ifndef CC1101_fXOSC
-#define CC1101_fXOSC 27000000
+#define CC1101_fXOSC 26998040
 #endif
 
 // --- UART ---

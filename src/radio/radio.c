@@ -159,6 +159,7 @@ void radio_set_frequency(uint32_t freq_hz) {
         (setting >> 8) & 0xFF,  /* FREQ1 */
          setting & 0xFF,        /* FREQ0 */
     };
+    log_info("radio: closest frequency = %lldHz", (setting*CC1101_fXOSC)>>16);
     ccsend(cmd, NULL, 4);
 }
 
@@ -250,7 +251,12 @@ const uint8_t radio_preset_gfsk[] = {
     //CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
     //CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
     CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
+    CC1101_MDMCFG1, 0x22, /* 4 preamble bytes by default */
+#if CC1101_fXOSC < 26500000
     CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz */
+#else
+    CC1101_DEVIATN, 0x34, /* Deviation; 0x34 gives 19.78kHz; but 0x33 gives 18.13 which is worse? */
+#endif
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
     CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */

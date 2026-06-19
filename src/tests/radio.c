@@ -380,7 +380,7 @@ int main() {
 
     log_cc_status();
 
-    //tx_pulses();
+    tx_pulses();
     ////rx_times();
 
     ///* We need a reset between changing modes, otherwise some of the conf makes it never go out of calibrating */
@@ -389,27 +389,27 @@ int main() {
     //ccsend(cmd, NULL, 1);
     //radio_wait_state(CC1101_STATE_IDLE, false);
 
-    //tx_chat_flipper("Badge SecSea joined chat.\n");
-    //sleep_ms(3000);
-    ////tx_chat_flipper("Badge SecSea: Hey, how are you?\n");
-    ////sleep_ms(2000);
-    ////tx_chat_flipper("Badge SecSea: Ouais ?\n");
-    ////sleep_ms(2000);
-    ////tx_chat_flipper("Badge SecSea: pas tres locace dis donc...\n");
-    ////sleep_ms(2000);
-    ////tx_chat_flipper("Badge SecSea: ...\n");
-    ////sleep_ms(2000);
-    ////tx_chat_flipper("Badge SecSea: Never\n");
-    ////sleep_ms(300);
-    ////tx_chat_flipper("Badge SecSea: gonna\n");
-    ////sleep_ms(300);
-    ////tx_chat_flipper("Badge SecSea: let\n");
-    ////sleep_ms(500);
-    ////tx_chat_flipper("Badge SecSea: you\n");
-    ////sleep_ms(500);
-    ////tx_chat_flipper("Badge SecSea: doooown!\n");
-    ////sleep_ms(3000);
-    ////tx_chat_flipper("Badge SecSea left chat.\n");
+    tx_chat_flipper("Badge SecSea joined chat.\n");
+    sleep_ms(3000);
+    tx_chat_flipper("Badge SecSea: Hey, how are you?\n");
+    sleep_ms(2000);
+    tx_chat_flipper("Badge SecSea: Ouais ?\n");
+    sleep_ms(2000);
+    tx_chat_flipper("Badge SecSea: pas tres locace dis donc...\n");
+    sleep_ms(2000);
+    tx_chat_flipper("Badge SecSea: ...\n");
+    sleep_ms(2000);
+    tx_chat_flipper("Badge SecSea: Never\n");
+    sleep_ms(300);
+    tx_chat_flipper("Badge SecSea: gonna\n");
+    sleep_ms(300);
+    tx_chat_flipper("Badge SecSea: let\n");
+    sleep_ms(500);
+    tx_chat_flipper("Badge SecSea: you\n");
+    sleep_ms(500);
+    tx_chat_flipper("Badge SecSea: doooown!\n");
+    sleep_ms(3000);
+    tx_chat_flipper("Badge SecSea left chat.\n");
 
     rx_fsk_printf();
     //rx_fsk_raw_printf();

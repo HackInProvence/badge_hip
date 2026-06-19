@@ -39,6 +39,13 @@ Conclusions:
   waiting (> 10s ?), then connecting with UART (once connected, even if disconnected, the value drifts) -> 29_997_640 Hz
 - the python value oscillates because it depends on the serial module,
   but it is a mean over the whole time the script runs, so it should stabilize -> 29_997_100 Hz
+
+New elements:
+- this is still not a very good calibration, needs more work,
+- the actual frequency is even higher than the one given by the pico,
+- beware when calibrating with something like an HackRF,
+  the higher the fXOSC, the lower the final frequency,
+  because of how the frequency register works, so don't overshoot.
 """
 
 import time
