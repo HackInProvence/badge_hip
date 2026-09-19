@@ -187,6 +187,30 @@ pico_enable_stdio_usb(test_log 1)
 pico_enable_stdio_uart(test_log 0)
 
 
+# Test proto
+
+add_executable(test_proto_badge)
+target_sources(test_proto_badge PRIVATE proto.c)
+pico_add_extra_outputs(test_proto_badge)
+
+target_link_libraries(test_proto_badge PRIVATE
+    badge
+    pico_stdlib
+    log
+    badge_tests
+    badge_images
+    btns
+    hardware_gpio
+    hardware_spi
+    noise_gen
+    screen
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_proto_badge 1)
+pico_enable_stdio_uart(test_proto_badge 0)
+
+
 ## Test template
 #
 #add_executable(test_template)

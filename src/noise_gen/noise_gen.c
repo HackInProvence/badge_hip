@@ -57,8 +57,8 @@ void noise_gen_cicada() {
         else {
             pio_sm_put(pio, sm, CICA_WORD(
                 CICA_SILENCE(15),
-                CICA_SILENCE(15),
-                CICA_SILENCE(15),
+                CICA_SILENCE(0),
+                CICA_SILENCE(0),
                 CICA_SILENCE(0)
             ));
 
