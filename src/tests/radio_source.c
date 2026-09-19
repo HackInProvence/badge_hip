@@ -540,7 +540,13 @@ int main() {
 
         /* Compute color, we have priorities: radio first, then USB, then waiting (keep alive) */
         if (st_raso == RADIO_RECEIVING) {  /* FIXME: inverse all tests to avoid lhs wrongly set */
-            /* If receiving with known RSSI: fixed red to green */
+            /* If receiving with known RSSI: fixed red to green
+             * If receiving but rssi unknown (waiting for SYNC): fixed white
+             * -> we don't know here with global var rssi whether we are synched,
+             *    because it is set in read_rx_fifo which is called *after* a packet received.
+             *    So we use an intermediate (maybe) inaccurate value */
+            int16_t rssi = (int8_t)ccread_status_reg(CC1101_RSSI) - 74;
+            //log_info("RSSI %+ 3ddBm", rssi);  /* Varies a lot */
             if (rssi > INT16_MIN) {
                 float f = rssi;
                 f = (f + 80.f)/90.f;  /* -80 = RED, +10 = GREEN */
@@ -548,9 +554,8 @@ int main() {
                 uint8_t r = clamp2byte(cosf(f*M_PI/2.f));
                 uint8_t g = clamp2byte(cosf((f-1)*M_PI/2.f));
                 led.color = LED_RGB(r,g,0);
-            /* If receiving but rssi unknown (waiting for SYNC): fixed white */
-            } else {
-                led.color = WHITE;
+            //} else {
+            //    led.color = WHITE;
             }
             led.kind = LED_FIXED;
         /* If airing something: pink -> this will also be pink when pushing commands to the radio

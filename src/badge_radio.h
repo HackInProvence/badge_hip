@@ -5,7 +5,7 @@
 
 // -----------------------------------------------------
 // Configures another prototype which will live as a radio emitter based on a Pico or Pico W
-// Should not be included manually but using -DPICO_BOARD=badge_secsea while configuring cmake
+// Should not be included manually but using -DPICO_BOARD=badge_radio while configuring cmake
 // Inspired from pico-sdk/src/boards/include/boards/pico_w.h
 // -----------------------------------------------------
 
