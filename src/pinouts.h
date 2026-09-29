@@ -33,7 +33,9 @@
 #define BADGE_SPI0_CS_A0 18
 #define BADGE_SPI0_CS_A1 19
 //#define BADGE_GPIO20 20
-//#define BADGE_GPIO21 21
+#if defined(BADGE_SECSEA)
+#define BADGE_SD_DETECT 21  /* Micro SD card detect (board V1.1, not connected on V1.0) */
+#endif
 #if defined(BADGE_PROTO) || defined(BADGE_RADIO)
 #define BADGE_RADIO_GDO2 21
 #endif
@@ -51,6 +53,19 @@
 #define BADGE_SPI1_RX_MISO_RADIO_SO 28
 #endif
 #define BADGE_VBAT 29
+
+/* Extension modules (see docs/idees_reseau_extensions_ctf.md), badge seen from the front:
+ * - right port J2: infrared receiver (38kHz, e.g. VS1838B/TSOP38238, active low output) and emitter (IR LED + transistor),
+ * - left port J3: OLED screen SSD1306 128x64 on I2C1 (address 0x3C or 0x3D). */
+#define BADGE_IR_RX 20  /* J2 pin 2 */
+#define BADGE_IR_TX BADGE_I2C0_SCL  /* J2 pin 3 (GPIO17) */
+#define BADGE_OLED_I2C 1
+#define BADGE_OLED_SDA BADGE_I2C1_SDA  /* J3 pin 4 (GPIO2) */
+#define BADGE_OLED_SCL BADGE_I2C1_SCL  /* J3 pin 3 (GPIO3) */
+
+/* SPI0 devices, selected by the 74HC139 decoder: address = A1*2 + A0, enabled by SPI0_CSn low */
+#define BADGE_SPI0_ADDR_SCREEN 0
+#define BADGE_SPI0_ADDR_SD 1  /* Micro SD card (board V1.1) */
 
 /* We need defines that we use in the libraries, but they are unavailable on some platforms
  * TODO: disable the libs for these or better */
