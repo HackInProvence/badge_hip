@@ -31,6 +31,25 @@ typedef enum {
 } state_t;
 STATIC state_t state = STATE_UNINIT;
 STATIC absolute_time_t state_ts = 0;  /* Last time the state changed */
+STATIC bool ram_bypassed = false;  /* DISPLAY_CTRL1 was changed by screen_clear() and must be restored */
+
+/* Copy of the RAM of the screen, in image coordinates (row major, bit 7 = leftmost pixel), for screen_shot() */
+static uint8_t shadow[2][(SCREEN_WIDTH*SCREEN_HEIGHT)/8];  /* B/W (lsb) and RED (msb) RAM */
+static uint8_t win_x0 = 0, win_x1 = SCREEN_WIDTH/8 - 1, win_y0 = 0, win_y1 = SCREEN_HEIGHT - 1;  /* RAM window */
+static const uint8_t *current_ws = NULL;
+static uint32_t shot_counter = 0;
+static screen_shot_kind_t shot_kind = SCREEN_SHOT_WHITE;
+
+/* Mirrors the data pushed in the RAM window. The RAM is filled from (x1, y1) with decreasing X then Y
+ * (see setup()): the RAM address (x, y) is the byte (24 - x, 199 - y) of the image. */
+static void shadow_write(uint8_t *plane, const uint8_t *data, size_t len) {
+    size_t w = win_x1 - win_x0 + 1, k = 0;
+    for (int ram_y = win_y1; ram_y >= win_y0 && k < len; --ram_y) {
+        uint8_t *row = plane + (SCREEN_HEIGHT - 1 - ram_y) * (SCREEN_WIDTH/8);
+        for (size_t c = 0; c < w && k < len; ++c, ++k)
+            row[SCREEN_WIDTH/8 - 1 - (win_x1 - c)] = data[k];
+    }
+}
 
 
 /* Send data on the SPI but don't wait for BUSY to be LOW */
@@ -50,6 +69,15 @@ STATIC void _send(const uint8_t *cmd, size_t len) {
  * so you have to copy-paste it to use it in tests... */
 #define UINT8_LIT(...) (uint8_t[]){__VA_ARGS__}
 #define send(...) _send(UINT8_LIT(__VA_ARGS__), sizeof(UINT8_LIT(__VA_ARGS__))/sizeof(uint8_t))
+
+
+/* Stop bypassing the RAM if the previous refresh was a screen_clear(), otherwise all next draws are uniform */
+static void restore_ram_bypass(void) {
+    if (ram_bypassed) {
+        send(SSD1681_DISPLAY_CTRL1, 0x00);
+        ram_bypassed = false;
+    }
+}
 
 
 void screen_init(void) {
@@ -220,9 +248,13 @@ void screen_clear(bool bit) {
     // CC,EE -> black
     // DD,FF -> white
     send(SSD1681_DISPLAY_CTRL1, 0x44 | (bit ? 0x11 : 0x00));
+    ram_bypassed = false;  /* Don't let screen_show_rams() undo what we just configured */
 
-    /* Do start drawing */
+    /* Do start drawing (the bypass must stay active until the refresh is done,
+     * it is restored before the next draw) */
     screen_show_rams();
+    ram_bypassed = true;
+    shot_kind = bit ? SCREEN_SHOT_WHITE : SCREEN_SHOT_BLACK;
 }
 
 
@@ -256,11 +288,21 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
     }
 
     /* Bind values to [0..200] */
-    /* x1,y1 includethe last line/column, but the screen commands excludes them */
-    x0 = x0 >= 200 ? 25 : x0/8;
-    x1 = x1 >= 200 ? 24 : (x1%8 == 0 ? x1/8-1 : x1/8-1); /* FIXME: this is the same value in both cases */
-    y0 = y0 >= 200 ? 200 : y0;
-    y1 = y1 >= 200 ? 199 : y1-1;
+    /* x1,y1 exclude the last line/column (x1 = x0+width), but the screen commands include them.
+     * The RAM is addressed by bytes of 8 pixels on X: a partially covered byte must be kept in the window. */
+    x0 = x0 >= 200 ? 24 : x0/8;
+    x1 = x1 >= 200 ? 24 : (x1 == 0 ? 0 : (x1-1)/8);
+    y0 = y0 >= 200 ? 199 : y0;
+    y1 = y1 >= 200 ? 199 : (y1 == 0 ? 0 : y1-1);
+    if (x1 < x0)
+        x1 = x0;
+    if (y1 < y0)
+        y1 = y0;
+
+    win_x0 = x0;
+    win_x1 = x1;
+    win_y0 = y0;
+    win_y1 = y1;
 
     send(SSD1681_RAM_XRANGE, x1, x0);  /* Set RAM-X start/end (*8) -> 0x18=24, (24+1)*8 = 200 */
     send(SSD1681_RAM_YRANGE, y1, 0, y0, 0);  /* Set RAM-Y start/end -> 0xC7=199, 199+1 = 200 */
@@ -316,6 +358,7 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
         spi_write_blocking(spi0, "\x24", 1);  /* B/W RAM */
         gpio_put(BADGE_SCREEN_DC, 1);
         spi_write_blocking(spi0, lsb, len);
+        shadow_write(shadow[0], lsb, len);
     }
 
     if(msb) {
@@ -323,6 +366,7 @@ void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len) {
         spi_write_blocking(spi0, "\x26", 1);  /* RED RAM */
         gpio_put(BADGE_SCREEN_DC, 1);
         spi_write_blocking(spi0, msb, len);
+        shadow_write(shadow[1], msb, len);
     }
 }
 
@@ -340,12 +384,16 @@ void screen_show_rams(void) {
         state = STATE_READY;
     }
 
+    restore_ram_bypass();
+
     /* Configure then Activate */
     /* 0xC7 seems the normal mode for our target */
     /* 0xF7 (load temperature) on the b version (Red) */
     /* 0xCF for the partial image (display mode 2) */
     send(SSD1681_DISPLAY_CTRL2, 0xC7);
     send(SSD1681_ACTIVATE);
+    shot_kind = current_ws == screen_ws_1681_4grays ? SCREEN_SHOT_4G : SCREEN_SHOT_BW;
+    ++shot_counter;
 }
 
 
@@ -354,6 +402,8 @@ void screen_push_ws(const uint8_t *luts) {
         log_warning("screen_push_ws() called but screen is busy");
         return;
     }
+
+    current_ws = luts;
 
     /* First 153 are the LUT + similar parameters */
     gpio_put(BADGE_SCREEN_DC, 0);  /* Low for commands, high for data */
@@ -439,6 +489,7 @@ void screen_start_multiframe(void) {
                     " for example already started a multiframe (now is %d instead of %d)", state, STATE_READY);
     }
 
+    restore_ram_bypass();
     send(SSD1681_DISPLAY_CTRL2, 0xC0);
     send(SSD1681_ACTIVATE);
     state = STATE_MULTIFRAME;
@@ -456,6 +507,20 @@ void screen_draw_multiframe(void) {
 
     send(SSD1681_DISPLAY_CTRL2, 0x04);
     send(SSD1681_ACTIVATE);
+    shot_kind = SCREEN_SHOT_BW;  /* The multiframe waveforms show the new image (lsb) */
+    ++shot_counter;
+}
+
+
+uint32_t screen_shot_counter(void) {
+    return shot_counter;
+}
+
+
+screen_shot_kind_t screen_shot(const uint8_t **lsb, const uint8_t **msb) {
+    *lsb = shadow[0];
+    *msb = shadow[1];
+    return shot_kind;
 }
 
 void screen_end_multiframe(void) {

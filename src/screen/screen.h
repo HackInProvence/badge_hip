@@ -33,7 +33,7 @@
  * - now you can push an image:
  *   - set the image position with screen_set_image_position(),
  *   - use one of the screen_show_image_* functions,
- *   - or manually screen_set_ws() to load some waveform settings to choose your color mode and refresh style
+ *   - or manually screen_push_ws() to load some waveform settings to choose your color mode and refresh style
  *     (black and white, or 4 grays, partial/full refresh, ...),
  *     then screen_push_rams() to load the image in the RAM banks,
  *     then screen_show_rams() to actually show your image,
@@ -62,6 +62,12 @@
 
 #ifndef _SCREEN_H
 #define _SCREEN_H
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include "badge_defs.h"
 
 #define SCREEN_HEIGHT 200
 #define SCREEN_WIDTH 200
@@ -139,7 +145,7 @@ void screen_show_image_bw(const uint8_t *img);
  * They form a color between 00 for black to 11 for white.
  *
  * \param lsb   The image LSB plane, which must be of size 5000 (=200*(200/8))
- * \param lsb   The image MSB plane, which must be of size 5000 */
+ * \param msb   The image MSB plane, which must be of size 5000 */
 void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
 
 /** \brief Set the screen position of the next image
@@ -147,10 +153,11 @@ void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
  * The screen must not be busy.
  *
  * The (0,0) origin is in the lower right angle.
- * The X coordinates can only be controlled by increments of 8 (0*8 to 25*8=200).
+ * The X coordinates can only be controlled by increments of 8 (0*8 to 25*8=200):
+ * x0 is rounded down and x1 is rounded up to a multiple of 8.
  * The Y coordinates are in [0..200].
  *
- * The x1 and y1 coordinate include the last line/column (x1 = x0+image_width).
+ * The x1 and y1 coordinates exclude the last line/column (x1 = x0+image_width, y1 = y0+image_height).
  *
  * To show the fullscreen, use the macro screen_clear_image_position().
  * Remember that pushing a partial image does not overwrite the RAM outside of the selected window,
@@ -159,8 +166,8 @@ void screen_show_image_4g(const uint8_t *lsb, const uint8_t *msb);
  * There may be a bug/feature when you push too much data to the window,
  * it will leak on lines with y < y0.
  *
- * \return The number of bytes of the bitplane to push (image size = (y1-y0)*((x1-x0)//8))
- * \return SIZE_T_MAX when the screen is busy */
+ * \return The number of bytes of the bitplane to push (image size = (y1-y0)*ceil((x1-x0)/8))
+ * \return SIZE_MAX when the screen is busy */
 size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
 #define screen_clear_image_position() screen_set_image_position(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -180,7 +187,6 @@ size_t screen_set_image_position(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
  * \param lsb       The least significant bitplane of the image (or NULL).
  * \param msb       The most significant bitplane of the image (or NULL).
  * \param len       The length of both planes, in bytes (<= 5000).
- * \param push_lut  Push factory waveform settings beforehand (leave it true).
  */
 void screen_push_rams(const uint8_t *lsb, const uint8_t *msb, size_t len);
 
@@ -328,6 +334,22 @@ typedef enum {
     SSD1681_RAM_YSTART = 0x4F,
     SSD1681_NOP = 0x7F,
 } screen_register_t;
+
+
+/** What the screen shows, see screen_shot() */
+typedef enum {
+    SCREEN_SHOT_BW,  /* Black and white: the lsb plane (1 = white) */
+    SCREEN_SHOT_4G,  /* 4 grays: msb*2 + lsb, 0 = black, 3 = white */
+    SCREEN_SHOT_WHITE,  /* Cleared (screen_clear()) */
+    SCREEN_SHOT_BLACK,
+} screen_shot_kind_t;
+
+/** rief Incremented each time the screen draws something (to know when screen_shot() changed). */
+uint32_t screen_shot_counter(void);
+
+/** rief What the screen shows: a copy of its RAM (as written by screen_push_rams(), in image coordinates)
+ * and how it was drawn. The planes are SCREEN_WIDTH*SCREEN_HEIGHT/8 bytes, same format as the images of image2epaper.py. */
+screen_shot_kind_t screen_shot(const uint8_t **lsb, const uint8_t **msb);
 
 
 /** Internal util made accessible to tests, see also the send(...) macro */
