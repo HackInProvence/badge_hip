@@ -45,6 +45,11 @@ int main(void) {
     CHECK(e > 0);
     CHECK(e_acute > 0);
     CHECK_EQ(gfx_text_width(&gfx_font_small, "\xe6\xbc\xa2"), question);  /* A CJK character */
+    /* Accented letters missing in the font are drawn without their accent */
+    CHECK_EQ(gfx_text_width(&gfx_font_small, "\xc5\xb7"), gfx_text_width(&gfx_font_small, "y"));  /* U+0177 */
+    CHECK_EQ(gfx_text_width(&gfx_font_small, "\xc5\x92"), gfx_text_width(&gfx_font_small, "O"));  /* U+0152 */
+    CHECK_EQ(gfx_text_width(&gfx_font_small, "\xc5\xa6"), gfx_text_width(&gfx_font_small, "T"));  /* U+0166 */
+    CHECK_EQ(gfx_text_width(&gfx_font_small, "\xc5\xbf"), gfx_text_width(&gfx_font_small, "s"));  /* U+017F, last */
     CHECK(gfx_text_width(&gfx_font_small, "Badge SecSea") < gfx_text_width(&gfx_font_large, "Badge SecSea"));
     CHECK_EQ(gfx_text_width(&gfx_font_small, ""), 0);
 

@@ -79,10 +79,19 @@ static uint16_t next_codepoint(const char **s) {
     return cp;
 }
 
+/* Letter without its accent of U+00C0..U+017F (Latin-1 Supplement and Latin Extended-A), for the letters missing
+ * in the fonts (generated with unicodedata: first letter of the NFD decomposition) */
+static const char UNACCENTED[] =
+    "AAAAAAACEEEEIIIIDNOOOOOxOUUUUYTsaaaaaaaceeeeiiiidnooooo/ouuuuytyAaAaAaCcCcCcCcDdDdEeEeEeEeEeGgGgGgGgHhHhIiIiIiIiIiIiJjKkk"
+    "LlLlLlLlLlNnNnNnnNnOoOoOoOoRrRrRrSsSsSsSsTtTtTtUuUuUuUuUuUuWwYyYZzZzZzs";
+
 static const gfx_glyph_t *find_glyph(const gfx_font_t *font, uint16_t cp) {
     for (uint16_t i = 0; i < font->n_glyphs; ++i)
         if (font->glyphs[i].codepoint == cp)
             return &font->glyphs[i];
+    /* Accented letter not in the font: the letter without its accent */
+    if (cp >= 0xC0 && cp < 0xC0 + sizeof(UNACCENTED) - 1)
+        return find_glyph(font, (uint8_t)UNACCENTED[cp - 0xC0]);
     /* Unknown character: use '?' */
     return cp == '?' ? NULL : find_glyph(font, '?');
 }
