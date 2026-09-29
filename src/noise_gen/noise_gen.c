@@ -68,10 +68,11 @@ void noise_gen_cicada() {
 }
 
 
-void noise_gen_setup(PIO pio, uint sm, irq_handler_t sound_gen) {
+void noise_gen_setup(PIO pio_setup, uint sm_setup, irq_handler_t sound_gen) {
     int8_t irq_pio;
-    pio = pio;
-    sm = sm;
+    /* The parameters must not shadow the globals, otherwise the globals used by the IRQ are never set */
+    pio = pio_setup;
+    sm = sm_setup;
 
     // Interrupts / IRQs
     // We use the "interrupt when not full" to be sure to feed the PIO with enough data
@@ -137,4 +138,10 @@ void noise_gen_set_enabled(bool enabled) {
     if (enabled)
         pio_gpio_init(pio, BADGE_BUZZER);  /* In case the GPIO was set to PWM for other uses */
     pio_sm_set_enabled(pio, sm, enabled);
+    if (! enabled) {
+        /* The state machine may have stopped with the pin high, which would keep the buzzer powered: drive it low */
+        gpio_init(BADGE_BUZZER);
+        gpio_put(BADGE_BUZZER, 0);
+        gpio_set_dir(BADGE_BUZZER, GPIO_OUT);
+    }
 }
