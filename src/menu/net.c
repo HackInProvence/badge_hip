@@ -157,7 +157,7 @@ static void poll_rx(absolute_time_t now) {
 static void send_next(void) {
     tx_packet_t *t = &queue[queue_head];
     radio_wait_state(CC1101_STATE_IDLE, true);
-    radio_set_power(t->flags & NET_LOUD ? NET_PATABLE_LOUD : NET_PATABLE_QUIET);
+    radio_set_power(t->flags & NET_LOUD ? NET_PATABLE_LOUD : t->flags & NET_MEDIUM ? NET_PATABLE_MEDIUM : NET_PATABLE_QUIET);
     if (radio_tx_packet(t->bytes, t->len)) {
         tx_pending = true;
         tx_ts = get_absolute_time();

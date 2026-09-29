@@ -49,10 +49,12 @@ typedef enum {
 #define NET_QUIET 0x00  /* -20 dBm: only the badges close by (a few meters) */
 #define NET_LOUD 0x01  /* +10 dBm: the whole room */
 #define NET_JITTER 0x02  /* Random delay (up to NET_JITTER_MS) before sending: many badges answer the same packet */
+#define NET_MEDIUM 0x04  /* -10 dBm: a few tens of meters (hot / cold hunt, relayed messages) */
 #define NET_JITTER_MS 300
 
 #define NET_PATABLE_QUIET 0x0E  /* -20 dBm @433MHz */
 #define NET_PATABLE_LOUD 0xC0  /* +10 dBm @433MHz */
+#define NET_PATABLE_MEDIUM 0x34  /* -10 dBm @433MHz */
 
 typedef struct {
     uint8_t type;

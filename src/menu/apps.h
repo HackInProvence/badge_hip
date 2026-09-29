@@ -26,6 +26,10 @@ typedef enum {
     APP_PENDU,
     APP_DECODER,
     APP_WEATHER,
+    APP_TALK,
+    APP_HOTCOLD,
+    APP_HOTCOLD_MASTER,
+    APP_RADAR,
     APP_COUNT,
 } app_id_t;
 

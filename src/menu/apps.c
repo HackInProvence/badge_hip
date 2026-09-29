@@ -8,6 +8,7 @@
 extern const app_t app_lamp, app_nametag, app_admin_commands, app_admin_type;
 extern const app_t app_mines, app_2048, app_taquin, app_sokoban, app_mastermind, app_pendu;
 extern const app_t app_decoder, app_weather;
+extern const app_t app_talk, app_hotcold, app_hotcold_master, app_radar;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
@@ -22,4 +23,8 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_PENDU] = &app_pendu,
     [APP_DECODER] = &app_decoder,
     [APP_WEATHER] = &app_weather,
+    [APP_TALK] = &app_talk,
+    [APP_HOTCOLD] = &app_hotcold,
+    [APP_HOTCOLD_MASTER] = &app_hotcold_master,
+    [APP_RADAR] = &app_radar,
 };

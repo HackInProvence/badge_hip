@@ -6,7 +6,9 @@ target_sources(badge_menu PRIVATE
     admin.c
     apps.c
     lamp.c
+    hotcold.c
     nametag.c
+    talk.c
     remote.c
     ui.c
     net.c

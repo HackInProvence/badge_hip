@@ -32,7 +32,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433', 'social']
 
 
 class Tester:
@@ -365,6 +365,33 @@ def test_ir(t):
              f'{m.group(1)} us (~67500 expected)' if m else 'no answer')
 
 
+def test_social(t):
+    """Social theme: radar, hot / cold; talk badge (Badge theme) with its states."""
+    if not open_theme(t, 'Social'):
+        return t.result('social', False, 'theme "Social" not shown')
+    ok = t.press('xb', 'Radar des cigales')
+    t.screenshot('radar')
+    t.result('social: radar', ok and t.press('a', 'Social'))
+    ok = t.press('xb', 'Chaud - froid')
+    t.pump(2)
+    t.screenshot('hotcold')
+    t.result('social: hot / cold', ok and t.press('a', 'Social'))
+    t.keys('yy')
+    close_theme(t, 'Social')
+    if not open_theme(t, 'Badge'):
+        return t.result('talk', False, 'theme "Badge" not shown')
+    ok = t.press('xxb', 'Badge de talk')
+    t.mark()
+    t.keys('xxxx')  # Green, orange, red, angry
+    states = [m for m in (t.expect(r'^talk: (\S.*)$', 2) for _ in range(4)) if m]
+    t.screenshot('talk_angry', 1.0)
+    t.keys('x')  # Off
+    t.result('talk: states', ok and len(states) == 4 and t.press('a', 'Badge'),
+             ', '.join(m.group(1) for m in states))
+    t.keys('yy')
+    close_theme(t, 'Badge')
+
+
 def test_apps(t):
     """The applications of the Badge theme: name tag and lamp."""
     if not open_theme(t, 'Badge'):
@@ -467,7 +494,7 @@ def test_images(t):
 
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
-         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433}
+         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433, 'social': test_social}
 
 
 def main():

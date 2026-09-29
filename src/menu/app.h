@@ -46,6 +46,7 @@ typedef struct {
     bool (*calm)(void);  /* Optional: false while the page changes often (no slow full refresh then) */
     void (*stop)(void);  /* Optional: when leaving (LEDs, sound...) */
     bool no_saver;  /* The screensaver must not start (the page shows something alive) */
+    bool owns_leds;  /* The application drives the LEDs itself, even in mute mode (talk badge) */
 } app_t;
 
 /** \brief Opens an application (from a service: e.g. a message received shows the program), implemented in main.c. */

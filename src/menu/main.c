@@ -546,11 +546,11 @@ static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
     {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
-    {"Social", 1, {M_SOCIAL}},
+    {"Social", 3, {M_SOCIAL, M_APP(APP_RADAR), M_APP(APP_HOTCOLD)}},
     {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
-    {"Badge", 6, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
+    {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
-    {"Admin", 3, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
+    {"Admin", 4, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_HOTCOLD_MASTER), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
@@ -2070,7 +2070,8 @@ int main() {
         static bool was_muted = false;
         if (remote_muted() != was_muted) {
             was_muted = remote_muted();
-            set_leds(led_mode);
+            if (! (app == A_APP && cur_app->owns_leds))
+                set_leds(led_mode);
             set_sound(sound_on);
             redraw = true;
         }
