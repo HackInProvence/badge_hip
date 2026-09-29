@@ -8,6 +8,7 @@
 
 #include "games.h"
 #include "gfx.h"
+#include "score_code.h"
 
 #define TITLE_H 28
 #define FOOTER_Y 180
@@ -18,6 +19,9 @@ static game_t game = GAME_TICTACTOE;
 static bool changed = false;  /* The screen must be redrawn */
 
 static const char *NAMES[GAME_COUNT] = {"Morpion", "Puissance 4", "Simon", "Réflexes", "Snake"};
+static const char *CODES[GAME_COUNT] = {"MORPION", "P4", "SIMON", "REFLEX", "SNAKE"};  /* In the score QR codes */
+static bool qr_shown = false;  /* The page of the signed score (score_code.h) */
+static char qr_text[SCORE_CODE_MAX];
 
 
 /* ------ Common ------ */
@@ -130,8 +134,11 @@ static void thick_line(uint8_t *fb, int x0, int y0, int x1, int y1, int w) {
 }
 
 static const char *result_text(uint8_t result) {
-    return result == 1 ? "Gagné !  D : rejouer" : result == 2 ? "Perdu...  D : rejouer" : "Match nul  D : rejouer";
+    return result == 1 ? "Gagné !" : result == 2 ? "Perdu..." : "Match nul";
 }
+
+/* Footer of the end pages: the buttons in the order of the badge, left wing on the left */
+#define OVER_FOOTER "G : menu  Flanc : QR  D : rejouer"
 
 static void end_sound(uint8_t result) {
     if (result == 1) {
@@ -302,7 +309,10 @@ static void ttt_task(absolute_time_t now) {
 
 static void ttt_render(uint8_t *fb) {
     char title[32];
-    snprintf(title, sizeof(title), "Morpion : %u - %u", ttt_score[0], ttt_score[1]);
+    if (ttt_result)
+        snprintf(title, sizeof(title), "%s %u - %u", result_text(ttt_result), ttt_score[0], ttt_score[1]);
+    else
+        snprintf(title, sizeof(title), "Morpion : %u - %u", ttt_score[0], ttt_score[1]);
     draw_title(fb, title);
     for (int i = 1; i < 3; ++i) {
         gfx_fill_rect(fb, TTT_X0 + i*TTT_CELL - 1, TTT_Y0, 3, 3*TTT_CELL, GFX_BLACK);
@@ -324,7 +334,7 @@ static void ttt_render(uint8_t *fb) {
         thick_line(fb, TTT_X0 + (l[0] % 3)*TTT_CELL + TTT_CELL/2, TTT_Y0 + (l[0] / 3)*TTT_CELL + TTT_CELL/2,
                    TTT_X0 + (l[2] % 3)*TTT_CELL + TTT_CELL/2, TTT_Y0 + (l[2] / 3)*TTT_CELL + TTT_CELL/2, 6);
     }
-    draw_footer(fb, ttt_result ? result_text(ttt_result) : ttt_badge_turn ? "La cigale réfléchit..." : "Flancs : case  D : jouer");
+    draw_footer(fb, ttt_result ? OVER_FOOTER : ttt_badge_turn ? "La cigale réfléchit..." : "Flancs : case  D : jouer");
 }
 
 
@@ -529,7 +539,10 @@ static void c4_task(absolute_time_t now) {
 
 static void c4_render(uint8_t *fb) {
     char title[32];
-    snprintf(title, sizeof(title), "Puissance 4 : %u - %u", c4_score[0], c4_score[1]);
+    if (c4_result)
+        snprintf(title, sizeof(title), "%s %u - %u", result_text(c4_result), c4_score[0], c4_score[1]);
+    else
+        snprintf(title, sizeof(title), "Puissance 4 : %u - %u", c4_score[0], c4_score[1]);
     draw_title(fb, title);
     frame(fb, C4_X0 - 2, C4_Y0 - 2, C4_COLS*C4_CELL + 4, C4_ROWS*C4_CELL + 4, 2, GFX_BLACK);
     for (int c = 1; c < C4_COLS; ++c)
@@ -554,7 +567,7 @@ static void c4_render(uint8_t *fb) {
         for (int i = 0; i < 7; ++i)
             gfx_fill_rect(fb, cx - 6 + i, 31 + i, 13 - 2*i, 1, GFX_BLACK);
     }
-    draw_footer(fb, c4_result ? result_text(c4_result) : c4_badge_turn ? "La cigale réfléchit..." : "Flancs : colonne  D : jouer");
+    draw_footer(fb, c4_result ? OVER_FOOTER : c4_badge_turn ? "La cigale réfléchit..." : "Flancs : colonne  D : jouer");
 }
 
 
@@ -573,9 +586,9 @@ static bool simon_showing = false;  /* The lit pad is from the sequence (not the
 static absolute_time_t simon_ts = 0, simon_lit_ts = 0;
 static bool simon_new_record = false;
 
-/* Pads as on the badge seen from the front: wings at the top, flanks at the bottom */
-static const char *SIMON_LABELS[4] = {"Aile G", "Aile D", "Flanc G", "Flanc D"};
-static const uint8_t SIMON_BUTTONS[4] = {GAMES_BTN_A, GAMES_BTN_B, GAMES_BTN_Y, GAMES_BTN_X};
+/* Pads where the buttons are on the badge seen from the front: flanks at the top, wings at the bottom */
+static const char *SIMON_LABELS[4] = {"Flanc G", "Flanc D", "Aile G", "Aile D"};
+static const uint8_t SIMON_BUTTONS[4] = {GAMES_BTN_Y, GAMES_BTN_X, GAMES_BTN_A, GAMES_BTN_B};
 static const uint16_t SIMON_HZ[4] = {659, 880, 1109, 1319};  /* E A C# E, like the original */
 static const uint8_t SIMON_RGB[4][3] = {{0, 255, 0}, {255, 0, 0}, {255, 160, 0}, {0, 64, 255}};
 
@@ -725,7 +738,7 @@ static void simon_render(uint8_t *fb) {
         snprintf(text, sizeof(text), "A vous ! %d / %d", simon_pos, simon_len);
         draw_footer(fb, text);
     } else
-        draw_footer(fb, "D : rejouer  G : quitter");
+        draw_footer(fb, OVER_FOOTER);
 }
 
 
@@ -756,8 +769,11 @@ static bool reflex_buttons(uint8_t pressed, absolute_time_t now) {
     if (! tap)
         return true;
     switch (reflex_phase) {
-    case REFLEX_READY:
     case REFLEX_DONE:
+        if (! (tap & GAMES_BTN_B))
+            break;
+        /* fall through */
+    case REFLEX_READY:
         reflex_round = 0;
         reflex_new_record = false;
         reflex_wait(now);
@@ -845,7 +861,7 @@ static void reflex_render(uint8_t *fb) {
         draw_lines(fb, 40, &gfx_font_small, "Quand les LEDs s'allument\nen vert, appuyez vite\nsur l'aile droite\nou sur un flanc.\n5 essais, la moyenne compte.",
                    GFX_BLACK);
         draw_lines(fb, 154, &gfx_font_small, text + 64, GFX_BLACK);
-        footer = "D : commencer  G : quitter";
+        footer = "G : quitter  D : commencer";
         break;
     case REFLEX_WAIT:
         draw_lines(fb, 85, &gfx_font_large, "Attendez...", GFX_BLACK);
@@ -871,7 +887,7 @@ static void reflex_render(uint8_t *fb) {
         for (int i = 0; i < REFLEX_ROUNDS; ++i)
             n += snprintf(p + n, sizeof(text) - n, "%s%u", i ? "  " : "", reflex_times[i]);
         draw_lines(fb, 120, &gfx_font_small, text, GFX_BLACK);
-        footer = "D : rejouer  G : quitter";
+        footer = OVER_FOOTER;
         break;
     }
     }
@@ -1045,7 +1061,7 @@ static void snake_render(uint8_t *fb) {
     draw_footer(fb, snake_phase == SNAKE_READY ? "D : partir  Flancs : tourner"
                   : snake_phase == SNAKE_RUN ? "Flancs : tourner  D : pause"
                   : snake_phase == SNAKE_PAUSE ? "Pause  D : reprendre"
-                  : "D : rejouer  G : quitter");
+                  : OVER_FOOTER);
 }
 
 
@@ -1073,8 +1089,48 @@ void games_record_text(game_t g, char *buf, int len) {
         snprintf(buf, len, g == GAME_REFLEX ? "Record : %u ms" : "Record : %u", records[g]);
 }
 
+/* The game is finished: its score can be shown as a QR code */
+static bool game_over(void) {
+    switch (game) {
+    case GAME_TICTACTOE: return ttt_result != 0;
+    case GAME_CONNECT4: return c4_result != 0;
+    case GAME_SIMON: return simon_phase == SIMON_OVER;
+    case GAME_REFLEX: return reflex_phase == REFLEX_DONE;
+    case GAME_SNAKE: return snake_phase == SNAKE_OVER;
+    default: return false;
+    }
+}
+
+static void make_qr_text(void) {
+    char score[16];
+    switch (game) {
+    case GAME_TICTACTOE: snprintf(score, sizeof(score), "%u-%u-%u", ttt_score[0], ttt_score[1], ttt_score[2]); break;
+    case GAME_CONNECT4: snprintf(score, sizeof(score), "%u-%u-%u", c4_score[0], c4_score[1], c4_score[2]); break;
+    case GAME_SIMON: snprintf(score, sizeof(score), "%d", simon_len - 1); break;
+    case GAME_REFLEX: snprintf(score, sizeof(score), "%ums", reflex_average); break;
+    default: snprintf(score, sizeof(score), "%u", snake_score); break;
+    }
+    score_code_text(qr_text, sizeof(qr_text), CODES[game], score, hooks->badge_id ? hooks->badge_id() : 0,
+                    hooks->player_name ? hooks->player_name() : "?");
+    printf("game: score code %s\n", qr_text);
+}
+
+static void qr_render(uint8_t *fb) {
+    int y = 6;
+    /* 4 pixels per module when it fits above the text, 3 otherwise */
+    int size = score_code_draw(NULL, qr_text, 0, 1);
+    int scale = size * 4 <= 134 ? 4 : 3;
+    y += score_code_draw(fb, qr_text, y, scale) + 6;
+    char line[48];
+    const char *name = hooks->player_name ? hooks->player_name() : "";
+    snprintf(line, sizeof(line), "%s - %s", NAMES[game], name);
+    gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, line, GFX_BLACK, GFX_ALIGN_CENTER);
+    draw_footer(fb, "Score signé  Bouton : retour");
+}
+
 void games_start(game_t g, absolute_time_t now) {
     game = g;
+    qr_shown = false;
     switch (g) {
     case GAME_TICTACTOE:
         memset(ttt_score, 0, sizeof(ttt_score));
@@ -1106,6 +1162,17 @@ void games_start(game_t g, absolute_time_t now) {
 bool games_buttons(uint8_t pressed, absolute_time_t now) {
     if (! pressed)
         return true;
+    if (qr_shown) {  /* Any button closes the QR code */
+        qr_shown = false;
+        changed = true;
+        return true;
+    }
+    if (game_over() && (pressed & (GAMES_BTN_X | GAMES_BTN_Y))) {
+        make_qr_text();
+        qr_shown = true;
+        changed = true;
+        return true;
+    }
     bool stay;
     if (game == GAME_SIMON)
         stay = simon_buttons(pressed, now);  /* The left wing is also a pad */
@@ -1143,6 +1210,10 @@ bool games_task(absolute_time_t now) {
 
 void games_render(uint8_t *fb) {
     gfx_clear(fb, GFX_WHITE);
+    if (qr_shown) {
+        qr_render(fb);
+        return;
+    }
     switch (game) {
     case GAME_TICTACTOE: ttt_render(fb); break;
     case GAME_CONNECT4: c4_render(fb); break;

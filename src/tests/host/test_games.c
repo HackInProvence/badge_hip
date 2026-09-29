@@ -21,7 +21,9 @@ static uint8_t led_g = 0;
 static void fake_tone(uint16_t hz, uint16_t ms) { (void)ms; tones += hz != 0; }
 static void fake_leds(uint8_t r, uint8_t g, uint8_t b) { (void)r; (void)b; led_g = g; }
 static void fake_saved(void) { ++saves; }
-static const games_hooks_t HOOKS = {fake_tone, fake_leds, fake_random, fake_saved};
+static const char *fake_name(void) { return "Cig 33EC"; }
+static uint32_t fake_id(void) { return 0x1A2B3C4D; }
+static const games_hooks_t HOOKS = {fake_tone, fake_leds, fake_random, fake_saved, fake_name, fake_id};
 static uint16_t recs[GAME_COUNT] = {GAMES_NO_RECORD, GAMES_NO_RECORD, 0xFFFF, 0, 0xFFFF};
 
 /* Runs the game for ms milliseconds, 1 ms per call like a busy main loop */
@@ -147,22 +149,31 @@ int main(void) {
     CHECK_EQ(rings, 1);
 
     /* ---- Simon ---- */
-    next_random = 1;  /* Always the pad 1 (right wing) */
+    next_random = 1;  /* Always the pad 1 (right flank, top right like on the badge) */
     games_start(GAME_SIMON, host_time_us);
     CHECK(! games_calm());
     run_ms(1500 + 300 + 600 + 250);
     CHECK_EQ(simon_phase, SIMON_INPUT);
     CHECK_EQ(simon_len, 1);
-    press(GAMES_BTN_B);
+    press(GAMES_BTN_X);
     CHECK_EQ(simon_phase, SIMON_SHOW);
     CHECK_EQ(simon_len, 2);
     run_ms(1000 + 2 * (600 + 200) + 100);
     CHECK_EQ(simon_phase, SIMON_INPUT);
-    press(GAMES_BTN_B);
+    press(GAMES_BTN_X);
     CHECK(games_buttons(GAMES_BTN_A, host_time_us));  /* Wrong pad (the left wing is a pad): game over, not quit */
     CHECK_EQ(simon_phase, SIMON_OVER);
     CHECK_EQ(recs[GAME_SIMON], 1);
     CHECK(games_calm());
+    /* End of the game: a flank shows the signed score, any button closes it */
+    press(GAMES_BTN_Y);
+    CHECK(qr_shown);
+    CHECK(! strncmp(qr_text, "HIP26:SIMON:1:1A2B3C4D:Cig 33EC:", 32));
+    CHECK_EQ(strlen(qr_text), 32 + 16);
+    static uint8_t qr_fb[GFX_FB_SIZE];
+    games_render(qr_fb);
+    CHECK(games_buttons(GAMES_BTN_A, host_time_us));  /* Closes the QR code, doesn't quit */
+    CHECK(! qr_shown);
     CHECK(games_buttons(GAMES_BTN_A, host_time_us) == false);
     /* Too slow */
     games_start(GAME_SIMON, host_time_us);
@@ -189,6 +200,12 @@ int main(void) {
     CHECK_EQ(reflex_phase, REFLEX_DONE);
     CHECK(reflex_average >= 178 && reflex_average <= 182);  /* 200 ms minus the debounce */
     CHECK_EQ(recs[GAME_REFLEX], reflex_average);
+    press(GAMES_BTN_X);
+    CHECK(qr_shown && strstr(qr_text, ":REFLEX:") && strstr(qr_text, "ms:"));
+    press(GAMES_BTN_B);  /* Closes */
+    CHECK_EQ(reflex_phase, REFLEX_DONE);
+    press(GAMES_BTN_B);  /* Restarts */
+    CHECK_EQ(reflex_phase, REFLEX_WAIT);
 
     /* ---- Snake ---- */
     games_start(GAME_SNAKE, host_time_us);

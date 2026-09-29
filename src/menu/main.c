@@ -1314,6 +1314,8 @@ static const games_hooks_t GAME_HOOKS = {
     .leds = game_leds,
     .random = get_rand_32,
     .records_changed = store_changed,
+    .player_name = social_name,
+    .badge_id = social_id,
 };
 
 static void change_volume(int delta) {

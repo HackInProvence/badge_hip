@@ -94,13 +94,20 @@ In every game (except Simon), **the left wing quits the game**.
 |---|---|
 | **Morpion** (tic-tac-toe) | Flanks: choose the square; right wing: play. You are the crosses, the cicada the noughts. You take turns starting. The cicada makes a mistake now and then... |
 | **Puissance 4** (Connect Four) | Flanks: choose the column; right wing: drop the counter. Line up 4 solid counters before the cicada's rings. |
-| **Simon** | Each button is an area of the screen with its own colour and note. Repeat the sequence, which gets longer each round. Here the left wing is part of the game: to quit, wait until the game is over, then press the left wing. |
+| **Simon** | Each button is an area of the screen, placed like the button on the badge (flanks at the top, wings at the bottom), with its own colour and note. Repeat the sequence, which gets longer each round. Here the left wing is part of the game: to quit, wait until the game is over, then press the left wing. |
 | **Réflexes** (Reflexes) | When the LEDs light up green (with a beep), quickly press the right wing or a flank. 5 tries, the average counts. Too early: the try starts over. |
 | **Snake** | Right wing: start / pause. Left flank: turn left; right flank: turn right (relative to the snake's direction). |
 | **Blind test** | Pick a music folder: tracks play in random order, without repeats. Right wing: show the title; right flank: next track; left flank: pause. |
 | **CTF** | A challenge: enter a famous video game code with the 4 buttons to get a "flag". |
 
 High scores for Simon, Réflexes and Snake are kept even after the badge is switched off.
+
+**Score as a QR code**: at the end of a game, press a flank to show a QR code with the game, the score, the name
+of your cicada and a signature: the organizers can scan it for a leaderboard, and a score edited by hand is rejected.
+Any button closes the QR code.
+
+At the bottom of the screen, the buttons are listed in the order they are on the badge: G (left wing) on the left,
+D (right wing) on the right.
 
 
 ### 4.3 Badge

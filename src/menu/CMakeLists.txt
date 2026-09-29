@@ -11,6 +11,7 @@ target_sources(badge_menu PRIVATE
     oled_demo.c
     radio_tools.c
     rsvp.c
+    score_code.c
     screen_demo.c
     social.c
     store.c
@@ -36,6 +37,7 @@ target_link_libraries(badge_menu PRIVATE
     hardware_flash
     hardware_watchdog
     pico_rand
+    qrcode
     radio
     screen
     sd

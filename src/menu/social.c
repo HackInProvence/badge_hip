@@ -85,6 +85,10 @@ bool social_enabled(void) {
 }
 
 
+uint32_t social_id(void) {
+    return my_id;
+}
+
 const char *social_name(void) {
     return store_get()->name;
 }

@@ -92,13 +92,20 @@ Dans tous les jeux (sauf Simon), **l'aile gauche quitte le jeu**.
 |---|---|
 | **Morpion** | Flancs : choisir la case ; aile droite : jouer. Vous avez les croix, la cigale les ronds. Chacun commence à son tour. La cigale se trompe de temps en temps... |
 | **Puissance 4** | Flancs : choisir la colonne ; aile droite : lâcher le pion. Alignez 4 pions pleins avant les anneaux de la cigale. |
-| **Simon** | Chaque bouton est une zone de l'écran avec sa couleur et sa note. Répétez la séquence, qui s'allonge à chaque tour. Ici l'aile gauche est une zone du jeu : pour quitter, attendez la fin de la partie puis aile gauche. |
+| **Simon** | Chaque bouton est une zone de l'écran, à sa place sur le badge (flancs en haut, ailes en bas), avec sa couleur et sa note. Répétez la séquence, qui s'allonge à chaque tour. Ici l'aile gauche est une zone du jeu : pour quitter, attendez la fin de la partie puis aile gauche. |
 | **Réflexes** | Quand les LEDs s'allument en vert (avec un bip), appuyez vite sur l'aile droite ou un flanc. 5 essais, la moyenne compte. Trop tôt : l'essai recommence. |
 | **Snake** | Aile droite : départ / pause. Flanc gauche : tourner à gauche ; flanc droit : tourner à droite (par rapport à la direction du serpent). |
 | **Blind test** | Choisissez un dossier de musiques : les morceaux passent dans un ordre aléatoire, sans répétition. Aile droite : afficher le titre ; flanc droit : morceau suivant ; flanc gauche : pause. |
 | **CTF** | Un défi : entrer un code célèbre des jeux vidéo avec les 4 boutons pour obtenir un « flag ». |
 
 Les records de Simon, Réflexes et Snake sont gardés même après extinction.
+
+**Score en QR code** : à la fin d'une partie, un appui sur un flanc affiche un QR code qui contient le jeu, le score,
+le nom de votre cigale et une signature : les organisateurs peuvent le scanner pour un classement, et un score
+modifié à la main est refusé. N'importe quel bouton referme le QR code.
+
+En bas de l'écran, les boutons sont indiqués dans l'ordre où ils sont sur le badge : G (aile gauche) à gauche,
+D (aile droite) à droite.
 
 
 ### 4.3 Badge

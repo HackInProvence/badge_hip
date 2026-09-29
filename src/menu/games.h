@@ -10,6 +10,7 @@
  * - Simon: repeat the sequence of sounds and lights, one pad per button,
  * - Réflexes: press as soon as the LEDs light up (the screen is too slow for that, the LEDs and the sound are instant),
  * - Snake: the flanks turn left or right.
+ * At the end of a game, the flanks show the score as a signed QR code (score_code.h).
  *
  * The games only draw in a frame buffer (gfx.h): the sound, the LEDs and the random numbers are given by the caller
  * (hooks), so that they can be tested on a PC (tests/host/test_games.c).
@@ -51,6 +52,8 @@ typedef struct {
     void (*leds)(uint8_t r, uint8_t g, uint8_t b);  /* All the LEDs of this color, black = off */
     uint32_t (*random)(void);
     void (*records_changed)(void);  /* To save them */
+    const char *(*player_name)(void);  /* Name of the cicada, in the score QR codes */
+    uint32_t (*badge_id)(void);  /* Id of the badge, in the score QR codes */
 } games_hooks_t;
 
 /** \brief Set the hooks and the records (GAME_COUNT values, kept up to date by the games). */

@@ -50,6 +50,9 @@ bool social_enabled(void);
 void social_task(absolute_time_t now);
 
 const char *social_name(void);
+
+/** \brief Id of this badge in the beacons (hash of its unique id). */
+uint32_t social_id(void);
 uint32_t social_score(void);
 uint16_t social_met_count(void);
 

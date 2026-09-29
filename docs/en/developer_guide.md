@@ -131,6 +131,7 @@ game...), the pages drawn into a frame buffer, and the button actions.
 | `social.c` | cicada network (radio beacons, encounters, score) |
 | `radio_tools.c` | radio message and carrier, crystal measurement |
 | `credits.c` | credits pages |
+| `score_code.c` | signed scores shown as a QR code (§ 6.11) |
 | `battery.c` | battery level (calibration) |
 | `store.c` | settings and scores in flash |
 | `ctf.c`, `oled_demo.c`, `screen_demo.c` | CTF, OLED demos, display demo |
@@ -273,6 +274,22 @@ How it works:
 - `gfx_set_size()` allows drawing for the 128×64 OLED.
 
 
+### 6.11 Signed scores (QR code)
+
+- At the end of a game, `games.c` builds the text `HIP26:<game>:<score>:<badge id>:<name>:<signature>`:
+  - games: `MORPION`, `P4` (wins-losses-draws of the session), `SIMON`, `REFLEX` (average in ms), `SNAKE`;
+  - the id is the one of the network of the cicadas (hash of the RP2040 unique id).
+- The signature is a 64-bit SipHash-2-4 of the text before it, with a 128-bit key
+  ([score_code.c](../../src/menu/score_code.c)). The key is not stored in clear: it is masked by a xorshift stream,
+  rebuilt on the stack for the computation then wiped. Someone reading the firmware can recover it: this protects
+  against hand-made cheating and is a challenge for the curious, not a strong cryptographic secret.
+- The QR code comes from Project Nayuki's [qrcodegen](../../src/qrcode/qrcodegen.h) library (MIT license, no allocation),
+  error correction level M, version 6 at most, 4 pixels per module when it fits.
+- `tools/score_check.py` checks the scanned texts and ranks them (best score of each badge, a QR code scanned twice
+  counts once). The key is given with `--key` or the `BADGE_SCORE_KEY` environment variable;
+  `--make-key` generates a new key and the masked table to paste into `score_code.c`.
+
+
 ## 7. File formats
 
 | Format | Content |
@@ -331,6 +348,7 @@ Pico SDK stand-ins are provided in `tests/host/stubs`: GPIO, recorded SPI, simul
 | `gfx` | frame buffer format, clipping, UTF-8 text, accents, sizes |
 | `ir` | exact NEC decoding, ±20 % tolerance, extended addresses, invalid frames |
 | `games` | tic-tac-toe never loses (every game), Connect 4 wins / blocks, Simon, Reflexes and Snake rules, high scores |
+| `score` | SipHash (reference vectors), score text and signature, QR code drawing |
 | `rsvp` | word splitting, French typography, BOM, Windows-1252, durations, long words, forward / back |
 | `screen` | RAM windows, screen copy, recovery after `screen_clear` |
 | `image2epi`, `video2epaper`, `audio2wav` | output files (headers, sizes, non-empty sound). The last two are skipped without ffmpeg. |
@@ -362,6 +380,7 @@ No badge setting is changed, except with `--ctf`.
 |---|---|
 | `tools/badge_remote.py` | window showing the badge screen enlarged (zoom 2–4), arrows / Enter / Esc = buttons, PNG capture; `--snapshot file.png` for a single capture |
 | `tools/badge_selftest.py` | automated badge test (§ 9.2) |
+| `tools/score_check.py` | checks the score QR codes and ranks them (§ 6.11) |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | video → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sounds → 8-bit 16 kHz WAV (wildcards, folders, `--no-filter`, `--start`, `--duration`) |

@@ -131,6 +131,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `social.c` | réseau des cigales (balises radio, rencontres, score) |
 | `radio_tools.c` | message et porteuse radio, mesure du quartz |
 | `credits.c` | pages des crédits |
+| `score_code.c` | scores signés affichés en QR code (§ 6.11) |
 | `battery.c` | niveau de batterie (calibration) |
 | `store.c` | réglages et scores en flash |
 | `ctf.c`, `oled_demo.c`, `screen_demo.c` | CTF, démos OLED, démo de l'écran |
@@ -273,6 +274,22 @@ Principe :
 - `gfx_set_size()` permet de dessiner pour l'OLED 128×64.
 
 
+### 6.11 Scores signés (QR code)
+
+- À la fin d'une partie, `games.c` construit le texte `HIP26:<jeu>:<score>:<id du badge>:<nom>:<signature>` :
+  - jeux : `MORPION`, `P4` (victoires-défaites-nuls de la session), `SIMON`, `REFLEX` (moyenne en ms), `SNAKE` ;
+  - l'identifiant est celui du réseau des cigales (hash de l'identifiant unique du RP2040).
+- La signature est un SipHash-2-4 sur 64 bits du texte qui la précède, avec une clé de 128 bits
+  ([score_code.c](../../src/menu/score_code.c)). La clé n'est pas écrite en clair : elle est masquée par un flux xorshift,
+  reconstruite sur la pile le temps du calcul puis effacée. Quelqu'un qui lit le firmware peut la retrouver : c'est
+  une protection contre la triche à la main, et un défi pour les curieux, pas un secret cryptographique fort.
+- Le QR code est produit par la bibliothèque [qrcodegen](../../src/qrcode/qrcodegen.h) de Project Nayuki
+  (licence MIT, sans allocation), niveau de correction M, version 6 au plus, 4 pixels par module quand il tient.
+- `tools/score_check.py` vérifie les textes scannés et fait le classement (meilleur score de chaque badge, un QR code
+  scanné deux fois compte une fois). La clé se donne par `--key` ou la variable `BADGE_SCORE_KEY` ;
+  `--make-key` génère une nouvelle clé et la table masquée à recopier dans `score_code.c`.
+
+
 ## 7. Formats de fichiers
 
 | Format | Contenu |
@@ -331,6 +348,7 @@ Des remplaçants du Pico SDK sont fournis dans `tests/host/stubs` : GPIO, SPI en
 | `gfx` | format du frame buffer, découpage, texte UTF-8, accents, tailles |
 | `ir` | décodage NEC exact, tolérance ±20 %, adresses étendues, trames invalides |
 | `games` | le morpion ne perd jamais (toutes les parties), Puissance 4 gagne / bloque, règles de Simon, Réflexes et Snake, records |
+| `score` | SipHash (vecteurs de référence), texte et signature du score, dessin du QR code |
 | `rsvp` | découpage des mots, typographie française, BOM, Windows-1252, durées, mots longs, avance / recul |
 | `screen` | fenêtres RAM, copie de l'écran, rétablissement après `screen_clear` |
 | `image2epi`, `video2epaper`, `audio2wav` | fichiers produits (en-têtes, tailles, son non vide). Les deux derniers sont ignorés sans ffmpeg. |
@@ -362,6 +380,7 @@ Aucun réglage du badge n'est modifié, sauf avec `--ctf`.
 |---|---|
 | `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée / Échap = boutons, capture PNG ; `--snapshot fichier.png` pour une capture seule |
 | `tools/badge_selftest.py` | test automatique du badge (§ 9.2) |
+| `tools/score_check.py` | vérifie les QR codes de score et fait le classement (§ 6.11) |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | vidéo → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sons → WAV 8 bits 16 kHz (jokers, dossiers, `--no-filter`, `--start`, `--duration`) |

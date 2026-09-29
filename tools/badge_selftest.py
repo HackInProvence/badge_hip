@@ -11,7 +11,9 @@ the buttons are simulated with the keys of the serial protocol (a, b, x, y), the
 ("ui: <page title>", "radio: ...", "game: ...") and the screen ("@FB ..." lines, saved as PNG screenshots).
 
 The badge is rebooted first ("R" key) so that the menus start from a known state. Nothing is written in the settings
-of the badge, except with --ctf (the Konami code test marks the flag as found).
+of the badge, except the records of the games (a Simon or Snake game can end with 0 points) and with --ctf
+(the Konami code test marks the flag as found).
+With the BADGE_SCORE_KEY environment variable (see score_check.py), the signature of the score QR code is checked.
 
 Usage:
     python tools/badge_selftest.py [--port COM9] [--out selftest] [--ctf] [--only games,radio,...]
@@ -196,8 +198,26 @@ def test_games(t):
             else:
                 ok, detail = False, 'the LEDs never lit up'
         elif name == 'Snake':
+            t.mark()
             t.keys('b')
             t.pump(3.0)
+            t.screenshot('game_Snake_run', 0)
+            # Straight into the wall, then the signed score as a QR code
+            if t.expect(r'^game: snake over', 15):
+                t.mark()
+                t.keys('x')
+                m = t.expect(r'^game: score code (HIP26:SNAKE:\d+:[0-9A-F]{8}:.+:[0-9A-F]{16})$', 3)
+                t.screenshot('game_Snake_qr', 1.5)
+                detail = m.group(1) if m else 'no score code'
+                ok = m is not None
+                key = os.environ.get('BADGE_SCORE_KEY')
+                if m and key:
+                    from score_check import check
+                    ok, _ = check(m.group(1), bytes.fromhex(key))
+                    detail += ', signature ' + ('ok' if ok else 'WRONG')
+                t.keys('b')  # Closes the QR code
+            else:
+                ok, detail = False, 'no game over'
         t.screenshot('game_' + re.sub(r'\W+', '_', name), 0.8)
         # Quit. In Simon the left wing is also a pad: a wrong pad ends the game, then it quits
         t.mark()
