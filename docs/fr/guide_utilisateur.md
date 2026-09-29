@@ -151,6 +151,9 @@ Un **appui long sur l'aile droite** lance le **mode test** : un message toutes l
   - l'image affichée pendant la veille (la SecSea par défaut, ou une image du dossier `IMAGES`) ;
   - « Aperçu » pour l'essayer.
 
+  L'image de veille est affichée en noir et blanc tramé (les gris deviennent des motifs de points) :
+  c'est l'affichage le plus stable de l'écran, l'image reste nette pendant des heures sans courant.
+
   Pendant la veille, n'importe quel bouton réveille le badge.
 - **Infos** : version de la radio, quartz, carte SD, batterie. Aile droite : les crédits.
 - **Crédits** : les personnes et associations derrière le badge.

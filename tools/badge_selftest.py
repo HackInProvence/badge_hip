@@ -266,11 +266,13 @@ def test_settings(t):
     t.mark()
     t.keys('xxb')
     m = t.expect(r'^saver: on', 15)  # After the cleaning full refreshes (black, white)
-    t.pump(4)  # The 4 grays refresh takes ~2s
-    grays = t.frame is not None and any(v in (1, 2) for row in t.frame for v in row)
+    t.pump(4)  # The full refresh takes ~2s
+    # Dithered black and white (the 4 grays waveform leaves a ghost): both colors, no gray
+    shown = t.frame is not None and all(v in (0, 3) for row in t.frame for v in row) \
+        and any(v == 0 for row in t.frame for v in row) and any(v == 3 for row in t.frame for v in row)
     t.screenshot('saver', 0)
-    t.result('screensaver: preview', m is not None and grays, (m.group(0) if m else 'not started')
-             + ('' if grays else ', no 4 grays image'))
+    t.result('screensaver: preview', m is not None and shown, (m.group(0) if m else 'not started')
+             + ('' if shown else ', no black and white image'))
     t.mark()
     t.keys('x')  # Any button wakes up
     t.result('screensaver: wake up', t.expect(r'^saver: off$', 3) is not None)

@@ -173,8 +173,11 @@ Ajouter ensuite des tests dans [tests/host/test_games.c](../../src/tests/host/te
   `screen_set_image_position()` gère les fenêtres, y compris les octets partiellement couverts.
 - **Nettoyage** : `screen_clean()` efface l'écran avec la forme d'onde complète de l'écran (OTP, commande 0x22 0xF7,
   compensée en température, environ 3 s). Les formes d'onde personnalisées sont trop courtes pour effacer les fantômes
-  des rafraîchissements rapides : le fantôme revient un moment après l'image. La veille nettoie en noir puis en blanc
-  avant son image.
+  des rafraîchissements rapides : le fantôme revient un moment après l'image.
+- **Veille** : nettoyage en noir puis en blanc, puis l'image **tramée en noir et blanc** (2×2 ordonné) dessinée avec
+  la forme d'onde OTP (`screen_show_image_bw_otp()`). Essais sur le badge : avec la forme d'onde 4 gris du projet,
+  un gros fantôme revient quelques secondes après l'image (aussi avec EOPT 0x22) ; avec l'OTP, l'image tient.
+  La visionneuse d'images garde les 4 gris.
 - **Deep sleep** : après 20 s sans mise à jour, `display.c` endort l'écran (recommandation du constructeur).
 - **Copie de l'écran** : `screen_shot()` renvoie une copie de ce qui a été envoyé (shadow des deux RAM) et sa nature
   (BW, 4G, blanc, noir). C'est ce qu'envoie le protocole USB (`@FB`).

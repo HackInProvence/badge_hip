@@ -173,7 +173,11 @@ Then add tests in [tests/host/test_games.c](../../src/tests/host/test_games.c).
   `screen_set_image_position()` handles windows, including partially covered bytes.
 - **Cleaning**: `screen_clean()` clears the screen with the screen's own full waveform (OTP, command 0x22 0xF7,
   temperature compensated, about 3 s). The custom waveforms are too short to erase the ghosts of the fast refreshes:
-  the ghost comes back a while after the image. The screensaver cleans in black then white before its image.
+  the ghost comes back a while after the image.
+- **Screensaver**: cleaning in black then white, then the image **dithered to black and white** (2×2 ordered) drawn
+  with the OTP waveform (`screen_show_image_bw_otp()`). Tried on the badge: with the project's 4 grays waveform,
+  a big ghost comes back a few seconds after the image (also with EOPT 0x22); with the OTP one, the image holds.
+  The image viewer keeps the 4 grays.
 - **Deep sleep**: after 20 s without an update, `display.c` puts the display to sleep (as recommended by the manufacturer).
 - **Screen copy**: `screen_shot()` returns a copy of what was sent (shadow of both RAMs) and its kind
   (BW, 4G, white, black). This is what the USB protocol sends (`@FB`).

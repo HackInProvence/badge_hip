@@ -88,11 +88,6 @@ static absolute_time_t btn_down_ts[4];  /* When each button was pressed (A, B, X
 static uint8_t btn_simulated_long = 0;  /* Long presses simulated on USB (keys B, X, Y) */
 static bool fb_stream = false;  /* Send the screen on USB each time it changes */
 static bool fb_send_now = false;  /* Send the screen once */
-/* Experiment ("v" key on USB): how the screensaver image is drawn, to compare how it holds over time
- * 0: 4 grays waveform (EOPT 0x07), 1: same with EOPT 0x22 (sources back to VSS), 2: dithered B/W with the OTP waveform */
-#define SAVER_VARIANTS 3
-static int saver_variant = 0;
-static bool saver_variant_try = false;
 
 static int btn_index(uint8_t bit) {
     return bit == BTN_A ? 0 : bit == BTN_B ? 1 : bit == BTN_X ? 2 : 3;
@@ -177,10 +172,6 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         printf("ir test: sent in %lld us (expected ~67500)\n", absolute_time_diff_us(t0, get_absolute_time()));
         break;
     }
-    case 'v':
-        saver_variant = (saver_variant + 1) % SAVER_VARIANTS;
-        saver_variant_try = true;
-        break;
     case 'R':
         /* Reboot (the automatic tests start from a known state) */
         printf("rebooting\n");
@@ -846,7 +837,7 @@ static int load_saver_image(const char *p) {
     return bpp <= 2 ? bpp : 0;
 }
 
-/* Shows the image of the screensaver (full refresh, 4 grays) */
+/* Shows the image of the screensaver (full refresh with the OTP waveform, dithered black and white) */
 /* 4 grays -> 1 bit, ordered 2x2 dithering (0 black .. 3 white, 1 and 2 are 1 and 2 white pixels out of 4), in lsb */
 static void dither_4g(uint8_t *lsb, const uint8_t *msb) {
     static const uint8_t THRESHOLD[2][2] = {{1, 3}, {3, 2}};
@@ -876,26 +867,12 @@ static void show_saver(void) {
         memcpy(saver_planes[1], msb, GFX_FB_SIZE);
         bpp = 2;
     }
-    if (bpp == 1) {
-        if (saver_variant == 2)
-            screen_show_image_bw_otp(saver_planes[0]);
-        else
-            screen_show_image_bw(saver_planes[0]);
-    } else if (saver_variant == 0) {
-        screen_show_image_4g(saver_planes[0], saver_planes[1]);
-    } else if (saver_variant == 1) {
-        static uint8_t ws[159];
-        memcpy(ws, screen_ws_1681_4grays, sizeof(ws));
-        ws[153] = 0x22;  /* EOPT: normal end, the sources go back to VSS */
-        screen_clear_image_position();
-        screen_push_ws(ws);
-        screen_push_rams(saver_planes[0], saver_planes[1], GFX_FB_SIZE);
-        screen_show_rams();
-    } else {
+    /* Dithered black and white with the full waveform of the screen (OTP): the 4 grays waveform leaves the screen
+     * unstable, a ghost comes back a few seconds after the image (tried: also with EOPT 0x22); the OTP one holds */
+    if (bpp == 2)
         dither_4g(saver_planes[0], saver_planes[1]);
-        screen_show_image_bw_otp(saver_planes[0]);
-    }
-    printf("saver: on (%s), variant %d\n", p[0] ? p : "SecSea", saver_variant + 1);
+    screen_show_image_bw_otp(saver_planes[0]);
+    printf("saver: on (%s)\n", p[0] ? p : "SecSea");
 }
 
 /* Whether the screensaver can start in this state (not while playing, reading, typing...) */
@@ -1754,13 +1731,6 @@ int main() {
         uint8_t pressed = buttons_pressed(now);
         if (pressed)
             printf("buttons pressed: 0x%02x\n", pressed);
-
-        /* Experiment of the screensaver drawings ("v" key): show it now with the next variant */
-        if (saver_variant_try) {
-            saver_variant_try = false;
-            printf("saver: variant %d\n", saver_variant + 1);
-            start_saver(app == A_SAVER || app == A_START_SAVER ? saver_return : app);
-        }
 
         /* Buttons */
         if (pressed)

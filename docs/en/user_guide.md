@@ -153,6 +153,9 @@ A **long press on the right wing** starts the **test mode**: one message every 5
   - the image shown while asleep (the SecSea by default, or an image from the `IMAGES` folder);
   - "Aperçu" (Preview) to try it out.
 
+  The screensaver image is shown in dithered black and white (grays become dot patterns):
+  it is the most stable display of the screen, the image stays sharp for hours without power.
+
   While asleep, any button wakes the badge up.
 - **Infos** (Info): radio version, crystal, SD card, battery. Right wing: the credits.
 - **Crédits** (Credits): the people and associations behind the badge.
