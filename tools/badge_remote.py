@@ -20,6 +20,7 @@ Keyboard (the window must have the focus):
     Right / Enter / b   right wing (OK)                   Shift: long press
     F5              ask the screen again
     F12             screenshot (PNG)
+    V               screensaver drawing experiment: next variant (see show_saver() in main.c)
 
 Protocol (see src/menu/main.c): the keys a, b, x, y simulate the buttons (A, B, X, Y: long presses),
 '[' / ']' start / stop sending the screen, 's' sends it once. The badge answers with lines
@@ -292,6 +293,8 @@ def run_window(port, zoom, on_ready=None):
             badge.send('s')
         elif event.keysym == 'F12':
             screenshot()
+        elif event.keysym in ('v', 'V'):
+            badge.send('v')
     root.bind('<Key>', on_key)
 
     def poll():

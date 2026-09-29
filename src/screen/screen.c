@@ -277,6 +277,24 @@ void screen_clean(bool bit) {
 }
 
 
+void screen_show_image_bw_otp(const uint8_t *img) {
+    if (screen_busy()) {
+        log_warning("screen_show_image_bw_otp() called but screen is busy");
+        return;
+    }
+
+    screen_clear_image_position();
+    screen_push_rams(img, NULL, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+    send(SSD1681_DISPLAY_CTRL1, 0x40);  /* RED RAM read as 0, B/W RAM normal */
+    send(SSD1681_DISPLAY_CTRL2, 0xF7);  /* Full update with the LUT of the OTP (see screen_clean()) */
+    send(SSD1681_ACTIVATE);
+    current_ws = NULL;
+    ram_bypassed = true;  /* DISPLAY_CTRL1 restored before the next drawing */
+    shot_kind = SCREEN_SHOT_BW;
+    ++shot_counter;
+}
+
+
 void screen_deep_sleep(void) {
     if (screen_busy()) {
         log_warning("screen_deep_sleep() called but screen is busy");

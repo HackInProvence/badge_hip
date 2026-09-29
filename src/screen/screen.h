@@ -122,6 +122,12 @@ void screen_clear(bool bit);
  * */
 void screen_clean(bool bit);
 
+/** \brief Show a black and white image fullscreen with the full waveform of the screen (OTP, like screen_clean()):
+ * slower than screen_show_image_bw() but the most stable image, for long times.
+ *
+ * \param img   The image, 5000 bytes (1 = white, bit 7 = leftmost pixel, row major) */
+void screen_show_image_bw_otp(const uint8_t *img);
+
 /** \brief Put the screen in deep sleep mode. Should be done after pushing images.
  *
  * The screen must not be busy.
