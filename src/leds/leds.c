@@ -67,7 +67,7 @@ bool change_leds(repeating_timer_t *rt) {
             push_led(LED_RGB(r,g,b));
             break;
         case LED_OOK:
-            if ((2*diff_us/animation.period) % 2)
+            if (animation.period && (2*diff_us/animation.period) % 2)
                 /* Odd number of half periods: LED OFF */
                 push_led(0);
             else

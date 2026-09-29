@@ -36,10 +36,11 @@ void noise_gen_setup(PIO pio, uint sm, irq_handler_t sound_gen);
 void noise_gen_cicada(void);
 
 // See the .pio for documentation of the sound engine, and libcicacda_fill_fifo on how to use this
-#define CICA_NOTE(note, len)  (uint8_t)(((len & 0xF) << 4) | (note & 0xF))
-#define CICA_SILENCE(len) (uint8_t)((len & 0xF) << 4)
+#define CICA_NOTE(note, len)  (uint8_t)((((len) & 0xF) << 4) | ((note) & 0xF))
+#define CICA_SILENCE(len) (uint8_t)(((len) & 0xF) << 4)
 
-#define _shift_u8(x, n) ((x&0xff) << n)
+/* Cast before shifting: shifting a byte >= 0x80 by 24 overflows an int */
+#define _shift_u8(x, n) ((uint32_t)((x) & 0xff) << (n))
 // Plays a then b then c then d
 #define CICA_WORD(a, b, c, d) (uint32_t)(_shift_u8(d, 24) | _shift_u8(c, 16) | _shift_u8(b, 8) | _shift_u8(a, 0))
 

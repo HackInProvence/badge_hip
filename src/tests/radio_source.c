@@ -29,6 +29,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "pico/stdlib.h"
 #include "pico/sync.h"
@@ -64,8 +65,8 @@ typedef enum {
     RADIO_CONTROL,  /* Radio is being configured or sending a packet */
 } raso_state_t;
 
-/* Global state management */
-static raso_state_t st_raso = BOOT;
+/* Global state management (volatile: shared with the GPIO IRQ) */
+static volatile raso_state_t st_raso = BOOT;
 static critical_section_t cs_update_st_raso;  /* Protect changes of stradio to be interrupted */
 
 /* TX side */
@@ -78,7 +79,7 @@ static uint8_t send_mode = 1;  /* Mirrors PKTCTRL0.LENGTH_CONFIG */
 static const uint8_t config_tx[] = {CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07};
 
 /* RX side */
-static buffer_state_t st_rx = WAITING;
+static volatile buffer_state_t st_rx = WAITING;  /* volatile: shared with the GPIO IRQ */
 static uint8_t buffer_rx[BUFFER_RX_LENGTH+64]; /* +64 to be able to flush the RX FIFO in cases of overflow */
 static size_t i_rx = 0;
 static absolute_time_t t_rise = 0, t_fall = 0;  /* Measure reception time */
@@ -108,7 +109,7 @@ void process_packet(void) {
         /* Pass config */
         log_info("write %d registers", len/2);
         /* Filter the configuration to prevent known erroneous states */
-        for (size_t i=0; i<len-1; i+=2) {
+        for (size_t i=0; i+1<len; i+=2) {  /* i<len-1 would overflow with len == 0 */
             if (payload[i] == CC1101_PKTCTRL0) {
                 uint8_t new_mode = payload[i+1] & 0x03;
                 if (new_mode == 0) {
@@ -133,8 +134,9 @@ void process_packet(void) {
     case 0xD1:
         /* Set frequency */
         if(len == 4) {
-            uint32_t freq = *(uint32_t *)payload;
-            log_info("set frequency to %d", freq);
+            uint32_t freq;
+            memcpy(&freq, payload, sizeof(freq));  /* payload is not aligned: a direct uint32_t read HardFaults on Cortex-M0+ */
+            log_info("set frequency to %lu", (unsigned long)freq);
             radio_set_frequency(freq);
         } else
             log_warning("expecting 7 bytes for frequency command, received %d", len+3);
@@ -145,8 +147,9 @@ void process_packet(void) {
     case 0xD3:
         /* Set baud rate */
         if(len == 4) {
-            uint32_t rate = *(uint32_t *)payload;
-            log_info("set baud rate to %d", rate);
+            uint32_t rate;
+            memcpy(&rate, payload, sizeof(rate));  /* payload is not aligned: a direct uint32_t read HardFaults on Cortex-M0+ */
+            log_info("set baud rate to %lu", (unsigned long)rate);
             radio_set_baud_rate(rate);
         } else
             log_warning("expecting 7 bytes for baud rate command, received %d", len+3);
@@ -164,6 +167,13 @@ void emit_buffer(void) {
     uint8_t pktctrl0;
     uint16_t sent = 0;  /* Keep track of how many we sent */
     bool changed_mode = false;  /* Changed from infinite to fixed length modes */
+
+    if (len == 0 && send_mode != 1) {
+        /* Would underflow sent = len-1 below and send 64k of garbage
+         * (in variable length mode, the length byte is always sent so len >= 1) */
+        log_warning("empty packet, nothing to send");
+        return;
+    }
 
     /* The radio should already be in the IDLE state */
     radio_wait_state(CC1101_STATE_IDLE, true);
@@ -203,8 +213,8 @@ void emit_buffer(void) {
         ccsend(buffer_tx, NULL, 2);
         break;
     default:
-        log_warning("unsupported packet length mode: %d", send_mode);
-        break;
+        log_warning("unsupported packet length mode: %d (send nothing)", send_mode);
+        return;
     }
 
     /* Flush then fill the FIFO with some data before putting the radio in TX mode */
@@ -293,7 +303,7 @@ void read_rx_fifo(bool incl_last) {
     i_rx += to_read;
 
     /* Also read the RSSI because we have received the SYNC word (we have data) and it won't change now */
-    rssi = (int8_t)ccread_status_reg(CC1101_RSSI) - 74;
+    rssi = (int8_t)ccread_status_reg(CC1101_RSSI)/2 - 74;  /* RSSI_dBm = RSSI_dec/2 - RSSI_offset */
 }
 
 /* Use IRQs to signal start of radio RX, but we may not be in an RX state */
@@ -427,12 +437,12 @@ int main() {
                         uint16_t *payload_len = (uint16_t *)buffer_tx;
                         if (*payload_len+2 > sizeof(buffer_tx)) {
                             log_warning("announced USB packet too large, dropping and wait for end of stream");
-                            /* We just wait that the current stream stops */
-                            st_raso = WAITING;  /* FIXME: st_tx??? */
+                            /* We just wait that the current stream stops (WAITING ignores chars until 50ms of silence).
+                             * Note: this is st_tx, setting st_raso to WAITING (== BOOT) would block the whole loop */
+                            st_tx = WAITING;
                             i_tx = 0;
                             buffer_tx[0] = buffer_tx[1] = 0;
-                        }
-                        if (i_tx == *payload_len+2) {
+                        } else if (i_tx == *payload_len+2) {
                             log_info("received USB packet of %d bytes", i_tx);
                             st_tx = READY;
                         }

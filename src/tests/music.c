@@ -14,7 +14,7 @@
 #define NEVEGONA {NOTE_D5, 1.f/4}, {NOTE_E5, 1.f/4}, {NOTE_G5, 1.f/4}, {NOTE_E5, 1.f/4}
 const Note rick[] = {
     // TODO: *60/114
-    SIL, SIL, /* FIXME: trying to fix some delays */
+    SIL, SIL,
     // Never gonna
     NEVEGONA,
     // give you up Never gonna
@@ -45,7 +45,6 @@ int main() {
     bool enab = music_set_enabled(true);
     printf("first enab %d\n", enab);  /* Should be false */
 
-    /* FIXME: the first notes are skipped/too fast... */
     music_set_melody(rick, 114.);
     enab = music_set_enabled(true);
 

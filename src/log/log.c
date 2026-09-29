@@ -31,7 +31,7 @@ void log_printf(log_level lev, const char *fmt, ...) {
 
     /* Choose a prefix to printf it before the msg */
     lev = clamp_lev(lev);
-    char *pref;
+    const char *pref;
     switch(lev)
     {
     case LOG_LEVEL_INFO:
@@ -44,10 +44,11 @@ void log_printf(log_level lev, const char *fmt, ...) {
         pref = "[] ";
         break;
     }
-    printf(pref);
+    fputs(pref, stdout);
 
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
-    puts(NULL);
+    va_end(args);
+    putchar('\n');
 }

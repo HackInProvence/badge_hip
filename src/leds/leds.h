@@ -17,6 +17,7 @@
 
 #include "pico/time.h"
 
+#include "badge_defs.h"
 #include "ws2812.pio.h"
 
 
@@ -29,7 +30,7 @@
 #endif
 
 /** Color mixing/de-mixing defines */
-#define LED_RGB(r,g,b) (((g) << 24) | ((r) << 16) | ((b) << 8))
+#define LED_RGB(r,g,b) (((uint32_t)(g) << 24) | ((uint32_t)(r) << 16) | ((uint32_t)(b) << 8))
 #define LED_RGB_R(color) (((color) >> 16) & 0xFF)
 #define LED_RGB_G(color) (((color) >> 24) & 0xFF)
 #define LED_RGB_B(color) (((color) >>  8) & 0xFF)

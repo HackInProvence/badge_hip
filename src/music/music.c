@@ -19,28 +19,31 @@ static float cur_beat = 0.f;
 static alarm_id_t aid = 0;
 
 
+// cur_notes points to the next note to play (not the one currently playing)
 int64_t next_note(alarm_id_t id, void *user_data) {
-    if (!cur_notes) {
-        aid = 0;
-        return 0;
-    }
-
-    ++cur_notes;
-    if(cur_notes->pitch == 0 && cur_notes->duration == 0.f) {
+    if (!cur_notes || (cur_notes->pitch == 0 && cur_notes->duration == 0.f)) {
         cur_notes = NULL;
         aid = 0;
         return 0;
     }
 
+    const Note *note = cur_notes++;
+
     // Handle either pitch or silence (pitch=0 will automatically produce a 0% PWM output)
-    uint16_t wrap = cur_notes->pitch;
+    uint16_t wrap = note->pitch;
     pwm_set_wrap(slice_num, wrap);
     // As we don't know the channel of the configured pin in its slice, set both
     pwm_set_both_levels(slice_num, wrap>>1, wrap>>1);
 
     // Compute how long this silence or note lasts
-    // (a 0 duration also cancels the timer)
-    return -(int64_t)(1e6f * cur_notes->duration * 60.f/cur_beat);
+    int64_t duration_us = (int64_t)(1e6f * note->duration * 60.f/cur_beat);
+    if (duration_us <= 0) {
+        // A 0 duration would cancel the timer: stop the melody cleanly so that music_is_playing() is false
+        cur_notes = NULL;
+        aid = 0;
+        return 0;
+    }
+    return -duration_us;
 }
 
 

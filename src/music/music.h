@@ -6,6 +6,9 @@
 #ifndef _MUSIC_H
 #define _MUSIC_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef struct {
     uint32_t pitch; /**< One of the PITCH_ constant (pitch given as the half period of the note in ticks), 0 for silences */
     float duration; /**< Duration, relative to 1 beat */

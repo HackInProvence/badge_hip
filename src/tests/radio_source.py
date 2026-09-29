@@ -116,7 +116,7 @@ if __name__ == '__main__':
                                                  'When possible, use -f and -b to set up baud rates, '+
                                                  'as they take into account the calibrated crystal frequency of the CC1101')
     parser.add_argument('--tty', '-t', default='/dev/ttyACM0', help='path to the (maybe not yet existing) path of the tty to which to send data')
-    parser.add_argument('--preset', '-p ', default=None, choices=PRESETS.keys(), help='push a configuration beforehand')
+    parser.add_argument('--preset', '-p', default=None, choices=PRESETS.keys(), help='push a configuration beforehand')
     parser.add_argument('--frequency', '-f', default=None, type=int, help='push a frequency beforehand')
     parser.add_argument('--baud-rate', '-b', default=None, type=int, help='push a baud rate beforehand')
     parser.add_argument('--packet-size', '-s', default=-1, type=int,

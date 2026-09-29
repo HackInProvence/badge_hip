@@ -3,14 +3,17 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/** \file screen.h
+/** \file btns.h
  *
  * \brief Buttons API: fetch and expose the button's state.
  *
+ * Buttons are active high (external pull-downs), a pressed button reads as 1.
  * */
 
 #ifndef _BTNS_H
 #define _BTNS_H
+
+#include <stdint.h>
 
 
 /** TODO doc */

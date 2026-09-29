@@ -56,7 +56,6 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_DEFAULT_WS2812_PIN BADGE_LED
 
 // --- I2C ---
-#define I2
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C 0
 #endif
@@ -64,7 +63,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_DEFAULT_I2C_SDA_PIN BADGE_I2C0_SDA
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN BADGE_I2C1_SDL
+#define PICO_DEFAULT_I2C_SCL_PIN BADGE_I2C0_SCL
 #endif
 
 // --- SPI ---

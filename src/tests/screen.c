@@ -49,7 +49,7 @@ void time_busy(const char *msg) {
     while(screen_busy())
         tight_loop_contents();
     t1 = get_absolute_time();
-    printf("%s done, took %" PRIu64 "µs\n", msg, absolute_time_diff_us(t0, t1));
+    printf("%s done, took %" PRIu64 "µs\n", msg ? msg : "", absolute_time_diff_us(t0, t1));
 }
 
 
@@ -164,7 +164,9 @@ const uint8_t ws_roll[159] = \
     "\x20"; /* VCOM, 0x20 == -0.8V */
 
 void test_roll(void) {
-    uint8_t A[5000], B[5000], *prev = A, *next = B, *o;
+    /* static: 10kB would overflow the 2kB stack */
+    static uint8_t A[5000], B[5000];
+    uint8_t *prev = A, *next = B, *o;
 
     screen_clear_image_position();
     screen_push_ws(ws_roll);
@@ -183,7 +185,8 @@ void test_roll(void) {
         for(size_t j=0; j<200; ++j) {
             size_t j8 = j*SCREEN_WIDTH/8;
             for(size_t k=0; k<5; ++k) {
-                size_t v = (j/k == t%(200/k)) ? 0x00:0xFF;
+                /* Each band rolls at its own speed (k+1), k=0 would divide by 0 */
+                size_t v = (j/(k+1) == t%(200/(k+1))) ? 0x00:0xFF;
                 size_t k5 = j8 + 5*k;
                 for(size_t i=0; i<5; ++i) {
                     next[k5 + i] = v;
@@ -268,7 +271,7 @@ void test_anim(const uint8_t * const * frames, size_t n_frames, const uint8_t *w
         tight_loop_contents();
 
     uint64_t diff = absolute_time_diff_us(t0, t1);
-    printf("push+draw %d images took %" PRIu64 "µs, %f fps\n", n_frames, diff, n_frames * 1e6f/(float)(diff));
+    printf("push+draw %zu images took %" PRIu64 "µs, %f fps\n", n_frames, diff, n_frames * 1e6f/(float)(diff));
 }
 
 #include "hip_anim.h"
@@ -289,12 +292,12 @@ int main() {
         tight_loop_contents();
 
     size_t len = screen_clear_image_position();
-    printf("fullscreen images should be of size %d\n", len);
+    printf("fullscreen images should be of size %zu\n", len);
 
     //test_read_all();
     test_show_bw_images();
     test_show_4g_images();
-    test_subimage();  /* FIXME: we don't handle correctly cases where x%8 != 0 */
+    test_subimage();
     test_enable_once();
 
     /* test_roll is the PoC that shows that we CAN display multiple images per second */

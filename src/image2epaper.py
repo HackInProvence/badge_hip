@@ -39,18 +39,26 @@ def get_palette(frames):
     # Collect all pixels values (either palette indexes or color values)
     colors = set()
     for img in frames:
-        colors |= {col for n,col in img.getcolors()}
+        img_colors = img.getcolors(256)  # None when there are more than 256 colors
+        if img_colors is None:
+            eprint('image has too many colors, it should only have 2 or 4 colors')
+            sys.exit(1)
+        colors |= {col for n,col in img_colors}
 
     # Now put an indicator of the grayness to the colors to be able to sort them
-    # We hope that all layers have the same mode (either palette or RGB(A))
-    if img.palette is None:
-        # For RGB(A), we already have the colors, but we have to sum the channels to sort them
-        colors = [(sum(col),col) for col in colors]  # example [(0, (0,0,0)), (150, (50,50,50)), ...]
-    else:
+    # We hope that all layers have the same mode (either palette, grayscale or RGB(A))
+    if img.mode == 'P':
         # For palette mode, we have to recover the color to sort them by grayness.
+        # Only keep the palette entries that are used: the palette usually has more entries (e.g. 256) than used colors.
         pal = img.palette
         ml = len(pal.mode)
-        colors = [(sum(pal.palette[i:i+ml]),icol) for icol,i in enumerate(range(0, len(pal.palette), ml))]  # example [(0,0), (12,1), (6,2), (15,3)]
+        colors = [(sum(pal.palette[icol*ml:(icol+1)*ml]),icol) for icol in colors]  # example [(0,0), (12,1), (6,2), (15,3)]
+    elif isinstance(next(iter(colors)), int):
+        # For grayscale modes ('1', 'L', ...), the color is already the grayness
+        colors = [(col,col) for col in colors]
+    else:
+        # For RGB(A), we already have the colors, but we have to sum the channels to sort them
+        colors = [(sum(col),col) for col in colors]  # example [(0, (0,0,0)), (150, (50,50,50)), ...]
     colors.sort()  # Now entry (_,i) are sorted by increasing whiteness, example [(0,0), (6,2), (12,1), (15,3)]
     return {c:i for i,(_,c) in enumerate(colors)}  # When pixels[x,y] is 2 this means that it should be color nb 1 (NOT TESTED)
 
@@ -130,7 +138,7 @@ if __name__ == "__main__":
     for frame in frames:
         width, height = frame.width, frame.height
         break  # If frames have different shapes, I'm sorry for you!
-    w8 = width//8
+    w8 = width//8 + (1 if width%8 else 0)  # Same as in convert_frame, lines are padded to a whole byte
 
     fprint(rf'''
 /* badge_secsea © 2025 by Hack In Provence is licensed under
@@ -144,6 +152,7 @@ if __name__ == "__main__":
 #define {header_name}
 
 #include <stddef.h>
+#include <stdint.h>
 
 /* This is the width of the generated buffer, not the width of the image */
 #define {buffer_prefix}_width {w8}
@@ -189,9 +198,9 @@ if __name__ == "__main__":
             fprint(f'const uint8_t * {buffer_prefix}[] = {{')
             fprint(',\n'.join(f'    {buffer_prefix}_frame{i}' for i in range(len(frames))) + '\n};')
         else:
-            fprint(f'const uint8_t[][] {buffer_prefix}_lsb = {{')
+            fprint(f'const uint8_t * {buffer_prefix}_lsb[] = {{')
             fprint(',\n'.join(f'    {buffer_prefix}_frame{i}_lsb' for i in range(len(frames))) + '\n};')
-            fprint(f'const uint8_t[][] {buffer_prefix}_msb = {{')
+            fprint(f'const uint8_t * {buffer_prefix}_msb[] = {{')
             fprint(',\n'.join(f'    {buffer_prefix}_frame{i}_msb' for i in range(len(frames))) + '\n};')
 
     fprint(f'\n#endif /* {header_name} */')

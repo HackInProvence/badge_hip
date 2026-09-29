@@ -91,4 +91,5 @@ if __name__ == '__main__':
         print('\nconnection lost')
     except KeyboardInterrupt:
         print()
-        print(data[-1])
+        if data:
+            print(data[-1])

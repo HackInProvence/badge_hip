@@ -5,7 +5,7 @@
 
 // -----------------------------------------------------
 // Configures another prototype which will live as a radio emitter based on a Pico or Pico W
-// Should not be included manually but using -DPICO_BOARD=badge_secsea while configuring cmake
+// Should not be included manually but using -DPICO_BOARD=badge_radio while configuring cmake
 // Inspired from pico-sdk/src/boards/include/boards/pico_w.h
 // -----------------------------------------------------
 
@@ -55,7 +55,6 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_DEFAULT_WS2812_PIN BADGE_LED
 
 // --- I2C ---
-#define I2
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C 0
 #endif
@@ -63,7 +62,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_DEFAULT_I2C_SDA_PIN BADGE_I2C0_SDA
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN BADGE_I2C1_SDL
+#define PICO_DEFAULT_I2C_SCL_PIN BADGE_I2C0_SCL
 #endif
 
 // --- SPI ---

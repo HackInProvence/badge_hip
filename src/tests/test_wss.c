@@ -7,6 +7,7 @@
 // certain versions of GCC and newlib which causes omission of PRIu64
 #include <sys/types.h>
 #include <inttypes.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -36,7 +37,8 @@ void time_busy(const char *msg) {
 
 
 void test_zones44(const uint8_t *ws0, const uint8_t *ws1, const uint8_t *ws2) {
-    uint8_t msb[5000], lsb[5000];
+    /* static: 10kB would overflow the 2kB stack */
+    static uint8_t msb[5000], lsb[5000];
     const uint8_t w8 = SCREEN_WIDTH/8;
 
     /* Prepare 4 bands on lsb */
@@ -202,7 +204,8 @@ vs_cols_t ctov(char c) {
     case '2':
         return VSH2;
     }
-    assert("invalid char from encoded phases, maybe reached the \\0");
+    assert(0 && "invalid char from encoded phases, maybe reached the \\0");
+    return SKIP_VSS;
 }
 
 /* You should always provide more tps than phases... (no stop on this one, we will overrun the buffer) */
@@ -515,4 +518,4 @@ int main() {
     screen_deep_sleep();
     sleep_ms(1000);
     printf("Screen sleeping, after 1s BUSY = %d\n\n", gpio_get(BADGE_SCREEN_BUSY));
-};
+}

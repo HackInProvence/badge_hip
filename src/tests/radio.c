@@ -129,7 +129,7 @@ void rx_times(void) {
 
     /* Show a trace */
     for (size_t i=0; i<sizeof(lengths)/sizeof(lengths[0]); ++i) {
-        printf("%d for % 7" PRIu64 "\n", (uint8_t)(lengths[i] >> 63), lengths[i] & 0x7fFFffFF);
+        printf("%d for % 7" PRIu64 "\n", (uint8_t)(lengths[i] >> 63), lengths[i] & 0x7fffffffffffffffULL);
     }
 }
 
@@ -137,7 +137,7 @@ void rx_times(void) {
 /** \brief msg must be \0 terminated */
 void tx_chat_flipper(const uint8_t *msg) {
     /* Maybe someone else, like rx_pulses, did not reset the direction of this pin... */
-    printf("chat with flipper: \"%s\"", msg);
+    printf("chat with flipper: \"%s\"", (const char *)msg);
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
     /* 800µs per byte (without preamble) */
@@ -147,14 +147,15 @@ void tx_chat_flipper(const uint8_t *msg) {
     print_cc_configuration();
 
     /* We send data in 63 bytes blocks to simplify the transmission (no interrupt, use GD0 to follow the current packet status) */
-    size_t len = strlen(msg);
+    size_t len = strlen((const char *)msg);
     size_t block_len;
     uint8_t tx[66];  /* Group the flush + burst write FIFO in a single SPI write */
     while (len) {
         /* Prepare the block */
         block_len = len > 63 ? 63 : len;  /* 64-1 for the length */
         memcpy(tx+3, msg, block_len);
-        printf("send block (len %d)\n", block_len);
+        msg += block_len;  /* Next block starts after this one */
+        printf("send block (len %zu)\n", block_len);
         log_cc_status();
 
         tx[0] = CC1101_SFTX;  /* Flush the TX FIFO to be sure that OUR message is sent */
@@ -224,15 +225,22 @@ void rx_fsk_printf(void) {
             ccsend(recv, NULL, 1);
             continue;
         }
+        if (n < 3) {
+            /* We need at least the length byte + RSSI + LQI, otherwise n-2 underflows */
+            printf("received only %d bytes, ignoring\n", n);
+            if (n)
+                ccread_burst(CC1101_RXFIFO, recv, n);  /* Empty the FIFO */
+            continue;
+        }
         printf("received %02d bytes ", n-2);
         ccread_burst(CC1101_RXFIFO, recv, n);
         int16_t rssi = (int8_t)recv[n-2];
-        rssi -= 74;  /* According to CC1101 datasheet */
+        rssi = rssi/2 - 74;  /* According to CC1101 datasheet: RSSI_dBm = RSSI_dec/2 - RSSI_offset */
         uint8_t lqi = recv[n-1];
         bool crc_ok = lqi >> 7;
         lqi = lqi & 0x7f;
         int8_t eoff;
-        ccread_burst(CC1101_FREQEST, &eoff, 1);
+        ccread_burst(CC1101_FREQEST, (uint8_t *)&eoff, 1);
         printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz: ", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
         for (size_t i=0; i<n-2; ++i)
             printf("%02x ", recv[i]);
@@ -277,9 +285,9 @@ void rx_fsk_raw_printf(void) {
     radio_set_baud_rate(19500);
     print_cc_configuration();
 
-    uint8_t recv[65];
+    static uint8_t recv[65];  /* static: these buffers are too big for the 2kB stack */
     printf("wait for RX...\n");
-    uint8_t buf[1024];  /* stores multi-part packets */
+    static uint8_t buf[1024];  /* stores multi-part packets */
     size_t buf_i = 0;
     absolute_time_t t0 = get_absolute_time(), now;
     while (true) {
@@ -348,8 +356,8 @@ void rx_fsk_raw_printf(void) {
         uint8_t lqi = ccread_status_reg(CC1101_LQI);
         bool crc_ok = lqi >> 7;
         lqi &= 0x7f;
-        int16_t rssi = ccread_status_reg(CC1101_RSSI);
-        rssi -= 74;  /* According to CC1101 datasheet */
+        int16_t rssi = (int8_t)ccread_status_reg(CC1101_RSSI);  /* Two's complement */
+        rssi = rssi/2 - 74;  /* According to CC1101 datasheet: RSSI_dBm = RSSI_dec/2 - RSSI_offset */
         printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz\n", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
 
         /* Add data to our current buffer, but don't overflow */

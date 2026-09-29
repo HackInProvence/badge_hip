@@ -102,7 +102,7 @@ target_sources(radio_calibrate PRIVATE radio_calibrate.c)
 pico_add_extra_outputs(radio_calibrate)
 
 target_link_libraries(radio_calibrate PRIVATE
-    badge
+    badge_tests
     hardware_gpio
     pico_multicore
     pico_stdlib

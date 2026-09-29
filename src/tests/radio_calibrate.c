@@ -22,8 +22,9 @@
 #include "radio.h"
 
 
-static uint64_t rises = 0;
-static absolute_time_t t0 = 0;
+/* volatile: written by core 1 (IRQ), read in loops by core 0 */
+static volatile uint64_t rises = 0;
+static volatile absolute_time_t t0 = 0;
 
 void counter(uint gpio, uint32_t events) {
     ++rises;
