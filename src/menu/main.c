@@ -140,8 +140,13 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         for (int i = 0; i < n; ++i)
             printf("  %s %d dBm%s\n", nb[i].name, nb[i].rssi, nb[i].met ? " (met)" : "");
         printf("ctf: %d/%d flags\n", ctf_found_count(), CTF_N_FLAGS);
-        printf("battery: %u mV, %d %%, ADC raw %u%s\n", battery_mv(), battery_percent(), battery_raw(),
-               battery_charging() ? ", charging" : "");
+        printf("radio: CC1101 version 0x%02x, crystal used %lu Hz, measured %lu Hz\n", radio_tools_chip_version(),
+               (unsigned long)radio_get_xosc(), (unsigned long)radio_tools_xosc_hz());
+        if (battery_calibrated())
+            printf("battery: %u mV, %d %%, ADC raw %u%s\n", battery_mv(), battery_percent(), battery_raw(),
+                   battery_charging() ? ", USB" : "");
+        else
+            printf("battery: not calibrated, ADC raw %u%s (see battery.h)\n", battery_raw(), battery_charging() ? ", USB" : "");
         break;
     }
     case 'i': {
@@ -356,13 +361,17 @@ static void set_status(const char *msg) {
     redraw = true;
 }
 
-static void draw_title(const char *title) {
-    /* For the automatic tests (tools/badge_selftest.py): the page shown */
+/* For the automatic tests (tools/badge_selftest.py): "ui: <title>" when the page shown changes */
+static void ui_trace(const char *title) {
     static char last_title[40] = "";
     if (strncmp(last_title, title, sizeof(last_title) - 1)) {
         snprintf(last_title, sizeof(last_title), "%s", title);
         printf("ui: %s\n", title);
     }
+}
+
+static void draw_title(const char *title) {
+    ui_trace(title);
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
 }
@@ -1024,12 +1033,17 @@ static void render_info(void) {
         snprintf(xosc, sizeof(xosc), "%.4f MHz", measured / 1e6);
     else
         snprintf(xosc, sizeof(xosc), "inconnu");
+    /* Only a calibrated measure is shown (see battery.h) */
+    char bat[32];
+    if (battery_mv())
+        snprintf(bat, sizeof(bat), "%u,%02u V (%d %%)", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent());
+    else
+        snprintf(bat, sizeof(bat), "non calibrée");
     snprintf(text, sizeof(text),
              "Radio : CC1101 v0x%02x\nQuartz mesuré : %s\nQuartz utilisé : %.4f MHz\nDéfaut (firmware) : %.4f\nCarte SD : %s\n"
-             "Batterie : %u,%02u V (%d %%)%s",
+             "Batterie : %s",
              radio_tools_chip_version(), xosc, radio_get_xosc() / 1e6, CC1101_fXOSC / 1e6,
-             sd_is_ready() ? "prête" : "absente", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent(),
-             battery_charging() ? ", charge" : "");
+             sd_is_ready() ? "prête" : "absente", bat);
     render_page("Infos", text, "D : crédits  G : retour");
 }
 
@@ -1381,6 +1395,7 @@ static void validate(void) {
     case M_REFLEX:
     case M_SNAKE:
         games_start(selected - M_TICTACTOE, get_absolute_time());
+        ui_trace(games_name(selected - M_TICTACTOE));
         app = A_GAME;
         break;
     case M_CREDITS:
@@ -1705,7 +1720,7 @@ int main() {
         battery_task(now);
         static int shown_bars = -2;
         static bool shown_charging = false;
-        if (app == A_MENU && (battery_bars() != shown_bars || battery_charging() != shown_charging)) {
+        if (app == A_MENU && (battery_bars() != shown_bars || (battery_bars() >= 0 && battery_charging() != shown_charging))) {
             shown_bars = battery_bars();  /* Only when the icon changes: the e-Paper refresh is visible */
             shown_charging = battery_charging();
             redraw = true;
@@ -1939,7 +1954,7 @@ int main() {
                     games_render(fb);
                 else if (app == A_CREDITS) {
                     credits_render(fb, credits_page);
-                    printf("ui: Crédits\n");
+                    ui_trace("Crédits");
                 }
                 display_show(fb);
             }

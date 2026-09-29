@@ -792,6 +792,7 @@ static void reflex_task(absolute_time_t now) {
         if (reached(reflex_ts, now)) {
             leds(0, 255, 0);
             tone(1319, 120);
+            printf("game: reflex go\n");
             reflex_phase = REFLEX_GO;
             reflex_ts = now;
             changed = true;
@@ -1074,7 +1075,6 @@ void games_record_text(game_t g, char *buf, int len) {
 
 void games_start(game_t g, absolute_time_t now) {
     game = g;
-    printf("ui: %s\n", games_name(g));
     switch (g) {
     case GAME_TICTACTOE:
         memset(ttt_score, 0, sizeof(ttt_score));

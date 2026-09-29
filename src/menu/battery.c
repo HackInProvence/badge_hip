@@ -9,12 +9,9 @@
 #include "pico/stdio_usb.h"
 #include "pinouts.h"
 
-#define ADC_VREF_MV 3300
 #define ADC_SAMPLES 16
-#define CHARGING_MV 4120  /* A Li-ion cell at rest stays below, a charger goes above */
 
-static uint16_t filtered_mv = 0;
-static uint16_t last_raw = 0;
+static uint16_t filtered_raw = 0;
 static absolute_time_t next_ts = 0;
 
 /* Voltage (mV) -> charge (%) of a Li-ion cell under a light load, linear between the points */
@@ -38,36 +35,44 @@ void battery_init(void) {
     adc_gpio_init(BADGE_VBAT);
 }
 
-static uint16_t measure_mv(void) {
-    adc_select_input(BADGE_VBAT - 26);  /* GPIO26..29 are ADC0..3 */
-    uint32_t sum = 0;
-    for (int i = 0; i < ADC_SAMPLES; ++i)  /* 2us each */
-        sum += adc_read();
-    last_raw = sum / ADC_SAMPLES;
-    return (uint32_t)last_raw * ADC_VREF_MV * BATTERY_DIVIDER_NUM / (4095u * BATTERY_DIVIDER_DEN);
+bool battery_calibrated(void) {
+    return BATTERY_CAL_RAW1 != BATTERY_CAL_RAW2 && BATTERY_CAL_MV1 && BATTERY_CAL_MV2;
 }
 
 bool battery_charging(void) {
-    return stdio_usb_connected() || filtered_mv >= CHARGING_MV;
+    return stdio_usb_connected();
 }
 
 void battery_task(absolute_time_t now) {
     if (absolute_time_diff_us(next_ts, now) < 0)
         return;
     next_ts = delayed_by_ms(now, BATTERY_PERIOD_MS);
-    uint16_t mv = measure_mv();
+    adc_select_input(BADGE_VBAT - 26);  /* GPIO26..29 are ADC0..3 */
+    uint32_t sum = 0;
+    for (int i = 0; i < ADC_SAMPLES; ++i)  /* 2us each */
+        sum += adc_read();
+    uint16_t raw = sum / ADC_SAMPLES;
     /* The voltage drops while the buzzer or the radio draw current: slow filter (1/4 of each new measure) */
-    filtered_mv = filtered_mv ? (filtered_mv * 3 + mv) / 4 : mv;
-}
-
-uint16_t battery_mv(void) {
-    return filtered_mv;
+    filtered_raw = filtered_raw ? (filtered_raw * 3 + raw) / 4 : raw;
 }
 
 uint16_t battery_raw(void) {
-    return last_raw;
+    return filtered_raw;
+}
+
+uint16_t battery_mv(void) {
+#if BATTERY_CAL_RAW1 != BATTERY_CAL_RAW2
+    if (! battery_calibrated() || ! filtered_raw)
+        return 0;
+    int32_t mv = BATTERY_CAL_MV1 + ((int32_t)filtered_raw - BATTERY_CAL_RAW1) * (BATTERY_CAL_MV2 - BATTERY_CAL_MV1)
+                                   / (BATTERY_CAL_RAW2 - BATTERY_CAL_RAW1);
+    return mv < 0 ? 0 : mv > 5000 ? 5000 : mv;
+#else
+    return 0;  /* Not calibrated */
+#endif
 }
 
 int battery_percent(void) {
-    return battery_percent_of_mv(filtered_mv);
+    uint16_t mv = battery_mv();
+    return mv ? battery_percent_of_mv(mv) : -1;
 }
