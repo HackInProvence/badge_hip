@@ -19,6 +19,11 @@
 #ifndef _RADIO_H
 #define _RADIO_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include "badge_defs.h"
 #include "pinouts.h"
 
 
@@ -39,8 +44,22 @@ void radio_init(void);
 /** \brief Boot the radio module (or wake from deep sleep) */
 void radio_boot(void);
 
+/** \brief Reset all registers of the radio module to their default values (SRES), to do once after power-up. */
+void radio_reset(void);
+
+/** \brief Sets the TX power (PATABLE[0]), e.g. 0xC0 for +10dBm, 0x60 for 0dBm @433MHz (see the CC1101 datasheet).
+ *
+ * The PATABLE is lost when the radio goes to power down (deep sleep). */
+void radio_set_power(uint8_t patable0);
+
 /** \brief Power down / deep sleep the radio module */
 void radio_power_down(void);
+
+/** \brief Sets the crystal frequency used by the next radio_set_frequency() and radio_set_baud_rate() (default CC1101_fXOSC).
+ *
+ * Some badges have a 26MHz crystal and others a 27MHz one: measure it (see radio_tools.c in the menu, or radio_calibrate.c). */
+void radio_set_xosc(uint32_t hz);
+uint32_t radio_get_xosc(void);
 
 /** \brief Sets the frequency (in Hz) of the transmission using calibrated crystal frequency.
  *
@@ -75,6 +94,23 @@ radio_state_t radio_state(void);
  *
  * Can only \param do_change when \param target_state is IDLE, RX, TX, or FSTXON. */
 void radio_wait_state(radio_state_t target_state, bool do_change);
+
+
+/** \brief Write registers, given as a list of (register, value) pairs such as \ref radio_preset_gfsk. */
+void radio_write_registers(const uint8_t *pairs, size_t len);
+
+/** \brief Read \p len consecutive registers starting at \p reg (status registers such as CC1101_PARTNUM: len must be 1). */
+void radio_read_registers(uint8_t reg, uint8_t *values, size_t len);
+
+/** \brief Non blocking: load a packet in the TX FIFO and start sending it.
+ *
+ * Expects a variable packet length configuration (e.g. \ref radio_preset_gfsk):
+ * the length byte is prepended by this function.
+ * The radio goes back to IDLE when the packet is sent, poll \ref radio_state to know when.
+ *
+ * \param len At most 63 bytes (64 bytes TX FIFO minus the length byte).
+ * \return false when the packet is too long */
+bool radio_tx_packet(const uint8_t *payload, size_t len);
 
 
 /** \brief Default configuration for the flipper chat app.
