@@ -53,6 +53,7 @@
 #include "screen_demo.h"
 #include "sd.h"
 #include "net.h"
+#include "ook_rx.h"
 #include "social.h"
 #include "store.h"
 #include "video.h"
@@ -546,7 +547,7 @@ static const submenu_t SUBMENUS[] = {
     {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
     {"Social", 1, {M_SOCIAL}},
-    {"Radio & IR", 3, {M_RADIO_MSG, M_RADIO_CARRIER, M_IR}},
+    {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
     {"Badge", 6, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
     {"Admin", 3, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
@@ -2065,6 +2066,7 @@ int main() {
         }
         net_task(now);
         remote_task(now);
+        ook_rx_task(now);
         static bool was_muted = false;
         if (remote_muted() != was_muted) {
             was_muted = remote_muted();

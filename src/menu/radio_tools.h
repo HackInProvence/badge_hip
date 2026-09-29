@@ -51,6 +51,9 @@ const char *radio_tools_last_text(void);
 /** \brief Whether no feature of this file uses the radio (the network of the cicadas can then use it). */
 bool radio_tools_idle(void);
 
+/** \brief Configures the radio again with the GFSK profile of the badges (after another mode, e.g. OOK). */
+void radio_tools_reconfigure(void);
+
 /** \brief Sync word of the network of the cicadas: different from the Flipper chat (0x464C), so that they ignore each other. */
 #define RADIO_TOOLS_SOCIAL_SYNC1 0xC1
 #define RADIO_TOOLS_SOCIAL_SYNC0 0x6A

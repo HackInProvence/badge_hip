@@ -10,6 +10,9 @@ target_sources(badge_menu PRIVATE
     remote.c
     ui.c
     net.c
+    ook_rx.c
+    radio433.c
+    ../radio/ookdec.c
     battery.c
     display.c
     credits.c

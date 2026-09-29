@@ -70,6 +70,11 @@ const char *radio_tools_message(void) {
 }
 
 
+void radio_tools_reconfigure(void) {
+    configure();
+}
+
+
 bool radio_tools_idle(void) {
     return state == R_IDLE;
 }
@@ -96,6 +101,7 @@ const char *radio_tools_last_text(void) {
 unsigned radio_tools_send(void) {
     if (state != R_IDLE)
         return 0;
+    configure();  /* The whole GFSK profile: another feature may have left the radio in OOK (ook_rx.c) */
     set_profile(0x46, 0x4C, PATABLE);  /* Flipper chat */
     char msg[64];
     int len = snprintf(msg, sizeof(msg), "SecSea %s coucou #%u\n", social_name(), ++count);
@@ -113,6 +119,7 @@ unsigned radio_tools_send(void) {
 void radio_tools_carrier_start(uint32_t max_ms) {
     if (state != R_IDLE)
         return;
+    configure();  /* From the GFSK profile (the radio may be in OOK, see ook_rx.c) */
     radio_wait_state(CC1101_STATE_IDLE, true);
     /* Asynchronous serial mode: the data to send is read on GDO0, keep it high for a constant frequency (f + deviation) */
     radio_write_registers((const uint8_t[]){CC1101_IOCFG0, 0x2E, CC1101_PKTCTRL0, 0x32}, 4);

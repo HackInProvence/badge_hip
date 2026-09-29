@@ -76,6 +76,9 @@ void net_subscribe(uint8_t type, net_handler_t handler);
 /** \brief Queue a packet, returns false when the queue is full or the data too long. */
 bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags);
 
+/** \brief Nothing to send nor being sent or received: the radio can be lent a moment. */
+bool net_idle(void);
+
 /** \brief Stop using the radio (another feature needs it), or use it again. */
 void net_pause(bool paused);
 

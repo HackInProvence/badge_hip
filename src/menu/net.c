@@ -78,6 +78,11 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags) {
 }
 
 
+bool net_idle(void) {
+    return ! tx_pending && ! queue_count && ! gpio_get(BADGE_RADIO_GDO0);
+}
+
+
 void net_pause(bool p) {
     paused = p;
     if (paused && owner && radio_tools_idle()) {

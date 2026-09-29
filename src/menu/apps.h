@@ -24,6 +24,8 @@ typedef enum {
     APP_SOKOBAN,
     APP_MASTERMIND,
     APP_PENDU,
+    APP_DECODER,
+    APP_WEATHER,
     APP_COUNT,
 } app_id_t;
 

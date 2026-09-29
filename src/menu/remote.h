@@ -59,6 +59,10 @@ void remote_set_enabled(bool enabled);
 bool remote_muted(void);
 void remote_set_muted(bool muted);
 
+/** \brief Stops (or allows again) listening to the OOK remotes a moment every second: for the features that need
+ * all the packets of the network (chorus, image transfer...). Calls are counted. */
+void remote_pause_windows(bool pause);
+
 /** \brief Feeds a Princeton code received by the OOK receiver (ook_rx.c). */
 void remote_princeton(uint32_t code);
 

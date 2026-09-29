@@ -32,7 +32,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433']
 
 
 class Tester:
@@ -406,6 +406,33 @@ def test_admin(t):
     t.result('admin: leave', t.expect(r'^admin: off$', 3) is not None)
 
 
+def test_radio433(t):
+    """The OOK receivers: the pages open, the radio goes back to the network afterwards."""
+    if not open_theme(t, 'Radio & IR'):
+        return t.result('radio433', False, 'theme "Radio & IR" not shown')
+    ok = t.press('xxb', 'Décodeur 433 MHz')
+    t.pump(4)
+    t.screenshot('decoder', 0.5)
+    t.result('433: decoder page', ok and t.press('a', 'Radio & IR'))
+    ok = t.press('xb', 'Station météo')
+    t.pump(2)
+    t.screenshot('weather', 0.5)
+    t.result('433: weather page', ok and t.press('a', 'Radio & IR'))
+    t.keys('yyy')
+    close_theme(t, 'Radio & IR')
+    # Back to the network: beacons again (the remote windows lend the radio a moment every second)
+    t.pump(2)
+    counts = []
+    for _ in range(2):
+        t.mark()
+        t.keys('!')
+        m = t.expect(r'social: (on|off), .* beacons sent (\d+)', 3)
+        counts.append(int(m.group(2)) if m else None)
+        t.pump(6)
+    ok = None not in counts and counts[1] > counts[0]
+    t.result('433: network after the OOK receivers', ok, f'{counts[1] - counts[0]} beacon(s) in 6s' if ok else str(counts))
+
+
 def test_images(t):
     if not open_theme(t, 'Médias'):
         return t.result('images', False, 'theme "Médias" not shown')
@@ -440,7 +467,7 @@ def test_images(t):
 
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
-         'apps': test_apps, 'admin': test_admin}
+         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433}
 
 
 def main():

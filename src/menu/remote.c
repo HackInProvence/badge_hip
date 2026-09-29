@@ -11,6 +11,8 @@
 #include "audio.h"
 #include "net.h"
 #include "noise_gen.h"
+#include "ook_rx.h"
+#include "radio_tools.h"
 #include "remote.h"
 #include "store.h"
 
@@ -20,6 +22,8 @@
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
 #define CIGALE_MS 6000
+#define OOK_WINDOW_MS 220  /* 2 frames of a Princeton remote (~50 ms each) whatever the start */
+#define OOK_PERIOD_MS 1000  /* Hold the button of the remote ~1 s */
 
 typedef struct {
     uint32_t src;
@@ -40,6 +44,9 @@ static uint16_t send_nonce = 0;
 static absolute_time_t next_send = 0;
 static char event[40];
 static bool event_pending = false;
+static bool window = false;  /* Listening to the OOK remotes */
+static absolute_time_t window_ts = 0;
+static int windows_paused = 0;
 
 
 static bool is_muted(void) {
@@ -169,7 +176,28 @@ void remote_init(void) {
 }
 
 
+void remote_pause_windows(bool pause) {
+    windows_paused += pause ? 1 : -1;
+    if (windows_paused < 0)
+        windows_paused = 0;
+}
+
+
 void remote_task(absolute_time_t now) {
+    /* A moment every second, listen to the Princeton remotes (Flipper Zero): ook_rx.c decodes them */
+    if (! window) {
+        if (remote_enabled() && ! windows_paused && radio_tools_idle() && net_idle()
+                && absolute_time_diff_us(window_ts, now) >= 0) {
+            ook_rx_start();
+            window = true;
+            window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
+        }
+    } else if (absolute_time_diff_us(window_ts, now) >= 0 || ! radio_tools_idle() || windows_paused) {
+        ook_rx_stop();
+        window = false;
+        window_ts = delayed_by_ms(now, OOK_PERIOD_MS);
+    }
+
     if (cigale_on && absolute_time_diff_us(cigale_end, now) >= 0) {
         noise_gen_set_enabled(false);
         cigale_on = false;
