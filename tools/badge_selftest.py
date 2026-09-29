@@ -258,7 +258,7 @@ def test_settings(t):
     t.keys('b')
     t.mark()
     t.keys('xxb')
-    m = t.expect(r'^saver: on', 6)
+    m = t.expect(r'^saver: on', 15)  # After the cleaning full refreshes (black, white)
     t.pump(4)  # The 4 grays refresh takes ~2s
     grays = t.frame is not None and any(v in (1, 2) for row in t.frame for v in row)
     t.screenshot('saver', 0)

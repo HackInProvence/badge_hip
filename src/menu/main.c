@@ -692,6 +692,14 @@ static int saver_selected = 0;
 static absolute_time_t last_activity = 0;
 static app_state_t saver_return = A_MENU;  /* Where the screensaver goes back to */
 static bool saver_shown = false;
+static int saver_clean_step = 0;  /* Full refreshes in black then white before the image (erase the ghosts) */
+
+static void start_saver(app_state_t back) {
+    saver_return = back;
+    saver_clean_step = 0;
+    app = A_START_SAVER;
+}
+
 static uint8_t saver_planes[2][GFX_FB_SIZE];
 
 static unsigned saver_minutes(void) {
@@ -794,8 +802,7 @@ static void settings_validate(void) {
         open_saver_images();
         break;
     default:
-        saver_return = A_SETTINGS;
-        app = A_START_SAVER;
+        start_saver(A_SETTINGS);
         break;
     }
 }
@@ -805,8 +812,18 @@ static int load_saver_image(const char *p) {
     FIL f;
     uint8_t header[16];
     UINT n;
-    if (sd_mount() != FR_OK || f_open(&f, p, FA_READ) != FR_OK)
-        return 0;
+    FRESULT fr = sd_mount();
+    if (fr == FR_OK)
+        fr = f_open(&f, p, FA_READ);
+    if (fr != FR_OK && fr != FR_NO_FILE && fr != FR_NO_PATH) {
+        /* The card was removed or changed since it was mounted: mount it again */
+        sd_unmount();
+        fr = sd_mount();
+        if (fr == FR_OK)
+            fr = f_open(&f, p, FA_READ);
+    }
+    if (fr != FR_OK)
+        return 0;  /* The built-in image instead */
     int bpp = 0;
     if (f_read(&f, header, sizeof(header), &n) == FR_OK && n == sizeof(header) && ! memcmp(header, "EPIMAGE1", 8)
             && (header[8] | header[9] << 8) == GFX_WIDTH && (header[10] | header[11] << 8) == GFX_HEIGHT) {
@@ -1768,8 +1785,7 @@ int main() {
         /* Screensaver after a while without button */
         if (saver_minutes() && saver_allowed(app)
                 && absolute_time_diff_us(last_activity, now) > saver_minutes() * 60000000ll) {
-            saver_return = app;
-            app = A_START_SAVER;
+            start_saver(app);
         }
 
         switch (app) {
@@ -1777,9 +1793,19 @@ int main() {
             /* The display must have finished its updates before giving the screen */
             display_task(now);
             if (display_is_idle() && screen_boot() && ! screen_busy()) {
-                show_saver();
-                saver_shown = false;
-                app = A_SAVER;
+                if (saver_clean_step < 2) {
+                    /* A clean image: the fast refreshes of the menus leave ghosts that the 4 grays waveform
+                     * doesn't erase. Full refreshes (normal waveform, not the fast one still loaded) in black,
+                     * then in white, one per loop (non blocking, ~2s each) */
+                    if (saver_clean_step == 0)
+                        screen_push_ws(screen_ws_1681_bw);
+                    screen_clear(saver_clean_step == 1);
+                    ++saver_clean_step;
+                } else {
+                    show_saver();
+                    saver_shown = false;
+                    app = A_SAVER;
+                }
             }
             break;
         case A_SAVER:
