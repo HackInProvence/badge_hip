@@ -11,7 +11,7 @@ To modify the badge software, see the [developer guide](developer_guide.md).
 
 - A 200 × 200 pixel e-Paper (electronic ink) screen, in black and white or 4 shades of grey.
   The image stays on screen even without power.
-- 4 buttons, 6 colour LEDs, a buzzer.
+- 4 buttons, 2 colour LEDs, a buzzer.
 - A 433 MHz radio (CC1101) compatible with the Flipper Zero.
 - A micro-SD card reader for videos, music, texts and images.
 - Two extension ports (infrared, OLED screen...).

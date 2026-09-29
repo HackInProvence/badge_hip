@@ -18,7 +18,7 @@ L'installation du SDK est détaillée dans le [README](../../README.md).
 | Sélection SPI0 | décodeur 74HC139 | A0/A1 = 18/19, CSn = 5 |
 | Radio | CC1101 433 MHz | SPI1 : SCK 26, MOSI 27, MISO 24, CS 25 ; GDO0/GDO2 |
 | Boutons | 4 poussoirs | Y (flanc G) 0, A (aile G) 1, B (aile D) 14, X (flanc D) 15 |
-| LEDs | 6 × WS2812 | 11 (PIO) |
+| LEDs | 2 × WS2812 (RGB) | 11 (PIO) |
 | Buzzer | via transistor 2N7002 | 28 (PWM) |
 | Batterie | TP4056 (charge), pont 100k/200k + LM321 | 29 (ADC3) |
 | Extensions | 2 connecteurs 2×6 | port droit J2 (IR), port gauche J3 (I2C1 : SDA 2, SCL 3) |

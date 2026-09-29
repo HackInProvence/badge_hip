@@ -6,7 +6,7 @@ ports d'extension, challenges CTF) : ces idées-là ne sont pas répétées ici,
 
 Rappel du matériel (contraintes réelles) : RP2040 (2 × M0+ 133 MHz, 264 Ko de RAM, 2 PIO), flash 16 Mo,
 USB CDC, e-Paper 200×200 N/B (4 gris en ~2 s, partiel ~0,3 s), **4 boutons** (ailes G/D, flancs G/D, courts et longs),
-6 LEDs WS2812, buzzer PWM (8 bits 16 kHz, son faible), CC1101 433 MHz (portée de quelques dizaines de mètres),
+2 LEDs RGB WS2812, buzzer PWM (8 bits 16 kHz, son faible), CC1101 433 MHz (portée de quelques dizaines de mètres),
 micro-SD, 2 ports 2×6 (I2C, GPIO, 3,3 V ; aujourd'hui IR à droite, OLED 128×64 à gauche), batterie Li-ion,
 un secteur de flash de 4 Ko pour les réglages.
 
@@ -202,7 +202,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 - **U1. Programme de la conférence** : planning sur la SD, « prochain talk » en page d'accueil, rappel par les LEDs 5 min avant. *Facile.*
 - **U2. Minuteur / chronomètre** : pour les orateurs et les ateliers. *Facile.*
 - **U3. Horloge** : l'heure, réglée par l'application PC ou par une balise radio de l'orga, et la veille qui affiche l'heure. *Facile.*
-- **U4. Lampe de poche** : les 6 LEDs en blanc, utile dans les couloirs le soir. *Facile.*
+- **U4. Veilleuse** : les 2 LEDs en blanc, pour se repérer dans un couloir sombre (pas une vraie lampe de poche). *Facile.*
 - **U5. Niveau à bulle / métronome / diapason** : le buzzer et les LEDs au service des musiciens. *Facile.*
 - **U6. Mode « ne pas déranger »** : coupe la radio et le son d'un appui long. *Facile.*
 - **U7. Mise à jour depuis la SD** : copier un `.uf2` sur la carte et l'installer sans ordinateur. *Difficile (bootloader).*
