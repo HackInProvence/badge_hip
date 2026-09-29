@@ -27,6 +27,10 @@
 #define STORE_NAME_LEN 12
 #define STORE_SAVER_IMAGE_LEN 80
 #define STORE_GAMES 8  /* At least GAME_COUNT */
+#define STORE_TYPE_PARTICIPANT 0
+#define STORE_TYPE_SPEAKER 1
+#define STORE_TYPE_STAFF 2
+#define STORE_ADMIN_ON 0xA5
 
 typedef struct {
     uint32_t id;
@@ -51,6 +55,14 @@ typedef struct {
     uint8_t saver_minutes;  /* Screensaver delay (0 = off, 0xFF = default) */
     char saver_image[STORE_SAVER_IMAGE_LEN];  /* Path of the .EPI image on the SD card, empty (or 0xFF) = built-in */
     uint16_t game_records[STORE_GAMES];  /* Records of the mini games (games.h), 0xFFFF = none */
+    uint8_t lamp_percent;  /* Brightness of the lamp, 0xFF = default */
+    uint8_t badge_type;  /* STORE_TYPE_*, set in the admin menu; 0xFF = participant */
+    uint8_t admin;  /* STORE_ADMIN_ON: the admin menu is shown (secret sequence of keys) */
+    uint8_t remote_off;  /* 1: the remote commands (Flipper, admin badges) are ignored; 0xFF = default (obeyed) */
+    uint8_t muted;  /* 1: no sound and no LEDs (remote command during the talks) */
+    uint8_t infection;  /* INFECTION_* state of the virus game */
+    uint16_t crypto_solved;  /* Bit n: challenge n solved; 0xFFFF = none */
+    uint16_t puzzle_records[STORE_GAMES];  /* Records of the puzzles (puzzles.h), 0xFFFF = none */
 } store_t;
 
 /** \brief Load the store from the flash (or initialize it). */

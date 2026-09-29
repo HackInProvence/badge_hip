@@ -27,6 +27,8 @@
 #include "pico/rand.h"
 #include "pico/stdlib.h"
 
+#include "app.h"
+#include "apps.h"
 #include "audio.h"
 #include "battery.h"
 #include "btns.h"
@@ -37,6 +39,7 @@
 #include "noise_gen.h"
 #include "radio.h"
 #include "radio_tools.h"
+#include "remote.h"
 #include "rsvp.h"
 #include "credits.h"
 #include "ctf.h"
@@ -87,8 +90,29 @@ static absolute_time_t btn_ts = 0;
 static uint8_t btn_released = 0;  /* Buttons released during the last call of buttons_pressed() */
 static absolute_time_t btn_down_ts[4];  /* When each button was pressed (A, B, X, Y) */
 static uint8_t btn_simulated_long = 0;  /* Long presses simulated on USB (keys B, X, Y) */
+static uint8_t btn_long_fired = 0;  /* Buttons whose long press was reported during the current press */
 static bool fb_stream = false;  /* Send the screen on USB each time it changes */
 static bool fb_send_now = false;  /* Send the screen once */
+
+static int btn_index(uint8_t bit);
+static uint32_t btn_held_ms(uint8_t bit, absolute_time_t now);
+
+/* The buttons for the applications (app.h), to call once per loop after buttons_pressed() */
+static void app_buttons_event(app_buttons_t *ev, uint8_t pressed, absolute_time_t now) {
+    memset(ev, 0, sizeof(*ev));
+    ev->pressed = pressed;
+    ev->held = btn_stable;
+    ev->long_pressed = btn_simulated_long;
+    for (uint8_t bit = BTN_A; bit <= BTN_Y; bit <<= 1) {
+        ev->held_ms[btn_index(bit)] = btn_held_ms(bit, now);
+        if ((btn_stable & bit) && ! (btn_long_fired & bit) && btn_held_ms(bit, now) >= APP_LONG_PRESS_MS) {
+            ev->long_pressed |= bit;
+            btn_long_fired |= bit;
+        }
+    }
+    ev->released_short = btn_released & ~btn_long_fired & ~btn_simulated_long;
+    btn_long_fired &= ~btn_released;
+}
 
 static int btn_index(uint8_t bit) {
     return bit == BTN_A ? 0 : bit == BTN_B ? 1 : bit == BTN_X ? 2 : 3;
@@ -210,11 +234,15 @@ static const char *LED_NAMES[] = {"éteintes", "arc-en-ciel", "respiration", "ba
 
 static void set_sound(bool on) {
     sound_on = on;
-    noise_gen_set_enabled(on);
+    noise_gen_set_enabled(on && ! remote_muted());
 }
 
 static void set_leds(unsigned mode) {
     led_mode = mode % N_LED_MODES;
+    if (remote_muted()) {
+        leds_cancel_anim(true);  /* Mute mode: the LED mode is kept for later */
+        return;
+    }
     switch (led_mode) {
     case 1: leds_anim_wheel(2000000); break;
     case 2: leds_anim_breath(LED_RGB(255, 64, 0), 2000000); break;
@@ -252,8 +280,12 @@ typedef enum {
     M_REFLEX,
     M_SNAKE,
     M_CREDITS,
+    M_REMOTE_TOGGLE,  /* Settings: obey the remote commands */
+    M_MUTE_TOGGLE,  /* Settings: mute mode */
+    M_ADMIN_OFF,  /* Admin menu: leave the admin mode */
     N_ITEMS,
 } menu_item_t;
+#define M_APP(id) (64 + (id))  /* The applications (apps.h) in the menus */
 
 typedef enum {
     A_MENU,
@@ -285,10 +317,21 @@ typedef enum {
     A_PAGE,  /* A message page (e.g. an error), back to the menu with any wing */
     A_GAME,  /* A mini game (games.c) owns the buttons and the page */
     A_RADIO_TEST,  /* Radio test: a message every radio_test_s seconds (long press on "Radio : message") */
+    A_APP,  /* An application (app.h) owns the buttons and the page */
     A_CREDITS,  /* One page per contributor, the flanks change the page */
 } app_state_t;
 
 static app_state_t app = A_MENU;
+static const app_t *cur_app = NULL;  /* When app == A_APP */
+static const app_t *app_pending = NULL;  /* Opened by app_open() at the next loop */
+
+void app_open(const app_t *a) {
+    app_pending = a;
+}
+
+const app_t *app_current(void) {
+    return app == A_APP ? cur_app : NULL;
+}
 static int selected = M_SOUND;
 static uint8_t fb[GFX_FB_SIZE];
 static bool redraw = true;
@@ -452,7 +495,20 @@ static void item_label(int item, char *buf, size_t len) {
     case M_RADIO_CARRIER: snprintf(buf, len, "Radio : porteuse"); break;
     case M_INFO: snprintf(buf, len, "Infos"); break;
     case M_CREDITS: snprintf(buf, len, "Crédits"); break;
-    default: buf[0] = 0; break;
+    case M_REMOTE_TOGGLE: snprintf(buf, len, "Télécommande : %s", remote_enabled() ? "oui" : "non"); break;
+    case M_MUTE_TOGGLE: snprintf(buf, len, "Mode muet : %s", remote_muted() ? "oui" : "non"); break;
+    case M_ADMIN_OFF: snprintf(buf, len, "Quitter le mode admin"); break;
+    default:
+        if (item >= M_APP(0) && item < M_APP(APP_COUNT)) {
+            const app_t *a = APPS[item - M_APP(0)];
+            if (a->label)
+                a->label(buf, len);
+            else
+                snprintf(buf, len, "%s", a->name);
+            return;
+        }
+        buf[0] = 0;
+        break;
     }
 }
 
@@ -480,17 +536,41 @@ static void track_title(const char *track_path, char *buf, size_t len) {
 typedef struct {
     const char *title;
     uint8_t n;
-    menu_item_t items[8];
+    int items[16];
 } submenu_t;
 
 static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
     {"Jeux", 7, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_BLIND_TEST, M_CTF}},
-    {"Badge", 4, {M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
-    {"Radio & IR", 4, {M_SOCIAL, M_RADIO_MSG, M_RADIO_CARRIER, M_IR}},
-    {"Réglages", 3, {M_SETTINGS, M_INFO, M_CREDITS}},
+    {"Social", 1, {M_SOCIAL}},
+    {"Radio & IR", 3, {M_RADIO_MSG, M_RADIO_CARRIER, M_IR}},
+    {"Badge", 6, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
+    {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
+    {"Admin", 3, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
-#define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])))
+/* The admin menu is only shown in admin mode */
+#define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
+
+/* Secret sequence of the flanks in the main menu that shows the admin menu (L = left flank, R = right flank) */
+#define ADMIN_SEQUENCE "LLRRLRLR"
+#define ADMIN_SEQUENCE_MS 8000
+static char admin_keys[sizeof(ADMIN_SEQUENCE)] = "";
+static absolute_time_t admin_keys_ts = 0;
+
+static bool admin_sequence(uint8_t flank, absolute_time_t now) {
+    size_t n = strlen(admin_keys);
+    if (n && absolute_time_diff_us(admin_keys_ts, now) > ADMIN_SEQUENCE_MS * 1000ll)
+        n = 0;  /* Too slow: start again */
+    if (n == sizeof(admin_keys) - 1) {
+        memmove(admin_keys, admin_keys + 1, n);
+        --n;
+    }
+    if (! n)
+        admin_keys_ts = now;
+    admin_keys[n] = flank == BTN_Y ? 'L' : 'R';
+    admin_keys[n + 1] = 0;
+    return ! strcmp(admin_keys, ADMIN_SEQUENCE);
+}
 static int menu_level = 0;  /* 0: the themes, 1: the features of the theme */
 static int top_selected = 0;
 static int sub_selected = 0;
@@ -878,6 +958,8 @@ static void show_saver(void) {
 
 /* Whether the screensaver can start in this state (not while playing, reading, typing...) */
 static bool saver_allowed(app_state_t a) {
+    if (a == A_APP)
+        return cur_app && ! cur_app->no_saver;
     return a == A_MENU || a == A_BROWSE || a == A_PAGE || a == A_INFO || a == A_CREDITS || a == A_SOCIAL || a == A_IR || a == A_CTF
            || a == A_BT_FOLDERS || a == A_SETTINGS || a == A_SAVER_IMAGES;
 }
@@ -1342,10 +1424,22 @@ static void game_tone(uint16_t hz, uint16_t ms) {
 }
 
 static void game_leds(uint8_t r, uint8_t g, uint8_t b) {
-    if (r || g || b)
+    if ((r || g || b) && ! remote_muted())
         leds_anim_fixed(LED_RGB(r, g, b));
     else
         leds_cancel_anim(true);
+}
+
+/* For the applications (app.h) */
+void app_tone(uint16_t hz, uint16_t ms) {
+    game_tone(hz, ms);  /* Silent in mute mode (audio_set_mute()) */
+}
+
+void app_leds(uint8_t r, uint8_t g, uint8_t b) {
+    if (r || g || b)
+        game_leds(r, g, b);
+    else
+        set_leds(led_mode);  /* Back to the animation of the badge */
 }
 
 static const games_hooks_t GAME_HOOKS = {
@@ -1523,6 +1617,10 @@ static void validate(void) {
         return;
     }
     selected = SUBMENUS[top_selected].items[sub_selected];
+    if (selected >= M_APP(0) && selected < M_APP(APP_COUNT)) {
+        app_open(APPS[selected - M_APP(0)]);
+        return;
+    }
     switch (selected) {
     case M_SOUND:
         set_sound(! sound_on);
@@ -1587,6 +1685,20 @@ static void validate(void) {
         games_start(selected - M_TICTACTOE, get_absolute_time());
         ui_trace(games_name(selected - M_TICTACTOE));
         app = A_GAME;
+        break;
+    case M_REMOTE_TOGGLE:
+        remote_set_enabled(! remote_enabled());
+        break;
+    case M_MUTE_TOGGLE:
+        remote_set_muted(! remote_muted());
+        break;
+    case M_ADMIN_OFF:
+        store_get()->admin = 0;
+        store_changed();
+        menu_level = 0;
+        top_selected = 0;
+        printf("admin: off\n");
+        set_status("Mode admin désactivé");
         break;
     case M_CREDITS:
         credits_page = 0;
@@ -1717,6 +1829,7 @@ int main() {
     display_init();
     radio_tools_init();
     net_init();
+    remote_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
@@ -1745,7 +1858,34 @@ int main() {
             redraw = true;
             pressed = 0;
         }
-        if (app == A_GAME) {
+        app_buttons_t app_ev;
+        app_buttons_event(&app_ev, pressed, now);
+        if (app_pending) {
+            /* Open an application (from the menu or from a service: wakes up from the screensaver) */
+            if (app == A_SAVER || app == A_START_SAVER) {
+                printf("saver: off\n");
+                display_invalidate();
+            }
+            if (app == A_APP && cur_app && cur_app->stop)
+                cur_app->stop();
+            cur_app = app_pending;
+            app_pending = NULL;
+            ui_trace(cur_app->name);
+            app = A_APP;
+            cur_app->start(now);
+            redraw = true;
+        } else if (app == A_APP) {
+            if ((pressed || app_ev.released_short || app_ev.long_pressed || app_ev.held) && ! cur_app->buttons(&app_ev, now)) {
+                if (cur_app->stop)
+                    cur_app->stop();
+                cur_app = NULL;
+                display_set_periodic_full(true);
+                set_leds(led_mode);
+                app = A_MENU;
+            }
+            if (pressed || app_ev.released_short || app_ev.long_pressed)
+                redraw = true;
+        } else if (app == A_GAME) {
             if (! games_buttons(pressed, now)) {
                 set_leds(led_mode);  /* The games used the LEDs */
                 display_set_periodic_full(true);
@@ -1852,6 +1992,14 @@ int main() {
         } else if (pressed & (BTN_UP | BTN_DOWN)) {
             int delta = (pressed & BTN_UP) ? -1 : 1;
             if (app == A_MENU) {
+                if (menu_level == 0 && admin_sequence(pressed & (BTN_UP | BTN_DOWN), now)) {
+                    if (store_get()->admin != STORE_ADMIN_ON) {
+                        store_get()->admin = STORE_ADMIN_ON;
+                        store_changed();
+                    }
+                    printf("admin: on\n");
+                    set_status("Mode admin activé");
+                }
                 if (menu_level == 0)
                     top_selected = (top_selected + delta + N_SUBMENUS) % N_SUBMENUS;
                 else
@@ -1912,6 +2060,17 @@ int main() {
                 set_status(last_radio_msg);
         }
         net_task(now);
+        remote_task(now);
+        static bool was_muted = false;
+        if (remote_muted() != was_muted) {
+            was_muted = remote_muted();
+            set_leds(led_mode);
+            set_sound(sound_on);
+            redraw = true;
+        }
+        char remote_msg[40];
+        if (remote_event(remote_msg, sizeof(remote_msg)))
+            set_status(remote_msg);
         social_task(now);
         battery_task(now);
         static int shown_bars = -2;
@@ -2101,6 +2260,11 @@ int main() {
             }
             if (app == A_RADIO_TEST)
                 radio_test_task(now);
+            if (app == A_APP) {
+                if (cur_app->task && cur_app->task(now))
+                    redraw = true;
+                display_set_periodic_full(! cur_app->calm || cur_app->calm());
+            }
             if (app == A_GAME) {
                 if (games_task(now))
                     redraw = true;
@@ -2159,6 +2323,10 @@ int main() {
                     games_render(fb);
                 else if (app == A_RADIO_TEST)
                     render_radio_test(now);
+                else if (app == A_APP) {
+                    gfx_clear(fb, GFX_WHITE);
+                    cur_app->render(fb, now);
+                }
                 else if (app == A_CREDITS) {
                     credits_render(fb, credits_page);
                     ui_trace("Crédits");

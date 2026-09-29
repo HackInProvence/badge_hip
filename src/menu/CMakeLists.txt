@@ -3,6 +3,12 @@
 add_executable(badge_menu)
 target_sources(badge_menu PRIVATE
     main.c
+    admin.c
+    apps.c
+    lamp.c
+    nametag.c
+    remote.c
+    ui.c
     net.c
     battery.c
     display.c

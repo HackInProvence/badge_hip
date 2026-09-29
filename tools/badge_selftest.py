@@ -32,7 +32,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'ctf', 'settings', 'radio', 'ir', 'images']
+GROUPS = ['diag', 'menus', 'games', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin']
 
 
 class Tester:
@@ -117,7 +117,7 @@ class Tester:
 
 # ---- The tests, grouped. Each group starts and ends at the main menu, on the first theme ----
 
-THEMES = ['Médias', 'Jeux', 'Badge', 'Radio & IR', 'Réglages']
+THEMES = ['Médias', 'Jeux', 'Social', 'Radio & IR', 'Badge', 'Réglages']
 TOP = 'Badge SecSea'
 
 
@@ -279,7 +279,7 @@ def test_settings(t):
     t.keys('yy')
     t.press('a', 'Réglages')
     # Infos, then the credits
-    t.check_ui('infos', 'xb', 'Infos')
+    t.check_ui('infos', 'xxxb', 'Infos')  # After the screensaver, the remote and the mute settings
     t.screenshot('infos')
     t.check_ui('credits', 'b', 'Crédits')
     t.mark()
@@ -289,7 +289,7 @@ def test_settings(t):
     t.result('credits: next page', m is not None, m.group(1) if m else '')
     t.check_ui('credits: back to infos', 'a', 'Infos')
     t.press('a', 'Réglages')
-    t.keys('y')
+    t.keys('yyy')
     close_theme(t, 'Réglages')
 
 
@@ -297,7 +297,7 @@ def test_radio(t):
     if not open_theme(t, 'Radio & IR'):
         return t.result('radio', False, 'theme "Radio & IR" not shown')
     t.mark()
-    t.keys('xb')  # Radio : message
+    t.keys('b')  # Radio : message (first line)
     m = t.expect(r'^radio: sending message #(\d+)$', 3)
     sent = t.expect(r'^radio: message #\d+ sent in (\d+) ms$', 5) if m else None
     t.result('radio: message', sent is not None, f'sent in {sent.group(1)} ms' if sent else 'not sent')
@@ -316,7 +316,6 @@ def test_radio(t):
     stopped = t.press('a', 'Radio & IR')
     t.result('radio: test mode', started is not None and 4.0 <= period <= 6.0 and stopped,
              f'{len(times)} message(s), {period:.1f} s apart' if started else 'not started')
-    t.keys('y')
     # The network of the cicadas sends a beacon every ~2s
     counts = []
     for _ in range(2):
@@ -344,6 +343,47 @@ def test_ir(t):
     m = t.expect(r'ir test: sent in (\d+) us')
     t.result('ir: NEC send', m is not None and 60000 <= int(m.group(1)) <= 80000,
              f'{m.group(1)} us (~67500 expected)' if m else 'no answer')
+
+
+def test_apps(t):
+    """The applications of the Badge theme: name tag and lamp."""
+    if not open_theme(t, 'Badge'):
+        return t.result('apps', False, 'theme "Badge" not shown')
+    ok = t.press('b', 'Badge nominatif')
+    t.screenshot('nametag')
+    t.result('app: name tag', ok and t.press('a', 'Badge'))
+    ok = t.press('xb', 'Lampe')
+    t.keys('x')  # Brighter
+    t.screenshot('lamp')
+    t.result('app: lamp', ok and t.press('a', 'Badge'))
+    t.keys('y')
+    close_theme(t, 'Badge')
+
+
+def test_admin(t):
+    """The secret sequence shows the admin menu; mute / unmute commands; leave the admin mode."""
+    t.pump(8.5)  # The flanks pressed before don't count (the sequence must be typed within 8 s)
+    t.mark()
+    t.keys('yyxxyxyx')  # Left, left, right, right, left, right, left, right: back on the first theme
+    on = t.expect(r'^admin: (on)$', 3)
+    t.result('admin: secret sequence', on is not None)
+    if not on:
+        return
+    admin_index = len(THEMES)  # The admin menu is after the themes
+    t.press('y' + 'b', 'Admin')  # From the first theme, up = the last one (Admin)
+    ok = t.press('b', 'Commandes radio')
+    t.mark()
+    t.keys('b')  # Muet
+    muted = t.expect(r'^remote: command 0x02', 3)
+    t.screenshot('admin_commands')
+    t.keys('xb')  # Fin du mode muet
+    unmuted = t.expect(r'^remote: command 0x03', 3)
+    t.result('admin: mute / unmute', ok and muted is not None and unmuted is not None)
+    t.keys('y')
+    t.press('a', 'Admin')
+    t.mark()
+    t.keys('xxb')  # Quitter le mode admin
+    t.result('admin: leave', t.expect(r'^admin: off$', 3) is not None)
 
 
 def test_images(t):
@@ -379,7 +419,8 @@ def test_images(t):
 
 
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'ctf': test_ctf,
-         'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images}
+         'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
+         'apps': test_apps, 'admin': test_admin}
 
 
 def main():

@@ -31,6 +31,7 @@ void store_init(void) {
         memset(&store, 0, sizeof(store));
         store.magic = STORE_MAGIC;
         store.version = STORE_VERSION;
+        memset(store.puzzle_records, 0xFF, sizeof(store.puzzle_records));  /* No record yet */
         printf("store: initialized\n");
     }
     for (uint16_t i = 0; i < store.n_met; ++i)

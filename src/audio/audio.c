@@ -27,11 +27,12 @@ static uint32_t written = 0;  /* Samples written since open */
 static uint32_t silence = 0;  /* Samples of silence inserted by this module (start, underruns) */
 #define SILENCE_AHEAD 512  /* Silence written after the samples: a late producer plays silence, not old samples */
 static uint8_t volume = AUDIO_VOLUME_MAX * 3 / 4;
+static volatile bool muted = false;  /* The samples still play (the players use them as a clock), silently */
 
 
 /* The PWM level of a sample: the volume scales the whole signal (also its DC part, which only heats the buzzer) */
 static inline uint16_t level(uint8_t sample) {
-    return (uint16_t)((sample * volume) / AUDIO_VOLUME_MAX);
+    return muted ? 0 : (uint16_t)((sample * volume) / AUDIO_VOLUME_MAX);
 }
 
 
@@ -175,6 +176,11 @@ void audio_write(const uint8_t *samples, size_t n) {
 
 void audio_set_volume(uint8_t v) {
     volume = v > AUDIO_VOLUME_MAX ? AUDIO_VOLUME_MAX : v;
+}
+
+
+void audio_set_mute(bool m) {
+    muted = m;
 }
 
 

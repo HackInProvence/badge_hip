@@ -8,7 +8,8 @@
 """
 Automatic tests run on the PC, without the badge:
 - C modules of the firmware compiled with a host compiler (gcc or clang) and a stand-in of the Pico SDK (stubs/):
-  graphics (gfx), infrared decoding (ir), mini games (games), signed score QR codes (score), fast reading (rsvp), copy of the screen RAM (screen),
+  graphics (gfx), infrared decoding (ir), mini games (games), signed score QR codes (score),
+  crypto challenges (crypto), 433 MHz OOK decoders (ookdec), fast reading (rsvp), copy of the screen RAM (screen),
 - Python converters: image2epi.py (exact round trip), video2epaper.py and audio2wav.py (need ffmpeg, skipped without).
 
 Usage: python src/tests/host/run_tests.py [--cc gcc] [--keep] [test names...]
@@ -71,6 +72,16 @@ def test_games(work):
 def test_score(work):
     return c_test('test_score', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'qrcode/qrcodegen.c'],
                   [os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work)
+
+
+def test_crypto(work):
+    return c_test('test_crypto_ctf', ['menu/crypto_ctf.c', 'menu/score_code.c', 'qrcode/qrcodegen.c', 'gfx/gfx.c',
+                                      'gfx/gfx_fonts.c'],
+                  [os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work)
+
+
+def test_ookdec(work):
+    return c_test('test_ookdec', [], [STUBS, SRC, os.path.join(SRC, 'radio')], work)
 
 
 def test_rsvp(work):
@@ -176,7 +187,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('score', test_score), ('rsvp', test_rsvp), ('screen', test_screen),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('rsvp', test_rsvp), ('screen', test_screen),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
@@ -193,7 +204,7 @@ if __name__ == '__main__':
     for name, func in TESTS:
         if ARGS.names and name not in ARGS.names:
             continue
-        if func in (test_gfx, test_ir, test_games, test_score, test_rsvp, test_screen) and not shutil.which(ARGS.cc):
+        if func in (test_gfx, test_ir, test_games, test_score, test_crypto, test_ookdec, test_rsvp, test_screen) and not shutil.which(ARGS.cc):
             ok, output = None, f'no C compiler ({ARGS.cc})'
         else:
             work = tempfile.mkdtemp(prefix=f'badge_{name}_')

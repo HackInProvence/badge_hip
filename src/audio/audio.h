@@ -53,4 +53,7 @@ size_t audio_queued(void);
 void audio_set_volume(uint8_t volume);
 uint8_t audio_get_volume(void);
 
+/* Mute (the samples still play silently: the players keep their clock) */
+void audio_set_mute(bool muted);
+
 #endif /* _AUDIO_H */
