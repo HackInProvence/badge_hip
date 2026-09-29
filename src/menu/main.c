@@ -292,6 +292,7 @@ typedef enum {
     A_INFO,
     A_PAGE,  /* A message page (e.g. an error), back to the menu with any wing */
     A_GAME,  /* A mini game (games.c) owns the buttons and the page */
+    A_RADIO_TEST,  /* Radio test: a message every radio_test_s seconds (long press on "Radio : message") */
     A_CREDITS,  /* One page per contributor, the flanks change the page */
 } app_state_t;
 
@@ -1378,25 +1379,142 @@ static const games_hooks_t GAME_HOOKS = {
     .badge_id = social_id,
 };
 
-/* Games menu: right wing released = play, held = the record as a signed QR code */
-#define GAME_RECORD_LONG_MS 800
-static void validate(void);
-static bool game_ok_pending = false;
+/* Radio test mode: a message every radio_test_s seconds, the flanks change the pause (held: faster and faster) */
+#define RADIO_TEST_DEFAULT_S 5
+#define RADIO_TEST_MAX_S (99 * 3600)  /* Practically unlimited */
+#define RADIO_TEST_REPEAT_DELAY_MS 400
+#define RADIO_TEST_REPEAT_MS 100
+static uint32_t radio_test_s = RADIO_TEST_DEFAULT_S;
+static bool radio_test_paused = false;
+static unsigned radio_test_sent = 0;
+static absolute_time_t radio_test_last = 0, radio_test_next = 0, radio_test_tick = 0;
+static absolute_time_t radio_test_repeat_ts[2];
 
-static bool game_item_selected(void) {
-    menu_item_t item = SUBMENUS[top_selected].items[sub_selected];
-    return app == A_MENU && menu_level == 1 && item >= M_TICTACTOE && item <= M_SNAKE;
+static void radio_test_start(absolute_time_t now) {
+    radio_test_s = RADIO_TEST_DEFAULT_S;
+    radio_test_paused = false;
+    radio_test_sent = 0;
+    radio_test_next = now;  /* The first message right away */
+    radio_test_tick = now;
+    display_set_periodic_full(false);  /* A redraw every second: no blinking full refresh */
+    app = A_RADIO_TEST;
+    printf("radio test: every %lu s\n", (unsigned long)radio_test_s);
 }
 
-static void game_item_ok(uint8_t pressed, absolute_time_t now) {
-    if (pressed & BTN_OK)
-        game_ok_pending = true;
-    if (! game_ok_pending)
+/* Changes the pause, by bigger steps the longer the flank is held */
+static void radio_test_change(int direction, uint32_t held_ms, bool simulated_long) {
+    uint32_t step = simulated_long ? 10 : held_ms > 6000 ? 60 : held_ms > 4000 ? 10 : held_ms > 2000 ? 5 : 1;
+    if (direction < 0)
+        radio_test_s = radio_test_s > step ? radio_test_s - step : 1;
+    else
+        radio_test_s = radio_test_s + step < RADIO_TEST_MAX_S ? radio_test_s + step : RADIO_TEST_MAX_S;
+    if (radio_test_sent)
+        radio_test_next = delayed_by_ms(radio_test_last, radio_test_s * 1000);
+    redraw = true;
+}
+
+static void radio_test_buttons(uint8_t pressed, absolute_time_t now) {
+    if (pressed & BTN_CANCEL) {
+        printf("radio test: stopped after %u message(s)\n", radio_test_sent);
+        display_set_periodic_full(true);
+        app = A_MENU;
+        redraw = true;
         return;
-    game_t g = SUBMENUS[top_selected].items[sub_selected] - M_TICTACTOE;
-    if ((btn_simulated_long & BTN_OK) || btn_held_ms(BTN_OK, now) >= GAME_RECORD_LONG_MS) {
-        game_ok_pending = false;
-        if (games_show_record(g)) {
+    }
+    if (pressed & BTN_OK) {
+        radio_test_paused = ! radio_test_paused;
+        if (! radio_test_paused)
+            radio_test_next = now;  /* Resume with a message */
+        redraw = true;
+    }
+    static const uint8_t flanks[2] = {BTN_Y, BTN_X};  /* Left flank: shorter, right flank: longer */
+    for (int f = 0; f < 2; ++f) {
+        if (pressed & flanks[f]) {
+            radio_test_change(f ? 1 : -1, 0, btn_simulated_long & flanks[f]);
+            radio_test_repeat_ts[f] = delayed_by_ms(now, RADIO_TEST_REPEAT_DELAY_MS);
+        } else if (btn_held_ms(flanks[f], now) && absolute_time_diff_us(radio_test_repeat_ts[f], now) >= 0) {
+            radio_test_change(f ? 1 : -1, btn_held_ms(flanks[f], now), false);
+            radio_test_repeat_ts[f] = delayed_by_ms(now, RADIO_TEST_REPEAT_MS);
+        }
+    }
+}
+
+static void radio_test_task(absolute_time_t now) {
+    if (! radio_test_paused && absolute_time_diff_us(radio_test_next, now) >= 0 && radio_tools_send()) {
+        /* (radio busy, e.g. a beacon of the network: tried again at the next loop) */
+        ++radio_test_sent;
+        radio_test_last = now;
+        radio_test_next = delayed_by_ms(now, radio_test_s * 1000);
+        redraw = true;
+    }
+    if (absolute_time_diff_us(radio_test_tick, now) >= 1000000) {  /* The countdown */
+        radio_test_tick = now;
+        redraw = true;
+    }
+}
+
+static void format_duration(char *buf, size_t len, uint32_t s) {
+    if (s < 60)
+        snprintf(buf, len, "%lu s", (unsigned long)s);
+    else if (s < 3600)
+        snprintf(buf, len, s % 60 ? "%lu min %02lu s" : "%lu min", (unsigned long)(s / 60), (unsigned long)(s % 60));
+    else
+        snprintf(buf, len, "%lu h %02lu min", (unsigned long)(s / 3600), (unsigned long)(s % 3600 / 60));
+}
+
+static void render_radio_test(absolute_time_t now) {
+    char text[64], fitted[64];
+    gfx_clear(fb, GFX_WHITE);
+    draw_title("Test radio");
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 6, &gfx_font_small, "Un message toutes les", GFX_BLACK, GFX_ALIGN_CENTER);
+    format_duration(text, sizeof(text), radio_test_s);
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 24, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 54, &gfx_font_small, "Flancs : - / +  (maintenir : vite)", GFX_BLACK,
+             GFX_ALIGN_CENTER);
+    snprintf(text, sizeof(text), "Messages envoyés : %u", radio_test_sent);
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 80, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    /* The last message on two lines: "SecSea <name>" and "coucou #<counter>" */
+    const char *msg = radio_test_sent ? radio_tools_last_text() : "-";
+    const char *second = strstr(msg, " coucou");
+    snprintf(text, sizeof(text), "%.*s", second ? (int)(second - msg) : (int)strlen(msg), msg);
+    fit_text(fitted, sizeof(fitted), text, GFX_WIDTH - 8);
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 96, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+    if (second)
+        gfx_text(fb, GFX_WIDTH/2, TITLE_H + 112, &gfx_font_small, second + 1, GFX_BLACK, GFX_ALIGN_CENTER);
+    if (radio_test_paused) {
+        snprintf(text, sizeof(text), "En pause");
+    } else {
+        int64_t left = absolute_time_diff_us(now, radio_test_next) / 1000000;
+        char d[24];
+        format_duration(d, sizeof(d), left > 0 ? (uint32_t)left : 0);
+        snprintf(text, sizeof(text), "Prochain dans %s", d);
+    }
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 132, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    draw_footer(radio_test_paused ? "G : quitter  D : reprendre" : "G : quitter  D : pause");
+}
+
+/* Menu: right wing released = the usual action, held = another one (games: the record as a signed QR code,
+ * radio message: the test mode) */
+#define LONG_PRESS_MS 800
+static void validate(void);
+static bool long_ok_pending = false;
+
+static bool long_item_selected(void) {
+    menu_item_t item = SUBMENUS[top_selected].items[sub_selected];
+    return app == A_MENU && menu_level == 1 && ((item >= M_TICTACTOE && item <= M_SNAKE) || item == M_RADIO_MSG);
+}
+
+static void long_item_ok(uint8_t pressed, absolute_time_t now) {
+    if (pressed & BTN_OK)
+        long_ok_pending = true;
+    if (! long_ok_pending)
+        return;
+    menu_item_t item = SUBMENUS[top_selected].items[sub_selected];
+    if ((btn_simulated_long & BTN_OK) || btn_held_ms(BTN_OK, now) >= LONG_PRESS_MS) {
+        long_ok_pending = false;
+        if (item == M_RADIO_MSG) {
+            radio_test_start(now);
+        } else if (games_show_record(item - M_TICTACTOE)) {
             ui_trace("Record");
             app = A_GAME;
         } else {
@@ -1404,7 +1522,7 @@ static void game_item_ok(uint8_t pressed, absolute_time_t now) {
         }
         redraw = true;
     } else if (btn_released & BTN_OK) {
-        game_ok_pending = false;
+        long_ok_pending = false;
         validate();
         redraw = true;
     }
@@ -1662,6 +1780,8 @@ int main() {
                 app = A_MENU;
             }
             redraw = true;
+        } else if (app == A_RADIO_TEST) {
+            radio_test_buttons(pressed, now);
         } else if (app == A_NAME_EDIT) {
             name_edit_buttons(pressed, now);
         } else if (app == A_RSVP) {
@@ -1688,8 +1808,8 @@ int main() {
                 page_back = A_CTF;
                 app = A_PAGE;
             }
-        } else if (game_item_selected() && ((pressed & BTN_OK) || game_ok_pending)) {
-            game_item_ok(pressed, now);
+        } else if (long_item_selected() && ((pressed & BTN_OK) || long_ok_pending)) {
+            long_item_ok(pressed, now);
         } else if (pressed & BTN_CANCEL) {
             cancel();
         } else if (pressed & BTN_OK) {
@@ -2006,6 +2126,8 @@ int main() {
                 app = A_MENU;
                 redraw = true;
             }
+            if (app == A_RADIO_TEST)
+                radio_test_task(now);
             if (app == A_GAME) {
                 if (games_task(now))
                     redraw = true;
@@ -2062,6 +2184,8 @@ int main() {
                     render_page(page_title, page_text, "G ou D : retour");
                 else if (app == A_GAME)
                     games_render(fb);
+                else if (app == A_RADIO_TEST)
+                    render_radio_test(now);
                 else if (app == A_CREDITS) {
                     credits_render(fb, credits_page);
                     ui_trace("Crédits");

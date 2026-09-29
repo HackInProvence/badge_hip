@@ -87,6 +87,12 @@ void radio_tools_profile_social(uint8_t patable) {
 }
 
 
+static char last_text[64] = "";
+
+const char *radio_tools_last_text(void) {
+    return last_text;
+}
+
 unsigned radio_tools_send(void) {
     if (state != R_IDLE)
         return 0;
@@ -95,6 +101,7 @@ unsigned radio_tools_send(void) {
     int len = snprintf(msg, sizeof(msg), "SecSea %s coucou #%u\n", social_name(), ++count);
     if (! radio_tx_packet((const uint8_t *)msg, len))
         return 0;
+    snprintf(last_text, sizeof(last_text), "%.*s", len - 1, msg);  /* Without the newline */
     state = R_SENDING;
     start_ts = get_absolute_time();
     snprintf(message, sizeof(message), "Envoi du message #%u", count);

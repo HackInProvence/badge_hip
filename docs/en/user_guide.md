@@ -133,7 +133,11 @@ D (right wing) on the right.
   - Left wing on the first letter: cancel.
 - Right flank: turn the signals on / off.
 
-**Radio : message** (Radio: message) sends a message you can read with the "SubGHz chat" app on a Flipper Zero (433.92 MHz).
+**Radio : message** (Radio: message) sends "SecSea <name of your cicada> coucou #<number>", which you can read with
+the "SubGHz chat" app on a Flipper Zero (433.92 MHz).
+A **long press on the right wing** starts the **test mode**: one message every 5 seconds.
+- Flanks: shorter / longer pause (1 second minimum, no maximum). Hold a flank to scroll the values faster and faster.
+- Right wing: pause / resume; left wing: quit.
 
 **Radio : porteuse** (Radio: carrier) transmits a continuous signal for 30 s (visible with a Flipper Zero's frequency analyzer).
 

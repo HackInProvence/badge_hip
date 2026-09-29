@@ -131,7 +131,11 @@ D (aile droite) à droite.
   - Aile gauche sur la première lettre : annuler.
 - Flanc droit : activer / couper les signaux.
 
-**Radio : message** envoie un message que l'on peut lire avec l'application « SubGHz chat » d'un Flipper Zero (433,92 MHz).
+**Radio : message** envoie « SecSea <nom de votre cigale> coucou #<numéro> », que l'on peut lire avec l'application
+« SubGHz chat » d'un Flipper Zero (433,92 MHz).
+Un **appui long sur l'aile droite** lance le **mode test** : un message toutes les 5 secondes.
+- Flancs : pause plus courte / plus longue (1 seconde au minimum, sans maximum). En maintenant, les valeurs défilent de plus en plus vite.
+- Aile droite : pause / reprise ; aile gauche : quitter.
 
 **Radio : porteuse** émet un signal continu pendant 30 s (visible avec l'analyseur de fréquence d'un Flipper Zero).
 

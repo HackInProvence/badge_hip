@@ -299,6 +299,21 @@ def test_radio(t):
     m = t.expect(r'^radio: sending message #(\d+)$', 3)
     sent = t.expect(r'^radio: message #\d+ sent in (\d+) ms$', 5) if m else None
     t.result('radio: message', sent is not None, f'sent in {sent.group(1)} ms' if sent else 'not sent')
+    # Long press: test mode, a message every 5 s (the first one right away)
+    t.pump(1)
+    t.mark()
+    t.keys('B')
+    started = t.expect(r'^radio test: every 5 s$', 3)
+    times = []
+    for _ in range(2):
+        if t.expect(r'^radio: message #\d+ sent', 8):
+            times.append(time.time())
+    period = times[1] - times[0] if len(times) == 2 else 0
+    t.keys('y')  # Left flank: 4 s
+    t.screenshot('radio_test', 1.5)
+    stopped = t.press('a', 'Radio & IR')
+    t.result('radio: test mode', started is not None and 4.0 <= period <= 6.0 and stopped,
+             f'{len(times)} message(s), {period:.1f} s apart' if started else 'not started')
     t.keys('y')
     # The network of the cicadas sends a beacon every ~2s
     counts = []

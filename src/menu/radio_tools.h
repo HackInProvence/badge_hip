@@ -45,6 +45,9 @@ uint8_t radio_tools_chip_version(void);
 /** \brief Human readable status of the last operation. */
 const char *radio_tools_message(void);
 
+/** \brief Text of the last message sent by radio_tools_send() (without its newline). */
+const char *radio_tools_last_text(void);
+
 /** \brief Whether no feature of this file uses the radio (the network of the cicadas can then use it). */
 bool radio_tools_idle(void);
 
