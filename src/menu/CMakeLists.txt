@@ -3,6 +3,7 @@
 add_executable(badge_menu)
 target_sources(badge_menu PRIVATE
     main.c
+    net.c
     battery.c
     display.c
     credits.c

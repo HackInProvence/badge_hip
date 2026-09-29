@@ -48,6 +48,7 @@
 #include "screen.h"
 #include "screen_demo.h"
 #include "sd.h"
+#include "net.h"
 #include "social.h"
 #include "store.h"
 #include "video.h"
@@ -1715,6 +1716,7 @@ int main() {
     noise_gen_set_enabled(false);  /* init_play starts the sound, we start silent */
     display_init();
     radio_tools_init();
+    net_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
@@ -1909,6 +1911,7 @@ int main() {
             if (app == A_MENU)
                 set_status(last_radio_msg);
         }
+        net_task(now);
         social_task(now);
         battery_task(now);
         static int shown_bars = -2;
