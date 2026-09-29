@@ -38,6 +38,10 @@ void display_invalidate(void);
 /** \brief Run the display, to call in the main loop. */
 void display_task(absolute_time_t now);
 
+/** \brief Allow the full refresh every DISPLAY_FULL_EVERY updates (default), or delay it while false
+ * (games: the full refresh blinks for ~2s). */
+void display_set_periodic_full(bool allowed);
+
 /** \brief Whether all updates are done and the screen can be used by someone else. */
 bool display_is_idle(void);
 

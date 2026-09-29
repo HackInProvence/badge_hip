@@ -26,6 +26,7 @@
 #define STORE_IR_SLOTS 4
 #define STORE_NAME_LEN 12
 #define STORE_SAVER_IMAGE_LEN 80
+#define STORE_GAMES 8  /* At least GAME_COUNT */
 
 typedef struct {
     uint32_t id;
@@ -49,6 +50,7 @@ typedef struct {
     uint32_t rsvp_offset;  /* ...and where the reading stopped */
     uint8_t saver_minutes;  /* Screensaver delay (0 = off, 0xFF = default) */
     char saver_image[STORE_SAVER_IMAGE_LEN];  /* Path of the .EPI image on the SD card, empty (or 0xFF) = built-in */
+    uint16_t game_records[STORE_GAMES];  /* Records of the mini games (games.h), 0xFFFF = none */
 } store_t;
 
 /** \brief Load the store from the flash (or initialize it). */

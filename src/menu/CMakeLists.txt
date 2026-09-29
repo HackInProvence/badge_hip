@@ -3,8 +3,11 @@
 add_executable(badge_menu)
 target_sources(badge_menu PRIVATE
     main.c
+    battery.c
     display.c
+    credits.c
     ctf.c
+    games.c
     oled_demo.c
     radio_tools.c
     rsvp.c
@@ -29,7 +32,9 @@ target_link_libraries(badge_menu PRIVATE
     oled
     pico_flash
     pico_unique_id
+    hardware_adc
     hardware_flash
+    hardware_watchdog
     pico_rand
     radio
     screen

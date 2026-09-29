@@ -23,10 +23,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "hardware/watchdog.h"
 #include "pico/rand.h"
 #include "pico/stdlib.h"
 
 #include "audio.h"
+#include "battery.h"
 #include "btns.h"
 #include "display.h"
 #include "gfx.h"
@@ -36,7 +38,9 @@
 #include "radio.h"
 #include "radio_tools.h"
 #include "rsvp.h"
+#include "credits.h"
 #include "ctf.h"
+#include "games.h"
 #include "ff.h"
 #include "ir.h"
 #include "oled.h"
@@ -136,6 +140,8 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         for (int i = 0; i < n; ++i)
             printf("  %s %d dBm%s\n", nb[i].name, nb[i].rssi, nb[i].met ? " (met)" : "");
         printf("ctf: %d/%d flags\n", ctf_found_count(), CTF_N_FLAGS);
+        printf("battery: %u mV, %d %%, ADC raw %u%s\n", battery_mv(), battery_percent(), battery_raw(),
+               battery_charging() ? ", charging" : "");
         break;
     }
     case 'i': {
@@ -161,6 +167,11 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         printf("ir test: sent in %lld us (expected ~67500)\n", absolute_time_diff_us(t0, get_absolute_time()));
         break;
     }
+    case 'R':
+        /* Reboot (the automatic tests start from a known state) */
+        printf("rebooting\n");
+        watchdog_reboot(0, 0, 50);
+        break;
     case '[':
         /* PC application (tools/badge_remote.py): send the screen each time it changes */
         fb_stream = true;
@@ -229,6 +240,12 @@ typedef enum {
     M_RADIO_CARRIER,
     M_INFO,
     M_IMAGES,
+    M_TICTACTOE,  /* The games follow the order of game_t */
+    M_CONNECT4,
+    M_SIMON,
+    M_REFLEX,
+    M_SNAKE,
+    M_CREDITS,
     N_ITEMS,
 } menu_item_t;
 
@@ -260,6 +277,8 @@ typedef enum {
     A_CARRIER,
     A_INFO,
     A_PAGE,  /* A message page (e.g. an error), back to the menu with any wing */
+    A_GAME,  /* A mini game (games.c) owns the buttons and the page */
+    A_CREDITS,  /* One page per contributor, the flanks change the page */
 } app_state_t;
 
 static app_state_t app = A_MENU;
@@ -271,6 +290,8 @@ static absolute_time_t status_ts = 0;
 static char page_title[32] = "";
 static char page_text[160] = "";
 static app_state_t page_back = A_MENU;  /* Where a message page goes back to */
+static int credits_page = 0;
+static app_state_t credits_back = A_MENU;
 static char last_radio_msg[64] = "";
 
 /* File browser: the directories, then the files of the current directory */
@@ -336,6 +357,12 @@ static void set_status(const char *msg) {
 }
 
 static void draw_title(const char *title) {
+    /* For the automatic tests (tools/badge_selftest.py): the page shown */
+    static char last_title[40] = "";
+    if (strncmp(last_title, title, sizeof(last_title) - 1)) {
+        snprintf(last_title, sizeof(last_title), "%s", title);
+        printf("ui: %s\n", title);
+    }
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
 }
@@ -406,10 +433,14 @@ static void item_label(int item, char *buf, size_t len) {
     case M_RSVP: snprintf(buf, len, "Lecture rapide (PVSR)"); break;
     case M_SETTINGS: snprintf(buf, len, "Veille de l'écran"); break;
     case M_IMAGES: snprintf(buf, len, "Images"); break;
+    case M_TICTACTOE: case M_CONNECT4: case M_SIMON: case M_REFLEX: case M_SNAKE:
+        snprintf(buf, len, "%s", games_name(item - M_TICTACTOE));
+        break;
     case M_VOLUME: snprintf(buf, len, "Volume : %u/%u", audio_get_volume(), AUDIO_VOLUME_MAX); break;
     case M_RADIO_MSG: snprintf(buf, len, "Radio : message"); break;
     case M_RADIO_CARRIER: snprintf(buf, len, "Radio : porteuse"); break;
     case M_INFO: snprintf(buf, len, "Infos"); break;
+    case M_CREDITS: snprintf(buf, len, "Crédits"); break;
     default: buf[0] = 0; break;
     }
 }
@@ -438,15 +469,15 @@ static void track_title(const char *track_path, char *buf, size_t len) {
 typedef struct {
     const char *title;
     uint8_t n;
-    menu_item_t items[6];
+    menu_item_t items[8];
 } submenu_t;
 
 static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
-    {"Jeux", 2, {M_BLIND_TEST, M_CTF}},
+    {"Jeux", 7, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_BLIND_TEST, M_CTF}},
     {"Badge", 4, {M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Radio & IR", 4, {M_SOCIAL, M_RADIO_MSG, M_RADIO_CARRIER, M_IR}},
-    {"Réglages", 2, {M_SETTINGS, M_INFO}},
+    {"Réglages", 3, {M_SETTINGS, M_INFO, M_CREDITS}},
 };
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])))
 static int menu_level = 0;  /* 0: the themes, 1: the features of the theme */
@@ -461,6 +492,29 @@ static void sub_label(int i, char *buf, size_t len) {
     item_label(SUBMENUS[top_selected].items[i], buf, len);
 }
 
+/* Battery in the title bar (white on black), 4 bars */
+static int battery_bars(void) {
+    return battery_mv() ? (battery_percent() + 12) / 25 : -1;
+}
+
+static void draw_battery(void) {
+    int bars = battery_bars();
+    if (bars < 0)
+        return;
+    int x = GFX_WIDTH - 27, y = 8;
+    gfx_rect(fb, x, y, 22, 12, GFX_WHITE);
+    gfx_fill_rect(fb, x + 22, y + 3, 2, 6, GFX_WHITE);
+    for (int i = 0; i < bars; ++i)
+        gfx_fill_rect(fb, x + 2 + i*5, y + 2, 4, 8, GFX_WHITE);
+    if (battery_charging()) {
+        /* Lightning bolt on the left */
+        static const int8_t BOLT[][2] = {{4, 0}, {3, 1}, {2, 2}, {1, 3}, {0, 4}, {1, 4}, {2, 4}, {3, 4}, {3, 5}, {2, 6},
+                                         {1, 7}, {0, 8}, {1, 8}, {2, 9}, {3, 10}};
+        for (unsigned i = 0; i < sizeof(BOLT)/sizeof(BOLT[0]); ++i)
+            gfx_fill_rect(fb, x - 9 + BOLT[i][0], y + BOLT[i][1], 2, 1, GFX_WHITE);
+    }
+}
+
 static void render_menu(absolute_time_t now) {
     gfx_clear(fb, GFX_WHITE);
     if (menu_level == 0) {
@@ -470,6 +524,7 @@ static void render_menu(absolute_time_t now) {
         draw_title(SUBMENUS[top_selected].title);
         draw_list(SUBMENUS[top_selected].n, sub_selected, sub_label);
     }
+    draw_battery();
     bool show_status = status[0] && absolute_time_diff_us(status_ts, now) < STATUS_MS*1000ll;
     draw_footer(show_status ? status : "Flancs : choix  D : OK  G : retour");
 }
@@ -775,7 +830,7 @@ static void show_saver(void) {
 
 /* Whether the screensaver can start in this state (not while playing, reading, typing...) */
 static bool saver_allowed(app_state_t a) {
-    return a == A_MENU || a == A_BROWSE || a == A_PAGE || a == A_INFO || a == A_SOCIAL || a == A_IR || a == A_CTF
+    return a == A_MENU || a == A_BROWSE || a == A_PAGE || a == A_INFO || a == A_CREDITS || a == A_SOCIAL || a == A_IR || a == A_CTF
            || a == A_BT_FOLDERS || a == A_SETTINGS || a == A_SAVER_IMAGES;
 }
 
@@ -970,10 +1025,12 @@ static void render_info(void) {
     else
         snprintf(xosc, sizeof(xosc), "inconnu");
     snprintf(text, sizeof(text),
-             "Radio : CC1101 v0x%02x\nQuartz mesuré : %s\nQuartz utilisé : %.4f MHz\nDéfaut (firmware) : %.4f\nCarte SD : %s",
+             "Radio : CC1101 v0x%02x\nQuartz mesuré : %s\nQuartz utilisé : %.4f MHz\nDéfaut (firmware) : %.4f\nCarte SD : %s\n"
+             "Batterie : %u,%02u V (%d %%)%s",
              radio_tools_chip_version(), xosc, radio_get_xosc() / 1e6, CC1101_fXOSC / 1e6,
-             sd_is_ready() ? "prête" : "absente");
-    render_page("Infos", text, "G ou D : retour");
+             sd_is_ready() ? "prête" : "absente", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent(),
+             battery_charging() ? ", charge" : "");
+    render_page("Infos", text, "D : crédits  G : retour");
 }
 
 static void render_music(void) {
@@ -1204,6 +1261,47 @@ static void play_chime(void) {
     chime_playing = true;
 }
 
+/* Sound of the games: a square wave, like the chime */
+static void game_tone(uint16_t hz, uint16_t ms) {
+    if (wav_is_paused())
+        return;
+    if (chime_playing || audio_is_open()) {
+        audio_close();
+        chime_playing = false;
+    }
+    if (hz == 0 || ms == 0)
+        return;
+    set_sound(false);
+    const uint32_t rate = 16000;
+    if (! audio_open(rate))
+        return;
+    uint32_t period = rate / hz, n = rate * (ms > 450 ? 450 : ms) / 1000;  /* Fits in the audio buffer */
+    uint8_t chunk[256];
+    for (uint32_t i = 0; i < n; ) {
+        uint32_t k = 0;
+        for (; k < sizeof(chunk) && i < n; ++k, ++i) {
+            int amp = 100 * (n - i) / n;
+            chunk[k] = (uint8_t)(128 + ((i % period) < period / 2 ? amp : -amp));
+        }
+        audio_write(chunk, k);
+    }
+    chime_playing = true;
+}
+
+static void game_leds(uint8_t r, uint8_t g, uint8_t b) {
+    if (r || g || b)
+        leds_anim_fixed(LED_RGB(r, g, b));
+    else
+        leds_cancel_anim(true);
+}
+
+static const games_hooks_t GAME_HOOKS = {
+    .tone = game_tone,
+    .leds = game_leds,
+    .random = get_rand_32,
+    .records_changed = store_changed,
+};
+
 static void change_volume(int delta) {
     int v = audio_get_volume() + delta;
     if (v < 0)
@@ -1276,6 +1374,19 @@ static void validate(void) {
     case M_VOLUME:
         audio_set_volume((audio_get_volume() + 1) % (AUDIO_VOLUME_MAX + 1));
         play_chime();
+        break;
+    case M_TICTACTOE:
+    case M_CONNECT4:
+    case M_SIMON:
+    case M_REFLEX:
+    case M_SNAKE:
+        games_start(selected - M_TICTACTOE, get_absolute_time());
+        app = A_GAME;
+        break;
+    case M_CREDITS:
+        credits_page = 0;
+        credits_back = A_MENU;
+        app = A_CREDITS;
         break;
     case M_RADIO_MSG:
         if (! radio_tools_send())
@@ -1377,6 +1488,9 @@ static void cancel(void) {
     case A_INFO:
         app = A_MENU;
         break;
+    case A_CREDITS:
+        app = credits_back;
+        break;
     case A_PAGE:
         app = page_back;
         page_back = A_MENU;
@@ -1399,6 +1513,8 @@ int main() {
     radio_tools_init();
     store_init();
     social_init();
+    games_init(&GAME_HOOKS, store_get()->game_records);
+    battery_init();
     ir_init();
     oled_init();
     printf("badge menu ready\n");
@@ -1423,7 +1539,14 @@ int main() {
             redraw = true;
             pressed = 0;
         }
-        if (app == A_NAME_EDIT) {
+        if (app == A_GAME) {
+            if (! games_buttons(pressed, now)) {
+                set_leds(led_mode);  /* The games used the LEDs */
+                display_set_periodic_full(true);
+                app = A_MENU;
+            }
+            redraw = true;
+        } else if (app == A_NAME_EDIT) {
             name_edit_buttons(pressed, now);
         } else if (app == A_RSVP) {
             rsvp_buttons(pressed, now);
@@ -1508,7 +1631,11 @@ int main() {
             else if (app == A_MUSIC) {
                 wav_toggle_pause();
                 redraw = true;
-            } else if (app == A_INFO || app == A_PAGE)
+            } else if (app == A_INFO) {
+                credits_page = 0;
+                credits_back = A_INFO;
+                app = A_CREDITS;
+            } else if (app == A_PAGE || app == A_CREDITS)
                 cancel();
             /* Every validation changes the page (start of the blind test, sub-directory, music player...) */
             redraw = true;
@@ -1545,6 +1672,10 @@ int main() {
             } else if (app == A_OLED) {
                 oled_selected = (oled_selected + delta + OLED_DEMO_COUNT) % OLED_DEMO_COUNT;
                 redraw = true;
+            } else if (app == A_CREDITS) {
+                credits_page = (credits_page + delta + credits_count()) % credits_count();
+                printf("credits: %s\n", credits_name(credits_page));
+                redraw = true;
             } else if (app == A_CTF) {
                 ctf_selected = (ctf_selected + delta + 2) % 2;
                 redraw = true;
@@ -1571,6 +1702,14 @@ int main() {
                 set_status(last_radio_msg);
         }
         social_task(now);
+        battery_task(now);
+        static int shown_bars = -2;
+        static bool shown_charging = false;
+        if (app == A_MENU && (battery_bars() != shown_bars || battery_charging() != shown_charging)) {
+            shown_bars = battery_bars();  /* Only when the icon changes: the e-Paper refresh is visible */
+            shown_charging = battery_charging();
+            redraw = true;
+        }
         char event[48];
         if (social_event(event, sizeof(event))) {
             set_status(event);
@@ -1742,6 +1881,12 @@ int main() {
                 app = A_MENU;
                 redraw = true;
             }
+            if (app == A_GAME) {
+                if (games_task(now))
+                    redraw = true;
+                /* No slow full refresh in the middle of an action (Snake, Simon...), only between the rounds */
+                display_set_periodic_full(games_calm());
+            }
             if (app == A_INFO && was_measuring != radio_tools_measuring())
                 redraw = true;
             was_measuring = radio_tools_measuring();
@@ -1790,6 +1935,12 @@ int main() {
                                 "G : arrêter");
                 else if (app == A_PAGE)
                     render_page(page_title, page_text, "G ou D : retour");
+                else if (app == A_GAME)
+                    games_render(fb);
+                else if (app == A_CREDITS) {
+                    credits_render(fb, credits_page);
+                    printf("ui: Crédits\n");
+                }
                 display_show(fb);
             }
             display_task(now);

@@ -23,6 +23,7 @@ static bool dirty = false;  /* wanted != shown */
 static bool full_needed = true;
 static unsigned fast_count = 0;
 static bool asleep = true;
+static bool periodic_full = true;
 static absolute_time_t last_update = 0;
 
 
@@ -41,6 +42,11 @@ void display_invalidate(void) {
     full_needed = true;
     asleep = false;  /* The other user may have left the screen awake, or asleep: sleep again to be sure */
     last_update = get_absolute_time();
+}
+
+
+void display_set_periodic_full(bool allowed) {
+    periodic_full = allowed;
 }
 
 
@@ -70,7 +76,7 @@ void display_task(absolute_time_t now) {
 
     switch (state) {
     case D_IDLE:
-        if (full_needed || fast_count >= DISPLAY_FULL_EVERY) {
+        if (full_needed || (periodic_full && fast_count >= DISPLAY_FULL_EVERY)) {
             screen_show_image_bw(wanted);
             memcpy(shown, wanted, GFX_FB_SIZE);
             dirty = false;
