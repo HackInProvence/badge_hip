@@ -18,6 +18,12 @@ typedef enum {
     APP_NAMETAG,
     APP_ADMIN_COMMANDS,
     APP_ADMIN_TYPE,
+    APP_MINES,
+    APP_2048,
+    APP_TAQUIN,
+    APP_SOKOBAN,
+    APP_MASTERMIND,
+    APP_PENDU,
     APP_COUNT,
 } app_id_t;
 

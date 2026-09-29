@@ -15,6 +15,8 @@ target_sources(badge_menu PRIVATE
     credits.c
     ctf.c
     games.c
+    puzzles.c
+    puzzles_app.c
     oled_demo.c
     radio_tools.c
     rsvp.c

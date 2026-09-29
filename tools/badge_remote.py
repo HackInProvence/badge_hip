@@ -16,7 +16,7 @@ Requires Python 3 with Tkinter (included in the Windows and macOS installers, "p
 Keyboard (the window must have the focus):
     Up / y          left flank (up in the lists)          Shift: long press
     Down / x        right flank (down in the lists)       Shift: long press
-    Left / a        left wing (back, cancel)
+    Left / a        left wing (back, cancel)              Shift: long press
     Right / Enter / b   right wing (OK)                   Shift: long press
     F5              ask the screen again
     F12             screenshot (PNG)
@@ -280,9 +280,9 @@ def run_window(port, zoom, on_ready=None):
     log.grid(row=4, column=0, columnspan=4, sticky='we', pady=(6, 0))
 
     # Keyboard
-    keys = {'Up': ('y', 'Y'), 'Down': ('x', 'X'), 'Left': ('a', 'a'), 'Right': ('b', 'B'), 'Return': ('b', 'B'),
-            'y': ('y', 'Y'), 'x': ('x', 'X'), 'a': ('a', 'a'), 'b': ('b', 'B'),
-            'Y': ('Y', 'Y'), 'X': ('X', 'X'), 'A': ('a', 'a'), 'B': ('B', 'B')}
+    keys = {'Up': ('y', 'Y'), 'Down': ('x', 'X'), 'Left': ('a', 'A'), 'Right': ('b', 'B'), 'Return': ('b', 'B'),
+            'y': ('y', 'Y'), 'x': ('x', 'X'), 'a': ('a', 'A'), 'b': ('b', 'B'),
+            'Y': ('Y', 'Y'), 'X': ('X', 'X'), 'A': ('A', 'A'), 'B': ('B', 'B')}
 
     def on_key(event):
         if event.keysym in keys:

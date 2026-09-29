@@ -32,7 +32,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin']
 
 
 class Tester:
@@ -241,10 +241,30 @@ def test_games(t):
     close_theme(t, 'Jeux')
 
 
+PUZZLES = ['Démineur', '2048', 'Taquin', 'Sokoban', 'Mastermind', 'Pendu']
+
+
+def test_puzzles(t):
+    """Each puzzle: help page, start, a move, quit with a long press on the left wing."""
+    if not open_theme(t, 'Jeux'):
+        return t.result('puzzles', False, 'theme "Jeux" not shown')
+    t.keys('x' * len(GAMES))
+    for name in PUZZLES:
+        ok = t.press('b', name)
+        t.keys('b')  # Help page -> the game
+        t.keys('x')  # A move (right)
+        t.screenshot('puzzle_' + re.sub(r'\W+', '_', name), 1.0)
+        ok = ok and t.press('A', 'Jeux')
+        t.result(f'puzzle: {name}', ok)
+        t.keys('x')
+    t.keys('y' * (len(GAMES) + len(PUZZLES)))
+    close_theme(t, 'Jeux')
+
+
 def test_ctf(t):
     if not open_theme(t, 'Jeux'):
         return t.result('ctf', False, 'theme "Jeux" not shown')
-    t.keys('x' * (len(GAMES) + 1))  # After the games and the blind test
+    t.keys('x' * (len(GAMES) + len(PUZZLES) + 1))  # After the games, the puzzles and the blind test
     t.press('b', 'CTF')
     t.mark()
     t.keys('b')  # Type a code
@@ -254,7 +274,7 @@ def test_ctf(t):
     t.result('ctf: Konami code', m is not None and m.group(1) == 'right', m.group(0) if m else 'no answer')
     t.keys('a')  # Page -> CTF list
     t.press('a', 'Jeux')
-    t.keys('y' * (len(GAMES) + 1))
+    t.keys('y' * (len(GAMES) + len(PUZZLES) + 1))
     close_theme(t, 'Jeux')
 
 
@@ -418,7 +438,7 @@ def test_images(t):
     t.press('a', TOP)
 
 
-TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'ctf': test_ctf,
+TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
          'apps': test_apps, 'admin': test_admin}
 

@@ -44,6 +44,7 @@
 #include "credits.h"
 #include "ctf.h"
 #include "games.h"
+#include "puzzles.h"
 #include "ff.h"
 #include "ir.h"
 #include "oled.h"
@@ -89,7 +90,7 @@ static uint8_t btn_stable = 0, btn_raw = 0;
 static absolute_time_t btn_ts = 0;
 static uint8_t btn_released = 0;  /* Buttons released during the last call of buttons_pressed() */
 static absolute_time_t btn_down_ts[4];  /* When each button was pressed (A, B, X, Y) */
-static uint8_t btn_simulated_long = 0;  /* Long presses simulated on USB (keys B, X, Y) */
+static uint8_t btn_simulated_long = 0;  /* Long presses simulated on USB (keys A, B, X, Y) */
 static uint8_t btn_long_fired = 0;  /* Buttons whose long press was reported during the current press */
 static bool fb_stream = false;  /* Send the screen on USB each time it changes */
 static bool fb_send_now = false;  /* Send the screen once */
@@ -144,7 +145,8 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                 btn_down_ts[btn_index(b)] = now;
     }
     switch (getchar_timeout_us(0)) {
-    case 'a': case 'A': pressed |= BTN_A; btn_released |= BTN_A; break;
+    case 'a': pressed |= BTN_A; btn_released |= BTN_A; break;
+    case 'A': pressed |= BTN_A; btn_released |= BTN_A; btn_simulated_long = BTN_A; break;
     case 'b': pressed |= BTN_B; btn_released |= BTN_B; break;
     case 'B': pressed |= BTN_B; btn_released |= BTN_B; btn_simulated_long = BTN_B; break;
     case 'x': pressed |= BTN_X; btn_released |= BTN_X; break;
@@ -541,7 +543,8 @@ typedef struct {
 
 static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
-    {"Jeux", 7, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_BLIND_TEST, M_CTF}},
+    {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+                  M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
     {"Social", 1, {M_SOCIAL}},
     {"Radio & IR", 3, {M_RADIO_MSG, M_RADIO_CARRIER, M_IR}},
     {"Badge", 6, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
@@ -1833,6 +1836,7 @@ int main() {
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
+    puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);
     battery_init();
     ir_init();
     oled_init();

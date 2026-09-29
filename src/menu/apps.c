@@ -6,10 +6,17 @@
 #include "apps.h"
 
 extern const app_t app_lamp, app_nametag, app_admin_commands, app_admin_type;
+extern const app_t app_mines, app_2048, app_taquin, app_sokoban, app_mastermind, app_pendu;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
     [APP_NAMETAG] = &app_nametag,
     [APP_ADMIN_COMMANDS] = &app_admin_commands,
     [APP_ADMIN_TYPE] = &app_admin_type,
+    [APP_MINES] = &app_mines,
+    [APP_2048] = &app_2048,
+    [APP_TAQUIN] = &app_taquin,
+    [APP_SOKOBAN] = &app_sokoban,
+    [APP_MASTERMIND] = &app_mastermind,
+    [APP_PENDU] = &app_pendu,
 };
