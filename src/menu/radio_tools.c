@@ -12,6 +12,7 @@
 #include "pinouts.h"
 #include "radio.h"
 #include "radio_tools.h"
+#include "social.h"
 
 
 #define BAUDS 9995
@@ -91,7 +92,7 @@ unsigned radio_tools_send(void) {
         return 0;
     set_profile(0x46, 0x4C, PATABLE);  /* Flipper chat */
     char msg[64];
-    int len = snprintf(msg, sizeof(msg), "Badge SecSea: coucou #%u\n", ++count);
+    int len = snprintf(msg, sizeof(msg), "SecSea %s coucou #%u\n", social_name(), ++count);
     if (! radio_tx_packet((const uint8_t *)msg, len))
         return 0;
     state = R_SENDING;
