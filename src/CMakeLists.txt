@@ -4,27 +4,38 @@ target_include_directories(badge SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 target_sources(badge INTERFACE ${CMAKE_CURRENT_LIST_DIR}/badge_defs.h)
 
 # Add libraries projects
+add_subdirectory(audio)
 add_subdirectory(btns)
+add_subdirectory(gfx)
+add_subdirectory(ir)
 add_subdirectory(leds)
 add_subdirectory(log)
 add_subdirectory(music)
 add_subdirectory(noise_gen)
+add_subdirectory(oled)
 add_subdirectory(radio)
 add_subdirectory(screen)
+add_subdirectory(sd)
 #add_subdirectory(template)
 
 # Add tests
 add_subdirectory(tests)
 
+# Add the applications
+add_subdirectory(menu)
+add_subdirectory(video)
+
 
 # Screen precompilation target: generate C headers from images using image2epaper.py
 # Images paths are relative to the current directory and will output basename.h that can be included by them
 # Add badge_images to your link libraries to use one of the images
+# Use the interpreter found by CMake: "python3" does not exist on every platform (e.g. Windows)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 function(badge_image2epaper path)
     get_filename_component(basename ${path} NAME_WLE)
     add_custom_command(OUTPUT ${basename}.h
-        DEPENDS ${path}
-        COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/image2epaper.py ${CMAKE_CURRENT_LIST_DIR}/${path} -o ${basename}.h
+        DEPENDS ${path} ${CMAKE_CURRENT_LIST_DIR}/image2epaper.py
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/image2epaper.py ${CMAKE_CURRENT_LIST_DIR}/${path} -o ${basename}.h
         VERBATIM
     )
     target_sources(badge_images PRIVATE ${basename}.h)
