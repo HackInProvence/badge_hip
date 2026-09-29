@@ -13,6 +13,23 @@
 - [ ] chipselect sur SPI0.
 
 
+# Documentation
+
+| | Français | English |
+|---|---|---|
+| Utiliser le badge (menus, jeux, médias, carte SD) | [Guide utilisateur](docs/fr/guide_utilisateur.md) | [User guide](docs/en/user_guide.md) |
+| Développer (architecture, mécanismes, formats, protocole USB, tests) | [Guide développeur](docs/fr/guide_developpeur.md) | [Developer guide](docs/en/developer_guide.md) |
+
+Autres documents :
+- [lecture rapide PVSR](docs/pvsr.md) ;
+- [réseau des cigales, ports d'extension, CTF](docs/idees_reseau_extensions_ctf.md) ;
+- [idées d'applications](docs/idees_applications.md).
+
+Tests :
+- `python src/tests/host/run_tests.py` sur le PC ;
+- `python tools/badge_selftest.py` sur le badge branché en USB.
+
+
 # Hardware
 
 La conception est faite sous KiCad.
@@ -31,8 +48,8 @@ Pour compiler le badge, il faut donc commencer par installer le pico SDK.
 
 - [utiliser VS Code](#installation-via-vscode), fonctionne sous Linux et Windows via PlatformIO qui s'occupe d'installer le SDK,
   mais son aspect magique le rend difficile à debug en cas de problème d'installation,
-- [installer le SDK sur votre machine](#installation-via-pico-setup) avec le script `pico_setup.sh` qui utilise `apt` donc réservé aux Debian et dérivés (Ubuntu, Kali, Mint, ...),
-- [utiliser un docker](#todo).
+- [installer le SDK sur votre machine](#installation-via-pico_setup) avec le script `pico_setup.sh` qui utilise `apt` donc réservé aux Debian et dérivés (Ubuntu, Kali, Mint, ...),
+- [utiliser un docker](#installation-via-docker).
 
 
 ## Pico C SDK
