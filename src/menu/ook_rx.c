@@ -84,9 +84,18 @@ void ook_rx_start(void) {
 }
 
 
+static void decode(uint32_t silence);
+
 void ook_rx_stop(void) {
-    if (! users || --users)
+    if (! users || users > 1) {
+        if (users)
+            --users;
         return;  /* Someone still listens */
+    }
+    /* The last user: decode what was received before leaving (the end of a transmission) */
+    if (count >= MIN_FRAME)
+        decode(time_us_32() - last_edge_us);
+    users = 0;
     gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, false);
     gpio_remove_raw_irq_handler(BADGE_RADIO_GDO0, edge);
     if (radio_tools_idle())
@@ -97,6 +106,19 @@ void ook_rx_stop(void) {
 
 bool ook_rx_active(void) {
     return users > 0;
+}
+
+
+void ook_rx_dump(void) {
+    printf("ook: last signal, %u durations:", signal.n);
+    for (uint16_t i = 0; i < signal.n; ++i)
+        printf(" %c%u", i % 2 ? '-' : '+', signal.us[i]);
+    printf("\n");
+}
+
+
+uint32_t ook_rx_quiet_us(void) {
+    return time_us_32() - last_edge_us;
 }
 
 
@@ -159,6 +181,11 @@ void ook_rx_task(absolute_time_t now) {
             count = 0;  /* Too short to be a frame: noise */
         return;
     }
+    decode(silence);
+}
+
+
+static void decode(uint32_t silence) {
     build_signal(silence);
     if (signal.n < MIN_FRAME || ! ookdec_decode(&signal, &last))
         return;

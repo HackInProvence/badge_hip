@@ -200,6 +200,27 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         printf("ir test: sent in %lld us (expected ~67500)\n", absolute_time_diff_us(t0, get_absolute_time()));
         break;
     }
+    case 'o': {
+        /* Debug: state of the OOK receiver (ook_rx.c) */
+        uint8_t rssi = 0, marc = 0;
+        radio_read_registers(CC1101_RSSI, &rssi, 1);
+        radio_read_registers(CC1101_MARCSTATE, &marc, 1);
+        printf("ook: active %d, pulses %lu, frames %lu, rssi %d dBm, marcstate 0x%02x, gdo0 %d\n", ook_rx_active(),
+               (unsigned long)ook_rx_pulses(), (unsigned long)ook_rx_frames(), (int8_t)rssi / 2 - 74, marc,
+               gpio_get(BADGE_RADIO_GDO0));
+        break;
+    }
+    case 'p':
+        ook_rx_dump();
+        break;
+    case 'P':
+        net_ping();
+        break;
+    case 'L':
+        /* Debug: the packets sent come back as sent by a twin badge (test the radio features alone) */
+        net_set_loopback(! net_loopback());
+        printf("net: loopback %s\n", net_loopback() ? "on" : "off");
+        break;
     case 'R':
         /* Reboot (the automatic tests start from a known state) */
         printf("rebooting\n");
@@ -331,6 +352,33 @@ static const app_t *app_pending = NULL;  /* Opened by app_open() at the next loo
 void app_open(const app_t *a) {
     app_pending = a;
 }
+
+static void set_status(const char *msg);
+static void game_tone(uint16_t hz, uint16_t ms);
+
+/* A notification: opens \p a from the menus or the screensaver (true), otherwise a status in the footer */
+static bool notify(const app_t *a, const char *msg) {
+    game_tone(1319, 80);
+    set_status(msg);
+    printf("notify: %s\n", msg);
+    if (a && (app == A_MENU || app == A_SAVER || app == A_START_SAVER)) {
+        app_open(a);
+        return true;
+    }
+    return false;
+}
+
+/* The services of the social features (vote.c, program.c, infection.c, messages.c) */
+void vote_task(absolute_time_t now);
+bool vote_new(void);
+void program_init(void);
+bool program_announced(char *buf, int len);
+void program_forget(void);
+void infection_init(void);
+void infection_task(absolute_time_t now);
+bool infection_event(void);
+void messages_init(void);
+bool messages_new(char *buf, int len);
 
 const app_t *app_current(void) {
     return app == A_APP ? cur_app : NULL;
@@ -546,11 +594,13 @@ static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
     {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
-    {"Social", 3, {M_SOCIAL, M_APP(APP_RADAR), M_APP(APP_HOTCOLD)}},
+    {"Social", 7, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_PROGRAM), M_APP(APP_VOTE), M_APP(APP_RADAR),
+                   M_APP(APP_HOTCOLD), M_APP(APP_INFECTION)}},
     {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
-    {"Admin", 4, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_HOTCOLD_MASTER), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
+    {"Admin", 7, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
+                  M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
@@ -1834,6 +1884,9 @@ int main() {
     radio_tools_init();
     net_init();
     remote_init();
+    program_init();
+    infection_init();
+    messages_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
@@ -2078,6 +2131,20 @@ int main() {
         char remote_msg[40];
         if (remote_event(remote_msg, sizeof(remote_msg)))
             set_status(remote_msg);
+        vote_task(now);
+        infection_task(now);
+        /* Notifications of the social features: the page opens from the menus, a status otherwise */
+        char notif[64];
+        if (program_announced(notif, sizeof(notif))) {
+            if (! notify(APPS[APP_PROGRAM], notif))
+                program_forget();
+        }
+        if (messages_new(notif, sizeof(notif)))
+            notify(NULL, notif);
+        if (vote_new())
+            notify(APPS[APP_VOTE], "Vote ouvert : Social > Vote");
+        if (infection_event())
+            notify(APPS[APP_INFECTION], "Vous êtes infecté !");
         social_task(now);
         battery_task(now);
         static int shown_bars = -2;

@@ -42,6 +42,7 @@ typedef enum {
     NET_INFECTION = 0x09,  /* The (harmless) virus of the cicadas (infection.c) */
     NET_IMAGE = 0x0A,  /* Image transfer (image_radio.c) */
     NET_SONG = 0x0B,  /* Chorus: song start and position (chorus.c) */
+    NET_PING = 0x0F,  /* Diagnostic ("P" key on the USB serial port): the badges that hear it print it */
     NET_TYPES = 0x10,
 } net_type_t;
 
@@ -86,6 +87,15 @@ void net_pause(bool paused);
 
 /** \brief Run the network, to call in the main loop. */
 void net_task(absolute_time_t now);
+
+/** \brief Test with a single badge: every packet sent is also received, as sent by a "twin" badge
+ * (id = net_id() ^ NET_TWIN). Debug only ("L" key on the USB serial port). */
+#define NET_TWIN 0x00FF00FF
+void net_set_loopback(bool on);
+bool net_loopback(void);
+
+/** \brief Diagnostic: sends a loud ping (the other badges print "net: ping from ..."). */
+void net_ping(void);
 
 /** \brief Counters for the diagnostics. */
 void net_stats(uint32_t *sent, uint32_t *received, uint32_t *dropped);

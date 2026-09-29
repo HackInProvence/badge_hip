@@ -24,7 +24,7 @@
 
 #include "ookdec.h"
 
-#define OOK_RX_FRAME_GAP_US 5000  /* A silence this long ends a frame */
+#define OOK_RX_FRAME_GAP_US 50000  /* A silence this long ends a transmission (the guards between the repeats of a frame last up to 25 ms: the decoder wants the repeats) */
 
 /** \brief One more user: takes the radio (pauses the network) and listens in OOK. */
 void ook_rx_start(void);
@@ -39,6 +39,12 @@ void ook_rx_task(absolute_time_t now);
 
 /** \brief The last decoded frame, when it is newer than \p seen (updated): returns false otherwise. */
 bool ook_rx_get(uint32_t *seen, ookdec_result_t *result);
+
+/** \brief Debug: prints the durations of the last signal given to the decoder. */
+void ook_rx_dump(void);
+
+/** \brief Microseconds since the last pulse edge (activity on the air). */
+uint32_t ook_rx_quiet_us(void);
 
 /** \brief Pulses received and frames decoded since the boot (activity indicators). */
 uint32_t ook_rx_pulses(void);

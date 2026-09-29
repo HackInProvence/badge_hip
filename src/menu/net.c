@@ -37,6 +37,22 @@ static bool tx_pending = false;
 static absolute_time_t tx_ts = 0;
 static absolute_time_t next_poll = 0;
 static uint32_t n_sent = 0, n_received = 0, n_dropped = 0;
+static bool loopback = false;
+static uint8_t loop_bytes[NET_HEADER + NET_MAX_DATA];
+static uint8_t loop_len = 0;  /* A packet sent, to deliver as received (loopback) */
+
+
+static void handle_ping(const net_packet_t *p) {
+    printf("net: ping #%u from %08lX, rssi %d dBm\n", p->len ? p->data[0] : 0, (unsigned long)p->src, p->rssi);
+}
+
+
+void net_ping(void) {
+    static uint8_t n = 0;
+    ++n;
+    net_send(NET_PING, &n, 1, NET_LOUD);
+    printf("net: ping #%u sent\n", n);
+}
 
 
 void net_init(void) {
@@ -46,6 +62,7 @@ void net_init(void) {
     my_id = 2166136261u;
     for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; ++i)
         my_id = (my_id ^ uid.id[i]) * 16777619u;
+    handlers[NET_PING] = handle_ping;
 }
 
 
@@ -90,6 +107,16 @@ void net_pause(bool p) {
         owner = false;
         tx_pending = false;
     }
+}
+
+
+void net_set_loopback(bool on) {
+    loopback = on;
+}
+
+
+bool net_loopback(void) {
+    return loopback;
 }
 
 
@@ -162,6 +189,10 @@ static void send_next(void) {
         tx_pending = true;
         tx_ts = get_absolute_time();
         ++n_sent;
+        if (loopback) {
+            memcpy(loop_bytes, t->bytes, t->len);
+            loop_len = t->len;
+        }
     } else {
         ++n_dropped;
         start_rx();
@@ -187,6 +218,21 @@ void net_task(absolute_time_t now) {
     if (absolute_time_diff_us(now, next_poll) > 0)
         return;
     next_poll = delayed_by_us(now, POLL_US);
+
+    if (loop_len && ! tx_pending) {
+        /* Loopback: the packet sent comes back from the "twin" badge */
+        net_packet_t p = {
+            .type = loop_bytes[1],
+            .src = my_id ^ NET_TWIN,
+            .data = loop_bytes + NET_HEADER,
+            .len = loop_len - NET_HEADER,
+            .rssi = -40,
+            .at = now,
+        };
+        loop_len = 0;
+        if (p.type < NET_TYPES && handlers[p.type])
+            handlers[p.type](&p);
+    }
 
     if (tx_pending) {
         /* Wait for the end of the packet (~20-60ms), then listen */

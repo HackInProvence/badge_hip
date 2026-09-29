@@ -7,7 +7,11 @@ target_sources(badge_menu PRIVATE
     apps.c
     lamp.c
     hotcold.c
+    infection.c
+    messages.c
     nametag.c
+    program.c
+    vote.c
     talk.c
     remote.c
     ui.c

@@ -23,7 +23,9 @@
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
 #define CIGALE_MS 6000
 #define OOK_WINDOW_MS 220  /* 2 frames of a Princeton remote (~50 ms each) whatever the start */
-#define OOK_PERIOD_MS 1000  /* Hold the button of the remote ~1 s */
+#define OOK_PERIOD_MS 800  /* Hold the button of the remote ~1 s */
+#define OOK_WINDOW_MAX_MS 1500  /* A window is extended while pulses come (a remote is sending) */
+#define OOK_ACTIVE_US 60000  /* Pulses within this time: activity */
 
 typedef struct {
     uint32_t src;
@@ -46,6 +48,7 @@ static char event[40];
 static bool event_pending = false;
 static bool window = false;  /* Listening to the OOK remotes */
 static absolute_time_t window_ts = 0;
+static absolute_time_t window_start = 0;
 static int windows_paused = 0;
 
 
@@ -190,8 +193,13 @@ void remote_task(absolute_time_t now) {
                 && absolute_time_diff_us(window_ts, now) >= 0) {
             ook_rx_start();
             window = true;
+            window_start = now;
             window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
         }
+    } else if (absolute_time_diff_us(window_ts, now) >= 0 && ook_rx_quiet_us() < OOK_ACTIVE_US
+               && absolute_time_diff_us(window_start, now) < OOK_WINDOW_MAX_MS * 1000ll
+               && radio_tools_idle() && ! windows_paused) {
+        window_ts = delayed_by_ms(now, 100);  /* Something is sending: listen until it stops (the frames repeat) */
     } else if (absolute_time_diff_us(window_ts, now) >= 0 || ! radio_tools_idle() || windows_paused) {
         ook_rx_stop();
         window = false;

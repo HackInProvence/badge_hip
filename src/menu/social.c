@@ -52,6 +52,16 @@ void social_init(void) {
         snprintf(s->name, sizeof(s->name), "Cig %04X", (unsigned)(net_id() & 0xFFFF));
     net_subscribe(NET_BEACON, handle_beacon);
     schedule_beacon(get_absolute_time());
+    /* Repair: the first loopback tests (net.h) counted meetings with the "twin" of this badge */
+    for (uint16_t i = 0; i < s->n_met; ++i)
+        if (s->met[i].id == (net_id() ^ NET_TWIN)) {
+            uint32_t points = POINTS_NEW + (s->met[i].meets > 1 ? (s->met[i].meets - 1) * POINTS_AGAIN : 0);
+            s->score = s->score > points ? s->score - points : 0;
+            s->met[i] = s->met[--s->n_met];
+            store_changed();
+            printf("social: removed the meeting with the loopback twin (-%lu)\n", (unsigned long)points);
+            break;
+        }
 }
 
 
@@ -159,6 +169,8 @@ static void handle_beacon(const net_packet_t *packet) {
         return;
     const uint8_t *p = packet->data;
     uint32_t id = packet->src;
+    if (id == (net_id() ^ NET_TWIN))
+        return;  /* The loopback test (net.h) must not make meetings */
     int16_t rssi = packet->rssi;
     absolute_time_t now = packet->at;
     ++n_received;
@@ -204,7 +216,7 @@ static void send_beacon(void) {
     store_t *s = store_get();
     uint8_t p[BEACON_LEN] = {seq++, s->score, s->score >> 8};
     memcpy(p + 3, s->name, 8);  /* The name is truncated to 8 characters in the beacon */
-    if (net_send(NET_BEACON, p, sizeof(p), NET_QUIET))
+    if (net_send(NET_BEACON, p, sizeof(p), NET_MEDIUM))  /* -10 dBm: -20 dBm was only heard within ~50 cm */
         ++n_sent;
 }
 

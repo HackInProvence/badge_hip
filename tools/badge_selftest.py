@@ -32,7 +32,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433', 'social']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433', 'social', 'net']
 
 
 class Tester:
@@ -369,14 +369,14 @@ def test_social(t):
     """Social theme: radar, hot / cold; talk badge (Badge theme) with its states."""
     if not open_theme(t, 'Social'):
         return t.result('social', False, 'theme "Social" not shown')
-    ok = t.press('xb', 'Radar des cigales')
+    ok = t.press('xxxxb', 'Radar des cigales')
     t.screenshot('radar')
     t.result('social: radar', ok and t.press('a', 'Social'))
     ok = t.press('xb', 'Chaud - froid')
     t.pump(2)
     t.screenshot('hotcold')
     t.result('social: hot / cold', ok and t.press('a', 'Social'))
-    t.keys('yy')
+    t.keys('yyyyy')
     close_theme(t, 'Social')
     if not open_theme(t, 'Badge'):
         return t.result('talk', False, 'theme "Badge" not shown')
@@ -390,6 +390,128 @@ def test_social(t):
              ', '.join(m.group(1) for m in states))
     t.keys('yy')
     close_theme(t, 'Badge')
+
+
+SOCIAL = ['Réseau cigales', 'Messages', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
+          'Virus des cigales']
+ADMIN = ['Commandes radio', 'Annoncer un talk', 'Vote (admin)', 'Balise chaud-froid', 'Virus : patient zéro',
+         'Type du badge', 'Quitter le mode admin']
+
+
+def open_admin(t):
+    """From the main menu: the secret sequence, then the Admin theme (after the last theme)."""
+    t.pump(8.5)
+    t.mark()
+    t.keys('yyxxyxyx')
+    if not t.expect(r'^admin: on$', 3):
+        return False
+    return t.press('yb', 'Admin')
+
+
+def admin_app(t, name):
+    """In the Admin theme (first line selected): open an application."""
+    return t.press('x' * ADMIN.index(name) + 'b', name)
+
+
+def admin_back(t, name):
+    t.press('a', 'Admin')
+    t.keys('y' * ADMIN.index(name))
+
+
+def social_app(t, name):
+    return t.press('x' * SOCIAL.index(name) + 'b', name)
+
+
+def social_back(t, name):
+    t.press('a', 'Social')
+    t.keys('y' * SOCIAL.index(name))
+
+
+def test_net(t):
+    """The social features with a single badge: loopback (the packets sent come back from a twin badge)."""
+    t.mark()
+    t.keys('L')
+    if not t.expect(r'^net: loopback on$', 3):
+        return t.result('net: loopback', False)
+    if not open_admin(t):
+        t.keys('L')
+        return t.result('net: admin menu', False)
+    # Vote: the admin badge opens a question, hears it as a voter, votes, counts the vote of the twin
+    ok = admin_app(t, 'Vote (admin)')
+    t.mark()
+    t.keys('b')  # First question
+    opened = t.expect(r'^vote: opened question 0$', 3)
+    heard = t.expect(r'^vote: question 0 ', 6)
+    admin_back(t, 'Vote (admin)')
+    t.press('a', TOP)
+    t.keys('x')  # From the admin menu (the last one) to the first theme
+    open_theme(t, 'Social')
+    ok &= social_app(t, 'Vote')
+    t.screenshot('vote_voter', 1.0)
+    t.mark()
+    t.keys('xb')  # Second answer
+    voted = t.expect(r'^vote: answer 1$', 3)
+    counted = t.expect(r'^vote: 1 voter\(s\)$', 6)
+    social_back(t, 'Vote')
+    close_theme(t, 'Social')
+    t.press('yb', 'Admin')
+    admin_app(t, 'Vote (admin)')
+    t.screenshot('vote_admin', 1.0)
+    t.mark()
+    t.keys('b')
+    closed = t.expect(r'^vote: closed, 1 voter\(s\)$', 3)
+    admin_back(t, 'Vote (admin)')
+    t.result('net: vote', bool(ok and opened and heard and voted and counted and closed),
+             f'opened {bool(opened)}, heard {bool(heard)}, voted {bool(voted)}, counted {bool(counted)}, closed {bool(closed)}')
+    # Program: announce the third talk
+    admin_app(t, 'Annoncer un talk')
+    t.mark()
+    t.keys('xxb')
+    announced = t.expect(r'^program: talk 2 announced$', 3)
+    t.result('net: program announce', announced is not None)
+    admin_back(t, 'Annoncer un talk')
+    # Infection: patient zero, then cured
+    admin_app(t, 'Virus : patient zéro')
+    t.mark()
+    t.keys('b')
+    zero = t.expect(r'^infection: patient zero$', 3)
+    t.keys('y')
+    cured = t.expect(r'^infection: this badge cured$', 3)
+    t.result('net: infection', zero is not None and cured is not None)
+    admin_back(t, 'Virus : patient zéro')
+    t.press('a', TOP)
+    t.keys('x')
+    # Messages: write to everybody
+    open_theme(t, 'Social')
+    ok = social_app(t, 'Messages')
+    t.mark()
+    t.keys('bbb')  # Write, everybody, first message
+    sent = t.expect(r'^message: sent ', 3)
+    t.screenshot('message_sent', 1.0)
+    t.keys('b')
+    t.result('net: message', ok and sent is not None)
+    social_back(t, 'Messages')
+    close_theme(t, 'Social')
+    # Program page and infection page
+    open_theme(t, 'Social')
+    ok = social_app(t, 'Programme')
+    t.keys('xxb')
+    t.screenshot('program_details', 1.0)
+    t.keys('a')
+    social_back(t, 'Programme')
+    ok = ok and social_app(t, 'Virus des cigales')
+    t.screenshot('infection')
+    social_back(t, 'Virus des cigales')
+    close_theme(t, 'Social')
+    t.result('net: program and infection pages', ok)
+    # Leave the admin mode and the loopback
+    t.press('yb', 'Admin')
+    t.mark()
+    t.keys('x' * ADMIN.index('Quitter le mode admin') + 'b')
+    t.expect(r'^admin: off$', 3)
+    t.mark()
+    t.keys('L')
+    t.result('net: loopback off', t.expect(r'^net: loopback off$', 3) is not None)
 
 
 def test_apps(t):
@@ -494,7 +616,8 @@ def test_images(t):
 
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
-         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433, 'social': test_social}
+         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433, 'social': test_social,
+         'net': test_net}
 
 
 def main():
