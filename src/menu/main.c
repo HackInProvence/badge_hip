@@ -1335,6 +1335,38 @@ static const games_hooks_t GAME_HOOKS = {
     .badge_id = social_id,
 };
 
+/* Games menu: right wing released = play, held = the record as a signed QR code */
+#define GAME_RECORD_LONG_MS 800
+static void validate(void);
+static bool game_ok_pending = false;
+
+static bool game_item_selected(void) {
+    menu_item_t item = SUBMENUS[top_selected].items[sub_selected];
+    return app == A_MENU && menu_level == 1 && item >= M_TICTACTOE && item <= M_SNAKE;
+}
+
+static void game_item_ok(uint8_t pressed, absolute_time_t now) {
+    if (pressed & BTN_OK)
+        game_ok_pending = true;
+    if (! game_ok_pending)
+        return;
+    game_t g = SUBMENUS[top_selected].items[sub_selected] - M_TICTACTOE;
+    if ((btn_simulated_long & BTN_OK) || btn_held_ms(BTN_OK, now) >= GAME_RECORD_LONG_MS) {
+        game_ok_pending = false;
+        if (games_show_record(g)) {
+            ui_trace("Record");
+            app = A_GAME;
+        } else {
+            set_status("Pas encore de record");
+        }
+        redraw = true;
+    } else if (btn_released & BTN_OK) {
+        game_ok_pending = false;
+        validate();
+        redraw = true;
+    }
+}
+
 static void change_volume(int delta) {
     int v = audio_get_volume() + delta;
     if (v < 0)
@@ -1606,6 +1638,8 @@ int main() {
                 page_back = A_CTF;
                 app = A_PAGE;
             }
+        } else if (game_item_selected() && ((pressed & BTN_OK) || game_ok_pending)) {
+            game_item_ok(pressed, now);
         } else if (pressed & BTN_CANCEL) {
             cancel();
         } else if (pressed & BTN_OK) {
@@ -1794,12 +1828,10 @@ int main() {
             display_task(now);
             if (display_is_idle() && screen_boot() && ! screen_busy()) {
                 if (saver_clean_step < 2) {
-                    /* A clean image: the fast refreshes of the menus leave ghosts that the 4 grays waveform
-                     * doesn't erase. Full refreshes (normal waveform, not the fast one still loaded) in black,
-                     * then in white, one per loop (non blocking, ~2s each) */
-                    if (saver_clean_step == 0)
-                        screen_push_ws(screen_ws_1681_bw);
-                    screen_clear(saver_clean_step == 1);
+                    /* A clean image: the fast refreshes of the menus leave ghosts that the short custom waveforms
+                     * don't erase (they come back a while after the image). Full refreshes with the waveform
+                     * of the screen (OTP) in black, then in white, one per loop (non blocking, ~3s each) */
+                    screen_clean(saver_clean_step == 1);
                     ++saver_clean_step;
                 } else {
                     show_saver();

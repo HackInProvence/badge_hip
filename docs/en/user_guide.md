@@ -100,11 +100,13 @@ In every game (except Simon), **the left wing quits the game**.
 | **Blind test** | Pick a music folder: tracks play in random order, without repeats. Right wing: show the title; right flank: next track; left flank: pause. |
 | **CTF** | A challenge: enter a famous video game code with the 4 buttons to get a "flag". |
 
-High scores for Simon, Réflexes and Snake are kept even after the badge is switched off.
+Records are kept even after the badge is switched off: best score of Simon and Snake, best average of Réflexes,
+number of wins against the cicada in Morpion and Puissance 4.
 
 **Score as a QR code**: at the end of a game, press a flank to show a QR code with the game, the score, the name
 of your cicada and a signature: the organizers can scan it for a leaderboard, and a score edited by hand is rejected.
 Any button closes the QR code.
+In the Jeux menu, a **long press on the right wing** on the name of a game shows the QR code of its record the same way.
 
 At the bottom of the screen, the buttons are listed in the order they are on the badge: G (left wing) on the left,
 D (right wing) on the right.

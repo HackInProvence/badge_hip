@@ -171,6 +171,10 @@ Ajouter ensuite des tests dans [tests/host/test_games.c](../../src/tests/host/te
   - `screen_ws_10fps`, `20fps`, `30fps` : mode *multiframe* rapide, seules les différences sont redessinées.
 - **Orientation** : l'entrée des données décrémente X et Y ; l'octet RAM (x, y) est l'octet (24 − x, 199 − y) de l'image.
   `screen_set_image_position()` gère les fenêtres, y compris les octets partiellement couverts.
+- **Nettoyage** : `screen_clean()` efface l'écran avec la forme d'onde complète de l'écran (OTP, commande 0x22 0xF7,
+  compensée en température, environ 3 s). Les formes d'onde personnalisées sont trop courtes pour effacer les fantômes
+  des rafraîchissements rapides : le fantôme revient un moment après l'image. La veille nettoie en noir puis en blanc
+  avant son image.
 - **Deep sleep** : après 20 s sans mise à jour, `display.c` endort l'écran (recommandation du constructeur).
 - **Copie de l'écran** : `screen_shot()` renvoie une copie de ce qui a été envoyé (shadow des deux RAM) et sa nature
   (BW, 4G, blanc, noir). C'est ce qu'envoie le protocole USB (`@FB`).
@@ -278,6 +282,8 @@ Principe :
 
 - À la fin d'une partie, `games.c` construit le texte `HIP26:<jeu>:<score>:<id du badge>:<nom>:<signature>` :
   - jeux : `MORPION`, `P4` (victoires-défaites-nuls de la session), `SIMON`, `REFLEX` (moyenne en ms), `SNAKE` ;
+  - depuis le menu (appui long sur un jeu, `games_show_record()`), c'est le record : meilleur score, meilleure moyenne,
+    ou nombre total de victoires contre la cigale (`12V`) pour le Morpion et le Puissance 4 ;
   - l'identifiant est celui du réseau des cigales (hash de l'identifiant unique du RP2040).
 - La signature est un SipHash-2-4 sur 64 bits du texte qui la précède, avec une clé de 128 bits
   ([score_code.c](../../src/menu/score_code.c)). La clé n'est pas écrite en clair : elle est masquée par un flux xorshift,

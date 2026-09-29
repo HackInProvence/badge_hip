@@ -21,6 +21,7 @@ static bool changed = false;  /* The screen must be redrawn */
 static const char *NAMES[GAME_COUNT] = {"Morpion", "Puissance 4", "Simon", "Réflexes", "Snake"};
 static const char *CODES[GAME_COUNT] = {"MORPION", "P4", "SIMON", "REFLEX", "SNAKE"};  /* In the score QR codes */
 static bool qr_shown = false;  /* The page of the signed score (score_code.h) */
+static bool qr_record = false;  /* It is the record, shown from the menu: closing it goes back to the menu */
 static char qr_text[SCORE_CODE_MAX];
 
 
@@ -53,6 +54,13 @@ static bool new_record(game_t g, uint16_t value, bool lower_is_better) {
     if (hooks->records_changed)
         hooks->records_changed();
     return true;
+}
+
+/* Morpion and Puissance 4: the record counts the wins against the cicada */
+static void add_win(game_t g) {
+    records[g] = records[g] == GAMES_NO_RECORD ? 1 : records[g] + (records[g] < 0xFFFE);
+    if (hooks->records_changed)
+        hooks->records_changed();
 }
 
 static void draw_title(uint8_t *fb, const char *title) {
@@ -244,6 +252,8 @@ static void ttt_check_end(void) {
     ttt_result = ttt_winner(ttt, &ttt_line);
     if (ttt_result) {
         ++ttt_score[ttt_result - 1];
+        if (ttt_result == 1)
+            add_win(GAME_TICTACTOE);
         printf("game: morpion %s\n", ttt_result == 1 ? "won" : ttt_result == 2 ? "lost" : "draw");
         end_sound(ttt_result);
     }
@@ -481,6 +491,8 @@ static void c4_play(int c, int who) {
         c4_result = 3;
     if (c4_result) {
         ++c4_score[c4_result - 1];
+        if (c4_result == 1)
+            add_win(GAME_CONNECT4);
         printf("game: puissance 4 %s\n", c4_result == 1 ? "won" : c4_result == 2 ? "lost" : "draw");
         end_sound(c4_result);
     }
@@ -1071,8 +1083,8 @@ void games_init(const games_hooks_t *h, uint16_t *r) {
     hooks = h;
     records = r;
     for (int g = 0; g < GAME_COUNT; ++g)
-        if (g == GAME_REFLEX && records[g] == 0)
-            records[g] = GAMES_NO_RECORD;  /* A new store is zeroed: 0 ms is not a record */
+        if ((g == GAME_REFLEX || g == GAME_TICTACTOE || g == GAME_CONNECT4) && records[g] == 0)
+            records[g] = GAMES_NO_RECORD;  /* A new store is zeroed: 0 ms or 0 win is not a record */
 }
 
 const char *games_name(game_t g) {
@@ -1081,10 +1093,12 @@ const char *games_name(game_t g) {
 
 void games_record_text(game_t g, char *buf, int len) {
     buf[0] = 0;
-    if (g != GAME_SIMON && g != GAME_REFLEX && g != GAME_SNAKE)
+    if (g >= GAME_COUNT)
         return;
     if (records[g] == GAMES_NO_RECORD)
         snprintf(buf, len, "Pas encore de record");
+    else if (g == GAME_TICTACTOE || g == GAME_CONNECT4)
+        snprintf(buf, len, "Victoires : %u", records[g]);
     else
         snprintf(buf, len, g == GAME_REFLEX ? "Record : %u ms" : "Record : %u", records[g]);
 }
@@ -1103,7 +1117,10 @@ static bool game_over(void) {
 
 static void make_qr_text(void) {
     char score[16];
-    switch (game) {
+    if (qr_record) {
+        /* The record: wins against the cicada ("12V"), best score, best average reaction time */
+        snprintf(score, sizeof(score), game == GAME_REFLEX ? "%ums" : game <= GAME_CONNECT4 ? "%uV" : "%u", records[game]);
+    } else switch (game) {
     case GAME_TICTACTOE: snprintf(score, sizeof(score), "%u-%u-%u", ttt_score[0], ttt_score[1], ttt_score[2]); break;
     case GAME_CONNECT4: snprintf(score, sizeof(score), "%u-%u-%u", c4_score[0], c4_score[1], c4_score[2]); break;
     case GAME_SIMON: snprintf(score, sizeof(score), "%d", simon_len - 1); break;
@@ -1123,14 +1140,26 @@ static void qr_render(uint8_t *fb) {
     y += score_code_draw(fb, qr_text, y, scale) + 6;
     char line[48];
     const char *name = hooks->player_name ? hooks->player_name() : "";
-    snprintf(line, sizeof(line), "%s - %s", NAMES[game], name);
+    snprintf(line, sizeof(line), "%s%s - %s", qr_record ? "Record " : "", NAMES[game], name);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, line, GFX_BLACK, GFX_ALIGN_CENTER);
     draw_footer(fb, "Score signé  Bouton : retour");
+}
+
+bool games_show_record(game_t g) {
+    if (g >= GAME_COUNT || records[g] == GAMES_NO_RECORD)
+        return false;
+    game = g;
+    qr_record = true;
+    make_qr_text();
+    qr_shown = true;
+    changed = true;
+    return true;
 }
 
 void games_start(game_t g, absolute_time_t now) {
     game = g;
     qr_shown = false;
+    qr_record = false;
     switch (g) {
     case GAME_TICTACTOE:
         memset(ttt_score, 0, sizeof(ttt_score));
@@ -1165,6 +1194,10 @@ bool games_buttons(uint8_t pressed, absolute_time_t now) {
     if (qr_shown) {  /* Any button closes the QR code */
         qr_shown = false;
         changed = true;
+        if (qr_record) {
+            qr_record = false;
+            return false;  /* Back to the menu */
+        }
         return true;
     }
     if (game_over() && (pressed & (GAMES_BTN_X | GAMES_BTN_Y))) {

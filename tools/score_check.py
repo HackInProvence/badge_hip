@@ -13,7 +13,8 @@ e.g. for a leaderboard: scan the QR codes with a phone, paste the texts in a fil
     python tools/score_check.py "HIP26:SIMON:12:1A2B3C4D:Cig 33EC:0123456789ABCDEF" --key ...
 
 Text of a QR code: HIP26:<game>:<score>:<badge id>:<cicada name>:<signature>
-- game: MORPION, P4 (wins-losses-draws of the session), SIMON, REFLEX (average in ms, lower is better), SNAKE,
+- game: MORPION, P4 (wins-losses-draws of the session, or "<n>V": all the wins, from the record),
+  SIMON, REFLEX (average in ms, lower is better), SNAKE,
 - badge id: 8 hex digits (hash of the unique id of the badge, as in the network of the cicadas),
 - signature: SipHash-2-4 of everything before the last ':', with the 128 bits key of the firmware, 16 hex digits.
 
@@ -91,6 +92,8 @@ def check(text, key):
 def sort_key(row):
     game, score = row['game'], row['score']
     if game in ('MORPION', 'P4'):
+        if score.endswith('V'):  # Record: wins against the cicada
+            return (-int(score[:-1]), 0)
         w, l, d = (int(x) for x in score.split('-'))
         return (-w, l)
     if game == 'REFLEX':

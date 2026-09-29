@@ -98,11 +98,13 @@ Dans tous les jeux (sauf Simon), **l'aile gauche quitte le jeu**.
 | **Blind test** | Choisissez un dossier de musiques : les morceaux passent dans un ordre aléatoire, sans répétition. Aile droite : afficher le titre ; flanc droit : morceau suivant ; flanc gauche : pause. |
 | **CTF** | Un défi : entrer un code célèbre des jeux vidéo avec les 4 boutons pour obtenir un « flag ». |
 
-Les records de Simon, Réflexes et Snake sont gardés même après extinction.
+Les records sont gardés même après extinction : meilleur score de Simon et Snake, meilleure moyenne de Réflexes,
+nombre de victoires contre la cigale au Morpion et au Puissance 4.
 
 **Score en QR code** : à la fin d'une partie, un appui sur un flanc affiche un QR code qui contient le jeu, le score,
 le nom de votre cigale et une signature : les organisateurs peuvent le scanner pour un classement, et un score
 modifié à la main est refusé. N'importe quel bouton referme le QR code.
+Dans le menu Jeux, un **appui long sur l'aile droite** sur le nom d'un jeu affiche de la même façon le QR code de son record.
 
 En bas de l'écran, les boutons sont indiqués dans l'ordre où ils sont sur le badge : G (aile gauche) à gauche,
 D (aile droite) à droite.

@@ -71,5 +71,22 @@ int main(void) {
     screen_show_rams();
     CHECK(host_spi_log[0] != SSD1681_DISPLAY_CTRL1);  /* Only once */
 
+    /* Clean with the waveform of the screen (OTP): uniform color, then full update 0xF7 */
+    host_spi_len = 0;
+    screen_clean(1);
+    CHECK_EQ(host_spi_log[0], SSD1681_DISPLAY_CTRL1);
+    CHECK_EQ(host_spi_log[1], 0x55);
+    CHECK_EQ(host_spi_log[2], SSD1681_DISPLAY_CTRL2);
+    CHECK_EQ(host_spi_log[3], 0xF7);
+    CHECK_EQ(host_spi_log[4], SSD1681_ACTIVATE);
+    CHECK_EQ(screen_shot(&lsb, &msb), SCREEN_SHOT_WHITE);
+    host_spi_len = 0;
+    screen_show_image_4g(data, data);  /* Pushes its waveform, restores the RAM */
+    CHECK(host_spi_log[0] != SSD1681_DISPLAY_CTRL1);  /* The window first */
+    bool restored = false;
+    for (size_t i = 0; i + 1 < host_spi_len && ! restored; ++i)
+        restored = host_spi_log[i] == SSD1681_DISPLAY_CTRL1 && host_spi_log[i + 1] == 0x00;
+    CHECK(restored);
+
     TEST_END();
 }

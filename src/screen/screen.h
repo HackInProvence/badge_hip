@@ -112,6 +112,16 @@ void screen_border(uint8_t color);
  * */
 void screen_clear(bool bit);
 
+/** \brief Like screen_clear() but with the full waveform stored in the screen (OTP, temperature compensated):
+ * longer (~3s, several flashes) but it really erases the ghosts left by many fast refreshes,
+ * which the short custom waveforms don't (the ghost comes back a while after the next image).
+ *
+ * The screen must not be busy. The next drawing must push its waveform again (the screen_show_image_* do).
+ *
+ * \param bit   The color, 0 for black, 1 for white.
+ * */
+void screen_clean(bool bit);
+
 /** \brief Put the screen in deep sleep mode. Should be done after pushing images.
  *
  * The screen must not be busy.

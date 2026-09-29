@@ -171,6 +171,9 @@ Then add tests in [tests/host/test_games.c](../../src/tests/host/test_games.c).
   - `screen_ws_10fps`, `20fps`, `30fps`: fast *multiframe* mode, only the differences are redrawn.
 - **Orientation**: data entry decrements X and Y; RAM byte (x, y) is byte (24 − x, 199 − y) of the image.
   `screen_set_image_position()` handles windows, including partially covered bytes.
+- **Cleaning**: `screen_clean()` clears the screen with the screen's own full waveform (OTP, command 0x22 0xF7,
+  temperature compensated, about 3 s). The custom waveforms are too short to erase the ghosts of the fast refreshes:
+  the ghost comes back a while after the image. The screensaver cleans in black then white before its image.
 - **Deep sleep**: after 20 s without an update, `display.c` puts the display to sleep (as recommended by the manufacturer).
 - **Screen copy**: `screen_shot()` returns a copy of what was sent (shadow of both RAMs) and its kind
   (BW, 4G, white, black). This is what the USB protocol sends (`@FB`).
@@ -278,6 +281,8 @@ How it works:
 
 - At the end of a game, `games.c` builds the text `HIP26:<game>:<score>:<badge id>:<name>:<signature>`:
   - games: `MORPION`, `P4` (wins-losses-draws of the session), `SIMON`, `REFLEX` (average in ms), `SNAKE`;
+  - from the menu (long press on a game, `games_show_record()`), it is the record: best score, best average,
+    or total wins against the cicada (`12V`) for Morpion and Puissance 4;
   - the id is the one of the network of the cicadas (hash of the RP2040 unique id).
 - The signature is a 64-bit SipHash-2-4 of the text before it, with a 128-bit key
   ([score_code.c](../../src/menu/score_code.c)). The key is not stored in clear: it is masked by a xorshift stream,

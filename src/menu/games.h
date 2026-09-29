@@ -43,7 +43,8 @@ typedef enum {
     GAME_COUNT,
 } game_t;
 
-/* Persistent records (index: game_t): best Simon and Snake scores, best average reaction time (ms).
+/* Persistent records (index: game_t): wins against the cicada (Morpion, Puissance 4), best Simon and Snake scores,
+ * best average reaction time (ms).
  * 0xFFFF = no record yet. */
 #define GAMES_NO_RECORD 0xFFFF
 
@@ -64,6 +65,10 @@ const char *games_name(game_t game);
 
 /** \brief Record of the game as a text (e.g. "record 12"), empty when the game has none. */
 void games_record_text(game_t game, char *buf, int len);
+
+/** \brief Shows the record of the game as a signed QR code (long press in the menu), until a button is pressed
+ * (then games_buttons() returns false). Returns false when the game has no record yet. */
+bool games_show_record(game_t game);
 
 /** \brief Start a new game (the scores of the previous rounds are reset). */
 void games_start(game_t game, absolute_time_t now);

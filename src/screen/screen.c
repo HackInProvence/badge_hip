@@ -258,6 +258,25 @@ void screen_clear(bool bit) {
 }
 
 
+void screen_clean(bool bit) {
+    if (screen_busy()) {
+        log_warning("screen_clean() called but screen is busy");
+        return;
+    }
+
+    /* Uniform color, as in screen_clear() */
+    send(SSD1681_DISPLAY_CTRL1, 0x44 | (bit ? 0x11 : 0x00));
+    /* Full update with the waveform of the OTP: clock and analog on, load the temperature, load the LUT (mode 1),
+     * display, analog and clock off. The LUT registers are overwritten: the pushed waveform is lost. */
+    send(SSD1681_DISPLAY_CTRL2, 0xF7);
+    send(SSD1681_ACTIVATE);
+    current_ws = NULL;
+    ram_bypassed = true;  /* Restored before the next drawing */
+    shot_kind = bit ? SCREEN_SHOT_WHITE : SCREEN_SHOT_BLACK;
+    ++shot_counter;
+}
+
+
 void screen_deep_sleep(void) {
     if (screen_busy()) {
         log_warning("screen_deep_sleep() called but screen is busy");

@@ -230,7 +230,14 @@ def test_games(t):
         ok &= quit_ok
         t.result(f'game: {name}', ok, detail)
         t.keys('x')
-    t.keys('y' * len(GAMES))
+    # Long press on a game of the menu: the record as a signed QR code (Snake has one after the game above)
+    t.keys('y')
+    t.mark()
+    t.keys('B')
+    m = t.expect(r'^game: score code (HIP26:SNAKE:\d+:[0-9A-F]{8}:.+:[0-9A-F]{16})$', 3)
+    t.screenshot('record_Snake_qr', 1.5)
+    t.result('game: record QR code', m is not None and t.press('a', 'Jeux'), m.group(1) if m else 'no record shown')
+    t.keys('y' * (len(GAMES) - 1))
     close_theme(t, 'Jeux')
 
 

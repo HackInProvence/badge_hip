@@ -82,6 +82,16 @@ int main(void) {
         ttt_explore(b);
     }
     CHECK_EQ(ttt_losses, 0);
+    /* A win against the cicada is the record of the Morpion */
+    games_start(GAME_TICTACTOE, host_time_us);
+    CHECK(! games_show_record(GAME_TICTACTOE));
+    games_start(GAME_TICTACTOE, host_time_us);
+    memcpy(ttt, (uint8_t[]){1, 1, 1, 2, 2, 0, 0, 0, 0}, 9);
+    ttt_check_end();
+    CHECK_EQ(recs[GAME_TICTACTOE], 1);
+    CHECK(games_show_record(GAME_TICTACTOE));
+    CHECK(strstr(qr_text, ":MORPION:1V:") != NULL);
+    CHECK(games_buttons(GAMES_BTN_A, host_time_us) == false);
     /* Takes a win, blocks a line */
     uint8_t win[9] = {2, 2, 0, 1, 1, 0, 0, 0, 0};
     CHECK_EQ(ttt_best_move(win, 2), 2);
@@ -175,6 +185,12 @@ int main(void) {
     CHECK(games_buttons(GAMES_BTN_A, host_time_us));  /* Closes the QR code, doesn't quit */
     CHECK(! qr_shown);
     CHECK(games_buttons(GAMES_BTN_A, host_time_us) == false);
+    /* The record from the menu (long press): a QR code, any button goes back to the menu */
+    CHECK(games_show_record(GAME_SIMON));
+    CHECK(! strncmp(qr_text, "HIP26:SIMON:1:", 14));
+    CHECK(games_buttons(GAMES_BTN_B, host_time_us) == false);
+    CHECK(! qr_shown);
+    CHECK(! games_show_record(GAME_CONNECT4));  /* No win yet */
     /* Too slow */
     games_start(GAME_SIMON, host_time_us);
     run_ms(1500 + 300 + 600 + 250 + SIMON_INPUT_TIMEOUT_MS + 10);
