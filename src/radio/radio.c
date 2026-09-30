@@ -181,6 +181,16 @@ STATIC void print_cc_configuration(void) {
     log_cc_status();
 }
 
+void radio_set_patable(const uint8_t *values, size_t n) {
+    /* Burst write from PATABLE[0] (OOK: [0] = carrier off, [1] = carrier on, with FREND0.PA_POWER = 1) */
+    uint8_t cmd[9] = {CC1101_BURST(CC1101_PATABLE)};
+    if (n > 8)
+        n = 8;
+    memcpy(cmd + 1, values, n);
+    ccsend(cmd, NULL, n + 1);
+}
+
+
 void radio_print_registers(void) {
     print_cc_configuration();
 }

@@ -455,6 +455,11 @@ A command arrives in two ways:
 - from a **433 MHz remote control**, a Flipper Zero for instance: a 24-bit Princeton code `0xC16A00 | command`,
   decoded by the OOK receiver (§ 6.14); the same code repeated (button held) is only executed once (1.5 s).
 
+The admin badge first sends the command like a remote: 8 Princeton frames (te = 400 µs, ~0.4 s,
+[ook_tx.c](../../src/menu/ook_tx.c): CC1101 in asynchronous serial mode, edges on GDO0 timed by a hardware alarm),
+then the network packets. The talk badge, which only listens in OOK, thus gets the admin commands.
+A command received both ways is only executed once (same command within 4 s).
+
 | Command | Effect | Handled by |
 |---|---|---|
 | 0x01 | the cicada sings for 6 s | `remote.c` |

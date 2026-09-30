@@ -454,6 +454,11 @@ Une commande arrive de deux façons :
 - d'une **télécommande 433 MHz**, un Flipper Zero par exemple : un code Princeton 24 bits `0xC16A00 | commande`,
   décodé par le récepteur OOK (§ 6.14) ; le même code répété (bouton maintenu) n'est exécuté qu'une fois (1,5 s).
 
+Le badge admin envoie d'abord la commande comme une télécommande : 8 trames Princeton (te = 400 µs, ~0,4 s,
+[ook_tx.c](../../src/menu/ook_tx.c) : CC1101 en mode série asynchrone, fronts sur GDO0 cadencés par une alarme
+matérielle), puis les paquets réseau. Le badge de talk, qui n'écoute qu'en OOK, reçoit ainsi les commandes admin.
+Une commande reçue par les deux voies n'est exécutée qu'une fois (même commande dans les 4 s).
+
 | Commande | Effet | Traitée par |
 |---|---|---|
 | 0x01 | la cigale chante 6 s | `remote.c` |

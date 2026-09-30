@@ -12,6 +12,7 @@
 #include "net.h"
 #include "noise_gen.h"
 #include "ook_rx.h"
+#include "ook_tx.h"
 #include "radio_tools.h"
 #include "remote.h"
 #include "store.h"
@@ -22,6 +23,8 @@
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
 #define CIGALE_MS 6000
+#define OOK_FRAMES 8  /* Princeton frames of an admin command (~0.4 s: 2 at least in a listening window) */
+#define SAME_COMMAND_MS 4000  /* The command came by the network and in OOK: executed once */
 #define OOK_WINDOW_MS 220  /* 2 frames of a Princeton remote (~50 ms each) whatever the start */
 #define OOK_PERIOD_MS 800  /* Hold the button of the remote ~1 s */
 #define OOK_WINDOW_MAX_MS 1500  /* A window is extended while pulses come (a remote is sending) */
@@ -52,6 +55,9 @@ static absolute_time_t window_ts = 0;
 static absolute_time_t window_start = 0;
 static uint32_t window_pulses = 0;
 static int windows_paused = 0;
+static bool ook_pending = false;  /* The Princeton frames of the command to send */
+static uint8_t last_command = 0;  /* Received by the network and in OOK: executed once */
+static absolute_time_t last_command_at = 0;
 
 
 static bool is_muted(void) {
@@ -104,6 +110,8 @@ bool remote_event(char *buf, int len) {
 
 void remote_execute(uint8_t command, const char *from) {
     printf("remote: command 0x%02x from %s\n", command, from);
+    last_command = command;
+    last_command_at = get_absolute_time();
     snprintf(event, sizeof(event), "Commande 0x%02X reçue", command);
     switch (command) {
     case REMOTE_CIGALE:
@@ -131,6 +139,12 @@ void remote_execute(uint8_t command, const char *from) {
 }
 
 
+/* The admin badge sends a command both in OOK (Princeton) and by the network: the second one is ignored */
+static bool same_command(uint8_t command, absolute_time_t now) {
+    return command == last_command && last_command_at
+           && absolute_time_diff_us(last_command_at, now) < SAME_COMMAND_MS * 1000ll;
+}
+
 /* The same sender and nonce was received less than SEEN_MS ago */
 static bool already_seen(uint32_t src, uint16_t nonce, absolute_time_t now) {
     for (int i = 0; i < SEEN_SLOTS; ++i)
@@ -148,6 +162,8 @@ static void handle_command(const net_packet_t *p) {
     uint16_t nonce = p->data[1] | p->data[2] << 8;
     if (already_seen(p->src, nonce, p->at))
         return;
+    if (same_command(p->data[0], p->at))
+        return;
     char from[16];
     snprintf(from, sizeof(from), "%08lX", (unsigned long)p->src);
     remote_execute(p->data[0], from);
@@ -164,6 +180,8 @@ void remote_princeton(uint32_t code) {
     }
     last_princeton = code;
     last_princeton_at = now;
+    if (same_command(code & 0xFF, now))
+        return;
     remote_execute(code & 0xFF, "Princeton");
 }
 
@@ -173,6 +191,7 @@ void remote_send(uint8_t command) {
     sends_left = REPEATS;
     send_nonce = get_rand_32();
     next_send = get_absolute_time();
+    ook_pending = true;  /* First the Princeton frames (talk badges listen only in OOK), then the network */
     remote_execute(command, "this badge");  /* The admin badge obeys too */
 }
 
@@ -191,6 +210,23 @@ void remote_pause_windows(bool pause) {
 
 
 void remote_task(absolute_time_t now) {
+    ook_tx_task();
+    /* An admin command: the same code as a Flipper remote, for the badges that only listen in OOK (talk) */
+    if (ook_pending && ook_rx_active() && ! window)
+        ook_pending = false;  /* This badge listens in OOK itself (talk badge): the network only */
+    if (ook_pending && ! window && radio_tools_idle()) {
+        if (ook_tx_princeton(REMOTE_PRINCETON_ADDRESS | to_send, OOK_FRAMES)) {
+            ook_pending = false;
+            printf("remote: princeton 0x%06lX sent\n", (unsigned long)(REMOTE_PRINCETON_ADDRESS | to_send));
+        }
+    }
+    if (ook_tx_busy() || ook_pending) {
+        if (window) {
+            ook_rx_stop();  /* The radio is needed to send */
+            window = false;
+        }
+        return;  /* No listening window, no packet while the frames are sent */
+    }
     /* A moment every second, listen to the Princeton remotes (Flipper Zero): ook_rx.c decodes them */
     if (! window) {
         if (remote_enabled() && ! windows_paused && radio_tools_idle() && net_idle()

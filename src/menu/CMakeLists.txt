@@ -24,6 +24,7 @@ target_sources(badge_menu PRIVATE
     ui.c
     net.c
     ook_rx.c
+    ook_tx.c
     radio433.c
     ../radio/ookdec.c
     battery.c

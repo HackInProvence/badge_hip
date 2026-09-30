@@ -219,6 +219,9 @@ typedef enum {
 } radio_register_t;
 
 
+/** \brief Writes the \p n first values of the PATABLE (at most 8). */
+void radio_set_patable(const uint8_t *values, size_t n);
+
 /** \brief Debug: prints the configuration registers and the PATABLE. */
 void radio_print_registers(void);
 
