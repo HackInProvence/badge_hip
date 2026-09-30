@@ -168,6 +168,12 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         for (int i = 0; i < n; ++i)
             printf("  %s %d dBm%s\n", nb[i].name, nb[i].rssi, nb[i].met ? " (met)" : "");
         printf("ctf: %d/%d flags\n", ctf_found_count(), CTF_N_FLAGS);
+        uint32_t ns, nr, nd;
+        net_stats(&ns, &nr, &nd);
+        printf("net: sent %lu, received %lu, dropped %lu%s\n", (unsigned long)ns, (unsigned long)nr, (unsigned long)nd,
+               net_loopback() ? ", loopback" : "");
+        printf("remote: %s, %s, admin %s\n", remote_enabled() ? "enabled" : "disabled", remote_muted() ? "muted" : "not muted",
+               store_get()->admin == STORE_ADMIN_ON ? "on" : "off");
         printf("radio: CC1101 version 0x%02x, crystal used %lu Hz, measured %lu Hz\n", radio_tools_chip_version(),
                (unsigned long)radio_get_xosc(), (unsigned long)radio_tools_xosc_hz());
         if (battery_calibrated())
@@ -212,6 +218,10 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     }
     case 'p':
         ook_rx_dump();
+        break;
+    case 'V':
+        net_set_verbose(! net_verbose());
+        printf("net: verbose %s\n", net_verbose() ? "on" : "off");
         break;
     case 'P':
         net_ping();

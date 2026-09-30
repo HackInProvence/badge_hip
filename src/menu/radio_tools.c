@@ -43,6 +43,9 @@ static char message[64] = "";
 static void configure(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_write_registers(radio_preset_gfsk, radio_preset_gfsk_len);
+    /* The registers that the OOK receiver (ook_rx.c) changes and that the preset keeps at their reset values:
+     * with FREND0 = 0x11, the packets would be sent with PATABLE[1] (nothing) */
+    radio_write_registers((const uint8_t[]){CC1101_FREND0, 0x10, CC1101_FREND1, 0x56, CC1101_MDMCFG0, 0xF8}, 6);
     radio_set_power(PATABLE);
     radio_set_frequency(RADIO_TOOLS_FREQ_HZ);
     radio_set_baud_rate(BAUDS);

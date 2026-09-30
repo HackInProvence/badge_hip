@@ -16,8 +16,8 @@
 #include "remote.h"
 #include "store.h"
 
-#define REPEATS 3  /* An admin command is sent 3 times (some badges miss a packet) */
-#define REPEAT_MS 150
+#define REPEATS 5  /* An admin command is sent 5 times over 2 s: the badges listen to the OOK remotes */
+#define REPEAT_MS 450  /* a moment every OOK_PERIOD_MS (then they don't hear the network) */
 #define SEEN_SLOTS 8
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
@@ -25,7 +25,8 @@
 #define OOK_WINDOW_MS 220  /* 2 frames of a Princeton remote (~50 ms each) whatever the start */
 #define OOK_PERIOD_MS 800  /* Hold the button of the remote ~1 s */
 #define OOK_WINDOW_MAX_MS 1500  /* A window is extended while pulses come (a remote is sending) */
-#define OOK_ACTIVE_US 60000  /* Pulses within this time: activity */
+#define OOK_ACTIVE_PULSES 8  /* A remote is sending: at least this many pulses in 100 ms (the packets of the badges
+                               * are GFSK: only 1 or 2 pulses for the OOK receiver) */
 
 typedef struct {
     uint32_t src;
@@ -49,6 +50,7 @@ static bool event_pending = false;
 static bool window = false;  /* Listening to the OOK remotes */
 static absolute_time_t window_ts = 0;
 static absolute_time_t window_start = 0;
+static uint32_t window_pulses = 0;
 static int windows_paused = 0;
 
 
@@ -63,6 +65,7 @@ bool remote_muted(void) {
 
 
 void remote_set_muted(bool m) {
+    printf("remote: %s\n", m ? "muted" : "unmuted");
     store_get()->muted = m ? 1 : 0;
     store_changed();
     audio_set_mute(m);
@@ -81,6 +84,7 @@ bool remote_enabled(void) {
 void remote_set_enabled(bool e) {
     store_get()->remote_off = e ? 0 : 1;
     store_changed();
+    printf("remote: %s\n", e ? "enabled" : "disabled");
 }
 
 
@@ -194,12 +198,14 @@ void remote_task(absolute_time_t now) {
             ook_rx_start();
             window = true;
             window_start = now;
+            window_pulses = ook_rx_pulses();
             window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
         }
-    } else if (absolute_time_diff_us(window_ts, now) >= 0 && ook_rx_quiet_us() < OOK_ACTIVE_US
+    } else if (absolute_time_diff_us(window_ts, now) >= 0 && ook_rx_pulses() - window_pulses >= OOK_ACTIVE_PULSES
                && absolute_time_diff_us(window_start, now) < OOK_WINDOW_MAX_MS * 1000ll
                && radio_tools_idle() && ! windows_paused) {
-        window_ts = delayed_by_ms(now, 100);  /* Something is sending: listen until it stops (the frames repeat) */
+        window_pulses = ook_rx_pulses();
+        window_ts = delayed_by_ms(now, 100);  /* A remote is sending: listen until it stops (the frames repeat) */
     } else if (absolute_time_diff_us(window_ts, now) >= 0 || ! radio_tools_idle() || windows_paused) {
         ook_rx_stop();
         window = false;

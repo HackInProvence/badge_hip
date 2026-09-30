@@ -94,6 +94,10 @@ void net_task(absolute_time_t now);
 void net_set_loopback(bool on);
 bool net_loopback(void);
 
+/** \brief Diagnostic: prints every packet received and sent ("V" key on the USB serial port). */
+void net_set_verbose(bool on);
+bool net_verbose(void);
+
 /** \brief Diagnostic: sends a loud ping (the other badges print "net: ping from ..."). */
 void net_ping(void);
 

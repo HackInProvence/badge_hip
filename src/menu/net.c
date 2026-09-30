@@ -38,6 +38,7 @@ static absolute_time_t tx_ts = 0;
 static absolute_time_t next_poll = 0;
 static uint32_t n_sent = 0, n_received = 0, n_dropped = 0;
 static bool loopback = false;
+static bool verbose = false;
 static uint8_t loop_bytes[NET_HEADER + NET_MAX_DATA];
 static uint8_t loop_len = 0;  /* A packet sent, to deliver as received (loopback) */
 
@@ -110,6 +111,16 @@ void net_pause(bool p) {
 }
 
 
+void net_set_verbose(bool on) {
+    verbose = on;
+}
+
+
+bool net_verbose(void) {
+    return verbose;
+}
+
+
 void net_set_loopback(bool on) {
     loopback = on;
 }
@@ -168,6 +179,8 @@ static void poll_rx(absolute_time_t now) {
                 .rssi = (int8_t)buf[len] / 2 - 74,
                 .at = now,
             };
+            if (verbose)
+                printf("net: rx type %u from %08lX, %u bytes, %d dBm\n", p.type, (unsigned long)p.src, p.len, p.rssi);
             if (p.src != my_id && p.src != 0) {
                 ++n_received;
                 if (handlers[p.type])
@@ -185,6 +198,8 @@ static void send_next(void) {
     tx_packet_t *t = &queue[queue_head];
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_set_power(t->flags & NET_LOUD ? NET_PATABLE_LOUD : t->flags & NET_MEDIUM ? NET_PATABLE_MEDIUM : NET_PATABLE_QUIET);
+    if (verbose)
+        printf("net: tx type %u, %u bytes, flags 0x%02x\n", t->bytes[1], t->len - NET_HEADER, t->flags);
     if (radio_tx_packet(t->bytes, t->len)) {
         tx_pending = true;
         tx_ts = get_absolute_time();
