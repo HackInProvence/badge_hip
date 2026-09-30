@@ -1283,25 +1283,24 @@ static void render_page(const char *title, const char *text, const char *footer)
 
 static void render_info(void) {
     char text[280];
-    uint32_t measured = radio_tools_xosc_hz();
-    char xosc[40];
-    if (radio_tools_measuring())
-        snprintf(xosc, sizeof(xosc), "mesure en cours...");
-    else if (measured)
-        snprintf(xosc, sizeof(xosc), "%.4f MHz", measured / 1e6);
-    else
-        snprintf(xosc, sizeof(xosc), "inconnu");
     /* Only a calibrated measure is shown (see battery.h) */
     char bat[32];
     if (battery_mv())
         snprintf(bat, sizeof(bat), "%u,%02u V (%d %%)", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent());
     else
         snprintf(bat, sizeof(bat), "non calibrée");
+    /* 6 lines fit above the footer: the measured crystal and the default of the firmware are on the serial port ("!") */
+    char build[32];
+    snprintf(build, sizeof(build), "%s", BADGE_BUILD);
+    char *date = strchr(build, ' ');
+    if (date)
+        *date++ = 0;
     snprintf(text, sizeof(text),
-             "Version : " BADGE_VERSION " (" BADGE_BUILD ")\n"
-             "Radio : CC1101 v0x%02x\nQuartz mesuré : %s\nQuartz utilisé : %.4f MHz\nDéfaut (firmware) : %.4f\nCarte SD : %s\n"
+             "Version " BADGE_VERSION " (%s)\nCompilée le %s\n"
+             "Radio : CC1101 v0x%02x\nQuartz : %.4f MHz%s\nCarte SD : %s\n"
              "Batterie : %s",
-             radio_tools_chip_version(), xosc, radio_get_xosc() / 1e6, CC1101_fXOSC / 1e6,
+             build, date ? date : "?", radio_tools_chip_version(), radio_get_xosc() / 1e6,
+             radio_tools_measuring() ? " (mesure)" : "",
              sd_is_ready() ? "prête" : "absente", bat);
     render_page("Infos", text, "D : crédits  G : retour");
 }
