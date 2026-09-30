@@ -2474,6 +2474,14 @@ int main() {
                 if (cur_app->task && cur_app->task(now))
                     redraw = true;
                 display_set_periodic_full(! cur_app->calm || cur_app->calm());
+                if (still_pending) {
+                    /* The application ends on a page shown like the screensaver (app_show_still()) */
+                    still_pending = false;
+                    if (cur_app->stop)
+                        cur_app->stop();
+                    cur_app = NULL;
+                    start_saver(A_MENU);
+                }
             }
             if (app == A_GAME) {
                 if (games_task(now))

@@ -37,6 +37,9 @@ static uint16_t transfer = 0;
 static uint32_t sender = 0;
 static int received = 0, rebuilt = 0;
 static bool changed = false;
+#define REDRAW_BLOCKS 25  /* The progress page is drawn again every 25 blocks */
+static int shown_ok = 0;  /* Blocks shown on the progress page */
+static bool complete = false;
 static bool receiving = false;
 /* Sending */
 static int send_block = -1;  /* -1: not sending */
@@ -54,6 +57,13 @@ static void set_has(int b) {
 }
 
 /* A missing block of a group is rebuilt from the others and the parity */
+static int data_blocks_ok(void) {
+    int n = 0;
+    for (int i = 0; i < DATA_BLOCKS; ++i)
+        n += has(i);
+    return n;
+}
+
 static void rebuild(int g) {
     int missing = -1, n = 0;
     int last = (g + 1) * GROUP < DATA_BLOCKS ? (g + 1) * GROUP : DATA_BLOCKS;
@@ -89,6 +99,9 @@ static void handle_image(const net_packet_t *p) {
         memset(image, 0, sizeof(image));
         memset(have, 0, sizeof(have));
         received = rebuilt = 0;
+        complete = false;
+        shown_ok = 0;
+        changed = true;
         printf("image: receiving from %08lX\n", (unsigned long)p->src);
     }
     if (has(b))
@@ -97,12 +110,11 @@ static void handle_image(const net_packet_t *p) {
     set_has(b);
     ++received;
     rebuild(b < DATA_BLOCKS ? b / GROUP : b - DATA_BLOCKS);
-    if (b < DATA_BLOCKS && b % GROUP == GROUP - 1)
-        changed = true;  /* Redraw now and then */
-    int n = 0;
-    for (int i = 0; i < DATA_BLOCKS; ++i)
-        n += has(i);
-    if (n == DATA_BLOCKS) {
+    int n = data_blocks_ok();
+    if (n / REDRAW_BLOCKS != shown_ok / REDRAW_BLOCKS)
+        changed = true;  /* The progress, now and then: each fast refresh leaves a bit of ghost */
+    if (n == DATA_BLOCKS && ! complete) {
+        complete = true;
         changed = true;
         printf("image: complete (%d packets, %d rebuilt)\n", received, rebuilt);
     }
@@ -110,13 +122,6 @@ static void handle_image(const net_packet_t *p) {
 
 void image_radio_init(void) {
     net_subscribe(NET_IMAGE, handle_image);
-}
-
-static int data_blocks_ok(void) {
-    int n = 0;
-    for (int i = 0; i < DATA_BLOCKS; ++i)
-        n += has(i);
-    return n;
 }
 
 /* ------ Load an image to send ------ */
@@ -268,6 +273,10 @@ const app_t app_image_send = {
 
 static void recv_start(absolute_time_t now) {
     (void)now;
+    memset(have, 0, sizeof(have));  /* A new image (the previous one was shown) */
+    transfer = 0;
+    received = rebuilt = shown_ok = 0;
+    complete = false;
     receiving = true;
     remote_pause_windows(true);  /* All the packets */
 }
@@ -282,40 +291,50 @@ static bool recv_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_B) {
         memset(have, 0, sizeof(have));  /* Wait for another image */
         transfer = 0;
-        received = rebuilt = 0;
+        received = rebuilt = shown_ok = 0;
+        complete = false;
     }
     return ! (b->pressed & UI_BTN_A);
 }
 
+/* The image received, shown like the screensaver (full waveform: no ghost), with how it came */
+static void recv_still(uint8_t *fb) {
+    memcpy(fb, image, GFX_FB_SIZE);
+    char text[48];
+    snprintf(text, sizeof(text), "Reçue (%d bloc%s corrigé%s)", rebuilt, rebuilt > 1 ? "s" : "", rebuilt > 1 ? "s" : "");
+    gfx_fill_rect(fb, 0, GFX_HEIGHT - 20, GFX_WIDTH, 20, GFX_WHITE);
+    gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+}
+
 static bool recv_task(absolute_time_t now) {
     (void)now;
+    if (complete && receiving) {
+        receiving = false;
+        app_show_still(recv_still);  /* Any button: back to the menu */
+        return false;
+    }
     bool c = changed;
     changed = false;
+    if (c)
+        shown_ok = data_blocks_ok();
     return c;
 }
 
 static void recv_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    int ok = data_blocks_ok();
+    ui_title(fb, "Recevoir une image");
     if (! transfer) {
-        ui_title(fb, "Recevoir une image");
         ui_lines(fb, 50, &gfx_font_small, "En attente d'une image...\nSur l'autre badge :\nRadio & IR > Envoyer\nune image.");
         ui_footer(fb, "G : retour");
         return;
     }
-    /* The image, the missing blocks in gray */
-    memcpy(fb, image, GFX_FB_SIZE);
-    for (int b = 0; b < DATA_BLOCKS; ++b)
-        if (! has(b))
-            for (int i = 0; i < BLOCK && b * BLOCK + i < GFX_FB_SIZE; ++i)
-                fb[b * BLOCK + i] = ((b * BLOCK + i) / (GFX_WIDTH / 8)) % 2 ? 0xAA : 0x55;
+    /* Only the progress: the image comes at the end, drawn cleanly (the fast refreshes leave ghosts) */
+    int ok = data_blocks_ok();
     char text[48];
-    if (ok == DATA_BLOCKS)
-        snprintf(text, sizeof(text), "Reçue ! (%d bloc%s corrigé%s)", rebuilt, rebuilt > 1 ? "s" : "", rebuilt > 1 ? "s" : "");
-    else
-        snprintf(text, sizeof(text), "%d / %d blocs", ok, DATA_BLOCKS);
-    gfx_fill_rect(fb, 0, GFX_HEIGHT - 20, GFX_WIDTH, 20, GFX_WHITE);
-    gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    snprintf(text, sizeof(text), "Réception...\n%d / %d blocs", ok, DATA_BLOCKS);
+    ui_lines(fb, 60, &gfx_font_medium, text);
+    ui_gauge(fb, 20, 125, GFX_WIDTH - 40, 16, ok, DATA_BLOCKS);
+    ui_footer(fb, "G : arrêter  D : recommencer");
 }
 
 const app_t app_image_recv = {

@@ -40,6 +40,8 @@ static const uint8_t PATABLE_OOK[2] = {0x00, 0xC0};  /* Off, +10 dBm */
 static uint16_t durations[N_DURATIONS];  /* Carrier on (even index), off (odd index) */
 static volatile int step = 0, frames_left = 0;
 static volatile bool sending = false, done = false;
+static int frames_sent = 0;
+static absolute_time_t start_ts = 0;
 
 
 static int64_t next_edge(alarm_id_t id, void *data) {
@@ -81,11 +83,15 @@ bool ook_tx_princeton(uint32_t code, int frames) {
 
     step = -1;  /* The first alarm starts the first pulse */
     frames_left = frames;
+    frames_sent = frames;
+    start_ts = get_absolute_time();
     done = false;
     sending = true;
     /* After the calibration of the synthesizer (~1 ms) */
-    if (add_alarm_in_us(1500, next_edge, NULL, true) < 0)
+    if (add_alarm_in_us(1500, next_edge, NULL, true) < 0) {
+        frames_sent = 0;
         done = true;  /* No alarm available: ook_tx_task() gives the radio back */
+    }
     return true;
 }
 
@@ -103,5 +109,6 @@ void ook_tx_task(void) {
     radio_tools_reconfigure();  /* Back to GFSK, with the power of the network */
     sending = false;
     net_pause(false);
-    printf("ook tx: done\n");
+    printf("ook tx: done, %d frame(s) in %lu ms\n", frames_sent,
+           (unsigned long)(absolute_time_diff_us(start_ts, get_absolute_time()) / 1000));
 }
