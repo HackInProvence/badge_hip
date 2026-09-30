@@ -144,7 +144,7 @@ def test_diag(t):
     else:
         t.result('radio chip', m.group(1) == '14', f'CC1101 version 0x{m.group(1)} (0x14 expected)')
         used, measured = int(m.group(2)), int(m.group(3))
-        t.result('radio crystal', used in (26000000, 27000000),
+        t.result('radio crystal', any(abs(used - f) <= 50000 for f in (26000000, 27000000)),  # Calibrated values too
                  f'{used} Hz used, {measured} Hz measured (26 or 27 MHz expected)')
     m = t.expect(r'battery: (.*)', 1)
     if not m:
