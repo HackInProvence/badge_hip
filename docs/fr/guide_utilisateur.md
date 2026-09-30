@@ -199,7 +199,12 @@ ultrason).
   site web, Mastodon, commentaire). Aile droite : modifier le champ (saisie avec les 4 boutons) ;
   aile droite (appui long) : cocher ou décocher « [x] » pour l'envoyer ou non. Seuls les champs cochés sont envoyés.
 - « Echanger (badges proches) » : les **deux** badges doivent être sur cette page, l'échange n'a lieu qu'avec
-  votre accord. La carte reçue s'affiche : aile droite : la garder ; aile gauche : l'ignorer.
+  votre accord. Votre carte est renvoyée toutes les 3 secondes environ ; la carte reçue s'affiche : aile droite :
+  la garder ; aile gauche : l'ignorer. Aile gauche sur la page d'échange : arrêter.
+- La carte part **en clair**, au format vCard, sur le canal du « SubGHz chat » du Flipper Zero : n'importe quel
+  Flipper à portée qui lance `subghz chat 433920000 0` la lit pendant l'échange. Seuls les champs cochés sont envoyés.
+- Un Flipper peut aussi **envoyer** une carte au badge en mode échange : dans `subghz chat 433920000 0`, taper les
+  lignes une par une, par exemple `BEGIN:VCARD`, `N:Nom;Prénom;;;`, `TEL:0612345678`, `END:VCARD`.
 - « Contacts reçus » : les 12 dernières cartes gardées (la plus ancienne est oubliée au-delà).
   Aile droite : voir ; aile droite (appui long) : supprimer.
 - Sur l'ordinateur, `tools/contacts_export.py` exporte les cartes reçues en fichier vCard (`.vcf`),
@@ -254,12 +259,14 @@ Sondes reconnues : Nexus-TH, inFactory, ThermoPRO TX-4, GT-WT02, LaCrosse TX141T
 Les sondes émettent toutes les 30 à 60 s : un peu de patience. Aile droite : effacer.
 
 **Envoyer une image** : choisissez l'image intégrée « SecSea » ou une image du dossier `IMAGES` ;
-elle est convertie en noir et blanc et envoyée deux fois par radio aux badges qui l'attendent (une douzaine de secondes).
+elle est convertie en noir et blanc et envoyée deux fois par radio aux badges qui l'attendent (environ 17 secondes).
 Aile gauche : arrêter.
 
-**Recevoir une image** : attendez qu'un autre badge envoie une image. Elle s'affiche au fur et à mesure,
-les morceaux manquants en gris ; des blocs de contrôle permettent de reconstituer ceux qui se sont perdus en route.
-« Reçue ! » quand elle est complète. Aile droite : attendre une autre image.
+**Recevoir une image** : attendez qu'un autre badge envoie une image. Pendant la réception, la page indique
+le nombre de blocs reçus, avec une jauge ; des blocs de contrôle permettent de reconstituer ceux qui se sont perdus
+en route. Aile gauche : arrêter ; aile droite : recommencer (attendre une autre image).
+Une fois complète, l'image s'affiche comme la veille (nette, sans traces), avec « Reçue » et le nombre
+de blocs corrigés ; n'importe quel bouton ramène au menu.
 
 **Infrarouge** (module sur le port droit)
 - « Enregistrer un signal » : visez le récepteur avec une télécommande et appuyez sur une touche.
@@ -348,9 +355,13 @@ Autres commandes :
 - ou générer un fichier `.sub` sur l'ordinateur et le copier dans le dossier `subghz` de la carte SD du Flipper :
   `python tools/ook_sub.py princeton 0xC16A02 -o muet.sub`, puis Sub-GHz > Saved > muet > Send.
 
-Le badge écoute les télécommandes un court instant (220 ms) toutes les 800 ms environ : maintenez l'envoi
+Le badge écoute le réseau des cigales en permanence ; quand il entend un émetteur qui n'est pas un badge, il passe
+un instant à l'écoute des télécommandes pour décoder le code, qui doit être reçu deux fois : maintenez l'envoi
 une seconde. La commande `subghz tx` de la ligne de commande du Flipper ne transmet pas le code tel quel :
-utilisez un fichier `.sub` (elle remplace les 4 derniers bits du code).
+utilisez un fichier `.sub` (elle remplace les 4 derniers bits du code par 6).
+
+Un badge admin envoie ses commandes des deux façons, comme une télécommande puis par le réseau des cigales ;
+une commande reçue deux fois n'est exécutée qu'une fois.
 
 
 ### 4.8 Le mode admin (organisateurs)
@@ -388,6 +399,14 @@ en grand sur l'ordinateur et le pilote au clavier (flèches = boutons, Maj + fl�
 pip install pyserial
 python tools/badge_remote.py
 ```
+
+- Les boutons de la fenêtre simulent ceux du badge ; sous chacun, « appui long ».
+- **Badge :** la liste des badges branchés, pour choisir celui à piloter quand il y en a plusieurs.
+- **Mode clavier (saisie de texte)** : quand un éditeur de texte est ouvert sur le badge (carte de visite, réponse
+  à un défi...), les caractères tapés sur l'ordinateur y sont écrits ; Entrée : valider ; Échap : annuler ;
+  Retour arrière : effacer. Les flèches restent les boutons.
+- Un problème de connexion (badge débranché, port occupé) s'affiche dans la ligne d'état et le journal ;
+  l'application retrouve le badge quand il revient.
 
 Voir le [guide développeur](guide_developpeur.md#8-le-protocole-usb-série) pour les touches du port série.
 
@@ -472,6 +491,6 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz utilisé doit être 26 ou 27 MHz. |
 | Plus de son ni de LEDs | Le mode muet est peut-être actif (commande des organisateurs pendant un talk) : Réglages > Mode muet. |
 | Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ? Code Princeton `0xC16Axx`, envoyé depuis un fichier `.sub` et maintenu une seconde. |
-| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo ou le Badge de talk est ouvert : ils occupent la radio. |
+| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo, le Badge de talk ou l'échange de contacts est ouvert : ils occupent la radio. |
 | L'écran garde des traces | Normal après de nombreux rafraîchissements rapides : il se nettoie au prochain rafraîchissement complet. |
 | Le badge ne répond plus | Bouton RESET, ou éteindre / rallumer. |

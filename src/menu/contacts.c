@@ -79,9 +79,8 @@ static contact_card_t rx_card;
 static bool changed = false;
 
 static void on_chat(const char *text, int len, int rssi) {
-    (void)rssi;
-    if (! exchanging)
-        return;
+    if (! exchanging || rssi < SOCIAL_RSSI_CLOSE)
+        return;  /* "Badges proches": a card from further away is not taken (the same threshold as a meeting) */
     /* Someone is talking (a badge, a Flipper typing a card): the next sending of our card waits, a radio does not
      * hear while it sends */
     absolute_time_t later = delayed_by_ms(get_absolute_time(), LISTEN_MS);

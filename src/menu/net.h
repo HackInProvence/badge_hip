@@ -37,7 +37,7 @@ typedef enum {
     NET_VOTE_QUESTION = 0x04,  /* Question opened by an admin badge (vote.c) */
     NET_VOTE_ANSWER = 0x05,
     NET_GAME = 0x06,  /* Two player radio games (duel.c) */
-    NET_CONTACT = 0x07,  /* Contact card exchange (contacts.c) */
+    NET_CONTACT = 0x07,  /* Unused (the contact cards are vCards on the chat profile, see contacts.c) */
     NET_HOTCOLD = 0x08,  /* Beacon of the hot / cold hunt (hotcold.c) */
     NET_INFECTION = 0x09,  /* The (harmless) virus of the cicadas (infection.c) */
     NET_IMAGE = 0x0A,  /* Image transfer (image_radio.c) */

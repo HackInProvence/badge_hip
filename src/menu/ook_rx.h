@@ -9,7 +9,8 @@
  * (registers of the Flipper "AM650" preset) gives the demodulated signal on GDO0, an interrupt measures the pulses,
  * the main loop cuts them in frames and decodes them with ookdec.c. Receive only.
  *
- * Several users can listen at the same time (the remote commands a moment every second, the decoder page);
+ * Several users can listen at the same time (the remote commands when a transmitter is heard, the decoder
+ * page, the talk badge);
  * the network of the cicadas (net.c) is paused while someone listens.
  * The Princeton codes of the remote commands (remote.h) are given to remote_princeton().
  * */

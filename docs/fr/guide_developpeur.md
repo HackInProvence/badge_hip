@@ -88,7 +88,8 @@ tools/
 ├── contacts_export.py  cartes de visite reçues par le badge → fichier vCard
 ├── crypto_ctf_make.py  génère les défis crypto (fichier des solutions : spoilers)
 ├── ook_sub.py          fichiers .sub du Flipper Zero : télécommandes et sondes météo de test
-└── flipper_net_sub.py  fichiers .sub du Flipper Zero : paquets du réseau des cigales, préréglage « SecSea »
+├── flipper_net_sub.py  fichiers .sub du Flipper Zero : paquets du réseau des cigales, préréglage « SecSea »
+└── flipper/            télécommandes du Flipper : SecSea_general.sub, SecSea_talk.sub (§ 6.13)
 docs/           documentation, idées, PVSR, synchronisation du choeur (chorus_sync.md)
 hardware/       schémas et projet KiCad
 ```
@@ -144,7 +145,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `remote.c` | commandes à distance (badge admin, Flipper Zero), mode muet (§ 6.13) |
 | `ook_rx.c`, `radio433.c` | récepteur OOK 433 MHz ; pages Décodeur 433 MHz et Station météo (§ 6.14) |
 | `radio_tools.c` | message et porteuse radio, profil GFSK, mesure du quartz |
-| `messages.c`, `contacts.c`, `program.c`, `vote.c` | messages relayés, cartes de visite, programme, votes |
+| `messages.c`, `contacts.c`, `vcard.c`, `program.c`, `vote.c` | messages relayés, cartes de visite et leur format vCard (§ 6.20), programme, votes |
 | `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid et radar, virus des cigales, choeur (§ 6.15) |
 | `duel.c`, `battle.c` | pierre-feuille-ciseaux et bataille navale entre deux badges (§ 6.16) |
 | `image_radio.c` | envoi et réception d'une image par radio (§ 6.17) |
@@ -182,6 +183,9 @@ Bits : `UI_BTN_A` (aile gauche), `UI_BTN_B` (aile droite), `UI_BTN_X` (flanc dro
 
 Pour le son et les LEDs, utiliser `app_tone()` et `app_leds()` : ils respectent le mode muet ; `app_leds(0, 0, 0)`
 rend les LEDs à l'animation du badge. `app_open(app)` ouvre une application depuis un service (une notification).
+`app_show_still(render)` quitte l'application et affiche la page dessinée par `render` comme la veille : forme d'onde
+OTP de l'écran (sans fantôme), gardée sans courant ; n'importe quel bouton ramène au menu. Elle s'appelle depuis
+`start()` (badge nominatif) ou depuis `task()` (fin de la réception d'une image).
 
 Pour ajouter une application :
 1. écrire `foo.c` avec `const app_t app_foo = {...}` ;
@@ -200,7 +204,7 @@ par `main()`, et signale un événement par une fonction interrogée dans la bou
 `ui_list()` (liste avec défilement), `ui_lines()` / `ui_text()` (lignes centrées ou à gauche), `ui_fit()`
 (texte tronqué avec « ... »), `ui_box()`, `ui_gauge()`.
 
-L'éditeur de texte à 4 boutons (`ui_edit_t`, 48 caractères au plus) sert aux cartes de visite, aux défis crypto
+L'éditeur de texte à 4 boutons (`ui_edit_t`, 56 caractères au plus, `UI_EDIT_MAX`) sert aux cartes de visite, aux défis crypto
 et au remède du virus :
 - `ui_edit_start(e, texte, longueur, jeu_de_caractères)` : `UI_CHARSET_TEXT` (lettres, chiffres, ponctuation
   pour les noms, e-mails, URL), `UI_CHARSET_PHONE` (chiffres, +, espace), `UI_CHARSET_UPPER` (A-Z, 0-9, espace) ;
@@ -208,7 +212,9 @@ et au remède du virus :
 - aile droite (appui court) : `ui_edit_move(e, 1)` ; aile gauche : `ui_edit_move(e, -1)`, qui renvoie `false`
   depuis la première position (annuler) ;
 - aile droite (appui long) : terminé, `ui_edit_result()` rend le texte sans les espaces de fin ;
-- `ui_edit_render()` dessine la question, le texte autour du curseur et le mode d'emploi.
+- `ui_edit_render()` dessine la question, le texte autour du curseur et le mode d'emploi ;
+- le clavier du PC (mode clavier de `badge_remote.py` : octet 0x02 suivi du caractère sur l'USB) écrit dans l'éditeur
+  ouvert, par `ui_edit_apply_typed()` (Entrée : terminé ; Échap : annuler ; retour arrière : effacer).
 
 ### Ajouter une entrée de menu
 
@@ -358,8 +364,10 @@ Principe :
 
 Les cartes de visite ne tiennent pas dans ce secteur : elles sont dans un second stockage, `store_ext_t`, de 8 Ko
 (deux secteurs) juste avant le premier (`STORE_OFFSET - 8192`), avec son propre en-tête (magique `"CONT"`, version) :
-le masque des champs envoyés, ma carte et les 12 cartes reçues (`STORE_CONTACTS`), chacune de 448 octets à champs fixes.
-Il est réinitialisé si l'en-tête ne correspond pas. `store_ext_changed()` l'écrit de la même façon, 5 s plus tard.
+le masque des champs envoyés, ma carte et les 12 cartes reçues (`STORE_CONTACTS`), chacune de 512 octets à champs fixes
+(`CONTACT_BYTES`). Il est réinitialisé si l'en-tête ne correspond pas : le passage aux cartes de 512 octets
+(`STORE_EXT_VERSION` 2) efface donc, à la mise à jour, les cartes reçues **et** ma carte (le masque revient à
+prénom + nom). `store_ext_changed()` l'écrit de la même façon, 5 s plus tard.
 
 ### 6.9 Batterie
 
@@ -423,6 +431,13 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 
 - **Partage de la radio** : les autres fonctions (message au Flipper, porteuse, récepteur OOK) prennent la radio ;
   le réseau se met en pause (`net_pause()`, `radio_tools_idle()`) et reconfigure la radio ensuite.
+- **Mode chat** : `net_set_chat(gestionnaire)` passe la radio sur le profil du « SubGHz chat » du Flipper Zero
+  (`radio_tools_profile_chat()` : même modem GFSK 9,99 kbit/s, mot de synchronisation 0x464C) ; `net_set_chat(NULL)`
+  revient au réseau. Les paquets sont du texte brut, sans en-tête (61 octets au plus) : un Flipper (`subghz chat`)
+  ou tout CC1101 les lit et les écrit. `net_send_text()` les envoie à +10 dBm ; le gestionnaire reçoit chaque texte
+  avec son RSSI. Dans ce mode, le réseau n'entend rien, `net_send()` refuse les paquets et la file est vidée au
+  changement de mode ; `net_chat()` indique le mode, `net_queue_free()` la place libre dans la file.
+  Utilisé par l'échange de cartes (§ 6.20).
 
 | Type | Nom | Module | Données |
 |---|---|---|---|
@@ -432,7 +447,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x04 | `NET_VOTE_QUESTION` | `vote.c` | session (2), question, ouverte (0 / 1) ; toutes les 3 s tant que la question est ouverte |
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, réponse ; envoyée 3 fois |
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), genre, destinataire (4), manche ou tour, puis selon le genre (§ 6.16) |
-| 0x07 | `NET_CONTACT` | `contacts.c` | uid de la carte (2), numéro du morceau, nombre de morceaux, 48 octets au plus |
+| 0x07 | `NET_CONTACT` | — | inutilisé, réservé (les cartes passent en mode chat, § 6.20) |
 | 0x08 | `NET_HOTCOLD` | `hotcold.c` | balise chaud - froid, une par seconde |
 | 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
@@ -445,7 +460,8 @@ TTL décrémenté, avec `NET_MEDIUM | NET_JITTER`, jusqu'à TTL 0 (3 au départ)
 **Tester avec un seul badge** : la touche `L` active le mode *loopback* : chaque paquet émis revient comme s'il était
 envoyé par un « jumeau » d'identifiant `net_id() ^ NET_TWIN` (0x00FF00FF). Le badge peut ainsi voter à sa propre
 question, recevoir son propre message ou s'infecter lui-même. Le réseau des cigales ignore ce jumeau (pas de rencontre).
-`V` trace chaque paquet émis et reçu, `P` envoie un ping, `!` affiche les compteurs (émis, reçus, perdus).
+`V` trace chaque paquet émis et reçu (en mode chat, le texte des paquets reçus), `P` envoie un ping, `!` affiche
+les compteurs (émis, reçus, perdus).
 
 
 ### 6.13 Commandes à distance et mode muet (`remote.c`)
@@ -456,7 +472,7 @@ Une commande arrive de deux façons :
 - d'une **télécommande 433 MHz**, un Flipper Zero par exemple : un code Princeton 24 bits `0xC16A00 | commande`,
   décodé par le récepteur OOK (§ 6.14) ; le même code répété (bouton maintenu) n'est exécuté qu'une fois (1,5 s).
 
-Le badge admin envoie d'abord la commande comme une télécommande : 8 trames Princeton (te = 400 µs, ~0,4 s,
+Le badge admin envoie d'abord la commande comme une télécommande : 12 trames Princeton (`OOK_FRAMES`, te = 400 µs, ~0,6 s,
 [ook_tx.c](../../src/menu/ook_tx.c) : CC1101 en mode série asynchrone, fronts sur GDO0 cadencés par une alarme
 matérielle), puis les paquets réseau. Le badge de talk, qui n'écoute qu'en OOK, reçoit ainsi les commandes admin.
 Une commande reçue par les deux voies n'est exécutée qu'une fois (même commande dans les 4 s).
@@ -473,20 +489,42 @@ Un module traite un groupe de commandes (le quartet de poids fort) avec `remote_
 le gestionnaire reçoit le quartet de poids faible. `remote_execute()` exécute une commande locale.
 Le badge obéit sauf si Réglages > Télécommande est à « non » (`store_t.remote_off = 1`).
 
-**Écoute des télécommandes** : le CC1101 ne peut pas écouter en GFSK et en OOK à la fois. Quand la radio est libre,
-`remote_task()` ouvre une fenêtre d'écoute OOK de 220 ms (deux trames Princeton d'environ 50 ms, quel que soit
-le moment du début) toutes les 800 ms. La fenêtre est prolongée par pas de 100 ms, jusqu'à 1,5 s, tant qu'une
-télécommande émet (au moins 8 impulsions en 100 ms : les paquets GFSK des badges n'en donnent qu'une ou deux).
-Pendant une fenêtre, le réseau n'entend rien : les paquets importants sont répétés. Les fonctions qui ont besoin
-de tous les paquets (choeur, image) suspendent les fenêtres avec `remote_pause_windows()` (appels comptés) ;
-le badge de talk, lui, écoute la télécommande en permanence.
+**Écoute des télécommandes** : le CC1101 ne peut pas écouter en GFSK et en OOK à la fois. Il n'y a plus de fenêtre
+d'écoute à l'aveugle : le réseau écoute en permanence, et `remote_task()` lit le RSSI toutes les 20 ms (`RSSI_POLL_MS`)
+quand la radio et le réseau sont libres. Un émetteur à −90 dBm ou plus (`OOK_TRIGGER_DBM` ; le bruit est vers
+−105 dBm) mesuré deux fois de suite (`OOK_TRIGGER_POLLS`) sans paquet du réseau en cours (pas de mot de synchronisation
+reconnu, `net_transmitting()`) est peut-être une télécommande : une fenêtre OOK de 150 ms s'ouvre (`OOK_WINDOW_MS`).
+Elle est prolongée par pas de 100 ms, jusqu'à 1,5 s (`OOK_WINDOW_MAX_MS`), tant qu'une télécommande émet (au moins
+30 fronts en 100 ms, `OOK_ACTIVE_PULSES` : une trame Princeton en donne environ 95, le bruit et les paquets GFSK des
+badges bien moins). Après une fenêtre, la suivante attend au moins 800 ms (`OOK_PERIOD_MS`, contre un émetteur qui
+ne s'arrête jamais) ; une fenêtre s'ouvre de plus toutes les 10 s (`OOK_FORCED_MS`), pour une télécommande plus
+faible que le seuil. Mesuré entre deux badges : 97 à 98 % des pings reçus (82 à 85 % avec des fenêtres de 80 ms
+toutes les 800 ms, 73 % avec les anciennes fenêtres de 220 ms).
+Pendant une fenêtre, le réseau n'entend rien. Les fonctions qui ont besoin de tous les paquets (choeur, image,
+échange de cartes) suspendent les fenêtres avec `remote_pause_windows()` (appels comptés), et il n'y en a pas en
+mode chat. Le badge de talk, lui, écoute la télécommande en permanence : il ne reçoit les commandes admin qu'en OOK.
+
+**Boutons de la télécommande du Flipper** : l'application Sub-GHz du Flipper, sur un fichier Princeton enregistré,
+envoie le code du fichier avec OK, et avec les flèches le même code avec un autre bouton dans le quartet de poids
+faible : haut = 2, bas = 4, gauche = 8, droite = F. `flipper_buttons()` place sur ces boutons les commandes qui
+manquent à un groupe, pour qu'un seul fichier pilote tout le groupe :
+
+| Code reçu | Commande exécutée |
+|---|---|
+| 0x04 | 0x03 : fin du mode muet |
+| 0x18 | 0x10 : talk éteint |
+| 0x1F | 0x13 : talk rouge (fini) |
+
+Les fichiers `tools/flipper/SecSea_general.sub` (`C16A01` : OK cigale, haut muet, bas fin du mode muet) et
+`tools/flipper/SecSea_talk.sub` (`C16A11` : OK vert, haut orange, droite rouge, bas rouge énervé, gauche éteint)
+sont des clés Princeton 24 bits, te = 400 µs, préréglage `FuriHalSubGhzPresetOok650Async`.
 
 **Mode muet** (`store_t.muted`) : `audio_set_mute()` continue de jouer les échantillons au niveau 0 (les lecteurs
 gardent leur horloge), `set_leds()` et les LEDs des jeux restent éteintes, `app_tone()` et `app_leds()` le respectent.
 Une application `owns_leds` (le badge de talk) pilote ses LEDs et son buzzer même en mode muet.
 
 **Depuis un Flipper Zero** : la commande `subghz tx` de la ligne de commande du Flipper ne transmet pas la clé telle
-quelle ; utiliser un fichier `.sub` (§ 6.19) ou Sub-GHz > Add Manually > Princeton_433 puis modifier la ligne `Key:`.
+quelle (elle remplace le quartet de poids faible par 6) ; utiliser un fichier `.sub` (§ 6.19) ou Sub-GHz > Add Manually > Princeton_433 puis modifier la ligne `Key:`.
 
 
 ### 6.14 Récepteur OOK et décodeurs 433 MHz
@@ -495,6 +533,14 @@ quelle ; utiliser un fichier `.sub` (§ 6.19) ou Sub-GHz > Add Manually > Prince
   du Flipper, bande de 650 kHz) : le signal démodulé sort sur GDO0. Une interruption (`gpio_add_raw_irq_handler()`)
   mesure les durées entre les fronts dans un anneau de 1024 ; la boucle principale découpe les transmissions
   (50 ms de silence) et les décode avec `ookdec_decode()`.
+- **Décodage par morceaux** : quand l'anneau remplit le décodeur sans silence (transmission longue, bruit), il est
+  décodé par morceaux, avec un recouvrement de 120 durées (`OVERLAP`, plus de deux trames Princeton) : une trame à
+  cheval sur la coupure n'est pas perdue. Un morceau qui ne décode rien (200 durées au plus, `RETAIN_MAX`) est gardé
+  et décodé à nouveau avec le suivant, s'il arrive dans les 400 ms (`RETAIN_US`) : le Flipper laisse parfois plus de
+  50 ms entre deux trames, et une trame seule ne suffit pas (le code doit être vu deux fois). Vérifié : 10 codes sur
+  10 envoyés par le Flipper décodés, contre 2 sur 8 avant. La touche `O` trace les tentatives de décodage.
+- **Radio prêtée** : quand une autre fonction a utilisé la radio pendant une écoute (message, porteuse),
+  `radio_tools.c` appelle `ook_rx_resume()`, qui réécrit les registres OOK et relance la réception.
 - Plusieurs utilisateurs peuvent écouter en même temps (`ook_rx_start()` / `ook_rx_stop()`, comptés) : les fenêtres
   des télécommandes, les pages Décodeur et Station météo, le badge de talk. Le réseau est en pause pendant l'écoute.
   Les codes Princeton sont transmis à `remote_princeton()`, les pages lisent la dernière trame avec `ook_rx_get()`.
@@ -551,9 +597,13 @@ ou l'image SecSea intégrée :
 - découpée en 105 blocs de 48 octets (le dernier complété), plus 14 blocs de parité : le XOR de chaque groupe de 8 blocs.
   Un bloc perdu dans un groupe est reconstitué à partir des 7 autres et de la parité, sans rien redemander ;
 - paquet `NET_IMAGE` `[transfert 2][bloc][48 octets]`, blocs 0 à 104 pour l'image, 105 à 118 pour les parités ;
-  un bloc toutes les 40 ms à +10 dBm, et toute la séquence **deux fois** (un bloc manqué au premier passage arrive au second) ;
-- le récepteur affiche l'image au fur et à mesure, les blocs manquants en gris. Les fenêtres des télécommandes sont
-  suspendues pendant l'envoi et la réception. Entre deux badges : complète en 12 s environ.
+  un bloc toutes les 70 ms à +10 dBm (un bloc dure environ 53 ms sur l'air : la file garde de la place pour les
+  autres fonctions), et toute la séquence **deux fois** (un bloc manqué au premier passage arrive au second),
+  soit environ 17 s ;
+- le récepteur n'affiche que la progression (nombre de blocs et jauge, redessinés tous les 25 blocs : chaque
+  rafraîchissement rapide laisse un peu de fantôme) ; l'image complète est affichée par `app_show_still()`, comme la
+  veille (forme d'onde OTP, sans fantôme), avec le nombre de blocs corrigés. Les fenêtres des télécommandes sont
+  suspendues pendant l'envoi et la réception.
 
 
 ### 6.18 Défis crypto
@@ -598,7 +648,34 @@ carré sorti directement du PWM (le lecteur audio à 16 kHz ne peut pas dépasse
 - **Envoyer un fichier depuis le PC** par la ligne de commande du Flipper (port série USB) :
   `storage write_chunk /ext/subghz/<fichier>.sub <taille>` puis les octets du fichier, et
   `subghz tx_from_file /ext/subghz/<fichier>.sub 1 0` (1 répétition, radio interne).
-  Ne pas utiliser `subghz tx` pour les codes Princeton : la clé n'est pas transmise telle quelle.
+  Ne pas utiliser `subghz tx` pour les codes Princeton : la clé n'est pas transmise telle quelle (quartet de poids
+  faible remplacé par 6).
+- **Télécommandes prêtes** : `tools/flipper/SecSea_general.sub` et `SecSea_talk.sub` (§ 6.13).
+- **Cartes de visite** : `subghz chat 433920000 0` lit les cartes envoyées par les badges en mode échange,
+  et peut en envoyer une en tapant ses lignes (§ 6.20).
+
+
+### 6.20 Cartes de visite (vCard en mode chat)
+
+[contacts.c](../../src/menu/contacts.c) échange les cartes en clair, sur le profil du chat du Flipper (mode chat,
+§ 6.12) ; [vcard.c](../../src/menu/vcard.c) les met en forme et les relit, sans dépendre du matériel (testé sur PC) :
+- **Format** : une vCard 3.0 (RFC 6350), une ligne par paquet de texte, terminée par `\r\n`, 60 octets au plus
+  (`VCARD_PACKET_MAX`) ; une ligne plus longue est pliée (*folding*) : les paquets de suite commencent par une espace.
+  Propriétés : `N`, `FN`, `ADR`, `TEL`, `EMAIL`, `ORG`, `TITLE`, `URL;TYPE=linkedin`, `URL;TYPE=git`, `URL`,
+  `X-MASTODON`, `NOTE` ; seuls les champs cochés sont envoyés.
+- **Contrôle** : avant `END:VCARD`, une ligne `X-SECSEA-CHECK:<lignes>-<crc>` (extension permise par la norme) :
+  le nombre de lignes depuis `BEGIN:VCARD` et le CRC-16/CCITT-FALSE (hexadécimal) de ces lignes jointes par `\n`.
+  Une carte dont une ligne est perdue ou mélangée avec celles d'une autre carte est rejetée : elle arrivera à l'envoi
+  suivant. Une carte sans cette ligne (tapée sur un Flipper, `nom: LIGNE`) est acceptée telle quelle ; le préfixe
+  du nom et les codes de couleur du chat du Flipper sont retirés.
+- **Envoi** : la carte entière est renvoyée toutes les 2,5 s plus un délai aléatoire d'une seconde au plus
+  (deux badges ne restent pas en phase), une ligne toutes les 70 ms. Après chaque paquet de chat entendu,
+  l'envoi suivant de la carte attend 2 s : une radio n'entend rien pendant qu'elle émet (semi-duplex).
+  La même carte reçue à nouveau (même CRC) n'est proposée qu'une fois.
+- **Tailles** : 512 octets par carte (`CONTACT_BYTES`) ; e-mail 47 caractères, LinkedIn, Git et site web 55,
+  Mastodon 47 (tailles de `FIELDS`, 0 final compris) ; l'éditeur de texte va jusqu'à 56 caractères (`UI_EDIT_MAX`).
+- **Vie privée** : pendant l'échange, n'importe quel Flipper à portée en mode chat lit la carte ; seuls les champs
+  cochés sont envoyés. Le type `NET_CONTACT` n'est plus utilisé.
 
 
 ## 7. Formats de fichiers
@@ -631,13 +708,15 @@ Le badge est un port série USB (115200 bauds, sans importance en USB). Une touc
 | `i` | test IR : décodage d'une trame NEC puis émission (environ 68 ms) |
 | `o` | état du récepteur OOK : actif, impulsions, trames, RSSI, MARCSTATE, GDO0 |
 | `p` | durées du dernier signal donné au décodeur OOK |
+| `O` | trace des tentatives de décodage du récepteur OOK : marche / arrêt |
 | `k` | export des cartes de visite reçues en vCard (lu par `tools/contacts_export.py`) |
-| `V` | trace de chaque paquet réseau émis et reçu (avec l'écart de fréquence mesuré, FREQEST) : marche / arrêt |
+| `V` | trace de chaque paquet réseau émis et reçu (avec l'écart de fréquence mesuré, FREQEST ; en mode chat, le texte reçu) : marche / arrêt |
 | `r` | registres du CC1101 et PATABLE |
 | `M` | envoie le « Radio : message » (profil chat du Flipper : `subghz chat 433920000 0` le reçoit) |
 | `P` | ping à +10 dBm : les badges qui l'entendent écrivent `net: ping #n from <id>, rssi ...` |
 | `L` | mode *loopback* (§ 6.12) : marche / arrêt |
 | `R` | redémarrage (watchdog) |
+| 0x02 + caractère | écrit le caractère dans l'éditeur de texte ouvert (mode clavier de `badge_remote.py`) ; `\r` : terminé, Échap : annuler, `\b` : effacer |
 
 Le badge envoie des lignes de texte :
 - `ui: <titre>` à chaque changement de page (le nom de l'application à son ouverture) ;
@@ -674,6 +753,7 @@ Des remplaçants du Pico SDK sont fournis dans `tests/host/stubs` : GPIO, SPI en
 | `puzzles` | Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu : règles, fins de partie, records, textes qui tiennent à l'écran |
 | `score` | SipHash (vecteurs de référence), texte et signature du score, dessin du QR code |
 | `crypto` | textes qui tiennent à l'écran, chaque réponse pour son seul défi, normalisation, mauvaises réponses, morceaux et flag final |
+| `vcard` | paquets de la vCard (60 octets au plus, pliage, champs cochés), ligne de contrôle : ligne perdue (ou suite de ligne pliée) et valeur altérée rejetées ; carte tapée sur un Flipper acceptée, autres textes du chat ignorés, valeurs les plus longues (55 caractères) |
 | `ookdec` | télécommandes (Princeton, CAME, Nice FLO) et sondes (Nexus-TH, ThermoPRO-TX4, GT-WT02, inFactory, LaCrosse, Acurite) avec gigue, parasites, horloge ±20 %, répétition exigée sans somme de contrôle ; le bruit ne décode rien |
 | `rsvp` | découpage des mots, typographie française, BOM, Windows-1252, durées, mots longs, avance / recul |
 | `screen` | fenêtres RAM, copie de l'écran, rétablissement après `screen_clear` |
@@ -725,7 +805,7 @@ Les groupes (`--only`) :
 
 | Script | Usage |
 |---|---|
-| `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée / Échap = boutons, capture PNG ; `--snapshot fichier.png` pour une capture seule |
+| `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée = boutons, Maj = appui long (et boutons « appui long » à l'écran), capture PNG ; liste « Badge : » pour choisir parmi plusieurs badges (ou `--port`) ; case « Mode clavier » : le texte tapé va à l'éditeur du badge (0x02 + caractère ; Entrée : terminé, Échap : annuler, retour arrière : effacer) ; le fil de lecture ne s'arrête jamais (erreurs dans la ligne d'état et le journal) ; `--snapshot fichier.png` pour une capture seule |
 | `tools/badge_selftest.py` | test automatique du badge (§ 9.2) |
 | `tools/score_check.py` | vérifie les QR codes de score et fait le classement (§ 6.11) |
 | `tools/contacts_export.py` | cartes de visite reçues par le badge → `.vcf` (`--port`, `-o`) |
@@ -751,7 +831,8 @@ Les groupes (`--only`) :
 | Deux modules se disputent une interruption GPIO | utiliser `gpio_add_raw_irq_handler()` |
 | Nouveau champ de `store_t` à 0xFF | normal pour un badge déjà utilisé : tester et prendre une valeur par défaut |
 | Tester une fonction entre badges avec un seul badge | touche `L` (*loopback*, § 6.12), et `V` pour voir les paquets |
-| Un paquet n'arrive pas | `V` sur les deux badges ; compteur « dropped » de `!` (file pleine, données trop longues) ; pendant une fenêtre d'écoute OOK, le réseau n'entend rien : répéter les paquets importants |
+| Un paquet n'arrive pas | `V` sur les deux badges ; compteur « dropped » de `!` (file pleine, données trop longues, mode chat) ; une fenêtre OOK (émetteur non-badge entendu, ou toutes les 10 s) rend le réseau sourd un moment : répéter les paquets importants, ou suspendre les fenêtres avec `remote_pause_windows()` (§ 6.13) |
+| Un code du Flipper n'est pas décodé | touche `O` : tentatives de décodage ; le code doit être vu deux fois (§ 6.14) |
 | Plus aucun badge n'entend ce badge après une écoute OOK | FREND0 resté à 0x11 : la configuration GFSK doit réécrire FREND0, FREND1, MDMCFG0 (§ 6.14) |
 | Le Flipper envoie une autre clé Princeton | `subghz tx` en ligne de commande : utiliser un `.sub` et `subghz tx_from_file` (§ 6.19) |
 | Le Flipper n'enregistre rien des badges | les badges émettent en GFSK (modulation de fréquence) : Read RAW en AM650 / AM270 (par défaut) ne les voit pas. Utiliser le préréglage « SecSea » ajouté à `subghz/assets/setting_user` (§ 6.19), ou à défaut FM476. Vérifier l'émission : `subghz chat 433920000 0` sur le Flipper et `M` sur le badge |

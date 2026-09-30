@@ -18,8 +18,8 @@
 #include "remote.h"
 #include "store.h"
 
-#define REPEATS 5  /* An admin command is sent 5 times over 2 s: the badges listen to the OOK remotes */
-#define REPEAT_MS 450  /* a moment every OOK_PERIOD_MS (then they don't hear the network) */
+#define REPEATS 5  /* An admin command is sent 5 times over 2 s by the network (after its Princeton frames): */
+#define REPEAT_MS 450  /* a badge listening to a remote at that moment does not hear the network */
 #define SEEN_SLOTS 8
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
@@ -28,6 +28,8 @@
 #define SAME_COMMAND_MS 4000  /* The command came by the network and in OOK: executed once */
 #define OOK_WINDOW_MS 150  /* A window: enough to see that a remote sends (~95 edges per 100 ms), then extended */
 #define OOK_PERIOD_MS 800  /* After a window: the next one not before (a transmitter that never stops) */
+#define OOK_PERIOD_MAX_MS 3200  /* Doubled after each window without a remote decoded (an interferer); not more: a
+                                * remote must still be heard when its button is held ~3 s */
 #define RSSI_POLL_MS 20
 #define OOK_TRIGGER_DBM (-90)  /* The noise is ~-105 dBm */
 #define OOK_TRIGGER_POLLS 2  /* Measures in a row above the trigger, without a packet of the network */
@@ -63,6 +65,8 @@ static int windows_paused = 0;
 static bool ook_pending = false;  /* The Princeton frames of the command to send */
 static absolute_time_t rssi_ts = 0, forced_ts = 0;
 static int loud_polls = 0;
+static uint32_t window_frames = 0;  /* Frames decoded before the window */
+static uint32_t window_period_ms = OOK_PERIOD_MS;
 static uint8_t last_command = 0;  /* Received by the network and in OOK: executed once */
 static absolute_time_t last_command_at = 0;
 
@@ -269,6 +273,7 @@ void remote_task(absolute_time_t now) {
                 window = true;
                 window_start = now;
                 window_pulses = ook_rx_pulses();
+                window_frames = ook_rx_frames();
                 window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
             }
         }
@@ -278,9 +283,15 @@ void remote_task(absolute_time_t now) {
         window_pulses = ook_rx_pulses();
         window_ts = delayed_by_ms(now, 100);  /* A remote is sending: listen until it stops (the frames repeat) */
     } else if (absolute_time_diff_us(window_ts, now) >= 0 || ! radio_tools_idle() || windows_paused) {
-        ook_rx_stop();
+        ook_rx_stop();  /* Decodes what came */
         window = false;
-        window_ts = delayed_by_ms(now, OOK_PERIOD_MS);
+        /* Nothing decoded: a transmitter that is not a remote (the network is deaf during the windows), the next
+         * window waits longer and longer; a remote decoded: back to the shortest period */
+        if (ook_rx_frames() != window_frames)
+            window_period_ms = OOK_PERIOD_MS;
+        else if (window_period_ms < OOK_PERIOD_MAX_MS)
+            window_period_ms *= 2;
+        window_ts = delayed_by_ms(now, window_period_ms);
     }
 
     if (cigale_on && absolute_time_diff_us(cigale_end, now) >= 0) {

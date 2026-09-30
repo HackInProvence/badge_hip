@@ -7,7 +7,8 @@
  *
  * \brief Remote commands: sent by an admin badge (NET_COMMAND packets, loud, repeated) or by a Flipper Zero
  * as a Princeton 433 MHz code (SubGHz > Add Manually > Princeton_433, key 0xC16Axx with xx the command):
- * the badges listen to the OOK remotes a short moment every second (see remote_task()).
+ * the badges listen to the network all the time, and in OOK when they hear a transmitter that is not a badge
+ * (see remote_task()).
  *
  * The badge obeys unless disabled in the settings. Commands:
  * - 0x01 cicada: the cicada sings a few seconds,
@@ -61,7 +62,7 @@ void remote_set_enabled(bool enabled);
 bool remote_muted(void);
 void remote_set_muted(bool muted);
 
-/** \brief Stops (or allows again) listening to the OOK remotes a moment every second: for the features that need
+/** \brief Stops (or allows again) the moments of OOK listening (remotes): for the features that need
  * all the packets of the network (chorus, image transfer...). Calls are counted. */
 void remote_pause_windows(bool pause);
 

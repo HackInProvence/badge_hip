@@ -203,7 +203,12 @@ The texts are in French.
   web site, Mastodon, comment). Right wing: edit the field (typed with the 4 buttons);
   right wing (long press): tick or untick "[x]" to send it or not. Only the ticked fields are sent.
 - "Echanger (badges proches)" (exchange with the badges close by): **both** badges must be on this page, the exchange
-  only happens with your consent. The card received is shown: right wing: keep it; left wing: ignore it.
+  only happens with your consent. Your card is sent again about every 3 seconds; the card received is shown:
+  right wing: keep it; left wing: ignore it. Left wing on the exchange page: stop.
+- The card goes out **in clear**, as a vCard, on the channel of the Flipper Zero's "SubGHz chat": any Flipper
+  in range running `subghz chat 433920000 0` reads it during the exchange. Only the ticked fields are sent.
+- A Flipper can also **send** a card to a badge in exchange mode: in `subghz chat 433920000 0`, type the lines
+  one by one, for example `BEGIN:VCARD`, `N:Name;First name;;;`, `TEL:0612345678`, `END:VCARD`.
 - "Contacts reçus" (contacts received): the last 12 cards kept (beyond that, the oldest one is forgotten).
   Right wing: view; right wing (long press): delete.
 - On the computer, `tools/contacts_export.py` exports the cards received to a vCard file (`.vcf`),
@@ -258,12 +263,14 @@ Supported sensors: Nexus-TH, inFactory, ThermoPRO TX-4, GT-WT02, LaCrosse TX141T
 The sensors transmit every 30 to 60 s: be patient. Right wing: clear.
 
 **Envoyer une image** (Send an image): choose the built-in "SecSea" image or an image from the `IMAGES` folder;
-it is converted to black and white and sent twice over the radio to the badges waiting for it (about twelve seconds).
+it is converted to black and white and sent twice over the radio to the badges waiting for it (about 17 seconds).
 Left wing: stop.
 
-**Recevoir une image** (Receive an image): wait for another badge to send an image. It shows up as it arrives,
-the missing parts in grey; parity blocks allow rebuilding the ones lost on the way.
-"Reçue !" (received!) when it is complete. Right wing: wait for another image.
+**Recevoir une image** (Receive an image): wait for another badge to send an image. While it is received, the page
+shows the number of blocks received, with a gauge; parity blocks allow rebuilding the ones lost on the way.
+Left wing: stop; right wing: start again (wait for another image).
+Once complete, the image is shown like the screensaver (sharp, no ghost), with "Reçue" (received) and the number
+of blocks corrected; any button goes back to the menu.
 
 **Infrarouge** (Infrared, module on the right port)
 - "Enregistrer un signal" (Record a signal): point a remote control at the receiver and press a key.
@@ -353,8 +360,13 @@ Other commands:
 - or generate a `.sub` file on the computer and copy it to the `subghz` folder of the Flipper's SD card:
   `python tools/ook_sub.py princeton 0xC16A02 -o mute.sub`, then Sub-GHz > Saved > mute > Send.
 
-The badge listens to the remote controls for a short moment (220 ms) about every 800 ms: keep sending for
-a second. The `subghz tx` command of the Flipper's command line does not send the code as is: use a `.sub` file (it replaces the last 4 bits of the code).
+The badge listens to the network of the cicadas all the time; when it hears a transmitter that is not a badge, it
+listens to the remote controls for a moment to decode the code, which must be received twice: keep sending for
+a second. The `subghz tx` command of the Flipper's command line does not send the code as is: use a `.sub` file
+(it replaces the last 4 bits of the code with 6).
+
+An admin badge sends its commands both ways, like a remote control and then over the network of the cicadas;
+a command received twice is executed only once.
 
 
 ### 4.8 Admin mode (organizers)
@@ -393,6 +405,14 @@ Shift + arrow = long press).
 pip install pyserial
 python tools/badge_remote.py
 ```
+
+- The buttons of the window simulate those of the badge; under each one, "appui long" (long press).
+- **Badge :** the list of the badges plugged in, to choose the one to control when there are several.
+- **Mode clavier (saisie de texte)** (keyboard mode, text input): when a text editor is open on the badge (business
+  card, answer to a challenge...), the characters typed on the computer are written into it; Enter: done;
+  Escape: cancel; Backspace: erase. The arrow keys are still the buttons.
+- A connection problem (badge unplugged, port busy) is shown in the status line and in the log;
+  the application finds the badge again when it comes back.
 
 See the [developer guide](developer_guide.md#8-the-usb-serial-protocol) for the serial port keys.
 
@@ -477,6 +497,6 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Infos, the crystal used must be 26 or 27 MHz. |
 | No more sound or LEDs | The mute mode may be on (command of the organizers during a talk): Réglages > Mode muet. |
 | The badge does not obey the Flipper | Réglages > Télécommande : oui? Princeton code `0xC16Axx`, sent from a `.sub` file and held for a second. |
-| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station or the talk badge is open: they use the radio. |
+| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station, the talk badge or the contact exchange is open: they use the radio. |
 | The screen keeps ghost images | Normal after many fast refreshes: it cleans itself at the next full refresh. |
 | The badge stops responding | Press the RESET button, or switch it off and on again. |
