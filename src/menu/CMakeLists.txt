@@ -6,6 +6,7 @@ target_sources(badge_menu PRIVATE
     admin.c
     apps.c
     lamp.c
+    chorus.c
     hotcold.c
     infection.c
     messages.c

@@ -388,6 +388,8 @@ void infection_init(void);
 void infection_task(absolute_time_t now);
 bool infection_event(void);
 void messages_init(void);
+void chorus_init(void);
+void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
 
 const app_t *app_current(void) {
@@ -604,13 +606,14 @@ static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
     {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
-    {"Social", 7, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_PROGRAM), M_APP(APP_VOTE), M_APP(APP_RADAR),
-                   M_APP(APP_HOTCOLD), M_APP(APP_INFECTION)}},
+    {"Social", 8, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_PROGRAM), M_APP(APP_VOTE), M_APP(APP_RADAR),
+                   M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
     {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
-    {"Admin", 7, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
-                  M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_ADMIN_TYPE), M_ADMIN_OFF}},  /* Last: hidden unless admin */
+    {"Admin", 8, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
+                  M_APP(APP_CHORUS_LEAD), M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_ADMIN_TYPE),
+                  M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
@@ -1897,6 +1900,7 @@ int main() {
     program_init();
     infection_init();
     messages_init();
+    chorus_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
@@ -2143,6 +2147,7 @@ int main() {
             set_status(remote_msg);
         vote_task(now);
         infection_task(now);
+        chorus_task(now);
         /* Notifications of the social features: the page opens from the menus, a status otherwise */
         char notif[64];
         if (program_announced(notif, sizeof(notif))) {

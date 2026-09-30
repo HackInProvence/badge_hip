@@ -37,6 +37,8 @@ typedef enum {
     APP_INFECTION,
     APP_INFECTION_ZERO,
     APP_MESSAGES,
+    APP_CHORUS,
+    APP_CHORUS_LEAD,
     APP_COUNT,
 } app_id_t;
 
