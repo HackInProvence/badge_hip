@@ -8,6 +8,7 @@ target_sources(badge_menu PRIVATE
     lamp.c
     chorus.c
     contacts.c
+    duel.c
     hotcold.c
     infection.c
     messages.c
