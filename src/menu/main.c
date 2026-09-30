@@ -56,6 +56,7 @@
 #include "ook_rx.h"
 #include "social.h"
 #include "store.h"
+#include "version.h"  /* Generated at each build (version.cmake) */
 #include "video.h"
 #include "wav.h"
 
@@ -183,6 +184,7 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                net_loopback() ? ", loopback" : "");
         printf("remote: %s, %s, admin %s\n", remote_enabled() ? "enabled" : "disabled", remote_muted() ? "muted" : "not muted",
                store_get()->admin == STORE_ADMIN_ON ? "on" : "off");
+        printf("version: " BADGE_VERSION " (" BADGE_BUILD ")\n");
         printf("radio: CC1101 version 0x%02x, crystal used %lu Hz, measured %lu Hz\n", radio_tools_chip_version(),
                (unsigned long)radio_get_xosc(), (unsigned long)radio_tools_xosc_hz());
         if (battery_calibrated())
@@ -1280,7 +1282,7 @@ static void render_page(const char *title, const char *text, const char *footer)
 }
 
 static void render_info(void) {
-    char text[200];
+    char text[280];
     uint32_t measured = radio_tools_xosc_hz();
     char xosc[40];
     if (radio_tools_measuring())
@@ -1296,6 +1298,7 @@ static void render_info(void) {
     else
         snprintf(bat, sizeof(bat), "non calibrée");
     snprintf(text, sizeof(text),
+             "Version : " BADGE_VERSION " (" BADGE_BUILD ")\n"
              "Radio : CC1101 v0x%02x\nQuartz mesuré : %s\nQuartz utilisé : %.4f MHz\nDéfaut (firmware) : %.4f\nCarte SD : %s\n"
              "Batterie : %s",
              radio_tools_chip_version(), xosc, radio_get_xosc() / 1e6, CC1101_fXOSC / 1e6,
@@ -2010,6 +2013,7 @@ int main() {
     battery_init();
     ir_init();
     oled_init();
+    printf("version: " BADGE_VERSION " (" BADGE_BUILD ")\n");
     printf("badge menu ready\n");
 
     bool was_measuring = false;

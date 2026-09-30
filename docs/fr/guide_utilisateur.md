@@ -314,7 +314,8 @@ de blocs corrigés ; n'importe quel bouton ramène au menu.
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.
-- **Infos** : version de la radio, quartz, carte SD, batterie. Aile droite : les crédits.
+- **Infos** : version du firmware (numéro, commit git et date de compilation, un « + » si les sources différaient
+  du commit), version de la radio, quartz, carte SD, batterie. Aile droite : les crédits.
 - **Crédits** : les personnes et associations derrière le badge.
 
 

@@ -44,6 +44,17 @@ target_sources(badge_menu PRIVATE
     store.c
 )
 target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+
+# Version of the firmware (menu Réglages > Infos, "!" on the serial port): raise it for each release given to the
+# badges. version.h also gets the git commit and the date of the build, at each build.
+set(BADGE_VERSION 1.0.0)
+add_custom_target(badge_version ALL
+    COMMAND ${CMAKE_COMMAND} -DSRC=${CMAKE_SOURCE_DIR} -DOUT=${CMAKE_CURRENT_BINARY_DIR}/version.h
+            -DVERSION=${BADGE_VERSION} -P ${CMAKE_CURRENT_LIST_DIR}/version.cmake
+    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    COMMENT "Version of the badge")
+add_dependencies(badge_menu badge_version)
+target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 pico_add_extra_outputs(badge_menu)
 
 target_link_libraries(badge_menu PRIVATE

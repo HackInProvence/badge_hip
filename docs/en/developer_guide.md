@@ -58,6 +58,12 @@ To flash:
 
 Other executables: the per-module test applications (`src/tests/*.c`, targets `test_screen`, `test_radio`...).
 
+**Firmware version**: `BADGE_VERSION` in [src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt), to raise for
+each version installed on the badges. At each build, [version.cmake](../../src/menu/version.cmake) writes
+`version.h` (in the build folder) with this number, the short git commit and the date; a "+" after the commit
+means sources of `src/` or `tools/` changed since. The badge shows it in Réglages > Infos, at boot and with `!` on
+the serial port (`version: 1.0.0 (5d95da4 2026-09-30)`).
+
 
 ## 3. Repository layout
 

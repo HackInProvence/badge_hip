@@ -319,7 +319,8 @@ of blocks corrected; any button goes back to the menu.
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mode muet : oui / non** (Mute mode: yes / no): turns off the sound and the LEDs. The organizers can switch it on
   remotely during the talks.
-- **Infos** (Info): radio version, crystal, SD card, battery. Right wing: the credits.
+- **Infos** (Info): firmware version (number, git commit and build date, a "+" when the sources differed from the
+  commit), radio version, crystal, SD card, battery. Right wing: the credits.
 - **Crédits** (Credits): the people and associations behind the badge.
 
 

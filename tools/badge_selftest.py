@@ -135,6 +135,9 @@ def close_theme(t, theme):
 def test_diag(t):
     t.mark()
     t.keys('!')
+    m = t.expect(r'^version: (\d+\.\d+\.\d+) \((\S+) (\S+)\)$')
+    t.result('firmware version', m is not None, f'{m.group(1)}, commit {m.group(2)}, built {m.group(3)}' if m else
+             'no version line (firmware older than the version numbers?)')
     m = t.expect(r'radio: CC1101 version 0x([0-9a-f]+), crystal used (\d+) Hz, measured (\d+) Hz')
     if not m:
         t.result('radio chip', False, 'no answer to "!"')

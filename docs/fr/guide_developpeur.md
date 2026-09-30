@@ -58,6 +58,12 @@ Pour flasher :
 
 Autres exécutables : les applications de test de chaque module (`src/tests/*.c`, cibles `test_screen`, `test_radio`...).
 
+**Version du firmware** : `BADGE_VERSION` dans [src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt), à augmenter
+pour chaque version installée sur les badges. À chaque compilation, [version.cmake](../../src/menu/version.cmake)
+écrit `version.h` (dans le dossier de compilation) avec ce numéro, le commit git court et la date ; un « + » après le
+commit signale des sources de `src/` ou `tools/` modifiées depuis. Le badge l'affiche dans Réglages > Infos, au
+démarrage et avec `!` sur le port série (`version: 1.0.0 (5d95da4 2026-09-30)`).
+
 
 ## 3. Organisation du dépôt
 
