@@ -41,7 +41,7 @@ Paquets `NET_SONG` (réseau des cigales, +10 dBm) :
 | 4-7 | départ : délai en ms entre la fin du paquet et le premier temps ; position : ms écoulées depuis le départ |
 | 8 | nombre de voix utilisées |
 
-1. **Départ** : le badge chef (menu admin « Chœur », ou télécommande Flipper `0xC16A3n`) diffuse
+1. **Départ** : le badge chef (menu admin « Choeur : lancer », ou télécommande Flipper `0xC16A3n`) diffuse
    « départ dans 2 000 ms », trois fois, en recalculant le délai restant à chaque envoi : les trois copies désignent
    le même instant.
 2. Chaque badge qui reçoit le paquet planifie le départ à `réception + délai` (principe RBS) et choisit sa voix

@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "pico/time.h"
+
+#include "app.h"
 #include "ui.h"
 
 const char UI_CHARSET_TEXT[] = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_+/:'!?#&()";
@@ -168,6 +171,90 @@ void ui_edit_result(const ui_edit_t *e, char *buf, size_t len) {
 }
 
 
+static char typed[32];
+static int typed_head = 0, typed_count = 0;
+
+void ui_edit_type(char c) {
+    if (typed_count < (int)sizeof(typed)) {
+        typed[(typed_head + typed_count) % sizeof(typed)] = c;
+        ++typed_count;
+    }
+}
+
+
+bool ui_edit_typed_pending(void) {
+    return typed_count > 0;
+}
+
+
+void ui_edit_typed_clear(void) {
+    typed_count = 0;
+}
+
+
+int ui_edit_apply_typed(ui_edit_t *e) {
+    while (typed_count) {
+        char c = typed[typed_head];
+        typed_head = (typed_head + 1) % sizeof(typed);
+        --typed_count;
+        if (c == '\r' || c == '\n') {
+            typed_count = 0;
+            return UI_EDIT_DONE;
+        }
+        if (c == 0x1B) {
+            typed_count = 0;
+            return UI_EDIT_CANCEL;
+        }
+        if (c == '\b' || c == 0x7F) {
+            if (e->cursor > 0) {
+                /* Erase the previous character, the rest moves left */
+                memmove(e->text + e->cursor - 1, e->text + e->cursor, e->max_len - e->cursor);
+                e->text[e->max_len - 1] = ' ';
+                --e->cursor;
+            }
+            continue;
+        }
+        if (e->charset == UI_CHARSET_UPPER && c >= 'a' && c <= 'z')
+            c -= 'a' - 'A';
+        if (c && strchr(e->charset, c)) {
+            e->text[e->cursor] = c;
+            if (e->cursor < e->max_len - 1)
+                ++e->cursor;
+        }
+    }
+    return UI_EDIT_EDITING;
+}
+
+
+#define EDIT_REPEAT_DELAY_US 400000
+#define EDIT_REPEAT_US 90000
+
+int app_edit_buttons(ui_edit_t *e, const app_buttons_t *b) {
+    int typed_result = ui_edit_apply_typed(e);
+    if (typed_result != UI_EDIT_EDITING)
+        return typed_result;
+    if (b->long_pressed & UI_BTN_B)
+        return UI_EDIT_DONE;
+    if (b->released_short & UI_BTN_B)
+        ui_edit_move(e, 1);
+    if ((b->pressed & UI_BTN_A) && ! ui_edit_move(e, -1))
+        return UI_EDIT_CANCEL;
+    /* Flanks: the characters, repeated while held */
+    uint64_t now = time_us_64();
+    for (int f = 0; f < 2; ++f) {
+        uint8_t bit = f ? UI_BTN_X : UI_BTN_Y;
+        if (b->pressed & bit) {
+            ui_edit_change(e, f ? 1 : -1);
+            e->repeat_us[f] = now + EDIT_REPEAT_DELAY_US;
+        } else if ((b->held & bit) && now >= e->repeat_us[f]) {
+            ui_edit_change(e, f ? 1 : -1);
+            e->repeat_us[f] = now + EDIT_REPEAT_US;
+        }
+    }
+    return UI_EDIT_EDITING;
+}
+
+
 void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const char *prompt) {
     ui_title(fb, title);
     int y = ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, prompt) + 2;
@@ -200,6 +287,10 @@ void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const ch
     ui_fit(&gfx_font_small, fitted, sizeof(fitted), text[0] ? text : "(vide)", GFX_WIDTH - 8);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
     y += gfx_font_small.height + 6;
-    ui_lines(fb, y, &gfx_font_small, "Flancs : lettre (maintenir : vite)\nD : suivante  G : précédente\nD long : valider");
-    ui_footer(fb, e->cursor == 0 ? "G ici : annuler" : "Espace = effacer");
+    /* The help, as many lines as fit above the footer (a long prompt leaves less room) */
+    static const char *HELP[] = {"Flancs : lettre (maintenir : vite)", "D : suivante  G : précédente",
+                                 "Espace = effacer"};
+    for (int i = 0; i < (int)(sizeof(HELP) / sizeof(HELP[0])) && y + gfx_font_small.height <= UI_FOOTER_Y - 3; ++i)
+        y = ui_lines(fb, y, &gfx_font_small, HELP[i]);
+    ui_footer(fb, e->cursor == 0 ? "G : annuler  D long : valider" : "D long : valider");
 }

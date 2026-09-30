@@ -20,9 +20,12 @@ Keyboard (the window must have the focus):
     Right / Enter / b   right wing (OK)                   Shift: long press
     F5              ask the screen again
     F12             screenshot (PNG)
+Keyboard mode (check box): the characters typed go to the text editor of the badge (name, contact card, answers),
+    Enter = done, Escape = cancel, Backspace = erase; the arrows are still the buttons.
+Several badges plugged in: choose one in the "Badge" list (or --port).
 
 Protocol (see src/menu/main.c): the keys a, b, x, y simulate the buttons (A, B, X, Y: long presses),
-'[' / ']' start / stop sending the screen, 's' sends it once. The badge answers with lines
+'[' / ']' start / stop sending the screen, 's' sends it once, 0x02 + a character types it in a text editor. The badge answers with lines
 "@FB <BW|4G|WHITE|BLACK> [<base64 lsb plane> [<base64 msb plane>]]", other lines are its log.
 
 Without window: python badge_remote.py --snapshot screen.png   (saves the current screen and exits)
@@ -53,11 +56,15 @@ GRAYS = [(0x20, 0x20, 0x20), (0x6E, 0x6E, 0x6A), (0xB4, 0xB4, 0xAE), (0xEC, 0xEC
 
 # ------ Badge connection ------
 
+def badge_ports():
+    """The badges plugged in: [(port, label)], label = port and serial number of the RP2040."""
+    return sorted((p.device, f'{p.device}  ({p.serial_number or "?"})')
+                  for p in serial.tools.list_ports.comports() if p.vid == PICO_VID)
+
+
 def find_port():
-    for p in serial.tools.list_ports.comports():
-        if p.vid == PICO_VID:
-            return p.device
-    return None
+    ports = badge_ports()
+    return ports[0][0] if ports else None
 
 
 def decode_frame(line):
@@ -113,7 +120,20 @@ class Badge(threading.Thread):
     def connected(self):
         return self.ser is not None
 
+    def switch(self, port):
+        """Connects to another badge (several badges plugged in)."""
+        with self.lock:
+            self.port_name = port
+            if self.ser:
+                try:
+                    self.ser.write(b']')
+                    self.ser.close()
+                except serial.SerialException:
+                    pass
+                self.ser = None
+
     def run(self):
+        busy_reported = None
         while self.running:
             if not self.ser:
                 port = self.port_name or find_port()
@@ -122,21 +142,30 @@ class Badge(threading.Thread):
                     continue
                 try:
                     ser = serial.Serial(port, 115200, timeout=0.2)
-                except serial.SerialException:
+                except serial.SerialException as e:
+                    if busy_reported != port:
+                        self.logs.put(f'--- cannot open {port} (used by another program?): {e}')
+                        busy_reported = port
                     time.sleep(0.5)
                     continue
+                busy_reported = None
                 with self.lock:
+                    if port != (self.port_name or port):
+                        ser.close()  # Switched meanwhile
+                        continue
                     self.ser = ser
                 self.logs.put(f'--- connected to {port}')
-                self.send('[')  # Stream the screen
+                self.send('[')  # Stream the screen (a badge without screen only sends its log)
+            ser = self.ser
             try:
-                line = self.ser.readline()
+                line = ser.readline() if ser else b''
             except (serial.SerialException, AttributeError, TypeError, OSError):
                 if not self.running:
                     break  # Closed by stop()
                 with self.lock:
-                    self.ser = None
-                self.logs.put('--- disconnected')
+                    if self.ser is ser:
+                        self.ser = None
+                        self.logs.put('--- disconnected')
                 continue
             if not line:
                 continue
@@ -245,7 +274,7 @@ def run_window(port, zoom, on_ready=None):
 
     buttons = [
         ('Flanc gauche\n▲', 'y', 'Y'),
-        ('Aile gauche\nretour', 'a', None),
+        ('Aile gauche\nretour', 'a', 'A'),
         ('Aile droite\nOK', 'b', 'B'),
         ('Flanc droit\n▼', 'x', 'X'),
     ]
@@ -270,11 +299,43 @@ def run_window(port, zoom, on_ready=None):
         badge.logs.put(f'--- screenshot saved: {os.path.abspath(name)}')
 
     log_visible = tk.BooleanVar(value=True)
+    keyboard = tk.BooleanVar(value=False)
     ttk.Button(tools, text='Capture (F12)', command=screenshot).pack(side='left')
     ttk.Button(tools, text='Rafraîchir (F5)', command=lambda: badge.send('s')).pack(side='left', padx=4)
     ttk.Button(tools, text='Diagnostic', command=lambda: badge.send('!')).pack(side='left')
     ttk.Checkbutton(tools, text='Journal', variable=log_visible,
                     command=lambda: log.grid() if log_visible.get() else log.grid_remove()).pack(side='right')
+    ttk.Checkbutton(tools, text='Mode clavier (saisie de texte)', variable=keyboard,
+                    command=lambda: root.focus_set()).pack(side='right', padx=8)
+
+    # Several badges plugged in: choose the one to drive
+    ports_bar = tk.Frame(root)
+    ports_bar.grid(row=5, column=0, columnspan=4, sticky='we', pady=(6, 0))
+    tk.Label(ports_bar, text='Badge :').pack(side='left')
+    port_choice = tk.StringVar()
+    port_box = ttk.Combobox(ports_bar, textvariable=port_choice, state='readonly', width=40)
+    port_box.pack(side='left', padx=4)
+    port_labels = {}
+
+    def refresh_ports():
+        ports = badge_ports()
+        port_labels.clear()
+        port_labels.update({label: device for device, label in ports})
+        port_box['values'] = [label for _, label in ports]
+        current = badge.port_name or (badge.ser.port if badge.ser else None)
+        for device, label in ports:
+            if device == current:
+                port_choice.set(label)
+        root.after(2000, refresh_ports)
+
+    def on_port(_event):
+        device = port_labels.get(port_choice.get())
+        if device and device != badge.port_name:
+            badge.switch(device)
+            badge.logs.put(f'--- switching to {device}')
+        root.focus_set()
+    port_box.bind('<<ComboboxSelected>>', on_port)
+    refresh_ports()
 
     log = tk.Text(root, height=10, width=80, font=('Consolas', 9), bg='#111111', fg='#dddddd')
     log.grid(row=4, column=0, columnspan=4, sticky='we', pady=(6, 0))
@@ -284,7 +345,15 @@ def run_window(port, zoom, on_ready=None):
             'y': ('y', 'Y'), 'x': ('x', 'X'), 'a': ('a', 'A'), 'b': ('b', 'B'),
             'Y': ('Y', 'Y'), 'X': ('X', 'X'), 'A': ('A', 'A'), 'B': ('B', 'B')}
 
+    # Keyboard mode: the characters go to the text editor of the badge (0x02 + character), the arrows stay buttons
+    text_keys = {'Return': '\r', 'KP_Enter': '\r', 'BackSpace': '\b', 'Escape': '\x1b'}
+
     def on_key(event):
+        if keyboard.get() and event.keysym not in ('Up', 'Down', 'Left', 'Right', 'F5', 'F12'):
+            c = text_keys.get(event.keysym, event.char)
+            if c and len(c) == 1 and (c in '\r\b\x1b' or ' ' <= c < '\x7f'):
+                badge.send('\x02' + c)
+            return 'break'
         if event.keysym in keys:
             short, long_ = keys[event.keysym]
             badge.send(long_ if event.state & 0x0001 else short)  # Shift
@@ -309,8 +378,10 @@ def run_window(port, zoom, on_ready=None):
         fps = last['count'] / max(1e-3, time.time() - last['t0'])
         if time.time() - last['t0'] > 3:
             last['count'], last['t0'] = 0, time.time()
+        help_ = ('mode clavier : tapez le texte, Entrée = valider, Échap = annuler' if keyboard.get()
+                 else '↑↓ flancs, ← retour, → OK, Maj = appui long')
         status.set(('connecté' if badge.connected() else 'recherche du badge...') + f'   —   {fps:.1f} images/s'
-                   + '   —   ↑↓ flancs, ← retour, → OK, Maj = appui long')
+                   + '   —   ' + help_)
         root.after(30, poll)
 
     def on_close():

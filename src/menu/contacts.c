@@ -274,29 +274,17 @@ static bool contacts_buttons(const app_buttons_t *b, absolute_time_t now) {
         }
         break;
     case V_EDIT:
-        if (b->long_pressed & UI_BTN_B) {
+        switch (app_edit_buttons(&edit, b)) {
+        case UI_EDIT_DONE:
             ui_edit_result(&edit, field(&e->mine, card_sel), FIELDS[card_sel].size);
             e->send_mask |= 1 << card_sel;
             store_ext_changed();
             printf("contacts: %s saved\n", FIELDS[card_sel].label);
             view = V_CARD;
             break;
-        }
-        if (b->released_short & UI_BTN_B)
-            ui_edit_move(&edit, 1);
-        if ((b->pressed & UI_BTN_A) && ! ui_edit_move(&edit, -1))
+        case UI_EDIT_CANCEL:
             view = V_CARD;
-        /* Flanks: the characters, faster while held */
-        for (int f = 0; f < 2; ++f) {
-            uint8_t bit = f ? UI_BTN_X : UI_BTN_Y;
-            static absolute_time_t repeat_ts[2];
-            if (b->pressed & bit) {
-                ui_edit_change(&edit, f ? 1 : -1);
-                repeat_ts[f] = delayed_by_ms(now, 400);
-            } else if ((b->held & bit) && absolute_time_diff_us(repeat_ts[f], now) >= 0) {
-                ui_edit_change(&edit, f ? 1 : -1);
-                repeat_ts[f] = delayed_by_ms(now, 90);
-            }
+            break;
         }
         break;
     case V_EXCHANGE:

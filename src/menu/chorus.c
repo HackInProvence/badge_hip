@@ -344,10 +344,10 @@ static bool chorus_task_page(absolute_time_t now) {
 
 static void chorus_render(uint8_t *fb, absolute_time_t now) {
     char text[64];
-    ui_title(fb, "Chœur des cigales");
+    ui_title(fb, "Choeur des cigales");
     if (song < 0) {
-        ui_lines(fb, 40, &gfx_font_small, joined ? "En attente d'un chef de\nchœur : quand il lance un\nmorceau, chaque cigale\nchante sa voix." :
-                 "Vous ne participez pas\naux chœurs.");
+        ui_lines(fb, 40, &gfx_font_small, joined ? "En attente d'un chef de\nchoeur : quand il lance un\nmorceau, chaque cigale\nchante sa voix." :
+                 "Vous ne participez pas\naux choeurs.");
     } else {
         ui_lines(fb, 36, &gfx_font_medium, SONGS[song].name);
         snprintf(text, sizeof(text), "Voix %d / %d%s", voice + 1, SONGS[song].n_voices,
@@ -366,7 +366,7 @@ static void chorus_render(uint8_t *fb, absolute_time_t now) {
 }
 
 const app_t app_chorus = {
-    .name = "Chœur",
+    .name = "Choeur",
     .start = chorus_start,
     .buttons = chorus_buttons,
     .task = chorus_task_page,
@@ -398,14 +398,14 @@ static bool lead_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void lead_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Chœur : lancer");
+    ui_title(fb, "Choeur : lancer");
     ui_list(fb, N_SONGS, sel, song_label);
     ui_lines(fb, 90, &gfx_font_small, "Les cigales autour chantent\nchacune une voix (départ\nsynchronisé par radio).");
     ui_footer(fb, song >= 0 && leader == net_id() ? "G : retour  D : arrêter" : "G : retour  D : lancer");
 }
 
 const app_t app_chorus_lead = {
-    .name = "Chœur : lancer",
+    .name = "Choeur : lancer",
     .start = lead_start,
     .buttons = lead_buttons,
     .render = lead_render,

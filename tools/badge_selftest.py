@@ -370,7 +370,7 @@ def test_social(t):
     if not open_theme(t, 'Social'):
         return t.result('social', False, 'theme "Social" not shown')
     for name, shot in (('Contacts', 'contacts'), ('Radar des cigales', 'radar'), ('Chaud - froid', 'hotcold'),
-                       ('Chœur', 'chorus')):
+                       ('Choeur', 'chorus')):
         ok = social_app(t, name)
         t.pump(2)
         t.screenshot(shot)
@@ -392,8 +392,8 @@ def test_social(t):
 
 
 SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
-          'Virus des cigales', 'Chœur']
-ADMIN = ['Commandes radio', 'Annoncer un talk', 'Vote (admin)', 'Chœur : lancer', 'Balise chaud-froid',
+          'Virus des cigales', 'Choeur']
+ADMIN = ['Commandes radio', 'Annoncer un talk', 'Vote (admin)', 'Choeur : lancer', 'Balise chaud-froid',
          'Virus : patient zéro', 'Type du badge', 'Quitter le mode admin']
 
 

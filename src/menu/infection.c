@@ -22,6 +22,8 @@
 #define EXPOSURES 3  /* Coughs heard within EXPOSURE_WINDOW_MS */
 #define EXPOSURE_WINDOW_MS 30000
 #define CONTAGION_PERCENT 60
+#define AUDIBLE_EVERY 5  /* ~22 s between the coughs heard */
+#define FLASH_MS 150
 
 enum { HEALTHY = 0, INFECTED = 1, IMMUNE = 2 };
 
@@ -48,6 +50,10 @@ static int riddle = 0;
 static ui_edit_t edit;
 static bool editing = false;
 static bool wrong = false;
+static unsigned coughs = 0;
+static bool coughed = false;
+static bool flash_on = false;
+static absolute_time_t flash_end = 0;
 
 static int state(void) {
     uint8_t s = store_get()->infection;
@@ -84,12 +90,34 @@ void infection_init(void) {
     net_subscribe(NET_INFECTION, handle_cough);
 }
 
-/* Called in the main loop: an infected badge coughs */
+/* Called in the main loop: an infected badge coughs (radio), with a red flash; one cough out of AUDIBLE_EVERY is
+ * heard too (and shown in the footer), not to be unbearable during a talk */
 void infection_task(absolute_time_t now) {
+    if (flash_on && absolute_time_diff_us(flash_end, now) >= 0) {
+        flash_on = false;
+        if (! (app_current() && app_current()->owns_leds))
+            app_leds(0, 0, 0);
+    }
     if (state() == INFECTED && absolute_time_diff_us(cough_ts, now) >= 0) {
         net_send(NET_INFECTION, &generation, 1, NET_QUIET);
         cough_ts = delayed_by_ms(now, COUGH_MS + get_rand_32() % 1000);
+        if (! (app_current() && app_current()->owns_leds)) {
+            app_leds(255, 0, 0);  /* Nothing in mute mode */
+            flash_on = true;
+            flash_end = delayed_by_ms(now, FLASH_MS);
+        }
+        if (++coughs % AUDIBLE_EVERY == 1) {
+            app_cough();  /* Silent in mute mode */
+            coughed = true;
+        }
     }
+}
+
+/* An audible cough just happened: the main loop shows it */
+bool infection_coughed(void) {
+    bool c = coughed;
+    coughed = false;
+    return c;
 }
 
 /* The badge just got infected (or cured): the main loop shows it */
@@ -116,7 +144,8 @@ static void infection_start(absolute_time_t now) {
 static bool infection_buttons(const app_buttons_t *b, absolute_time_t now) {
     (void)now;
     if (editing) {
-        if (b->long_pressed & UI_BTN_B) {
+        int r = app_edit_buttons(&edit, b);
+        if (r == UI_EDIT_DONE) {
             char answer[UI_EDIT_MAX + 1];
             ui_edit_result(&edit, answer, sizeof(answer));
             editing = false;
@@ -125,17 +154,11 @@ static bool infection_buttons(const app_buttons_t *b, absolute_time_t now) {
                 printf("infection: cured\n");
             } else {
                 wrong = true;
+                printf("infection: wrong answer\n");
             }
-            return true;
-        }
-        if (b->released_short & UI_BTN_B)
-            ui_edit_move(&edit, 1);
-        if ((b->pressed & UI_BTN_A) && ! ui_edit_move(&edit, -1))
+        } else if (r == UI_EDIT_CANCEL) {
             editing = false;
-        if (b->pressed & UI_BTN_Y)
-            ui_edit_change(&edit, -1);
-        if (b->pressed & UI_BTN_X)
-            ui_edit_change(&edit, 1);
+        }
         return true;
     }
     if (b->pressed & UI_BTN_A)

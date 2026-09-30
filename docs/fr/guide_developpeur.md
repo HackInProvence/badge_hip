@@ -89,7 +89,7 @@ tools/
 ├── crypto_ctf_make.py  génère les défis crypto (fichier des solutions : spoilers)
 ├── ook_sub.py          fichiers .sub du Flipper Zero : télécommandes et sondes météo de test
 └── flipper_net_sub.py  fichiers .sub du Flipper Zero : paquets du réseau des cigales, préréglage « SecSea »
-docs/           documentation, idées, PVSR, synchronisation du chœur (chorus_sync.md)
+docs/           documentation, idées, PVSR, synchronisation du choeur (chorus_sync.md)
 hardware/       schémas et projet KiCad
 ```
 
@@ -145,7 +145,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `ook_rx.c`, `radio433.c` | récepteur OOK 433 MHz ; pages Décodeur 433 MHz et Station météo (§ 6.14) |
 | `radio_tools.c` | message et porteuse radio, profil GFSK, mesure du quartz |
 | `messages.c`, `contacts.c`, `program.c`, `vote.c` | messages relayés, cartes de visite, programme, votes |
-| `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid et radar, virus des cigales, chœur (§ 6.15) |
+| `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid et radar, virus des cigales, choeur (§ 6.15) |
 | `duel.c`, `battle.c` | pierre-feuille-ciseaux et bataille navale entre deux badges (§ 6.16) |
 | `image_radio.c` | envoi et réception d'une image par radio (§ 6.17) |
 | `crypto_ctf.c`, `crypto_app.c` | défis de cryptographie et leurs pages (§ 6.18) |
@@ -416,7 +416,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
   |---|---|
   | `NET_QUIET` | −20 dBm : les badges tout proches (quelques mètres) |
   | `NET_MEDIUM` | −10 dBm : quelques dizaines de mètres (balises, messages, jeux, cartes de visite) |
-  | `NET_LOUD` | +10 dBm : toute la salle (commandes, votes, image, chœur) |
+  | `NET_LOUD` | +10 dBm : toute la salle (commandes, votes, image, choeur) |
   | `NET_JITTER` | délai aléatoire (jusqu'à 300 ms) avant l'envoi : quand beaucoup de badges répondent au même paquet |
 
 - **Partage de la radio** : les autres fonctions (message au Flipper, porteuse, récepteur OOK) prennent la radio ;
@@ -460,7 +460,7 @@ Une commande arrive de deux façons :
 | 0x02 / 0x03 | mode muet / fin du mode muet | `remote.c` |
 | 0x10 à 0x14 | lumières du badge de talk : éteint, vert, orange, rouge, rouge énervé | `talk.c` (page ouverte) |
 | 0x20 + n | affiche le talk n du programme | `program.c` |
-| 0x30 + n | lance le morceau n du chœur | `chorus.c` |
+| 0x30 + n | lance le morceau n du choeur | `chorus.c` |
 
 Un module traite un groupe de commandes (le quartet de poids fort) avec `remote_subscribe(groupe, gestionnaire)` ;
 le gestionnaire reçoit le quartet de poids faible. `remote_execute()` exécute une commande locale.
@@ -471,7 +471,7 @@ Le badge obéit sauf si Réglages > Télécommande est à « non » (`store_t.re
 le moment du début) toutes les 800 ms. La fenêtre est prolongée par pas de 100 ms, jusqu'à 1,5 s, tant qu'une
 télécommande émet (au moins 8 impulsions en 100 ms : les paquets GFSK des badges n'en donnent qu'une ou deux).
 Pendant une fenêtre, le réseau n'entend rien : les paquets importants sont répétés. Les fonctions qui ont besoin
-de tous les paquets (chœur, image) suspendent les fenêtres avec `remote_pause_windows()` (appels comptés) ;
+de tous les paquets (choeur, image) suspendent les fenêtres avec `remote_pause_windows()` (appels comptés) ;
 le badge de talk, lui, écoute la télécommande en permanence.
 
 **Mode muet** (`store_t.muted`) : `audio_set_mute()` continue de jouer les échantillons au niveau 0 (les lecteurs
@@ -503,12 +503,12 @@ quelle ; utiliser un fichier `.sub` (§ 6.19) ou Sub-GHz > Add Manually > Prince
   `radio_tools.c` réécrit ces registres.
 
 
-### 6.15 Chœur des cigales
+### 6.15 Choeur des cigales
 
 Le protocole est détaillé dans [docs/chorus_sync.md](../chorus_sync.md). En bref :
 - le chef diffuse « départ dans 2 000 ms » (`NET_SONG`, genre 1) trois fois, en recalculant le délai restant :
   chaque badge planifie le départ à « réception + délai » (principe RBS : tous reçoivent le même paquet au même instant) ;
-- pendant le morceau, le chef diffuse sa position toutes les 2 s (genre 2) : un badge qui arrive en retard rejoint le chœur
+- pendant le morceau, le chef diffuse sa position toutes les 2 s (genre 2) : un badge qui arrive en retard rejoint le choeur
   à cette position ; à la fin, un arrêt (genre 3) ;
 - le chef chante la voix 1, les autres se répartissent les autres voix d'après leur identifiant ;
 - les morceaux sont dans le firmware (domaine public) ; les notes sont synthétisées en signaux carrés à 16 kHz,

@@ -36,6 +36,11 @@ static inline uint32_t app_held_ms(const app_buttons_t *b, uint8_t bit) {
     return b->held_ms[bit == UI_BTN_A ? 0 : bit == UI_BTN_B ? 1 : bit == UI_BTN_X ? 2 : 3];
 }
 
+/** \brief The buttons (and the PC keyboard) in the text editor of ui.h: flanks = character (held: repeated),
+ * right wing = next position, left wing = previous one, long press on the right wing = done.
+ * Returns UI_EDIT_DONE, UI_EDIT_CANCEL (left wing on the first position) or UI_EDIT_EDITING. */
+int app_edit_buttons(ui_edit_t *e, const app_buttons_t *b);
+
 typedef struct {
     const char *name;  /* In the menus */
     void (*label)(char *buf, int len);  /* Optional: dynamic text in the menus (e.g. "Lampe : 50 %") */
@@ -51,12 +56,16 @@ typedef struct {
 
 /** \brief Opens an application (from a service: e.g. a message received shows the program), implemented in main.c. */
 void app_open(const app_t *app);
+/** \brief Leaves the application and shows the page drawn by \p render like the screensaver: full waveform of the
+ * screen (no ghost), kept without power; any button goes back to the menu. */
+void app_show_still(void (*render)(uint8_t *fb));
 
 /** \brief The application shown, NULL in the menus. */
 const app_t *app_current(void);
 
 /* Sound and LEDs for the applications, implemented in main.c: they respect the mute mode (remote.h) */
 void app_tone(uint16_t hz, uint16_t ms);
+void app_cough(void);  /* The cough of the virus (infection.c) */
 void app_leds(uint8_t r, uint8_t g, uint8_t b);  /* All black: back to the LED animation of the badge */
 
 #endif /* _APP_H */

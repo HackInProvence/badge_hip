@@ -179,8 +179,13 @@ static void poll_rx(absolute_time_t now) {
                 .rssi = (int8_t)buf[len] / 2 - 74,
                 .at = now,
             };
-            if (verbose)
-                printf("net: rx type %u from %08lX, %u bytes, %d dBm\n", p.type, (unsigned long)p.src, p.len, p.rssi);
+            if (verbose) {
+                /* FREQEST: the offset between the sender and this badge, in fXOSC / 2^14 steps (~1.6 kHz) */
+                uint8_t fe = 0;
+                radio_read_registers(CC1101_FREQEST, &fe, 1);
+                printf("net: rx type %u from %08lX, %u bytes, %d dBm, offset %+ld Hz\n", p.type, (unsigned long)p.src,
+                       p.len, p.rssi, (long)((int64_t)(int8_t)fe * radio_get_xosc() >> 14));
+            }
             if (p.src != my_id && p.src != 0) {
                 ++n_received;
                 if (handlers[p.type])

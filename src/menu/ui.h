@@ -62,6 +62,7 @@ typedef struct {
     int max_len;  /* Characters (the text is ASCII in the editor) */
     int cursor;
     const char *charset;
+    uint64_t repeat_us[2];  /* Next repetition of the held flank (left, right), time_us_64() */
 } ui_edit_t;
 
 extern const char UI_CHARSET_TEXT[];  /* Letters, digits, punctuation for names, e-mails, URLs */
@@ -78,6 +79,16 @@ bool ui_edit_move(ui_edit_t *e, int delta);
 
 /** \brief The edited text, without the trailing spaces. */
 void ui_edit_result(const ui_edit_t *e, char *buf, size_t len);
+
+/* A real keyboard (tools/badge_remote.py, keyboard mode): the characters typed on the PC, received by the USB
+ * serial port, go to the editor on the screen. '\r' = done, 0x1B = cancel, '\b' = erase the previous character. */
+void ui_edit_type(char c);
+bool ui_edit_typed_pending(void);
+void ui_edit_typed_clear(void);  /* Nobody edits: the characters are dropped */
+/** \brief Applies the typed characters to \p e; returns UI_EDIT_DONE, UI_EDIT_CANCEL or UI_EDIT_EDITING. */
+int ui_edit_apply_typed(ui_edit_t *e);
+
+enum { UI_EDIT_EDITING, UI_EDIT_DONE, UI_EDIT_CANCEL };
 
 /** \brief Draws the editor: \p prompt (1-2 lines), the text around the cursor, the usage. */
 void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const char *prompt);

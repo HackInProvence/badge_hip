@@ -87,8 +87,11 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
             morse_ts = now;
         }
         break;
-    case V_ANSWER:
-        if (b->long_pressed & UI_BTN_B) {
+    case V_ANSWER: {
+        int r = app_edit_buttons(&edit, b);
+        if (r == UI_EDIT_CANCEL)
+            view = V_CHALLENGE;
+        if (r == UI_EDIT_DONE) {
             char answer[UI_EDIT_MAX + 1];
             ui_edit_result(&edit, answer, sizeof(answer));
             right = crypto_ctf_check(sel, answer);
@@ -101,24 +104,9 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
             }
             printf("crypto: challenge %d %s\n", sel + 1, right ? "solved" : "wrong answer");
             view = V_RESULT;
-            break;
-        }
-        if (b->released_short & UI_BTN_B)
-            ui_edit_move(&edit, 1);
-        if ((b->pressed & UI_BTN_A) && ! ui_edit_move(&edit, -1))
-            view = V_CHALLENGE;
-        for (int f = 0; f < 2; ++f) {
-            uint8_t bit = f ? UI_BTN_X : UI_BTN_Y;
-            static absolute_time_t repeat_ts[2];
-            if (b->pressed & bit) {
-                ui_edit_change(&edit, f ? 1 : -1);
-                repeat_ts[f] = delayed_by_ms(now, 400);
-            } else if ((b->held & bit) && absolute_time_diff_us(repeat_ts[f], now) >= 0) {
-                ui_edit_change(&edit, f ? 1 : -1);
-                repeat_ts[f] = delayed_by_ms(now, 90);
-            }
         }
         break;
+    }
     case V_HINT:
     case V_FLAG:
         if (b->pressed & (UI_BTN_A | UI_BTN_B))

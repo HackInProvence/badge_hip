@@ -13,7 +13,7 @@ Pour modifier le logiciel du badge, voir le [guide développeur](guide_developpe
   L'image reste affichée même sans courant.
 - 4 boutons, 2 LEDs de couleur, un buzzer.
 - Une radio 433 MHz (CC1101) compatible avec le Flipper Zero. Les badges s'en servent pour se parler :
-  messages, votes, jeux à deux, échange de cartes de visite, chœur...
+  messages, votes, jeux à deux, échange de cartes de visite, choeur...
 - Un lecteur de carte micro-SD pour les vidéos, musiques, textes et images.
 - Deux ports d'extension (infrarouge, écran OLED...).
 - Une batterie rechargeable par USB-C.
@@ -61,7 +61,7 @@ Le menu principal regroupe les fonctions par thème :
 |---|---|
 | **Médias** | Images, Vidéos, Musique, Lecture rapide, Volume |
 | **Jeux** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto, Duel, Bataille navale |
-| **Social** | Réseau des cigales, Messages, Contacts, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Chœur |
+| **Social** | Réseau des cigales, Messages, Contacts, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED |
 | **Réglages** | Veille de l'écran, Télécommande, Mode muet, Infos, Crédits |
@@ -225,10 +225,10 @@ Aile droite : chercher une autre balise.
 - Le remède : une énigme. Aile droite : se soigner, puis saisir la réponse avec les 4 boutons.
   Une cigale guérie est immunisée.
 
-**Chœur** : quand un chef de chœur (un organisateur ou une télécommande) lance un morceau, les cigales autour le
+**Choeur** : quand un chef de choeur (un organisateur ou une télécommande) lance un morceau, les cigales autour le
 chantent ensemble, chacune sa voix, avec un départ synchronisé par radio. Deux morceaux : « Frère Jacques » en canon
 à 4 voix et « L'Ode à la joie » à 3 voix.
-Votre badge participe par défaut ; aile droite : participer / ne plus chanter. En mode muet, le chœur est silencieux.
+Votre badge participe par défaut ; aile droite : participer / ne plus chanter. En mode muet, le choeur est silencieux.
 
 
 ### 4.4 Radio & IR
@@ -320,7 +320,7 @@ ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écra
 | 0x03 | fin du mode muet |
 | 0x10 à 0x14 | lumières du badge de talk (si sa page est ouverte) : éteint, OK, 5 min, FINI, STOP ! |
 | 0x20 + n | affiche le talk n du programme (« Prochain : ... ») |
-| 0x30 + n | lance le morceau n du chœur |
+| 0x30 + n | lance le morceau n du choeur |
 
 Le réglage du mode muet est gardé après extinction ; il se désactive par la commande 0x03 ou dans Réglages > Mode muet.
 Pour ne plus obéir aux commandes : Réglages > Télécommande : non.
@@ -347,7 +347,7 @@ après les autres. Le mode admin reste actif après extinction.
 | **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk |
 | **Annoncer un talk** | affiche un talk du programme sur tous les badges |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
-| **Chœur : lancer** | lance un morceau du chœur ; ce badge chante la première voix |
+| **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |

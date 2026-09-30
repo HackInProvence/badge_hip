@@ -43,7 +43,7 @@ voir le [guide utilisateur](fr/guide_utilisateur.md).
 
 On suppose que la couche « balise + rencontre + identité » du document réseau existe. Tout ce qui suit s'appuie dessus.
 
-### S1. Le chœur des cigales *(fait : Social > Chœur, 2 morceaux)*
+### S1. Le chœur des cigales *(fait : Social > Choeur, 2 morceaux)*
 Quand plusieurs cigales sont proches, elles se synchronisent (horloge radio commune) et chantent **ensemble** une polyphonie :
 chaque badge joue une voix différente selon son rang, les LEDs pulsent en rythme. Plus il y a de cigales, plus le morceau est riche.
 Un moment « wow » garanti dans la salle ou au bar.

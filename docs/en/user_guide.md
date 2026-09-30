@@ -63,7 +63,7 @@ The main menu groups the features by theme:
 |---|---|
 | **Médias** (Media) | "Images", "Vidéos" (Videos), "Musique" (Music), "Lecture rapide" (Speed reading), "Volume" |
 | **Jeux** (Games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges), Duel, Bataille navale (Battleship) |
-| **Social** | Cicada network, Messages, Contacts, Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Chœur (Choir) |
+| **Social** | Cicada network, Messages, Contacts, Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir) |
 | **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared |
 | **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen |
 | **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits) |
@@ -229,7 +229,7 @@ Right wing: look for another beacon.
 - The cure: a riddle (in French). Right wing: get cured, then type the answer with the 4 buttons.
   A cured cicada is immune.
 
-**Chœur** (Choir): when a choir leader (an organizer or a remote control) starts a song, the cicadas around sing it
+**Choeur** (Choir): when a choir leader (an organizer or a remote control) starts a song, the cicadas around sing it
 together, each one its own voice, with a start synchronized over the radio. Two songs: "Frère Jacques" as a 4-voice
 canon and the "Ode to Joy" in 3 voices.
 Your badge takes part by default; right wing: take part / stop singing. In mute mode, the choir is silent.
@@ -351,7 +351,7 @@ others. The admin mode stays on after the badge is switched off.
 | **Commandes radio** (Radio commands) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge |
 | **Annoncer un talk** (Announce a talk) | shows a talk of the program on all the badges |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
-| **Chœur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
+| **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
 | **Type du badge** (Badge type) | Participant, Orateur (speaker) or Staff, shown by the name tag |

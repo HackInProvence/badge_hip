@@ -148,6 +148,13 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                 btn_down_ts[btn_index(b)] = now;
     }
     switch (getchar_timeout_us(0)) {
+    case 0x02: {
+        /* Keyboard mode of badge_remote.py: 0x02 then a character typed on the PC, for the text editors */
+        int c = getchar_timeout_us(50000);
+        if (c > 0 && c < 0x80)
+            ui_edit_type((char)c);
+        break;
+    }
     case 'a': pressed |= BTN_A; btn_released |= BTN_A; break;
     case 'A': pressed |= BTN_A; btn_released |= BTN_A; btn_simulated_long = BTN_A; break;
     case 'b': pressed |= BTN_B; btn_released |= BTN_B; break;
@@ -368,6 +375,15 @@ void app_open(const app_t *a) {
     app_pending = a;
 }
 
+/* A page shown like the screensaver (app_show_still()) */
+static void (*still_render)(uint8_t *fb) = NULL;
+static bool still_pending = false;
+
+void app_show_still(void (*render)(uint8_t *fb)) {
+    still_render = render;
+    still_pending = true;
+}
+
 static void set_status(const char *msg);
 static void game_tone(uint16_t hz, uint16_t ms);
 
@@ -392,6 +408,7 @@ void program_forget(void);
 void infection_init(void);
 void infection_task(absolute_time_t now);
 bool infection_event(void);
+bool infection_coughed(void);
 void messages_init(void);
 void chorus_init(void);
 void contacts_init(void);
@@ -1016,6 +1033,13 @@ static void dither_4g(uint8_t *lsb, const uint8_t *msb) {
 }
 
 static void show_saver(void) {
+    if (still_render) {
+        gfx_clear(saver_planes[0], GFX_WHITE);
+        still_render(saver_planes[0]);
+        screen_show_image_bw_otp(saver_planes[0]);
+        printf("saver: still page\n");
+        return;
+    }
     const char *p = saver_image();
     int bpp = p[0] ? load_saver_image(p) : 0;
     if (! bpp) {
@@ -1108,6 +1132,24 @@ static void rsvp_buttons(uint8_t pressed, absolute_time_t now) {
 
 /* The buttons in the name editor (the generic handling is skipped) */
 static void name_edit_buttons(uint8_t pressed, absolute_time_t now) {
+    /* The keyboard of the PC (badge_remote.py): the same editing as ui_edit_apply_typed() */
+    if (ui_edit_typed_pending()) {
+        ui_edit_t e = {.max_len = NAME_LEN, .cursor = name_cursor, .charset = NAME_CHARS};
+        memcpy(e.text, name_edit, NAME_LEN + 1);
+        int r = ui_edit_apply_typed(&e);
+        memcpy(name_edit, e.text, NAME_LEN + 1);
+        name_cursor = e.cursor;
+        redraw = true;
+        if (r == UI_EDIT_DONE) {
+            name_edit_save();
+            return;
+        }
+        if (r == UI_EDIT_CANCEL) {
+            printf("name: cancelled\n");
+            app = A_SOCIAL;
+            return;
+        }
+    }
     /* Flanks: previous / next letter, repeated while held */
     if (pressed & (BTN_Y | BTN_X)) {
         name_edit_change((pressed & BTN_Y) ? -1 : 1);
@@ -1502,6 +1544,33 @@ static void game_tone(uint16_t hz, uint16_t ms) {
     chime_playing = true;
 }
 
+/* A cough (virus of the cicadas): two bursts of low-pass filtered noise. Not over a music or a video. */
+static void game_cough(void) {
+    if (wav_is_paused() || (audio_is_open() && ! chime_playing))
+        return;
+    game_tone(0, 0);  /* Stops a previous tone */
+    set_sound(false);
+    const uint32_t rate = 16000;
+    if (! audio_open(rate))
+        return;
+    static const uint16_t PARTS_MS[4] = {110, 90, 160, 0};  /* Kof, silence, kof */
+    int level = 0;
+    uint8_t chunk[256];
+    for (int p = 0; PARTS_MS[p]; ++p) {
+        uint32_t n = rate * PARTS_MS[p] / 1000;
+        for (uint32_t i = 0; i < n; ) {
+            uint32_t k = 0;
+            for (; k < sizeof(chunk) && i < n; ++k, ++i) {
+                int amp = p % 2 ? 0 : 110 * (n - i) / n;  /* Decays */
+                level += ((int)(get_rand_32() & 0xFF) - 128 - level) / 3;  /* Low-pass: a deep sound */
+                chunk[k] = (uint8_t)(128 + level * amp / 128);
+            }
+            audio_write(chunk, k);
+        }
+    }
+    chime_playing = true;
+}
+
 static void game_leds(uint8_t r, uint8_t g, uint8_t b) {
     if ((r || g || b) && ! remote_muted())
         leds_anim_fixed(LED_RGB(r, g, b));
@@ -1512,6 +1581,10 @@ static void game_leds(uint8_t r, uint8_t g, uint8_t b) {
 /* For the applications (app.h) */
 void app_tone(uint16_t hz, uint16_t ms) {
     game_tone(hz, ms);  /* Silent in mute mode (audio_set_mute()) */
+}
+
+void app_cough(void) {
+    game_cough();
 }
 
 void app_leds(uint8_t r, uint8_t g, uint8_t b) {
@@ -1940,6 +2013,7 @@ int main() {
         if ((app == A_SAVER || app == A_START_SAVER) && pressed) {
             /* The press only wakes up */
             printf("saver: off\n");
+            still_render = NULL;
             display_invalidate();
             app = saver_return;
             redraw = true;
@@ -1951,6 +2025,7 @@ int main() {
             /* Open an application (from the menu or from a service: wakes up from the screensaver) */
             if (app == A_SAVER || app == A_START_SAVER) {
                 printf("saver: off\n");
+                still_render = NULL;
                 display_invalidate();
             }
             if (app == A_APP && cur_app && cur_app->stop)
@@ -1961,8 +2036,18 @@ int main() {
             app = A_APP;
             cur_app->start(now);
             redraw = true;
+            if (still_pending) {
+                /* The application only shows a page, like the screensaver (app_show_still()) */
+                still_pending = false;
+                if (cur_app->stop)
+                    cur_app->stop();
+                cur_app = NULL;
+                start_saver(A_MENU);
+            }
         } else if (app == A_APP) {
-            if ((pressed || app_ev.released_short || app_ev.long_pressed || app_ev.held) && ! cur_app->buttons(&app_ev, now)) {
+            bool typed = ui_edit_typed_pending();
+            if ((pressed || app_ev.released_short || app_ev.long_pressed || app_ev.held || typed)
+                    && ! cur_app->buttons(&app_ev, now)) {
                 if (cur_app->stop)
                     cur_app->stop();
                 cur_app = NULL;
@@ -1970,8 +2055,10 @@ int main() {
                 set_leds(led_mode);
                 app = A_MENU;
             }
-            if (pressed || app_ev.released_short || app_ev.long_pressed)
+            /* A held flank repeats (text editors, lamp...): the page changes while it is held */
+            if (pressed || app_ev.released_short || app_ev.long_pressed || typed || (app_ev.held & (UI_BTN_X | UI_BTN_Y)))
                 redraw = true;
+            ui_edit_typed_clear();  /* Not used by the page: dropped */
         } else if (app == A_GAME) {
             if (! games_buttons(pressed, now)) {
                 set_leds(led_mode);  /* The games used the LEDs */
@@ -2173,6 +2260,12 @@ int main() {
             notify(NULL, notif);
         if (vote_new())
             notify(APPS[APP_VOTE], "Vote ouvert : Social > Vote");
+        if (app != A_APP && app != A_NAME_EDIT)
+            ui_edit_typed_clear();  /* Typed on the PC keyboard, but no text editor on the screen */
+        if (infection_coughed()) {
+            set_status("Kof kof ! (virus des cigales)");
+            printf("infection: cough\n");
+        }
         if (infection_event())
             notify(APPS[APP_INFECTION], "Vous êtes infecté !");
         if (duel_invited(notif, sizeof(notif)))
