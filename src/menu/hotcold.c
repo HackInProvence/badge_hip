@@ -91,6 +91,11 @@ static void handle_hotcold(const net_packet_t *p) {
         return;  /* Another hunt: keep the first master heard */
     hunt_master = p->src;
     signal_add(&hunt, p->rssi, p->at);
+    static absolute_time_t logged = 0;
+    if (absolute_time_diff_us(logged, p->at) > 5000000) {
+        logged = p->at;
+        printf("hotcold: master %08lX at %d dBm\n", (unsigned long)p->src, p->rssi);
+    }
 }
 
 static void hotcold_init(void) {
@@ -164,8 +169,10 @@ static void master_start(absolute_time_t now) {
 
 static bool master_buttons(const app_buttons_t *b, absolute_time_t now) {
     (void)now;
-    if (b->pressed & UI_BTN_B)
+    if (b->pressed & UI_BTN_B) {
         master = ! master;
+        printf("hotcold: master beacon %s\n", master ? "on" : "off");
+    }
     return ! (b->pressed & UI_BTN_A);
 }
 
@@ -220,6 +227,7 @@ static void radar_start(absolute_time_t now) {
     followed = 0;
     radar_sel = 0;
     n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    printf("radar: %d cicada(s)%s%s\n", n_near, n_near ? ", the first " : "", n_near ? near[0].name : "");
 }
 
 static bool radar_buttons(const app_buttons_t *b, absolute_time_t now) {
@@ -250,7 +258,10 @@ static bool radar_task(absolute_time_t now) {
     if (absolute_time_diff_us(radar_ts, now) < 1000000)
         return false;
     radar_ts = now;
+    int before = n_near;
     n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    if (n_near != before)
+        printf("radar: %d cicada(s)%s%s\n", n_near, n_near ? ", the first " : "", n_near ? near[0].name : "");
     if (radar_sel >= n_near)
         radar_sel = n_near ? n_near - 1 : 0;
     if (followed) {

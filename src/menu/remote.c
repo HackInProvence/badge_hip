@@ -13,6 +13,7 @@
 #include "noise_gen.h"
 #include "ook_rx.h"
 #include "ook_tx.h"
+#include "radio.h"
 #include "radio_tools.h"
 #include "remote.h"
 #include "store.h"
@@ -23,13 +24,17 @@
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
 #define CIGALE_MS 6000
-#define OOK_FRAMES 8  /* Princeton frames of an admin command (~0.4 s: 2 at least in a listening window) */
+#define OOK_FRAMES 12  /* Princeton frames of an admin command (~0.6 s) */
 #define SAME_COMMAND_MS 4000  /* The command came by the network and in OOK: executed once */
-#define OOK_WINDOW_MS 220  /* 2 frames of a Princeton remote (~50 ms each) whatever the start */
-#define OOK_PERIOD_MS 800  /* Hold the button of the remote ~1 s */
+#define OOK_WINDOW_MS 150  /* A window: enough to see that a remote sends (~95 edges per 100 ms), then extended */
+#define OOK_PERIOD_MS 800  /* After a window: the next one not before (a transmitter that never stops) */
+#define RSSI_POLL_MS 20
+#define OOK_TRIGGER_DBM (-90)  /* The noise is ~-105 dBm */
+#define OOK_TRIGGER_POLLS 2  /* Measures in a row above the trigger, without a packet of the network */
+#define OOK_FORCED_MS 10000  /* A window anyway, for a remote weaker than the trigger */
 #define OOK_WINDOW_MAX_MS 1500  /* A window is extended while pulses come (a remote is sending) */
-#define OOK_ACTIVE_PULSES 8  /* A remote is sending: at least this many pulses in 100 ms (the packets of the badges
-                               * are GFSK: only 1 or 2 pulses for the OOK receiver) */
+#define OOK_ACTIVE_PULSES 30  /* A remote is sending: at least this many edges in 100 ms (a Princeton frame gives ~95,
+                                * the noise and the GFSK packets of the badges much fewer) */
 
 typedef struct {
     uint32_t src;
@@ -56,6 +61,8 @@ static absolute_time_t window_start = 0;
 static uint32_t window_pulses = 0;
 static int windows_paused = 0;
 static bool ook_pending = false;  /* The Princeton frames of the command to send */
+static absolute_time_t rssi_ts = 0, forced_ts = 0;
+static int loud_polls = 0;
 static uint8_t last_command = 0;  /* Received by the network and in OOK: executed once */
 static absolute_time_t last_command_at = 0;
 
@@ -243,15 +250,27 @@ void remote_task(absolute_time_t now) {
         }
         return;  /* No listening window, no packet while the frames are sent */
     }
-    /* A moment every second, listen to the Princeton remotes (Flipper Zero): ook_rx.c decodes them */
+    /* The remotes (Flipper Zero, Princeton): the network listens all the time; a transmitter heard (RSSI) without
+     * any packet of the network (no sync word) is maybe a remote: then a moment in OOK, ook_rx.c decodes it.
+     * No blind window: the packets of the network are not lost any more (with a window every 800 ms, ~15 % were) */
     if (! window) {
-        if (remote_enabled() && ! windows_paused && radio_tools_idle() && net_idle()
-                && absolute_time_diff_us(window_ts, now) >= 0) {
-            ook_rx_start();
-            window = true;
-            window_start = now;
-            window_pulses = ook_rx_pulses();
-            window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
+        if (remote_enabled() && ! windows_paused && radio_tools_idle() && net_idle() && ! net_chat()
+                && absolute_time_diff_us(window_ts, now) >= 0 && absolute_time_diff_us(rssi_ts, now) >= 0) {
+            rssi_ts = delayed_by_ms(now, RSSI_POLL_MS);
+            uint8_t raw = 0;
+            radio_read_registers(CC1101_RSSI, &raw, 1);
+            int rssi = (int8_t)raw / 2 - 74;
+            loud_polls = rssi >= OOK_TRIGGER_DBM && ! net_transmitting() ? loud_polls + 1 : 0;
+            if (loud_polls >= OOK_TRIGGER_POLLS || absolute_time_diff_us(forced_ts, now) >= 0) {
+                /* A transmitter, or now and then anyway (a remote weaker than the trigger) */
+                loud_polls = 0;
+                forced_ts = delayed_by_ms(now, OOK_FORCED_MS);
+                ook_rx_start();
+                window = true;
+                window_start = now;
+                window_pulses = ook_rx_pulses();
+                window_ts = delayed_by_ms(now, OOK_WINDOW_MS);
+            }
         }
     } else if (absolute_time_diff_us(window_ts, now) >= 0 && ook_rx_pulses() - window_pulses >= OOK_ACTIVE_PULSES
                && absolute_time_diff_us(window_start, now) < OOK_WINDOW_MAX_MS * 1000ll
