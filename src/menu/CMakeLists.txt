@@ -10,6 +10,7 @@ target_sources(badge_menu PRIVATE
     contacts.c
     duel.c
     hotcold.c
+    image_radio.c
     infection.c
     messages.c
     nametag.c

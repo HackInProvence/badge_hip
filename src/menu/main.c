@@ -396,6 +396,7 @@ void messages_init(void);
 void chorus_init(void);
 void contacts_init(void);
 void duel_init(void);
+void image_radio_init(void);
 bool duel_invited(char *buf, int len);
 void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
@@ -617,7 +618,8 @@ static const submenu_t SUBMENUS[] = {
                   M_APP(APP_DUEL)}},
     {"Social", 9, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
                    M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
-    {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
+    {"Radio & IR", 7, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
+                       M_APP(APP_IMAGE_RECV), M_IR}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
     {"Admin", 8, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
@@ -1912,6 +1914,7 @@ int main() {
     chorus_init();
     contacts_init();
     duel_init();
+    image_radio_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);

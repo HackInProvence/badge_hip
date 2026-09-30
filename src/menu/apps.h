@@ -41,6 +41,8 @@ typedef enum {
     APP_CHORUS_LEAD,
     APP_CONTACTS,
     APP_DUEL,
+    APP_IMAGE_SEND,
+    APP_IMAGE_RECV,
     APP_COUNT,
 } app_id_t;
 
