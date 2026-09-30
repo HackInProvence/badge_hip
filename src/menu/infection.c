@@ -4,7 +4,7 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 /* The (harmless) virus of the cicadas: the patient zero is chosen in the admin menu, an infected badge coughs
- * a NET_INFECTION packet every few seconds (-20 dBm), a healthy badge close to it for a while gets infected.
+ * a NET_INFECTION packet every few seconds (+10 dBm), a healthy badge close to it for a while gets infected.
  * The cure: solve a riddle (then the badge is immune). A talk about how worms spread, live.
  * NET_INFECTION [generation]: the generation of the infection (0 = patient zero). */
 
@@ -18,7 +18,7 @@
 #include "store.h"
 
 #define COUGH_MS 4000
-#define EXPOSURE_RSSI (-65)  /* Close: a few meters */
+#define EXPOSURE_RSSI (-80)  /* Close (coughs at +10 dBm: ~-70 to -83 at 1 m), to calibrate on site */
 #define EXPOSURES 3  /* Coughs heard within EXPOSURE_WINDOW_MS */
 #define EXPOSURE_WINDOW_MS 30000
 #define CONTAGION_PERCENT 60
@@ -99,7 +99,7 @@ void infection_task(absolute_time_t now) {
             app_leds(0, 0, 0);
     }
     if (state() == INFECTED && absolute_time_diff_us(cough_ts, now) >= 0) {
-        net_send(NET_INFECTION, &generation, 1, NET_QUIET);
+        net_send(NET_INFECTION, &generation, 1, NET_LOUD);
         cough_ts = delayed_by_ms(now, COUGH_MS + get_rand_32() % 1000);
         if (! (app_current() && app_current()->owns_leds)) {
             app_leds(255, 0, 0);  /* Nothing in mute mode */

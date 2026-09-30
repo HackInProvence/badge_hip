@@ -118,8 +118,8 @@ static void handle_contact(const net_packet_t *p) {
         return;
     uint16_t uid = p->data[0] | p->data[1] << 8;
     uint8_t i = p->data[2], n = p->data[3];
-    if (n == 0 || n > MAX_CHUNKS || i >= n)
-        return;
+    if (n == 0 || n > MAX_CHUNKS || i >= n || p->len - 4 > CHUNK)
+        return;  /* Invalid: a longer chunk would write after rx_buf */
     if (p->src == last_src && uid == last_uid)
         return;  /* Already accepted or ignored */
     if (p->src != rx_src || uid != rx_uid) {
@@ -132,6 +132,8 @@ static void handle_contact(const net_packet_t *p) {
         rx_have = 0;
         memset(rx_buf, 0, sizeof(rx_buf));
     }
+    if (n != rx_chunks)
+        return;  /* The same card announced with another number of chunks */
     rx_ts = p->at;
     memcpy(rx_buf + i * CHUNK, p->data + 4, p->len - 4);
     rx_have |= 1u << i;
@@ -160,7 +162,7 @@ static void send_task(absolute_time_t now) {
     d[3] = n;
     int len = serial_len - send_chunk * CHUNK < CHUNK ? serial_len - send_chunk * CHUNK : CHUNK;
     memcpy(d + 4, serial_buf + send_chunk * CHUNK, len);
-    if (! net_send(NET_CONTACT, d, 4 + len, NET_MEDIUM))
+    if (! net_send(NET_CONTACT, d, 4 + len, NET_LOUD))
         return;
     if (++send_chunk >= n) {
         send_chunk = 0;

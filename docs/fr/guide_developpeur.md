@@ -322,9 +322,11 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
   l'application *SubGHz chat*.
 - **Réseau des cigales** (`social.c`, voir [docs/idees_reseau_extensions_ctf.md](../idees_reseau_extensions_ctf.md)),
   au-dessus de la couche réseau (§ 6.12) :
-  - une balise `NET_BEACON` toutes les 2 s ± 0,5 s à −10 dBm (à −20 dBm, elle n'était entendue qu'à 50 cm environ) ;
+  - une balise `NET_BEACON` toutes les 2 s ± 0,5 s à +10 dBm (mesuré entre deux badges à 1 m environ : +10 dBm
+    arrive vers −70 à −83 dBm, −10 dBm vers −97 dBm, à la limite de la sensibilité, −20 dBm n'arrive pas) ;
   - paquet de 17 octets : `0xC1`, type 1, identifiant (hash FNV de l'identifiant unique), numéro, score, nom (8 caractères) ;
-  - une rencontre = RSSI ≥ −65 dBm (`SOCIAL_RSSI_CLOSE`, à calibrer avec de vrais badges) sur 3 balises en 10 s ;
+  - une rencontre = RSSI ≥ −80 dBm (`SOCIAL_RSSI_CLOSE`, provisoire : à calibrer sur place avec le radar)
+    sur 3 balises en 10 s ;
   - +10 points pour un nouveau badge, +1 pour un badge connu, au plus une fois par heure ;
   - les voisins entendus (`social_neighbours()`) servent au radar, aux messages et aux invitations des jeux.
 
@@ -414,9 +416,9 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 
   | Drapeau | Effet |
   |---|---|
-  | `NET_QUIET` | −20 dBm : les badges tout proches (quelques mètres) |
-  | `NET_MEDIUM` | −10 dBm : quelques dizaines de mètres (balises, messages, jeux, cartes de visite) |
-  | `NET_LOUD` | +10 dBm : toute la salle (commandes, votes, image, choeur) |
+  | `NET_QUIET` | −20 dBm : ~−107 dBm à 1 m, sous la sensibilité (inutilisé) |
+  | `NET_MEDIUM` | −10 dBm : ~−97 dBm à 1 m, à la limite de la sensibilité (inutilisé) |
+  | `NET_LOUD` | +10 dBm : ~−70 à −83 dBm à 1 m ; utilisé par toutes les fonctions (la proximité se juge au RSSI) |
   | `NET_JITTER` | délai aléatoire (jusqu'à 300 ms) avant l'envoi : quand beaucoup de badges répondent au même paquet |
 
 - **Partage de la radio** : les autres fonctions (message au Flipper, porteuse, récepteur OOK) prennent la radio ;
@@ -432,7 +434,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), genre, destinataire (4), manche ou tour, puis selon le genre (§ 6.16) |
 | 0x07 | `NET_CONTACT` | `contacts.c` | uid de la carte (2), numéro du morceau, nombre de morceaux, 48 octets au plus |
 | 0x08 | `NET_HOTCOLD` | `hotcold.c` | balise chaud - froid, une par seconde |
-| 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à −20 dBm |
+| 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |

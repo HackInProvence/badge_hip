@@ -34,6 +34,9 @@ void ook_rx_stop(void);
 
 bool ook_rx_active(void);
 
+/** \brief Listening again after another feature used the radio (radio_tools.c), when someone still listens. */
+void ook_rx_resume(void);
+
 /** \brief Decodes the frames, to call in the main loop. */
 void ook_rx_task(absolute_time_t now);
 

@@ -59,8 +59,8 @@ static int64_t next_edge(alarm_id_t id, void *data) {
 
 
 bool ook_tx_princeton(uint32_t code, int frames) {
-    if (sending || ook_rx_active() || ! radio_tools_idle() || frames < 1)
-        return false;
+    if (sending || ook_rx_active() || ! radio_tools_idle() || net_transmitting() || frames < 1)
+        return false;  /* Not now: another user of the radio, or a packet on air */
     /* 1 = long pulse, short gap; 0 = short pulse, long gap; most significant bit first */
     for (int i = 0; i < 24; ++i) {
         bool bit = (code >> (23 - i)) & 1;

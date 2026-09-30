@@ -62,15 +62,25 @@ static uint32_t commitment(int c, uint32_t nonce, uint32_t id) {
     return h;
 }
 
-static void send_kind(uint8_t kind, const uint8_t *extra, int n) {
+static void send_round(uint8_t kind, uint8_t round, const uint8_t *extra, int n) {
     uint8_t d[16] = {session, session >> 8, kind};
     net_put_u32(d + 3, peer);
-    d[7] = round_n;
+    d[7] = round;
     memcpy(d + 8, extra, n);
-    net_send(NET_GAME, d, 8 + n, NET_MEDIUM);
+    net_send(NET_GAME, d, 8 + n, NET_LOUD);
 }
 
+static void send_kind(uint8_t kind, const uint8_t *extra, int n) {
+    send_round(kind, round_n, extra, n);
+}
+
+/* The reveal of the previous round: the peer may still wait for it (lost packets) while this badge plays the next */
+static int prev_choice = -1;
+static uint32_t prev_nonce = 0;
+
 static void new_round(void) {
+    prev_choice = round_n ? my_choice : -1;  /* Round 0: a new game, nothing to reveal again */
+    prev_nonce = my_nonce;
     ++round_n;
     my_choice = -1;
     peer_choice = -1;
@@ -110,6 +120,13 @@ static void handle_game(const net_packet_t *p) {
     if (p->src != peer || sess != session)
         return;
     peer_seen = p->at;
+    if (round == (uint8_t)(round_n - 1) && prev_choice >= 0 && kind != K_BYE) {
+        /* The peer is still in the previous round: it did not get our reveal */
+        uint8_t r[5] = {prev_choice};
+        net_put_u32(r + 1, prev_nonce);
+        send_round(K_REVEAL, round, r, 5);
+        return;
+    }
     switch (kind) {
     case K_ACCEPT:
         if (state == S_INVITING) {

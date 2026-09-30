@@ -111,7 +111,9 @@ def main():
     parser.add_argument('kind', choices=['command', 'ping', 'raw', 'preset'])
     parser.add_argument('args', nargs='*', help='command: the command (0x02...); raw: the type then data bytes (hex)')
     parser.add_argument('--id', type=lambda v: int(v, 0), default=0x5EC5EA26, help='id of the sender (4 bytes)')
-    parser.add_argument('--repeats', type=int, default=3, help='packets in the file')
+    parser.add_argument('--repeats', type=int, default=8, help='packets in the file (default 8, 250 ms apart: '
+                        'the badges listen to the OOK remotes a moment every second)')
+    parser.add_argument('--gap', type=int, default=250, help='milliseconds between the packets')
     parser.add_argument('-o', '--output', default=None)
     args = parser.parse_args()
 
@@ -134,7 +136,7 @@ def main():
         if not args.args:
             sys.exit('the type, then the data bytes in hex')
         packet = header + [int(args.args[0], 0)] + sender + [int(b, 16) for b in args.args[1:]]
-    durations = raw_durations(packet_bits(packet), args.repeats, 5000)
+    durations = raw_durations(packet_bits(packet), args.repeats, args.gap * 1000)
     out = args.output or f'secsea_{args.kind}.sub'
     write_sub(out, durations, f'SecSea {args.kind} {" ".join(args.args)}: packet {bytes(packet).hex()}')
     print(f'{out}: {len(packet)} bytes, {len(durations)} durations')

@@ -19,6 +19,7 @@
 
 #define RING 1024  /* Durations, signed: > 0 carrier on, < 0 silence */
 #define MIN_FRAME 40  /* Durations of the shortest frames worth decoding */
+#define OVERLAP 120  /* Durations decoded again with the next part (> 2 Princeton frames of 50 durations) */
 
 /* Asynchronous OOK receiver, like the "AM650" preset of the Flipper Zero */
 static const uint8_t OOK_REGS[] = {
@@ -80,6 +81,17 @@ void ook_rx_start(void) {
     gpio_add_raw_irq_handler(BADGE_RADIO_GDO0, edge);
     gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
     irq_set_enabled(IO_IRQ_BANK0, true);
+    radio_write_registers((const uint8_t[]){CC1101_SRX}, 1);
+}
+
+
+void ook_rx_resume(void) {
+    if (! users)
+        return;
+    /* Another feature used the radio meanwhile (message, carrier): the OOK registers again */
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    radio_write_registers(OOK_REGS, sizeof(OOK_REGS));
+    gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
     radio_write_registers((const uint8_t[]){CC1101_SRX}, 1);
 }
 
@@ -146,7 +158,8 @@ static void build_signal(uint32_t silence_us) {
     uint32_t irq = save_and_disable_interrupts();
     uint16_t n = count, start = (head + RING - n) % RING;
     signal.n = 0;
-    for (uint16_t i = 0; i < n && signal.n < OOKDEC_MAX_PULSES - 1; ++i) {
+    uint16_t i = 0;
+    for (; i < n && signal.n < OOKDEC_MAX_PULSES - 1; ++i) {
         int16_t v = ring[(start + i) % RING];
         bool high = v > 0;
         uint16_t us = high ? v : -v;
@@ -160,7 +173,8 @@ static void build_signal(uint32_t silence_us) {
             signal.us[signal.n++] = us;
         }
     }
-    count = 0;
+    /* What did not fit stays for the next decoding, with an overlap: a frame across the cut is not lost */
+    count = i < n ? (n - i + OVERLAP < n ? n - i + OVERLAP : n) : 0;
     restore_interrupts(irq);
     /* The silence since the last edge ends the frame */
     if (signal.n % 2 == 1)
@@ -174,9 +188,9 @@ void ook_rx_task(absolute_time_t now) {
         return;
     uint32_t silence = time_us_32() - last_edge_us;
     uint16_t n = count;
-    /* A frame ended (a long silence), or the buffer is almost full (noise, or a long transmission) */
+    /* A frame ended (a long silence), or the decoder can be filled (noise, or a long transmission) */
     bool ended = silence >= OOK_RX_FRAME_GAP_US && n >= MIN_FRAME;
-    if (! ended && n < RING - 64) {
+    if (! ended && n < OOKDEC_MAX_PULSES - 1) {
         if (silence >= OOK_RX_FRAME_GAP_US && n)
             count = 0;  /* Too short to be a frame: noise */
         return;

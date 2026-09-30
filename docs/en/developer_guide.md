@@ -323,9 +323,11 @@ the SD card CS is driven as a plain GPIO. Only one user at a time:
   the *SubGHz chat* application.
 - **Cicada network** (`social.c`, see [docs/idees_reseau_extensions_ctf.md](../idees_reseau_extensions_ctf.md)),
   on top of the network layer (§ 6.12):
-  - one `NET_BEACON` every 2 s ± 0.5 s at −10 dBm (at −20 dBm it was only heard within about 50 cm);
+  - one `NET_BEACON` every 2 s ± 0.5 s at +10 dBm (measured between two badges about 1 m apart: +10 dBm arrives
+    around −70 to −83 dBm, −10 dBm around −97 dBm, at the edge of the sensitivity, −20 dBm does not arrive);
   - 17-byte packet: `0xC1`, type 1, identifier (FNV hash of the unique ID), sequence number, score, name (8 characters);
-  - an encounter = RSSI ≥ −65 dBm (`SOCIAL_RSSI_CLOSE`, to be calibrated with real badges) on 3 beacons within 10 s;
+  - an encounter = RSSI ≥ −80 dBm (`SOCIAL_RSSI_CLOSE`, provisional: to calibrate on site with the radar)
+    on 3 beacons within 10 s;
   - +10 points for a new badge, +1 for a known badge, at most once per hour;
   - the neighbours heard (`social_neighbours()`) are used by the radar, the messages and the game invitations.
 
@@ -415,9 +417,9 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 
   | Flag | Effect |
   |---|---|
-  | `NET_QUIET` | −20 dBm: only the badges close by (a few meters) |
-  | `NET_MEDIUM` | −10 dBm: a few tens of meters (beacons, messages, games, business cards) |
-  | `NET_LOUD` | +10 dBm: the whole room (commands, votes, image, choir) |
+  | `NET_QUIET` | −20 dBm: ~−107 dBm at 1 m, below the sensitivity (unused) |
+  | `NET_MEDIUM` | −10 dBm: ~−97 dBm at 1 m, at the edge of the sensitivity (unused) |
+  | `NET_LOUD` | +10 dBm: ~−70 to −83 dBm at 1 m; used by every feature (proximity is judged on the RSSI) |
   | `NET_JITTER` | random delay (up to 300 ms) before sending: when many badges answer the same packet |
 
 - **Sharing the radio**: the other features (message to the Flipper, carrier, OOK receiver) take the radio;
@@ -433,7 +435,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), kind, recipient (4), round or turn, then depending on the kind (§ 6.16) |
 | 0x07 | `NET_CONTACT` | `contacts.c` | card uid (2), chunk number, number of chunks, at most 48 bytes |
 | 0x08 | `NET_HOTCOLD` | `hotcold.c` | hot - cold beacon, one per second |
-| 0x09 | `NET_INFECTION` | `infection.c` | generation (0 = patient zero); a "cough" every 4 to 5 s, at −20 dBm |
+| 0x09 | `NET_INFECTION` | `infection.c` | generation (0 = patient zero); a "cough" every 4 to 5 s, at +10 dBm; contagion at RSSI ≥ −80 dBm (provisional) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfer (2), block, 48 bytes (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | song, kind, session (2), ms (4), voices (§ 6.15) |
 | 0x0F | `NET_PING` | `net.c` | number (`P` key) |

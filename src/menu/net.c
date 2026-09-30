@@ -103,11 +103,18 @@ bool net_idle(void) {
 
 void net_pause(bool p) {
     paused = p;
-    if (paused && owner && radio_tools_idle()) {
+    if (paused && owner && radio_tools_idle())
         radio_wait_state(CC1101_STATE_IDLE, true);
+    if (paused) {
+        /* The radio will be reconfigured (profile, sync word) when the network gets it back */
         owner = false;
         tx_pending = false;
     }
+}
+
+
+bool net_transmitting(void) {
+    return tx_pending || (owner && gpio_get(BADGE_RADIO_GDO0));  /* GDO0: a packet on air (sent or received) */
 }
 
 

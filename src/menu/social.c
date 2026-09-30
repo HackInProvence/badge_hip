@@ -216,7 +216,7 @@ static void send_beacon(void) {
     store_t *s = store_get();
     uint8_t p[BEACON_LEN] = {seq++, s->score, s->score >> 8};
     memcpy(p + 3, s->name, 8);  /* The name is truncated to 8 characters in the beacon */
-    if (net_send(NET_BEACON, p, sizeof(p), NET_MEDIUM))  /* -10 dBm: -20 dBm was only heard within ~50 cm */
+    if (net_send(NET_BEACON, p, sizeof(p), NET_LOUD))  /* +10 dBm: at -10 dBm, ~-97 dBm at 1 m (edge of the sensitivity) */
         ++n_sent;
 }
 

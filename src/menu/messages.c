@@ -21,6 +21,8 @@
 #define INBOX 10
 #define SEEN 32
 #define PACKET_LEN 20
+#define SENDS 3
+#define RESEND_MS 600  /* Longer than a listening window of the OOK remotes (220 ms) */
 
 static const char *MESSAGES[] = {
     "Salut !", "Café ?", "On se retrouve au stand HIP", "Qui fait le CTF ?", "Je cherche un binôme",
@@ -84,13 +86,25 @@ static void handle_message(const net_packet_t *p) {
         uint8_t copy[PACKET_LEN];
         memcpy(copy, d, PACKET_LEN);
         copy[2] = ttl - 1;
-        if (net_send(NET_MESSAGE, copy, PACKET_LEN, NET_MEDIUM | NET_JITTER))
+        if (net_send(NET_MESSAGE, copy, PACKET_LEN, NET_LOUD | NET_JITTER))
             ++n_relayed;
     }
 }
 
 void messages_init(void) {
     net_subscribe(NET_MESSAGE, handle_message);
+}
+
+static uint8_t pending[PACKET_LEN];  /* The message written on this badge, sent several times */
+static int sends_left = 0;
+static absolute_time_t next_send = 0;
+
+/* In the main loop: the copies of the message written on this badge */
+void messages_task(absolute_time_t now) {
+    if (sends_left && absolute_time_diff_us(next_send, now) >= 0 && net_send(NET_MESSAGE, pending, PACKET_LEN, NET_LOUD)) {
+        --sends_left;
+        next_send = delayed_by_ms(now, RESEND_MS);
+    }
 }
 
 /* A message arrived (for the notification): its text */
@@ -114,7 +128,10 @@ static void send_message(uint32_t recipient, int message) {
     memcpy(d + 11, social_name(), strnlen(social_name(), 8));
     d[19] = message;
     already_seen(net_id(), uid);
-    net_send(NET_MESSAGE, d, PACKET_LEN, NET_MEDIUM);
+    /* Sent SENDS times, RESEND_MS apart (a badge may be listening to the OOK remotes): the uid removes the copies */
+    memcpy(pending, d, PACKET_LEN);
+    sends_left = SENDS;
+    next_send = get_absolute_time();
     printf("message: sent \"%s\" to %08lX\n", MESSAGES[message], (unsigned long)recipient);
 }
 

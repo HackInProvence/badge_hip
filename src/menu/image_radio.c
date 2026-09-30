@@ -27,7 +27,7 @@
 #define GROUP 8
 #define GROUPS ((DATA_BLOCKS + GROUP - 1) / GROUP)  /* 14 */
 #define ALL_BLOCKS (DATA_BLOCKS + GROUPS)
-#define SEND_GAP_MS 40
+#define SEND_GAP_MS 70  /* A block is ~53 ms on air: the queue keeps room for the other features */
 #define MAX_IMAGES 24
 
 static uint8_t image[DATA_BLOCKS * BLOCK];  /* 1 bit per pixel, 1 = white, padded */

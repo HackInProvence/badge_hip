@@ -10,7 +10,7 @@
  * All the packets use the same radio profile (GFSK 9.99 kbps like the Flipper preset, sync word 0xC16A, CRC):
  * [0xC1][type][id of the sender, 4 bytes little endian][data...], at most 61 bytes.
  * The badge listens all the time; the packets to send are queued and sent when the channel is free,
- * quiet (-20 dBm, a few meters: proximity) or loud (+10 dBm, the whole room).
+ * quiet (-20 dBm), medium (-10 dBm) or loud (+10 dBm: ~-70 to -83 dBm at 1 m, used by all the features).
  * The features subscribe to the types they handle. See docs/fr/guide_developpeur.md for the list of the types.
  *
  * Other features can take the radio (message to the Flipper, carrier, OOK receiver): net_pause() or
@@ -47,10 +47,10 @@ typedef enum {
 } net_type_t;
 
 /* Flags of net_send() */
-#define NET_QUIET 0x00  /* -20 dBm: only the badges close by (a few meters) */
+#define NET_QUIET 0x00  /* -20 dBm: measured ~-107 dBm at 1 m, below the sensitivity: not used */
 #define NET_LOUD 0x01  /* +10 dBm: the whole room */
 #define NET_JITTER 0x02  /* Random delay (up to NET_JITTER_MS) before sending: many badges answer the same packet */
-#define NET_MEDIUM 0x04  /* -10 dBm: a few tens of meters (hot / cold hunt, relayed messages) */
+#define NET_MEDIUM 0x04  /* -10 dBm: measured ~-97 dBm at 1 m, at the edge of the sensitivity */
 #define NET_JITTER_MS 300
 
 #define NET_PATABLE_QUIET 0x0E  /* -20 dBm @433MHz */
@@ -81,6 +81,9 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags);
 
 /** \brief Nothing to send nor being sent or received: the radio can be lent a moment. */
 bool net_idle(void);
+
+/** \brief A packet is on air (being sent or received): wait before taking the radio. */
+bool net_transmitting(void);
 
 /** \brief Stop using the radio (another feature needs it), or use it again. */
 void net_pause(bool paused);

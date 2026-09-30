@@ -110,7 +110,7 @@ static void send_kind(uint8_t kind, const uint8_t *extra, int n) {
     net_put_u32(d + 3, peer);
     d[7] = turn;
     memcpy(d + 8, extra, n);
-    net_send(NET_GAME, d, 8 + n, NET_MEDIUM);
+    net_send(NET_GAME, d, 8 + n, NET_LOUD);
 }
 
 static bool my_turn(void) {

@@ -27,7 +27,7 @@
 
 #include "pico/time.h"
 
-#define SOCIAL_RSSI_CLOSE (-65)  /* dBm with the beacons at -10 dBm, to calibrate with real badges (radar page) */
+#define SOCIAL_RSSI_CLOSE (-80)  /* dBm with the beacons at +10 dBm (~-70 to -83 at 1 m), to calibrate on site (radar page) */
 #define SOCIAL_CLOSE_BEACONS 3
 #define SOCIAL_CLOSE_WINDOW_MS 10000
 #define SOCIAL_PATABLE 0x0E  /* -20dBm @433MHz */

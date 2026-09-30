@@ -416,6 +416,7 @@ void infection_task(absolute_time_t now);
 bool infection_event(void);
 bool infection_coughed(void);
 void messages_init(void);
+void messages_task(absolute_time_t now);
 void chorus_init(void);
 void contacts_init(void);
 void duel_init(void);
@@ -2262,6 +2263,7 @@ int main() {
             if (! notify(APPS[APP_PROGRAM], notif))
                 program_forget();
         }
+        messages_task(now);
         if (messages_new(notif, sizeof(notif)))
             notify(NULL, notif);
         if (vote_new())

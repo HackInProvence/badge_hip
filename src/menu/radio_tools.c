@@ -9,6 +9,8 @@
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
 
+#include "ook_rx.h"
+#include "ook_tx.h"
 #include "pinouts.h"
 #include "radio.h"
 #include "radio_tools.h"
@@ -78,6 +80,14 @@ void radio_tools_reconfigure(void) {
 }
 
 
+/* Back to idle: a feature that listens in OOK all the time (talk badge) gets its receiver back */
+static void back_to_idle(void) {
+    state = R_IDLE;
+    if (ook_rx_active())
+        ook_rx_resume();
+}
+
+
 bool radio_tools_idle(void) {
     return state == R_IDLE;
 }
@@ -102,7 +112,7 @@ const char *radio_tools_last_text(void) {
 }
 
 unsigned radio_tools_send(void) {
-    if (state != R_IDLE)
+    if (state != R_IDLE || ook_tx_busy())
         return 0;
     configure();  /* The whole GFSK profile: another feature may have left the radio in OOK (ook_rx.c) */
     set_profile(0x46, 0x4C, PATABLE);  /* Flipper chat */
@@ -120,7 +130,7 @@ unsigned radio_tools_send(void) {
 
 
 void radio_tools_carrier_start(uint32_t max_ms) {
-    if (state != R_IDLE)
+    if (state != R_IDLE || ook_tx_busy())
         return;
     configure();  /* From the GFSK profile (the radio may be in OOK, see ook_rx.c) */
     radio_wait_state(CC1101_STATE_IDLE, true);
@@ -144,7 +154,7 @@ void radio_tools_carrier_stop(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
     configure();  /* Back to the packet mode */
-    state = R_IDLE;
+    back_to_idle();
     snprintf(message, sizeof(message), "Porteuse arrêtée");
     printf("radio: carrier off\n");
 }
@@ -166,7 +176,7 @@ static void count_edge(void) {
 
 
 void radio_tools_measure_xosc(void) {
-    if (state != R_IDLE)
+    if (state != R_IDLE || ook_tx_busy())
         return;
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_write_registers((const uint8_t[]){CC1101_IOCFG0, 0x3F}, 2);  /* CLK_XOSC/192 on GDO0 */
@@ -200,13 +210,13 @@ void radio_tools_task(absolute_time_t now) {
             break;
         radio_state_t st = radio_state();
         if (st == CC1101_STATE_IDLE) {
-            state = R_IDLE;
+            back_to_idle();
             snprintf(message, sizeof(message), "Message #%u envoyé", count);
             printf("radio: message #%u sent in %lld ms\n", count, elapsed / 1000);
         } else if (st == CC1101_STATE_TXFIFO_UNDERFLOW || elapsed > TX_TIMEOUT_US) {
             radio_write_registers((const uint8_t[]){CC1101_SIDLE}, 1);
             radio_write_registers((const uint8_t[]){CC1101_SFTX}, 1);
-            state = R_IDLE;
+            back_to_idle();
             snprintf(message, sizeof(message), "Echec de l'envoi (état %d)", st);
             printf("radio: %s\n", message);
         }
@@ -233,7 +243,7 @@ void radio_tools_task(absolute_time_t now) {
             radio_set_xosc(nominal);
         }
         configure();  /* Recompute the frequency and baud rate, and restore GDO0 */
-        state = R_IDLE;
+        back_to_idle();
         snprintf(message, sizeof(message), "Quartz : %.4f MHz", xosc_hz / 1e6);
         printf("radio: crystal measured %lu Hz (default CC1101_fXOSC = %d Hz), using %lu Hz\n",
                (unsigned long)xosc_hz, CC1101_fXOSC, (unsigned long)radio_get_xosc());

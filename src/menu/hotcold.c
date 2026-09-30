@@ -17,7 +17,7 @@
 #define MASTER_PERIOD_MS 1000
 #define LOST_MS 5000  /* No beacon for this long: lost */
 #define RSSI_MIN (-100)  /* Far */
-#define RSSI_MAX (-35)  /* Next to it */
+#define RSSI_MAX (-45)  /* Next to it (beacon at +10 dBm: ~-70 to -83 at 1 m) */
 
 /* ------ The hot / cold view, shared with the radar ------ */
 
@@ -172,7 +172,7 @@ static bool master_buttons(const app_buttons_t *b, absolute_time_t now) {
 static bool master_task(absolute_time_t now) {
     if (master && absolute_time_diff_us(master_ts, now) >= 0) {
         uint8_t data[1] = {1};
-        net_send(NET_HOTCOLD, data, sizeof(data), NET_MEDIUM);
+        net_send(NET_HOTCOLD, data, sizeof(data), NET_LOUD);
         master_ts = delayed_by_ms(now, MASTER_PERIOD_MS);
     }
     return false;
@@ -182,7 +182,7 @@ static void master_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, "Balise chaud-froid");
     gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_large, master ? "Emission" : "Arrêtée", GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_lines(fb, 95, &gfx_font_small, "Une balise par seconde\n(-10 dBm). Cachez ce badge :\nles autres le cherchent avec\nSocial > Chaud - froid.");
+    ui_lines(fb, 95, &gfx_font_small, "Une balise par seconde\n(+10 dBm). Cachez ce badge :\nles autres le cherchent avec\nSocial > Chaud - froid.");
     ui_footer(fb, master ? "G : quitter  D : arrêter" : "G : quitter  D : émettre");
 }
 
