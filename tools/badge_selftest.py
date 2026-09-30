@@ -653,7 +653,7 @@ def main():
         if not args.no_reboot:
             t.mark()
             t.keys('R')
-            t.expect(r'^--- disconnected$', 5)
+            t.expect(r'^--- disconnected', 5)
             deadline = time.time() + 20
             while not badge.connected() and time.time() < deadline:
                 time.sleep(0.2)

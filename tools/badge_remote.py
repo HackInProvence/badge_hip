@@ -108,82 +108,101 @@ class Badge(threading.Thread):
         self.logs = queue.Queue()
         self.running = True
         self.lock = threading.Lock()
+        self.error = ''  # Last connection problem, for the status line ('' when connected)
+        self.switch_to = None  # Port asked by the window: the thread itself closes the current one (no race)
 
     def send(self, keys):
+        """Never raises: a lost port (unplugged badge, permission taken back...) is handled by the thread."""
         with self.lock:
-            if self.ser:
-                try:
-                    self.ser.write(keys.encode())
-                except serial.SerialException:
-                    pass
+            ser = self.ser
+            if not ser:
+                return
+            try:
+                ser.write(keys.encode())
+            except Exception as e:  # serial.SerialException, OSError, PermissionError...
+                self.error = f'envoi impossible : {e}'
 
     def connected(self):
         return self.ser is not None
 
     def switch(self, port):
-        """Connects to another badge (several badges plugged in)."""
+        """Connects to another badge (several badges plugged in): done by the thread at its next read."""
+        self.switch_to = port
+
+    def _close(self, reason=None):
         with self.lock:
-            self.port_name = port
-            if self.ser:
-                try:
-                    self.ser.write(b']')
-                    self.ser.close()
-                except serial.SerialException:
-                    pass
-                self.ser = None
+            ser, self.ser = self.ser, None
+        if ser:
+            try:
+                ser.write(b']')
+            except Exception:
+                pass
+            try:
+                ser.close()
+            except Exception:
+                pass
+        if reason:
+            self.logs.put(f'--- {reason}')
+
+    def _open(self, port):
+        try:
+            ser = serial.Serial(port, 115200, timeout=0.2)
+        except Exception as e:  # Busy, no permission, vanished...
+            msg = f'impossible d\'ouvrir {port} (utilisé par un autre programme ?) : {e}'
+            if self.error != msg:
+                self.logs.put('--- ' + msg)
+            self.error = msg
+            return False
+        with self.lock:
+            self.ser = ser
+        self.error = ''
+        self.logs.put(f'--- connected to {port}')
+        self.send('[')  # Stream the screen (a badge without screen only sends its log)
+        return True
+
+    def _step(self):
+        if self.switch_to:
+            self.port_name, self.switch_to = self.switch_to, None
+            self._close(f'switching to {self.port_name}')
+        if not self.ser:
+            port = self.port_name or find_port()
+            if not port:
+                self.error = 'aucun badge trouvé'
+                time.sleep(0.5)
+            elif not self._open(port):
+                time.sleep(1)
+            return
+        try:
+            line = self.ser.readline()
+        except Exception as e:  # Unplugged, permission lost, closed meanwhile...
+            if self.running:
+                self.error = f'connexion perdue : {e}'
+                self._close(f'disconnected ({e})')
+                time.sleep(0.5)
+            return
+        if not line:
+            return
+        line = line.decode('utf-8', errors='replace').rstrip()
+        if line.startswith('@FB'):
+            frame = decode_frame(line)
+            if frame:
+                self.frames.put(frame)
+        else:
+            self.logs.put(line)
 
     def run(self):
-        busy_reported = None
+        # The thread never dies: any unexpected error is logged and the connection is tried again
         while self.running:
-            if not self.ser:
-                port = self.port_name or find_port()
-                if not port:
-                    time.sleep(0.5)
-                    continue
-                try:
-                    ser = serial.Serial(port, 115200, timeout=0.2)
-                except serial.SerialException as e:
-                    if busy_reported != port:
-                        self.logs.put(f'--- cannot open {port} (used by another program?): {e}')
-                        busy_reported = port
-                    time.sleep(0.5)
-                    continue
-                busy_reported = None
-                with self.lock:
-                    if port != (self.port_name or port):
-                        ser.close()  # Switched meanwhile
-                        continue
-                    self.ser = ser
-                self.logs.put(f'--- connected to {port}')
-                self.send('[')  # Stream the screen (a badge without screen only sends its log)
-            ser = self.ser
             try:
-                line = ser.readline() if ser else b''
-            except (serial.SerialException, AttributeError, TypeError, OSError):
-                if not self.running:
-                    break  # Closed by stop()
-                with self.lock:
-                    if self.ser is ser:
-                        self.ser = None
-                        self.logs.put('--- disconnected')
-                continue
-            if not line:
-                continue
-            line = line.decode('utf-8', errors='replace').rstrip()
-            if line.startswith('@FB'):
-                frame = decode_frame(line)
-                if frame:
-                    self.frames.put(frame)
-            else:
-                self.logs.put(line)
+                self._step()
+            except Exception as e:
+                self.logs.put(f'--- error: {e!r}')
+                self._close()
+                time.sleep(1)
 
     def stop(self):
-        self.send(']')
         self.running = False
-        with self.lock:
-            if self.ser:
-                self.ser.close()
-                self.ser = None
+        self._close()
 
 
 # ------ PNG (no dependency) ------
@@ -318,21 +337,25 @@ def run_window(port, zoom, on_ready=None):
     port_labels = {}
 
     def refresh_ports():
-        ports = badge_ports()
-        port_labels.clear()
-        port_labels.update({label: device for device, label in ports})
-        port_box['values'] = [label for _, label in ports]
-        current = badge.port_name or (badge.ser.port if badge.ser else None)
-        for device, label in ports:
-            if device == current:
-                port_choice.set(label)
-        root.after(2000, refresh_ports)
+        try:
+            ports = badge_ports()
+            port_labels.clear()
+            port_labels.update({label: device for device, label in ports})
+            port_box['values'] = [label for _, label in ports]
+            ser = badge.ser  # May be closed by the thread at any time: a local copy
+            current = badge.switch_to or badge.port_name or (getattr(ser, 'port', None) if ser else None)
+            for device, label in ports:
+                if device == current:
+                    port_choice.set(label)
+        except Exception as e:
+            badge.logs.put(f'--- ports: {e}')
+        finally:
+            root.after(2000, refresh_ports)
 
     def on_port(_event):
         device = port_labels.get(port_choice.get())
         if device and device != badge.port_name:
             badge.switch(device)
-            badge.logs.put(f'--- switching to {device}')
         root.focus_set()
     port_box.bind('<<ComboboxSelected>>', on_port)
     refresh_ports()
@@ -364,6 +387,14 @@ def run_window(port, zoom, on_ready=None):
     root.bind('<Key>', on_key)
 
     def poll():
+        try:
+            poll_once()
+        except Exception as e:
+            badge.logs.put(f'--- window: {e!r}')
+        finally:
+            root.after(30, poll)
+
+    def poll_once():
         # Only show the last frame received (the badge may draw faster than we display)
         rows = None
         while not badge.frames.empty():
@@ -380,13 +411,17 @@ def run_window(port, zoom, on_ready=None):
             last['count'], last['t0'] = 0, time.time()
         help_ = ('mode clavier : tapez le texte, Entrée = valider, Échap = annuler' if keyboard.get()
                  else '↑↓ flancs, ← retour, → OK, Maj = appui long')
-        status.set(('connecté' if badge.connected() else 'recherche du badge...') + f'   —   {fps:.1f} images/s'
-                   + '   —   ' + help_)
-        root.after(30, poll)
+        state = 'connecté' if badge.connected() else ('⚠ ' + badge.error if badge.error else 'recherche du badge...')
+        status.set(state + f'   —   {fps:.1f} images/s   —   ' + help_)
+
+    # An error in a callback of the window goes to the log instead of a traceback
+    root.report_callback_exception = lambda kind, value, tb: badge.logs.put(f'--- error: {value!r}')
 
     def on_close():
-        badge.stop()
-        root.destroy()
+        try:
+            badge.stop()
+        finally:
+            root.destroy()
     root.protocol('WM_DELETE_WINDOW', on_close)
     root.focus_set()
     poll()
