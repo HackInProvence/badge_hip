@@ -10,11 +10,13 @@
 #include <string.h>
 
 #include "app.h"
+#include "audio.h"
 #include "crypto_ctf.h"
 #include "store.h"
 
 #define DOT_MS 150
-
+#define ULTRA_DOT_MS 250  /* Slower: easier to read on the spectrogram of a phone */
+#define ULTRA_HZ 19000
 enum { V_LIST, V_CHALLENGE, V_HINT, V_ANSWER, V_RESULT, V_FLAG };
 
 static int view = V_LIST;
@@ -25,6 +27,7 @@ static bool right = false;
 static const char *morse = NULL;
 static absolute_time_t morse_ts = 0;
 static bool morse_on = false;
+static bool ultrasound = false;  /* At 19 kHz, without the LEDs, again and again (crypto_ctf_ultrasound()) */
 
 static uint32_t solved(void) {
     uint16_t s = store_get()->crypto_solved;
@@ -46,14 +49,21 @@ static void list_label(int i, char *buf, size_t len) {
     snprintf(buf, len, "%s %d. %s", (solved() >> i) & 1 ? "[x]" : "[ ]", i + 1, crypto_ctf_title(i));
 }
 
+static void stop_morse(void) {
+    if (morse && ultrasound)
+        audio_pwm_tone(0);
+    morse = NULL;
+    ultrasound = false;
+}
+
 static void crypto_start(absolute_time_t now) {
     (void)now;
     view = V_LIST;
-    morse = NULL;
+    stop_morse();
 }
 
 static void crypto_stop(void) {
-    morse = NULL;
+    stop_morse();
     app_leds(0, 0, 0);
 }
 
@@ -82,10 +92,18 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
             view = V_ANSWER;
         }
         if ((b->pressed & UI_BTN_X) && crypto_ctf_morse(sel)) {
-            morse = crypto_ctf_morse(sel);  /* Play it */
-            morse_on = false;
-            morse_ts = now;
+            if (morse && ultrasound) {
+                stop_morse();  /* The 19 kHz Morse loops: the flank stops it */
+            } else {
+                morse = crypto_ctf_morse(sel);  /* Play it */
+                ultrasound = crypto_ctf_ultrasound(sel);
+                morse_on = false;
+                morse_ts = now;
+                printf("crypto: morse%s\n", ultrasound ? " at 19 kHz" : "");
+            }
         }
+        if (view == V_LIST)
+            stop_morse();
         break;
     case V_ANSWER: {
         int r = app_edit_buttons(&edit, b);
@@ -122,27 +140,42 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 /* The Morse: a dot = 1 unit, a dash = 3, 1 unit between the signs, 3 between the letters (space) */
 static bool crypto_task(absolute_time_t now) {
+    if (view == V_LIST || view == V_FLAG)
+        stop_morse();  /* Only on the pages of the challenge (it goes on while typing the answer) */
     if (! morse || absolute_time_diff_us(morse_ts, now) < 0)
         return false;
+    uint32_t dot = ultrasound ? ULTRA_DOT_MS : DOT_MS;
     if (morse_on) {
-        app_leds(0, 0, 0);
+        if (ultrasound)
+            audio_pwm_tone(0);
+        else
+            app_leds(0, 0, 0);
         morse_on = false;
-        morse_ts = delayed_by_ms(now, DOT_MS);
+        morse_ts = delayed_by_ms(now, dot);
         return false;
     }
     char c = *morse++;
     if (! c) {
-        morse = NULL;
+        if (ultrasound) {
+            morse = crypto_ctf_morse(sel);  /* Again, after a long silence */
+            morse_ts = delayed_by_ms(now, 10 * dot);
+        } else {
+            morse = NULL;
+        }
         return false;
     }
     if (c == '.' || c == '-') {
-        uint32_t ms = c == '.' ? DOT_MS : 3 * DOT_MS;
-        app_tone(880, ms);
-        app_leds(0, 80, 255);
+        uint32_t ms = c == '.' ? dot : 3 * dot;
+        if (ultrasound) {
+            audio_pwm_tone(ULTRA_HZ);  /* No LEDs: they would give the Morse away */
+        } else {
+            app_tone(880, ms);
+            app_leds(0, 80, 255);
+        }
         morse_on = true;
         morse_ts = delayed_by_ms(now, ms);
     } else {
-        morse_ts = delayed_by_ms(now, (c == '/' ? 6 : 2) * DOT_MS);  /* The sign gap is already done */
+        morse_ts = delayed_by_ms(now, (c == '/' ? 6 : 2) * dot);  /* The sign gap is already done */
     }
     return false;
 }

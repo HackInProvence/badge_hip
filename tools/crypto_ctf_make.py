@@ -223,6 +223,12 @@ CHALLENGES = [
               + ' '.join(HASH_WORDS),
          hint='SHA-1 de chaque mot, sans\nretour à la ligne (echo -n),\npuis compare le début.',
          solve=lambda c: [w for w in HASH_WORDS if sha1_prefix(w) == c['text'].split('\n')[2]][0]),
+    # The Morse is not shown: the badge plays it at 19 kHz (hardly heard), a phone sees it on a spectrogram
+    dict(title='Ultrason', answer='DAUPHIN',
+         text='La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l\'entend, lui.\nQui d\'autre entend ça ?\n\nFlanc D : chanter (en boucle),\nencore : arrêter.',
+         morse=morse('DAUPHIN'), ultrasound=True,
+         hint='Appli de spectrogramme\n(Spectroid, Spek...) : des\ntraits vers 19 kHz, en Morse.',
+         solve=lambda c: unmorse(c['morse'])),
 ]
 
 
@@ -310,7 +316,7 @@ def build():
             raise ValueError('Piece too long: %s' % pieces[i])
         stream = piece_stream(i)
         out.append(dict(title=c['title'], text='\n'.join(lines), hint='\n'.join(hint), morse=c.get('morse'),
-                        hash=answer_hash(i, answer), piece=[ord(ch) ^ stream[k] for k, ch in enumerate(pieces[i])],
+                        ultrasound=c.get('ultrasound', False), hash=answer_hash(i, answer), piece=[ord(ch) ^ stream[k] for k, ch in enumerate(pieces[i])],
                         answer=answer, clear_piece=pieces[i]))
     # The hash truncated to 4 hex digits must single out the answer
     prefixes = [sha1_prefix(w) for w in HASH_WORDS]
@@ -328,6 +334,7 @@ def c_table(challenges):
         lines.append('        %s,' % c_string(c['text']))
         lines.append('        %s,' % c_string(c['hint']))
         lines.append('        %s,' % (c_string(c['morse']) if c['morse'] else 'NULL'))
+        lines.append('        %s,' % ('true' if c['ultrasound'] else 'false'))
         lines.append('        0x%016XULL,' % c['hash'])
         lines.append('        {%s}, %d,' % (', '.join('0x%02X' % b for b in c['piece']), len(c['piece'])))
         lines.append('    },')

@@ -148,11 +148,14 @@ Chaque jeu commence par sa page d'aide (règles, commandes, record).
 Records gardés : meilleur temps au Démineur, meilleur score au 2048, moins de coups au Taquin, nombre de niveaux
 réussis au Sokoban, moins d'essais au Mastermind, plus de mots trouvés d'affilée au Pendu.
 
-**Défis crypto** : 12 énigmes de cryptographie classique, de la plus simple à la plus difficile
-(acrostiche, César, ROT13, Morse, binaire, hexadécimal, base64, Atbash, scytale, XOR, Vigenère, hash tronqué).
+**Défis crypto** : 13 énigmes de cryptographie classique, de la plus simple à la plus difficile
+(acrostiche, César, ROT13, Morse, binaire, hexadécimal, base64, Atbash, scytale, XOR, Vigenère, hash tronqué,
+ultrason).
 - La liste coche les défis résolus ; aile droite : ouvrir un défi.
 - Sur un défi : aile droite (appui court) : répondre ; aile droite (appui long) : un indice ;
-  flanc droit : écouter le Morse (buzzer et LEDs), pour le défi qui en contient.
+  flanc droit : écouter le Morse (buzzer et LEDs), pour les défis qui en contiennent. Le défi « Ultrason »
+  joue son Morse en boucle à 19 kHz, sans LEDs : presque inaudible, il se lit sur le spectrogramme d'un
+  téléphone (Spectroid, Spek...) ; flanc droit à nouveau : arrêter.
 - La réponse se saisit avec les 4 boutons (lettres majuscules, chiffres, espace) ; aile droite longue : valider.
 - Chaque défi résolu donne un morceau du flag ; « > Le flag final » l'affiche en entier quand tous sont résolus.
   La progression est gardée même après extinction.

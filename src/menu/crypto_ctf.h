@@ -39,6 +39,10 @@ const char *crypto_ctf_hint(int i);
  * NULL if the challenge has no Morse code. */
 const char *crypto_ctf_morse(int i);
 
+/** \brief Whether the Morse of the challenge \p i is played at 19 kHz (hardly audible: a phone with a spectrogram
+ * sees it), without the LEDs. */
+bool crypto_ctf_ultrasound(int i);
+
 /** \brief Whether \p answer is the answer of the challenge \p i: letters in any case, spaces at the ends and
  * repeated spaces ignored. */
 bool crypto_ctf_check(int i, const char *answer);

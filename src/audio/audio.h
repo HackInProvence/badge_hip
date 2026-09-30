@@ -38,6 +38,10 @@ void audio_close(void);
 
 bool audio_is_open(void);
 
+/** \brief A square wave of \p hz on the buzzer, straight from the PWM (above the sample rates, e.g. 19 kHz that
+ * a phone hears but hardly a human), 0 to stop. Closes the audio playback; silent in mute mode. */
+void audio_pwm_tone(uint32_t hz);
+
 /** \brief Number of samples that can be written now. */
 size_t audio_free(void);
 

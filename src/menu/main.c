@@ -2319,11 +2319,12 @@ int main() {
             redraw = true;  /* The footer shows "Emission..." while sending */
         ir_was_sending = ir_sending();
 
-        /* Screensaver after a while without button */
-        if (saver_minutes() && saver_allowed(app)
-                && absolute_time_diff_us(last_activity, now) > saver_minutes() * 60000000ll) {
+        /* Screensaver after a while without button. While it is not allowed (video, music, game...) the time counts
+         * from the end of it: back in the list after a whole video, the saver must not start right away */
+        if (! saver_allowed(app))
+            last_activity = now;
+        else if (saver_minutes() && absolute_time_diff_us(last_activity, now) > saver_minutes() * 60000000ll)
             start_saver(app);
-        }
 
         switch (app) {
         case A_START_SAVER:

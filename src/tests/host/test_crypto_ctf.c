@@ -18,6 +18,7 @@
 static const char *ANSWERS[] = {
     "PATCH", "SOLEIL", "LUMIERE", "CHANTIER NAVAL", "BOULE", "CALANQUE",
     "EDEN THEATRE", "MISTRAL", "TRAIN", "SARDINE", "PIEDS TANQUES", "GABIAN",
+    "DAUPHIN",
 };
 #define N_ANSWERS ((int)(sizeof(ANSWERS) / sizeof(ANSWERS[0])))
 static const char FLAG[] = "SECSEA{L4_C1G4L3_CH1FFR3_4_L4_C10T4T}";
@@ -69,7 +70,7 @@ static int check_lines(const char *text, const char *what, int i) {
 int main(void) {
     int n = crypto_ctf_count();
     CHECK_EQ(n, N_ANSWERS);
-    CHECK(n >= 8 && n <= 12);
+    CHECK(n >= 8 && n <= 16);
     uint32_t all = (1u << n) - 1;
 
     /* Texts: they fit the screen */
@@ -83,12 +84,17 @@ int main(void) {
         CHECK(check_lines(crypto_ctf_hint(i), "Hint", i) <= 3);
         const char *m = crypto_ctf_morse(i);
         if (m)
-            CHECK(strspn(m, ".-/ ") == strlen(m) && strstr(crypto_ctf_text(i), m));
+            CHECK(strspn(m, ".-/ ") == strlen(m) && (crypto_ctf_ultrasound(i) || strstr(crypto_ctf_text(i), m)));
+        CHECK(! crypto_ctf_ultrasound(i) || m);  /* The ultrasound is Morse (hidden from the text) */
     }
-    int n_morse = 0;
-    for (int i = 0; i < n; ++i)
+    int n_morse = 0, n_ultrasound = 0;
+    for (int i = 0; i < n; ++i) {
         n_morse += crypto_ctf_morse(i) != NULL;
-    CHECK_EQ(n_morse, 1);
+        n_ultrasound += crypto_ctf_ultrasound(i);
+    }
+    CHECK_EQ(n_morse, 2);
+    CHECK_EQ(n_ultrasound, 1);
+    CHECK(! crypto_ctf_ultrasound(n));
     /* Out of range */
     CHECK_STR(crypto_ctf_title(-1), "");
     CHECK_STR(crypto_ctf_text(n), "");

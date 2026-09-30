@@ -551,12 +551,14 @@ ou l'image SecSea intégrée :
 
 ### 6.18 Défis crypto
 
-[crypto_ctf.c](../../src/menu/crypto_ctf.c) contient 12 défis, du plus simple au plus difficile. Leurs textes sont
+[crypto_ctf.c](../../src/menu/crypto_ctf.c) contient 13 défis, du plus simple au plus difficile. Leurs textes sont
 générés par `tools/crypto_ctf_make.py`, **le fichier des solutions** (réponses en clair : ne pas le distribuer aux
 joueurs), qui calcule les chiffrés, vérifie que tout tient à l'écran (7 lignes de texte, 3 d'indice)
 et remplace la table entre les marqueurs `GENERATED` (`--update` ; `--answers` affiche les réponses).
 Le firmware ne garde que le SipHash-2-4 des réponses normalisées (majuscules, espaces) et les morceaux du flag final,
 masqués par un flux SipHash. La progression est dans `store_t.crypto_solved`.
+Le défi « Ultrason » (`ultrasound` dans la table) joue son Morse à 19 kHz avec `audio_pwm_tone()` : un signal
+carré sorti directement du PWM (le lecteur audio à 16 kHz ne peut pas dépasser 8 kHz), sans les LEDs.
 
 
 ### 6.19 Flipper Zero

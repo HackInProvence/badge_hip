@@ -14,6 +14,7 @@ typedef struct {
     const char *text;
     const char *hint;
     const char *morse;
+    bool ultrasound;  /* The Morse is played at 19 kHz, without the LEDs */
     uint64_t hash;  /* SipHash of: index of the challenge, ':', normalized answer */
     uint8_t piece[4];  /* Piece of the final flag XOR piece_stream() */
     uint8_t piece_len;
@@ -29,6 +30,7 @@ static const challenge_t CHALLENGES[] = {
         "Lis entre les lignes :\nPour qui trouve une faille,\nAlerter est le vrai travail,\nTaire l'exploit, prévenir,\nCorriger avant de trahir :\nHacker, c'est protéger.",
         "Regarde la première lettre\nde chaque vers.",
         NULL,
+        false,
         0x063E6E7524238960ULL,
         {0xE2, 0x5E, 0xD4}, 3,
     },
@@ -37,6 +39,7 @@ static const challenge_t CHALLENGES[] = {
         "Jules a chiffré ce message\nen décalant les lettres :\nOH PRW HVW VROHLO",
         "Chaque lettre est décalée\nde 3 rangs : A devient D.",
         NULL,
+        false,
         0x63E1576FC85B571FULL,
         {0x8A, 0x39, 0xA4}, 3,
     },
@@ -45,6 +48,7 @@ static const challenge_t CHALLENGES[] = {
         "Les frères qui ont tourné à\nLa Ciotat en 1895, en ROT13 :\nYRF SERERF YHZVRER",
         "ROT13 : décalage de 13,\nle même pour chiffrer et\ndéchiffrer. Un seul nom.",
         NULL,
+        false,
         0x55BD97504B422113ULL,
         {0x91, 0x42, 0x4A}, 3,
     },
@@ -53,72 +57,90 @@ static const challenge_t CHALLENGES[] = {
         "Signal capté au large du\nBec de l'Aigle :\n-.-. .... .- -. - .. . .-. / -. .- ...- .- .-..",
         "Le badge peut le jouer :\nbips et LEDs. Point = court,\ntiret = long, / = espace.",
         "-.-. .... .- -. - .. . .-. / -. .- ...- .- .-..",
+        false,
         0xD4E1C1EE24F81768ULL,
-        {0x9A, 0x91, 0xF5}, 3,
+        {0x9A, 0x91}, 2,
     },
     {  /* Binaire */
         "Binaire",
         "Au jeu provençal né ici en\n1907, on lance une... (ASCII)\n01000010 01001111\n01010101 01001100\n01000101",
         "Chaque octet (8 bits) est un\ncode ASCII : 01000001 = A.",
         NULL,
+        false,
         0x47F23551DA4C5810ULL,
-        {0x84, 0xC7, 0x24}, 3,
+        {0xFD, 0xB0}, 2,
     },
     {  /* Hexadécimal */
         "Hexadécimal",
         "Entre Marseille et La Ciotat,\nla mer entre dans la roche :\n43 41 4C 41 4E 51 55 45",
         "Deux chiffres hexa = un\noctet = un caractère ASCII.\n41 = A.",
         NULL,
+        false,
         0x6EAB888B573B975DULL,
-        {0x0F, 0xFD}, 2,
+        {0x1B, 0x88}, 2,
     },
     {  /* Base64 */
         "Base64",
         "Le plus vieux cinéma encore\nouvert au monde est ici :\nRURFTiBUSEVBVFJF",
         "Base64 : 4 caractères pour\n3 octets. CyberChef ou\n\"base64 -d\" le décodent.",
         NULL,
+        false,
         0xEA4BE5347D75FB4EULL,
-        {0x4D, 0x9B}, 2,
+        {0x40, 0x9C}, 2,
     },
     {  /* Atbash */
         "Atbash",
         "Le miroir de l'alphabet :\nA vaut Z, B vaut Y...\nOV EVMG ULF HV MLNNV\nNRHGIZO",
         "Chaque lettre est remplacée\npar son symétrique :\nA<>Z, B<>Y, C<>X...",
         NULL,
+        false,
         0xF25F2FF67A592D75ULL,
-        {0x87, 0x57}, 2,
+        {0x87, 0x2F}, 2,
     },
     {  /* Scytale */
         "Scytale",
         "Un Spartiate a enroulé la\nbande sur un bâton à 4 faces.\nQui entre en gare ?\nLOSRANTARSLIEEENPETX",
         "Lis une lettre sur 4, puis\nrecommence un cran plus loin.",
         NULL,
+        false,
         0x95CAE224A1AB98BFULL,
-        {0x04, 0x00}, 2,
+        {0x6F, 0x13}, 2,
     },
     {  /* XOR */
         "XOR",
         "Chiffré par XOR avec un seul\noctet : l'année de naissance\nde la pétanque, modulo 256.\n20 32 21 37 3A 3D 36",
         "1907 mod 256 = 115 = 0x73.\nXOR avec 0x73 octet par\noctet, puis lire en ASCII.",
         NULL,
+        false,
         0x661473EF0645E3BAULL,
-        {0xEC, 0xA4}, 2,
+        {0x9B, 0xCA}, 2,
     },
     {  /* Vigenère */
         "Vigenère",
         "L'origine de la pétanque,\nchiffrée avec Vigenère.\nClé : la cigale, en provençal.\nRQKDD HCVWUPG",
         "Mistral l'écrivait CIGALO :\nc'est la clé. Les espaces ne\nconsomment pas la clé.",
         NULL,
+        false,
         0xEF6FB83F13A25DB5ULL,
-        {0x85, 0x5F}, 2,
+        {0xF6, 0x3A}, 2,
     },
     {  /* Hash tronqué */
         "Hash tronqué",
         "SHA-1 d'un mot en majuscules,\nses 4 premiers chiffres hexa :\nCDE9\nLequel ?\nFADA MINOT PITCHOUN\nCAGOLE GABIAN PEUCHERE\nESQUICHE",
         "SHA-1 de chaque mot, sans\nretour à la ligne (echo -n),\npuis compare le début.",
         NULL,
+        false,
         0xA20EA04021574001ULL,
-        {0x2E, 0xEA}, 2,
+        {0x2A, 0xEA}, 2,
+    },
+    {  /* Ultrason */
+        "Ultrason",
+        "La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l'entend, lui.\nQui d'autre entend ça ?\n\nFlanc D : chanter (en boucle),\nencore : arrêter.",
+        "Appli de spectrogramme\n(Spectroid, Spek...) : des\ntraits vers 19 kHz, en Morse.",
+        "-.. .- ..- .--. .... .. -.",
+        true,
+        0xFD740137912B0565ULL,
+        {0xED, 0x6B}, 2,
     },
 };
 /* END GENERATED */
@@ -189,6 +211,12 @@ const char *crypto_ctf_hint(int i) {
 const char *crypto_ctf_morse(int i) {
     const challenge_t *c = get(i);
     return c ? c->morse : NULL;
+}
+
+
+bool crypto_ctf_ultrasound(int i) {
+    const challenge_t *c = get(i);
+    return c && c->ultrasound;
 }
 
 

@@ -122,6 +122,29 @@ void audio_close(void) {
 }
 
 
+void audio_pwm_tone(uint32_t hz) {
+    if (dma_chan >= 0)
+        audio_close();
+    if (! hz || muted) {
+        pwm_set_enabled(slice, false);
+        gpio_init(BADGE_BUZZER);
+        gpio_put(BADGE_BUZZER, 0);
+        gpio_set_dir(BADGE_BUZZER, GPIO_OUT);
+        return;
+    }
+    /* A square wave straight from the PWM: up to ~65k cycles of the system clock per period (no sample rate) */
+    slice = pwm_gpio_to_slice_num(BADGE_BUZZER);
+    uint32_t wrap = clock_get_hz(clk_sys) / hz - 1;
+    if (wrap > 0xFFFF)
+        wrap = 0xFFFF;
+    pwm_config pc = pwm_get_default_config();
+    pwm_config_set_wrap(&pc, wrap);
+    pwm_init(slice, &pc, true);
+    pwm_set_gpio_level(BADGE_BUZZER, (wrap + 1) / 2);
+    gpio_set_function(BADGE_BUZZER, GPIO_FUNC_PWM);
+}
+
+
 bool audio_is_open(void) {
     return dma_chan >= 0;
 }

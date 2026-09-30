@@ -150,12 +150,15 @@ Each game starts on its help page (rules, controls, record).
 Records kept: best time at Démineur, best score at 2048, fewest moves at Taquin, number of levels solved at Sokoban,
 fewest tries at Mastermind, most words found in a row at Pendu.
 
-**Défis crypto** (Crypto challenges): 12 classical cryptography puzzles, from the easiest to the hardest
-(acrostic, Caesar, ROT13, Morse, binary, hexadecimal, base64, Atbash, scytale, XOR, Vigenère, truncated hash).
+**Défis crypto** (Crypto challenges): 13 classical cryptography puzzles, from the easiest to the hardest
+(acrostic, Caesar, ROT13, Morse, binary, hexadecimal, base64, Atbash, scytale, XOR, Vigenère, truncated hash,
+ultrasound).
 The texts are in French.
 - The list ticks the solved challenges; right wing: open a challenge.
 - On a challenge: right wing (short press): answer; right wing (long press): a hint;
-  right flank: listen to the Morse (buzzer and LEDs), for the challenge that has some.
+  right flank: listen to the Morse (buzzer and LEDs), for the challenges that have some. The "Ultrason"
+  challenge plays its Morse in a loop at 19 kHz, without the LEDs: hardly audible, it shows on the spectrogram
+  of a phone (Spectroid, Spek...); right flank again: stop.
 - The answer is typed with the 4 buttons (capital letters, digits, space); long right wing: confirm.
 - Each solved challenge gives a piece of the flag; "> Le flag final" (the final flag) shows it whole once all are
   solved. Progress is kept even after the badge is switched off.
