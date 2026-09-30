@@ -13,11 +13,11 @@
 
 #include "app.h"
 #include "audio.h"
+#include "noise_gen.h"
 #include "leds.h"
 #include "ook_rx.h"
 #include "remote.h"
 
-#define ANGRY_BEEP_MS 1500
 
 enum { TALK_OFF, TALK_GREEN, TALK_ORANGE, TALK_RED, TALK_ANGRY, TALK_STATES };
 
@@ -27,7 +27,6 @@ static const char *DETAILS[TALK_STATES] = {"LEDs éteintes", "Vert : tout va bie
 static int state = TALK_OFF;
 static bool active = false;
 static bool changed = false;
-static absolute_time_t beep_ts = 0;
 
 static void apply(void) {
     switch (state) {
@@ -37,13 +36,16 @@ static void apply(void) {
     case TALK_ANGRY: leds_anim_ook(LED_RGB(255, 0, 0), 250000); break;
     default: leds_cancel_anim(true); break;
     }
+    /* Angry: the cicada sings (the noise generator drives the buzzer at full swing), even in mute mode */
+    if (state == TALK_ANGRY)
+        audio_close();  /* The buzzer to the noise generator */
+    noise_gen_set_enabled(state == TALK_ANGRY);
     printf("talk: %s\n", NAMES[state]);
 }
 
 static void set_state(int s) {
     state = s;
     apply();
-    beep_ts = get_absolute_time();
     changed = true;
 }
 
@@ -62,7 +64,7 @@ static void talk_start(absolute_time_t now) {
     }
     active = true;
     ook_rx_start();  /* The remote, all the time */
-    audio_set_mute(false);  /* The buzzer of the angry state, even in mute mode */
+    audio_set_mute(false);  /* The cicada of the angry state, even in mute mode */
     set_state(TALK_OFF);
 }
 
@@ -70,6 +72,7 @@ static void talk_stop(void) {
     active = false;
     ook_rx_stop();
     state = TALK_OFF;
+    noise_gen_set_enabled(false);
     leds_cancel_anim(true);
     audio_set_mute(remote_muted());
 }
@@ -87,10 +90,7 @@ static bool talk_buttons(const app_buttons_t *b, absolute_time_t now) {
 }
 
 static bool talk_task(absolute_time_t now) {
-    if (state == TALK_ANGRY && absolute_time_diff_us(beep_ts, now) >= 0) {
-        app_tone(1760, 200);
-        beep_ts = delayed_by_ms(now, ANGRY_BEEP_MS);
-    }
+    (void)now;
     bool c = changed;
     changed = false;
     return c;

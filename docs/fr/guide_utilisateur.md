@@ -289,7 +289,7 @@ de blocs corrigés ; n'importe quel bouton ramène au menu.
   | OK | vert fixe : tout va bien |
   | 5 min | orange qui respire doucement : il reste 5 minutes |
   | FINI | rouge qui clignote : le temps est écoulé |
-  | STOP ! | rouge qui clignote vite, avec un bip toutes les 1,5 s : on conclut ! |
+  | STOP ! | rouge qui clignote vite, et la cigale chante à plein volume (même en mode muet) : on conclut ! |
 
   L'état est changé par la télécommande des organisateurs (voir [§ 4.7](#47-télécommande-et-mode-muet)) ou à la main :
   flanc gauche : état précédent ; flanc droit ou aile droite : état suivant. Cette page fonctionne même en mode muet,

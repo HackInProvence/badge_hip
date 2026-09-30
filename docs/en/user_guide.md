@@ -293,7 +293,7 @@ of blocks corrected; any button goes back to the menu.
   | OK | steady green: all is well |
   | 5 min | orange, softly breathing: 5 minutes left |
   | FINI (over) | blinking red: time is up |
-  | STOP ! | fast blinking red, with a beep every 1.5 s: time to conclude! |
+  | STOP ! | fast blinking red, and the cicada sings at full volume (even in mute mode): time to conclude! |
 
   The state is changed by the organizers' remote control (see [§ 4.7](#47-remote-control-and-mute-mode)) or by hand:
   left flank: previous state; right flank or right wing: next state. This page works even in mute mode,
