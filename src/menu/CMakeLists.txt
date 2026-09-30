@@ -8,6 +8,8 @@ target_sources(badge_menu PRIVATE
     lamp.c
     chorus.c
     contacts.c
+    crypto_app.c
+    crypto_ctf.c
     duel.c
     hotcold.c
     image_radio.c

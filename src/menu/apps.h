@@ -43,6 +43,7 @@ typedef enum {
     APP_DUEL,
     APP_IMAGE_SEND,
     APP_IMAGE_RECV,
+    APP_CRYPTO,
     APP_COUNT,
 } app_id_t;
 
