@@ -219,6 +219,9 @@ typedef enum {
 } radio_register_t;
 
 
+/** \brief Debug: prints the configuration registers and the PATABLE. */
+void radio_print_registers(void);
+
 /** Internal util/debug made accessible to tests */
 STATIC void ccsend(const uint8_t *, uint8_t *, size_t);
 STATIC void ccread_burst(uint8_t, uint8_t *, size_t);

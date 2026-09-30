@@ -181,6 +181,10 @@ STATIC void print_cc_configuration(void) {
     log_cc_status();
 }
 
+void radio_print_registers(void) {
+    print_cc_configuration();
+}
+
 
 /* Crystal frequency used to compute the registers: the badges don't all have the same crystal (26 or 27MHz) */
 static uint32_t xosc_hz = CC1101_fXOSC;
