@@ -45,6 +45,7 @@ typedef enum {
     APP_IMAGE_RECV,
     APP_CRYPTO,
     APP_BATTLE,
+    APP_HUNT433,
     APP_COUNT,
 } app_id_t;
 

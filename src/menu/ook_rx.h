@@ -47,6 +47,10 @@ void ook_rx_task(absolute_time_t now);
 /** \brief The last decoded frame, when it is newer than \p seen (updated): returns false otherwise. */
 bool ook_rx_get(uint32_t *seen, ookdec_result_t *result);
 
+/** \brief The power (dBm) of the last decoded frame: the peak of the RSSI while its carrier was on
+ * (-128 when unknown). */
+int ook_rx_last_rssi(void);
+
 /** \brief Debug: prints the durations of the last signal given to the decoder. */
 void ook_rx_dump(void);
 

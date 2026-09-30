@@ -49,6 +49,13 @@ static ookdec_signal_t signal;  /* Static: 1 KB */
 static ookdec_result_t last;
 static uint32_t frames = 0;
 static bool debug = false;
+#define NO_RSSI (-128)
+static int peak_rssi = NO_RSSI, last_rssi = NO_RSSI;
+
+
+int ook_rx_last_rssi(void) {
+    return last_rssi;
+}
 #define RETAIN_MAX 200  /* Durations of a part without a decoded frame, kept for the next part (4 frames) */
 #define RETAIN_US 400000  /* The next part must come within this silence */
 static bool retained = false;
@@ -197,6 +204,14 @@ void ook_rx_task(absolute_time_t now) {
     (void)now;
     if (! users)
         return;
+    /* The power of the frames: sampled while the carrier is on, the peak goes with the next decoded frame */
+    if (gpio_get(BADGE_RADIO_GDO0) && radio_tools_idle()) {
+        uint8_t raw = 0;
+        radio_read_registers(CC1101_RSSI, &raw, 1);
+        int rssi = (int8_t)raw / 2 - 74;
+        if (rssi > peak_rssi)
+            peak_rssi = rssi;
+    }
     uint32_t silence = time_us_32() - last_edge_us;
     uint16_t n = count;
     /* A frame ended (a long silence), or the decoder can be filled (noise, or a long transmission) */
@@ -212,6 +227,7 @@ void ook_rx_task(absolute_time_t now) {
             if (debug && n > 4)
                 printf("ook: %u durations dropped (too short for a frame)\n", n);
             count = 0;  /* Too short to be a frame: noise */
+            peak_rssi = NO_RSSI;
         }
         return;
     }
@@ -223,6 +239,12 @@ static void decode(uint32_t silence) {
     uint16_t n = count;
     build_signal(silence);
     bool ok = signal.n >= MIN_FRAME && ookdec_decode(&signal, &last);
+    if (ok) {
+        last_rssi = peak_rssi;
+        peak_rssi = NO_RSSI;
+    } else if (! retained) {
+        peak_rssi = NO_RSSI;  /* Noise: its power is not the one of the next frame */
+    }
     if (debug)
         printf("ook: decoding %u durations (%u kept): %s\n", n, signal.n, ok ? last.text : "nothing");
     retained = false;

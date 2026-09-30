@@ -12,6 +12,8 @@
 
 #include "app.h"
 #include "net.h"
+#include "ook_rx.h"
+#include "remote.h"
 #include "social.h"
 
 #define MASTER_PERIOD_MS 1000
@@ -26,6 +28,7 @@ typedef struct {
     absolute_time_t seen;
     bool valid;
     absolute_time_t beep_ts;
+    uint32_t lost_ms;  /* Not heard for this long: lost (0: LOST_MS) */
 } signal_t;
 
 static void signal_add(signal_t *s, int16_t rssi, absolute_time_t now) {
@@ -35,7 +38,7 @@ static void signal_add(signal_t *s, int16_t rssi, absolute_time_t now) {
 }
 
 static bool signal_lost(const signal_t *s, absolute_time_t now) {
-    return ! s->valid || absolute_time_diff_us(s->seen, now) > LOST_MS * 1000ll;
+    return ! s->valid || absolute_time_diff_us(s->seen, now) > (s->lost_ms ? s->lost_ms : LOST_MS) * 1000ll;
 }
 
 /* 0 (far) to 100 (next to it) */
@@ -306,5 +309,138 @@ const app_t app_radar = {
     .render = radar_render,
     .calm = radar_calm,
     .stop = radar_stop,
+    .no_saver = true,
+};
+
+
+/* ------ Hunt for a 433 MHz transmitter (a remote, a sensor, a jammer that repeats its code) ------
+ * The OOK receiver listens all the time: the list of the codes heard, then the hot / cold of the chosen one
+ * (the power of its frames, ook_rx_last_rssi()). */
+
+#define TARGETS 8
+#define TARGET_LOST_MS 15000  /* A transmitter repeats less often than a badge */
+
+typedef struct {
+    char protocol[20];
+    uint64_t code;
+    char text[32];
+    int16_t rssi;  /* Last frame */
+    uint16_t frames;
+    absolute_time_t seen;
+} target_t;
+
+static target_t targets[TARGETS];
+static int n_targets = 0, target_sel = 0, hunted = -1;
+static uint32_t frames_seen = 0;
+static signal_t target_signal;
+static absolute_time_t list_ts = 0;
+
+static void hunt433_start(absolute_time_t now) {
+    (void)now;
+    n_targets = 0;
+    target_sel = 0;
+    hunted = -1;
+    ook_rx_start();  /* All the time, like the decoder page */
+    ookdec_result_t r;
+    ook_rx_get(&frames_seen, &r);  /* Only the frames from now on */
+    printf("hunt433: listening\n");
+}
+
+static void hunt433_stop(void) {
+    ook_rx_stop();
+    app_leds(0, 0, 0);
+}
+
+static bool hunt433_buttons(const app_buttons_t *b, absolute_time_t now) {
+    (void)now;
+    if (hunted >= 0) {
+        if (b->pressed & UI_BTN_A) {
+            hunted = -1;  /* Back to the list */
+            app_leds(0, 0, 0);
+        }
+        return true;
+    }
+    if (b->pressed & UI_BTN_A)
+        return false;
+    if (! n_targets)
+        return true;
+    if (b->pressed & UI_BTN_Y)
+        target_sel = (target_sel + n_targets - 1) % n_targets;
+    if (b->pressed & UI_BTN_X)
+        target_sel = (target_sel + 1) % n_targets;
+    if (b->pressed & UI_BTN_B) {
+        hunted = target_sel;
+        memset(&target_signal, 0, sizeof(target_signal));
+        target_signal.lost_ms = TARGET_LOST_MS;
+        if (targets[hunted].rssi > -128)
+            signal_add(&target_signal, targets[hunted].rssi, now);
+        printf("hunt433: hunting %s\n", targets[hunted].text);
+    }
+    return true;
+}
+
+static bool hunt433_task(absolute_time_t now) {
+    bool changed = false;
+    ookdec_result_t r;
+    while (ook_rx_get(&frames_seen, &r)) {
+        int rssi = ook_rx_last_rssi();
+        int i = 0;
+        while (i < n_targets && ! (targets[i].code == r.code && ! strcmp(targets[i].protocol, r.protocol)))
+            ++i;
+        if (i == n_targets) {
+            if (n_targets == TARGETS)
+                continue;  /* The list is full: the hunt goes on with the codes already there */
+            ++n_targets;
+            memset(&targets[i], 0, sizeof(targets[i]));
+            snprintf(targets[i].protocol, sizeof(targets[i].protocol), "%s", r.protocol);
+            targets[i].code = r.code;
+            /* A short name: the protocol and the code (the text of the decoder also has the te, that varies) */
+            snprintf(targets[i].text, sizeof(targets[i].text), "%.12s %0*llX", r.protocol, (r.bits + 3) / 4,
+                     (unsigned long long)r.code);
+        }
+        targets[i].rssi = rssi;
+        targets[i].seen = now;
+        ++targets[i].frames;
+        if (i == hunted && rssi > -128)
+            signal_add(&target_signal, rssi, now);
+        printf("hunt433: %s at %d dBm\n", r.text, rssi);
+        changed = true;
+    }
+    if (hunted >= 0) {
+        signal_feedback(&target_signal, now);
+        return changed || absolute_time_diff_us(list_ts, now) > 1000000 ? (list_ts = now, true) : false;
+    }
+    return changed;
+}
+
+static void target_label(int i, char *buf, size_t len) {
+    snprintf(buf, len, "%s %ddBm x%u", targets[i].text, targets[i].rssi, targets[i].frames);
+}
+
+static void hunt433_render(uint8_t *fb, absolute_time_t now) {
+    if (hunted >= 0) {
+        ui_title(fb, "Chasse 433 MHz");
+        signal_render(fb, &target_signal, now, targets[hunted].text);
+        ui_footer(fb, "G : retour à la liste");
+        return;
+    }
+    ui_title(fb, "Chasse 433 MHz");
+    if (! n_targets) {
+        ui_lines(fb, 50, &gfx_font_small, "Écoute des émetteurs\n433 MHz (télécommandes,\ncapteurs, brouilleurs)...");
+        ui_footer(fb, "G : retour");
+        return;
+    }
+    ui_list(fb, n_targets, target_sel, target_label);
+    ui_footer(fb, "G : retour  D : le chasser");
+}
+
+const app_t app_hunt433 = {
+    .name = "Chasse 433 MHz",
+    .start = hunt433_start,
+    .buttons = hunt433_buttons,
+    .task = hunt433_task,
+    .render = hunt433_render,
+    .calm = never_calm,
+    .stop = hunt433_stop,
     .no_saver = true,
 };
