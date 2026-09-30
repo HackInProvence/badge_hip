@@ -48,7 +48,7 @@ void remote_subscribe(uint8_t group, remote_handler_t handler);
 /** \brief Executes a command (received, or local e.g. from the admin menu). */
 void remote_execute(uint8_t command, const char *from);
 
-/** \brief Sends a command to all the badges around (admin menu): loud, 3 times. */
+/** \brief Sends a command to all the badges around (admin menu): loud, 5 times over 2 s. */
 void remote_send(uint8_t command);
 
 /** \brief The remote commands are obeyed (settings). */

@@ -45,9 +45,12 @@ Paquets `NET_SONG` (réseau des cigales, +10 dBm) :
    « départ dans 2 000 ms », trois fois, en recalculant le délai restant à chaque envoi : les trois copies désignent
    le même instant.
 2. Chaque badge qui reçoit le paquet planifie le départ à `réception + délai` (principe RBS) et choisit sa voix
-   d'après son identifiant (`id % voix`) ; le chef chante la voix 0.
-3. **Re-synchronisation** : pendant le morceau, le chef diffuse sa position toutes les 2 secondes ; un badge qui
-   arrive en cours de route rejoint le chœur à cette position, un badge décalé de plus de 30 ms se recale.
+   d'après son identifiant : le chef chante la première voix, les autres badges se partagent les autres voix
+   (`1 + id % (voix - 1)`), pour que la mélodie principale soit toujours là.
+3. **Retardataires** : pendant le morceau, le chef diffuse sa position toutes les 2 secondes ; un badge qui
+   arrive en cours de route (il a manqué le départ) rejoint le chœur à cette position. Un badge déjà parti suit son
+   horloge jusqu'au bout : il ne se recale pas en cours de morceau (la dérive des quartz reste sous quelques ms
+   sur une chanson).
 4. Plusieurs chefs (deux télécommandes) : le départ le plus proche gagne, à égalité le plus petit identifiant.
 
 ## Limites

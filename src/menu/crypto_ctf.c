@@ -124,6 +124,7 @@ static const challenge_t CHALLENGES[] = {
 /* END GENERATED */
 
 #define COUNT ((int)(sizeof(CHALLENGES) / sizeof(CHALLENGES[0])))
+_Static_assert(COUNT <= 16, "store_t.crypto_solved has 16 bits");
 #define ALL_SOLVED (COUNT >= 32 ? 0xFFFFFFFFu : (1u << (COUNT & 31)) - 1)
 
 

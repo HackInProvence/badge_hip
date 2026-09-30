@@ -1906,6 +1906,7 @@ int main() {
     noise_gen_init_play();
     noise_gen_set_enabled(false);  /* init_play starts the sound, we start silent */
     display_init();
+    store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
     radio_tools_init();
     net_init();
     remote_init();
@@ -1916,7 +1917,6 @@ int main() {
     contacts_init();
     duel_init();
     image_radio_init();
-    store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
     puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);

@@ -35,30 +35,33 @@ ont presque toujours ces ingrédients :
 
 Chaque idée ci-dessous essaie de cocher au moins deux de ces cases.
 
+*(fait)* : l'idée est réalisée dans le firmware actuel, parfois sous une forme plus simple (détails entre parenthèses) ;
+voir le [guide utilisateur](fr/guide_utilisateur.md).
+
 
 ## 2. Social et multi-badges
 
 On suppose que la couche « balise + rencontre + identité » du document réseau existe. Tout ce qui suit s'appuie dessus.
 
-### S1. Le chœur des cigales
+### S1. Le chœur des cigales *(fait : Social > Chœur, 2 morceaux)*
 Quand plusieurs cigales sont proches, elles se synchronisent (horloge radio commune) et chantent **ensemble** une polyphonie :
 chaque badge joue une voix différente selon son rang, les LEDs pulsent en rythme. Plus il y a de cigales, plus le morceau est riche.
 Un moment « wow » garanti dans la salle ou au bar.
 - **Moyen** : synchronisation par un paquet « top départ » (la latence radio de quelques ms suffit), son faible du buzzer compensé par le nombre.
 
-### S2. Infection virale (épidémie éthique)
+### S2. Infection virale (épidémie éthique) *(fait : Social > Virus des cigales, remède par énigme)*
 Un « virus » (inoffensif !) se propage de cigale en cigale par proximité : patient zéro choisi par l'orga, contagion au RSSI,
 symptômes visibles (la cigale tousse sur l'écran, LEDs vertes). Des « vaccins » se gagnent en résolvant des énigmes.
 La station de base affiche la courbe épidémique en direct : super support pour un talk sur la propagation des vers informatiques.
 - **Moyen** : réutilise la balise ; il faut un état « infecté » signé pour éviter la triche facile (ou l'assumer comme challenge).
 
-### S3. Messagerie maillée (mesh) à faible débit
+### S3. Messagerie maillée (mesh) à faible débit *(fait : 16 messages prédéfinis, TTL 3)*
 Des messages courts (40 caractères, emojis 16×16) relayés de badge en badge jusqu'au destinataire, avec un TTL.
 On voit sur l'écran par combien de cigales le message est passé. Saisie avec les 4 boutons via des phrases prédéfinies
 et un clavier en « roue » (voir U8), ou depuis l'application PC.
 - **Moyen** : routage par inondation contrôlée (TTL 3-4, identifiants de messages déjà vus), attention au rapport cyclique radio.
 
-### S4. Votes du public en direct
+### S4. Votes du public en direct *(fait : questions prédéfinies, histogramme sur le badge admin)*
 L'orateur pose une question, chaque cigale vote avec les ailes (A/B/C/D), la station de base affiche le résultat en temps réel.
 Utilisable aussi pour élire le meilleur talk, le meilleur costume, le prochain morceau du DJ.
 - **Facile** : un paquet de 8 octets par vote ; un vote par badge et par question (identifiant de question dans le paquet).
@@ -74,17 +77,17 @@ Les balises fixes du lieu (voir C1) sont « capturées » par l'équipe qui a le
 Tableau des territoires sur l'écran de la salle.
 - **Moyen** : nécessite des balises fixes et la station de base.
 
-### S7. Duel de cigales
+### S7. Duel de cigales *(fait : pierre-feuille-ciseaux et bataille navale)*
 Deux badges proches peuvent se défier (pierre-feuille-ciseaux, bataille navale de La Ciotat, quiz sécurité) en radio.
 Le perdant perd... une plume virtuelle. Rapide, drôle, parfait pour la file d'attente du café.
 - **Facile à moyen** : jeux au tour par tour, parfaits pour l'e-Paper lent ; protocole requête/réponse simple.
 
-### S8. Carte de visite échangée
+### S8. Carte de visite échangée *(fait : Social > Contacts, export vCard)*
 Une poignée d'ailes (les deux personnes appuient en même temps) échange pseudo, Mastodon, site, clé PGP courte (empreinte).
 Après l'événement, l'application PC exporte les contacts en vCard.
 - **Facile** : la rencontre existe déjà, il suffit d'un champ « contact » ; export via USB. Respect du consentement : échange **explicite** uniquement.
 
-### S9. Radar de cigales (« qui est là ? »)
+### S9. Radar de cigales (« qui est là ? ») *(fait : Social > Radar des cigales)*
 Liste des cigales entendues avec leur RSSI sous forme de barres, et un mode « chaud / froid » pour retrouver un ami
 (les LEDs virent au rouge quand on s'approche). Utile aussi pour retrouver un badge perdu.
 - **Facile** : RSSI déjà mesuré ; seule la cible choisie est suivie, ne suivre que des amis ayant accepté (voir éthique).
@@ -115,7 +118,7 @@ affichage d'une courbe RSSI ou d'une « cascade » (waterfall) qui défile ligne
 une ligne par balayage en rafraîchissement partiel, et l'OLED pour la vue instantanée.
 - **Moyen** : réception uniquement, donc sans contrainte légale ; balayage ~100 canaux en ~0,5 s.
 
-### H2. Sniffer OOK/ASK et décodeur de protocoles
+### H2. Sniffer OOK/ASK et décodeur de protocoles *(fait en partie : décodeur 433 MHz, sans capture sur la SD)*
 Capture brute des impulsions (via PIO, horodatage à la µs), affichage de la forme d'onde sur l'écran,
 décodage des protocoles courants (Princeton PT2262, sondes météo, sonnettes) façon `rtl_433` simplifié.
 Export des captures au format `.sub` du Flipper Zero sur la SD.
@@ -127,13 +130,13 @@ le badge montre la trame reçue, explique qu'elle est toujours identique, puis c
 et ce qui le protège. On repart en sachant choisir ses équipements.
 - **Moyen** : uniquement sur le matériel de l'atelier, en bande ISM, à faible puissance (voir la section éthique).
 
-### H4. Défis de cryptographie sur l'écran
+### H4. Défis de cryptographie sur l'écran *(fait : 12 défis)*
 Une série d'énigmes progressives : César, Vigenère, XOR, hash tronqué, signature à vérifier... L'écran affiche le chiffré,
 les ailes font défiler les indices, la réponse se saisit avec la roue de caractères (celle du nom de la cigale).
 Chaque défi réussi donne un fragment du grand flag final.
 - **Facile** : du texte et un peu de calcul ; les solutions sont stockées sous forme de hash dans le firmware.
 
-### H5. Le badge « outil de talk »
+### H5. Le badge « outil de talk » *(fait : badge de talk, annonce du talk suivant)*
 L'orateur diffuse en radio le numéro de la diapositive, un lien ou un petit quiz : les cigales de la salle affichent
 un résumé ou un QR code à la fin du talk. Et un mode « minuteur » pour l'orateur (temps restant en grand, LEDs qui passent à l'orange puis au rouge).
 - **Facile** : un paquet radio ; le QR code demande un petit générateur (voir C4).
@@ -144,7 +147,7 @@ ou brancher un analyseur logique sur le SPI de l'écran pour « voir » une imag
 Documenter la démarche sur la SD (`docs/`) en fait une vraie initiation au reverse engineering.
 - **Facile** : c'est surtout de la documentation et un flag bien caché.
 
-### H7. Station météo et capteurs radio du lieu
+### H7. Station météo et capteurs radio du lieu *(fait : Radio & IR > Station météo)*
 Réception seule des sondes 433 MHz présentes (thermomètres de la salle installés par l'orga) : température,
 humidité, et le « mistral-mètre » du jour sur l'écran de veille.
 - **Moyen** : décodeurs des sondes courantes, réception uniquement.
@@ -152,7 +155,7 @@ humidité, et le « mistral-mètre » du jour sur l'écran de veille.
 
 ## 4. CTF et quêtes pendant la conférence
 
-### C1. Balises cachées dans le lieu
+### C1. Balises cachées dans le lieu *(fait en partie : balise chaud - froid du menu admin)*
 Des petites balises radio (un badge sans écran suffit) cachées dans le bâtiment. Le mode « chasse » de la cigale
 affiche le RSSI en « chaud / froid » ; trouver une balise donne un succès et une énigme. Quelques balises ne s'allument
 qu'à certaines heures.
@@ -168,7 +171,7 @@ Une histoire en chapitres (la cigale a perdu sa chanson dans les calanques...) :
 défi, une rencontre ou une balise, et se lit sur l'écran comme un livre dont vous êtes le héros.
 - **Moyen** : surtout de l'écriture ; le moteur est un lecteur de texte avec choix.
 
-### C4. QR codes
+### C4. QR codes *(fait : scores signés, liens du programme)*
 Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 200×200 est parfait pour un QR version 3-5.
 - **Moyen** : un générateur QR en C (quelques Ko), sans dépendance.
 
@@ -178,7 +181,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 | Idée | Description | Faisabilité |
 |---|---|---|
 | **P1. Éditeur de pixel art** | Dessiner une image 25×25 agrandie (les flancs déplacent, les ailes changent la couleur), en faire son image de veille | Moyen |
-| **P2. Badge nominatif** | Grand pseudo en police large, sous-titre (« Orateur », « Staff »), QR de contact : l'écran e-Paper reste affiché même éteint | Facile |
+| **P2. Badge nominatif** *(fait, sans QR)* | Grand pseudo en police large, sous-titre (« Orateur », « Staff »), QR de contact : l'écran e-Paper reste affiché même éteint | Facile |
 | **P3. Galerie souvenir** | Les photos de l'événement copiées sur la SD à la sortie, la cigale devient un cadre photo qui change d'image chaque jour | Facile |
 | **P4. SSTV** | Recevoir une image transmise en son (SSTV) par l'orga... ou l'afficher depuis le PC, clin d'œil radioamateur | Difficile |
 | **P5. Thèmes** | Polices, cadres et sons de menu au choix (Provence, rétro 8 bits, terminal vert) | Facile |
@@ -191,22 +194,22 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 | **J1. Tamagotchi cigale** | La cigale grandit, mue et chante selon vos rencontres, vos jeux, l'heure. Négligée, elle s'endort. Le cœur émotionnel du badge | Moyen |
 | **J2. Pétanque** | Clin d'œil à La Ciotat : jauge de force et d'effet avec les boutons, trajectoire dessinée, bouchon ; en duel radio avec un autre badge | Moyen |
 | **J3. Roguelike des calanques** | Donjon au tour par tour en tuiles 8×8 : parfait pour un écran lent | Moyen |
-| **J4. Démineur, 2048, taquin, Sokoban** | Grands classiques au tour par tour, jouables avec 4 boutons | Facile |
+| **J4. Démineur, 2048, taquin, Sokoban** *(fait, avec Mastermind et Pendu)* | Grands classiques au tour par tour, jouables avec 4 boutons | Facile |
 | **J5. Quiz sécurité** | Questions de culture sécurité, seul ou en duel radio | Facile |
-| **J6. Bataille navale** | En radio entre deux badges, en souvenir des chantiers navals | Moyen |
+| **J6. Bataille navale** *(fait)* | En radio entre deux badges, en souvenir des chantiers navals | Moyen |
 | **J7. L'arrivée d'un train** | Mini-jeu hommage aux frères Lumière : garder le train à l'heure en gare de La Ciotat | Facile |
 
 
 ## 7. Utilitaires
 
-- **U1. Programme de la conférence** : planning sur la SD, « prochain talk » en page d'accueil, rappel par les LEDs 5 min avant. *Facile.*
+- **U1. Programme de la conférence** *(fait : dans le firmware, annonce du talk suivant)* : planning sur la SD, « prochain talk » en page d'accueil, rappel par les LEDs 5 min avant. *Facile.*
 - **U2. Minuteur / chronomètre** : pour les orateurs et les ateliers. *Facile.*
 - **U3. Horloge** : l'heure, réglée par l'application PC ou par une balise radio de l'orga, et la veille qui affiche l'heure. *Facile.*
-- **U4. Veilleuse** : les 2 LEDs en blanc, pour se repérer dans un couloir sombre (pas une vraie lampe de poche). *Facile.*
+- **U4. Veilleuse** *(fait : Badge > Lampe)* : les 2 LEDs en blanc, pour se repérer dans un couloir sombre (pas une vraie lampe de poche). *Facile.*
 - **U5. Niveau à bulle / métronome / diapason** : le buzzer et les LEDs au service des musiciens. *Facile.*
-- **U6. Mode « ne pas déranger »** : coupe la radio et le son d'un appui long. *Facile.*
+- **U6. Mode « ne pas déranger »** *(fait : mode muet, aussi à distance)* : coupe la radio et le son d'un appui long. *Facile.*
 - **U7. Mise à jour depuis la SD** : copier un `.uf2` sur la carte et l'installer sans ordinateur. *Difficile (bootloader).*
-- **U8. Clavier en roue** : un composant de saisie commun (lettres, emojis, phrases favorites) pour tous les modes. *Moyen.*
+- **U8. Clavier en roue** *(fait en partie : éditeur de texte à 4 boutons)* : un composant de saisie commun (lettres, emojis, phrases favorites) pour tous les modes. *Moyen.*
 
 
 ## 8. Musique et son
@@ -222,7 +225,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 - **E1. Accéléromètre (I2C)** : secouer pour relancer, inclinaison pour les jeux, podomètre de la conférence. *Facile avec un module.*
 - **E2. Capteur de lumière / température** : la cigale chante plus fort au soleil, comme une vraie. *Facile.*
 - **E3. Vibreur** : notifications discrètes pendant les talks. *Facile.*
-- **E4. Échanges avec le Flipper Zero** : le chat existe ; ajouter un fichier `.sub` d'exemple et une application Flipper qui affiche le score d'une cigale. *Moyen.*
+- **E4. Échanges avec le Flipper Zero** *(fait en partie : télécommande Princeton, fichiers `.sub`)* : le chat existe ; ajouter un fichier `.sub` d'exemple et une application Flipper qui affiche le score d'une cigale. *Moyen.*
 - **E5. Module GPS ou horloge temps réel** : pour les balises horaires et la chasse. *Moyen.*
 - **E6. « Shitty add-ons »** : publier le brochage des ports pour que chacun fabrique et échange ses modules. *Facile (documentation).*
 
@@ -259,7 +262,8 @@ Classement par impact et effort raisonnable, dans l'ordre de réalisation propos
 
 - **Bandes et puissances** : n'émettre qu'en bande ISM 433,05–434,79 MHz, dans les limites de la réglementation
   européenne des appareils à courte portée (10 mW PAR, rapport cyclique limité selon la sous-bande).
-  Les balises du badge émettent à −20 dBm, loin de ces limites.
+  Les balises du badge émettent à −10 dBm ; les paquets destinés à toute la salle (commandes, votes, image, chœur)
+  à +10 dBm au plus.
 - **Jamais de brouillage** : aucune fonction ne doit empêcher d'autres équipements de communiquer.
   La porteuse de test s'arrête d'elle-même après 30 s.
 - **Rejeu et capture** : uniquement sur les équipements de l'atelier ou les siens. Rejouer le signal d'un équipement
