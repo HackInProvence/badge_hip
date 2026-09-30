@@ -60,6 +60,8 @@ void radio_tools_reconfigure(void);
 
 /** \brief Configure the radio for the network of the cicadas (sync word, TX power), in IDLE. */
 void radio_tools_profile_social(uint8_t patable);
+/** \brief The profile of the chat of the Flipper Zero (sync word 0x464C). */
+void radio_tools_profile_chat(uint8_t patable);
 
 /** \brief Run the radio features, to call in the main loop. */
 void radio_tools_task(absolute_time_t now);

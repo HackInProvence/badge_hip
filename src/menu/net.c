@@ -41,6 +41,9 @@ static bool loopback = false;
 static bool verbose = false;
 static uint8_t loop_bytes[NET_HEADER + NET_MAX_DATA];
 static uint8_t loop_len = 0;  /* A packet sent, to deliver as received (loopback) */
+/* Chat mode: the profile of the chat of the Flipper Zero (sync word 0x464C), plain text packets */
+static bool chat = false;
+static net_chat_handler_t chat_handler = NULL;
 
 
 static void handle_ping(const net_packet_t *p) {
@@ -79,7 +82,7 @@ void net_subscribe(uint8_t type, net_handler_t handler) {
 
 
 bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags) {
-    if (len > NET_MAX_DATA || queue_count >= QUEUE_LEN) {
+    if (len > NET_MAX_DATA || queue_count >= QUEUE_LEN || chat) {  /* Chat mode: no network packets */
         ++n_dropped;
         return false;
     }
@@ -93,6 +96,39 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags) {
     uint32_t delay_ms = flags & NET_JITTER ? get_rand_32() % NET_JITTER_MS : 0;
     t->not_before = delayed_by_ms(get_absolute_time(), delay_ms);
     return true;
+}
+
+
+void net_set_chat(net_chat_handler_t handler) {
+    chat = handler != NULL;
+    chat_handler = handler;
+    queue_count = 0;  /* The packets queued were for the other profile */
+    loop_len = 0;
+    owner = false;  /* The profile (sync word) is set again by net_task() */
+}
+
+
+bool net_chat(void) {
+    return chat;
+}
+
+
+bool net_send_text(const char *text, uint8_t len) {
+    if (! chat || len == 0 || len > NET_HEADER + NET_MAX_DATA || queue_count >= QUEUE_LEN) {
+        ++n_dropped;
+        return false;
+    }
+    tx_packet_t *t = &queue[(queue_head + queue_count++) % QUEUE_LEN];
+    memcpy(t->bytes, text, len);  /* As it is: the chat has no header */
+    t->len = len;
+    t->flags = NET_LOUD;
+    t->not_before = get_absolute_time();
+    return true;
+}
+
+
+int net_queue_free(void) {
+    return QUEUE_LEN - queue_count;
 }
 
 
@@ -177,7 +213,19 @@ static void poll_rx(absolute_time_t now) {
         }
         radio_read_registers(CC1101_RXFIFO, buf, len + 2);  /* Payload + RSSI + LQI/CRC */
         bool crc_ok = buf[len + 1] & 0x80;
-        if (crc_ok && len >= NET_HEADER && buf[0] == NET_MAGIC && buf[1] < NET_TYPES) {
+        if (chat) {
+            /* Chat mode: the text as it is (the CC1101 checked its CRC) */
+            if (crc_ok && chat_handler) {
+                ++n_received;
+                if (verbose) {
+                    printf("net: chat rx %u bytes, %d dBm: \"", len, (int8_t)buf[len] / 2 - 74);
+                    for (int i = 0; i < len; ++i)
+                        printf(buf[i] >= 0x20 && buf[i] < 0x7F ? "%c" : "\\x%02x", buf[i]);
+                    printf("\"\n");
+                }
+                chat_handler((const char *)buf, len, (int8_t)buf[len] / 2 - 74);
+            }
+        } else if (crc_ok && len >= NET_HEADER && buf[0] == NET_MAGIC && buf[1] < NET_TYPES) {
             net_packet_t p = {
                 .type = buf[1],
                 .src = net_u32(buf + 2),
@@ -211,12 +259,13 @@ static void send_next(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_set_power(t->flags & NET_LOUD ? NET_PATABLE_LOUD : t->flags & NET_MEDIUM ? NET_PATABLE_MEDIUM : NET_PATABLE_QUIET);
     if (verbose)
-        printf("net: tx type %u, %u bytes, flags 0x%02x\n", t->bytes[1], t->len - NET_HEADER, t->flags);
+        printf("net: tx %s %u, %u bytes, flags 0x%02x\n", chat ? "chat" : "type", chat ? 0 : t->bytes[1],
+               t->len, t->flags);
     if (radio_tx_packet(t->bytes, t->len)) {
         tx_pending = true;
         tx_ts = get_absolute_time();
         ++n_sent;
-        if (loopback) {
+        if (loopback && ! chat) {
             memcpy(loop_bytes, t->bytes, t->len);
             loop_len = t->len;
         }
@@ -238,7 +287,10 @@ void net_task(absolute_time_t now) {
         return;
     }
     if (! owner) {
-        radio_tools_profile_social(NET_PATABLE_QUIET);
+        if (chat)
+            radio_tools_profile_chat(NET_PATABLE_LOUD);
+        else
+            radio_tools_profile_social(NET_PATABLE_QUIET);
         start_rx();
         owner = true;
     }

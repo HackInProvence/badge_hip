@@ -17,7 +17,7 @@
 #define STORE_OFFSET (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
 #define SAVE_DELAY_US 5000000
 #define STORE_EXT_MAGIC 0x544E4F43  /* "CONT" */
-#define STORE_EXT_VERSION 1
+#define STORE_EXT_VERSION 2  /* 2: cards of 512 bytes (longer URLs) */
 #define STORE_EXT_OFFSET (STORE_OFFSET - STORE_EXT_SIZE)
 
 _Static_assert(sizeof(store_t) <= FLASH_SECTOR_SIZE, "the store must fit in a flash sector");

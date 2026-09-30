@@ -66,7 +66,7 @@ typedef struct {
 } store_t;
 
 /* Second store (2 sectors before the first one): the contact cards (contacts.c) */
-#define CONTACT_BYTES 448  /* All the fields of a card (contacts.c) */
+#define CONTACT_BYTES 512  /* All the fields of a card (contacts.c, sizes of FIELDS) */
 #define STORE_CONTACTS 12
 #define STORE_EXT_SIZE 8192
 

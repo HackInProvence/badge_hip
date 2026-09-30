@@ -89,6 +89,10 @@ def test_ookdec(work):
     return c_test('test_ookdec', [], [STUBS, SRC, os.path.join(SRC, 'radio')], work)
 
 
+def test_vcard(work):
+    return c_test('test_vcard', ['menu/vcard.c'], [os.path.join(SRC, 'menu')], work)
+
+
 def test_rsvp(work):
     # rsvp.c is copied next to the stand-ins of its dependencies, so that its "store.h", "screen.h"... are them
     for h in os.listdir(os.path.join(STUBS, 'rsvp')):
@@ -192,7 +196,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('rsvp', test_rsvp), ('screen', test_screen),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('screen', test_screen),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
@@ -209,7 +213,7 @@ if __name__ == '__main__':
     for name, func in TESTS:
         if ARGS.names and name not in ARGS.names:
             continue
-        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_rsvp, test_screen) and not shutil.which(ARGS.cc):
+        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_vcard, test_rsvp, test_screen) and not shutil.which(ARGS.cc):
             ok, output = None, f'no C compiler ({ARGS.cc})'
         else:
             work = tempfile.mkdtemp(prefix=f'badge_{name}_')

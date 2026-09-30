@@ -82,6 +82,23 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags);
 /** \brief Nothing to send nor being sent or received: the radio can be lent a moment. */
 bool net_idle(void);
 
+/* ------ Chat mode: the profile of the chat of the Flipper Zero ("subghz chat"), plain text packets ------
+ * Same modem as the network (GFSK 9.99 kbps), sync word 0x464C, no header: any CC1101 (Flipper, ESP32 with
+ * RadioLib...) reads and writes it. While it is on, the network is deaf and net_send() refuses. */
+
+typedef void (*net_chat_handler_t)(const char *text, int len, int rssi);
+
+/** \brief \p handler: chat mode on (the received texts go to it), NULL: back to the network. */
+void net_set_chat(net_chat_handler_t handler);
+
+bool net_chat(void);
+
+/** \brief Sends a text packet in chat mode (at most 61 bytes), at +10 dBm. */
+bool net_send_text(const char *text, uint8_t len);
+
+/** \brief Room in the transmit queue (packets). */
+int net_queue_free(void);
+
 /** \brief A packet is on air (being sent or received): wait before taking the radio. */
 bool net_transmitting(void);
 

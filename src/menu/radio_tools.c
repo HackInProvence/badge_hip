@@ -100,6 +100,11 @@ static void set_profile(uint8_t sync1, uint8_t sync0, uint8_t patable) {
     radio_set_power(patable);
 }
 
+void radio_tools_profile_chat(uint8_t patable) {
+    set_profile(0x46, 0x4C, patable);
+}
+
+
 void radio_tools_profile_social(uint8_t patable) {
     set_profile(RADIO_TOOLS_SOCIAL_SYNC1, RADIO_TOOLS_SOCIAL_SYNC0, patable);
 }

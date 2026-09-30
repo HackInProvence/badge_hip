@@ -55,7 +55,7 @@ void ui_gauge(uint8_t *fb, int x, int y, int w, int h, int value, int max);
  * Flanks: previous / next character (held: repeated by the caller), right wing: next position,
  * left wing: previous position (leave from the first one), long press on the right wing: done. */
 
-#define UI_EDIT_MAX 48
+#define UI_EDIT_MAX 56
 
 typedef struct {
     char text[UI_EDIT_MAX + 1];

@@ -22,6 +22,7 @@ target_sources(badge_menu PRIVATE
     talk.c
     remote.c
     ui.c
+    vcard.c
     net.c
     ook_rx.c
     ook_tx.c

@@ -6,7 +6,9 @@
 /* Contact cards: my card (typed with the 4 buttons, each field checked to be sent or not), exchanged with the badges
  * close by when both are in exchange mode (explicit consent), the cards received kept in the flash (store_ext_t)
  * and exported on USB as vCards ("k" key on the serial port).
- * NET_CONTACT [card uid 2][chunk][chunks][data]: the card is [field][length][bytes]... cut in chunks of 48 bytes. */
+ * On the air: a vCard in clear, one line per packet, on the profile of the chat of the Flipper Zero (vcard.c): a
+ * Flipper ("subghz chat") or any CC1101 reads the cards, and can send one. The card is sent again every few
+ * seconds; its line X-SECSEA-CHECK (number of lines, CRC) rejects a card with a lost or mixed line. */
 
 #include <stdio.h>
 #include <string.h>
@@ -15,14 +17,14 @@
 
 #include "app.h"
 #include "net.h"
+#include "remote.h"
 #include "social.h"
 #include "store.h"
+#include "vcard.h"
 
-#define CHUNK 48
-#define MAX_SERIAL (CONTACT_BYTES + 2 * 16)
-#define MAX_CHUNKS ((MAX_SERIAL + CHUNK - 1) / CHUNK)
-#define SEND_PERIOD_MS 3000
-#define ASSEMBLY_TIMEOUT_MS 10000
+#define SEND_PERIOD_MS 2500  /* The whole card again (+ up to 1 s at random: two badges don't stay in step) */
+#define PACKET_GAP_MS 70  /* A line of 60 bytes lasts ~55 ms on the air */
+#define LISTEN_MS 2000  /* After a packet heard, our card waits this long (the other one may go on) */
 
 typedef struct {
     const char *label;
@@ -35,18 +37,19 @@ static const field_t FIELDS[] = {
     {"Prénom", NULL, 20, UI_CHARSET_TEXT},
     {"Nom", NULL, 24, UI_CHARSET_TEXT},
     {"Téléphone", "TEL", 20, UI_CHARSET_PHONE},
-    {"E-mail", "EMAIL", 40, UI_CHARSET_TEXT},
+    {"E-mail", "EMAIL", 48, UI_CHARSET_TEXT},
     {"Société", "ORG", 32, UI_CHARSET_TEXT},
     {"Poste", "TITLE", 32, UI_CHARSET_TEXT},
     {"Adresse", NULL, 48, UI_CHARSET_TEXT},
     {"Ville", NULL, 24, UI_CHARSET_TEXT},
-    {"LinkedIn", "URL;TYPE=linkedin", 40, UI_CHARSET_TEXT},
-    {"Git", "URL;TYPE=git", 40, UI_CHARSET_TEXT},
-    {"Site web", "URL", 40, UI_CHARSET_TEXT},
-    {"Mastodon", "X-MASTODON", 40, UI_CHARSET_TEXT},
+    {"LinkedIn", "URL;TYPE=linkedin", 56, UI_CHARSET_TEXT},
+    {"Git", "URL;TYPE=git", 56, UI_CHARSET_TEXT},
+    {"Site web", "URL", 56, UI_CHARSET_TEXT},
+    {"Mastodon", "X-MASTODON", 48, UI_CHARSET_TEXT},
     {"Commentaire", "NOTE", 48, UI_CHARSET_TEXT},
 };
 #define N_FIELDS ((int)(sizeof(FIELDS) / sizeof(FIELDS[0])))
+_Static_assert(N_FIELDS == VCARD_FIELDS, "the fields of vcard.c");
 
 static char *field(contact_card_t *c, int f) {
     int offset = 0;
@@ -62,114 +65,81 @@ static void card_name(contact_card_t *c, char *buf, size_t len) {
         snprintf(buf, len, "%s", field(c, 4)[0] ? field(c, 4) : "(sans nom)");
 }
 
-/* ------ Radio ------ */
+/* ------ Radio: vCards on the chat profile ------ */
 
-static uint8_t serial_buf[MAX_SERIAL];
-static int serial_len = 0;
-static uint16_t my_uid = 0;
-static int send_chunk = 0;
+static vcard_packet_t packets[VCARD_PACKETS_MAX];
+static int n_packets = 0, send_packet = 0;
 static absolute_time_t send_ts = 0;
 static bool exchanging = false;
-
-/* Received card being assembled */
-static uint32_t rx_src = 0;
-static uint16_t rx_uid = 0;
-static uint8_t rx_chunks = 0;
-static uint32_t rx_have = 0;  /* Bit per chunk */
-static uint8_t rx_buf[MAX_CHUNKS * CHUNK];
-static absolute_time_t rx_ts = 0;
+static vcard_rx_t vrx;
 static bool rx_done = false;  /* Complete: to accept or not */
-static uint16_t last_uid = 0;  /* Last card accepted or ignored (it is sent again and again) */
-static uint32_t last_src = 0;
+static uint16_t last_crc = 0;  /* Last card accepted or ignored (it is sent again and again) */
+static bool have_last = false;
 static contact_card_t rx_card;
 static bool changed = false;
 
-static void serialize(void) {
-    store_ext_t *e = store_ext_get();
-    serial_len = 0;
-    for (int f = 0; f < N_FIELDS; ++f) {
-        const char *v = field(&e->mine, f);
-        int n = strnlen(v, FIELDS[f].size - 1);
-        if (! n || ! (e->send_mask & (1 << f)))
-            continue;
-        serial_buf[serial_len++] = f;
-        serial_buf[serial_len++] = n;
-        memcpy(serial_buf + serial_len, v, n);
-        serial_len += n;
-    }
-    my_uid = (get_rand_32() & 0xFFFE) + 1;
-}
-
-static void deserialize(const uint8_t *d, int len, contact_card_t *c) {
-    memset(c, 0, sizeof(*c));
-    for (int i = 0; i + 2 <= len; ) {
-        int f = d[i], n = d[i + 1];
-        i += 2;
-        if (f >= N_FIELDS || i + n > len)
-            break;
-        int m = n < FIELDS[f].size - 1 ? n : FIELDS[f].size - 1;
-        memcpy(field(c, f), d + i, m);
-        i += n;
-    }
-}
-
-static void handle_contact(const net_packet_t *p) {
-    if (! exchanging || rx_done || p->len < 5)
+static void on_chat(const char *text, int len, int rssi) {
+    (void)rssi;
+    if (! exchanging)
         return;
-    uint16_t uid = p->data[0] | p->data[1] << 8;
-    uint8_t i = p->data[2], n = p->data[3];
-    if (n == 0 || n > MAX_CHUNKS || i >= n || p->len - 4 > CHUNK)
-        return;  /* Invalid: a longer chunk would write after rx_buf */
-    if (p->src == last_src && uid == last_uid)
+    /* Someone is talking (a badge, a Flipper typing a card): the next sending of our card waits, a radio does not
+     * hear while it sends */
+    absolute_time_t later = delayed_by_ms(get_absolute_time(), LISTEN_MS);
+    if (send_packet == 0 && absolute_time_diff_us(send_ts, later) > 0)
+        send_ts = later;
+    if (rx_done || ! vcard_rx_packet(&vrx, text, len))
+        return;
+    if (have_last && vrx.crc == last_crc)
         return;  /* Already accepted or ignored */
-    if (p->src != rx_src || uid != rx_uid) {
-        /* Another card: only when the previous one stalled */
-        if (rx_src && absolute_time_diff_us(rx_ts, p->at) < ASSEMBLY_TIMEOUT_MS * 1000ll)
-            return;
-        rx_src = p->src;
-        rx_uid = uid;
-        rx_chunks = n;
-        rx_have = 0;
-        memset(rx_buf, 0, sizeof(rx_buf));
-    }
-    if (n != rx_chunks)
-        return;  /* The same card announced with another number of chunks */
-    rx_ts = p->at;
-    memcpy(rx_buf + i * CHUNK, p->data + 4, p->len - 4);
-    rx_have |= 1u << i;
-    if (rx_have == (1u << rx_chunks) - 1) {
-        deserialize(rx_buf, rx_chunks * CHUNK, &rx_card);
-        rx_done = true;
-        changed = true;
-        char name[48];
-        card_name(&rx_card, name, sizeof(name));
-        printf("contacts: card of %s received\n", name);
-    }
+    memset(&rx_card, 0, sizeof(rx_card));
+    for (int f = 0; f < N_FIELDS; ++f)
+        snprintf(field(&rx_card, f), FIELDS[f].size, "%s", vrx.values[f]);
+    rx_done = true;
+    changed = true;
+    char name[48];
+    card_name(&rx_card, name, sizeof(name));
+    printf("contacts: card of %s received\n", name);
 }
 
 void contacts_init(void) {
-    net_subscribe(NET_CONTACT, handle_contact);
 }
 
 static void send_task(absolute_time_t now) {
-    if (! exchanging || ! serial_len || absolute_time_diff_us(send_ts, now) < 0)
+    if (! exchanging || ! n_packets || absolute_time_diff_us(send_ts, now) < 0 || net_queue_free() < 2)
         return;
-    int n = (serial_len + CHUNK - 1) / CHUNK;
-    uint8_t d[4 + CHUNK];
-    d[0] = my_uid;
-    d[1] = my_uid >> 8;
-    d[2] = send_chunk;
-    d[3] = n;
-    int len = serial_len - send_chunk * CHUNK < CHUNK ? serial_len - send_chunk * CHUNK : CHUNK;
-    memcpy(d + 4, serial_buf + send_chunk * CHUNK, len);
-    if (! net_send(NET_CONTACT, d, 4 + len, NET_LOUD))
+    if (! net_send_text(packets[send_packet].text, packets[send_packet].len))
         return;
-    if (++send_chunk >= n) {
-        send_chunk = 0;
-        send_ts = delayed_by_ms(now, SEND_PERIOD_MS);  /* The whole card again later */
+    if (++send_packet >= n_packets) {
+        send_packet = 0;
+        send_ts = delayed_by_ms(now, SEND_PERIOD_MS + get_rand_32() % 1000);  /* The whole card again later */
     } else {
-        send_ts = delayed_by_ms(now, 60);
+        send_ts = delayed_by_ms(now, PACKET_GAP_MS);
     }
+}
+
+static void start_exchange(void) {
+    store_ext_t *e = store_ext_get();
+    const char *values[N_FIELDS];
+    for (int f = 0; f < N_FIELDS; ++f)
+        values[f] = field(&e->mine, f);
+    n_packets = vcard_build(values, e->send_mask, packets, VCARD_PACKETS_MAX);
+    send_packet = 0;
+    send_ts = get_absolute_time();
+    vcard_rx_init(&vrx);
+    rx_done = false;
+    exchanging = true;
+    remote_pause_windows(true);  /* The radio stays on the chat profile */
+    net_set_chat(on_chat);
+    printf("contacts: exchange, %d packets to send\n", n_packets);
+}
+
+static void stop_exchange(void) {
+    if (! exchanging)
+        return;
+    exchanging = false;
+    net_set_chat(NULL);  /* Back to the network of the cicadas */
+    remote_pause_windows(false);
+    printf("contacts: exchange stopped\n");
 }
 
 /* USB export: the cards received as vCards */
@@ -219,16 +189,6 @@ static void contacts_start(absolute_time_t now) {
     (void)now;
     view = V_MAIN;
     sel = 0;
-}
-
-static void start_exchange(void) {
-    serialize();
-    exchanging = true;
-    send_chunk = 0;
-    send_ts = get_absolute_time();
-    rx_src = 0;
-    rx_done = false;
-    printf("contacts: exchange, %d bytes to send\n", serial_len);
 }
 
 static void keep_card(void) {
@@ -294,15 +254,14 @@ static bool contacts_buttons(const app_buttons_t *b, absolute_time_t now) {
             if (b->pressed & UI_BTN_B)
                 keep_card();
             if (b->pressed & (UI_BTN_A | UI_BTN_B)) {
-                last_src = rx_src;
-                last_uid = rx_uid;
+                last_crc = vrx.crc;
+                have_last = true;
                 rx_done = false;
-                rx_src = 0;
             }
             break;
         }
         if (b->pressed & UI_BTN_A) {
-            exchanging = false;
+            stop_exchange();
             view = V_MAIN;
         }
         break;
@@ -337,7 +296,7 @@ static bool contacts_buttons(const app_buttons_t *b, absolute_time_t now) {
 static bool contacts_task(absolute_time_t now) {
     send_task(now);
     if (exchanging && view != V_EXCHANGE)
-        exchanging = false;
+        stop_exchange();
     bool c = changed;
     changed = false;
     return c;
@@ -370,7 +329,7 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
             ui_lines(fb, 90, &gfx_font_small, field(&rx_card, 4));
             ui_footer(fb, "G : ignorer  D : garder");
         } else {
-            ui_lines(fb, 40, &gfx_font_small, "Votre carte est envoyée\nà la cigale d'à côté si elle\nest aussi en mode échange.\n\nRapprochez les badges !");
+            ui_lines(fb, 40, &gfx_font_small, "Votre carte (vCard) est\nenvoyée aux cigales en mode\néchange, et lisible par un\nFlipper (subghz chat).\nRapprochez les badges !");
             ui_footer(fb, "G : arrêter");
         }
         break;
@@ -406,4 +365,5 @@ const app_t app_contacts = {
     .buttons = contacts_buttons,
     .task = contacts_task,
     .render = contacts_render,
+    .stop = stop_exchange,
 };
