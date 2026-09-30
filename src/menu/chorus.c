@@ -77,7 +77,7 @@ static const note_t ODE_BASS[] = {
 #define N_OF(a) (sizeof(a) / sizeof(a[0]))
 
 static const song_t SONGS[] = {
-    {"Frère Jacques (canon)", 100, 4, {{FRERE_JACQUES, N_FJ, 2, 0}, {FRERE_JACQUES, N_FJ, 2, 16},
+    {"Frère Jacques", 100, 4, {{FRERE_JACQUES, N_FJ, 2, 0}, {FRERE_JACQUES, N_FJ, 2, 16},
                                         {FRERE_JACQUES, N_FJ, 2, 32}, {FRERE_JACQUES, N_FJ, 2, 48}}},
     {"Ode à la joie", 110, 3, {{ODE_MELODY, N_OF(ODE_MELODY), 1, 0}, {ODE_THIRD, N_OF(ODE_THIRD), 1, 0},
                                {ODE_BASS, N_OF(ODE_BASS), 1, 0}}},

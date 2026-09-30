@@ -12,9 +12,9 @@
 #include "app.h"
 #include "store.h"
 
-enum { R_SOCIAL, R_GAMES, R_CHALLENGES, R_CONTACTS, R_VIRUS, R_ALL, N_RESETS };
+enum { R_SOCIAL, R_GAMES, R_CHALLENGES, R_CONTACTS, R_VIRUS, R_ALL, R_ANNOUNCES, N_RESETS };
 static const char *NAMES[N_RESETS] = {"Scores sociaux", "Records des jeux", "Défis CTF et crypto", "Contacts reçus",
-                                      "Virus", "Tout"};
+                                      "Virus", "Tout", "Annonces d'origine"};
 static const char *DETAILS[N_RESETS] = {
     "Le score et les rencontres\ndu réseau des cigales.",
     "Les records des jeux et\ndes casse-têtes.",
@@ -22,6 +22,7 @@ static const char *DETAILS[N_RESETS] = {
     "Les cartes de visite\nreçues (pas votre carte).",
     "L'état du virus : en forme.",
     "Tout cela à la fois (le nom,\nles réglages et votre carte\nsont gardés).",
+    "Les 6 annonces du menu admin\nreprennent leurs textes\nd'origine.",
 };
 
 static int sel = 0;
@@ -45,6 +46,10 @@ static void reset(int what) {
     if (what == R_VIRUS || what == R_ALL)
         s->infection = 0;
     store_changed();
+    if (what == R_ANNOUNCES) {
+        store_ext_get()->announce_magic = 0;  /* The defaults of announce.c at the next use */
+        store_ext_changed();
+    }
     if (what == R_CONTACTS || what == R_ALL) {
         store_ext_get()->n_contacts = 0;
         store_ext_changed();

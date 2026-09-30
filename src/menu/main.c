@@ -604,7 +604,7 @@ static void item_label(int item, char *buf, size_t len) {
     case M_BLIND_TEST: snprintf(buf, len, "Blind test"); break;
     case M_SOCIAL: snprintf(buf, len, "Réseau cigales : %lu pts", (unsigned long)social_score()); break;
     case M_IR: snprintf(buf, len, "Infrarouge"); break;
-    case M_OLED: snprintf(buf, len, "Ecran OLED"); break;
+    case M_OLED: snprintf(buf, len, "Écran OLED"); break;
     case M_CTF: snprintf(buf, len, "CTF : %d/%d flags", ctf_found_count(), CTF_N_FLAGS); break;
     case M_RSVP: snprintf(buf, len, "Lecture rapide (PVSR)"); break;
     case M_SETTINGS: snprintf(buf, len, "Veille de l'écran"); break;
@@ -982,7 +982,7 @@ static void saver_image_label(int i, char *buf, size_t len) {
 
 static void render_settings(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Réglages");
+    draw_title("Veille de l'écran");  /* Not "Réglages": the name of its theme */
     draw_list(3, settings_selected, settings_label);
     draw_footer("D : changer  G : retour");
 }
@@ -1268,7 +1268,7 @@ static void oled_label(int i, char *buf, size_t len) {
 
 static void render_oled(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Ecran OLED");
+    draw_title("Écran OLED");
     draw_list(OLED_DEMO_COUNT, oled_selected, oled_label);
     draw_footer("D : lancer  G : retour");
 }
@@ -1329,6 +1329,11 @@ static void render_info(void) {
     else
         snprintf(bat, sizeof(bat), "non calibrée");
     /* 6 lines fit above the footer: the measured crystal and the default of the firmware are on the serial port ("!") */
+    char xosc[24];
+    if (radio_tools_measuring())
+        snprintf(xosc, sizeof(xosc), "mesure...");
+    else
+        snprintf(xosc, sizeof(xosc), "%.4f MHz", radio_get_xosc() / 1e6);
     char build[32];
     snprintf(build, sizeof(build), "%s", BADGE_BUILD);
     char *date = strchr(build, ' ');
@@ -1336,10 +1341,9 @@ static void render_info(void) {
         *date++ = 0;
     snprintf(text, sizeof(text),
              "Version " BADGE_VERSION " (%s)\nCompilée le %s\n"
-             "Radio : CC1101 v0x%02x\nQuartz : %.4f MHz%s\nCarte SD : %s\n"
+             "Radio : CC1101 v0x%02x\nQuartz : %s\nCarte SD : %s\n"
              "Batterie : %s",
-             build, date ? date : "?", radio_tools_chip_version(), radio_get_xosc() / 1e6,
-             radio_tools_measuring() ? " (mesure)" : "",
+             build, date ? date : "?", radio_tools_chip_version(), xosc,
              sd_is_ready() ? "prête" : "absente", bat);
     render_page("Infos", text, "D : crédits  G : retour");
 }
@@ -1858,7 +1862,7 @@ static void validate(void) {
         break;
     case M_OLED:
         if (! oled_present() && ! oled_init()) {
-            snprintf(page_title, sizeof(page_title), "Ecran OLED");
+            snprintf(page_title, sizeof(page_title), "Écran OLED");
             snprintf(page_text, sizeof(page_text),
                      "Aucun écran détecté.\n\nSSD1306 128x64 I2C,\nport gauche (J3) :\nSDA broche 4, SCL broche 3,\n3,3 V broche 1, GND 11.");
             app = A_PAGE;

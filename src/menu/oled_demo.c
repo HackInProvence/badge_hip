@@ -22,7 +22,7 @@
 #define EPV_HEADER_SIZE 512
 #define N_STARS 60
 
-static const char *NAMES[OLED_DEMO_COUNT] = {"Etoiles", "Cube 3D", "Cigale", "Texte défilant", "Vidéo (carte SD)"};
+static const char *NAMES[OLED_DEMO_COUNT] = {"Étoiles", "Cube 3D", "Cigale", "Texte défilant", "Vidéo (carte SD)"};
 
 static int demo = -1;
 static absolute_time_t next_frame = 0;

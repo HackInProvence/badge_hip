@@ -174,7 +174,7 @@ static void list_recipients(void) {
 
 static void inbox_label(int i, char *buf, size_t len) {
     if (i == 0) {
-        snprintf(buf, len, "> Ecrire un message");
+        snprintf(buf, len, "> Écrire un message");
         return;
     }
     const inbox_t *m = &inbox[i - 1];

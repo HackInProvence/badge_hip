@@ -37,6 +37,7 @@ void ui_footer(uint8_t *fb, const char *text) {
 /* The check of the texts (debug, key U on the serial port): the texts cut or drawn under the footer are traced,
  * to find them all by going through every page (tools/badge_screens.py) */
 bool ui_check = false;
+static bool in_list = false;  /* ui_list(): a row cut is a preview, the page shows it all */
 
 void ui_check_width(const gfx_font_t *font, const char *text, int width, const char *what) {
     if (ui_check && gfx_text_width(font, text) > width)
@@ -53,7 +54,7 @@ void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int 
     snprintf(dst, len, "%s", src);
     size_t n = strlen(dst);
     if (ui_check && (strlen(src) >= len || gfx_text_width(font, dst) > width))
-        printf("uicheck: cut \"%s\"\n", src);
+        printf("uicheck: %s \"%s\"\n", in_list ? "list row cut" : "cut", src);
     while (n > 3 && gfx_text_width(font, dst) > width) {
         /* Remove a whole UTF-8 character before the ellipsis */
         do
@@ -114,7 +115,9 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
     for (int i = first; i < count && i < first + UI_VISIBLE_ROWS; ++i) {
         int y = UI_TITLE_H + 3 + (i - first)*UI_ROW_H;
         label(i, text, sizeof(text));
+        in_list = true;
         ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);
+        in_list = false;
         if (i == sel) {
             gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, UI_ROW_H-1, GFX_BLACK);
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_LEFT);
@@ -395,11 +398,9 @@ void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const ch
         gfx_text(fb, x0 + n_cells * cell + 3, y + 2, &gfx_font_small, ">", GFX_BLACK, GFX_ALIGN_CENTER);
     y += h + 4;
     /* The whole text */
-    char text[2 * UI_EDIT_MAX + 1], fitted[2 * UI_EDIT_MAX + 4];  /* UTF-8: 2 bytes per accented letter */
+    char text[2 * UI_EDIT_MAX + 1];  /* UTF-8: 2 bytes per accented letter */
     ui_edit_result(e, text, sizeof(text));
-    ui_fit(&gfx_font_small, fitted, sizeof(fitted), text[0] ? text : "(vide)", GFX_WIDTH - 8);
-    gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
-    y += gfx_font_small.height + 6;
+    y = ui_wrapped(fb, y, &gfx_font_small, text[0] ? text : "(vide)", 2) + 3;  /* A long text on 2 lines */
     /* The help, as many lines as fit above the footer (a long prompt leaves less room) */
     static const char *HELP[] = {"Flancs : lettre (maintenir : vite)", "D : suivante  G : précédente",
                                  "Espace = effacer"};

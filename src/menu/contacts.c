@@ -320,7 +320,7 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
         ui_edit_render(fb, &edit, FIELDS[card_sel].label, "");
         break;
     case V_EXCHANGE:
-        ui_title(fb, "Echange de cartes");
+        ui_title(fb, "Échange de cartes");
         if (rx_done) {
             card_name(&rx_card, text, sizeof(text));
             ui_lines(fb, 40, &gfx_font_small, "Carte reçue :");

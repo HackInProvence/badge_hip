@@ -21,7 +21,7 @@
 
 enum { TALK_OFF, TALK_GREEN, TALK_ORANGE, TALK_RED, TALK_ANGRY, TALK_STATES };
 
-static const char *NAMES[TALK_STATES] = {"Eteint", "OK", "5 min", "FINI", "STOP !"};
+static const char *NAMES[TALK_STATES] = {"Éteint", "OK", "5 min", "FINI", "STOP !"};
 static const char *DETAILS[TALK_STATES] = {"LEDs éteintes", "Vert : tout va bien", "Orange : il reste 5 min",
                                            "Rouge : temps écoulé", "Rouge énervé : on conclut !"};
 static int state = TALK_OFF;

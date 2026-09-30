@@ -317,7 +317,7 @@ static void row_label(int i, char *buf, size_t len) {
     case ROW_QR_TYPE: snprintf(buf, len, "QR code : %s", QR_NAMES[a->qr_type < ANNOUNCE_QR_TYPES ? a->qr_type : 0]); break;
     case ROW_QR: snprintf(buf, len, "Contenu : %s", a->qr[0] ? a->qr : "-"); break;
     case ROW_PREVIEW: snprintf(buf, len, "> Aperçu"); break;
-    default: snprintf(buf, len, "> Envoyer à toutes les cigales"); break;
+    default: snprintf(buf, len, "> Envoyer à tous"); break;
     }
 }
 

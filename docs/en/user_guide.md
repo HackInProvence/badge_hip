@@ -309,7 +309,7 @@ that repeats its code) by "hot - cold".
 
   | State | LEDs |
   |---|---|
-  | Eteint (off) | off |
+  | Éteint (off) | off |
   | OK | steady green: all is well |
   | 5 min | orange, softly breathing: 5 minutes left |
   | FINI (over) | blinking red: time is up |

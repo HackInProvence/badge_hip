@@ -305,7 +305,7 @@ sonde, brouilleur qui répète son code).
 
   | État | LEDs |
   |---|---|
-  | Eteint | éteintes |
+  | Éteint | éteintes |
   | OK | vert fixe : tout va bien |
   | 5 min | orange qui respire doucement : il reste 5 minutes |
   | FINI | rouge qui clignote : le temps est écoulé |

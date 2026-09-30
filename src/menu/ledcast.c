@@ -261,7 +261,7 @@ static void ledcast_render(uint8_t *fb, absolute_time_t now) {
     char text[48];
     if (timing) {
         ui_title(fb, order.mode == MODE_BLINK ? "Clignotement" : "Fondu");
-        const char *names[2][2] = {{"Allumé", "Eteint"}, {"Vers la couleur", "Vers le noir"}};
+        const char *names[2][2] = {{"Allumé", "Éteint"}, {"Vers la couleur", "Vers le noir"}};
         int m = order.mode == MODE_BLINK ? 0 : 1;
         for (int i = 0; i < 2; ++i) {
             snprintf(text, sizeof(text), "%s : %u ms", names[m][i], i ? order.t2 : order.t1);

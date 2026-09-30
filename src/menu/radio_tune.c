@@ -174,7 +174,7 @@ static void tune_render(uint8_t *fb, absolute_time_t now) {
             int y = ui_text(fb, 4, UI_TITLE_H + 6, &gfx_font_small, text);
             if (measured) {
                 snprintf(text, sizeof(text), freq_packets >= FREQ_MIN_PACKETS ? "(%d paquets d'autres cigales)"
-                         : "(aucune autre cigale entendue)", freq_packets);
+                         : "(pas d'autre cigale)", freq_packets);
                 ui_text(fb, 4, y, &gfx_font_small, text);
             }
         }
