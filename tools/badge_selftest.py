@@ -663,6 +663,10 @@ def main():
             while not badge.connected() and time.time() < deadline:
                 time.sleep(0.2)
             t.pump(3)  # Boot: the screen is cleared, the menu drawn
+            if t.expect(r"^ui: Réglage radio$", 2):  # A badge not tuned yet: the tuning of the radio first
+                t.expect(r"^tune: crystal", 25)
+                t.keys("a")
+                t.pump(2)
             if not badge.connected():
                 sys.exit('the badge did not come back after the reboot')
         # The badge answers

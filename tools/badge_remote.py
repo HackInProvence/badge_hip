@@ -119,7 +119,7 @@ class Badge(threading.Thread):
             if not ser:
                 return
             try:
-                ser.write(keys.encode())
+                ser.write(keys.encode('latin-1'))  # One byte per character (0x80+: accents of the editor)
             except Exception as e:  # serial.SerialException, OSError, PermissionError...
                 self.error = f'envoi impossible : {e}'
 
@@ -380,11 +380,15 @@ def run_window(port, zoom, on_ready=None):
 
     # Keyboard mode: the characters go to the text editor of the badge (0x02 + character), the arrows stay buttons
     text_keys = {'Return': '\r', 'KP_Enter': '\r', 'BackSpace': '\b', 'Escape': '\x1b'}
+    # The accented letters of the editor of the badge: one byte each, 0x80 + index (ACCENTS in src/menu/ui.c)
+    accents = 'éèêàâçôîùûëïÉÈÀÇ'
 
     def on_key(event):
         if keyboard.get() and event.keysym not in ('Up', 'Down', 'Left', 'Right', 'F5', 'F12'):
             c = text_keys.get(event.keysym, event.char)
-            if c and len(c) == 1 and (c in '\r\b\x1b' or ' ' <= c < '\x7f'):
+            if c and len(c) == 1 and c in accents:
+                badge.send('\x02' + chr(0x80 + accents.index(c)))
+            elif c and len(c) == 1 and (c in '\r\b\x1b' or ' ' <= c < '\x7f'):
                 badge.send('\x02' + c)
             return 'break'
         if event.keysym in keys:

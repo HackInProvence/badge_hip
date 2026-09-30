@@ -161,7 +161,7 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     case 0x02: {
         /* Keyboard mode of badge_remote.py: 0x02 then a character typed on the PC, for the text editors */
         int c = getchar_timeout_us(50000);
-        if (c > 0 && c < 0x80)
+        if (c > 0 && c < 0x90)  /* ASCII, and 0x80 + n: the accented letter n of the editor (ui.c) */
             ui_edit_type((char)c);
         break;
     }

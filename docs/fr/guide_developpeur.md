@@ -29,7 +29,8 @@ Les brochages sont dans [src/pinouts.h](../../src/pinouts.h) et la carte dans [s
 Points d'attention :
 - **Quartz de la radio** : le code d'origine supposait 26,998 MHz ; les badges mesurés ont un quartz de 26 MHz.
   Le firmware le mesure au démarrage et se cale sur la valeur nominale la plus proche (26 ou 27 MHz),
-  car la mesure varie d'environ 500 ppm.
+  car la mesure varie d'environ 500 ppm. Le réglage automatique de la radio (§ 6.21) corrige ensuite le petit écart
+  de fréquence entre les badges.
 - **Mesure de batterie** : le LM321 est alimenté par la batterie elle-même. Son entrée et sa sortie ne dépassent pas
   environ V_bat − 1,5 V, alors que le pont lui présente 2/3 V_bat : il sature.
   La mesure doit être calibrée (voir [§ 6.9](#69-batterie)).
@@ -61,8 +62,9 @@ Autres exécutables : les applications de test de chaque module (`src/tests/*.c`
 **Version du firmware** : `BADGE_VERSION` dans [src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt), à augmenter
 pour chaque version installée sur les badges. À chaque compilation, [version.cmake](../../src/menu/version.cmake)
 écrit `version.h` (dans le dossier de compilation) avec ce numéro, le commit git court et la date ; un « + » après le
-commit signale des sources de `src/` ou `tools/` modifiées depuis. Le badge l'affiche dans Réglages > Infos, au
-démarrage et avec `!` sur le port série (`version: 1.0.0 (5d95da4 2026-09-30)`).
+commit signale des sources de `src/` ou `tools/` modifiées depuis (`sans-git` si git ne répond pas). Le badge
+l'affiche dans Réglages > Infos (« Version 1.0.0 (5d95da4) » et « Compilée le 2026-09-30 »), au démarrage et avec `!`
+sur le port série (`version: 1.0.0 (5d95da4 2026-09-30)`).
 
 
 ## 3. Organisation du dépôt
@@ -90,13 +92,16 @@ src/
 tools/
 ├── badge_remote.py     écran du badge sur le PC + pilotage au clavier
 ├── badge_selftest.py   test automatique du badge par l'USB
+├── badge_screens.py    captures de tous les écrans et vérification des textes (docs/screens, ecrans.md)
+├── badge_media_test.py lit toutes les vidéos et musiques de la carte SD, rapport media_report.txt
 ├── score_check.py      vérification des QR codes de score, classement
 ├── contacts_export.py  cartes de visite reçues par le badge → fichier vCard
 ├── crypto_ctf_make.py  génère les défis crypto (fichier des solutions : spoilers)
 ├── ook_sub.py          fichiers .sub du Flipper Zero : télécommandes et sondes météo de test
 ├── flipper_net_sub.py  fichiers .sub du Flipper Zero : paquets du réseau des cigales, préréglage « SecSea »
 └── flipper/            télécommandes du Flipper : SecSea_general.sub, SecSea_talk.sub (§ 6.13)
-docs/           documentation, idées, PVSR, synchronisation du choeur (chorus_sync.md)
+docs/           documentation, idées, PVSR, synchronisation du choeur (chorus_sync.md),
+                écrans du badge (fr/ecrans.md, en/screens.md et screens/, générés par badge_screens.py)
 hardware/       schémas et projet KiCad
 ```
 
@@ -150,13 +155,16 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `social.c` | réseau des cigales (balises radio, rencontres, score, voisins) |
 | `remote.c` | commandes à distance (badge admin, Flipper Zero), mode muet (§ 6.13) |
 | `ook_rx.c`, `radio433.c` | récepteur OOK 433 MHz ; pages Décodeur 433 MHz et Station météo (§ 6.14) |
-| `radio_tools.c` | message et porteuse radio, profil GFSK, mesure du quartz |
+| `radio_tools.c` | message et porteuse radio, profil GFSK, mesure du quartz, correction de fréquence |
+| `radio_tune.c` | réglage automatique de la radio : quartz, bruit, fréquence (§ 6.21) |
 | `messages.c`, `contacts.c`, `vcard.c`, `program.c`, `vote.c` | messages relayés, cartes de visite et leur format vCard (§ 6.20), programme, votes |
-| `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid et radar, virus des cigales, choeur (§ 6.15) |
+| `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid, radar et Chasse 433 MHz (§ 6.14), virus des cigales, choeur (§ 6.15) |
+| `ledcast.c`, `announce.c` | LEDs des cigales pilotées par un badge admin (§ 6.22), annonces (§ 6.23) |
 | `duel.c`, `battle.c` | pierre-feuille-ciseaux et bataille navale entre deux badges (§ 6.16) |
 | `image_radio.c` | envoi et réception d'une image par radio (§ 6.17) |
 | `crypto_ctf.c`, `crypto_app.c` | défis de cryptographie et leurs pages (§ 6.18) |
 | `lamp.c`, `nametag.c`, `talk.c`, `admin.c` | lampe, badge nominatif, badge de talk, commandes radio et type du badge (admin) |
+| `reset.c` | remise à zéro des scores et de la progression (admin) |
 | `credits.c` | pages des crédits |
 | `score_code.c` | scores signés affichés en QR code (§ 6.11) |
 | `battery.c` | niveau de batterie (calibration) |
@@ -208,19 +216,31 @@ par `main()`, et signale un événement par une fonction interrogée dans la bou
 
 [ui.h](../../src/menu/ui.h) donne l'aspect commun des pages : `ui_title()` (bandeau noir), `ui_footer()`,
 `ui_list()` (liste avec défilement), `ui_lines()` / `ui_text()` (lignes centrées ou à gauche), `ui_fit()`
-(texte tronqué avec « ... »), `ui_box()`, `ui_gauge()`.
+(texte tronqué avec « ... »), `ui_wrapped()` (texte centré, coupé aux espaces pour tenir dans la largeur, sur
+`max_lines` lignes au plus ; utilisé par les annonces), `ui_box()`, `ui_gauge()`.
+
+**Vérification des textes** (touche `U` du port série, `ui_check`) : `ui_title()`, `ui_footer()`, `ui_fit()`,
+`ui_lines()`, `ui_text()`, `ui_wrapped()` et les pages de `main.c` tracent les textes coupés
+(`uicheck: cut "..."`), trop larges (`uicheck: title too wide (...)`, `footer`, `wrapped text cut`) ou dessinés sous
+le pied de page (`uicheck: under the footer (y ...)`). `tools/badge_screens.py` l'active en parcourant toutes les pages.
 
 L'éditeur de texte à 4 boutons (`ui_edit_t`, 56 caractères au plus, `UI_EDIT_MAX`) sert aux cartes de visite, aux défis crypto
 et au remède du virus :
 - `ui_edit_start(e, texte, longueur, jeu_de_caractères)` : `UI_CHARSET_TEXT` (lettres, chiffres, ponctuation
-  pour les noms, e-mails, URL), `UI_CHARSET_PHONE` (chiffres, +, espace), `UI_CHARSET_UPPER` (A-Z, 0-9, espace) ;
+  pour les noms, e-mails, URL), `UI_CHARSET_PHONE` (chiffres, +, espace), `UI_CHARSET_UPPER` (A-Z, 0-9, espace),
+  `UI_CHARSET_LONG` (lettres avec les accents français é è ê à â ç ô î ù û ë ï É È À Ç, chiffres, plus de ponctuation :
+  texte et contenu du QR code des annonces). Dans l'éditeur, une lettre accentuée occupe une case (un octet,
+  0x80 + son rang dans `ACCENTS`) ; `ui_edit_start()` la lit en UTF-8 et `ui_edit_result()` la rend en UTF-8
+  (2 octets) : la destination doit avoir la place ;
 - flancs : `ui_edit_change(e, -1 / +1)` (la répétition en maintenant est à la charge de l'appelant) ;
 - aile droite (appui court) : `ui_edit_move(e, 1)` ; aile gauche : `ui_edit_move(e, -1)`, qui renvoie `false`
   depuis la première position (annuler) ;
 - aile droite (appui long) : terminé, `ui_edit_result()` rend le texte sans les espaces de fin ;
 - `ui_edit_render()` dessine la question, le texte autour du curseur et le mode d'emploi ;
-- le clavier du PC (mode clavier de `badge_remote.py` : octet 0x02 suivi du caractère sur l'USB) écrit dans l'éditeur
-  ouvert, par `ui_edit_apply_typed()` (Entrée : terminé ; Échap : annuler ; retour arrière : effacer).
+- le clavier du PC (mode clavier de `badge_remote.py` : octet 0x02 suivi du caractère sur l'USB) **insère** le
+  caractère au curseur de l'éditeur ouvert (la suite se décale, le dernier caractère est perdu si le texte est plein),
+  par `ui_edit_apply_typed()` (Entrée : terminé ; Échap : annuler ; retour arrière : effacer). Les boutons, eux,
+  changent le caractère sous le curseur. Seul l'ASCII passe (0x20 à 0x7E) : pas de lettre accentuée par le clavier.
 
 ### Ajouter une entrée de menu
 
@@ -240,7 +260,9 @@ Une application (ci-dessus) évite les étapes 3 à 5.
 
 **Mode admin** : dans le menu principal, la séquence `ADMIN_SEQUENCE` (`"LLRRLRLR"`, L = flanc gauche,
 R = flanc droit) tapée en moins de 8 s (`ADMIN_SEQUENCE_MS`) met `store_t.admin` à `STORE_ADMIN_ON` et sélectionne
-le thème Admin ; « Quitter le mode admin » le remet à 0.
+le thème Admin ; « Quitter le mode admin » le remet à 0. Sur le port série, l'octet 0x01 suivi de `A` (marche) ou `a`
+(arrêt) fait de même (case « Mode admin » de `badge_remote.py`). Les trois passent par `set_admin()` (`main.c`),
+qui trace `admin: on` / `admin: off` et redessine le menu (le thème Admin disparaît s'il était ouvert).
 
 ### Ajouter un jeu
 
@@ -360,7 +382,8 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
 - champs ajoutés ensuite : `lamp_percent` (luminosité de la lampe), `badge_type` (`STORE_TYPE_PARTICIPANT`,
   `SPEAKER`, `STAFF`), `admin` (`STORE_ADMIN_ON` = 0xA5 : mode admin), `remote_off` (1 : commandes à distance ignorées),
   `muted` (1 : mode muet), `infection` (état du virus), `crypto_solved` (bit n : défi n résolu),
-  `puzzle_records` (records des casse-têtes).
+  `puzzle_records` (records des casse-têtes), `radio_tuned` (`STORE_RADIO_TUNED` = 0xA5 : radio réglée),
+  `radio_noise_dbm` (bruit mesuré, dBm), `radio_freq_offset` (correction de fréquence, FSCTRL0) (§ 6.21).
 
 Principe :
 - l'écriture a lieu 5 s après la dernière modification, avec `flash_safe_execute` (environ 50 ms, interruptions coupées) ;
@@ -374,6 +397,10 @@ le masque des champs envoyés, ma carte et les 12 cartes reçues (`STORE_CONTACT
 (`CONTACT_BYTES`). Il est réinitialisé si l'en-tête ne correspond pas : le passage aux cartes de 512 octets
 (`STORE_EXT_VERSION` 2) efface donc, à la mise à jour, les cartes reçues **et** ma carte (le masque revient à
 prénom + nom). `store_ext_changed()` l'écrit de la même façon, 5 s plus tard.
+Les annonces de l'admin (§ 6.23) ont été ajoutées ensuite à la fin de `store_ext_t`, sans changer la version :
+`announce_magic` puis 6 `store_announce_t` (`STORE_ANNOUNCES` : heure 6 octets, texte 112, type du QR code, contenu
+64), valides quand `announce_magic` vaut `STORE_ANNOUNCE_MAGIC` (`"ANNO"`) ; sinon `announce_list()` y met les
+annonces par défaut.
 
 ### 6.9 Batterie
 
@@ -458,6 +485,8 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |
+| 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, durée 1 (2), durée 2 (2) ; envoyé 5 fois (§ 6.22) |
+| 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux, 48 octets au plus ; le tout 3 fois (§ 6.23) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |
 
 Les messages sont relayés par inondation : chaque badge renvoie une fois un message pas encore vu (origine + uid),
@@ -467,7 +496,27 @@ TTL décrémenté, avec `NET_MEDIUM | NET_JITTER`, jusqu'à TTL 0 (3 au départ)
 envoyé par un « jumeau » d'identifiant `net_id() ^ NET_TWIN` (0x00FF00FF). Le badge peut ainsi voter à sa propre
 question, recevoir son propre message ou s'infecter lui-même. Le réseau des cigales ignore ce jumeau (pas de rencontre).
 `V` trace chaque paquet émis et reçu (en mode chat, le texte des paquets reçus), `P` envoie un ping, `!` affiche
-les compteurs (émis, reçus, perdus).
+les compteurs (émis, reçus, perdus) et l'état du réseau (`net state: ...` : en pause ou non, propriétaire de la radio,
+envoi en cours, mode chat, file, nombre de réparations, MARCSTATE et principaux registres, GDO0).
+
+**Robustesse de la radio** : un badge pouvait devenir sourd et muet (GDO0 resté haut : le réseau attendait la fin
+d'un paquet qui ne venait jamais).
+- **PKTLEN = 61** : `configure()` de [radio_tools.c](../../src/menu/radio_tools.c) limite la longueur des paquets
+  à 61 octets (la FIFO de réception moins l'octet de longueur et les deux octets d'état). Avec la valeur par défaut
+  (255), un mot de synchronisation trouvé dans le bruit suivi d'une grande « longueur » laissait la radio attendre
+  la fin d'un paquet qui n'existait pas.
+- **Surveillance** : chaque seconde (`CHECK_MS`, hors envoi), `check_radio()` vérifie que la radio est dans la
+  configuration du réseau : PKTLEN 61, PKTCTRL0 0x05, MDMCFG2 0x12, IOCFG0 0x06, le mot de synchronisation du mode
+  (0xC16A, ou 0x464C en mode chat) et MARCSTATE entre IDLE et RX (ni débordement de FIFO, ni émission). GDO0 haut
+  plus de 300 ms (`GDO0_STUCK_US` ; un paquet dure 60 ms au plus) est bloqué : la broche redevient une entrée.
+  Dans tous ces cas, la radio passe en IDLE, les FIFO sont vidées, le réseau la reconfigure au tour suivant
+  et trace `net: radio repaired (...)` ; le compteur `repairs` est dans la ligne `net state:` de `!`.
+- **Reconfiguration complète** : quand le réseau reprend la radio (après le récepteur OOK, l'émission OOK, la mesure
+  du quartz...), il appelle d'abord `radio_tools_reconfigure()` (tous les registres du profil), puis son profil :
+  un autre utilisateur peut avoir laissé d'autres registres (une radio restée en OOK n'envoie rien d'utilisable).
+- **Écart de fréquence** : pour chaque paquet reçu d'un autre badge, le réseau additionne le FREQEST du CC1101
+  (écart mesuré, pas de fXOSC / 2^14) ; `net_freq_offsets(&somme, reset)` le rend au réglage de la radio (§ 6.21),
+  et `net_reconfigure()` fait reconfigurer la radio par le réseau.
 
 
 ### 6.13 Commandes à distance et mode muet (`remote.c`)
@@ -488,8 +537,12 @@ Une commande reçue par les deux voies n'est exécutée qu'une fois (même comma
 | 0x01 | la cigale chante 6 s | `remote.c` |
 | 0x02 / 0x03 | mode muet / fin du mode muet | `remote.c` |
 | 0x10 à 0x14 | lumières du badge de talk : éteint, vert, orange, rouge, rouge énervé | `talk.c` (page ouverte) |
-| 0x20 + n | affiche le talk n du programme | `program.c` |
+| 0x20 + n | affiche le talk n du programme (page Programme du badge) | `program.c` |
 | 0x30 + n | lance le morceau n du choeur | `chorus.c` |
+
+« Annoncer un talk » (admin) n'envoie plus la commande 0x20 + n : il envoie le contenu du talk (heure, « titre -
+orateur », lien en QR code) comme une annonce (§ 6.23), que les cigales affichent sans dépendre de leur programme.
+La commande 0x20 + n (du Flipper par exemple) ouvre toujours la page du programme du badge.
 
 Un module traite un groupe de commandes (le quartet de poids fort) avec `remote_subscribe(groupe, gestionnaire)` ;
 le gestionnaire reçoit le quartet de poids faible. `remote_execute()` exécute une commande locale.
@@ -497,18 +550,25 @@ Le badge obéit sauf si Réglages > Télécommande est à « non » (`store_t.re
 
 **Écoute des télécommandes** : le CC1101 ne peut pas écouter en GFSK et en OOK à la fois. Il n'y a plus de fenêtre
 d'écoute à l'aveugle : le réseau écoute en permanence, et `remote_task()` lit le RSSI toutes les 20 ms (`RSSI_POLL_MS`)
-quand la radio et le réseau sont libres. Un émetteur à −90 dBm ou plus (`OOK_TRIGGER_DBM` ; le bruit est vers
-−105 dBm) mesuré deux fois de suite (`OOK_TRIGGER_POLLS`) sans paquet du réseau en cours (pas de mot de synchronisation
+quand la radio et le réseau sont libres. Un émetteur au-dessus du seuil `remote_trigger_dbm()` (le bruit mesuré par
+le réglage de la radio + 15 dB, `OOK_TRIGGER_ABOVE_NOISE`, borné entre −95 et −70 dBm ; −90 dBm, `OOK_TRIGGER_DBM`,
+sans réglage : le bruit est vers −105 dBm) mesuré deux fois de suite (`OOK_TRIGGER_POLLS`) sans paquet du réseau en cours (pas de mot de synchronisation
 reconnu, `net_transmitting()`) est peut-être une télécommande : une fenêtre OOK de 150 ms s'ouvre (`OOK_WINDOW_MS`).
 Elle est prolongée par pas de 100 ms, jusqu'à 1,5 s (`OOK_WINDOW_MAX_MS`), tant qu'une télécommande émet (au moins
 30 fronts en 100 ms, `OOK_ACTIVE_PULSES` : une trame Princeton en donne environ 95, le bruit et les paquets GFSK des
 badges bien moins). Après une fenêtre, la suivante attend au moins 800 ms (`OOK_PERIOD_MS`, contre un émetteur qui
-ne s'arrête jamais) ; une fenêtre s'ouvre de plus toutes les 10 s (`OOK_FORCED_MS`), pour une télécommande plus
-faible que le seuil. Mesuré entre deux badges : 97 à 98 % des pings reçus (82 à 85 % avec des fenêtres de 80 ms
+ne s'arrête jamais), durée doublée après chaque fenêtre sans code décodé (un parasite), jusqu'à 3,2 s
+(`OOK_PERIOD_MAX_MS`) ; un signal fort, −75 dBm ou plus (`OOK_STRONG_DBM` : une télécommande tout près du badge),
+ouvre une fenêtre même pendant cette attente. Une fenêtre s'ouvre de plus toutes les 10 s (`OOK_FORCED_MS`), pour une
+télécommande plus faible que le seuil. Mesuré entre deux badges : 97 à 98 % des pings reçus (82 à 85 % avec des fenêtres de 80 ms
 toutes les 800 ms, 73 % avec les anciennes fenêtres de 220 ms).
 Pendant une fenêtre, le réseau n'entend rien. Les fonctions qui ont besoin de tous les paquets (choeur, image,
 échange de cartes) suspendent les fenêtres avec `remote_pause_windows()` (appels comptés), et il n'y en a pas en
 mode chat. Le badge de talk, lui, écoute la télécommande en permanence : il ne reçoit les commandes admin qu'en OOK.
+Si la radio reste occupée, le badge admin renonce aux trames Princeton au bout de 2 s (`OOK_GIVE_UP_MS`,
+`remote: princeton not sent (radio busy)`) et envoie quand même les paquets réseau. `!` trace l'état de l'écoute
+(`remote state: ...` : fenêtre, pauses, récepteur et émetteur OOK, trames en attente, envois restants, attente
+entre deux fenêtres).
 
 **Boutons de la télécommande du Flipper** : l'application Sub-GHz du Flipper, sur un fichier Princeton enregistré,
 envoie le code du fichier avec OK, et avec les flèches le même code avec un autre bouton dans le quartet de poids
@@ -527,7 +587,9 @@ sont des clés Princeton 24 bits, te = 400 µs, préréglage `FuriHalSubGhzPrese
 
 **Mode muet** (`store_t.muted`) : `audio_set_mute()` continue de jouer les échantillons au niveau 0 (les lecteurs
 gardent leur horloge), `set_leds()` et les LEDs des jeux restent éteintes, `app_tone()` et `app_leds()` le respectent.
-Une application `owns_leds` (le badge de talk) pilote ses LEDs et son buzzer même en mode muet.
+Une application `owns_leds` (le badge de talk) pilote ses LEDs et son buzzer même en mode muet. Dans l'état
+« STOP ! » (rouge énervé), le badge de talk fait chanter la cigale (`noise_gen_set_enabled(true)` après
+`audio_close()` : le générateur de bruit pilote le buzzer à pleine amplitude) au lieu d'un bip.
 
 **Depuis un Flipper Zero** : la commande `subghz tx` de la ligne de commande du Flipper ne transmet pas la clé telle
 quelle (elle remplace le quartet de poids faible par 6) ; utiliser un fichier `.sub` (§ 6.19) ou Sub-GHz > Add Manually > Princeton_433 puis modifier la ligne `Key:`.
@@ -557,6 +619,14 @@ quelle (elle remplace le quartet de poids faible par 6) ; utiliser un fichier `.
   a une somme GT-WT02 juste environ une fois sur 300.
 - [radio433.c](../../src/menu/radio433.c) : les pages Décodeur 433 MHz (8 dernières trames) et Station météo
   (dernière mesure de 4 sondes au plus). Réception seule.
+- **Puissance des trames** : pendant que la porteuse est présente (GDO0 haut), `ook_rx_task()` lit le RSSI et garde
+  le maximum ; ce pic est attribué à la trame décodée suivante, `ook_rx_last_rssi()` (−128 : inconnu). Le pic d'un
+  signal qui ne décode rien (du bruit) est oublié.
+- **Chasse 433 MHz** (`app_hunt433`, [hotcold.c](../../src/menu/hotcold.c)) : le récepteur OOK écoute en permanence
+  (`ook_rx_start()`) ; la page liste les codes entendus (8 au plus, `TARGETS` : protocole, code, dBm de la dernière
+  trame, nombre de trames), puis suit celui choisi avec la vue, les LEDs et les bips du chaud - froid entre badges,
+  sur la puissance de chacune de ses trames. Il est perdu après 15 s sans trame (`TARGET_LOST_MS` ; 5 s pour
+  une balise de badge). Trace : `hunt433: <trame> at <n> dBm`.
 - **Retour au GFSK** : le récepteur OOK modifie FREND0, FREND1 et MDMCFG0, que le préréglage GFSK laisse à leurs valeurs
   de reset. Avec FREND0 = 0x11, les paquets partiraient avec `PATABLE[1]`, sans puissance : la configuration GFSK de
   `radio_tools.c` réécrit ces registres.
@@ -684,6 +754,78 @@ carré sorti directement du PWM (le lecteur audio à 16 kHz ne peut pas dépasse
   cochés sont envoyés. Le type `NET_CONTACT` n'est plus utilisé.
 
 
+### 6.21 Réglage automatique de la radio
+
+[radio_tune.c](../../src/menu/radio_tune.c) (Réglages > Réglage radio) s'ouvre tout seul au démarrage tant que
+`store_t.radio_tuned` n'est pas `STORE_RADIO_TUNED` (0xA5) : premier démarrage, ou mise à jour qui l'apporte
+(le champ vaut alors 0xFF). Un réglage interrompu recommence donc au démarrage suivant. Les fenêtres des
+télécommandes sont suspendues pendant les mesures (le réseau écoute en permanence). Trois étapes :
+1. **Quartz** : la mesure de `radio_tools.c` (`radio_tools_measure_xosc()`, 26 ou 27 MHz).
+2. **Bruit** : 150 lectures du RSSI en 3 s (`NOISE_MS`, une toutes les 20 ms) quand aucun paquet n'est en cours de
+   réception ; la médiane est le bruit (`radio_noise_dbm`). Le seuil d'écoute des télécommandes devient
+   `remote_trigger_dbm()` = bruit + 15 dB, borné entre −95 et −70 dBm (§ 6.13) : plus sensible dans un endroit
+   calme, pas trompé dans un endroit bruyant.
+3. **Fréquence** : pendant 10 s (`FREQ_MS`), les FREQEST des paquets des autres badges (`net_freq_offsets()`).
+   Avec au moins 2 paquets (`FREQ_MIN_PACKETS`), la **moitié** de l'écart moyen est ajoutée à la correction
+   (FSCTRL0, pas de fXOSC / 2^14, environ 1,6 kHz ; en émission et en réception) : deux badges réglés en même temps
+   se rejoignent au lieu de se croiser. Un écart moyen de plus de 60 pas (`FREQ_MAX_STEPS`, environ 95 kHz) est une
+   mesure fausse : ignoré ; la correction reste entre −60 et +60.
+
+À la fin, `radio_tuned`, `radio_noise_dbm` et `radio_freq_offset` sont enregistrés, `radio_tools_set_freq_offset()`
+applique la correction et `net_reconfigure()` fait reconfigurer la radio ; `radio_tools_init()` la relit au démarrage.
+Trace : `tune: crystal ... Hz, noise ... dBm (remotes above ... dBm), frequency offset <avant> -> <après> (<n> packets,
+mean <m>)`. La page montre les étapes avec une jauge (pied de page « G : arrêter »), puis le quartz, le bruit, le
+seuil des télécommandes, la correction et le nombre de paquets entendus (« D : régler  G : retour »).
+
+
+### 6.22 LEDs des cigales (badge admin)
+
+[ledcast.c](../../src/menu/ledcast.c) (Admin > LEDs des cigales) : une couleur (liste de 9 couleurs, ou R, G, B de
+0 à 255) et un mode : `Fixe`, `Clignotant` (durées allumé / éteint) ou `Fondu` (vers la couleur / vers le noir),
+durées de 50 ms à 5 s par pas de 50 ms.
+- **Paquet** `NET_LEDS` : `[nonce 2][mode][r][g][b][durée 1, ms, u16 LE][durée 2, ms, u16 LE]`, à +10 dBm, envoyé
+  5 fois en 2 s (toutes les 450 ms). Mode 0 : « Rétablir ». Le même émetteur + nonce n'est appliqué qu'une fois ;
+  les durées reçues sont bornées à 50 ms - 5 s. Trace : `leds: <mode>, color r g b, times t1 / t2 ms (from <id>)`.
+- **Réception** : `ledcast_show()`, appelée par `set_leds()` de `main.c`, remplace l'animation du badge
+  (`leds_anim_fixed()`, `leds_anim_blink()`, `leds_anim_fade()`) jusqu'à « Rétablir » ou un redémarrage (rien n'est
+  gardé en flash). Le mode muet éteint toujours les LEDs (vérifié avant) ; la boucle principale n'applique pas
+  l'ordre reçu pendant un jeu ni dans une application `owns_leds` (badge de talk) : il s'applique à leur sortie.
+- **Émission** : le badge admin s'applique l'ordre à lui-même. La page est `owns_leds` : elle montre la couleur
+  et le mode choisis sur ses propres LEDs pendant le réglage.
+- **Bibliothèque `leds`** : deux animations ajoutées, `leds_anim_blink(couleur, allumé_us, éteint_us)` et
+  `leds_anim_fade(couleur, montée_us, descente_us)` (du noir à la couleur puis retour au noir, en boucle) ;
+  `leds_anim_t` a un second temps, `period2`.
+
+
+### 6.23 Annonces
+
+[announce.c](../../src/menu/announce.c) : un badge admin envoie une annonce, les cigales **construisent l'écran**
+à partir de ce qu'elles reçoivent (pas d'image transmise).
+- **Contenu** (`store_announce_t`) : l'heure (`"10:30"`), le texte (56 caractères au plus, UTF-8), le type du QR code
+  (`ANNOUNCE_QR_NONE`, `URL`, `TEXT`, `TEL`, `SMS`, `EMAIL`, `WIFI`, `GEO`) et son contenu (64 octets).
+  `announce_qr_text()` le met dans la forme standard que lisent les téléphones : URL (`https://` ajouté s'il n'y a pas
+  de `://`), texte tel quel, `tel:`, `SMSTO:`, `mailto:`, `WIFI:T:WPA;S:<réseau>;P:<mot de passe>;;` à partir de
+  `réseau;mot de passe` (`WIFI:T:nopass;S:<réseau>;;` sans « ; »), `geo:`. Un contenu vide : pas de QR code.
+- **Écran** (`announce_draw()`) : l'heure en grand dans un bandeau noir de 38 pixels (« Annonce » sans heure), le texte
+  en police moyenne coupé aux espaces (`ui_wrapped()`, 3 lignes avec un QR code, 6 sans), puis le QR code
+  (`score_code_draw()`, 2 à 4 pixels par module selon la place ; « (QR code trop grand) » en dessous de 2).
+- **Radio** : `NET_ANNOUNCE` `[nonce 2][morceau][nombre de morceaux][48 octets au plus]`. L'annonce est sérialisée
+  (`heure\0texte\0<type>contenu\0`), coupée en morceaux de 48 octets (5 au plus), un toutes les 70 ms, et le tout est
+  envoyé 3 fois (600 ms entre deux tours), à +10 dBm. Le récepteur rassemble les morceaux d'un même émetteur + nonce ;
+  une annonce complète n'est prise qu'une fois (`announce: received ...`).
+- **Réception** : les 5 dernières annonces sont gardées en mémoire (Social > Annonces, pas en flash).
+  `announce_new()` donne à la boucle principale le texte de la notification (« Annonce : ... ») ;
+  `announce_open_newest()` fait que la prochaine ouverture de la page affiche la plus récente avec `app_show_still()`,
+  comme la veille. `notify()` ouvre la page tout de suite si le badge est sur les menus ou la veille ; sinon, elle
+  s'affichera à la prochaine ouverture de Social > Annonces.
+- **Admin** (Admin > Annonces (admin), `app_announce_admin`) : 6 annonces modifiables (`STORE_ANNOUNCES`), gardées
+  dans `store_ext_t` (§ 6.8), des exemples au départ (`DEFAULTS`). Lignes : Heure (éditeur `UI_CHARSET_TEXT`,
+  5 caractères), Texte et Contenu (`UI_CHARSET_LONG`, 56 caractères), type du QR code (ailes), Aperçu
+  (`announce_draw()` en rafraîchissement rapide), Envoyer (`announce_send()`, en tâche de fond).
+- **Annoncer un talk** ([program.c](../../src/menu/program.c)) construit une annonce avec l'heure, « titre -
+  orateur » et le lien du talk (QR code URL), et l'envoie avec `announce_send()`.
+
+
 ## 7. Formats de fichiers
 
 | Format | Contenu |
@@ -709,7 +851,7 @@ Le badge est un port série USB (115200 bauds, sans importance en USB). Une touc
 | `A` `B` `X` `Y` | appui long (quitter un casse-tête, enregistrer le nom, avance / recul de la lecture rapide...) |
 | `[` / `]` | envoi de l'écran à chaque changement : marche / arrêt |
 | `s` | envoi de l'écran une fois |
-| `!` | diagnostic : OLED, IR, réseau des cigales et voisins, CTF, compteurs du réseau (émis, reçus, perdus, loopback), télécommande (activée, muet, mode admin), radio (version, quartz), batterie |
+| `!` | diagnostic : OLED, IR, réseau des cigales et voisins, CTF, compteurs du réseau (émis, reçus, perdus, loopback), état du réseau et de la radio (`net state:`, § 6.12), état de l'écoute des télécommandes (`remote state:`, § 6.13), télécommande (activée, muet, mode admin), version du firmware (`version:`), radio (version, quartz utilisé et mesuré), batterie |
 | `?` | diagnostic du son |
 | `i` | test IR : décodage d'une trame NEC puis émission (environ 68 ms) |
 | `o` | état du récepteur OOK : actif, impulsions, trames, RSSI, MARCSTATE, GDO0 |
@@ -722,13 +864,19 @@ Le badge est un port série USB (115200 bauds, sans importance en USB). Une touc
 | `P` | ping à +10 dBm : les badges qui l'entendent écrivent `net: ping #n from <id>, rssi ...` |
 | `L` | mode *loopback* (§ 6.12) : marche / arrêt |
 | `R` | redémarrage (watchdog) |
-| 0x02 + caractère | écrit le caractère dans l'éditeur de texte ouvert (mode clavier de `badge_remote.py`) ; `\r` : terminé, Échap : annuler, `\b` : effacer |
+| `U` | vérification des textes (§ 5, `ui.h`) : trace `uicheck: ...` pour les textes coupés, trop larges ou sous le pied de page : marche / arrêt |
+| 0x01 + `A` / `a` | mode admin : marche / arrêt (case « Mode admin » de `badge_remote.py`) ; le badge répond `admin: on` / `admin: off` |
+| 0x02 + caractère | insère le caractère (ASCII) dans l'éditeur de texte ouvert (mode clavier de `badge_remote.py`) ; `\r` : terminé, Échap : annuler, `\b` : effacer |
 
 Le badge envoie des lignes de texte :
 - `ui: <titre>` à chaque changement de page (le nom de l'application à son ouverture) ;
 - `browser:`, `image:`, `saver: on/off`, `radio:`, `social:`, `game:`, `ctf: code right/wrong`, `credits:`, `name:`...
 - `notify:` (notification), `net:`, `remote:`, `admin:`, `ook:`, `talk:`, `vote:`, `message:`, `program:`,
-  `infection:`, `hotcold:`, `contacts:`, `chorus:`, `duel:`, `battle:`, `crypto:`, `store:`...
+  `infection:`, `hotcold:`, `hunt433:`, `contacts:`, `chorus:`, `duel:`, `battle:`, `crypto:`, `store:`, `tune:`,
+  `leds:`, `announce:`, `reset:`, `uicheck:`...
+- `version: <numéro> (<commit> <date>)` au démarrage ;
+- `music: end at <n>s of <durée>s` à la fin d'une musique (ou sur une erreur de lecture : la position est alors
+  avant la fin), utilisé par `tools/badge_media_test.py`.
 
 L'écran est envoyé ainsi :
 
@@ -782,12 +930,15 @@ Déroulement :
 Un test est SKIP quand le matériel manque (pas de carte SD, batterie non calibrée).
 Aucun réglage du badge n'est modifié, sauf avec `--ctf` (et les records des jeux, une partie pouvant finir à 0 point).
 Les groupes `admin` et `net` activent le mode admin, le mode muet ou le virus le temps du test, puis les désactivent.
+Le groupe `admin` vérifie la séquence secrète des flancs ; les autres ouvrent le thème Admin par la commande série
+0x01 `A` (`open_admin()`), comme la case de `badge_remote.py`. Les listes `SOCIAL` et `ADMIN` du script suivent
+l'ordre des menus : à mettre à jour avec `SUBMENUS`.
 
 Les groupes (`--only`) :
 
 | Groupe | Vérifie |
 |---|---|
-| `diag` | diagnostic `!` : version du CC1101, quartz, batterie |
+| `diag` | diagnostic `!` : version du firmware, version du CC1101, quartz, batterie |
 | `menus` | chaque thème s'ouvre, retour aux thèmes |
 | `games` | mini-jeux, QR code du score, record (appui long) |
 | `puzzles` | chaque casse-tête : page d'aide, départ, un coup, sortie par l'appui long sur l'aile gauche |
@@ -800,7 +951,7 @@ Les groupes (`--only`) :
 | `admin` | séquence secrète, commandes mode muet / fin du mode muet, sortie du mode admin |
 | `radio433` | pages Décodeur 433 MHz et Station météo, puis retour des balises du réseau |
 | `social` | pages du thème Social (contacts, radar, chaud - froid...) et états du badge de talk |
-| `net` | avec un seul badge, en *loopback* : vote, annonce d'un talk, virus, message |
+| `net` | avec un seul badge, en *loopback* : vote, « Annoncer un talk », virus, message |
 
 ### 9.3 Applications de test par module
 
@@ -811,8 +962,10 @@ Les groupes (`--only`) :
 
 | Script | Usage |
 |---|---|
-| `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée = boutons, Maj = appui long (et boutons « appui long » à l'écran), capture PNG ; liste « Badge : » pour choisir parmi plusieurs badges (ou `--port`) ; case « Mode clavier » : le texte tapé va à l'éditeur du badge (0x02 + caractère ; Entrée : terminé, Échap : annuler, retour arrière : effacer) ; le fil de lecture ne s'arrête jamais (erreurs dans la ligne d'état et le journal) ; `--snapshot fichier.png` pour une capture seule |
+| `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée = boutons, Maj = appui long (et boutons « appui long » à l'écran), capture PNG ; liste « Badge : » pour choisir parmi plusieurs badges (ou `--port`) ; case « Mode clavier » : le texte tapé va à l'éditeur du badge (0x02 + caractère ; Entrée : terminé, Échap : annuler, retour arrière : effacer) ; case « Mode admin » (0x01 + `A` / `a`), qui suit l'état du badge (lignes `admin: on/off`, et `!` envoyé à la connexion) ; le fil de lecture ne s'arrête jamais (erreurs dans la ligne d'état et le journal) ; `--snapshot fichier.png` pour une capture seule |
 | `tools/badge_selftest.py` | test automatique du badge (§ 9.2) |
+| `tools/badge_screens.py` | parcourt tous les thèmes, toutes les entrées (Admin compris) et les pages des applications, enregistre une image PNG de chaque écran dans `docs/screens/` et écrit [docs/fr/ecrans.md](ecrans.md) et [docs/en/screens.md](../en/screens.md) ; avec la vérification des textes (`U`), liste les textes coupés, trop larges ou sous le pied de page (`docs/screens/checks.txt` et fin des pages) ; `--port`, `--only Jeux,Social`. Le badge est redémarré ; les interrupteurs des menus ne sont pas pressés |
+| `tools/badge_media_test.py` | lit toutes les vidéos et musiques de la carte SD (sous-dossiers compris) et vérifie que chacune va jusqu'au bout (erreur de lecture, arrêt avant la fin, images par seconde des vidéos) ; `--videos`, `--music` (les deux par défaut), `--max N` (N secondes de chaque fichier au plus, 0 = en entier), `--port` ; rapport affiché et écrit dans `media_report.txt` |
 | `tools/score_check.py` | vérifie les QR codes de score et fait le classement (§ 6.11) |
 | `tools/contacts_export.py` | cartes de visite reçues par le badge → `.vcf` (`--port`, `-o`) |
 | `tools/crypto_ctf_make.py` | génère la table des défis crypto (`--update`, `--answers`) : fichier des solutions (§ 6.18) |
@@ -831,7 +984,8 @@ Les groupes (`--only`) :
 |---|---|
 | Le badge n'apparaît pas en USB | interrupteur sur ON ; câble de données ; mode BOOTLOADER pour flasher |
 | `picotool` ne trouve pas le badge | le port série est-il ouvert par une autre application (badge_remote, terminal) ? |
-| Aucun paquet radio reçu | quartz : comparer « Quartz mesuré » et « utilisé » dans Infos ; même préréglage des deux côtés |
+| Aucun paquet radio reçu | quartz : comparer « crystal used » et « measured » de la ligne `radio:` de `!` ; même préréglage des deux côtés ; Réglages > Réglage radio près d'autres badges (écart de fréquence, § 6.21) |
+| `net: radio repaired (...)` dans les traces | la surveillance du réseau a remis la radio dans sa configuration (§ 6.12) ; si cela se répète, chercher la fonction qui laisse la radio dans un autre état (registres de la ligne `net state:` de `!`) |
 | Écran figé ou uniforme | appel pendant `screen_busy()` ; après `screen_clear()`, le bypass RAM est rétabli au dessin suivant |
 | Son inaudible | volume ; fichier converti par `audio2wav.py` (sans `--no-filter`) |
 | Deux modules se disputent une interruption GPIO | utiliser `gpio_add_raw_irq_handler()` |

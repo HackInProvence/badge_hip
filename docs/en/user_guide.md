@@ -3,6 +3,7 @@
 This guide explains how to use the Hack In Provence SecSea badge: turning it on, finding your way around the menus,
 enjoying the media, games, social features, radio and extensions, and preparing a micro-SD card.
 To modify the badge software, see the [developer guide](developer_guide.md).
+All the pages of the badge in pictures, with their texts: [the screens of the badge](screens.md).
 
 *Version française : [guide utilisateur](../fr/guide_utilisateur.md).*
 
@@ -63,16 +64,16 @@ The main menu groups the features by theme:
 |---|---|
 | **Médias** (Media) | "Images", "Vidéos" (Videos), "Musique" (Music), "Lecture rapide" (Speed reading), "Volume" |
 | **Jeux** (Games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges), Duel, Bataille navale (Battleship) |
-| **Social** | Cicada network, Messages, Contacts, Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir) |
-| **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared |
+| **Social** | Cicada network, Messages, Contacts, Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir), Annonces (Announcements) |
+| **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared, Chasse 433 MHz (433 MHz hunt) |
 | **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen |
-| **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits) |
+| **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits), "Réglage radio" (Radio tuning) |
 
 A seventh theme, **Admin**, is hidden: it is for the organizers (see [§ 4.8](#48-admin-mode-organizers)).
 
-**Notifications**: when a message, a vote question, an invitation to play or the announcement of a talk arrives,
-the badge beeps and writes it at the bottom of the screen. From the menus or the screensaver, the relevant page opens
-directly (vote, program, virus, invitation to a duel or a battleship game).
+**Notifications**: when a message, a vote question, an invitation to play or an announcement of the organizers
+arrives, the badge beeps and writes it at the bottom of the screen. From the menus or the screensaver, the relevant
+page opens directly (vote, program, virus, invitation to a duel or a battleship game, full-screen announcement).
 
 
 ### 4.1 Médias (Media)
@@ -242,6 +243,16 @@ together, each one its own voice, with a start synchronized over the radio. Two 
 canon and the "Ode to Joy" in 3 voices.
 Your badge takes part by default; right wing: take part / stop singing. In mute mode, the choir is silent.
 
+**Annonces** (Announcements): the announcements of the organizers (coffee break, next talk...). An announcement is a
+screen built by the badge: the time in a black band, the text, and often a QR code (a link, a phone number, a Wi-Fi
+network...) to scan with a phone.
+- When the badge is on the menus or the screensaver, the announcement shows up by itself, like the screensaver
+  image (sharp, it stays on screen); any button goes back to the menu.
+- Otherwise, the badge beeps and writes it at the bottom of the screen: the next time Social > Annonces is opened,
+  it shows the new announcement right away.
+- The page keeps the last 5 announcements received (time and text). Flanks: choose; right wing: show it;
+  left wing: back.
+
 
 ### 4.4 Radio & IR
 
@@ -275,6 +286,15 @@ of blocks corrected; any button goes back to the menu.
 **Infrarouge** (Infrared, module on the right port)
 - "Enregistrer un signal" (Record a signal): point a remote control at the receiver and press a key.
 - The 4 slots replay the recorded signals, like a remote control.
+
+**Chasse 433 MHz** (433 MHz hunt, receive only): find a hidden 433 MHz transmitter (remote control, sensor, jammer
+that repeats its code) by "hot - cold".
+- The page lists the codes heard (8 at most): protocol and code, strength of the last frame (dBm) and number of
+  frames received ("x3"...). Flanks: choose; right wing: hunt it; left wing: back.
+- The badge then follows this code like Social > Chaud - froid: from "Glacial" to "BRÛLANT !", gauge, LEDs from blue
+  to red and faster and faster beeps. The strength is measured on each frame received: the transmitter must be
+  sending. Without a frame for 15 s, it is "hors de portée" (out of range). Left wing: back to the list.
+- During the hunt, the badge no longer hears the other cicadas.
 
 
 ### 4.5 Badge
@@ -319,9 +339,19 @@ of blocks corrected; any button goes back to the menu.
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mode muet : oui / non** (Mute mode: yes / no): turns off the sound and the LEDs. The organizers can switch it on
   remotely during the talks.
-- **Infos** (Info): firmware version (number, git commit and build date, a "+" when the sources differed from the
-  commit), radio version, crystal, SD card, battery. Right wing: the credits.
+- **Infos** (Info): 6 lines: firmware version (number and git commit, a "+" when the sources differed from the
+  commit), build date, radio version, crystal used ("(mesure)" while it is being measured), SD card, battery.
+  Right wing: the credits.
 - **Crédits** (Credits): the people and associations behind the badge.
+- **Réglage radio** (Radio tuning): tunes the radio automatically, in 3 steps (about 15 s):
+  1. the crystal of the radio (26 or 27 MHz);
+  2. the radio noise of the place (3 s): the badge listens to the remote controls from 15 dB above the noise;
+  3. the frequency, from the packets of the other cicadas heard for 10 s: stay close to other badges switched on.
+
+  The tuning runs by itself at the first start of the badge (and after an update that brings it), then on demand:
+  right wing: tune again; left wing: stop or go back. The page shows the result: crystal, noise, threshold of the
+  remote controls ("Télécommandes : > −90 dBm"...), frequency correction, and the number of packets of other
+  cicadas heard (with no other cicada, the frequency is not corrected).
 
 
 ### 4.7 Remote control and mute mode
@@ -375,17 +405,68 @@ a command received twice is executed only once.
 In the main menu (the list of themes), press the flanks **left, left, right, right, left, right, left, right** within
 8 seconds: "Mode admin activé" (admin mode on) is shown and the **Admin** theme appears, already selected, after the
 others. The admin mode stays on after the badge is switched off.
+More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the badge plugged into USB (see [§ 6](#6-controlling-the-badge-from-a-computer)).
 
 | Entry | Role |
 |---|---|
 | **Commandes radio** (Radio commands) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge |
-| **Annoncer un talk** (Announce a talk) | shows a talk of the program on all the badges |
+| **LEDs des cigales** (LEDs of the cicadas) | chooses the colour and the animation of the LEDs of all the cicadas around (see below) |
+| **Annonces (admin)** (Announcements) | writes and sends the announcements to all the cicadas (see below) |
+| **Annoncer un talk** (Announce a talk) | sends a talk of the program to all the cicadas, as an announcement: its time, its title and speaker, the QR code of its link |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
 | **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
+| **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Type du badge** (Badge type) | Participant, Orateur (speaker) or Staff, shown by the name tag |
 | **Quitter le mode admin** (Leave admin mode) | hides the Admin theme again |
+
+**LEDs des cigales** (LEDs of the cicadas): a list of settings; flanks: choose the row.
+- "Couleur" (colour): wings: previous / next colour (red, orange, yellow, green, cyan, blue, purple, pink, white);
+- "Rouge (R)", "Vert (G)", "Bleu (B)": from 0 to 255; left wing: −, right wing: + (hold: faster and faster);
+  the colour becomes "personnalisée" (custom);
+- "Mode": Fixe (steady), Clignotant (blinking) or Fondu (fading) (wings: previous / next mode). In Clignotant or Fondu,
+  a long press on the right wing opens the times: on / off, or to the colour / to black, from 50 ms to 5 s in steps
+  of 50 ms (flanks: choose the time; wings: − / +; long press on a wing: back);
+- "> Envoyer aux cigales" (send to the cicadas, right wing): the cicadas around, and this badge, show these LEDs
+  instead of their animation, until "> Rétablir leurs LEDs" (restore their LEDs) or their restart. The mute mode still
+  turns their LEDs off, and the pages that drive the LEDs themselves (games, talk badge) keep them.
+
+While setting, the LEDs of this badge show the colour and the mode chosen. Long left wing (or left wing on the last
+two rows): quit.
+
+**Annonces (admin)** (Announcements): 6 announcements, kept after the badge is switched off; at first, examples
+(welcome, breaks, CTF awards...). Flanks: choose; right wing: open it; left wing: back. An announcement has 6 rows
+(flanks: choose; left wing: back to the list):
+- "Heure" (time, for example 10:30) and "Texte" (text, at most 56 characters, accented letters included): right wing:
+  edit, with the 4-button editor (or the keyboard of the computer);
+- "QR code": the type of the QR code, with the wings: Aucun (none), Lien (URL), Texte (text), Téléphone (phone), SMS,
+  E-mail, Wi-Fi, Position GPS (GPS position);
+- "Contenu" (content): what the QR code contains (right wing: edit); the badge puts it in the form that phones
+  understand:
+
+  | Type | Content to type | QR code |
+  |---|---|---|
+  | Lien (URL) | `www.example.com` or `https://...` | `https://` added when missing |
+  | Texte | a text | the text |
+  | Téléphone | `+33612345678` | `tel:+33612345678` |
+  | SMS | `number:message` | `SMSTO:number:message` |
+  | E-mail | `address@mail.com` | `mailto:address@mail.com` |
+  | Wi-Fi | `network;password` | `WIFI:T:WPA;S:network;P:password;;` (without ";": open network) |
+  | Position GPS | `43.17,5.60` | `geo:43.17,5.60` |
+
+- "> Aperçu" (preview): the screen of the announcement, as the cicadas will show it (a wing: back);
+- "> Envoyer à toutes les cigales" (send to all the cicadas): the announcement goes over the radio, 3 times in a row
+  (for the cicadas that missed it). This badge does not show it to itself: that is what the preview is for.
+
+**Remise à zéro** (Reset): before the event or after tests. Flanks: choose; right wing, then a **long press on the
+right wing** to confirm (left wing: no):
+- "Scores sociaux" (social scores): the score and the encounters of the cicada network;
+- "Records des jeux" (game records): the records of the games and the puzzles;
+- "Défis CTF et crypto" (CTF and crypto challenges): the CTF flags and the crypto challenges solved;
+- "Contacts reçus" (contacts received): the business cards received (not your card);
+- "Virus": the state of the virus (healthy);
+- "Tout" (all): all of this at once. The name, the settings and your business card are kept.
 
 
 ## 5. Battery
@@ -410,8 +491,11 @@ python tools/badge_remote.py
 - The buttons of the window simulate those of the badge; under each one, "appui long" (long press).
 - **Badge :** the list of the badges plugged in, to choose the one to control when there are several.
 - **Mode clavier (saisie de texte)** (keyboard mode, text input): when a text editor is open on the badge (business
-  card, answer to a challenge...), the characters typed on the computer are written into it; Enter: done;
-  Escape: cancel; Backspace: erase. The arrow keys are still the buttons.
+  card, answer to a challenge...), the characters typed on the computer are inserted at the cursor; Enter: done;
+  Escape: cancel; Backspace: erase. The arrow keys are still the buttons. Only the characters without accent go
+  through the keyboard: the accented letters are chosen with the flanks.
+- **Mode admin**: turns the admin mode of the badge on or off (see [§ 4.8](#48-admin-mode-organizers));
+  the box follows the state of the badge.
 - A connection problem (badge unplugged, port busy) is shown in the status line and in the log;
   the application finds the badge again when it comes back.
 
@@ -495,9 +579,10 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | "Carte SD absente" (SD card missing) | Is the card pushed all the way in? Formatted as FAT32 or exFAT? |
 | A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`) and right folder? Name shorter than 64 characters? |
 | No sound | Volume at 0? (Médias > Volume). The buzzer is quiet: put your ear close to it. |
-| The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Infos, the crystal used must be 26 or 27 MHz. |
+| The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Infos, the crystal must be 26 or 27 MHz. |
 | No more sound or LEDs | The mute mode may be on (command of the organizers during a talk): Réglages > Mode muet. |
 | The badge does not obey the Flipper | Réglages > Télécommande : oui? Princeton code `0xC16Axx`, sent from a `.sub` file and held for a second. |
-| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station, the talk badge or the contact exchange is open: they use the radio. |
+| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station, the 433 MHz hunt, the talk badge or the contact exchange is open: they use the radio. |
+| The remote controls or the other cicadas are poorly received | Réglages > Réglage radio, close to other badges switched on. |
 | The screen keeps ghost images | Normal after many fast refreshes: it cleans itself at the next full refresh. |
 | The badge stops responding | Press the RESET button, or switch it off and on again. |

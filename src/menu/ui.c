@@ -157,7 +157,8 @@ int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int
         memcpy(line, text, fit);
         line[fit] = 0;
         if (lines == max_lines - 1 && text[fit] && text[fit] != '\n' && strspn(text + fit, " ") != strlen(text + fit))
-            ui_check_width(font, text, 0, "wrapped text cut");  /* More than max_lines: traced by the check */
+            if (ui_check)
+                printf("uicheck: cut (more than %d lines): \"%s\"\n", max_lines, text);
         char fitted[100];
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
         gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);

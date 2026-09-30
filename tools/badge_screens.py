@@ -34,7 +34,8 @@ from badge_remote import Badge, find_port  # noqa: E402
 OUT = os.path.join(ROOT, 'docs', 'screens')
 
 # Entries of the menu that are not pages: toggles or actions (not pressed, the label is shown by the menu)
-NOT_PAGES = {('Médias', 4), ('Badge', 3), ('Badge', 4), ('Réglages', 1), ('Réglages', 2), ('Admin', 8)}
+NOT_PAGES = {('Médias', 4), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
+             ('Admin', 10)}  # Démo écran (Badge, 5): an animation, not a page
 
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
 # screen to capture, with its caption. "back" at the end of a step goes back where the page was.
@@ -84,6 +85,11 @@ PAGES = {
                          ('xb', None, None, None), ('B', 'fondu', 'Les temps du fondu', None), ('B', None, None, None),
                          ('b', None, None, None), ('xx', 'envoyer', 'Envoyer / rétablir', None)],
     'Annoncer un talk': [],
+    'Annonces (admin)': [('b', 'detail', 'Une annonce : ses champs', None), ('b', 'heure', "Saisie de l'heure", 'a'),
+                         ('xb', 'texte', 'Saisie du texte (lettres accentuées)', 'a'), ('xx', None, None, None),
+                         ('xb', 'apercu', "Aperçu (l'écran des cigales)", 'a'), ('a', None, None, None)],
+    'Remise à zéro': [('b', 'confirmation', 'La confirmation', 'a')],
+    'Annonces': [],
     'Vote (admin)': [],
     'Type du badge': [],
 }
@@ -152,42 +158,43 @@ def main():
         time.sleep(0.1)
     t = st.Tester(badge, OUT, False)
     c = Crawler(t)
-    t.mark()
-    t.keys('R')
-    t.expect(r'^--- disconnected', 5)
-    while not badge.connected():
-        time.sleep(0.2)
-    t.pump(4)
-    if t.expect(r'^ui: Réglage radio$', 2):  # The first start tunes the radio
-        t.expect(r'^tune: crystal', 25)
-        t.pump(1)
-        t.keys('a')
-    t.pump(8)
-    t.keys('U')  # Check of the texts
-    t.expect(r'^uicheck: on', 3)
-    start = len(t.lines)
-    c.shot('Menu', 'Accueil', None, 'Le menu principal', start)
+
+    def restart():
+        """A restarted badge, on the main menu, with the check of the texts"""
+        t.mark()
+        t.keys('R')
+        t.expect(r'^--- disconnected', 5)
+        while not badge.connected():
+            time.sleep(0.2)
+        t.pump(4)
+        if t.expect(r'^ui: Réglage radio$', 2):  # The first start tunes the radio
+            t.expect(r'^tune: crystal', 25)
+            t.pump(1)
+            t.keys('a')
+        t.pump(8)
+        t.mark()
+        t.keys('U')
+        t.expect(r'^uicheck: on', 3)
+
+    def enter(ti, theme):
+        """Restarted, then the theme open"""
+        restart()
+        if theme == 'Admin':
+            return st.open_admin(t)  # It opens the Admin theme
+        t.mark()
+        t.keys('x' * ti + 'b')
+        return c.ui() == theme
+
+    restart()
+    c.shot('Menu', 'Accueil', None, 'Le menu principal', len(t.lines))
     only = args.only.split(',') if args.only else None
-    themes = submenus()
-    for ti, (theme, n) in enumerate(themes):
+    for ti, (theme, n) in enumerate(submenus()):
         if only and theme not in only:
             continue
         print(theme)
-        if theme == 'Admin':
-            if not st.open_admin(t):
-                print('  pas de mode admin')
-                continue
-            t.mark()
-            t.keys('b')
-            if not c.ui():
-                continue
-        else:
-            t.mark()
-            t.keys('x' * ti + 'b')
-            if c.ui() != theme:
-                print(f'  thème {theme} non ouvert')
-                t.keys('R')
-                continue
+        if not enter(ti, theme):
+            print(f'  thème {theme} non ouvert')
+            continue
         c.shot(theme, 'Menu', None, f'Le thème {theme}', len(t.lines))
         for i in range(n):
             if (theme, i) in NOT_PAGES:
@@ -198,11 +205,11 @@ def main():
             page = c.ui(3)
             if not page or page == theme:
                 print(f'  entrée {i}: pas de page')
-                t.keys('y' * i)
+                if not enter(ti, theme):
+                    break
                 continue
             t.pump(LONG_PAGES.get(page, 0))
             c.shot(theme, page, None, None, start)
-            here = page
             for keys, name, caption, back in PAGES.get(page, []):
                 start = len(t.lines)
                 t.mark()
@@ -211,29 +218,14 @@ def main():
                     c.shot(theme, page, name, caption, start)
                 if back:
                     t.keys(back, 0.6)
-            if not c.back_to(theme):
-                print(f'  retour au thème {theme} impossible depuis {here}: redémarrage')
-                t.mark()
-                t.keys('R')
-                t.expect(r'^--- disconnected', 5)
-                while not badge.connected():
-                    time.sleep(0.2)
-                t.pump(12)
-                t.keys('U')
-                if theme == 'Admin':
-                    st.open_admin(t)
-                    t.keys('b')
-                else:
-                    t.keys('x' * ti + 'b')
-                t.pump(2)
-                continue
-            t.keys('y' * i, 0.3)
+            if c.back_to(theme):
+                t.keys('y' * i, 0.3)
+            elif not enter(ti, theme):  # Lost: from a restarted badge
+                break
         if theme == 'Admin':
             t.mark()
-            t.keys('x' * (n - 1) + 'b')  # Quitter le mode admin
+            t.badge.send('\x01a')
             t.expect(r'^admin: off', 3)
-        else:
-            st.close_theme(t, theme)
     t.keys('U')
     badge.stop()
     write_docs(c)

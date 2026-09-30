@@ -3,6 +3,7 @@
 Ce guide explique comment utiliser le badge SecSea de Hack In Provence : allumer, naviguer dans les menus,
 profiter des médias, des jeux, des fonctions sociales, de la radio et des extensions, et préparer une carte SD.
 Pour modifier le logiciel du badge, voir le [guide développeur](guide_developpeur.md).
+Toutes les pages du badge en images, avec leurs textes : [les écrans du badge](ecrans.md).
 
 *English version: [user guide](../en/user_guide.md).*
 
@@ -61,16 +62,16 @@ Le menu principal regroupe les fonctions par thème :
 |---|---|
 | **Médias** | Images, Vidéos, Musique, Lecture rapide, Volume |
 | **Jeux** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto, Duel, Bataille navale |
-| **Social** | Réseau des cigales, Messages, Contacts, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur |
-| **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge |
+| **Social** | Réseau des cigales, Messages, Contacts, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces |
+| **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED |
-| **Réglages** | Veille de l'écran, Télécommande, Mode muet, Infos, Crédits |
+| **Réglages** | Veille de l'écran, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un septième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
 
-**Notifications** : quand un message, une question de vote, une invitation à jouer ou l'annonce d'un talk arrive,
-le badge émet un bip et l'écrit en bas de l'écran. Depuis les menus ou la veille, la page concernée s'ouvre
-directement (vote, programme, virus, invitation au duel ou à la bataille navale).
+**Notifications** : quand un message, une question de vote, une invitation à jouer ou une annonce des organisateurs
+arrive, le badge émet un bip et l'écrit en bas de l'écran. Depuis les menus ou la veille, la page concernée s'ouvre
+directement (vote, programme, virus, invitation au duel ou à la bataille navale, annonce en plein écran).
 
 
 ### 4.1 Médias
@@ -238,6 +239,16 @@ chantent ensemble, chacune sa voix, avec un départ synchronisé par radio. Deux
 à 4 voix et « L'Ode à la joie » à 3 voix.
 Votre badge participe par défaut ; aile droite : participer / ne plus chanter. En mode muet, le choeur est silencieux.
 
+**Annonces** : les annonces des organisateurs (pause café, prochain talk...). Une annonce est un écran construit
+par le badge : l'heure dans un bandeau noir, le texte, et souvent un QR code (un lien, un numéro de téléphone,
+un réseau Wi-Fi...) à scanner avec un téléphone.
+- Quand le badge est sur les menus ou en veille, l'annonce s'affiche toute seule, comme l'image de veille
+  (nette, elle reste affichée) ; n'importe quel bouton ramène au menu.
+- Sinon, le badge émet un bip et l'écrit en bas de l'écran : la prochaine ouverture de Social > Annonces
+  affiche directement la nouvelle annonce.
+- La page garde les 5 dernières annonces reçues (heure et texte). Flancs : choisir ; aile droite : l'afficher ;
+  aile gauche : retour.
+
 
 ### 4.4 Radio & IR
 
@@ -271,6 +282,15 @@ de blocs corrigés ; n'importe quel bouton ramène au menu.
 **Infrarouge** (module sur le port droit)
 - « Enregistrer un signal » : visez le récepteur avec une télécommande et appuyez sur une touche.
 - Les 4 emplacements rejouent les signaux enregistrés, comme une télécommande.
+
+**Chasse 433 MHz** (réception seule) : retrouvez au « chaud - froid » un émetteur 433 MHz caché (télécommande,
+sonde, brouilleur qui répète son code).
+- La page liste les codes entendus (8 au plus) : protocole et code, force de la dernière trame (dBm) et nombre
+  de trames reçues (« x3 »...). Flancs : choisir ; aile droite : le chasser ; aile gauche : retour.
+- Le badge suit alors ce code comme Social > Chaud - froid : de « Glacial » à « BRÛLANT ! », jauge, LEDs du bleu
+  au rouge et bips de plus en plus rapides. La force est mesurée sur chaque trame reçue : l'émetteur doit émettre.
+  Sans trame pendant 15 s, il est « hors de portée ». Aile gauche : retour à la liste.
+- Pendant la chasse, le badge n'entend plus les autres cigales.
 
 
 ### 4.5 Badge
@@ -314,9 +334,20 @@ de blocs corrigés ; n'importe quel bouton ramène au menu.
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.
-- **Infos** : version du firmware (numéro, commit git et date de compilation, un « + » si les sources différaient
-  du commit), version de la radio, quartz, carte SD, batterie. Aile droite : les crédits.
+- **Infos** : 6 lignes : version du firmware (numéro et commit git, un « + » si les sources différaient du commit),
+  date de compilation, version de la radio, quartz utilisé (« (mesure) » pendant sa mesure), carte SD, batterie.
+  Aile droite : les crédits.
 - **Crédits** : les personnes et associations derrière le badge.
+- **Réglage radio** : règle la radio automatiquement, en 3 étapes (environ 15 s) :
+  1. le quartz de la radio (26 ou 27 MHz) ;
+  2. le bruit radio de l'endroit (3 s) : le badge écoute les télécommandes à partir de 15 dB au-dessus du bruit ;
+  3. la fréquence, d'après les paquets des autres cigales entendues pendant 10 s : restez près d'autres badges
+     allumés.
+
+  Le réglage se fait tout seul au premier démarrage du badge (et après une mise à jour qui l'apporte), puis
+  à la demande : aile droite : régler à nouveau ; aile gauche : arrêter ou revenir. La page affiche le résultat :
+  quartz, bruit, seuil des télécommandes (« Télécommandes : > −90 dBm »...), correction de fréquence, et le nombre
+  de paquets d'autres cigales entendus (sans autre cigale, la fréquence n'est pas corrigée).
 
 
 ### 4.7 Télécommande et mode muet
@@ -370,17 +401,68 @@ une commande reçue deux fois n'est exécutée qu'une fois.
 Dans le menu principal (la liste des thèmes), tapez sur les flancs **gauche, gauche, droit, droit, gauche, droit,
 gauche, droit** en moins de 8 secondes : « Mode admin activé » s'affiche et le thème **Admin** apparaît, déjà sélectionné,
 après les autres. Le mode admin reste actif après extinction.
+Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branché en USB (voir [§ 6](#6-piloter-le-badge-depuis-un-ordinateur)).
 
 | Entrée | Rôle |
 |---|---|
 | **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk |
-| **Annoncer un talk** | affiche un talk du programme sur tous les badges |
+| **LEDs des cigales** | choisit la couleur et l'animation des LEDs de toutes les cigales autour (voir ci-dessous) |
+| **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
+| **Annoncer un talk** | envoie un talk du programme à toutes les cigales, comme une annonce : son heure, son titre et son orateur, le QR code de son lien |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
+| **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
+
+**LEDs des cigales** : une liste de réglages ; flancs : choisir la ligne.
+- « Couleur » : ailes : couleur précédente / suivante (rouge, orange, jaune, vert, cyan, bleu, violet, rose, blanc) ;
+- « Rouge (R) », « Vert (G) », « Bleu (B) » : de 0 à 255 ; aile gauche : −, aile droite : + (en maintenant :
+  de plus en plus vite) ; la couleur devient « personnalisée » ;
+- « Mode » : Fixe, Clignotant ou Fondu (ailes : mode précédent / suivant). En Clignotant ou Fondu, un appui long
+  sur l'aile droite ouvre les durées : allumé / éteint, ou vers la couleur / vers le noir, de 50 ms à 5 s par pas
+  de 50 ms (flancs : choisir la durée ; ailes : − / + ; appui long sur une aile : retour) ;
+- « > Envoyer aux cigales » (aile droite) : les cigales autour, et ce badge, prennent ces LEDs à la place de leur
+  animation, jusqu'à « > Rétablir leurs LEDs » ou leur redémarrage. Le mode muet éteint toujours leurs LEDs,
+  et les pages qui pilotent elles-mêmes les LEDs (jeux, badge de talk) les gardent.
+
+Pendant le réglage, les LEDs de ce badge montrent la couleur et le mode choisis. Aile gauche longue (ou aile gauche
+sur les deux dernières lignes) : quitter.
+
+**Annonces (admin)** : 6 annonces, gardées après extinction ; au départ, des exemples (accueil, pauses, remise des
+prix du CTF...). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retour. Une annonce a 6 lignes
+(flancs : choisir ; aile gauche : retour à la liste) :
+- « Heure » (par exemple 10:30) et « Texte » (56 caractères au plus, lettres accentuées comprises) : aile droite :
+  modifier, avec l'éditeur à 4 boutons (ou le clavier de l'ordinateur) ;
+- « QR code » : le type du QR code, avec les ailes : Aucun, Lien (URL), Texte, Téléphone, SMS, E-mail, Wi-Fi,
+  Position GPS ;
+- « Contenu » : ce que contient le QR code (aile droite : modifier) ; le badge le met dans la forme que
+  comprennent les téléphones :
+
+  | Type | Contenu à saisir | QR code |
+  |---|---|---|
+  | Lien (URL) | `www.exemple.fr` ou `https://...` | `https://` ajouté s'il manque |
+  | Texte | un texte | le texte |
+  | Téléphone | `+33612345678` | `tel:+33612345678` |
+  | SMS | `numéro:message` | `SMSTO:numéro:message` |
+  | E-mail | `adresse@mail.fr` | `mailto:adresse@mail.fr` |
+  | Wi-Fi | `réseau;mot de passe` | `WIFI:T:WPA;S:réseau;P:mot de passe;;` (sans « ; » : réseau ouvert) |
+  | Position GPS | `43.17,5.60` | `geo:43.17,5.60` |
+
+- « > Aperçu » : l'écran de l'annonce, tel que les cigales l'afficheront (une aile : retour) ;
+- « > Envoyer à toutes les cigales » : l'annonce part par radio, 3 fois de suite (pour les cigales qui l'auraient
+  manquée). Ce badge ne se l'affiche pas : c'est le rôle de l'aperçu.
+
+**Remise à zéro** : avant l'événement ou après des essais. Flancs : choisir ; aile droite, puis **appui long sur
+l'aile droite** pour confirmer (aile gauche : non) :
+- « Scores sociaux » : le score et les rencontres du réseau des cigales ;
+- « Records des jeux » : les records des jeux et des casse-têtes ;
+- « Défis CTF et crypto » : les flags du CTF et les défis crypto résolus ;
+- « Contacts reçus » : les cartes de visite reçues (pas votre carte) ;
+- « Virus » : l'état du virus (en forme) ;
+- « Tout » : tout cela à la fois. Le nom, les réglages et votre carte de visite sont gardés.
 
 
 ## 5. Batterie
@@ -404,8 +486,11 @@ python tools/badge_remote.py
 - Les boutons de la fenêtre simulent ceux du badge ; sous chacun, « appui long ».
 - **Badge :** la liste des badges branchés, pour choisir celui à piloter quand il y en a plusieurs.
 - **Mode clavier (saisie de texte)** : quand un éditeur de texte est ouvert sur le badge (carte de visite, réponse
-  à un défi...), les caractères tapés sur l'ordinateur y sont écrits ; Entrée : valider ; Échap : annuler ;
-  Retour arrière : effacer. Les flèches restent les boutons.
+  à un défi...), les caractères tapés sur l'ordinateur y sont insérés au curseur ; Entrée : valider ; Échap : annuler ;
+  Retour arrière : effacer. Les flèches restent les boutons. Seuls les caractères sans accent passent par le clavier :
+  les lettres accentuées se choisissent avec les flancs.
+- **Mode admin** : active ou désactive le mode admin du badge (voir [§ 4.8](#48-le-mode-admin-organisateurs)) ;
+  la case suit l'état du badge.
 - Un problème de connexion (badge débranché, port occupé) s'affiche dans la ligne d'état et le journal ;
   l'application retrouve le badge quand il revient.
 
@@ -489,9 +574,10 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | « Carte SD absente » | Carte bien enfoncée ? Formatée en FAT32 ou exFAT ? |
 | Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`) et bon dossier ? Nom de moins de 64 caractères ? |
 | Pas de son | Volume à 0 ? (Médias > Volume). Le buzzer est discret : collez l'oreille. |
-| Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz utilisé doit être 26 ou 27 MHz. |
+| Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz doit être 26 ou 27 MHz. |
 | Plus de son ni de LEDs | Le mode muet est peut-être actif (commande des organisateurs pendant un talk) : Réglages > Mode muet. |
 | Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ? Code Princeton `0xC16Axx`, envoyé depuis un fichier `.sub` et maintenu une seconde. |
-| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo, le Badge de talk ou l'échange de contacts est ouvert : ils occupent la radio. |
+| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo, la Chasse 433 MHz, le Badge de talk ou l'échange de contacts est ouvert : ils occupent la radio. |
+| Les télécommandes ou les autres cigales passent mal | Réglages > Réglage radio, près d'autres badges allumés. |
 | L'écran garde des traces | Normal après de nombreux rafraîchissements rapides : il se nettoie au prochain rafraîchissement complet. |
 | Le badge ne répond plus | Bouton RESET, ou éteindre / rallumer. |

@@ -167,7 +167,7 @@ static int sel = 0, card_sel = 0, list_sel = 0;
 static ui_edit_t edit;
 
 static void main_label(int i, char *buf, size_t len) {
-    static const char *L[] = {"Ma carte", "Echanger (badges proches)", "Contacts reçus"};
+    static const char *L[] = {"Ma carte", "Échanger les cartes", "Contacts reçus"};
     if (i == 2)
         snprintf(buf, len, "%s (%u)", L[i], store_ext_get()->n_contacts);
     else
@@ -314,7 +314,7 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
     case V_CARD:
         ui_title(fb, "Ma carte");
         ui_list(fb, N_FIELDS, card_sel, card_label);
-        ui_footer(fb, "D : modifier  D long : [x] envoyer");
+        ui_footer(fb, "D : modifier  D long : cocher");
         break;
     case V_EDIT:
         ui_edit_render(fb, &edit, FIELDS[card_sel].label, "");

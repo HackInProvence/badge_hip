@@ -388,9 +388,18 @@ static bool hunt433_task(absolute_time_t now) {
         while (i < n_targets && ! (targets[i].code == r.code && ! strcmp(targets[i].protocol, r.protocol)))
             ++i;
         if (i == n_targets) {
-            if (n_targets == TARGETS)
-                continue;  /* The list is full: the hunt goes on with the codes already there */
-            ++n_targets;
+            if (n_targets == TARGETS) {
+                /* The list is full: the code heard the longest ago leaves (not the one hunted) */
+                int old = -1;
+                for (int k = 0; k < n_targets; ++k)
+                    if (k != hunted && (old < 0 || absolute_time_diff_us(targets[k].seen, targets[old].seen) > 0))
+                        old = k;
+                if (old < 0)
+                    continue;
+                i = old;
+            } else {
+                ++n_targets;
+            }
             memset(&targets[i], 0, sizeof(targets[i]));
             snprintf(targets[i].protocol, sizeof(targets[i].protocol), "%s", r.protocol);
             targets[i].code = r.code;

@@ -4,8 +4,9 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 /* Program of the conference, hard-coded (no SD card needed): the list, the details with a QR code.
- * The remote command 0x20 + n (Flipper: Princeton key 0xC16A2n, or the admin menu) shows the talk n on all the
- * badges: "the next talk is...". */
+ * The remote command 0x20 + n (Flipper: Princeton key 0xC16A2n) shows the talk n of the program of the badge.
+ * Admin > Annoncer un talk sends the content of the talk as an announcement (announce.c): the badges show what
+ * they received. */
 
 #include <stdio.h>
 #include <string.h>

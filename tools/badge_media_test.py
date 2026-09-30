@@ -114,7 +114,11 @@ def main():
     t.expect(r'^--- disconnected', 5)
     while not badge.connected():
         time.sleep(0.2)
-    t.pump(14)
+    t.pump(4)
+    if t.expect(r"^ui: Réglage radio$", 2):  # A badge not tuned yet: the tuning of the radio first
+        t.expect(r"^tune: crystal", 25)
+        t.keys("a")
+    t.pump(10)
     report = []
     for kind in kinds:
         st.open_theme(t, 'Médias')
