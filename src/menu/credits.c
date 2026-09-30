@@ -33,7 +33,7 @@ static const credit_t CREDITS[] = {
     {secsea_bw, 18, 172, 200, false, NULL, "SecSea 2026", "L'année de sortie du badge.", "x.com/SecSeaConf"},
     {NULL, 0, 0, 0, false, "PB", "Miaou", "Pierre-Antoine Brameret.\nA posé toutes les bases\ndu projet : écran, radio, son.", "github.com/Miaou"},
     {NULL, 0, 0, 0, false, "PG", "Paul Ganelon", "Instigateur du projet.", "linkedin.com/in/paulganelon"},
-    {NULL, 0, 0, 0, false, "CC", "Christophe Chaloin", "Première version\nhardware du badge.", ""},
+    {NULL, 0, 0, 0, false, "CC", "Christophe Chaloin", "Première version\nhardware du badge.", "linkedin.com/in/christophe-chaloin-1433851"},
     {NULL, 0, 0, 0, false, "CB", "Cédric Beranger", "A fait la version 1.1\nde la carte.", ""},
     {NULL, 0, 0, 0, false, "T", "Tristus1er", "Le code des applications :\nmenus, médias, jeux,\nradio, extensions.", "github.com/Tristus1er"},
     {NULL, 0, 0, 0, false, "+", "Et vous tous !", "Toutes les personnes qui\nont aidé et que l'on aurait\npu oublier. Merci !", "github.com/HackInProvence"},
@@ -115,9 +115,30 @@ void credits_render(uint8_t *fb, int page) {
         t += end ? (size_t)(end - t) + 1 : n;
     }
     if (c->link[0]) {
-        int w = gfx_text_width(&gfx_font_small, c->link);
-        gfx_text(fb, GFX_WIDTH/2, FOOTER_Y - gfx_font_small.height - 5, &gfx_font_small, c->link, GFX_BLACK, GFX_ALIGN_CENTER);
-        gfx_fill_rect(fb, (GFX_WIDTH - w)/2, FOOTER_Y - 5, w, 1, GFX_BLACK);  /* Underlined, like a link */
+        /* Underlined, like a link; too long for a line: cut after the last '/' that fits */
+        char parts[2][64];
+        snprintf(parts[0], sizeof(parts[0]), "%s", c->link);
+        parts[1][0] = 0;
+        if (gfx_text_width(&gfx_font_small, parts[0]) > GFX_WIDTH - 4) {
+            for (int k = strlen(parts[0]) - 1; k > 0; --k) {
+                if (c->link[k - 1] != '/')
+                    continue;
+                snprintf(parts[0], sizeof(parts[0]), "%.*s", k, c->link);
+                if (gfx_text_width(&gfx_font_small, parts[0]) <= GFX_WIDTH - 4) {
+                    snprintf(parts[1], sizeof(parts[1]), "%s", c->link + k);
+                    break;
+                }
+            }
+        }
+        if (! parts[1][0])
+            snprintf(parts[0], sizeof(parts[0]), "%s", c->link);  /* No cut that fits: as it is */
+        int n = parts[1][0] ? 2 : 1;
+        for (int i = 0; i < n; ++i) {
+            int ly = FOOTER_Y - (n - i) * (gfx_font_small.height + 3) - 2;
+            int w = gfx_text_width(&gfx_font_small, parts[i]);
+            gfx_text(fb, GFX_WIDTH/2, ly, &gfx_font_small, parts[i], GFX_BLACK, GFX_ALIGN_CENTER);
+            gfx_fill_rect(fb, (GFX_WIDTH - w)/2, ly + gfx_font_small.height, w, 1, GFX_BLACK);
+        }
     }
 
     gfx_fill_rect(fb, 0, FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);

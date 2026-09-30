@@ -262,6 +262,9 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     case 'r':
         radio_print_registers();  /* Debug: the registers of the CC1101 and its PATABLE */
         break;
+    case 'M':
+        radio_tools_send();  /* Debug: the "Radio : message" (Flipper chat profile), without the menus */
+        break;
     case '?':
         /* Debug: state of the audio */
         printf("audio: %s, played %lu samples, queued %u, volume %u/%u, music %lus/%lus\n",

@@ -625,7 +625,9 @@ The badge shows up as a USB serial port (115200 baud, irrelevant over USB). One 
 | `o` | state of the OOK receiver: active, pulses, frames, RSSI, MARCSTATE, GDO0 |
 | `p` | durations of the last signal given to the OOK decoder |
 | `k` | export of the business cards received as vCards (read by `tools/contacts_export.py`) |
-| `V` | log every network packet sent and received: on / off |
+| `V` | log every network packet sent and received (with the measured frequency offset, FREQEST): on / off |
+| `r` | registers of the CC1101 and PATABLE |
+| `M` | sends the "Radio : message" (chat profile of the Flipper: `subghz chat 433920000 0` receives it) |
 | `P` | ping at +10 dBm: the badges that hear it print `net: ping #n from <id>, rssi ...` |
 | `L` | *loopback* mode (§ 6.12): on / off |
 | `R` | reboot (watchdog) |
@@ -745,4 +747,4 @@ The groups (`--only`):
 | A packet does not arrive | `V` on both badges; "dropped" counter of `!` (queue full, data too long); during an OOK listening window the network hears nothing: repeat the important packets |
 | No badge hears this badge any more after OOK listening | FREND0 left at 0x11: the GFSK configuration must write FREND0, FREND1, MDMCFG0 back (§ 6.14) |
 | The Flipper sends another Princeton key | `subghz tx` on the command line: use a `.sub` file and `subghz tx_from_file` (§ 6.19) |
-| The Flipper records nothing from the badges | add the "SecSea" preset to `subghz/assets/setting_user` (§ 6.19) |
+| The Flipper records nothing from the badges | the badges send in GFSK (frequency modulation): Read RAW in AM650 / AM270 (the default) does not see them. Use the "SecSea" preset added to `subghz/assets/setting_user` (§ 6.19), or else FM476. Check the transmission: `subghz chat 433920000 0` on the Flipper and `M` on the badge |
