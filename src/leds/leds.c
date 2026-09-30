@@ -91,6 +91,22 @@ bool change_leds(repeating_timer_t *rt) {
             b = LED_RGB_B(animation.color) * f;
             push_led(LED_RGB(r,g,b));
             break;
+        case LED_BLINK:
+            cycle = animation.period + animation.period2;
+            push_led(cycle && diff_us % cycle >= animation.period ? 0 : animation.color);
+            break;
+        case LED_FADE:
+            cycle = animation.period + animation.period2;
+            n = cycle ? diff_us % cycle : 0;
+            if (n < animation.period)
+                f = animation.period ? (float)n / (float)animation.period : 1.f;  /* Rising */
+            else
+                f = animation.period2 ? 1.f - (float)(n - animation.period) / (float)animation.period2 : 0.f;
+            r = LED_RGB_R(animation.color) * f;
+            g = LED_RGB_G(animation.color) * f;
+            b = LED_RGB_B(animation.color) * f;
+            push_led(LED_RGB(r,g,b));
+            break;
         default:
             /* Forgotten implementation, do nothing */
             break;
@@ -212,6 +228,29 @@ void leds_anim_breath(uint32_t color, uint64_t period) {
         .kind = LED_BREATH,
         .color = color,
         .period = period,
+        .tref = get_absolute_time(),
+    };
+    leds_set_anim(&anim);
+}
+
+
+void leds_anim_blink(uint32_t color, uint64_t on_us, uint64_t off_us) {
+    leds_anim_t anim = {
+        .kind = LED_BLINK,
+        .color = color,
+        .period = on_us,
+        .period2 = off_us,
+        .tref = get_absolute_time(),
+    };
+    leds_set_anim(&anim);
+}
+
+void leds_anim_fade(uint32_t color, uint64_t in_us, uint64_t out_us) {
+    leds_anim_t anim = {
+        .kind = LED_FADE,
+        .color = color,
+        .period = in_us,
+        .period2 = out_us,
         .tref = get_absolute_time(),
     };
     leds_set_anim(&anim);

@@ -42,6 +42,8 @@ typedef enum {
     LED_OOK,
     LED_FLASHES,
     LED_BREATH,
+    LED_BLINK,  /* period: time on, period2: time off */
+    LED_FADE,  /* period: fade in (black -> color), period2: fade out (color -> black) */
 } leds_anim_kind_t;
 
 typedef struct {
@@ -50,6 +52,7 @@ typedef struct {
     uint32_t color;  /* BRGW in big endian where white is unused */
     absolute_time_t tref;
     uint64_t period;  /* in µs */
+    uint64_t period2;  /* in µs, LED_BLINK and LED_FADE */
     //uint16_t param;
     //uint64_t phase;  /* in µs between eyes */
 } leds_anim_t;
@@ -80,6 +83,12 @@ void leds_anim_flashes(uint32_t color);
 
 /** \brief Sets a continuously changing color, period in µs. */
 void leds_anim_breath(uint32_t color, uint64_t period);
+
+/** \brief Blinks: \p on_us with the color, \p off_us off. */
+void leds_anim_blink(uint32_t color, uint64_t on_us, uint64_t off_us);
+
+/** \brief Fades: from black to the color in \p in_us, then back to black in \p out_us, again and again. */
+void leds_anim_fade(uint32_t color, uint64_t in_us, uint64_t out_us);
 
 /** \brief Cancels previous animations on the LEDs, optionally shuts them down */
 void leds_cancel_anim(bool leds_off);

@@ -54,6 +54,10 @@ bool radio_tools_idle(void);
 /** \brief Configures the radio again with the GFSK profile of the badges (after another mode, e.g. OOK). */
 void radio_tools_reconfigure(void);
 
+/** \brief Correction of the frequency (FSCTRL0 of the CC1101, steps of fXOSC / 2^14 ~ 1.6 kHz), see radio_tune.c. */
+void radio_tools_set_freq_offset(int8_t steps);
+int8_t radio_tools_freq_offset(void);
+
 /** \brief Sync word of the network of the cicadas: different from the Flipper chat (0x464C), so that they ignore each other. */
 #define RADIO_TOOLS_SOCIAL_SYNC1 0xC1
 #define RADIO_TOOLS_SOCIAL_SYNC0 0x6A

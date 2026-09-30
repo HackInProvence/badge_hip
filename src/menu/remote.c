@@ -24,6 +24,7 @@
 #define SEEN_MS 10000  /* The same command (sender + nonce) is executed once */
 #define PRINCETON_SEEN_MS 1500  /* A remote repeats its code while its button is held */
 #define CIGALE_MS 6000
+#define OOK_GIVE_UP_MS 2000  /* The Princeton frames not sent after this: the network packets anyway */
 #define OOK_FRAMES 12  /* Princeton frames of an admin command (~0.6 s) */
 #define SAME_COMMAND_MS 4000  /* The command came by the network and in OOK: executed once */
 #define OOK_WINDOW_MS 150  /* A window: enough to see that a remote sends (~95 edges per 100 ms), then extended */
@@ -31,7 +32,9 @@
 #define OOK_PERIOD_MAX_MS 3200  /* Doubled after each window without a remote decoded (an interferer); not more: a
                                 * remote must still be heard when its button is held ~3 s */
 #define RSSI_POLL_MS 20
-#define OOK_TRIGGER_DBM (-90)  /* The noise is ~-105 dBm */
+#define OOK_TRIGGER_DBM (-90)  /* Without tuning (the noise is ~-105 dBm) */
+#define OOK_TRIGGER_ABOVE_NOISE 15  /* With the tuning (radio_tune.c): the noise measured + 15 dB */
+#define OOK_STRONG_DBM (-75)  /* A remote close to the badge: listened to even during the pause of the windows */
 #define OOK_TRIGGER_POLLS 2  /* Measures in a row above the trigger, without a packet of the network */
 #define OOK_FORCED_MS 10000  /* A window anyway, for a remote weaker than the trigger */
 #define OOK_WINDOW_MAX_MS 1500  /* A window is extended while pulses come (a remote is sending) */
@@ -63,6 +66,7 @@ static absolute_time_t window_start = 0;
 static uint32_t window_pulses = 0;
 static int windows_paused = 0;
 static bool ook_pending = false;  /* The Princeton frames of the command to send */
+static absolute_time_t ook_pending_ts = 0;
 static absolute_time_t rssi_ts = 0, forced_ts = 0;
 static int loud_polls = 0;
 static uint32_t window_frames = 0;  /* Frames decoded before the window */
@@ -219,6 +223,7 @@ void remote_send(uint8_t command) {
     send_nonce = get_rand_32();
     next_send = get_absolute_time();
     ook_pending = true;  /* First the Princeton frames (talk badges listen only in OOK), then the network */
+    ook_pending_ts = get_absolute_time();
     remote_execute(command, "this badge");  /* The admin badge obeys too */
 }
 
@@ -226,6 +231,22 @@ void remote_send(uint8_t command) {
 void remote_init(void) {
     net_subscribe(NET_COMMAND, handle_command);
     audio_set_mute(is_muted());
+}
+
+
+int remote_trigger_dbm(void) {
+    const store_t *s = store_get();
+    if (s->radio_tuned != STORE_RADIO_TUNED)
+        return OOK_TRIGGER_DBM;
+    int t = s->radio_noise_dbm + OOK_TRIGGER_ABOVE_NOISE;
+    return t < -95 ? -95 : t > -70 ? -70 : t;
+}
+
+
+void remote_debug(void) {
+    printf("remote state: window %d, windows paused %d, ook rx %d, ook tx %d, ook pending %d, sends left %d, "
+           "period %lu ms\n", window, windows_paused, ook_rx_active(), ook_tx_busy(), ook_pending, sends_left,
+           (unsigned long)window_period_ms);
 }
 
 
@@ -239,6 +260,10 @@ void remote_pause_windows(bool pause) {
 void remote_task(absolute_time_t now) {
     ook_tx_task();
     /* An admin command: the same code as a Flipper remote, for the badges that only listen in OOK (talk) */
+    if (ook_pending && absolute_time_diff_us(ook_pending_ts, now) > OOK_GIVE_UP_MS * 1000ll) {
+        ook_pending = false;  /* The radio stayed busy: the network packets go anyway */
+        printf("remote: princeton not sent (radio busy)\n");
+    }
     if (ook_pending && ook_rx_active() && ! window)
         ook_pending = false;  /* This badge listens in OOK itself (talk badge): the network only */
     if (ook_pending && ! window && radio_tools_idle()) {
@@ -259,13 +284,16 @@ void remote_task(absolute_time_t now) {
      * No blind window: the packets of the network are not lost any more (with a window every 800 ms, ~15 % were) */
     if (! window) {
         if (remote_enabled() && ! windows_paused && radio_tools_idle() && net_idle() && ! net_chat()
-                && absolute_time_diff_us(window_ts, now) >= 0 && absolute_time_diff_us(rssi_ts, now) >= 0) {
+                && absolute_time_diff_us(rssi_ts, now) >= 0) {
             rssi_ts = delayed_by_ms(now, RSSI_POLL_MS);
             uint8_t raw = 0;
             radio_read_registers(CC1101_RSSI, &raw, 1);
             int rssi = (int8_t)raw / 2 - 74;
-            loud_polls = rssi >= OOK_TRIGGER_DBM && ! net_transmitting() ? loud_polls + 1 : 0;
-            if (loud_polls >= OOK_TRIGGER_POLLS || absolute_time_diff_us(forced_ts, now) >= 0) {
+            loud_polls = rssi >= remote_trigger_dbm() && ! net_transmitting() ? loud_polls + 1 : 0;
+            /* The pause after a window without a remote (an interferer) does not stop a strong signal: a remote
+             * close to the badge */
+            bool allowed = absolute_time_diff_us(window_ts, now) >= 0 || rssi >= OOK_STRONG_DBM;
+            if (allowed && (loud_polls >= OOK_TRIGGER_POLLS || absolute_time_diff_us(forced_ts, now) >= 0)) {
                 /* A transmitter, or now and then anyway (a remote weaker than the trigger) */
                 loud_polls = 0;
                 forced_ts = delayed_by_ms(now, OOK_FORCED_MS);

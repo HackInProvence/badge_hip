@@ -15,6 +15,7 @@
 #include "radio.h"
 #include "radio_tools.h"
 #include "social.h"
+#include "store.h"
 
 
 #define BAUDS 9995
@@ -42,15 +43,35 @@ static volatile uint32_t edges = 0;
 static char message[64] = "";
 
 
+static int8_t freq_offset = 0;  /* FSCTRL0: steps of fXOSC / 2^14 */
+
 static void configure(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_write_registers(radio_preset_gfsk, radio_preset_gfsk_len);
     /* The registers that the OOK receiver (ook_rx.c) changes and that the preset keeps at their reset values:
      * with FREND0 = 0x11, the packets would be sent with PATABLE[1] (nothing) */
     radio_write_registers((const uint8_t[]){CC1101_FREND0, 0x10, CC1101_FREND1, 0x56, CC1101_MDMCFG0, 0xF8}, 6);
+    /* The longest packet: 61 bytes (the RX FIFO minus the length and the 2 status bytes). With the default (255),
+     * a sync word found in the noise followed by a big "length" made the radio wait for the end of a packet that
+     * never came (GDO0 stuck high: the network neither sent nor received, see check_radio() in net.c) */
+    radio_write_registers((const uint8_t[]){CC1101_PKTLEN, 61}, 2);
     radio_set_power(PATABLE);
     radio_set_frequency(RADIO_TOOLS_FREQ_HZ);
     radio_set_baud_rate(BAUDS);
+    /* The correction of the frequency found by the tuning (radio_tune.c), for sending and receiving */
+    radio_write_registers((const uint8_t[]){CC1101_FSCTRL0, (uint8_t)freq_offset}, 2);
+}
+
+
+void radio_tools_set_freq_offset(int8_t steps) {
+    freq_offset = steps;
+    if (state == R_IDLE)
+        configure();
+}
+
+
+int8_t radio_tools_freq_offset(void) {
+    return freq_offset;
 }
 
 
@@ -58,8 +79,10 @@ void radio_tools_init(void) {
     radio_init();
     radio_reset();  /* Same as the Flipper: reset, then only the preset registers differ from the defaults */
     radio_read_registers(CC1101_VERSION, &chip_version, 1);
+    if (store_get()->radio_tuned == STORE_RADIO_TUNED)
+        freq_offset = store_get()->radio_freq_offset;  /* The tuning (radio_tune.c) */
     configure();
-    printf("radio: CC1101 version 0x%02x\n", chip_version);
+    printf("radio: CC1101 version 0x%02x, frequency offset %d\n", chip_version, freq_offset);
     /* Measure the crystal (~1s, in the background) and reconfigure the radio with it */
     radio_tools_measure_xosc();
 }

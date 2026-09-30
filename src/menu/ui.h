@@ -47,6 +47,12 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int i, char *buf, si
 /** \brief A framed message box in the middle of the page. */
 void ui_box(uint8_t *fb, const char *text);
 
+/* Check of the texts (debug, key U of the serial port): the cut texts, the too wide ones and the ones under the
+ * footer are traced ("uicheck: ...") */
+extern bool ui_check;
+void ui_check_width(const gfx_font_t *font, const char *text, int width, const char *what);
+void ui_check_bottom(int bottom, const char *text);
+
 /** \brief Horizontal gauge (e.g. a signal strength) of \p value / \p max. */
 void ui_gauge(uint8_t *fb, int x, int y, int w, int h, int value, int max);
 

@@ -17,20 +17,39 @@ const char UI_CHARSET_UPPER[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 
 void ui_title(uint8_t *fb, const char *title) {
+    ui_check_width(&gfx_font_medium, title, GFX_WIDTH - 2, "title");
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, UI_TITLE_H, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, (UI_TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
 }
 
 
 void ui_footer(uint8_t *fb, const char *text) {
+    ui_check_width(&gfx_font_small, text, GFX_WIDTH - 2, "footer");
     gfx_fill_rect(fb, 0, UI_FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+}
+
+
+/* The check of the texts (debug, key U on the serial port): the texts cut or drawn under the footer are traced,
+ * to find them all by going through every page (tools/badge_screens.py) */
+bool ui_check = false;
+
+void ui_check_width(const gfx_font_t *font, const char *text, int width, const char *what) {
+    if (ui_check && gfx_text_width(font, text) > width)
+        printf("uicheck: %s too wide (%d > %d px): \"%s\"\n", what, gfx_text_width(font, text), width, text);
+}
+
+void ui_check_bottom(int bottom, const char *text) {
+    if (ui_check && bottom > UI_FOOTER_Y - 2)
+        printf("uicheck: under the footer (y %d): \"%s\"\n", bottom, text);
 }
 
 
 void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int width) {
     snprintf(dst, len, "%s", src);
     size_t n = strlen(dst);
+    if (ui_check && (strlen(src) >= len || gfx_text_width(font, dst) > width))
+        printf("uicheck: cut \"%s\"\n", src);
     while (n > 3 && gfx_text_width(font, dst) > width) {
         /* Remove a whole UTF-8 character before the ellipsis */
         do
@@ -61,6 +80,7 @@ int ui_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *text) {
         text = next_line(text, line, sizeof(line));
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
         gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+        ui_check_bottom(y + font->height, line);
         y += font->height + 3;
     }
     return y;
@@ -73,6 +93,7 @@ int ui_text(uint8_t *fb, int x, int y, const gfx_font_t *font, const char *text)
         text = next_line(text, line, sizeof(line));
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - x - 2);
         gfx_text(fb, x, y, font, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
+        ui_check_bottom(y + font->height, line);
         y += font->height + 3;
     }
     return y;

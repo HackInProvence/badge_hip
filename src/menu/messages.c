@@ -150,6 +150,7 @@ static int sel = 0;
 static contact_t recipients[1 + SOCIAL_MAX_NEIGHBOURS + INBOX];  /* Everybody, the neighbours, the senders */
 static int n_recipients = 0;
 static int recipient = 0;
+static const char EVERYBODY[] = "Tout le monde";
 
 static void add_recipient(uint32_t id, const char *name) {
     for (int i = 0; i < n_recipients; ++i)
@@ -162,7 +163,7 @@ static void add_recipient(uint32_t id, const char *name) {
 
 static void list_recipients(void) {
     n_recipients = 0;
-    add_recipient(0, "Tout le monde");
+    add_recipient(0, "");  /* Everybody: EVERYBODY on the screen */
     social_neighbour_t nb[SOCIAL_MAX_NEIGHBOURS];
     int n = social_neighbours(nb, SOCIAL_MAX_NEIGHBOURS);
     for (int i = 0; i < n; ++i)
@@ -184,7 +185,7 @@ static void recipient_label(int i, char *buf, size_t len) {
     if (recipients[i].id)
         snprintf(buf, len, "%s#%04X", recipients[i].name, (unsigned)(recipients[i].id & 0xFFFF));
     else
-        snprintf(buf, len, "%s", recipients[i].name);
+        snprintf(buf, len, "%s", EVERYBODY);  /* Longer than a name of a badge (9 bytes) */
 }
 
 static void message_label(int i, char *buf, size_t len) {

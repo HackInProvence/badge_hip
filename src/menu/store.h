@@ -63,7 +63,13 @@ typedef struct {
     uint8_t infection;  /* INFECTION_* state of the virus game */
     uint16_t crypto_solved;  /* Bit n: challenge n solved; 0xFFFF = none */
     uint16_t puzzle_records[STORE_GAMES];  /* Records of the puzzles (puzzles.h), 0xFFFF = none */
+    /* Automatic tuning of the radio (radio_tune.c), done at the first start and from Réglages */
+    uint8_t radio_tuned;  /* STORE_RADIO_TUNED once done */
+    int8_t radio_noise_dbm;  /* Noise floor measured (dBm): the trigger of the listening to the remotes */
+    int8_t radio_freq_offset;  /* FSCTRL0 (FREQOFF) of the CC1101, in steps of fXOSC / 2^14 (~1.6 kHz) */
 } store_t;
+
+#define STORE_RADIO_TUNED 0xA5
 
 /* Second store (2 sectors before the first one): the contact cards (contacts.c) */
 #define CONTACT_BYTES 512  /* All the fields of a card (contacts.c, sizes of FIELDS) */

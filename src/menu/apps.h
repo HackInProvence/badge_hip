@@ -46,6 +46,8 @@ typedef enum {
     APP_CRYPTO,
     APP_BATTLE,
     APP_HUNT433,
+    APP_RADIO_TUNE,
+    APP_LEDCAST,
     APP_COUNT,
 } app_id_t;
 

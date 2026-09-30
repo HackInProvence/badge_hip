@@ -66,6 +66,13 @@ void remote_set_muted(bool muted);
  * all the packets of the network (chorus, image transfer...). Calls are counted. */
 void remote_pause_windows(bool pause);
 
+/** \brief The RSSI above which a transmitter opens a moment of listening to the remotes: the noise measured by the
+ * tuning + 15 dB (radio_tune.c), -90 dBm without tuning. */
+int remote_trigger_dbm(void);
+
+/** \brief Debug ("!" on the serial port): the listening to the remotes. */
+void remote_debug(void);
+
 /** \brief Feeds a Princeton code received by the OOK receiver (ook_rx.c). */
 void remote_princeton(uint32_t code);
 

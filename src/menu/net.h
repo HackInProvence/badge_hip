@@ -42,6 +42,7 @@ typedef enum {
     NET_INFECTION = 0x09,  /* The (harmless) virus of the cicadas (infection.c) */
     NET_IMAGE = 0x0A,  /* Image transfer (image_radio.c) */
     NET_SONG = 0x0B,  /* Chorus: song start and position (chorus.c) */
+    NET_LEDS = 0x0C,  /* The LEDs of the cicadas driven by an admin badge (ledcast.c) */
     NET_PING = 0x0F,  /* Diagnostic ("P" key on the USB serial port): the badges that hear it print it */
     NET_TYPES = 0x10,
 } net_type_t;
@@ -123,6 +124,16 @@ void net_ping(void);
 
 /** \brief Counters for the diagnostics. */
 void net_stats(uint32_t *sent, uint32_t *received, uint32_t *dropped);
+
+/** \brief The frequency offsets (FREQEST, steps of fXOSC / 2^14) of the packets received from the other badges since
+ * the last reset: their sum in \p sum, returns their number. */
+int net_freq_offsets(int32_t *sum, bool reset);
+
+/** \brief The configuration of the radio changed (radio_tune.c): the network configures it again. */
+void net_reconfigure(void);
+
+/** \brief Debug ("!" on the serial port): the state of the network and the main registers of the radio. */
+void net_debug(void);
 
 /* Little endian helpers for the packets */
 static inline uint32_t net_u32(const uint8_t *p) {

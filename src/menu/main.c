@@ -182,6 +182,8 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         net_stats(&ns, &nr, &nd);
         printf("net: sent %lu, received %lu, dropped %lu%s\n", (unsigned long)ns, (unsigned long)nr, (unsigned long)nd,
                net_loopback() ? ", loopback" : "");
+        net_debug();
+        remote_debug();
         printf("remote: %s, %s, admin %s\n", remote_enabled() ? "enabled" : "disabled", remote_muted() ? "muted" : "not muted",
                store_get()->admin == STORE_ADMIN_ON ? "on" : "off");
         printf("version: " BADGE_VERSION " (" BADGE_BUILD ")\n");
@@ -261,6 +263,10 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     case 's':
         fb_send_now = true;
         break;
+    case 'U':
+        ui_check = ! ui_check;  /* Debug: the texts cut or under the footer are traced ("uicheck: ...") */
+        printf("uicheck: %s\n", ui_check ? "on" : "off");
+        break;
     case 'r':
         radio_print_registers();  /* Debug: the registers of the CC1101 and its PATABLE */
         break;
@@ -298,12 +304,16 @@ static void set_sound(bool on) {
     noise_gen_set_enabled(on && ! remote_muted());
 }
 
+bool ledcast_show(void);
+
 static void set_leds(unsigned mode) {
     led_mode = mode % N_LED_MODES;
     if (remote_muted()) {
         leds_cancel_anim(true);  /* Mute mode: the LED mode is kept for later */
         return;
     }
+    if (ledcast_show())
+        return;  /* The LEDs set by an admin badge (ledcast.c) */
     switch (led_mode) {
     case 1: leds_anim_wheel(2000000); break;
     case 2: leds_anim_breath(LED_RGB(255, 64, 0), 2000000); break;
@@ -432,6 +442,10 @@ void duel_init(void);
 void image_radio_init(void);
 bool duel_invited(char *buf, int len);
 bool battle_invited(char *buf, int len);
+bool radio_tune_needed(void);
+void ledcast_init(void);
+bool ledcast_show(void);
+bool ledcast_changed(void);
 void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
 
@@ -523,28 +537,20 @@ static void ui_trace(const char *title) {
 
 static void draw_title(const char *title) {
     ui_trace(title);
+    ui_check_width(&gfx_font_medium, title, GFX_WIDTH - 2, "title");
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
 }
 
 static void draw_footer(const char *text) {
+    ui_check_width(&gfx_font_small, text, GFX_WIDTH - 2, "footer");
     gfx_fill_rect(fb, 0, FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
 }
 
 /* Text truncated with "..." to fit in the width */
 static void fit_text_font(const gfx_font_t *font, char *dst, size_t len, const char *src, int width) {
-    snprintf(dst, len, "%s", src);
-    size_t n = strlen(dst);
-    while (n > 3 && gfx_text_width(font, dst) > width) {
-        /* Remove a whole UTF-8 character before the ellipsis */
-        do
-            --n;
-        while (n > 0 && (dst[n] & 0xC0) == 0x80);
-        if (n + 4 > len)
-            break;
-        strcpy(dst + n, "...");
-    }
+    ui_fit(font, dst, len, src, width);  /* The same, with the check of the texts (ui_check) */
 }
 
 static void fit_text(char *dst, size_t len, const char *src, int width) {
@@ -655,8 +661,8 @@ static const submenu_t SUBMENUS[] = {
     {"Radio & IR", 8, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433)}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
-    {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
-    {"Admin", 8, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
+    {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
+    {"Admin", 9, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
                   M_APP(APP_CHORUS_LEAD), M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_ADMIN_TYPE),
                   M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
@@ -1275,6 +1281,7 @@ static void render_page(const char *title, const char *text, const char *footer)
         line[n] = 0;
         fit_text(fitted, sizeof(fitted), line, GFX_WIDTH - 12);
         gfx_text(fb, 6, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
+        ui_check_bottom(y + gfx_font_small.height, line);
         y += gfx_font_small.height + 4;
         text += end ? (size_t)(end - text) + 1 : n;
     }
@@ -2006,6 +2013,7 @@ int main() {
     contacts_init();
     duel_init();
     image_radio_init();
+    ledcast_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
     puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);
@@ -2014,6 +2022,8 @@ int main() {
     oled_init();
     printf("version: " BADGE_VERSION " (" BADGE_BUILD ")\n");
     printf("badge menu ready\n");
+    if (radio_tune_needed())
+        app_open(APPS[APP_RADIO_TUNE]);  /* First start (or an update that brings the tuning): tune the radio */
 
     bool was_measuring = false;
     uint32_t sent_shot = 0;
@@ -2253,6 +2263,8 @@ int main() {
         net_task(now);
         remote_task(now);
         ook_rx_task(now);
+        if (ledcast_changed() && ! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
+            set_leds(led_mode);  /* An admin badge set the LEDs */
         static bool was_muted = false;
         if (remote_muted() != was_muted) {
             was_muted = remote_muted();
@@ -2458,6 +2470,8 @@ int main() {
             break;
         case A_MUSIC:
             if (! wav_task()) {
+                /* The end (or a read error: the position is then before the end) */
+                printf("music: end at %lus of %lus\n", (unsigned long)wav_position_s(), (unsigned long)wav_duration_s());
                 app = A_BROWSE;
                 redraw = true;
             } else if (absolute_time_diff_us(music_refresh_ts, now) > MUSIC_REFRESH_MS*1000ll) {

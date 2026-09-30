@@ -43,6 +43,13 @@ static uint8_t loop_bytes[NET_HEADER + NET_MAX_DATA];
 static uint8_t loop_len = 0;  /* A packet sent, to deliver as received (loopback) */
 /* Chat mode: the profile of the chat of the Flipper Zero (sync word 0x464C), plain text packets */
 static bool chat = false;
+static int32_t freq_sum = 0;  /* FREQEST of the packets received (net_freq_offsets()) */
+static int freq_n = 0;
+#define CHECK_MS 1000  /* The watchdog of the radio (check_radio()) */
+#define GDO0_STUCK_US 300000
+static absolute_time_t gdo0_high_ts = 0;
+static absolute_time_t check_ts = 0;
+static uint32_t n_repairs = 0;
 static net_chat_handler_t chat_handler = NULL;
 
 
@@ -174,6 +181,37 @@ bool net_loopback(void) {
 }
 
 
+int net_freq_offsets(int32_t *sum, bool reset) {
+    int n = freq_n;
+    *sum = freq_sum;
+    if (reset)
+        freq_sum = freq_n = 0;
+    return n;
+}
+
+
+void net_reconfigure(void) {
+    owner = false;  /* The whole configuration again at the next net_task() */
+}
+
+
+void net_debug(void) {
+    uint8_t marc = 0, pktctrl0 = 0, mdmcfg2 = 0, sync1 = 0, frend0 = 0, iocfg0 = 0;
+    radio_read_registers(CC1101_MARCSTATE, &marc, 1);
+    radio_read_registers(CC1101_PKTCTRL0, &pktctrl0, 1);
+    radio_read_registers(CC1101_MDMCFG2, &mdmcfg2, 1);
+    radio_read_registers(CC1101_SYNC1, &sync1, 1);
+    radio_read_registers(CC1101_FREND0, &frend0, 1);
+    radio_read_registers(CC1101_IOCFG0, &iocfg0, 1);
+    printf("net state: %s%s%s%s, queue %d, repairs %lu, radio_tools %s, marcstate 0x%02x, pktctrl0 0x%02x, mdmcfg2 0x%02x, "
+           "sync1 0x%02x, frend0 0x%02x, iocfg0 0x%02x, gdo0 %d (%s)\n", paused ? "paused" : "running",
+           owner ? ", owner" : "", tx_pending ? ", tx pending" : "", chat ? ", chat" : "", queue_count,
+           (unsigned long)n_repairs, radio_tools_idle() ? "idle" : "busy",
+           marc & 0x1F, pktctrl0, mdmcfg2, sync1, frend0, iocfg0, gpio_get(BADGE_RADIO_GDO0),
+           gpio_get_dir(BADGE_RADIO_GDO0) ? "output" : "input");
+}
+
+
 void net_stats(uint32_t *sent, uint32_t *received, uint32_t *dropped) {
     *sent = n_sent;
     *received = n_received;
@@ -243,6 +281,11 @@ static void poll_rx(absolute_time_t now) {
             }
             if (p.src != my_id && p.src != 0) {
                 ++n_received;
+                /* The frequency offset of the sender, for the tuning of the radio (radio_tune.c) */
+                uint8_t fe = 0;
+                radio_read_registers(CC1101_FREQEST, &fe, 1);
+                freq_sum += (int8_t)fe;
+                ++freq_n;
                 if (handlers[p.type])
                     handlers[p.type](&p);
             }
@@ -278,6 +321,55 @@ static void send_next(void) {
 }
 
 
+/* Watchdog: the radio must be in the configuration of the network, listening (or idle between two packets). Any
+ * other state (registers changed by another feature, FIFO overflow, radio stuck...) is repaired: the network would
+ * be deaf or mute until the next full reconfiguration. */
+static bool check_radio(void) {
+    if (tx_pending)
+        return true;  /* Sending: next time */
+    if (gpio_get(BADGE_RADIO_GDO0)) {
+        /* A packet being received lasts ~60 ms at most: GDO0 high longer is stuck (the network would wait for the
+         * end of this packet forever: it would neither send nor receive) */
+        if (! gdo0_high_ts)
+            gdo0_high_ts = get_absolute_time();
+        if (absolute_time_diff_us(gdo0_high_ts, get_absolute_time()) < GDO0_STUCK_US) {
+            check_ts = delayed_by_ms(get_absolute_time(), 100);  /* Checked again soon */
+            return true;
+        }
+        printf("net: radio repaired (GDO0 stuck high, %s)\n", gpio_get_dir(BADGE_RADIO_GDO0) ? "output" : "input");
+        gdo0_high_ts = 0;
+        ++n_repairs;
+        gpio_init(BADGE_RADIO_GDO0);  /* An input again, whatever left it */
+        gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
+        radio_wait_state(CC1101_STATE_IDLE, true);
+        radio_write_registers((const uint8_t[]){CC1101_SFRX, CC1101_SFTX}, 2);
+        owner = false;
+        return false;
+    }
+    gdo0_high_ts = 0;
+    uint8_t r[7] = {0};
+    radio_read_registers(CC1101_PKTLEN, &r[6], 1);
+    radio_read_registers(CC1101_PKTCTRL0, &r[0], 1);
+    radio_read_registers(CC1101_MDMCFG2, &r[1], 1);
+    radio_read_registers(CC1101_IOCFG0, &r[2], 1);
+    radio_read_registers(CC1101_SYNC1, &r[3], 1);
+    radio_read_registers(CC1101_SYNC0, &r[4], 1);
+    radio_read_registers(CC1101_MARCSTATE, &r[5], 1);
+    uint8_t marc = r[5] & 0x1F;
+    uint8_t sync1 = chat ? 0x46 : RADIO_TOOLS_SOCIAL_SYNC1, sync0 = chat ? 0x4C : RADIO_TOOLS_SOCIAL_SYNC0;
+    if (r[6] == 61 && r[0] == 0x05 && r[1] == 0x12 && r[2] == 0x06 && r[3] == sync1 && r[4] == sync0
+            && marc >= 0x01 && marc <= 0x10)  /* IDLE, calibration, settling, RX (not an overflow, not TX) */
+        return true;
+    ++n_repairs;
+    printf("net: radio repaired (pktctrl0 0x%02x, mdmcfg2 0x%02x, iocfg0 0x%02x, sync 0x%02x%02x, marcstate 0x%02x)\n",
+           r[0], r[1], r[2], r[3], r[4], marc);
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    radio_write_registers((const uint8_t[]){CC1101_SFRX, CC1101_SFTX}, 2);
+    owner = false;
+    return false;
+}
+
+
 void net_task(absolute_time_t now) {
     if (paused)
         return;
@@ -287,16 +379,25 @@ void net_task(absolute_time_t now) {
         return;
     }
     if (! owner) {
+        /* The whole configuration: another user of the radio (OOK receiver or transmitter, measure of the crystal...)
+         * may have left other registers (a radio left in OOK sends nothing usable) */
+        radio_tools_reconfigure();
         if (chat)
             radio_tools_profile_chat(NET_PATABLE_LOUD);
         else
             radio_tools_profile_social(NET_PATABLE_QUIET);
         start_rx();
         owner = true;
+        check_ts = delayed_by_ms(now, CHECK_MS);
     }
     if (absolute_time_diff_us(now, next_poll) > 0)
         return;
     next_poll = delayed_by_us(now, POLL_US);
+    if (absolute_time_diff_us(check_ts, now) >= 0) {
+        check_ts = delayed_by_ms(now, CHECK_MS);
+        if (! check_radio())
+            return;  /* Reconfigured at the next call */
+    }
 
     if (loop_len && ! tx_pending) {
         /* Loopback: the packet sent comes back from the "twin" badge */
