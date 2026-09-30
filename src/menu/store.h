@@ -65,6 +65,31 @@ typedef struct {
     uint16_t puzzle_records[STORE_GAMES];  /* Records of the puzzles (puzzles.h), 0xFFFF = none */
 } store_t;
 
+/* Second store (2 sectors before the first one): the contact cards (contacts.c) */
+#define CONTACT_BYTES 448  /* All the fields of a card (contacts.c) */
+#define STORE_CONTACTS 12
+#define STORE_EXT_SIZE 8192
+
+typedef struct {
+    char bytes[CONTACT_BYTES];  /* The fields at fixed offsets, each one a C string */
+} contact_card_t;
+
+typedef union {
+    struct {
+        uint32_t magic;
+        uint16_t version;
+        uint16_t send_mask;  /* Bit n: field n of my card is sent */
+        contact_card_t mine;
+        uint8_t n_contacts;
+        uint8_t pad[3];
+        contact_card_t contacts[STORE_CONTACTS];  /* Received, the newest last */
+    };
+    uint8_t raw[STORE_EXT_SIZE];  /* Whole sectors (the flash is written from this buffer) */
+} store_ext_t;
+
+store_ext_t *store_ext_get(void);
+void store_ext_changed(void);
+
 /** \brief Load the store from the flash (or initialize it). */
 void store_init(void);
 

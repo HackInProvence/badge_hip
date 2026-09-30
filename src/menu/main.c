@@ -59,6 +59,8 @@
 #include "video.h"
 #include "wav.h"
 
+void contacts_export(void);  /* contacts.c: the cards received as vCards on USB */
+
 
 /* Buttons flags from btns_get_state() */
 #define BTN_A 0x01  /* left wing */
@@ -218,6 +220,9 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     }
     case 'p':
         ook_rx_dump();
+        break;
+    case 'k':
+        contacts_export();  /* tools/contacts_export.py */
         break;
     case 'V':
         net_set_verbose(! net_verbose());
@@ -389,6 +394,7 @@ void infection_task(absolute_time_t now);
 bool infection_event(void);
 void messages_init(void);
 void chorus_init(void);
+void contacts_init(void);
 void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
 
@@ -606,8 +612,8 @@ static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
     {"Jeux", 13, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF}},
-    {"Social", 8, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_PROGRAM), M_APP(APP_VOTE), M_APP(APP_RADAR),
-                   M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
+    {"Social", 9, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
+                   M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
     {"Radio & IR", 5, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_IR}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 5, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS}},
@@ -1901,6 +1907,7 @@ int main() {
     infection_init();
     messages_init();
     chorus_init();
+    contacts_init();
     store_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);

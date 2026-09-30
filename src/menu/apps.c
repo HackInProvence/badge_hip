@@ -10,7 +10,7 @@ extern const app_t app_mines, app_2048, app_taquin, app_sokoban, app_mastermind,
 extern const app_t app_decoder, app_weather;
 extern const app_t app_talk, app_hotcold, app_hotcold_master, app_radar;
 extern const app_t app_vote, app_vote_admin, app_program, app_program_announce, app_infection, app_infection_zero;
-extern const app_t app_messages, app_chorus, app_chorus_lead;
+extern const app_t app_messages, app_chorus, app_chorus_lead, app_contacts;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
@@ -38,4 +38,5 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_MESSAGES] = &app_messages,
     [APP_CHORUS] = &app_chorus,
     [APP_CHORUS_LEAD] = &app_chorus_lead,
+    [APP_CONTACTS] = &app_contacts,
 };
