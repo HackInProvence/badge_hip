@@ -170,6 +170,21 @@ static void handle_command(const net_packet_t *p) {
 }
 
 
+/* The remote of the Flipper Zero (Sub-GHz app, a saved Princeton file): OK sends the code of the file, the arrows
+ * the same code with another button in the low nibble: up 2, down 4, left 8, right F. The commands missing from a
+ * group are put on these buttons, so that one file drives a whole group:
+ * - file C16A01: OK cicada, up mute, down end of the mute;
+ * - file C16A11: OK green, up orange (5 min), right red (done), down angry, left off. */
+static uint8_t flipper_buttons(uint8_t command) {
+    switch (command) {
+    case 0x04: return REMOTE_UNMUTE;
+    case 0x18: return REMOTE_TALK + 0;
+    case 0x1F: return REMOTE_TALK + 3;
+    default: return command;
+    }
+}
+
+
 void remote_princeton(uint32_t code) {
     if ((code & 0xFFFF00) != REMOTE_PRINCETON_ADDRESS || ! remote_enabled())
         return;
@@ -180,9 +195,10 @@ void remote_princeton(uint32_t code) {
     }
     last_princeton = code;
     last_princeton_at = now;
-    if (same_command(code & 0xFF, now))
+    uint8_t command = flipper_buttons(code & 0xFF);
+    if (same_command(command, now))
         return;
-    remote_execute(code & 0xFF, "Princeton");
+    remote_execute(command, "Princeton");
 }
 
 

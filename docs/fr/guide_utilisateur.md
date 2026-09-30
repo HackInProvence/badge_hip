@@ -330,13 +330,27 @@ Pour ne plus obéir aux commandes : Réglages > Télécommande : non.
 
 **Depuis un Flipper Zero** : une commande est un code **Princeton** 24 bits `0xC16Axx`, où `xx` est la commande
 (par exemple `0xC16A02` pour le mode muet).
+
+Le plus simple : copier les deux fichiers de `tools/flipper/` dans le dossier `subghz` de la carte SD du Flipper,
+puis Sub-GHz > Saved > le fichier. La télécommande du Flipper envoie avec chaque bouton le même code avec un autre
+bouton Princeton (les 4 derniers bits), et chaque bouton a sa commande :
+
+| Bouton du Flipper | `SecSea_general.sub` | `SecSea_talk.sub` |
+|---|---|---|
+| OK | la cigale chante | talk : vert |
+| Haut | mode muet | talk : orange (5 min) |
+| Bas | fin du mode muet | talk : rouge énervé |
+| Droite | — | talk : rouge (fini) |
+| Gauche | — | talk : éteint |
+
+Autres commandes :
 - Sub-GHz > Add Manually > Princeton_433, enregistrer, puis modifier la ligne `Key:` du fichier enregistré ;
 - ou générer un fichier `.sub` sur l'ordinateur et le copier dans le dossier `subghz` de la carte SD du Flipper :
   `python tools/ook_sub.py princeton 0xC16A02 -o muet.sub`, puis Sub-GHz > Saved > muet > Send.
 
 Le badge écoute les télécommandes un court instant (220 ms) toutes les 800 ms environ : maintenez l'envoi
 une seconde. La commande `subghz tx` de la ligne de commande du Flipper ne transmet pas le code tel quel :
-utilisez un fichier `.sub`.
+utilisez un fichier `.sub` (elle remplace les 4 derniers bits du code).
 
 
 ### 4.8 Le mode admin (organisateurs)

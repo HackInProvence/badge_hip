@@ -265,6 +265,13 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     case 'M':
         radio_tools_send();  /* Debug: the "Radio : message" (Flipper chat profile), without the menus */
         break;
+    case 'O': {
+        static bool ook_debug = false;
+        ook_debug = ! ook_debug;
+        ook_rx_set_debug(ook_debug);  /* Debug: the decoding attempts of the OOK receiver */
+        printf("ook: debug %s\n", ook_debug ? "on" : "off");
+        break;
+    }
     case '?':
         /* Debug: state of the audio */
         printf("audio: %s, played %lu samples, queued %u, volume %u/%u, music %lus/%lus\n",

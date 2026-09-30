@@ -37,6 +37,9 @@ bool ook_rx_active(void);
 /** \brief Listening again after another feature used the radio (radio_tools.c), when someone still listens. */
 void ook_rx_resume(void);
 
+/** \brief Debug: traces the decoding attempts (key O of the serial port). */
+void ook_rx_set_debug(bool on);
+
 /** \brief Decodes the frames, to call in the main loop. */
 void ook_rx_task(absolute_time_t now);
 

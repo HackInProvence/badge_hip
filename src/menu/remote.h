@@ -15,6 +15,8 @@
  * - 0x10 to 0x14: lights of the talk badge (off, green, orange, red, red angry), see talk.c,
  * - 0x20 + n: shows the talk n of the program (program.c),
  * - 0x30 + n: starts the song n of the chorus (chorus.c).
+ * The buttons of the remote of a Flipper (a saved Princeton file, see remote.c): 0x04 = end of the mute,
+ * 0x18 = talk off, 0x1F = talk red, so that the files C16A01 and C16A11 drive their whole group.
  * */
 
 #ifndef _REMOTE_H

@@ -48,6 +48,16 @@ static int users = 0;
 static ookdec_signal_t signal;  /* Static: 1 KB */
 static ookdec_result_t last;
 static uint32_t frames = 0;
+static bool debug = false;
+#define RETAIN_MAX 200  /* Durations of a part without a decoded frame, kept for the next part (4 frames) */
+#define RETAIN_US 400000  /* The next part must come within this silence */
+static bool retained = false;
+static uint32_t retained_pulses = 0;
+
+
+void ook_rx_set_debug(bool on) {
+    debug = on;
+}
 
 
 static void edge(void) {
@@ -75,6 +85,7 @@ void ook_rx_start(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
     radio_write_registers(OOK_REGS, sizeof(OOK_REGS));
     head = count = 0;
+    retained = false;
     last_edge_us = time_us_32();
     gpio_init(BADGE_RADIO_GDO0);
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
@@ -189,10 +200,19 @@ void ook_rx_task(absolute_time_t now) {
     uint32_t silence = time_us_32() - last_edge_us;
     uint16_t n = count;
     /* A frame ended (a long silence), or the decoder can be filled (noise, or a long transmission) */
-    bool ended = silence >= OOK_RX_FRAME_GAP_US && n >= MIN_FRAME;
+    if (retained && (silence >= RETAIN_US || ! n)) {
+        retained = false;  /* Nothing came after the part kept: dropped */
+        count = 0;
+        return;
+    }
+    /* A part kept is decoded again only when something new came */
+    bool ended = silence >= OOK_RX_FRAME_GAP_US && n >= MIN_FRAME && (! retained || pulses != retained_pulses);
     if (! ended && n < OOKDEC_MAX_PULSES - 1) {
-        if (silence >= OOK_RX_FRAME_GAP_US && n)
+        if (silence >= OOK_RX_FRAME_GAP_US && n && ! retained) {
+            if (debug && n > 4)
+                printf("ook: %u durations dropped (too short for a frame)\n", n);
             count = 0;  /* Too short to be a frame: noise */
+        }
         return;
     }
     decode(silence);
@@ -200,9 +220,24 @@ void ook_rx_task(absolute_time_t now) {
 
 
 static void decode(uint32_t silence) {
+    uint16_t n = count;
     build_signal(silence);
-    if (signal.n < MIN_FRAME || ! ookdec_decode(&signal, &last))
+    bool ok = signal.n >= MIN_FRAME && ookdec_decode(&signal, &last);
+    if (debug)
+        printf("ook: decoding %u durations (%u kept): %s\n", n, signal.n, ok ? last.text : "nothing");
+    retained = false;
+    if (! ok) {
+        /* Some remotes (the Flipper) leave more than OOK_RX_FRAME_GAP_US between two frames: a single frame is
+         * not enough (the code must be seen twice), the part is kept and decoded again with what follows */
+        if (n <= RETAIN_MAX && count == 0) {
+            uint32_t irq = save_and_disable_interrupts();
+            count = n;  /* The same durations: still in the ring, just before head */
+            restore_interrupts(irq);
+            retained = true;
+            retained_pulses = pulses;
+        }
         return;
+    }
     ++frames;
     printf("ook: %s\n", last.text);
     if (! strcmp(last.protocol, "Princeton"))
