@@ -6,13 +6,15 @@
 /* Talk badge: a badge in front of the speaker shows the time left with its LEDs (and its screen), changed with
  * a remote (a Flipper Zero, Princeton key 0xC16A10 to 0xC16A14, or an admin badge): off, green (all right),
  * orange breathing (5 minutes left), red blinking (time is over), angry red (faster, with the buzzer).
- * It ignores the mute mode: it is made for the talks. */
+ * It ignores the mute mode: it is made for the talks. It listens to the OOK remotes all the time (not only a moment
+ * every second like the other pages): the network of the cicadas is paused meanwhile. */
 
 #include <stdio.h>
 
 #include "app.h"
 #include "audio.h"
 #include "leds.h"
+#include "ook_rx.h"
 #include "remote.h"
 
 #define ANGRY_BEEP_MS 1500
@@ -59,12 +61,14 @@ static void talk_start(absolute_time_t now) {
         subscribed = true;
     }
     active = true;
+    ook_rx_start();  /* The remote, all the time */
     audio_set_mute(false);  /* The buzzer of the angry state, even in mute mode */
     set_state(TALK_OFF);
 }
 
 static void talk_stop(void) {
     active = false;
+    ook_rx_stop();
     state = TALK_OFF;
     leds_cancel_anim(true);
     audio_set_mute(remote_muted());
