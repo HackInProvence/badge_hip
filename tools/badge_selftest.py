@@ -395,19 +395,21 @@ def test_social(t):
 
 
 SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
-          'Virus des cigales', 'Choeur']
-ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annoncer un talk', 'Vote (admin)', 'Choeur : lancer', 'Balise chaud-froid',
-         'Virus : patient zéro', 'Type du badge', 'Quitter le mode admin']
+          'Virus des cigales', 'Choeur', 'Annonces']
+ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Annoncer un talk', 'Vote (admin)',
+         'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro', 'Type du badge',
+         'Quitter le mode admin']
 
 
 def open_admin(t):
-    """From the main menu: the secret sequence, then the Admin theme (after the last theme)."""
-    t.pump(8.5)
+    """From the main menu: the admin mode by the serial port (like the box of badge_remote.py), then the Admin
+    theme, selected by it (test_admin checks the secret sequence of the flanks)."""
     t.mark()
-    t.keys('yyxxyxyx')
+    t.badge.send('\x01A')
     if not t.expect(r'^admin: on$', 3):
         return False
-    return t.press('b', 'Admin')  # The sequence selects the Admin theme
+    t.pump(0.5)
+    return t.press('b', 'Admin')
 
 
 def admin_app(t, name):

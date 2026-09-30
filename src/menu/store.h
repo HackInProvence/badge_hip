@@ -70,6 +70,7 @@ typedef struct {
 } store_t;
 
 #define STORE_RADIO_TUNED 0xA5
+#define STORE_ANNOUNCE_MAGIC 0x4E4E4F41  /* "ANNO" */
 
 /* Second store (2 sectors before the first one): the contact cards (contacts.c) */
 #define CONTACT_BYTES 512  /* All the fields of a card (contacts.c, sizes of FIELDS) */
@@ -80,6 +81,15 @@ typedef struct {
     char bytes[CONTACT_BYTES];  /* The fields at fixed offsets, each one a C string */
 } contact_card_t;
 
+/* An announcement of the admin menu (announce.c): UTF-8 strings */
+#define STORE_ANNOUNCES 6
+typedef struct {
+    char time[6];  /* "10:30" */
+    char text[112];  /* Up to 56 characters (2 bytes for an accented letter) */
+    uint8_t qr_type;  /* ANNOUNCE_QR_* */
+    char qr[64];  /* The content of the QR code (a URL, a phone number...) */
+} store_announce_t;
+
 typedef union {
     struct {
         uint32_t magic;
@@ -89,6 +99,9 @@ typedef union {
         uint8_t n_contacts;
         uint8_t pad[3];
         contact_card_t contacts[STORE_CONTACTS];  /* Received, the newest last */
+        /* Added later: valid when announce_magic is STORE_ANNOUNCE_MAGIC (otherwise the defaults of announce.c) */
+        uint32_t announce_magic;
+        store_announce_t announces[STORE_ANNOUNCES];
     };
     uint8_t raw[STORE_EXT_SIZE];  /* Whole sectors (the flash is written from this buffer) */
 } store_ext_t;

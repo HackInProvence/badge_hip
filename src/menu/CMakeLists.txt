@@ -29,6 +29,8 @@ target_sources(badge_menu PRIVATE
     radio433.c
     radio_tune.c
     ledcast.c
+    announce.c
+    reset.c
     ../radio/ookdec.c
     battery.c
     display.c

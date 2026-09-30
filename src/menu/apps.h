@@ -48,6 +48,9 @@ typedef enum {
     APP_HUNT433,
     APP_RADIO_TUNE,
     APP_LEDCAST,
+    APP_ANNOUNCES,
+    APP_ANNOUNCE_ADMIN,
+    APP_RESET,
     APP_COUNT,
 } app_id_t;
 

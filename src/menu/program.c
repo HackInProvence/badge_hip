@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "announce.h"
 #include "app.h"
 #include "remote.h"
 #include "score_code.h"
@@ -157,8 +158,19 @@ static bool announce_buttons(const app_buttons_t *b, absolute_time_t now) {
         selected = (selected + N_TALKS - 1) % N_TALKS;
     if (b->pressed & UI_BTN_X)
         selected = (selected + 1) % N_TALKS;
-    if (b->pressed & UI_BTN_B)
-        remote_send(REMOTE_PROGRAM + selected);
+    if (b->pressed & UI_BTN_B) {
+        /* The content of the talk is sent (the cicadas build the screen from it): an announcement */
+        const talk_t *t = &TALKS[selected];
+        store_announce_t a = {.qr_type = ANNOUNCE_QR_URL};
+        snprintf(a.time, sizeof(a.time), "%s", t->time);
+        snprintf(a.text, sizeof(a.text), "%s%s%s", t->title, t->speaker[0] ? " - " : "", t->speaker);
+        for (char *c = a.text; *c; ++c)
+            if (*c == '\n')
+                *c = ' ';
+        snprintf(a.qr, sizeof(a.qr), "%s", t->url);
+        announce_send(&a);
+        printf("program: talk %d announced\n", selected);
+    }
     return true;
 }
 

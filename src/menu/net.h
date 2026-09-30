@@ -42,7 +42,8 @@ typedef enum {
     NET_INFECTION = 0x09,  /* The (harmless) virus of the cicadas (infection.c) */
     NET_IMAGE = 0x0A,  /* Image transfer (image_radio.c) */
     NET_SONG = 0x0B,  /* Chorus: song start and position (chorus.c) */
-    NET_LEDS = 0x0C,  /* The LEDs of the cicadas driven by an admin badge (ledcast.c) */
+    NET_LEDS = 0x0C,
+    NET_ANNOUNCE = 0x0D,  /* An announcement: time, text, QR code (announce.c) */  /* The LEDs of the cicadas driven by an admin badge (ledcast.c) */
     NET_PING = 0x0F,  /* Diagnostic ("P" key on the USB serial port): the badges that hear it print it */
     NET_TYPES = 0x10,
 } net_type_t;

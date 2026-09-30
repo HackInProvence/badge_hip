@@ -47,6 +47,10 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int i, char *buf, si
 /** \brief A framed message box in the middle of the page. */
 void ui_box(uint8_t *fb, const char *text);
 
+/** \brief Draws \p text centered, cut in lines at the spaces to fit the width (at most \p max_lines), from \p y.
+ * \return the y after the last line. */
+int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int max_lines);
+
 /* Check of the texts (debug, key U of the serial port): the cut texts, the too wide ones and the ones under the
  * footer are traced ("uicheck: ...") */
 extern bool ui_check;
@@ -74,6 +78,7 @@ typedef struct {
 extern const char UI_CHARSET_TEXT[];  /* Letters, digits, punctuation for names, e-mails, URLs */
 extern const char UI_CHARSET_PHONE[];  /* Digits, +, space */
 extern const char UI_CHARSET_UPPER[];  /* A-Z 0-9 space, for the answers of the challenges */
+extern const char UI_CHARSET_LONG[];  /* Letters with the French accents, digits, punctuation: messages, URLs */
 
 void ui_edit_start(ui_edit_t *e, const char *text, int max_len, const char *charset);
 

@@ -11,7 +11,8 @@ extern const app_t app_decoder, app_weather;
 extern const app_t app_talk, app_hotcold, app_hotcold_master, app_radar;
 extern const app_t app_vote, app_vote_admin, app_program, app_program_announce, app_infection, app_infection_zero;
 extern const app_t app_messages, app_chorus, app_chorus_lead, app_contacts, app_duel;
-extern const app_t app_image_send, app_image_recv, app_crypto, app_battle, app_hunt433, app_radio_tune, app_ledcast;
+extern const app_t app_image_send, app_image_recv, app_crypto, app_battle, app_hunt433, app_radio_tune, app_ledcast,
+    app_announces, app_announce_admin, app_reset;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
@@ -48,4 +49,7 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_HUNT433] = &app_hunt433,
     [APP_RADIO_TUNE] = &app_radio_tune,
     [APP_LEDCAST] = &app_ledcast,
+    [APP_ANNOUNCES] = &app_announces,
+    [APP_ANNOUNCE_ADMIN] = &app_announce_admin,
+    [APP_RESET] = &app_reset,
 };

@@ -14,6 +14,10 @@
 const char UI_CHARSET_TEXT[] = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_+/:'!?#&()";
 const char UI_CHARSET_PHONE[] = " 0123456789+";
 const char UI_CHARSET_UPPER[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+/* With the accented letters (bytes 0x80 + index of ACCENTS below, UTF-8 outside the editor) and more punctuation */
+const char UI_CHARSET_LONG[] = " abcdefghijklmnopqrstuvwxyz\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B"
+                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8C\x8D\x8E\x8F"
+                               "0123456789.,;:!?'\"-_+=/@#&%()*~$<>";
 
 
 void ui_title(uint8_t *fb, const char *title) {
@@ -127,6 +131,47 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
 }
 
 
+int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int max_lines) {
+    char line[96];
+    int lines = 0;
+    while (*text && lines < max_lines) {
+        while (*text == ' ')
+            ++text;
+        /* As many words as fit in the width (a word longer than the line is cut) */
+        size_t n = 0, fit = 0;
+        while (text[n] && text[n] != '\n' && n < sizeof(line) - 1) {
+            size_t end = n;
+            while (text[end] && text[end] != ' ' && text[end] != '\n' && end < sizeof(line) - 1)
+                ++end;
+            memcpy(line, text, end);
+            line[end] = 0;
+            if (gfx_text_width(font, line) > GFX_WIDTH - 6 && fit)
+                break;
+            fit = end;
+            n = end;
+            while (text[n] == ' ')
+                ++n;
+        }
+        if (! fit)
+            fit = n ? n : 1;
+        memcpy(line, text, fit);
+        line[fit] = 0;
+        if (lines == max_lines - 1 && text[fit] && text[fit] != '\n' && strspn(text + fit, " ") != strlen(text + fit))
+            ui_check_width(font, text, 0, "wrapped text cut");  /* More than max_lines: traced by the check */
+        char fitted[100];
+        ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
+        gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+        ui_check_bottom(y + font->height, line);
+        y += font->height + 3;
+        ++lines;
+        text += fit;
+        if (*text == '\n')
+            ++text;
+    }
+    return y;
+}
+
+
 void ui_box(uint8_t *fb, const char *text) {
     int lines = 1;
     for (const char *c = text; *c; ++c)
@@ -153,6 +198,20 @@ void ui_gauge(uint8_t *fb, int x, int y, int w, int h, int value, int max) {
 
 /* ------ Text editor ------ */
 
+/* The accented letters: one byte each in the editor (0x80 + index), UTF-8 outside */
+static const char *const ACCENTS[] = {"é", "è", "ê", "à", "â", "ç", "ô", "î", "ù", "û", "ë", "ï", "É", "È", "À", "Ç"};
+#define N_ACCENTS ((int)(sizeof(ACCENTS) / sizeof(ACCENTS[0])))
+
+/* The UTF-8 text of a cell of the editor */
+static const char *cell_text(char c, char *buf) {
+    uint8_t u = (uint8_t)c;
+    if (u >= 0x80 && u < 0x80 + N_ACCENTS)
+        return ACCENTS[u - 0x80];
+    buf[0] = c;
+    buf[1] = 0;
+    return buf;
+}
+
 void ui_edit_start(ui_edit_t *e, const char *text, int max_len, const char *charset) {
     if (max_len > UI_EDIT_MAX)
         max_len = UI_EDIT_MAX;
@@ -161,8 +220,26 @@ void ui_edit_start(ui_edit_t *e, const char *text, int max_len, const char *char
     e->cursor = 0;
     memset(e->text, ' ', max_len);
     e->text[max_len] = 0;
-    for (int i = 0; i < max_len && text && text[i]; ++i)
-        e->text[i] = strchr(charset, text[i]) ? text[i] : ' ';
+    /* From UTF-8: an accented letter of the charset takes one cell, the other characters not in it a space */
+    for (int i = 0; i < max_len && text && *text; ++i) {
+        char c = ' ';
+        int n = 1;
+        if ((uint8_t)*text >= 0x80) {
+            for (int a = 0; a < N_ACCENTS; ++a)
+                if (! strncmp(text, ACCENTS[a], strlen(ACCENTS[a]))) {
+                    c = (char)(0x80 + a);
+                    n = strlen(ACCENTS[a]);
+                    break;
+                }
+            if (c == ' ')
+                while (((uint8_t)text[n] & 0xC0) == 0x80)
+                    ++n;  /* The whole unknown UTF-8 character */
+        } else {
+            c = *text;
+        }
+        e->text[i] = c && strchr(charset, c) ? c : ' ';
+        text += n;
+    }
 }
 
 
@@ -186,8 +263,19 @@ bool ui_edit_move(ui_edit_t *e, int delta) {
 
 
 void ui_edit_result(const ui_edit_t *e, char *buf, size_t len) {
-    snprintf(buf, len, "%s", e->text);
-    for (int i = strlen(buf) - 1; i >= 0 && buf[i] == ' '; --i)
+    /* To UTF-8 (the accented letters take 2 bytes), without the trailing spaces */
+    size_t k = 0;
+    char one[2];
+    for (int i = 0; e->text[i] && k + 1 < len; ++i) {
+        const char *s = cell_text(e->text[i], one);
+        size_t n = strlen(s);
+        if (k + n >= len)
+            break;
+        memcpy(buf + k, s, n);
+        k += n;
+    }
+    buf[k] = 0;
+    for (int i = (int)k - 1; i >= 0 && buf[i] == ' '; --i)
         buf[i] = 0;
 }
 
@@ -238,6 +326,8 @@ int ui_edit_apply_typed(ui_edit_t *e) {
         if (e->charset == UI_CHARSET_UPPER && c >= 'a' && c <= 'z')
             c -= 'a' - 'A';
         if (c && strchr(e->charset, c)) {
+            /* Inserted, like on a keyboard: the rest moves right (the last character is lost when full) */
+            memmove(e->text + e->cursor + 1, e->text + e->cursor, e->max_len - e->cursor - 1);
             e->text[e->cursor] = c;
             if (e->cursor < e->max_len - 1)
                 ++e->cursor;
@@ -288,7 +378,8 @@ void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const ch
         first = 0;
     for (int i = 0; i < n_cells && first + i < e->max_len; ++i) {
         int x = x0 + i * cell, k = first + i;
-        char c[2] = {e->text[k], 0};
+        char one[2];
+        const char *c = cell_text(e->text[k], one);
         if (k == e->cursor) {
             gfx_fill_rect(fb, x, y, cell - 2, h, GFX_BLACK);
             gfx_text(fb, x + (cell - 2) / 2, y + 2, &gfx_font_medium, c, GFX_WHITE, GFX_ALIGN_CENTER);
@@ -303,7 +394,7 @@ void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const ch
         gfx_text(fb, x0 + n_cells * cell + 3, y + 2, &gfx_font_small, ">", GFX_BLACK, GFX_ALIGN_CENTER);
     y += h + 4;
     /* The whole text */
-    char text[UI_EDIT_MAX + 1], fitted[UI_EDIT_MAX + 4];
+    char text[2 * UI_EDIT_MAX + 1], fitted[2 * UI_EDIT_MAX + 4];  /* UTF-8: 2 bytes per accented letter */
     ui_edit_result(e, text, sizeof(text));
     ui_fit(&gfx_font_small, fitted, sizeof(fitted), text[0] ? text : "(vide)", GFX_WIDTH - 8);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);

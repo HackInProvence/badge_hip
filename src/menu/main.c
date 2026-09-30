@@ -130,6 +130,8 @@ static uint32_t btn_held_ms(uint8_t bit, absolute_time_t now) {
     return absolute_time_diff_us(btn_down_ts[btn_index(bit)], now) / 1000;
 }
 
+static int admin_request = -1;  /* The serial port asked for the admin mode on (1) or off (0) */
+
 /* Returns the buttons that were pressed since the last call (debounced rising edges), or simulated on USB
  * (keys a, b, x, y: press and release, B, X, Y: long press) */
 static uint8_t buttons_pressed(absolute_time_t now) {
@@ -149,6 +151,13 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                 btn_down_ts[btn_index(b)] = now;
     }
     switch (getchar_timeout_us(0)) {
+    case 0x01: {
+        /* Admin mode from badge_remote.py: 0x01 then A (on) or a (off) */
+        int c = getchar_timeout_us(50000);
+        if (c == 'A' || c == 'a')
+            admin_request = c == 'A' ? 1 : 0;
+        break;
+    }
     case 0x02: {
         /* Keyboard mode of badge_remote.py: 0x02 then a character typed on the PC, for the text editors */
         int c = getchar_timeout_us(50000);
@@ -446,6 +455,7 @@ bool radio_tune_needed(void);
 void ledcast_init(void);
 bool ledcast_show(void);
 bool ledcast_changed(void);
+#include "announce.h"
 void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
 
@@ -656,15 +666,17 @@ static const submenu_t SUBMENUS[] = {
     {"Jeux", 16, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF,
                   M_APP(APP_CRYPTO), M_APP(APP_DUEL), M_APP(APP_BATTLE)}},
-    {"Social", 9, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
-                   M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
+    {"Social", 10, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
+                    M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
+                    M_APP(APP_ANNOUNCES)}},
     {"Radio & IR", 8, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433)}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
-    {"Admin", 9, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN),
-                  M_APP(APP_CHORUS_LEAD), M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_ADMIN_TYPE),
-                  M_ADMIN_OFF}},  /* Last: hidden unless admin */
+    {"Admin", 11, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+                   M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
+                   M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_RESET), M_APP(APP_ADMIN_TYPE),
+                   M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
@@ -692,6 +704,26 @@ static bool admin_sequence(uint8_t flank, absolute_time_t now) {
 static int menu_level = 0;  /* 0: the themes, 1: the features of the theme */
 static int top_selected = 0;
 static int sub_selected = 0;
+static bool redraw_menu = false;  /* The menu changed outside the handling of the buttons (set_admin()) */
+
+static void set_status(const char *msg);
+
+/* The admin mode: by the secret sequence of the flanks, "Quitter le mode admin", or the serial port (0x01 A / a,
+ * the check box of tools/badge_remote.py) */
+static void set_admin(bool on) {
+    bool admin_theme = top_selected == (int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - 1;
+    store_get()->admin = on ? STORE_ADMIN_ON : 0;
+    store_changed();
+    if (on) {
+        top_selected = N_SUBMENUS - 1;  /* The Admin theme (the last one) is selected */
+    } else if (admin_theme) {
+        menu_level = 0;  /* Its theme disappears */
+        top_selected = 0;
+    }
+    printf("admin: %s\n", on ? "on" : "off");
+    set_status(on ? "Mode admin activé" : "Mode admin désactivé");
+    redraw_menu = true;
+}
 
 static void top_label(int i, char *buf, size_t len) {
     snprintf(buf, len, "%s  >", SUBMENUS[i].title);
@@ -1868,12 +1900,7 @@ static void validate(void) {
         remote_set_muted(! remote_muted());
         break;
     case M_ADMIN_OFF:
-        store_get()->admin = 0;
-        store_changed();
-        menu_level = 0;
-        top_selected = 0;
-        printf("admin: off\n");
-        set_status("Mode admin désactivé");
+        set_admin(false);
         break;
     case M_CREDITS:
         credits_page = 0;
@@ -2014,6 +2041,7 @@ int main() {
     duel_init();
     image_radio_init();
     ledcast_init();
+    announce_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
     puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);
@@ -2194,13 +2222,7 @@ int main() {
             int delta = (pressed & BTN_UP) ? -1 : 1;
             if (app == A_MENU) {
                 if (menu_level == 0 && admin_sequence(pressed & (BTN_UP | BTN_DOWN), now)) {
-                    if (store_get()->admin != STORE_ADMIN_ON) {
-                        store_get()->admin = STORE_ADMIN_ON;
-                        store_changed();
-                    }
-                    printf("admin: on\n");
-                    set_status("Mode admin activé");
-                    top_selected = N_SUBMENUS - 1;  /* The Admin theme (the last one) is selected */
+                    set_admin(true);
                 } else if (menu_level == 0)
                     top_selected = (top_selected + delta + N_SUBMENUS) % N_SUBMENUS;
                 else
@@ -2288,10 +2310,24 @@ int main() {
         messages_task(now);
         if (messages_new(notif, sizeof(notif)))
             notify(NULL, notif);
+        announce_task(now);
+        if (announce_new(notif, sizeof(notif))) {
+            announce_open_newest();  /* The page shows it right away */
+            notify(APPS[APP_ANNOUNCES], notif);
+        }
         if (vote_new())
             notify(APPS[APP_VOTE], "Vote ouvert : Social > Vote");
         if (app != A_APP && app != A_NAME_EDIT)
             ui_edit_typed_clear();  /* Typed on the PC keyboard, but no text editor on the screen */
+        if (admin_request >= 0) {
+            set_admin(admin_request);
+            admin_request = -1;
+        }
+        if (redraw_menu) {
+            redraw_menu = false;
+            if (app == A_MENU)
+                redraw = true;
+        }
         if (infection_coughed()) {
             set_status("Kof kof ! (virus des cigales)");
             printf("infection: cough\n");

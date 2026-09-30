@@ -36,6 +36,7 @@ import base64
 import datetime
 import os
 import queue
+import re
 import struct
 import sys
 import threading
@@ -326,6 +327,15 @@ def run_window(port, zoom, on_ready=None):
                     command=lambda: log.grid() if log_visible.get() else log.grid_remove()).pack(side='right')
     ttk.Checkbutton(tools, text='Mode clavier (saisie de texte)', variable=keyboard,
                     command=lambda: root.focus_set()).pack(side='right', padx=8)
+    # The admin mode of the badge (the secret sequence of the flanks does the same, less discreetly): the box
+    # follows the state of the badge, read in its log ("admin: on/off", and "!" when it connects)
+    admin = tk.BooleanVar(value=False)
+
+    def admin_clicked():
+        badge.send('\x01' + ('A' if admin.get() else 'a'))
+        root.focus_set()
+    ttk.Checkbutton(tools, text='Mode admin', variable=admin, command=admin_clicked).pack(side='right', padx=8)
+    was_connected = [False]
 
     # Several badges plugged in: choose the one to drive
     ports_bar = tk.Frame(root)
@@ -401,8 +411,15 @@ def run_window(port, zoom, on_ready=None):
             rows = badge.frames.get_nowait()
         if rows:
             show(rows)
+        if badge.connected() and not was_connected[0]:
+            badge.send('!')  # The state of the badge, the admin mode among others
+        was_connected[0] = badge.connected()
         while not badge.logs.empty():
-            log.insert('end', badge.logs.get_nowait() + '\n')
+            line = badge.logs.get_nowait()
+            m = re.search(r'(?:^admin: |, admin )(on|off)\b', line)
+            if m:
+                admin.set(m.group(1) == 'on')
+            log.insert('end', line + '\n')
             if int(log.index('end-1c').split('.')[0]) > 500:
                 log.delete('1.0', '100.0')
             log.see('end')
