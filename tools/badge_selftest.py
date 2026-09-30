@@ -369,14 +369,13 @@ def test_social(t):
     """Social theme: radar, hot / cold; talk badge (Badge theme) with its states."""
     if not open_theme(t, 'Social'):
         return t.result('social', False, 'theme "Social" not shown')
-    ok = t.press('xxxxb', 'Radar des cigales')
-    t.screenshot('radar')
-    t.result('social: radar', ok and t.press('a', 'Social'))
-    ok = t.press('xb', 'Chaud - froid')
-    t.pump(2)
-    t.screenshot('hotcold')
-    t.result('social: hot / cold', ok and t.press('a', 'Social'))
-    t.keys('yyyyy')
+    for name, shot in (('Contacts', 'contacts'), ('Radar des cigales', 'radar'), ('Chaud - froid', 'hotcold'),
+                       ('Chœur', 'chorus')):
+        ok = social_app(t, name)
+        t.pump(2)
+        t.screenshot(shot)
+        t.result(f'social: {name}', ok and t.press('a', 'Social'))
+        t.keys('y' * SOCIAL.index(name))
     close_theme(t, 'Social')
     if not open_theme(t, 'Badge'):
         return t.result('talk', False, 'theme "Badge" not shown')
@@ -392,10 +391,10 @@ def test_social(t):
     close_theme(t, 'Badge')
 
 
-SOCIAL = ['Réseau cigales', 'Messages', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
-          'Virus des cigales']
-ADMIN = ['Commandes radio', 'Annoncer un talk', 'Vote (admin)', 'Balise chaud-froid', 'Virus : patient zéro',
-         'Type du badge', 'Quitter le mode admin']
+SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
+          'Virus des cigales', 'Chœur']
+ADMIN = ['Commandes radio', 'Annoncer un talk', 'Vote (admin)', 'Chœur : lancer', 'Balise chaud-froid',
+         'Virus : patient zéro', 'Type du badge', 'Quitter le mode admin']
 
 
 def open_admin(t):
@@ -405,7 +404,7 @@ def open_admin(t):
     t.keys('yyxxyxyx')
     if not t.expect(r'^admin: on$', 3):
         return False
-    return t.press('yb', 'Admin')
+    return t.press('b', 'Admin')  # The sequence selects the Admin theme
 
 
 def admin_app(t, name):
@@ -533,13 +532,12 @@ def test_admin(t):
     """The secret sequence shows the admin menu; mute / unmute commands; leave the admin mode."""
     t.pump(8.5)  # The flanks pressed before don't count (the sequence must be typed within 8 s)
     t.mark()
-    t.keys('yyxxyxyx')  # Left, left, right, right, left, right, left, right: back on the first theme
+    t.keys('yyxxyxyx')  # Left, left, right, right, left, right, left, right: the Admin theme is selected
     on = t.expect(r'^admin: (on)$', 3)
     t.result('admin: secret sequence', on is not None)
     if not on:
         return
-    admin_index = len(THEMES)  # The admin menu is after the themes
-    t.press('y' + 'b', 'Admin')  # From the first theme, up = the last one (Admin)
+    t.press('b', 'Admin')
     ok = t.press('b', 'Commandes radio')
     t.mark()
     t.keys('b')  # Muet
@@ -551,7 +549,7 @@ def test_admin(t):
     t.keys('y')
     t.press('a', 'Admin')
     t.mark()
-    t.keys('xxb')  # Quitter le mode admin
+    t.keys('x' * ADMIN.index('Quitter le mode admin') + 'b')
     t.result('admin: leave', t.expect(r'^admin: off$', 3) is not None)
 
 

@@ -2086,8 +2086,8 @@ int main() {
                     }
                     printf("admin: on\n");
                     set_status("Mode admin activé");
-                }
-                if (menu_level == 0)
+                    top_selected = N_SUBMENUS - 1;  /* The Admin theme (the last one) is selected */
+                } else if (menu_level == 0)
                     top_selected = (top_selected + delta + N_SUBMENUS) % N_SUBMENUS;
                 else
                     sub_selected = (sub_selected + delta + SUBMENUS[top_selected].n) % SUBMENUS[top_selected].n;
