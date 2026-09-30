@@ -398,6 +398,7 @@ void contacts_init(void);
 void duel_init(void);
 void image_radio_init(void);
 bool duel_invited(char *buf, int len);
+bool battle_invited(char *buf, int len);
 void chorus_task(absolute_time_t now);
 bool messages_new(char *buf, int len);
 
@@ -613,9 +614,9 @@ typedef struct {
 
 static const submenu_t SUBMENUS[] = {
     {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
-    {"Jeux", 15, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+    {"Jeux", 16, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF,
-                  M_APP(APP_CRYPTO), M_APP(APP_DUEL)}},
+                  M_APP(APP_CRYPTO), M_APP(APP_DUEL), M_APP(APP_BATTLE)}},
     {"Social", 9, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
                    M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS)}},
     {"Radio & IR", 7, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
@@ -2176,6 +2177,8 @@ int main() {
             notify(APPS[APP_INFECTION], "Vous êtes infecté !");
         if (duel_invited(notif, sizeof(notif)))
             notify(APPS[APP_DUEL], notif);
+        if (battle_invited(notif, sizeof(notif)))
+            notify(APPS[APP_BATTLE], notif);
         social_task(now);
         battery_task(now);
         static int shown_bars = -2;

@@ -27,6 +27,8 @@ enum { K_INVITE = 1, K_ACCEPT, K_COMMIT, K_REVEAL, K_BYE };
 enum { S_LOBBY, S_INVITING, S_INVITED, S_CHOOSE, S_WAIT, S_RESULT, S_END, S_LOST };
 static const char *CHOICES[3] = {"Pierre", "Feuille", "Ciseaux"};
 
+void battle_handle(const net_packet_t *p);
+
 static int state = S_LOBBY;
 static uint16_t session = 0;
 static uint32_t peer = 0;
@@ -90,6 +92,10 @@ static void handle_game(const net_packet_t *p) {
     uint8_t kind = d[2], round = d[7];
     if (net_u32(d + 3) != net_id())
         return;  /* Not for this badge */
+    if (kind >= 10) {
+        battle_handle(p);  /* The battleship (battle.c) */
+        return;
+    }
     if (kind == K_INVITE) {
         if (state == S_LOBBY && ! invited) {
             invited = true;

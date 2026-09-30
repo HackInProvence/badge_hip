@@ -6,6 +6,7 @@ target_sources(badge_menu PRIVATE
     admin.c
     apps.c
     lamp.c
+    battle.c
     chorus.c
     contacts.c
     crypto_app.c
