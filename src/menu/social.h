@@ -39,6 +39,8 @@ typedef struct {
     int16_t rssi;  /* dBm, of the last beacon */
     uint16_t score;
     bool met;  /* Already met */
+    uint32_t skills;  /* Its skills (skills.h), 0 for the badges of an older firmware */
+    uint8_t level;  /* Its level (achievements.h), 0 when unknown */
 } social_neighbour_t;
 
 void social_init(void);

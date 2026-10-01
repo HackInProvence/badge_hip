@@ -8,12 +8,14 @@
 
 #include "pico/rand.h"
 
+#include "achievements.h"
 #include "net.h"
 #include "social.h"
 #include "store.h"
 
 
-#define BEACON_LEN 11  /* Data of the NET_BEACON packets: sequence, score (2 bytes), name (8 bytes) */
+#define BEACON_LEN 11  /* Data of the NET_BEACON packets: sequence, score (2 bytes), name (8 bytes)... */
+#define BEACON_LEN2 16  /* ...then (newer firmwares) skills (4 bytes), level */
 #define BEACON_PERIOD_MS 2000
 #define BEACON_JITTER_MS 500
 #define NEIGHBOUR_TIMEOUT_MS 15000
@@ -196,7 +198,11 @@ static void handle_beacon(const net_packet_t *packet) {
     nb->pub.name[8] = 0;
     nb->pub.score = p[1] | p[2] << 8;
     nb->pub.rssi = rssi;
+    nb->pub.skills = packet->len >= BEACON_LEN2 ? net_u32(p + 11) : 0;
+    nb->pub.level = packet->len >= BEACON_LEN2 ? p[15] : 0;
     nb->last_seen = now;
+    if ((nb->pub.skills & store_get()->skills) && rssi >= SOCIAL_RSSI_CLOSE)
+        achv_unlock(ACHV_SKILL_MATCH);  /* A cicada close by shares a skill */
 
     /* Close enough, long enough: meeting */
     if (rssi >= SOCIAL_RSSI_CLOSE && ! nb->met_now) {
@@ -214,8 +220,10 @@ static void handle_beacon(const net_packet_t *packet) {
 
 static void send_beacon(void) {
     store_t *s = store_get();
-    uint8_t p[BEACON_LEN] = {seq++, s->score, s->score >> 8};
+    uint8_t p[BEACON_LEN2] = {seq++, s->score, s->score >> 8};
     memcpy(p + 3, s->name, 8);  /* The name is truncated to 8 characters in the beacon */
+    net_put_u32(p + 11, s->skills);
+    p[15] = achv_level();
     if (net_send(NET_BEACON, p, sizeof(p), NET_LOUD))  /* +10 dBm: at -10 dBm, ~-97 dBm at 1 m (edge of the sensitivity) */
         ++n_sent;
 }

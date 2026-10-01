@@ -31,6 +31,8 @@
 #define STORE_TYPE_SPEAKER 1
 #define STORE_TYPE_STAFF 2
 #define STORE_ADMIN_ON 0xA5
+#define STORE_ACHV_COUNTERS 16
+#define STORE_CARGO_ITEMS 32
 
 typedef struct {
     uint32_t id;
@@ -67,7 +69,19 @@ typedef struct {
     uint8_t radio_tuned;  /* STORE_RADIO_TUNED once done */
     int8_t radio_noise_dbm;  /* Noise floor measured (dBm): the trigger of the listening to the remotes */
     int8_t radio_freq_offset;  /* FSCTRL0 (FREQOFF) of the CC1101, in steps of fXOSC / 2^14 (~1.6 kHz) */
+    /* Second generation of fields: valid when v2_magic is STORE_V2_MAGIC, set to their defaults otherwise
+     * (store_init()), so that 0xFF (erased flash) never means "all the achievements" */
+    uint8_t v2_magic;
+    uint32_t skills;  /* Bit n: skill n of skills.c checked (shown on the name tag, sent in the beacon) */
+    uint64_t achievements;  /* Bit n: achievement n of achievements.c unlocked */
+    uint16_t achv_counters[STORE_ACHV_COUNTERS];  /* Counters of the achievements (games won, trades...) */
+    uint32_t book_hash;  /* Gamebook (gamebook.c): hash of the book being read... */
+    uint16_t book_section;  /* ...and its current section */
+    uint8_t cargo[STORE_CARGO_ITEMS];  /* Smuggler (smuggler.c): how many of each good */
+    uint8_t cargo_seeded;  /* 1 once the first goods were given */
 } store_t;
+
+#define STORE_V2_MAGIC 0x5A
 
 #define STORE_RADIO_TUNED 0xA5
 #define STORE_ANNOUNCE_MAGIC 0x4E4E4F41  /* "ANNO" */

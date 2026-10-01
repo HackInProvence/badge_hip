@@ -52,6 +52,16 @@ typedef enum {
     APP_ANNOUNCE_ADMIN,
     APP_RESET,
     APP_BATTCAL,
+    APP_WEREWOLF,
+    APP_ASSASSIN,
+    APP_TUG,
+    APP_GAMEBOOK,
+    APP_RTTTL,
+    APP_PIRATE_RADIO,
+    APP_DEMO,
+    APP_SMUGGLER,
+    APP_SKILLS,
+    APP_ACHIEVEMENTS,
     APP_COUNT,
 } app_id_t;
 

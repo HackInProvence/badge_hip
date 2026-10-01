@@ -34,6 +34,17 @@ target_sources(badge_menu PRIVATE
     ../radio/ookdec.c
     battery.c
     battcal.c
+    party.c
+    werewolf.c
+    assassin.c
+    tug.c
+    gamebook.c
+    rtttl.c
+    pirate_radio.c
+    demo.c
+    smuggler.c
+    skills.c
+    achievements.c
     display.c
     credits.c
     ctf.c

@@ -52,8 +52,10 @@
 #include "screen.h"
 #include "screen_demo.h"
 #include "sd.h"
+#include "achievements.h"
 #include "net.h"
 #include "ook_rx.h"
+#include "party.h"
 #include "social.h"
 #include "store.h"
 #include "version.h"  /* Generated at each build (version.cmake) */
@@ -664,25 +666,27 @@ static void track_title(const char *track_path, char *buf, size_t len) {
 typedef struct {
     const char *title;
     uint8_t n;
-    int items[16];
+    int items[24];
 } submenu_t;
 
 static const submenu_t SUBMENUS[] = {
-    {"Médias", 5, {M_IMAGES, M_VIDEO, M_MUSIC, M_RSVP, M_VOLUME}},
-    {"Jeux", 16, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+    {"Médias", 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
+    {"Jeux", 19, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                   M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF,
-                  M_APP(APP_CRYPTO), M_APP(APP_DUEL), M_APP(APP_BATTLE)}},
-    {"Social", 10, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_PROGRAM), M_APP(APP_VOTE),
-                    M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
-                    M_APP(APP_ANNOUNCES)}},
+                  M_APP(APP_CRYPTO), M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
+                  M_APP(APP_TUG)}},
+    {"Social", 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
+                    M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
+                    M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
     {"Radio & IR", 8, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433)}},
-    {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
+    {"Badge", 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
+                  M_APP(APP_ACHIEVEMENTS)}},
     {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
-    {"Admin", 12, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {"Admin", 14, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_RESET), M_APP(APP_BATTCAL),
-                   M_APP(APP_ADMIN_TYPE),
+                   M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
@@ -2056,6 +2060,8 @@ int main() {
     image_radio_init();
     ledcast_init();
     announce_init();
+    party_init();
+    achievements_init();
     social_init();
     games_init(&GAME_HOOKS, store_get()->game_records);
     puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);
@@ -2353,6 +2359,7 @@ int main() {
         if (battle_invited(notif, sizeof(notif)))
             notify(APPS[APP_BATTLE], notif);
         social_task(now);
+        party_task(now);
         battery_task(now);
         static int shown_bars = -2;
         static bool shown_charging = false;
@@ -2362,7 +2369,18 @@ int main() {
             redraw = true;
         }
         char event[48];
-        if (social_event(event, sizeof(event))) {
+        static absolute_time_t achv_ts = 0;
+        if (absolute_time_diff_us(achv_ts, now) >= 0) {
+            achv_ts = delayed_by_ms(now, 1000);
+            achv_task();
+        }
+        if (achv_event(event, sizeof(event))) {
+            set_status(event);
+            if (! audio_is_open())
+                play_chime();
+            if (app == A_MENU)
+                redraw = true;
+        } else if (social_event(event, sizeof(event))) {
             set_status(event);
             if (! audio_is_open())
                 play_chime();

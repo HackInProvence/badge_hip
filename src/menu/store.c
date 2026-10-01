@@ -45,6 +45,16 @@ void store_init(void) {
         memset(store.puzzle_records, 0xFF, sizeof(store.puzzle_records));  /* No record yet */
         printf("store: initialized\n");
     }
+    if (store.v2_magic != STORE_V2_MAGIC) {  /* The fields added later: their defaults */
+        store.v2_magic = STORE_V2_MAGIC;
+        store.skills = 0;
+        store.achievements = 0;
+        memset(store.achv_counters, 0, sizeof(store.achv_counters));
+        store.book_hash = 0;
+        store.book_section = 0;
+        memset(store.cargo, 0, sizeof(store.cargo));
+        store.cargo_seeded = 0;
+    }
     for (uint16_t i = 0; i < store.n_met; ++i)
         store.met[i].last_minute = 0xFFFF;
     memcpy(&ext, (const void *)(XIP_BASE + STORE_EXT_OFFSET), sizeof(ext));

@@ -37,13 +37,14 @@ typedef enum {
     NET_VOTE_QUESTION = 0x04,  /* Question opened by an admin badge (vote.c) */
     NET_VOTE_ANSWER = 0x05,
     NET_GAME = 0x06,  /* Two player radio games (duel.c) */
-    NET_CONTACT = 0x07,  /* Unused (the contact cards are vCards on the chat profile, see contacts.c) */
+    NET_TRADE = 0x07,  /* Smuggling of the virtual goods between two cicadas (smuggler.c) */
     NET_HOTCOLD = 0x08,  /* Beacon of the hot / cold hunt (hotcold.c) */
     NET_INFECTION = 0x09,  /* The (harmless) virus of the cicadas (infection.c) */
     NET_IMAGE = 0x0A,  /* Image transfer (image_radio.c) */
     NET_SONG = 0x0B,  /* Chorus: song start and position (chorus.c) */
     NET_LEDS = 0x0C,  /* The LEDs of the cicadas driven by an admin badge (ledcast.c) */
     NET_ANNOUNCE = 0x0D,  /* An announcement: time, text, QR code (announce.c) */
+    NET_PARTY = 0x0E,  /* The group games: lobby (party.c), then the game (werewolf.c, assassin.c, tug.c) */
     NET_PING = 0x0F,  /* Diagnostic ("P" key on the USB serial port): the badges that hear it print it */
     NET_TYPES = 0x10,
 } net_type_t;

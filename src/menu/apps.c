@@ -13,6 +13,8 @@ extern const app_t app_vote, app_vote_admin, app_program, app_program_announce, 
 extern const app_t app_messages, app_chorus, app_chorus_lead, app_contacts, app_duel;
 extern const app_t app_image_send, app_image_recv, app_crypto, app_battle, app_hunt433, app_radio_tune, app_ledcast,
     app_announces, app_announce_admin, app_reset, app_battcal;
+extern const app_t app_werewolf, app_assassin, app_tug, app_gamebook, app_rtttl,
+    app_pirate_radio, app_demo, app_smuggler, app_skills, app_achievements;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
@@ -53,4 +55,14 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_ANNOUNCE_ADMIN] = &app_announce_admin,
     [APP_RESET] = &app_reset,
     [APP_BATTCAL] = &app_battcal,
+    [APP_WEREWOLF] = &app_werewolf,
+    [APP_ASSASSIN] = &app_assassin,
+    [APP_TUG] = &app_tug,
+    [APP_GAMEBOOK] = &app_gamebook,
+    [APP_RTTTL] = &app_rtttl,
+    [APP_PIRATE_RADIO] = &app_pirate_radio,
+    [APP_DEMO] = &app_demo,
+    [APP_SMUGGLER] = &app_smuggler,
+    [APP_SKILLS] = &app_skills,
+    [APP_ACHIEVEMENTS] = &app_achievements,
 };

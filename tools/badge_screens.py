@@ -34,8 +34,8 @@ from badge_remote import Badge, find_port  # noqa: E402
 OUT = os.path.join(ROOT, 'docs', 'screens')
 
 # Entries of the menu that are not pages: toggles or actions (not pressed, the label is shown by the menu)
-NOT_PAGES = {('Médias', 4), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
-             ('Admin', 10)}  # Démo écran (Badge, 5): an animation, not a page
+NOT_PAGES = {('Médias', 6), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
+             ('Admin', 11), ('Admin', 13)}  # Démo écran (Badge, 5), Mode démo (Admin, 11): animations, not pages
 
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
 # screen to capture, with its caption. "back" at the end of a step goes back where the page was.

@@ -395,11 +395,11 @@ def test_social(t):
     close_theme(t, 'Badge')
 
 
-SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
-          'Virus des cigales', 'Choeur', 'Annonces']
+SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Programme', 'Vote', 'Radar des cigales',
+          'Chaud - froid', 'Virus des cigales', 'Choeur', 'Annonces', 'Contrebande']
 ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Annoncer un talk', 'Vote (admin)',
          'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro',
-         'Batterie (calibration)', 'Type du badge',
+         'Batterie (calibration)', 'Radio pirate', 'Mode démo', 'Type du badge',
          'Quitter le mode admin']
 
 
