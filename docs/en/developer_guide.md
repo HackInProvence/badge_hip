@@ -285,7 +285,7 @@ and the cure of the virus:
 For an entry handled directly by `main.c` (the older features):
 1. Add a value to `menu_item_t` and its label in `item_label()`.
 2. Put it in a `SUBMENUS` theme (at most 24 entries per theme, `items[24]` of `submenu_t`; the number of entries
-   `n` is written by hand: Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 14).
+   `n` is written by hand: Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 13).
    The last theme, Admin, is only shown in admin mode (`store_t.admin == STORE_ADMIN_ON`).
 3. In `validate()`, run the action or switch to a new `app` state (`app_state_t`).
 4. If the state has its own page:
@@ -600,12 +600,7 @@ A command received both ways is only executed once (same command within 4 s).
 | 0x01 | the cicada sings for 6 s | `remote.c` |
 | 0x02 / 0x03 | mute mode / end of the mute mode | `remote.c` |
 | 0x10 to 0x14 | lights of the talk badge: off, green, orange, red, angry red | `talk.c` (page open) |
-| 0x20 + n | shows talk n of the program (Programme page of the badge) | `program.c` |
 | 0x30 + n | starts song n of the choir | `chorus.c` |
-
-"Annoncer un talk" (admin) no longer sends the command 0x20 + n: it sends the content of the talk (time, "title -
-speaker", link as a QR code) as an announcement (§ 6.23), which the cicadas show without depending on their program.
-The command 0x20 + n (from a Flipper for instance) still opens the program page of the badge.
 
 A module handles a group of commands (the high nibble) with `remote_subscribe(group, handler)`;
 the handler gets the low nibble. `remote_execute()` executes a local command.
@@ -886,8 +881,6 @@ what they receive (no image is sent).
   `store_ext_t` (§ 6.8), examples at first (`DEFAULTS`). Rows: Heure (editor `UI_CHARSET_TEXT`, 5 characters), Texte
   and Contenu (`UI_CHARSET_LONG`, 56 characters), type of the QR code (wings), Aperçu (`announce_draw()` with the fast
   refresh), Envoyer (`announce_send()`, in the background).
-- **Annoncer un talk** ([program.c](../../src/menu/program.c)) builds an announcement with the time, "title - speaker"
-  and the link of the talk (URL QR code), and sends it with `announce_send()`.
 
 
 ### 6.24 Skills and achievements
@@ -1155,7 +1148,7 @@ The groups (`--only`):
 | `admin` | secret sequence, mute / unmute commands, leaving the admin mode |
 | `radio433` | 433 MHz decoder and weather station pages, then the network beacons come back |
 | `social` | pages of the Social theme (contacts, radar, hot - cold...) and states of the talk badge |
-| `net` | with a single badge, in *loopback*: vote, "Annoncer un talk", virus, message |
+| `net` | with a single badge, in *loopback*: vote, virus, message |
 
 ### 9.3 Two-badge tests
 

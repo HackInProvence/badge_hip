@@ -292,8 +292,7 @@ Lockpicking, Défense.
 - Les badges d'un firmware plus ancien n'envoient pas leurs compétences.
 
 **Programme** : le programme de la conférence, sans carte SD. Aile droite : le détail d'un talk, avec le QR code
-de son lien ; flancs : talk précédent / suivant. Quand les organisateurs annoncent le prochain talk,
-sa page s'ouvre toute seule (« Prochain : ... »).
+de son lien ; flancs : talk précédent / suivant.
 Le programme de SecSea 2026 n'est pas encore publié : les talks affichés sont provisoires.
 
 **Vote** : quand les organisateurs posent une question (« Ce talk vous a plu ? »...), la page s'ouvre.
@@ -510,7 +509,6 @@ ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écra
 | 0x02 | **mode muet** : plus de son ni de LEDs (pendant les talks) |
 | 0x03 | fin du mode muet |
 | 0x10 à 0x14 | lumières du badge de talk (si sa page est ouverte) : éteint, OK, 5 min, FINI, STOP ! |
-| 0x20 + n | affiche le talk n du programme (« Prochain : ... ») |
 | 0x30 + n | lance le morceau n du choeur |
 
 Le réglage du mode muet est gardé après extinction ; il se désactive par la commande 0x03 ou dans Réglages > Mode muet.
@@ -557,7 +555,6 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk |
 | **LEDs des cigales** | choisit la couleur et l'animation des LEDs de toutes les cigales autour (voir ci-dessous) |
 | **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
-| **Annoncer un talk** | envoie un talk du programme à toutes les cigales, comme une annonce : son heure, son titre et son orateur, le QR code de son lien |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid |

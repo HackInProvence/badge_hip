@@ -296,8 +296,7 @@ Développement (development), CTF, Lockpicking, Défense (defense).
 - The badges of an older firmware do not send their skills.
 
 **Programme** (Program): the conference program, no SD card needed. Right wing: the details of a talk, with the
-QR code of its link; flanks: previous / next talk. When the organizers announce the next talk, its page opens
-by itself ("Prochain : ...", next: ...).
+QR code of its link; flanks: previous / next talk.
 The SecSea 2026 program is not published yet: the talks shown are placeholders.
 
 **Vote**: when the organizers ask a question ("Ce talk vous a plu ?", did you like this talk?...), the page opens.
@@ -516,7 +515,6 @@ The badge shows the command received at the bottom of the screen.
 | 0x02 | **mute mode**: no more sound or LEDs (during the talks) |
 | 0x03 | end of the mute mode |
 | 0x10 to 0x14 | lights of the talk badge (if its page is open): off, OK, 5 min, FINI, STOP ! |
-| 0x20 + n | shows talk n of the program ("Prochain : ...") |
 | 0x30 + n | starts song n of the choir |
 
 The mute mode setting is kept after the badge is switched off; it is turned off by command 0x03 or in Réglages > Mode muet.
@@ -563,7 +561,6 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Commandes radio** (Radio commands) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge |
 | **LEDs des cigales** (LEDs of the cicadas) | chooses the colour and the animation of the LEDs of all the cicadas around (see below) |
 | **Annonces (admin)** (Announcements) | writes and sends the announcements to all the cicadas (see below) |
-| **Annoncer un talk** (Announce a talk) | sends a talk of the program to all the cicadas, as an announcement: its time, its title and speaker, the QR code of its link |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
 | **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid |

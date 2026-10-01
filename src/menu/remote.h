@@ -14,7 +14,6 @@
  * - 0x01 cicada: the cicada sings a few seconds,
  * - 0x02 mute / 0x03 unmute: no sound and no LEDs during the talks,
  * - 0x10 to 0x14: lights of the talk badge (off, green, orange, red, red angry), see talk.c,
- * - 0x20 + n: shows the talk n of the program (program.c),
  * - 0x30 + n: starts the song n of the chorus (chorus.c).
  * The buttons of the remote of a Flipper (a saved Princeton file, see remote.c): 0x04 = end of the mute,
  * 0x18 = talk off, 0x1F = talk red, so that the files C16A01 and C16A11 drive their whole group.
@@ -35,17 +34,16 @@ enum {
     REMOTE_MUTE = 0x02,
     REMOTE_UNMUTE = 0x03,
     REMOTE_TALK = 0x10,  /* + state (talk.h) */
-    REMOTE_PROGRAM = 0x20,  /* + talk number */
     REMOTE_SONG = 0x30,  /* + song number */
 };
 
-/* Handler of a group of commands (the high nibble: 0x10, 0x20, 0x30), gets the low nibble */
+/* Handler of a group of commands (the high nibble: 0x10, 0x30), gets the low nibble */
 typedef void (*remote_handler_t)(uint8_t arg);
 
 void remote_init(void);
 void remote_task(absolute_time_t now);
 
-/** \brief Handles the commands of a group (0x10, 0x20...). */
+/** \brief Handles the commands of a group (0x10, 0x30). */
 void remote_subscribe(uint8_t group, remote_handler_t handler);
 
 /** \brief Executes a command (received, or local e.g. from the admin menu). */

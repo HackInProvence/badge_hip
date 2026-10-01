@@ -397,7 +397,7 @@ def test_social(t):
 
 SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Programme', 'Vote', 'Radar des cigales',
           'Chaud - froid', 'Virus des cigales', 'Choeur', 'Annonces', 'Contrebande']
-ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Annoncer un talk', 'Vote (admin)',
+ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Vote (admin)',
          'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro',
          'Batterie (calibration)', 'Radio pirate', 'Mode démo', 'Type du badge',
          'Quitter le mode admin']
@@ -469,13 +469,6 @@ def test_net(t):
     admin_back(t, 'Vote (admin)')
     t.result('net: vote', bool(ok and opened and heard and voted and counted and closed),
              f'opened {bool(opened)}, heard {bool(heard)}, voted {bool(voted)}, counted {bool(counted)}, closed {bool(closed)}')
-    # Program: announce the third talk
-    admin_app(t, 'Annoncer un talk')
-    t.mark()
-    t.keys('xxb')
-    announced = t.expect(r'^program: talk 2 announced$', 3)
-    t.result('net: program announce', announced is not None)
-    admin_back(t, 'Annoncer un talk')
     # Infection: patient zero, then cured
     admin_app(t, 'Virus : patient zéro')
     t.mark()

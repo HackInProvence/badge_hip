@@ -526,10 +526,6 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ![Annonces (admin) — Aperçu (l'écran des cigales)](../screens/admin__annonces_admin__apercu.png)
 
 
-### Annoncer un talk
-
-![Annoncer un talk](../screens/admin__annoncer_un_talk.png)
-
 
 ### Vote (admin)
 
@@ -621,8 +617,3 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 - Admin > Annonces (admin) > Saisie du texte (lettres accentuées) : list row cut "Texte : Bienvenue à SecSea 2026 ! Accueil et café"
 - Admin > Annonces (admin) > Aperçu (l'écran des cigales) : list row cut "Contenu : https://www.hackinprovence.fr/"
 - Admin > Annonces (admin) > Aperçu (l'écran des cigales) : list row cut "Texte : Bienvenue à SecSea 2026 ! Accueil et café"
-- Admin > Annoncer un talk : list row cut "09:30 Ouverture de SecSea 2026"
-- Admin > Annoncer un talk : list row cut "10:00 Talk 1 (titre à compléter)"
-- Admin > Annoncer un talk : list row cut "11:00 Talk 2 (titre à compléter)"
-- Admin > Annoncer un talk : list row cut "14:00 Talk 3 (titre à compléter)"
-- Admin > Annoncer un talk : list row cut "15:00 Atelier badge : hackez votre cigale !"

@@ -283,7 +283,7 @@ et au remède du virus :
 Pour une entrée gérée directement par `main.c` (les fonctions historiques) :
 1. Ajouter une valeur à `menu_item_t` et son libellé dans `item_label()`.
 2. La placer dans un thème de `SUBMENUS` (24 entrées au plus par thème, `items[24]` de `submenu_t` ; le nombre
-   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 14).
+   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 13).
    Le dernier thème, Admin, n'est affiché qu'en mode admin (`store_t.admin == STORE_ADMIN_ON`).
 3. Dans `validate()`, lancer l'action ou passer dans un nouvel état `app` (`app_state_t`).
 4. Si l'état a sa propre page :
@@ -600,12 +600,7 @@ Une commande reçue par les deux voies n'est exécutée qu'une fois (même comma
 | 0x01 | la cigale chante 6 s | `remote.c` |
 | 0x02 / 0x03 | mode muet / fin du mode muet | `remote.c` |
 | 0x10 à 0x14 | lumières du badge de talk : éteint, vert, orange, rouge, rouge énervé | `talk.c` (page ouverte) |
-| 0x20 + n | affiche le talk n du programme (page Programme du badge) | `program.c` |
 | 0x30 + n | lance le morceau n du choeur | `chorus.c` |
-
-« Annoncer un talk » (admin) n'envoie plus la commande 0x20 + n : il envoie le contenu du talk (heure, « titre -
-orateur », lien en QR code) comme une annonce (§ 6.23), que les cigales affichent sans dépendre de leur programme.
-La commande 0x20 + n (du Flipper par exemple) ouvre toujours la page du programme du badge.
 
 Un module traite un groupe de commandes (le quartet de poids fort) avec `remote_subscribe(groupe, gestionnaire)` ;
 le gestionnaire reçoit le quartet de poids faible. `remote_execute()` exécute une commande locale.
@@ -889,8 +884,6 @@ durées de 50 ms à 5 s par pas de 50 ms.
   dans `store_ext_t` (§ 6.8), des exemples au départ (`DEFAULTS`). Lignes : Heure (éditeur `UI_CHARSET_TEXT`,
   5 caractères), Texte et Contenu (`UI_CHARSET_LONG`, 56 caractères), type du QR code (ailes), Aperçu
   (`announce_draw()` en rafraîchissement rapide), Envoyer (`announce_send()`, en tâche de fond).
-- **Annoncer un talk** ([program.c](../../src/menu/program.c)) construit une annonce avec l'heure, « titre -
-  orateur » et le lien du talk (QR code URL), et l'envoie avec `announce_send()`.
 
 
 ### 6.24 Compétences et succès
@@ -1160,7 +1153,7 @@ Les groupes (`--only`) :
 | `admin` | séquence secrète, commandes mode muet / fin du mode muet, sortie du mode admin |
 | `radio433` | pages Décodeur 433 MHz et Station météo, puis retour des balises du réseau |
 | `social` | pages du thème Social (contacts, radar, chaud - froid...) et états du badge de talk |
-| `net` | avec un seul badge, en *loopback* : vote, « Annoncer un talk », virus, message |
+| `net` | avec un seul badge, en *loopback* : vote, virus, message |
 
 ### 9.3 Tests à deux badges
 

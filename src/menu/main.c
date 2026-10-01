@@ -451,9 +451,6 @@ bool werewolf_event(char *buf, int len);
 /* The services of the social features (vote.c, program.c, infection.c, messages.c) */
 void vote_task(absolute_time_t now);
 bool vote_new(void);
-void program_init(void);
-bool program_announced(char *buf, int len);
-void program_forget(void);
 void infection_init(void);
 void infection_task(absolute_time_t now);
 bool infection_event(void);
@@ -694,8 +691,8 @@ static const submenu_t SUBMENUS[] = {
     {"Badge", 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS)}},
     {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
-    {"Admin", 14, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
-                   M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
+    {"Admin", 13, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+                   M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_RESET), M_APP(APP_BATTCAL),
                    M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
@@ -2214,7 +2211,6 @@ int main() {
     radio_tools_init();
     net_init();
     remote_init();
-    program_init();
     infection_init();
     messages_init();
     chorus_init();
@@ -2495,10 +2491,6 @@ int main() {
             notify(APPS[APP_ASSASSIN], notif);  /* "Éliminé par X", a new target, the victory */
         if (werewolf_event(notif, sizeof(notif)))
             notify(APPS[APP_WEREWOLF], notif);  /* "Loup-garou : Nuit 2 : Loups" */
-        if (program_announced(notif, sizeof(notif))) {
-            if (! notify(APPS[APP_PROGRAM], notif))
-                program_forget();
-        }
         messages_task(now);
         if (messages_new(notif, sizeof(notif)))
             notify(NULL, notif);
