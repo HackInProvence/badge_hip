@@ -116,6 +116,7 @@ typedef union {
         /* Added later: valid when announce_magic is STORE_ANNOUNCE_MAGIC (otherwise the defaults of announce.c) */
         uint32_t announce_magic;
         store_announce_t announces[STORE_ANNOUNCES];
+        uint32_t contact_skills[STORE_CONTACTS];  /* The skills of the cards received (skills.h), 0: none */
     };
     uint8_t raw[STORE_EXT_SIZE];  /* Whole sectors (the flash is written from this buffer) */
 } store_ext_t;

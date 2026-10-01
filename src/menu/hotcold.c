@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "app.h"
 #include "net.h"
 #include "ook_rx.h"
@@ -94,6 +95,8 @@ static void handle_hotcold(const net_packet_t *p) {
         return;  /* Another hunt: keep the first master heard */
     hunt_master = p->src;
     signal_add(&hunt, p->rssi, p->at);
+    if (signal_level(&hunt) > 85)
+        achv_unlock(ACHV_HOTCOLD);  /* "BRÛLANT !": found */
     static absolute_time_t logged = 0;
     if (absolute_time_diff_us(logged, p->at) > 5000000) {
         logged = p->at;
@@ -413,6 +416,7 @@ static bool hunt433_task(absolute_time_t now) {
         if (i == hunted && rssi > -128)
             signal_add(&target_signal, rssi, now);
         printf("hunt433: %s at %d dBm\n", r.text, rssi);
+        achv_unlock(ACHV_HUNT433);
         changed = true;
     }
     if (hunted >= 0) {

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -122,6 +123,10 @@ static void finish(void) {
     end_ts = get_absolute_time();
     printf("battle: %s (%d-%d)\n", count(hit_peer) == SHIP_CELLS ? "victory" : "defeat", count(hit_peer),
            count(hit_me & fleet));
+    if (count(hit_peer) == SHIP_CELLS) {
+        achv_unlock(ACHV_BATTLE_WIN);
+        achv_add(ACHV_CNT_WINS, 1);
+    }
     changed = true;
 }
 

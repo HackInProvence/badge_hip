@@ -12,15 +12,17 @@
 #include "app.h"
 #include "store.h"
 
-enum { R_SOCIAL, R_GAMES, R_CHALLENGES, R_CONTACTS, R_VIRUS, R_ALL, R_ANNOUNCES, N_RESETS };
+enum { R_SOCIAL, R_GAMES, R_CHALLENGES, R_CONTACTS, R_VIRUS, R_ACHV, R_CARGO, R_ALL, R_ANNOUNCES, N_RESETS };
 static const char *NAMES[N_RESETS] = {"Scores sociaux", "Records des jeux", "Défis CTF et crypto", "Contacts reçus",
-                                      "Virus", "Tout", "Annonces d'origine"};
+                                      "Virus", "Succès et niveau", "Contrebande", "Tout", "Annonces d'origine"};
 static const char *DETAILS[N_RESETS] = {
     "Le score et les rencontres\ndu réseau des cigales.",
     "Les records des jeux et\ndes casse-têtes.",
     "Les flags du CTF et les\ndéfis crypto résolus.",
     "Les cartes de visite\nreçues (pas votre carte).",
     "L'état du virus : en forme.",
+    "Les succès obtenus et\nleurs compteurs (le niveau\nrepart de 1).",
+    "La cale de la contrebande :\nles marchandises sont\ndistribuées à nouveau.",
     "Tout cela à la fois (le nom,\nles réglages et votre carte\nsont gardés).",
     "Les 6 annonces du menu admin\nreprennent leurs textes\nd'origine.",
 };
@@ -45,6 +47,16 @@ static void reset(int what) {
     }
     if (what == R_VIRUS || what == R_ALL)
         s->infection = 0;
+    if (what == R_ACHV || what == R_ALL) {
+        s->achievements = 0;
+        memset(s->achv_counters, 0, sizeof(s->achv_counters));
+    }
+    if (what == R_CARGO || what == R_ALL) {
+        memset(s->cargo, 0, sizeof(s->cargo));
+        s->cargo_seeded = 0;
+    }
+    if (what == R_ALL)
+        s->book_hash = 0;  /* The gamebook starts again */
     store_changed();
     if (what == R_ANNOUNCES) {
         store_ext_get()->announce_magic = 0;  /* The defaults of announce.c at the next use */

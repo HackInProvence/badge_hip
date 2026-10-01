@@ -10,6 +10,7 @@
 
 #include "achievements.h"
 #include "net.h"
+#include "skills.h"
 #include "social.h"
 #include "store.h"
 
@@ -29,6 +30,7 @@ typedef struct {
     absolute_time_t close_start;
     uint8_t close_count;
     bool met_now;  /* Meeting counted during this visit */
+    bool skills_told;  /* The shared skills were announced during this visit */
 } neighbour_t;
 
 static bool enabled = true;
@@ -201,8 +203,17 @@ static void handle_beacon(const net_packet_t *packet) {
     nb->pub.skills = packet->len >= BEACON_LEN2 ? net_u32(p + 11) : 0;
     nb->pub.level = packet->len >= BEACON_LEN2 ? p[15] : 0;
     nb->last_seen = now;
-    if ((nb->pub.skills & store_get()->skills) && rssi >= SOCIAL_RSSI_CLOSE)
-        achv_unlock(ACHV_SKILL_MATCH);  /* A cicada close by shares a skill */
+    uint32_t common = nb->pub.skills & store_get()->skills;
+    if (common && rssi >= SOCIAL_RSSI_CLOSE && ! nb->skills_told) {
+        nb->skills_told = true;  /* A cicada close by shares a skill: once per visit */
+        int first = 0;
+        while (! (common >> first & 1))
+            ++first;
+        snprintf(event, sizeof(event), "%s aime aussi : %s", nb->pub.name, skills_name(first));
+        event_pending = true;
+        printf("social: %s\n", event);
+        achv_unlock(ACHV_SKILL_MATCH);
+    }
 
     /* Close enough, long enough: meeting */
     if (rssi >= SOCIAL_RSSI_CLOSE && ! nb->met_now) {

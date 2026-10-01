@@ -48,4 +48,7 @@ bool video_is_paused(void);
 /** \brief Human readable status: the error, or the statistics of the last playback. */
 const char *video_message(void);
 
+/** \brief The last video was played to its end (not stopped, no error). */
+bool video_completed(void);
+
 #endif /* _VIDEO_H */

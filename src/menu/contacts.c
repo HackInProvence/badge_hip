@@ -13,11 +13,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
 #include "net.h"
 #include "remote.h"
+#include "skills.h"
 #include "social.h"
 #include "store.h"
 #include "vcard.h"
@@ -76,6 +78,7 @@ static bool rx_done = false;  /* Complete: to accept or not */
 static uint16_t last_crc = 0;  /* Last card accepted or ignored (it is sent again and again) */
 static bool have_last = false;
 static contact_card_t rx_card;
+static uint32_t rx_skills;
 static bool changed = false;
 
 static void on_chat(const char *text, int len, int rssi) {
@@ -93,6 +96,7 @@ static void on_chat(const char *text, int len, int rssi) {
     memset(&rx_card, 0, sizeof(rx_card));
     for (int f = 0; f < N_FIELDS; ++f)
         snprintf(field(&rx_card, f), FIELDS[f].size, "%s", vrx.values[f]);
+    rx_skills = skills_from_text(vrx.categories);
     rx_done = true;
     changed = true;
     char name[48];
@@ -121,7 +125,9 @@ static void start_exchange(void) {
     const char *values[N_FIELDS];
     for (int f = 0; f < N_FIELDS; ++f)
         values[f] = field(&e->mine, f);
-    n_packets = vcard_build(values, e->send_mask, packets, VCARD_PACKETS_MAX);
+    char categories[VCARD_LINE_MAX - 12];
+    skills_to_text(store_get()->skills, categories, sizeof(categories));
+    n_packets = vcard_build(values, e->send_mask, categories, packets, VCARD_PACKETS_MAX);
     send_packet = 0;
     send_ts = get_absolute_time();
     vcard_rx_init(&vrx);
@@ -153,6 +159,11 @@ void contacts_export(void) {
         for (int f = 2; f < N_FIELDS; ++f)
             if (FIELDS[f].vcard && field(c, f)[0])
                 printf("%s:%s\n", FIELDS[f].vcard, field(c, f));
+        if (e->contact_skills[i]) {
+            char categories[VCARD_LINE_MAX];
+            skills_to_text(e->contact_skills[i], categories, sizeof(categories));
+            printf("CATEGORIES:%s\n", categories);
+        }
         printf("END:VCARD\n");
     }
 }
@@ -194,11 +205,14 @@ static void keep_card(void) {
     store_ext_t *e = store_ext_get();
     if (e->n_contacts == STORE_CONTACTS) {
         memmove(&e->contacts[0], &e->contacts[1], sizeof(e->contacts[0]) * (STORE_CONTACTS - 1));  /* Forget the oldest */
+        memmove(&e->contact_skills[0], &e->contact_skills[1], sizeof(e->contact_skills[0]) * (STORE_CONTACTS - 1));
         --e->n_contacts;
     }
+    e->contact_skills[e->n_contacts] = rx_skills;
     e->contacts[e->n_contacts++] = rx_card;
     store_ext_changed();
     printf("contacts: kept (%u)\n", e->n_contacts);
+    achv_unlock(ACHV_CONTACT);
 }
 
 static bool contacts_buttons(const app_buttons_t *b, absolute_time_t now) {
@@ -276,6 +290,8 @@ static bool contacts_buttons(const app_buttons_t *b, absolute_time_t now) {
         if (b->long_pressed & UI_BTN_B) {
             memmove(&e->contacts[list_sel], &e->contacts[list_sel + 1],
                     sizeof(e->contacts[0]) * (e->n_contacts - list_sel - 1));
+            memmove(&e->contact_skills[list_sel], &e->contact_skills[list_sel + 1],
+                    sizeof(e->contact_skills[0]) * (e->n_contacts - list_sel - 1));
             --e->n_contacts;
             if (list_sel >= e->n_contacts && list_sel)
                 --list_sel;
@@ -346,7 +362,10 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
         card_name(c, text, sizeof(text));
         ui_title(fb, text);
         int y = UI_TITLE_H + 3;
-        for (int f = 2; f < N_FIELDS && y < UI_FOOTER_Y - 16; ++f) {
+        uint32_t skills = e->contact_skills[list_sel];
+        if (skills)  /* Its skills, above the footer */
+            skills_draw_row(fb, GFX_WIDTH/2, UI_FOOTER_Y - SKILLS_ICON_SIZE - 3, skills, 9, GFX_BLACK);
+        for (int f = 2; f < N_FIELDS && y < UI_FOOTER_Y - (skills ? 36 : 16); ++f) {
             if (! field(c, f)[0])
                 continue;
             snprintf(text, sizeof(text), "%s : %s", FIELDS[f].label, field(c, f));

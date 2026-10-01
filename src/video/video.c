@@ -31,6 +31,8 @@ typedef enum {
 } video_state_t;
 
 static video_state_t state = V_IDLE;
+static bool completed = false;  /* The last video was played to its end */
+static bool stopping = false;  /* video_stop() was called */
 static FIL file;  /* Reads the frames */
 static FIL afile;  /* Reads the sound, stored after the frames */
 static uint16_t fps = 10;
@@ -173,6 +175,8 @@ static const uint8_t *waveform(void) {
 
 
 bool video_start(const char *path) {
+    completed = false;
+    stopping = false;
     if (state != V_IDLE)
         return true;
     if (! open_video(path))
@@ -188,6 +192,7 @@ bool video_start(const char *path) {
 
 
 void video_stop(void) {
+    stopping = true;
     switch (state) {
     case V_CLEAR:
         state = V_CLOSE;
@@ -216,6 +221,11 @@ void video_toggle_pause(void) {
 
 bool video_is_paused(void) {
     return state == V_PAUSING || state == V_PAUSED;
+}
+
+
+bool video_completed(void) {
+    return completed;
 }
 
 
@@ -332,6 +342,7 @@ bool video_task(absolute_time_t now) {
         if (audio_rate)
             f_close(&afile);
         state = V_IDLE;
+        completed = ! stopping;
         printf("video: done\n");
         return false;
     default:

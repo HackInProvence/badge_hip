@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "ctf.h"
 #include "store.h"
 
@@ -61,6 +62,7 @@ bool ctf_code_check(void) {
         s->flags_found |= 1;
         store_changed();
     }
+    achv_unlock(ACHV_CTF_FLAG);
     return true;
 }
 

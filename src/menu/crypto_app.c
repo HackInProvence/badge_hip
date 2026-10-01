@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "app.h"
 #include "audio.h"
 #include "crypto_ctf.h"
@@ -116,6 +117,7 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
             if (right) {
                 store_get()->crypto_solved = solved() | (1u << sel);
                 store_changed();
+                achv_unlock(ACHV_CRYPTO);
                 app_tone(1319, 300);
             } else {
                 app_tone(262, 300);

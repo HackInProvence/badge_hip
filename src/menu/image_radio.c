@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -192,6 +193,7 @@ static void send_task(absolute_time_t now) {
             send_block = -1;
             remote_pause_windows(false);
             printf("image: sent\n");
+            achv_unlock(ACHV_IMAGE_SENT);
         }
         changed = true;
     } else if (send_block % 20 == 0) {

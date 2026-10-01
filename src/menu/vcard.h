@@ -13,7 +13,7 @@
  * Flipper) is accepted as it is.
  *
  * The fields are those of contacts.c, in this order: first name, name, phone, e-mail, company, job title,
- * address, city, LinkedIn, Git, web site, Mastodon, comment.
+ * address, city, LinkedIn, Git, web site, Mastodon, comment. Plus CATEGORIES: the skills (skills.h), as text.
  * */
 
 #ifndef _VCARD_H
@@ -34,9 +34,10 @@ typedef struct {
     uint8_t len;
 } vcard_packet_t;
 
-/** \brief The packets of a card: \p values[f] ("" = empty), only the fields whose bit is set in \p mask.
- * \return the number of packets (0 if they don't fit in \p max). */
-int vcard_build(const char *const values[VCARD_FIELDS], uint16_t mask, vcard_packet_t *packets, int max);
+/** \brief The packets of a card: \p values[f] ("" = empty), only the fields whose bit is set in \p mask, and
+ * \p categories (NULL or "": none). \return the number of packets (0 if they don't fit in \p max). */
+int vcard_build(const char *const values[VCARD_FIELDS], uint16_t mask, const char *categories,
+                vcard_packet_t *packets, int max);
 
 /* Receiving: the packets of the chat, one by one */
 typedef struct {
@@ -44,6 +45,7 @@ typedef struct {
     int n;  /* Lines of the card being received (from BEGIN:VCARD) */
     bool in_card;
     char values[VCARD_FIELDS][VCARD_VALUE_MAX + 1];  /* The last complete card */
+    char categories[VCARD_LINE_MAX];  /* Its CATEGORIES ("" when none) */
     uint16_t crc;  /* Of the last complete card: the same card sent again is recognized */
 } vcard_rx_t;
 

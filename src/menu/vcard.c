@@ -77,7 +77,8 @@ static void add_line(builder_t *b, const char *line, bool checked) {
     }
 }
 
-int vcard_build(const char *const values[VCARD_FIELDS], uint16_t mask, vcard_packet_t *packets, int max) {
+int vcard_build(const char *const values[VCARD_FIELDS], uint16_t mask, const char *categories,
+                vcard_packet_t *packets, int max) {
     builder_t b = {packets, max, 0, false, 0, 0xFFFF};
     char line[VCARD_LINE_MAX];
     const char *v[VCARD_FIELDS];
@@ -98,6 +99,10 @@ int vcard_build(const char *const values[VCARD_FIELDS], uint16_t mask, vcard_pac
             snprintf(line, sizeof(line), "%s:%s", SIMPLE[i].prop, v[SIMPLE[i].field]);
             add_line(&b, line, true);
         }
+    if (categories && categories[0]) {
+        snprintf(line, sizeof(line), "CATEGORIES:%s", categories);
+        add_line(&b, line, true);
+    }
     snprintf(line, sizeof(line), CHECK_PROP ":%d-%04X", b.lines, b.crc);
     add_line(&b, line, false);
     add_line(&b, "END:VCARD", false);
@@ -168,6 +173,7 @@ static void component(const char *value, int n, char *dst) {
 static void parse_card(vcard_rx_t *rx) {
     char (*v)[VCARD_VALUE_MAX + 1] = rx->values;
     memset(rx->values, 0, sizeof(rx->values));
+    rx->categories[0] = 0;
     bool have_n = false;
     for (int i = 0; i < rx->n; ++i) {
         const char *line = rx->lines[i];
@@ -194,6 +200,8 @@ static void parse_card(vcard_rx_t *rx) {
             } else {
                 copy_value(v[F_NAME], value, -1);
             }
+        } else if (! strcmp(base, "CATEGORIES")) {
+            snprintf(rx->categories, sizeof(rx->categories), "%s", value);
         } else if (! strcmp(base, "ADR")) {
             component(value, 2, v[F_ADDRESS]);
             component(value, 3, v[F_CITY]);

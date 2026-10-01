@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -296,6 +297,7 @@ void chorus_task(absolute_time_t now) {
         seek(since * RATE / 1000000);  /* 0 at the start, more when joining late */
         playing = true;
         printf("chorus: playing voice %d\n", voice + 1);
+        achv_unlock(ACHV_CHORUS);
     }
     if (playing) {
         if (written >= song_samples() && audio_queued() == 0) {

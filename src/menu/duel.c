@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -310,6 +311,10 @@ static bool duel_task(absolute_time_t now) {
         if (my_score >= WIN_ROUNDS || peer_score >= WIN_ROUNDS) {
             state = S_END;
             printf("duel: %s %d-%d\n", my_score > peer_score ? "victory" : "defeat", my_score, peer_score);
+            if (my_score > peer_score) {
+                achv_unlock(ACHV_DUEL_WIN);
+                achv_add(ACHV_CNT_WINS, 1);
+            }
             changed = true;
         } else {
             new_round();

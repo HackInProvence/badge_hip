@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "skills.h"
 #include "social.h"
 #include "store.h"
 
@@ -77,6 +78,8 @@ static void nametag_render(uint8_t *fb) {
     ink_rows(&gfx_font_large, nametag_type(), &top, &bottom);
     int y = band_y + (band_h - (bottom - top + 1)) / 2 - top;
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_large, nametag_type(), GFX_WHITE, GFX_ALIGN_CENTER);
+    /* The pictograms of the skills (Social > Compétences) under the band */
+    skills_draw_row(fb, GFX_WIDTH/2, band_y + band_h + 6, store_get()->skills, 10, GFX_BLACK);
 }
 
 const app_t app_nametag = {

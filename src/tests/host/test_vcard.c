@@ -31,7 +31,7 @@ int main(void) {
     static vcard_rx_t rx;
 
     /* Every field: every packet fits the chat, the long lines are folded, the card comes back the same */
-    int n = vcard_build(CARD, 0x1FFF, p, VCARD_PACKETS_MAX);
+    int n = vcard_build(CARD, 0x1FFF, NULL, p, VCARD_PACKETS_MAX);
     CHECK(n > 15);
     for (int i = 0; i < n; ++i) {
         CHECK(p[i].len <= VCARD_PACKET_MAX && p[i].len == strlen(p[i].text));
@@ -51,17 +51,18 @@ int main(void) {
     uint16_t crc = rx.crc;
 
     /* Only the fields checked */
-    n = vcard_build(CARD, 0x0107, p, VCARD_PACKETS_MAX);  /* First name, name, phone, LinkedIn */
+    n = vcard_build(CARD, 0x0107, "Flipper Zero,Radio / SDR", p, VCARD_PACKETS_MAX);  /* First name, name, phone, LinkedIn */
     vcard_rx_init(&rx);
     CHECK(feed(&rx, p, n, -1));
     CHECK_STR(rx.values[0], "Tristan");
     CHECK_STR(rx.values[2], "0612345678");
     CHECK_STR(rx.values[3], "");
     CHECK_STR(rx.values[8], "https://www.linkedin.com/in/tristansalaun");
+    CHECK_STR(rx.categories, "Flipper Zero,Radio / SDR");  /* The skills */
     CHECK(rx.crc != crc);
 
     /* A lost line: rejected; the next sending completes it (the receiver starts again on BEGIN:VCARD) */
-    n = vcard_build(CARD, 0x1FFF, p, VCARD_PACKETS_MAX);
+    n = vcard_build(CARD, 0x1FFF, NULL, p, VCARD_PACKETS_MAX);
     vcard_rx_init(&rx);
     CHECK(! feed(&rx, p, n, 5));
     CHECK(feed(&rx, p, n, -1));
@@ -107,7 +108,7 @@ int main(void) {
     memset(url, 'u', 55);
     url[55] = 0;
     longest[8] = url;
-    n = vcard_build(longest, 0x1FFF, p, VCARD_PACKETS_MAX);
+    n = vcard_build(longest, 0x1FFF, NULL, p, VCARD_PACKETS_MAX);
     vcard_rx_init(&rx);
     CHECK(feed(&rx, p, n, -1));
     CHECK_STR(rx.values[8], url);

@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -166,6 +167,7 @@ static bool voter_buttons(const app_buttons_t *b, absolute_time_t now) {
         answer_repeats = ANSWER_REPEATS;
         answer_ts = now;
         printf("vote: answer %d\n", choice);
+        achv_unlock(ACHV_VOTE);
     }
     return true;
 }

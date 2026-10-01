@@ -1666,11 +1666,17 @@ void app_leds(uint8_t r, uint8_t g, uint8_t b) {
         set_leds(led_mode);  /* Back to the animation of the badge */
 }
 
+/* A new record (or a win against the cicada): saved, and an achievement */
+static void records_changed(void) {
+    store_changed();
+    achv_unlock(ACHV_RECORD);
+}
+
 static const games_hooks_t GAME_HOOKS = {
     .tone = game_tone,
     .leds = game_leds,
     .random = get_rand_32,
-    .records_changed = store_changed,
+    .records_changed = records_changed,
     .player_name = social_name,
     .badge_id = social_id,
 };
@@ -2036,6 +2042,152 @@ static void cancel(void) {
     redraw = true;
 }
 
+/* ------ Mode démo (Admin > Mode démo, demo.c): the features one after the other, in a loop, for a stand;
+ * any button stops it. The pages of the SD card are skipped when there is no card. ------ */
+
+typedef enum { D_NAMETAG, D_ACHIEVEMENTS, D_IMAGES, D_VIDEO, D_SKILLS, D_MUSIC, D_SCREEN_DEMO, D_PROGRAM, D_RADAR,
+               D_GAMEBOOK, D_CREDITS, D_INFO, D_STEPS } demo_step_t;
+static const struct {
+    const char *name;
+    uint16_t seconds;
+} DEMO_STEPS[D_STEPS] = {
+    [D_NAMETAG] = {"badge nominatif", 8}, [D_ACHIEVEMENTS] = {"succès", 6}, [D_IMAGES] = {"images", 18},
+    [D_VIDEO] = {"vidéo", 20}, [D_SKILLS] = {"compétences", 5}, [D_MUSIC] = {"musique", 10},
+    [D_SCREEN_DEMO] = {"démo écran", 15}, [D_PROGRAM] = {"programme", 6}, [D_RADAR] = {"radar", 6},
+    [D_GAMEBOOK] = {"livres-jeux", 5}, [D_CREDITS] = {"crédits", 6}, [D_INFO] = {"infos", 5},
+};
+#define DEMO_IMAGE_MS 6000
+
+static bool demo_on = false, demo_leaving = false, demo_stopping = false;
+static int demo_step = -1;
+static absolute_time_t demo_next = 0, demo_sub = 0;
+static unsigned demo_saved_leds = 0;
+
+/* One step back towards the menu. \return true while not there yet (a video stops in several loops) */
+static bool demo_back(void) {
+    switch (app) {
+    case A_MENU:
+        demo_stopping = false;
+        return false;
+    case A_APP:
+        if (cur_app && cur_app->stop)
+            cur_app->stop();
+        cur_app = NULL;
+        app = A_MENU;
+        break;
+    case A_SAVER:
+    case A_START_SAVER:
+        still_render = NULL;
+        app = A_MENU;
+        break;
+    case A_VIDEO:
+    case A_SCREEN_DEMO:
+    case A_RSVP:
+        if (! demo_stopping)  /* Asked once, then wait for the end */
+            cancel();
+        demo_stopping = true;
+        return true;
+    default:
+        cancel();
+        break;
+    }
+    display_invalidate();
+    redraw = true;
+    return app != A_MENU;
+}
+
+/* Plays the first file of a browser (or of its first folder) */
+static bool demo_media(browse_kind_t kind) {
+    open_browser(kind);
+    for (int depth = 0; depth < 2 && app == A_BROWSE; ++depth) {
+        for (size_t i = 0; i < n_files; ++i)
+            if (! file_is_dir[i]) {
+                file_selected = i;
+                play_selected();
+                return true;
+            }
+        if (! n_files)
+            break;
+        file_selected = 0;  /* Only folders: the first one */
+        play_selected();
+    }
+    return false;
+}
+
+static void demo_start_step(absolute_time_t now) {
+    demo_step = (demo_step + 1) % D_STEPS;
+    demo_next = delayed_by_ms(now, DEMO_STEPS[demo_step].seconds * 1000);
+    demo_sub = delayed_by_ms(now, DEMO_IMAGE_MS);
+    printf("demo: %s\n", DEMO_STEPS[demo_step].name);
+    bool shown = true;
+    switch (demo_step) {
+    case D_NAMETAG: app_open(APPS[APP_NAMETAG]); break;
+    case D_ACHIEVEMENTS: app_open(APPS[APP_ACHIEVEMENTS]); break;
+    case D_SKILLS: app_open(APPS[APP_SKILLS]); break;
+    case D_PROGRAM: app_open(APPS[APP_PROGRAM]); break;
+    case D_RADAR: app_open(APPS[APP_RADAR]); break;
+    case D_GAMEBOOK: app_open(APPS[APP_GAMEBOOK]); break;
+    case D_IMAGES: shown = demo_media(B_IMAGE); break;
+    case D_VIDEO: shown = demo_media(B_VIDEO); break;
+    case D_MUSIC: shown = demo_media(B_MUSIC); break;
+    case D_SCREEN_DEMO: app = A_START_SCREEN_DEMO; break;
+    case D_CREDITS:
+        credits_page = 0;
+        credits_back = A_MENU;
+        app = A_CREDITS;
+        break;
+    default:
+        sd_init();
+        app = A_INFO;
+        break;
+    }
+    if (! shown) {  /* No SD card, no file: the next step at once */
+        printf("demo: %s skipped\n", DEMO_STEPS[demo_step].name);
+        demo_back();
+        demo_next = now;
+    }
+    redraw = true;
+}
+
+void demo_start(void) {
+    demo_on = true;
+    demo_leaving = false;
+    demo_step = -1;
+    demo_next = get_absolute_time();
+    demo_saved_leds = led_mode;
+    set_leds(1);  /* Rainbow */
+    printf("demo: on\n");
+}
+
+static void demo_task(absolute_time_t now, uint8_t pressed) {
+    if (demo_leaving) {
+        if (! demo_back()) {
+            demo_leaving = false;
+            set_leds(demo_saved_leds);
+            set_status("Mode démo arrêté");
+            printf("demo: off\n");
+        }
+        return;
+    }
+    if (! demo_on)
+        return;
+    if (pressed) {
+        demo_on = false;
+        demo_leaving = true;
+        return;
+    }
+    last_activity = now;  /* No screensaver in between */
+    if (demo_step == D_IMAGES && app == A_IMAGE && absolute_time_diff_us(demo_sub, now) >= 0) {
+        demo_sub = delayed_by_ms(now, DEMO_IMAGE_MS);
+        image_next(1);
+    }
+    if (absolute_time_diff_us(demo_next, now) < 0)
+        return;
+    if (demo_back())
+        return;  /* The current page is not closed yet */
+    demo_start_step(now);
+}
+
 
 int main() {
     stdio_init_all();
@@ -2081,6 +2233,10 @@ int main() {
         uint8_t pressed = buttons_pressed(now);
         if (pressed)
             printf("buttons pressed: 0x%02x\n", pressed);
+        if (demo_on || demo_leaving) {
+            demo_task(now, pressed);
+            pressed = 0;  /* The press stops the demo, it is not for the page shown */
+        }
 
         /* Buttons */
         if (pressed)
@@ -2530,6 +2686,8 @@ int main() {
             break;
         case A_VIDEO:
             if (! video_task(now)) {
+                if (video_completed())
+                    achv_unlock(ACHV_VIDEO);
                 display_invalidate();
                 set_status(video_message());
                 app = A_BROWSE;

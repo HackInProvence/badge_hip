@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -83,6 +84,7 @@ static void handle_cough(const net_packet_t *p) {
     generation = p->data[0] + 1;
     riddle = get_rand_32() % N_RIDDLES;
     printf("infection: infected by %08lX (generation %u)\n", (unsigned long)p->src, generation);
+    achv_unlock(ACHV_INFECTED);
     set_state(INFECTED);
 }
 
@@ -152,6 +154,7 @@ static bool infection_buttons(const app_buttons_t *b, absolute_time_t now) {
             if (! strcmp(answer, RIDDLES[riddle].answer)) {
                 set_state(IMMUNE);
                 printf("infection: cured\n");
+                achv_unlock(ACHV_CURED);
             } else {
                 wrong = true;
                 printf("infection: wrong answer\n");

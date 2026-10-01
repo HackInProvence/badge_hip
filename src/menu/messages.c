@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "achievements.h"
 #include "pico/rand.h"
 
 #include "app.h"
@@ -131,6 +132,7 @@ static void send_message(uint32_t recipient, int message) {
     /* Sent SENDS times, RESEND_MS apart (a badge may be listening to the OOK remotes): the uid removes the copies */
     memcpy(pending, d, PACKET_LEN);
     sends_left = SENDS;
+    achv_unlock(ACHV_MESSAGE);
     next_send = get_absolute_time();
     printf("message: sent \"%s\" to %08lX\n", MESSAGES[message], (unsigned long)recipient);
 }
