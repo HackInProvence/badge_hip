@@ -286,8 +286,11 @@ static void test_builtin(void) {
     CHECK(f != NULL);
     if (f) {
         static char file[65536];
-        size_t n = fread(file, 1, sizeof(file), f);
+        size_t got = fread(file, 1, sizeof(file), f), n = 0;
         fclose(f);
+        for (size_t i = 0; i < got; ++i)  /* The checkout may have CRLF line ends (git core.autocrlf) */
+            if (file[i] != '\r')
+                file[n++] = file[i];
         CHECK_EQ(n, b->len);
         CHECK(n == b->len && ! memcmp(file, b->text, n));
         if (n != b->len || memcmp(file, b->text, n))
