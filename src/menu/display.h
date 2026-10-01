@@ -52,7 +52,8 @@ void display_set_periodic_full(bool allowed);
  * stopped: ask again until true). */
 bool display_is_idle(void);
 
-/** \brief The next frame shown (display_show()) is a page made to stay (an announcement, a QR code...): cleaned after
+/** \brief The frames shown in the next 1.5 s (display_show()) are a page made to stay (after the screensaver, a QR
+ * code...): cleaned after
  * DISPLAY_SETTLE_SOON_MS instead of DISPLAY_SETTLE_MS. */
 void display_settle_soon(void);
 

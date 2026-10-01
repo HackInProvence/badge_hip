@@ -30,7 +30,9 @@ static bool asleep = true;
 static bool periodic_full = true;
 static absolute_time_t last_update = 0;
 static bool settled = true;  /* The image on the screen was cleaned (or nothing to clean) */
-static bool settle_soon_next = false, settle_soon = false;
+static bool settle_soon = false;  /* The image shown is a page made to stay */
+static absolute_time_t soon_until = 0;  /* The frames shown until then are (display_settle_soon()) */
+#define SOON_WINDOW_MS 1500  /* A page is often drawn twice (a status, the battery icon...) */
 static bool settle_stop = false;
 
 
@@ -42,13 +44,12 @@ void display_init(void) {
 void display_show(const uint8_t *fb) {
     memcpy(wanted, fb, GFX_FB_SIZE);
     dirty = true;
-    settle_soon = settle_soon_next;
-    settle_soon_next = false;
+    settle_soon = absolute_time_diff_us(get_absolute_time(), soon_until) > 0;
 }
 
 
 void display_settle_soon(void) {
-    settle_soon_next = true;
+    soon_until = delayed_by_ms(get_absolute_time(), SOON_WINDOW_MS);
 }
 
 
