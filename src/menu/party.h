@@ -33,6 +33,7 @@
 #define PARTY_MAX 40
 #define PARTY_MAX_OPEN 8  /* Parties heard at once */
 #define PARTY_KIND_GAME 16  /* First kind of the messages of the games */
+#define PARTY_KIND_LEAVE 5  /* Given to the handler after the start: a player (or the host) left */
 #define PARTY_PAYLOAD 47
 
 typedef enum {
@@ -113,7 +114,7 @@ const char *party_name(uint32_t id);  /* "?" when unknown */
 uint32_t party_key(void);  /* The key of this badge */
 
 /** \brief The time of the start (the same on all the badges, within ~20 ms), and the random seed chosen by the host
- * (the same on all the badges). Valid once PARTY_STARTED. */
+ * (the same on all the badges). Valid once PARTY_STARTED. The seed travels in clear: never use it for a secret. */
 absolute_time_t party_start_time(void);
 uint32_t party_seed(void);
 

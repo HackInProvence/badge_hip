@@ -445,6 +445,8 @@ static bool notify(const app_t *a, const char *msg) {
 void tug_service(absolute_time_t now);
 void assassin_service(absolute_time_t now);
 bool assassin_event(char *buf, int len);
+void werewolf_service(absolute_time_t now);
+bool werewolf_event(char *buf, int len);
 
 /* The services of the social features (vote.c, program.c, infection.c, messages.c) */
 void vote_task(absolute_time_t now);
@@ -2491,6 +2493,8 @@ int main() {
         char notif[64];
         if (assassin_event(notif, sizeof(notif)))
             notify(APPS[APP_ASSASSIN], notif);  /* "Éliminé par X", a new target, the victory */
+        if (werewolf_event(notif, sizeof(notif)))
+            notify(APPS[APP_WEREWOLF], notif);  /* "Loup-garou : Nuit 2 : Loups" */
         if (program_announced(notif, sizeof(notif))) {
             if (! notify(APPS[APP_PROGRAM], notif))
                 program_forget();
@@ -2533,6 +2537,7 @@ int main() {
         smuggler_task(now);
         tug_service(now);
         assassin_service(now);
+        werewolf_service(now);
         battery_task(now);
         static int shown_bars = -2;
         static bool shown_charging = false;

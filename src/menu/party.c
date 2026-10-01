@@ -19,7 +19,7 @@
 #define K_JOIN 2
 #define K_ROSTER 3
 #define K_START 4
-#define K_LEAVE 5
+#define K_LEAVE PARTY_KIND_LEAVE
 #define PER_PAGE 3  /* Players (id + name) in a ROSTER packet */
 #define PAGES_PER_ROUND 4  /* ROSTER packets sent each second */
 #define PERIOD_MS 1000
@@ -361,6 +361,10 @@ void party_task(absolute_time_t now) {
     } else if (state == PARTY_STARTED && party_is_host()) {
         /* For the players who missed pages: all of them at first, then one per second during the game */
         send_roster_pages(absolute_time_diff_us(started_at, now) < ROSTER_AFTER_START_MS * 1000ll ? PAGES_PER_ROUND : 1);
+        int64_t left = absolute_time_diff_us(now, start_ts) / 1000;  /* START again: a player may have missed all 5 */
+        uint8_t d[7] = {n_roster, left > 0 ? left : 0, left > 0 ? left >> 8 : 0};
+        net_put_u32(d + 3, seed);
+        send_raw(K_START, 0, d, sizeof(d));
     } else if (state == PARTY_JOINING || (state == PARTY_JOINED && find(net_id()) < 0)) {
         uint8_t d[12];
         net_put_u32(d, my_key);
