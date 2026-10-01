@@ -152,8 +152,10 @@ Les joueurs reçoivent les succès **Pleine lune** (avoir joué) et **Survivant*
 - Il lit les annonces : « La nuit tombe, tout le monde choisit sur son badge... », les morts de l'aube, le
   verdict.
 - **G long** arrête la partie pour tout le monde (après confirmation).
-- **Mode test** : si le badge du meneur est en mode admin, une partie peut être lancée dès un joueur ; des robots
-  complètent jusqu'à 8. Ils peuvent recevoir n'importe quelle carte et jouent au hasard (votes blancs de temps en
+- **Moins de 8 joueurs** : pas de partie, sauf si l'organisateur le débloque dans Admin > Loup-garou (admin) :
+  « Petites parties (4+) » (dès 4 joueurs, 1 loup-garou sous 8), ou « Test : robots ».
+- **Mode test** (« Test : robots » dans Admin > Loup-garou (admin)) : une partie peut être lancée dès un joueur ; des
+  robots complètent jusqu'à 8. Ils peuvent recevoir n'importe quelle carte et jouent au hasard (votes blancs de temps en
   temps). Sert aux essais avec deux badges (`tools/test_werewolf.py`).
 
 

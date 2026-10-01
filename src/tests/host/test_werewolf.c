@@ -454,6 +454,7 @@ void app_show_still(void (*render)(uint8_t *fb)) { (void)render; }
 void app_cough(void) {}
 static store_t stores[NB];
 store_t *store_get(void) { return &stores[cur]; }
+void store_changed(void) {}
 static bool achv[NB][ACHV_COUNT];
 static uint16_t counters[NB][8];
 void achv_unlock(achv_id_t id) { achv[cur][id] = true; }
@@ -714,6 +715,7 @@ static void run_game(const char *name, int players, uint8_t opts, bool debug, in
     for (int b = 0; b < NB; ++b) {
         in_app[b] = false;
         stores[b].admin = b == 0 && debug ? STORE_ADMIN_ON : 0;
+        stores[b].ww_unlock = b == 0 && debug ? 2 : 0;  /* Admin > Loup-garou (admin) > Test : robots */
     }
     uint64_t t0 = host_time_us;
     sent_narrator = sent_players = 0;
@@ -792,6 +794,7 @@ static void run_abort(void) {
     for (int b = 0; b < NB; ++b) {
         in_app[b] = false;
         stores[b].admin = 0;
+        stores[b].ww_unlock = 0;
     }
     narrator_open(WW_OPT_ALL);
     for (int b = 1; b < n_badges; ++b)

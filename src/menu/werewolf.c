@@ -33,8 +33,9 @@
  *   Sent again until the PRIV of the step acknowledges the seq: the radio loses packets, duplicates are ignored.
  * - ABORT (narrator, 5 times, then the LEAVE of party.c): the narrator stopped the game.
  *
- * Test mode: when the narrator badge is in admin mode, a party starts with a single player, and robots (which can
- * hold any card) complete it up to the minimum (tools/test_werewolf.py with 2 badges). */
+ * Below 8 players (the minimum of the rules), no game unless Admin > Loup-garou (admin) unlocks it: small games from
+ * 4 players (1 wolf below 8), or the test mode: a party starts with a single player, and robots (which can hold any
+ * card) complete it up to 8 (tools/test_werewolf.py with 2 badges). */
 
 #include <stdio.h>
 #include <string.h>
@@ -189,8 +190,17 @@ static uint16_t debate_secs(void) {
     return DEBATE_S[debate < 3 ? debate : 1];
 }
 
+/* Admin > Loup-garou (admin): below 8 players, no game unless unlocked (store ww_unlock) */
+enum { WW_UNLOCK_RULE, WW_UNLOCK_SMALL, WW_UNLOCK_ROBOTS, WW_UNLOCKS };
+#define WW_SMALL_MIN_PLAYERS 4  /* Small games: 1 wolf, 3 others at least */
+
+static int unlock_mode(void) {
+    uint8_t u = store_get()->ww_unlock;
+    return u < WW_UNLOCKS ? u : WW_UNLOCK_RULE;
+}
+
 static int min_players(void) {
-    return debug_mode() ? 1 : WW_MIN_PLAYERS;
+    return debug_mode() ? 1 : unlock_mode() == WW_UNLOCK_SMALL ? WW_SMALL_MIN_PLAYERS : WW_MIN_PLAYERS;
 }
 
 static const char *pname(int i) {
@@ -1798,7 +1808,8 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, "Partie ouverte");
         int min = min_players();
         snprintf(text, sizeof(text), "%d joueur%s (%d à %d), %d loups", n_lobby, n_lobby > 1 ? "s" : "", min,
-                 WW_MAX_PLAYERS, ww_wolves_for(n_lobby < WW_MIN_PLAYERS ? WW_MIN_PLAYERS : n_lobby));
+                 WW_MAX_PLAYERS, ww_wolves_for(debug_mode() && n_lobby < WW_MIN_PLAYERS ? WW_MIN_PLAYERS
+                                               : n_lobby < min_players() ? min_players() : n_lobby));
         int y = ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
         if (debug_mode())
             y = ui_lines(fb, y, &gfx_font_small, "Test : des robots complètent");
@@ -1975,7 +1986,7 @@ static bool game_buttons(const app_buttons_t *b, absolute_time_t now) {
 }
 
 static void open_party(void) {
-    bool debug = store_get()->admin == STORE_ADMIN_ON;
+    bool debug = unlock_mode() == WW_UNLOCK_ROBOTS;  /* Admin > Loup-garou (admin): the test mode with robots */
     options = set_options | (debug ? FLAG_DEBUG : 0);
     debate = set_debate;
     reset_player();
@@ -2168,4 +2179,56 @@ const app_t app_werewolf = {
     .render = ww_render,
     .calm = ww_calm,
     .no_saver = true,
+};
+
+
+/* ------ Admin > Loup-garou (admin): below 8 players (the minimum of the rules), no game unless unlocked here ------ */
+
+static const char *UNLOCK_NAMES[WW_UNLOCKS] = {"8 joueurs minimum", "Petites parties (4+)", "Test : robots"};
+static const char *UNLOCK_HELP[WW_UNLOCKS] = {
+    "La règle du jeu :\nde 8 à 18 joueurs.",
+    "Dès 4 joueurs, avec\n1 loup-garou sous 8.",
+    "Dès 1 joueur : des robots\ncomplètent jusqu'à 8.",
+};
+static int unlock_sel = 0;
+
+static void unlock_label(int i, char *buf, size_t len) {
+    snprintf(buf, len, "%s %s", i == unlock_mode() ? "(o)" : "( )", UNLOCK_NAMES[i]);
+}
+
+static void unlock_start(absolute_time_t now) {
+    (void)now;
+    unlock_sel = unlock_mode();
+    printf("werewolf: unlock page, mode %d\n", unlock_sel);
+}
+
+static bool unlock_buttons(const app_buttons_t *b, absolute_time_t now) {
+    (void)now;
+    if (b->pressed & UI_BTN_A)
+        return false;
+    if (b->pressed & UI_BTN_X)
+        unlock_sel = (unlock_sel + 1) % WW_UNLOCKS;
+    if (b->pressed & UI_BTN_Y)
+        unlock_sel = (unlock_sel + WW_UNLOCKS - 1) % WW_UNLOCKS;
+    if (b->pressed & UI_BTN_B) {
+        store_get()->ww_unlock = unlock_sel;
+        store_changed();
+        printf("werewolf: unlock %s\n", UNLOCK_NAMES[unlock_sel]);
+    }
+    return true;
+}
+
+static void unlock_render(uint8_t *fb, absolute_time_t now) {
+    (void)now;
+    ui_title(fb, "Loup-garou (admin)");
+    ui_list(fb, WW_UNLOCKS, unlock_sel, unlock_label);
+    ui_lines(fb, UI_TITLE_H + 3 + WW_UNLOCKS * UI_ROW_H + 10, &gfx_font_small, UNLOCK_HELP[unlock_sel]);
+    ui_footer(fb, "Flancs : choisir  D : valider");
+}
+
+const app_t app_werewolf_admin = {
+    .name = "Loup-garou (admin)",
+    .start = unlock_start,
+    .buttons = unlock_buttons,
+    .render = unlock_render,
 };

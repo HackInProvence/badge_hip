@@ -42,6 +42,7 @@ from badge_selftest import Tester  # noqa: E402
 TOP = 'Badge SecSea'
 JEUX_INDEX = 1  # The themes of the main menu (main.c SUBMENUS): Médias, Jeux...
 WEREWOLF_INDEX = 16  # Loup-garou in the Jeux theme (main.c SUBMENUS)
+ADMIN_WEREWOLF_INDEX = 8  # Loup-garou (admin) in the Admin theme (main.c SUBMENUS, badge_selftest.ADMIN)
 OPTIONS = ['voyante', 'sorciere', 'chasseur', 'cupidon', 'petite-fille', 'capitaine', 'voleur']  # The setup page
 CARDS = 10  # The help: 8 roles, the captain, the lovers
 ACTIONS = {'thief': 'b', 'cupid': 'bxb', 'lovers': 'b', 'seer': 'b', 'wolves': 'b', 'witch': 'bb',
@@ -80,6 +81,28 @@ def connect(t, port, reboot):
     t.keys('!')
     if not t.expect(r'^social: ', 5):
         sys.exit(f'{port}: the badge does not answer: is the menu application (badge_menu) flashed?')
+
+
+def set_unlock(t, mode):
+    """Admin > Loup-garou (admin): 0 = 8 players minimum, 1 = small games, 2 = test with robots. From the main menu
+    with the admin mode on (the Admin theme selected). Returns the previous mode (None if the page was not found)."""
+    t.mark()
+    t.keys('b')  # The Admin theme
+    t.pump(0.5)
+    t.mark()
+    t.keys('x' * ADMIN_WEREWOLF_INDEX + 'b')
+    m = t.expect(r'^werewolf: unlock page, mode (\d)', 3)
+    if not m:
+        return None
+    before = int(m.group(1))
+    t.keys('x' * ((mode - before) % 3) + 'b')
+    t.expect(r'^werewolf: unlock ', 3)
+    t.keys('a')  # Back to the Admin theme
+    t.pump(0.5)
+    t.keys('y' * ADMIN_WEREWOLF_INDEX)
+    t.keys('a')  # The themes, Admin selected
+    t.pump(0.5)
+    return before
 
 
 def admin_state(t):
@@ -142,6 +165,7 @@ def main():
             raise Stop(name)
 
     admin_before = None
+    unlock_before = None
     try:
         connect(na, args.ports[0], not args.no_reboot)
         connect(pl, args.ports[1], not args.no_reboot)
@@ -166,6 +190,8 @@ def main():
         nb.send('\x01A')
         require('narrator: admin mode', na.expect(r'^admin: on$', 3) is not None)
         na.pump(0.5)
+        unlock_before = set_unlock(na, 2)  # Test : robots
+        require('narrator: Loup-garou (admin) > Test : robots', unlock_before is not None)
         require('narrator: Jeux > Loup-garou', open_werewolf(na, from_admin=True))
         shot(na, 'menu')
         na.keys('b')  # Mener une partie (the inner pages of an app have no "ui:" trace)
@@ -322,6 +348,12 @@ def main():
     finally:
         for t in (na, pl):
             t.keys('U')  # The check of the texts off again
+        if unlock_before is not None and unlock_before != 2:
+            na.press('A', TOP)
+            nb.send('\x01A')  # The setting of the small games as it was
+            na.expect(r'^admin: on$', 3)
+            na.pump(0.5)
+            set_unlock(na, unlock_before)
         if admin_before is False:
             nb.send('\x01a')  # The admin mode as it was
             na.expect(r'^admin: off$', 3)

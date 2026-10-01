@@ -285,7 +285,7 @@ and the cure of the virus:
 For an entry handled directly by `main.c` (the older features):
 1. Add a value to `menu_item_t` and its label in `item_label()`.
 2. Put it in a `SUBMENUS` theme (at most 24 entries per theme, `items[24]` of `submenu_t`; the number of entries
-   `n` is written by hand: Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 14).
+   `n` is written by hand: Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
    The last theme, Admin, is only shown in admin mode (`store_t.admin == STORE_ADMIN_ON`).
 3. In `validate()`, run the action or switch to a new `app` state (`app_state_t`).
 4. If the state has its own page:

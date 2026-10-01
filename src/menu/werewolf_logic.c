@@ -13,7 +13,7 @@ static const char *ROLE_NAMES[WW_ROLES] = {"Villageois", "Loup-garou", "Voyante"
                                            "Petite fille", "Voleur"};
 
 int ww_wolves_for(int n) {
-    return n >= 12 ? 3 : n >= 4 ? 2 : 1;
+    return n >= 12 ? 3 : n >= 8 ? 2 : 1;  /* The rules from 8 players; 1 below (small games unlocked by the admin) */
 }
 
 void ww_deal(ww_game_t *g, int n, uint8_t options, ww_rand_t rnd) {

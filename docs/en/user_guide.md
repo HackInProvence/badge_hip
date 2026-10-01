@@ -233,7 +233,8 @@ drawn at random; with an odd number of players, one of them is the **arbitre** (
 - The badge of the host must stay on; a badge that restarts leaves the game.
 
 **Loup-garou** (Werewolf, 8 to 18 players, plus a narrator): the werewolf game after the rules of Les Loups-garous
-de Thiercelieux, without cards. 2 werewolves from 8 to 11 players, 3 from 12 to 18.
+de Thiercelieux, without cards. 2 werewolves from 8 to 11 players, 3 from 12 to 18. Fewer than 8 players: only if
+the organizer unlocks it (Admin > Loup-garou (admin)).
 - The narrator, who does not play, chooses "Mener une partie" (lead a game): the roles in play (a check box per
   role: voyante (seer), sorcière (witch), chasseur (hunter), Cupidon (Cupid), petite fille (little girl), capitaine
   (captain), voleur (thief); presets classique and débutant), the length of the debate (2, 3 or 5 minutes), then
@@ -568,6 +569,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid. Flanks: the scale ("Brûlant dès -74 dBm" by default, 5 dB steps, saved), sent to the hunters with the beacon: set it on site for the distance wanted |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
+| **Loup-garou (admin)** (Werewolf, admin) | fewer than 8 players: "8 joueurs minimum" (the rules, the default), "Petites parties (4+)" (small games: 1 werewolf below 8) or "Test : robots" (robots complete up to 8); saved |
 | **Contrebande (admin)** (Smuggling, admin) | adds a good of your choice to the cargo of this badge (to unlock a rare or a legendary one, for instance): flanks: choose, right wing: add |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |

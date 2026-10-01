@@ -142,6 +142,7 @@ def test_werewolf(work):
         obj = os.path.join(work, f'werewolf_{k}.o')
         r = run([ARGS.cc] + CFLAGS + inc + ['-include', sim_h, f'-Dapp_werewolf=app_werewolf_{k}',
                 f'-Dwerewolf_service=werewolf_service_{k}', f'-Dwerewolf_event=werewolf_event_{k}',
+                f'-Dapp_werewolf_admin=app_werewolf_admin_{k}',
                 '-c', os.path.join(SRC, 'menu', 'werewolf.c'), '-o', obj])
         if r.returncode:
             return False, 'compilation of werewolf.c failed:\n' + r.stdout + r.stderr

@@ -229,7 +229,8 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
 - Le badge de l'hôte doit rester allumé ; un badge qui redémarre quitte la partie.
 
 **Loup-garou** (8 à 18 joueurs, plus un meneur) : le jeu du loup-garou d'après les règles des Loups-garous de
-Thiercelieux, sans cartes. 2 loups-garous de 8 à 11 joueurs, 3 de 12 à 18.
+Thiercelieux, sans cartes. 2 loups-garous de 8 à 11 joueurs, 3 de 12 à 18. Moins de 8 joueurs : seulement si
+l'organisateur le débloque (Admin > Loup-garou (admin)).
 - Le meneur, qui ne joue pas, choisit « Mener une partie » : les rôles en jeu (une case par rôle : voyante,
   sorcière, chasseur, Cupidon, petite fille, capitaine, voleur ; préréglages classique et débutant), la durée du
   débat (2, 3 ou 5 minutes), puis lance la partie ; les joueurs choisissent « Rejoindre une partie ».
@@ -562,6 +563,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid. Flancs : l'échelle (« Brûlant dès -74 dBm » par défaut, par pas de 5 dB, gardée), envoyée aux chercheurs avec la balise : à régler sur place selon la distance voulue |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
+| **Loup-garou (admin)** | moins de 8 joueurs : « 8 joueurs minimum » (la règle, par défaut), « Petites parties (4+) » (1 loup-garou sous 8) ou « Test : robots » (des robots complètent jusqu'à 8) ; gardé |
 | **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge (pour débloquer une rare ou une légendaire, par exemple) : flancs : choisir, aile droite : ajouter |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |

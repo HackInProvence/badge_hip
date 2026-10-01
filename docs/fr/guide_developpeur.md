@@ -283,7 +283,7 @@ et au remède du virus :
 Pour une entrée gérée directement par `main.c` (les fonctions historiques) :
 1. Ajouter une valeur à `menu_item_t` et son libellé dans `item_label()`.
 2. La placer dans un thème de `SUBMENUS` (24 entrées au plus par thème, `items[24]` de `submenu_t` ; le nombre
-   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 14).
+   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
    Le dernier thème, Admin, n'est affiché qu'en mode admin (`store_t.admin == STORE_ADMIN_ON`).
 3. Dans `validate()`, lancer l'action ou passer dans un nouvel état `app` (`app_state_t`).
 4. Si l'état a sa propre page :
