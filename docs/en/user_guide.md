@@ -232,18 +232,20 @@ drawn at random; with an odd number of players, one of them is the **arbitre** (
   "Assassin : victoire !" (victory)) arrives even on another page.
 - The badge of the host must stay on; a badge that restarts leaves the game.
 
-**Loup-garou** (Werewolf, 5 to 20 players, 7 to 20 in advanced mode, plus a narrator): the werewolf game, without
-cards.
-- The narrator, who does not play, chooses "Mener une partie" (lead a game: simple or advanced mode, length of the
-  debate: 2, 3 or 5 minutes) then starts the game; the players choose "Rejoindre une partie" (join a game).
-- Each one discovers his secret role on his badge (**hide your screen**): loup-garou (werewolf), voyante (seer),
-  villageois (villager), and in advanced mode sorcière (witch), chasseur (hunter), Cupidon (Cupid). The narrator's
-  badge runs the phases (night, dawn, debate, vote, verdict) and every badge rings at each new phase.
-- At night, every living player chooses a name in a list (the villagers pretend): nobody can guess the roles by
+**Loup-garou** (Werewolf, 8 to 18 players, plus a narrator): the werewolf game after the rules of Les Loups-garous
+de Thiercelieux, without cards. 2 werewolves from 8 to 11 players, 3 from 12 to 18.
+- The narrator, who does not play, chooses "Mener une partie" (lead a game): the roles in play (a check box per
+  role: voyante (seer), sorcière (witch), chasseur (hunter), Cupidon (Cupid), petite fille (little girl), capitaine
+  (captain), voleur (thief); presets classique and débutant), the length of the debate (2, 3 or 5 minutes), then
+  starts the game; the players choose "Rejoindre une partie" (join a game).
+- Each one discovers his secret card on his badge (**hide your screen**). The narrator's badge runs the phases (night:
+  thief, Cupid, lovers, seer, wolves, witch; day: dawn, election of the captain, debate, vote, verdict) and every badge
+  rings at each new phase.
+- At night, every living player chooses in a list (those without the role pretend): nobody can guess the roles by
   watching who presses buttons. During the day, each one votes on his badge.
-- Left wing: back to the menu, the game goes on; left wing held: leave the game; right wing held: see your role again.
-- The roles, the phases, the votes and the tips for the narrator: [loup_garou.md](../fr/loup_garou.md) (in French).
-
+- "Aide : les rôles" (help: the roles): an illustrated card per role, with its camp and its powers.
+- Left wing: back to the menu, the game goes on; left wing held: leave the game; right wing held: see your card again.
+- The rules, the phases, the votes and the tips for the narrator: [loup_garou.md](../fr/loup_garou.md) (in French).
 
 ### 4.3 Social
 

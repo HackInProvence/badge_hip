@@ -178,7 +178,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `party.c` | salon des jeux de groupe (§ 6.25) |
 | `tug.c`, `tug_logic.c` | tir à la corde (§ 6.25) |
 | `assassin.c`, `assassin_logic.c` | assassin (§ 6.25) |
-| `werewolf.c`, `werewolf_logic.c` | loup-garou (§ 6.25, [loup_garou.md](loup_garou.md)) |
+| `werewolf.c`, `werewolf_logic.c`, `werewolf_cards.c` | loup-garou, les cartes de l'aide dessinées dans `tools/werewolf_icons.py` (§ 6.25, [loup_garou.md](loup_garou.md)) |
 | `smuggler.c`, `smuggler_goods.c`, `smuggler_trade.c` | la cigale contrebandière (§ 6.26, [contrebande.md](contrebande.md)) |
 | `pirate_radio.c` | radio pirate : émission FM et écoute (§ 6.27, [radio_pirate.md](radio_pirate.md)) |
 | `rtttl.c`, `rtttl_parse.c` | sonneries RTTTL (§ 6.28, [sonneries.md](sonneries.md)) |
@@ -967,7 +967,7 @@ générateur (pas la graine commune) et un code secret par joueur, et envoie à 
 - La jauge chaud - froid suit les balises de la cible (§ 6.6) ou ses paquets du jeu.
 
 **Loup-garou** ([werewolf.c](../../src/menu/werewolf.c), règles dans [werewolf_logic.c](../../src/menu/werewolf_logic.c)) :
-un meneur (qui ne joue pas : `party_host(..., false, ...)`) et 5 à 20 joueurs. Le badge du meneur distribue les rôles
+un meneur (qui ne joue pas : `party_host(..., false, ...)`) et 8 à 18 joueurs (2 loups jusqu'à 11, 3 dès 12 ; un rôle par case : voyante, sorcière, chasseur, Cupidon, petite fille, capitaine, voleur). Le badge du meneur distribue les rôles
 et enchaîne les phases ; ses messages (STATE, NAMES, PRIV masqué par la clé de chaque joueur, ACT, ABORT) sont
 décrits en tête de `werewolf.c`. La nuit, tous les joueurs vivants choisissent dans une liste et reçoivent le même
 genre de paquet : personne ne devine les rôles. Mode test : meneur en mode admin, des robots complètent la partie.

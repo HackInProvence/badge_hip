@@ -178,7 +178,7 @@ game...), the pages drawn into a frame buffer, and the button actions.
 | `party.c` | lobby of the group games (§ 6.25) |
 | `tug.c`, `tug_logic.c` | tug of war (§ 6.25) |
 | `assassin.c`, `assassin_logic.c` | assassin (§ 6.25) |
-| `werewolf.c`, `werewolf_logic.c` | werewolf (§ 6.25, [loup_garou.md](../fr/loup_garou.md), in French) |
+| `werewolf.c`, `werewolf_logic.c`, `werewolf_cards.c` | werewolf, the cards of the help drawn in `tools/werewolf_icons.py` (§ 6.25, [loup_garou.md](../fr/loup_garou.md), in French) |
 | `smuggler.c`, `smuggler_goods.c`, `smuggler_trade.c` | the smuggler cicada (§ 6.26, [smuggler.md](smuggler.md)) |
 | `pirate_radio.c` | pirate radio: FM transmission and listening (§ 6.27, [pirate_radio.md](pirate_radio.md)) |
 | `rtttl.c`, `rtttl_parse.c` | RTTTL ringtones (§ 6.28, [ringtones.md](ringtones.md)) |
@@ -963,7 +963,7 @@ masked with `party_mask()` of its key) until the acknowledgement (`K_TARGET_ACK`
 - The hot - cold gauge follows the beacons of the target (§ 6.6) or its packets of the game.
 
 **Werewolf** ([werewolf.c](../../src/menu/werewolf.c), rules in [werewolf_logic.c](../../src/menu/werewolf_logic.c)):
-a narrator (who does not play: `party_host(..., false, ...)`) and 5 to 20 players. The narrator's badge deals the
+a narrator (who does not play: `party_host(..., false, ...)`) and 8 to 18 players (2 wolves up to 11, 3 from 12; a role per check box: seer, witch, hunter, Cupid, little girl, captain, thief). The narrator's badge deals the
 roles and runs the phases; its messages (STATE, NAMES, PRIV masked with the key of each player, ACT, ABORT) are
 described at the top of `werewolf.c`. At night, every living player chooses in a list and receives the same kind of
 packet: nobody can guess the roles. Test mode: narrator in admin mode, robots complete the party.

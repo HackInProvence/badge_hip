@@ -228,18 +228,20 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
   « Assassin : victoire ! ») arrivent même depuis une autre page.
 - Le badge de l'hôte doit rester allumé ; un badge qui redémarre quitte la partie.
 
-**Loup-garou** (5 à 20 joueurs, 7 à 20 en mode avancé, plus un meneur) : le jeu du loup-garou, sans cartes.
-- Le meneur, qui ne joue pas, choisit « Mener une partie » (mode simple ou avancé, durée du débat : 2, 3 ou
-  5 minutes) puis lance la partie ; les joueurs choisissent « Rejoindre une partie ».
-- Chacun découvre son rôle secret sur son badge (**cachez votre écran**) : loup-garou, voyante, villageois, et en mode
-  avancé sorcière, chasseur, Cupidon. Le badge du meneur enchaîne les phases (nuit, aube, débat, vote, verdict) et
-  tous les badges sonnent à chaque nouvelle phase.
-- La nuit, tous les joueurs vivants choisissent un nom dans une liste (les villageois font semblant) : personne ne
-  devine les rôles en regardant qui appuie. Le jour, chacun vote sur son badge.
-- Aile gauche : retour au menu, la partie continue ; aile gauche maintenue : quitter la partie ; aile droite maintenue :
-  revoir son rôle.
-- Les rôles, les phases, les votes et les conseils au meneur : [loup_garou.md](loup_garou.md).
-
+**Loup-garou** (8 à 18 joueurs, plus un meneur) : le jeu du loup-garou d'après les règles des Loups-garous de
+Thiercelieux, sans cartes. 2 loups-garous de 8 à 11 joueurs, 3 de 12 à 18.
+- Le meneur, qui ne joue pas, choisit « Mener une partie » : les rôles en jeu (une case par rôle : voyante,
+  sorcière, chasseur, Cupidon, petite fille, capitaine, voleur ; préréglages classique et débutant), la durée du
+  débat (2, 3 ou 5 minutes), puis lance la partie ; les joueurs choisissent « Rejoindre une partie ».
+- Chacun découvre sa carte secrète sur son badge (**cachez votre écran**). Le badge du meneur enchaîne les phases
+  (la nuit : voleur, Cupidon, amoureux, voyante, loups, sorcière ; le jour : aube, élection du capitaine, débat,
+  vote, verdict) et tous les badges sonnent à chaque nouvelle phase.
+- La nuit, tous les joueurs vivants choisissent dans une liste (ceux qui n'ont pas le rôle font semblant) :
+  personne ne devine les rôles en regardant qui appuie. Le jour, chacun vote sur son badge.
+- « Aide : les rôles » : une carte illustrée par rôle, avec son camp et ses pouvoirs.
+- Aile gauche : retour au menu, la partie continue ; aile gauche maintenue : quitter la partie ; aile droite
+  maintenue : revoir sa carte.
+- Les règles, les phases, les votes et les conseils au meneur : [loup_garou.md](loup_garou.md).
 
 ### 4.3 Social
 

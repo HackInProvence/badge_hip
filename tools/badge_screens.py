@@ -98,7 +98,8 @@ PAGES = {
     'Sonneries': [('b', 'lecture', 'Une sonnerie', 'a')],
     'Livres-jeux': [('b', 'livre', 'Un livre', None), ('b', 'lecture', 'La lecture', 'a')],
     'Contrebande': [('b', 'cale', 'La cale', 'a')],
-    'Loup-garou': [('b', 'meneur', 'Mener une partie', 'a')],
+    'Loup-garou': [('b', 'meneur', 'Mener une partie', 'a'), ('xxb', 'aide', 'Aide : une carte de rôle', None),
+                   ('b', 'aide_detail', 'Aide : le détail du rôle', 'a')],
     'Radio pirate': [('x', 'source', 'Les réglages', None)],
 }
 
