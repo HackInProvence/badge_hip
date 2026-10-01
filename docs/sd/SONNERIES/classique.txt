@@ -1,0 +1,13 @@
+# Sonneries pour le badge SecSea (menu Médias > Sonneries), voir docs/fr/sonneries.md
+# Une sonnerie par ligne, au format RTTTL : nom:d=durée,o=octave,b=tempo:notes
+# Les lignes qui commencent par # sont des commentaires.
+# Mélodies du domaine public.
+
+# Mozart, Marche turque (1783), le début
+Marche turque:d=16,o=5,b=120:b,a,g#,a,8c6,8p,d6,c6,b,c6,8e6,8p,f6,e6,d#6,e6,b6,a6,g#6,a6,b6,a6,g#6,a6,4c7
+
+# Brahms, Berceuse (1868)
+Berceuse de Brahms:d=4,o=5,b=100:8e,8e,g.,8e,e,2g,8e,8g,c6,b.,8a,a,g,8d,8e,f,d,8d,8e,2f,8d,8f,8b,8a,g,b,2c6.
+
+# Gruber, Douce nuit (1818)
+Douce nuit:d=8,o=5,b=90:g.,16a,g,4e.,g.,16a,g,4e.,4d6,d6,4b.,4c6,c6,4g.,4a,a,c6.,16b,a,g.,16a,g,4e.,4a,a,c6.,16b,a,g.,16a,g,4e.,4d6,d6,f6.,16d6,b,4c6.,4e6.,c6,g,e,g.,16f,d,4c.

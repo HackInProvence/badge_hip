@@ -40,6 +40,7 @@ target_sources(badge_menu PRIVATE
     tug.c
     gamebook.c
     rtttl.c
+    rtttl_parse.c
     pirate_radio.c
     demo.c
     smuggler.c
