@@ -38,6 +38,8 @@ target_sources(badge_menu PRIVATE
     werewolf.c
     assassin.c
     tug.c
+    tug_logic.c
+    assassin_logic.c
     gamebook.c
     rtttl.c
     rtttl_parse.c
