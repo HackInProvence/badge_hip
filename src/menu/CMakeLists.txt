@@ -36,6 +36,7 @@ target_sources(badge_menu PRIVATE
     battcal.c
     party.c
     werewolf.c
+    werewolf_logic.c
     assassin.c
     tug.c
     tug_logic.c

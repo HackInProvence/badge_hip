@@ -11,7 +11,7 @@ Automatic tests run on the PC, without the badge:
   graphics (gfx), infrared decoding (ir), mini games (games), signed score QR codes (score),
   crypto challenges (crypto), 433 MHz OOK decoders (ookdec), fast reading (rsvp), gamebooks (gamebook), RTTTL ringtones (rtttl),
   copy of the screen RAM (screen), rules of the group games (party_games),
-  goods and trade protocol of the smuggler cicada (smuggler),
+  goods and trade protocol of the smuggler cicada (smuggler), rules of the loup-garou (werewolf),
 - Python converters: image2epi.py (exact round trip), video2epaper.py and audio2wav.py (need ffmpeg, skipped without).
 
 Usage: python src/tests/host/run_tests.py [--cc gcc] [--keep] [test names...]
@@ -108,11 +108,53 @@ def test_smuggler(work):
     if r.returncode:
         return False, r.stdout + r.stderr
     return c_test('test_smuggler', [], [os.path.join(SRC, 'menu')], work)  # Includes the .c files
+
+
 def test_gamebook(work):
     # The built-in book must be the same text as the example of the SD card
     return c_test('test_gamebook', ['menu/gamebook_parse.c', 'menu/gamebook_builtin.c', 'gfx/gfx.c', 'gfx/gfx_fonts.c'],
                   [os.path.join(SRC, 'menu'), os.path.join(SRC, 'gfx')], work,
                   copy=[(os.path.join('..', 'docs', 'sd', 'LIVRES', 'tresor_cigalon.txt'), 'book.txt')])
+
+
+WEREWOLF_BADGES = 10  # NB of test_werewolf.c
+
+
+def test_werewolf(work):
+    # The rules, and whole games between simulated badges: werewolf.c is compiled once per badge, its public
+    # symbols renamed (app_werewolf_<k>...); its printf goes to the simulator, which reads the logs
+    os.makedirs(os.path.join(work, 'pico'), exist_ok=True)
+    with open(os.path.join(work, 'pico', 'rand.h'), 'w') as f:
+        f.write('#include <stdint.h>\nuint32_t get_rand_32(void);\n')
+    sim_h = os.path.join(work, 'werewolf_sim.h')
+    with open(sim_h, 'w') as f:
+        f.write('#include <stdint.h>\n#include <stdio.h>\nint sim_printf(const char *fmt, ...);\n'
+                '#define printf sim_printf\n'
+                'static inline uint64_t time_us_64(void) { extern uint64_t host_time_us; return host_time_us; }\n')
+    includes = [work, STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'ir')]
+    inc = ['-I' + i for i in includes]
+    objs = []
+    for k in range(WEREWOLF_BADGES):
+        obj = os.path.join(work, f'werewolf_{k}.o')
+        r = run([ARGS.cc] + CFLAGS + inc + ['-include', sim_h, f'-Dapp_werewolf=app_werewolf_{k}',
+                f'-Dwerewolf_service=werewolf_service_{k}', f'-Dwerewolf_event=werewolf_event_{k}',
+                '-c', os.path.join(SRC, 'menu', 'werewolf.c'), '-o', obj])
+        if r.returncode:
+            return False, 'compilation of werewolf.c failed:\n' + r.stdout + r.stderr
+        objs.append(obj)
+    obj = os.path.join(work, 'ui.o')  # The real ui.c: its text check (ui_check) traces the texts too wide
+    r = run([ARGS.cc] + CFLAGS + inc + ['-include', sim_h, '-c', os.path.join(SRC, 'menu', 'ui.c'), '-o', obj])
+    if r.returncode:
+        return False, 'compilation of ui.c failed:\n' + r.stdout + r.stderr
+    objs.append(obj)
+    exe = os.path.join(work, 'test_werewolf' + ('.exe' if os.name == 'nt' else ''))
+    r = run([ARGS.cc] + CFLAGS + inc + [os.path.join(HERE, 'test_werewolf.c')] +
+            [os.path.join(SRC, s) for s in ['menu/werewolf_logic.c', 'gfx/gfx.c', 'gfx/gfx_fonts.c']] + objs +
+            ['-o', exe])
+    if r.returncode:
+        return False, 'compilation failed:\n' + r.stdout + r.stderr
+    r = run([exe], cwd=work)
+    return r.returncode == 0, r.stdout + r.stderr
 
 
 def test_rsvp(work):
@@ -222,7 +264,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
@@ -239,7 +281,7 @@ if __name__ == '__main__':
     for name, func in TESTS:
         if ARGS.names and name not in ARGS.names:
             continue
-        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_vcard, test_rsvp, test_gamebook, test_rtttl, test_screen, test_party_games, test_smuggler) and not shutil.which(ARGS.cc):
+        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_vcard, test_werewolf, test_rsvp, test_gamebook, test_rtttl, test_screen, test_party_games, test_smuggler) and not shutil.which(ARGS.cc):
             ok, output = None, f'no C compiler ({ARGS.cc})'
         else:
             work = tempfile.mkdtemp(prefix=f'badge_{name}_')
