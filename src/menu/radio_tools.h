@@ -51,6 +51,16 @@ const char *radio_tools_last_text(void);
 /** \brief Whether no feature of this file uses the radio (the network of the cicadas can then use it). */
 bool radio_tools_idle(void);
 
+/** \brief Lends the whole radio to a feature that drives it itself (the pirate radio, pirate_radio.c): the other
+ * features of this file, the OOK transmitter, the windows of the remotes and the network (net.c) then leave it alone
+ * (radio_tools_idle() is false). Pause the network (net_pause(true)) before, as ook_tx.c does.
+ * \return false when the radio is busy (another feature of this file, OOK receiver or transmitter). */
+bool radio_tools_claim(void);
+/** \brief Gives the lent radio back: GDO0 as an input, the GFSK profile again (preset, frequency, offset); then
+ * net_pause(false) lets the network take it again. */
+void radio_tools_release(void);
+bool radio_tools_lent(void);
+
 /** \brief Configures the radio again with the GFSK profile of the badges (after another mode, e.g. OOK). */
 void radio_tools_reconfigure(void);
 

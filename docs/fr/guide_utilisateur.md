@@ -415,6 +415,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
+| **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM bande étroite sur 433 MHz, à écouter avec un Portapack, un SDR ou une autre cigale (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 

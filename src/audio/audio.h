@@ -29,7 +29,8 @@
 #define AUDIO_RING_SIZE (1u << AUDIO_RING_BITS)
 #define AUDIO_VOLUME_MAX 8
 
-/** \brief Start playing at this sample rate (silence until samples are written).
+/** \brief Start playing at this sample rate (silence until samples are written), on the outputs chosen by
+ * audio_set_outputs().
  * \return false when no DMA channel or timer is available */
 bool audio_open(uint32_t sample_rate);
 
@@ -59,5 +60,24 @@ uint8_t audio_get_volume(void);
 
 /* Mute (the samples still play silently: the players keep their clock) */
 void audio_set_mute(bool muted);
+
+
+/* ------ Outputs: the buzzer and/or the radio (pirate radio, see menu/pirate_radio.c) ------
+ * The radio output is a fast PWM (clk_sys / (AUDIO_RADIO_WRAP + 1), ~122 kHz at 125 MHz) on the GDO0 pin of the
+ * CC1101 (its asynchronous TX data input in 2-FSK: high = f0 + deviation, low = f0 - deviation): its duty cycle
+ * follows the samples (0 to 255 -> 0 to 100 %), so that the average frequency follows the sound: narrow FM.
+ * A second DMA channel and timer copy the samples to it, in step with the buzzer. Neither the volume nor the mute mode
+ * change it (the deviation is the level of the transmission). While the audio is closed, the duty cycle stays at
+ * 50 % (the carrier on f0, without modulation). Default: the buzzer only, as before. */
+
+#define AUDIO_OUT_SPEAKER 0x01
+#define AUDIO_OUT_RADIO 0x02
+#define AUDIO_RADIO_WRAP 1023  /* 10 bit duty cycle: 128 (silence) = 512 = 50 % */
+
+/** \brief Chooses the outputs (AUDIO_OUT_* flags, 0 = the buzzer), call it while the audio is closed: the radio
+ * output takes GDO0 at once (PWM at 50 %), leaving it releases GDO0 (input). The buzzer stays silent without
+ * AUDIO_OUT_SPEAKER (the samples still give the clock). */
+void audio_set_outputs(uint8_t outputs);
+uint8_t audio_get_outputs(void);
 
 #endif /* _AUDIO_H */
