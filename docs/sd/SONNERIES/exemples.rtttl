@@ -1,0 +1,10 @@
+# Exemples du format RTTTL pour le badge SecSea, voir docs/fr/sonneries.md
+
+# Sans réglages : d=4, o=6 et b=63 par défaut
+Gamme::c,d,e,f,g,a,b,c7
+
+# Majuscules, espaces, dièses, point avant ou après l'octave, silences
+Gamme chromatique : D=8, O=5, B=180 : C, C#, D, D#, E, F, F#, G, G#, A, A#, B, 4C6., 4p, 4c.6
+
+# Une erreur volontaire (x n'est pas une note) : le badge affiche la ligne, la colonne et la raison
+Erreur volontaire:d=4,o=5,b=120:c,d,x,f
