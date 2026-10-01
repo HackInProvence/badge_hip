@@ -534,7 +534,7 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
     else if (status[0])
         ui_wrapped(fb, y, &gfx_font_small, status, 2);
     else
-        ui_wrapped(fb, y, &gfx_font_small, "Bande ISM 433 MHz : faible puissance, essais courts", 2);
+        ui_wrapped(fb, y, &gfx_font_small, "ISM 433 MHz : essais courts", 1);
     ui_footer(fb, row == ROW_START ? "G : retour  D : valider" : "Ailes : -  +");
 }
 

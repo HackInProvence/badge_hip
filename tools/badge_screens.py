@@ -34,7 +34,7 @@ from badge_remote import Badge, find_port  # noqa: E402
 OUT = os.path.join(ROOT, 'docs', 'screens')
 
 # Entries of the menu that are not pages: toggles or actions (not pressed, the label is shown by the menu)
-NOT_PAGES = {('Médias', 6), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
+NOT_PAGES = {('Médias', 6), ('Radio & IR', 0), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
              ('Admin', 11), ('Admin', 13)}  # Démo écran (Badge, 5), Mode démo (Admin, 11): animations, not pages
 
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
@@ -94,6 +94,13 @@ PAGES = {
     'Annonces': [],
     'Vote (admin)': [],
     'Type du badge': [],
+    'Compétences': [('b', 'miennes', 'Mes compétences', 'a'), ('xb', 'partage', 'Qui les partage ?', 'a')],
+    'Succès': [('b', 'detail', 'Comment obtenir un succès', 'a')],
+    'Sonneries': [('b', 'lecture', 'Une sonnerie', 'a')],
+    'Livres-jeux': [('b', 'livre', 'Un livre', None), ('b', 'lecture', 'La lecture', 'a')],
+    'Contrebande': [('b', 'cale', 'La cale', 'a')],
+    'Loup-garou': [('b', 'meneur', 'Mener une partie', 'a')],
+    'Radio pirate': [('x', 'source', 'Les réglages', None)],
 }
 
 LONG_PAGES = {'Réglage radio': 20}  # Pages that work a while before their result (seconds)

@@ -656,7 +656,7 @@ static void render_read(uint8_t *fb) {
         snprintf(text, sizeof(text), "%d/%d", page + 1, n_pages);
         gfx_text(fb, GFX_WIDTH - 4, 1, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_RIGHT);
     }
-    ui_fit(&gfx_font_small, fitted, sizeof(fitted), book.title, 120);
+    ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), book.title, 120);  /* The title of a book: cut expected */
     gfx_text(fb, GFX_WIDTH / 2, 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_CENTER);
 
     for (int i = page_start[page], row = 0; i < page_start[page + 1]; ++i, ++row) {
@@ -692,7 +692,7 @@ static void render_read(uint8_t *fb) {
 
 static void render_menu(uint8_t *fb) {
     char text[64], fitted[64];
-    ui_fit(&gfx_font_medium, fitted, sizeof(fitted), book.title, GFX_WIDTH - 4);
+    ui_fit_preview(&gfx_font_medium, fitted, sizeof(fitted), book.title, GFX_WIDTH - 4);
     ui_title(fb, fitted);
     int y = UI_TITLE_H + 4;
     if (book.author[0]) {

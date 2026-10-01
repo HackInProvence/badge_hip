@@ -1378,7 +1378,7 @@ static void render_music(void) {
     for (unsigned i = 0; i < AUDIO_VOLUME_MAX; ++i)
         bar[i] = i < vol ? '#' : '-';
     bar[AUDIO_VOLUME_MAX] = 0;
-    char name[48];
+    char name[SD_NAME_MAX + 4];
     ui_fit_preview(&gfx_font_small, name, sizeof(name), playing_name, GFX_WIDTH - 12);  /* A file name of the SD */
     snprintf(text, sizeof(text), "%s\n\n%s   %lu:%02lu / %lu:%02lu\n\nVolume : %s",
              name, wav_is_paused() ? "Pause" : "Lecture",
