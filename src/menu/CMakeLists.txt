@@ -39,6 +39,8 @@ target_sources(badge_menu PRIVATE
     assassin.c
     tug.c
     gamebook.c
+    gamebook_parse.c
+    gamebook_builtin.c
     rtttl.c
     pirate_radio.c
     demo.c
