@@ -10,6 +10,7 @@ Automatic tests run on the PC, without the badge:
 - C modules of the firmware compiled with a host compiler (gcc or clang) and a stand-in of the Pico SDK (stubs/):
   graphics (gfx), infrared decoding (ir), mini games (games), signed score QR codes (score),
   crypto challenges (crypto), 433 MHz OOK decoders (ookdec), fast reading (rsvp), copy of the screen RAM (screen),
+  rules of the group games (party_games),
 - Python converters: image2epi.py (exact round trip), video2epaper.py and audio2wav.py (need ffmpeg, skipped without).
 
 Usage: python src/tests/host/run_tests.py [--cc gcc] [--keep] [test names...]
@@ -99,6 +100,10 @@ def test_rsvp(work):
         shutil.copy(os.path.join(STUBS, 'rsvp', h), work)
     return c_test('test_rsvp', ['gfx/gfx.c', 'gfx/gfx_fonts.c'], [work, STUBS, os.path.join(SRC, 'gfx')], work,
                   copy=[('menu/rsvp.c', 'rsvp.c'), ('menu/rsvp.h', 'rsvp.h')])
+
+
+def test_party_games(work):
+    return c_test('test_party_games', ['menu/tug_logic.c', 'menu/assassin_logic.c'], [os.path.join(SRC, 'menu')], work)
 
 
 # ---- Python converters ----
@@ -196,7 +201,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('screen', test_screen),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('screen', test_screen), ('party_games', test_party_games),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
