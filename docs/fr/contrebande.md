@@ -47,6 +47,13 @@ annonce la marchandise reçue (« Reçu en douce : ... »).
 Accueil > *Donner* : choisir la marchandise, puis la cigale à portée de main. Elle voit « *nom* vous offre : » avec
 l'icône, D accepte (la marchandise passe d'une cale à l'autre), G refuse.
 
+### Admin : ajouter une marchandise
+
+Admin > Contrebande (admin) : les 26 marchandises une à une (flancs), avec leur rareté et le nombre dans la cale ;
+l'aile droite en ajoute une à la cale de ce badge (enregistrée tout de suite), avec les succès d'une vraie
+acquisition (« Trésor » pour une légendaire, « Collectionneur »). Pour débloquer une marchandise rare, la mettre en
+jeu, ou préparer un badge de démonstration. Trace : `smuggler: admin added <nom> (<nombre>)`.
+
 ### Succès
 
 | Succès | Quand |

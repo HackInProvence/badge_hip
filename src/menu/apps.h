@@ -62,6 +62,7 @@ typedef enum {
     APP_SKILLS,
     APP_ACHIEVEMENTS,
     APP_PIRATE_LISTEN,
+    APP_SMUGGLER_ADMIN,
     APP_COUNT,
 } app_id_t;
 

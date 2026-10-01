@@ -562,6 +562,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid. Flancs : l'échelle (« Brûlant dès -74 dBm » par défaut, par pas de 5 dB, gardée), envoyée aux chercheurs avec la balise : à régler sur place selon la distance voulue |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
+| **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge (pour débloquer une rare ou une légendaire, par exemple) : flancs : choisir, aile droite : ajouter |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM bande étroite sur 433 MHz, à écouter avec un Portapack, un SDR ou une autre cigale (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |

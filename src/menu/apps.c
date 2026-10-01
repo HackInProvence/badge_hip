@@ -12,7 +12,7 @@ extern const app_t app_talk, app_hotcold, app_hotcold_master, app_radar;
 extern const app_t app_vote, app_vote_admin, app_program, app_infection, app_infection_zero;
 extern const app_t app_messages, app_chorus, app_chorus_lead, app_contacts, app_duel;
 extern const app_t app_image_send, app_image_recv, app_crypto, app_battle, app_hunt433, app_radio_tune, app_ledcast,
-    app_announces, app_announce_admin, app_reset, app_battcal, app_pirate_listen;
+    app_announces, app_announce_admin, app_reset, app_battcal, app_pirate_listen, app_smuggler_admin;
 extern const app_t app_werewolf, app_assassin, app_tug, app_gamebook, app_rtttl,
     app_pirate_radio, app_demo, app_smuggler, app_skills, app_achievements;
 
@@ -55,6 +55,7 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_RESET] = &app_reset,
     [APP_BATTCAL] = &app_battcal,
     [APP_PIRATE_LISTEN] = &app_pirate_listen,
+    [APP_SMUGGLER_ADMIN] = &app_smuggler_admin,
     [APP_WEREWOLF] = &app_werewolf,
     [APP_ASSASSIN] = &app_assassin,
     [APP_TUG] = &app_tug,

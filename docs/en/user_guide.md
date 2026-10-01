@@ -568,6 +568,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid. Flanks: the scale ("Brûlant dès -74 dBm" by default, 5 dB steps, saved), sent to the hunters with the beacon: set it on site for the distance wanted |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
+| **Contrebande (admin)** (Smuggling, admin) | adds a good of your choice to the cargo of this badge (to unlock a rare or a legendary one, for instance): flanks: choose, right wing: add |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |
 | **Radio pirate** (Pirate radio) | sends a melody, a 1 kHz tone or a WAV file of the SD card in narrow band FM on 433 MHz, to listen to with a Portapack, an SDR or another cicada (see [pirate_radio.md](pirate_radio.md)); low power, short tests |

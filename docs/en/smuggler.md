@@ -49,6 +49,13 @@ announces the good received ("Reçu en douce : ...", received on the quiet).
 Home > *Donner*: choose the good, then the cicada within reach. It sees "*name* vous offre :" (*name* offers you)
 with the icon, R accepts (the good goes from one hold to the other), L refuses.
 
+### Admin: adding a good
+
+Admin > Contrebande (admin): the 26 goods one by one (flanks), with their rarity and the number in the cargo; the
+right wing adds one to the cargo of this badge (saved at once), with the achievements of a real acquisition
+("Trésor" for a legendary one, "Collectionneur"). To unlock a rare good, put it in play, or prepare a demonstration
+badge. Trace: `smuggler: admin added <name> (<count>)`.
+
 ### Achievements
 
 | Achievement | When |

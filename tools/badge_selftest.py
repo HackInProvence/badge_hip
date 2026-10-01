@@ -398,7 +398,7 @@ def test_social(t):
 SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Programme', 'Vote', 'Radar des cigales',
           'Chaud - froid', 'Virus des cigales', 'Choeur', 'Annonces', 'Contrebande']
 ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Vote (admin)',
-         'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro',
+         'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Contrebande (admin)', 'Remise à zéro',
          'Batterie (calibration)', 'Radio pirate', 'Mode démo', 'Type du badge',
          'Quitter le mode admin']
 

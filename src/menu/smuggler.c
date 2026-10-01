@@ -743,3 +743,63 @@ const app_t app_smuggler = {
     .calm = calm,
     .stop = stop,
 };
+
+
+/* ------ Admin > Contrebande (admin): put any good in the cargo of this badge (e.g. to unlock a rare one) ------ */
+
+static int admin_sel = 0;
+static char admin_status[40];
+
+static void admin_start(absolute_time_t now) {
+    (void)now;
+    smuggler_init();
+    admin_status[0] = 0;
+}
+
+static bool admin_buttons(const app_buttons_t *b, absolute_time_t now) {
+    (void)now;
+    if (b->pressed & UI_BTN_A)
+        return false;
+    if (b->pressed & UI_BTN_X)
+        admin_sel = (admin_sel + 1) % SMUGGLER_GOODS;
+    if (b->pressed & UI_BTN_Y)
+        admin_sel = (admin_sel + SMUGGLER_GOODS - 1) % SMUGGLER_GOODS;
+    if (b->pressed & (UI_BTN_X | UI_BTN_Y))
+        admin_status[0] = 0;
+    if (b->pressed & UI_BTN_B) {
+        if (cargo_add(cargo(), admin_sel)) {
+            cargo_changed();
+            obtained(admin_sel);
+            printf("smuggler: admin added %s (%d)\n", smuggler_goods[admin_sel].name, cargo_count(cargo(), admin_sel));
+            snprintf(admin_status, sizeof(admin_status), "Ajouté à la cale");
+        } else {
+            snprintf(admin_status, sizeof(admin_status), "Cale pleine pour celle-ci");
+        }
+    }
+    return true;
+}
+
+static void admin_render(uint8_t *fb, absolute_time_t now) {
+    (void)now;
+    char text[48];
+    ui_title(fb, "Cale (admin)");
+    draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, admin_sel, 2, GFX_BLACK, false);
+    int y = UI_TITLE_H + 76;
+    fitted_text(fb, y, &gfx_font_medium, smuggler_goods[admin_sel].name, GFX_BLACK);
+    y += gfx_font_medium.height + 2;
+    snprintf(text, sizeof(text), "%s, %u doublons", smuggler_rarity_name(smuggler_goods[admin_sel].rarity),
+             smuggler_goods[admin_sel].value);
+    fitted_text(fb, y, &gfx_font_small, text, GFX_BLACK);
+    y += gfx_font_small.height + 2;
+    snprintf(text, sizeof(text), "Dans la cale : %d  (%d/%d)", cargo_count(cargo(), admin_sel), admin_sel + 1,
+             SMUGGLER_GOODS);
+    fitted_text(fb, y, &gfx_font_small, text, GFX_BLACK);
+    ui_footer(fb, admin_status[0] ? admin_status : "Flancs : choisir  D : ajouter");
+}
+
+const app_t app_smuggler_admin = {
+    .name = "Contrebande (admin)",
+    .start = admin_start,
+    .buttons = admin_buttons,
+    .render = admin_render,
+};
