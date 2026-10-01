@@ -31,6 +31,7 @@ typedef enum {
     R_SENDING,
     R_CARRIER,
     R_MEASURING,
+    R_LENT,  /* The whole radio is driven by another feature (radio_tools_claim()) */
 } radio_tools_state_t;
 
 static radio_tools_state_t state = R_IDLE;
@@ -113,6 +114,33 @@ static void back_to_idle(void) {
 
 bool radio_tools_idle(void) {
     return state == R_IDLE;
+}
+
+
+bool radio_tools_claim(void) {
+    if (state != R_IDLE || ook_tx_busy() || ook_rx_active())
+        return false;
+    state = R_LENT;
+    return true;
+}
+
+
+void radio_tools_release(void) {
+    if (state != R_LENT)
+        return;
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    /* The pins may have been given to a PWM (pirate radio): plain inputs again, GDO2 back to its reset function
+     * (CHIP_RDYn, the preset does not set it) */
+    gpio_init(BADGE_RADIO_GDO0);
+    gpio_init(BADGE_RADIO_GDO2);
+    radio_write_registers((const uint8_t[]){CC1101_IOCFG2, 0x29}, 2);
+    configure();  /* Back to the GFSK profile of the badges */
+    back_to_idle();
+}
+
+
+bool radio_tools_lent(void) {
+    return state == R_LENT;
 }
 
 
