@@ -150,6 +150,10 @@ store_t *store_get(void);
 /** \brief The store was modified: save it soon. */
 void store_changed(void);
 
+/** \brief The store was modified and must be written now (~50 ms), e.g. the goods of a trade: a badge switched off
+ * within the delay of store_changed() would come back with the old ones (and could duplicate a good). */
+void store_save_now(void);
+
 /** \brief Save when needed, to call in the main loop. */
 void store_task(absolute_time_t now);
 

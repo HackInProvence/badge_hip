@@ -130,6 +130,13 @@ void store_changed(void) {
 }
 
 
+void store_save_now(void) {
+    dirty = true;
+    dirty_ts = 0;
+    store_task(get_absolute_time());
+}
+
+
 /* Runs with the interrupts disabled, from RAM (the flash is not readable while it is written) */
 static void save(void *param) {
     (void)param;

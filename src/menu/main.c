@@ -464,6 +464,10 @@ void duel_init(void);
 void image_radio_init(void);
 bool duel_invited(char *buf, int len);
 bool battle_invited(char *buf, int len);
+void smuggler_init(void);
+void smuggler_task(absolute_time_t now);
+bool smuggler_invited(char *buf, int len);
+bool smuggler_event(char *buf, int len);
 bool radio_tune_needed(void);
 void ledcast_init(void);
 bool ledcast_show(void);
@@ -2214,6 +2218,7 @@ int main() {
     chorus_init();
     contacts_init();
     duel_init();
+    smuggler_init();
     image_radio_init();
     ledcast_init();
     announce_init();
@@ -2519,10 +2524,13 @@ int main() {
             notify(APPS[APP_INFECTION], "Vous êtes infecté !");
         if (duel_invited(notif, sizeof(notif)))
             notify(APPS[APP_DUEL], notif);
+        if (smuggler_invited(notif, sizeof(notif)))
+            notify(APPS[APP_SMUGGLER], notif);
         if (battle_invited(notif, sizeof(notif)))
             notify(APPS[APP_BATTLE], notif);
         social_task(now);
         party_task(now);
+        smuggler_task(now);
         tug_service(now);
         assassin_service(now);
         battery_task(now);
@@ -2545,6 +2553,8 @@ int main() {
                 play_chime();
             if (app == A_MENU)
                 redraw = true;
+        } else if (smuggler_event(event, sizeof(event))) {
+            set_status(event);  /* Discreet: no sound */
         } else if (social_event(event, sizeof(event))) {
             set_status(event);
             if (! audio_is_open())

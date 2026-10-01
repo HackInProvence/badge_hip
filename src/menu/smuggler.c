@@ -71,7 +71,7 @@ static void handle_trade(const net_packet_t *p) {
 }
 
 static void cargo_changed(void) {
-    store_changed();
+    store_save_now();  /* A trade: at once, see store.h */
     dirty = true;
 }
 
