@@ -11,6 +11,7 @@ Automatic tests run on the PC, without the badge:
   graphics (gfx), infrared decoding (ir), mini games (games), signed score QR codes (score),
   crypto challenges (crypto), 433 MHz OOK decoders (ookdec), fast reading (rsvp), RTTTL ringtones (rtttl),
   copy of the screen RAM (screen), rules of the group games (party_games),
+  goods and trade protocol of the smuggler cicada (smuggler),
 - Python converters: image2epi.py (exact round trip), video2epaper.py and audio2wav.py (need ffmpeg, skipped without).
 
 Usage: python src/tests/host/run_tests.py [--cc gcc] [--keep] [test names...]
@@ -99,6 +100,14 @@ def test_rtttl(work):
     examples = os.path.join('..', 'docs', 'sd', 'SONNERIES')
     return c_test('test_rtttl', ['menu/rtttl_parse.c'], [os.path.join(SRC, 'menu')], work,
                   copy=[(os.path.join(examples, f), f) for f in ('classique.txt', 'exemples.rtttl')])
+
+
+def test_smuggler(work):
+    # The icons in smuggler_goods.c are the ones of the ASCII art of tools/smuggler_icons.py
+    r = run([sys.executable, os.path.join(SRC, '..', 'tools', 'smuggler_icons.py'), '--check'])
+    if r.returncode:
+        return False, r.stdout + r.stderr
+    return c_test('test_smuggler', [], [os.path.join(SRC, 'menu')], work)  # Includes the .c files
 
 
 def test_rsvp(work):
@@ -208,7 +217,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('rtttl', test_rtttl), ('screen', test_screen), ('party_games', test_party_games),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('rsvp', test_rsvp), ('rtttl', test_rtttl), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
@@ -225,7 +234,7 @@ if __name__ == '__main__':
     for name, func in TESTS:
         if ARGS.names and name not in ARGS.names:
             continue
-        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_vcard, test_rsvp, test_rtttl, test_screen) and not shutil.which(ARGS.cc):
+        if func in (test_gfx, test_ir, test_games, test_puzzles, test_score, test_crypto, test_ookdec, test_vcard, test_rsvp, test_rtttl, test_screen, test_party_games, test_smuggler) and not shutil.which(ARGS.cc):
             ok, output = None, f'no C compiler ({ARGS.cc})'
         else:
             work = tempfile.mkdtemp(prefix=f'badge_{name}_')

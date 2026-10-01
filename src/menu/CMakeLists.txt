@@ -46,6 +46,8 @@ target_sources(badge_menu PRIVATE
     pirate_radio.c
     demo.c
     smuggler.c
+    smuggler_goods.c
+    smuggler_trade.c
     skills.c
     achievements.c
     display.c
