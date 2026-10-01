@@ -9,47 +9,52 @@
 
 #include "werewolf_logic.h"
 
-static const char *ROLE_NAMES[WW_ROLES] = {"Villageois", "Loup-garou", "Voyante", "Sorcière", "Chasseur", "Cupidon"};
-
-int ww_min_players(bool advanced) {
-    return advanced ? WW_MIN_ADVANCED : WW_MIN_SIMPLE;
-}
+static const char *ROLE_NAMES[WW_ROLES] = {"Villageois", "Loup-garou", "Voyante", "Sorcière", "Chasseur", "Cupidon",
+                                           "Petite fille", "Voleur"};
 
 int ww_wolves_for(int n) {
-    return n >= 15 ? 4 : n >= 11 ? 3 : n >= 7 ? 2 : 1;
+    return n >= 12 ? 3 : n >= 4 ? 2 : 1;
 }
 
-void ww_deal(ww_game_t *g, int n, bool advanced, ww_rand_t rnd) {
-    if (n > WW_MAX)
-        n = WW_MAX;
+void ww_deal(ww_game_t *g, int n, uint8_t options, ww_rand_t rnd) {
+    if (n > WW_MAX_PLAYERS)
+        n = WW_MAX_PLAYERS;
     if (n < 0)
         n = 0;
     memset(g, 0, sizeof(*g));
     g->n = n;
-    g->lovers[0] = g->lovers[1] = WW_NONE;
-    g->alive = n >= 32 ? 0xFFFFFFFFu : (1u << n) - 1;
-    /* The special roles first (a small debug game gets the most important ones), then the villagers */
+    g->options = options;
+    g->lovers[0] = g->lovers[1] = g->captain = WW_NONE;
+    g->center[0] = g->center[1] = WW_NONE;
+    g->alive = (1u << n) - 1;
+    /* The cards: the wolves, the roles (in this order when the players are too few: small test games), simple
+     * villagers for the others, and 2 more simple villagers with the thief */
+    bool thief = options & WW_OPT_THIEF;
+    int cards = n + (thief ? 2 : 0);
+    uint8_t deck[WW_MAX];
     int k = 0;
     for (int w = ww_wolves_for(n); w > 0 && k < n; --w)
-        g->role[k++] = WW_WOLF;
-    if (k < n)
-        g->role[k++] = WW_SEER;
-    if (advanced) {
-        if (k < n)
-            g->role[k++] = WW_WITCH;
-        if (k < n)
-            g->role[k++] = WW_HUNTER;
-        if (n >= WW_CUPID_MIN && k < n)
-            g->role[k++] = WW_CUPID;
-    }
-    while (k < n)
-        g->role[k++] = WW_VILLAGER;
+        deck[k++] = WW_WOLF;
+    static const struct { uint8_t opt, role; } ROLES[] = {
+        {WW_OPT_SEER, WW_SEER}, {WW_OPT_WITCH, WW_WITCH}, {WW_OPT_HUNTER, WW_HUNTER}, {WW_OPT_CUPID, WW_CUPID},
+        {WW_OPT_GIRL, WW_GIRL}, {WW_OPT_THIEF, WW_THIEF},
+    };
+    for (unsigned r = 0; r < sizeof(ROLES) / sizeof(ROLES[0]); ++r)
+        if ((options & ROLES[r].opt) && k < n)
+            deck[k++] = ROLES[r].role;
+    while (k < cards)
+        deck[k++] = WW_VILLAGER;
     /* Fisher-Yates */
-    for (int i = n - 1; i > 0; --i) {
+    for (int i = cards - 1; i > 0; --i) {
         int j = rnd() % (uint32_t)(i + 1);
-        uint8_t t = g->role[i];
-        g->role[i] = g->role[j];
-        g->role[j] = t;
+        uint8_t t = deck[i];
+        deck[i] = deck[j];
+        deck[j] = t;
+    }
+    memcpy(g->role, deck, n);
+    if (thief) {
+        g->center[0] = deck[n];
+        g->center[1] = deck[n + 1];
     }
 }
 
@@ -75,24 +80,98 @@ uint32_t ww_wolves(const ww_game_t *g) {
     return m;
 }
 
-int ww_tally(const uint8_t *votes, int n_votes, int n, ww_rand_t rnd) {
+int ww_partner(const ww_game_t *g, int i) {
+    if (i < 0 || g->lovers[0] == WW_NONE)
+        return WW_NONE;
+    return g->lovers[0] == i ? g->lovers[1] : g->lovers[1] == i ? g->lovers[0] : WW_NONE;
+}
+
+bool ww_may_harm(const ww_game_t *g, int actor, int target) {
+    return ww_alive(g, target) && target != actor && ww_partner(g, actor) != target;
+}
+
+bool ww_thief_must_take(const ww_game_t *g) {
+    return g->center[0] == WW_WOLF && g->center[1] == WW_WOLF;
+}
+
+bool ww_thief_swap(ww_game_t *g, int thief, int k) {
+    if (thief < 0 || thief >= g->n || g->role[thief] != WW_THIEF || g->center[0] == WW_NONE)
+        return false;
+    if (k < 0 || k > 1)
+        return ! ww_thief_must_take(g);  /* Keeps his card */
+    uint8_t card = g->center[k];
+    g->center[k] = WW_THIEF;
+    g->role[thief] = card;
+    return true;
+}
+
+int ww_count_votes(const ww_game_t *g, const uint8_t *votes, int double_voter, uint32_t *tied) {
     uint8_t count[WW_MAX] = {0};
     int best = 0;
-    for (int i = 0; i < n_votes; ++i)
-        if (votes[i] < n && votes[i] < WW_MAX && ++count[votes[i]] > best)
-            best = count[votes[i]];
-    if (! best)
+    for (int i = 0; i < g->n; ++i) {
+        int t = votes[i];
+        if (! ww_alive(g, i) || t >= g->n)
+            continue;
+        count[t] += i == double_voter ? 2 : 1;
+        if (count[t] > best)
+            best = count[t];
+    }
+    uint32_t top = 0;
+    for (int t = 0; best && t < g->n; ++t)
+        if (count[t] == best)
+            top |= 1u << t;
+    if (tied)
+        *tied = __builtin_popcount(top) > 1 ? top : 0;
+    if (__builtin_popcount(top) != 1)
         return WW_NONE;
-    int tied = 0;
-    for (int t = 0; t < n; ++t)
-        tied += count[t] == best;
-    if (tied > 1 && ! rnd)
+    return __builtin_ctz(top);
+}
+
+int ww_pick(uint32_t mask, ww_rand_t rnd) {
+    int n = __builtin_popcount(mask);
+    if (! n)
         return WW_NONE;
-    int pick = tied > 1 ? (int)(rnd() % (uint32_t)tied) : 0;
-    for (int t = 0; t < n; ++t)
-        if (count[t] == best && pick-- == 0)
-            return t;
+    int k = rnd() % (uint32_t)n;
+    for (int i = 0; i < 32; ++i)
+        if ((mask >> i & 1) && k-- == 0)
+            return i;
     return WW_NONE;
+}
+
+ww_day_t ww_day_vote(const ww_game_t *g, const uint8_t *votes, bool second, int *out, uint32_t *tied) {
+    int captain = ww_alive(g, g->captain) ? g->captain : WW_NONE;
+    uint32_t t = 0;
+    int o = ww_count_votes(g, votes, captain, &t);
+    *out = WW_NONE;
+    *tied = t;
+    if (o != WW_NONE) {
+        *out = o;
+        return WW_DAY_OUT;
+    }
+    if (! t)
+        return WW_DAY_NOBODY;  /* Nobody voted */
+    if (captain != WW_NONE) {
+        int v = votes[captain];
+        if (v < g->n && (t >> v & 1)) {
+            *out = v;  /* The vote of the captain designates the victim */
+            return WW_DAY_OUT;
+        }
+        return WW_DAY_TIEBREAK;
+    }
+    return second ? WW_DAY_NOBODY : WW_DAY_REVOTE;
+}
+
+bool ww_spy(const ww_game_t *g, uint32_t r, uint8_t *seen) {
+    uint32_t wolves = ww_wolves(g) & g->alive;
+    int n = __builtin_popcount(wolves);
+    *seen = WW_NONE;
+    if (n) {
+        int k = (r / 3) % n;
+        for (int i = 0; i < g->n; ++i)
+            if ((wolves >> i & 1) && k-- == 0)
+                *seen = i;
+    }
+    return r % 3 == 0;
 }
 
 int ww_kill(ww_game_t *g, int i, uint8_t *deaths, int n_deaths) {
@@ -101,8 +180,9 @@ int ww_kill(ww_game_t *g, int i, uint8_t *deaths, int n_deaths) {
     g->alive &= ~(1u << i);
     if (n_deaths < WW_MAX)
         deaths[n_deaths++] = i;
-    if (g->lovers[0] == i || g->lovers[1] == i)  /* The other one dies of grief */
-        n_deaths = ww_kill(g, g->lovers[0] == i ? g->lovers[1] : g->lovers[0], deaths, n_deaths);
+    int p = ww_partner(g, i);
+    if (p != WW_NONE)  /* The other one dies of grief */
+        n_deaths = ww_kill(g, p, deaths, n_deaths);
     return n_deaths;
 }
 
@@ -148,7 +228,7 @@ ww_win_t ww_winner(const ww_game_t *g) {
         return WW_WIN_LOVERS;
     if (! wolves)
         return WW_WIN_VILLAGE;
-    if (wolves >= others)
+    if (! others)
         return WW_WIN_WOLVES;
     return WW_WIN_NONE;
 }

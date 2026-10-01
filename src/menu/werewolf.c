@@ -3,31 +3,38 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/* Loup-garou (werewolf / mafia): a narrator ("meneur", who does not play) opens a party (party.c), 5 to 20 players
- * join; the badge of the narrator deals the roles and drives the game, phase by phase (night: Cupidon, the wolves,
- * the seer, the witch; day: dawn, debate, vote, verdict; the hunter when he dies). The rules are in
- * werewolf_logic.c and in docs/fr/loup_garou.md.
+/* Loup-garou (werewolf / mafia), after the rules of "Les Loups-garous de Thiercelieux": a narrator ("meneur", who
+ * does not play) chooses the roles in play and opens a party (party.c), 8 to 18 players join; the badge of the
+ * narrator deals the cards and drives the game, phase by phase:
+ * - the first night: the thief, Cupidon, the lovers who recognize each other;
+ * - each night: the seer, the wolves (the little girl may spy on them), the witch;
+ * - each day: the dawn (the dead and their cards), the shot of the hunter, the successor of a dead captain, the
+ *   election of the captain (the first day), the debate, the vote (the captain counts twice; a tie: the captain
+ *   decides, without captain a second vote among the tied players), the verdict.
+ * The rules are in werewolf_logic.c, the cards (help) in werewolf_cards.c, the whole in docs/fr/loup_garou.md.
  *
- * Secrecy in a room: during each night phase, every living player chooses in a list (the villagers pretend), so
- * that nobody can tell who acts by looking at who presses buttons, and every player receives the same kind of
- * packet. The roles and the actions travel XORed with a hash of the random key of the player (party_mask()), known
- * by the narrator and the player only.
+ * Secrecy in a room: during each night phase, every living player chooses in a list (those without the role
+ * pretend), so that nobody can tell who acts by looking at who presses buttons, and every player receives the same
+ * kind of packet. The roles and the actions travel XORed with a hash of the random key of the player
+ * (party_mask()), known by the narrator and the player only.
  *
  * Messages (party_send(), kinds from PARTY_KIND_GAME):
- * - STATE (narrator, every second, 3 times at each phase change): [phase][step][day][players][flags][seconds 2]
- *   [alive 4][acted 4][roles of the dead 10, nibbles, 0xF = secret][winner][hunter][deaths count][deaths 6]
- *   [winners 4][lovers 2, at the end only]. The step counts the phases: a new step resets the choices.
+ * - STATE (narrator, every second, 3 times at each phase change): [phase][step][day][players][options][seconds 2]
+ *   [alive 4][acted 4][cards of the dead 10, nibbles, 0xF = secret][winner][actor][deaths count][deaths 6]
+ *   [winners 4][lovers 2, at the end only][captain][candidates 4][debate]. The step counts the phases: a new step
+ *   resets the choices. The actor: the hunter who shoots, the captain who decides or names his successor.
  * - NAMES (narrator, every 3 s, fast during the first seconds): [first][players][3 x (id 4, name 8)]
  *   (the robots of the test mode are not in the roster of the party).
- * - PRIV (narrator -> a player): [nonce 4][masked: step, role, lover, wolves 4, ack, index, info 2, wolf votes 4,
+ * - PRIV (narrator -> a player): [nonce 4][masked: step, card, lover, wolves 4, ack, index, info 2, wolf votes 4,
  *   potions]. Sent to every living player at each phase change, to everybody when a wolf votes, and in answer to
- *   each ACT (the answer is the acknowledgement).
+ *   each ACT (the answer is the acknowledgement). The info: the 2 cards of the thief, the card seen by the seer,
+ *   the wolf seen by the little girl, the victim shown to the witch.
  * - ACT (player -> narrator): [nonce 4][masked: step, seq, a, b, 0 x 4]; seq 0: "send me my information".
  *   Sent again until the PRIV of the step acknowledges the seq: the radio loses packets, duplicates are ignored.
  * - ABORT (narrator, 5 times, then the LEAVE of party.c): the narrator stopped the game.
  *
- * Test mode: when the narrator badge is in admin mode, a party starts with a single player, and robots complete
- * it up to the minimum (tools/test_werewolf.py with 2 badges). */
+ * Test mode: when the narrator badge is in admin mode, a party starts with a single player, and robots (which can
+ * hold any card) complete it up to the minimum (tools/test_werewolf.py with 2 badges). */
 
 #include <stdio.h>
 #include <string.h>
@@ -40,6 +47,7 @@
 #include "party.h"
 #include "social.h"
 #include "store.h"
+#include "werewolf_cards.h"
 #include "werewolf_logic.h"
 
 extern const app_t app_werewolf;
@@ -52,8 +60,8 @@ static void abort_task(absolute_time_t now);
 #define K_PRIV (PARTY_KIND_GAME + 2)
 #define K_ACT (PARTY_KIND_GAME + 3)
 #define K_ABORT (PARTY_KIND_GAME + 4)
-#define K_PARTY_LEAVE 5  /* The LEAVE of party.c, given to the handler during the game: a player left */
 
+#define STATE_LEN 46
 #define START_DELAY_MS 3000
 #define STATE_MS 1000
 #define STATE_BURST 3
@@ -68,21 +76,20 @@ static void abort_task(absolute_time_t now);
 #define ALL_ACTED_GRACE_MS 2000  /* Everybody chose: the phase ends a moment later */
 #define ADD_TIME_S 30
 #define LOST_MS 20000
-#define PEEK_MS 5000
+#define CARD_SHOWN_MS 10000  /* The card of the player (long press during the game), then back to the game */
 #define MAX_DEATHS 6
 #define BOT_ID 0xB0700000u
 #define ABORT_REPEATS 5
 #define ABORT_GAP_MS 300
 #define NO_TIMER 0xFFFF
 
-#define FLAG_ADVANCED 0x01
-#define FLAG_DEBATE_SHIFT 1  /* 2 bits: index in DEBATE_S */
-#define FLAG_DEBUG 0x80  /* Test mode: robots complete the party */
+#define FLAG_DEBUG 0x80  /* In the options byte (party flags): test mode, robots complete the party */
 
 static const uint16_t DEBATE_S[3] = {120, 180, 300};
 
-enum { P_NONE, P_ROLES, P_CUPID, P_WOLVES, P_SEER, P_WITCH, P_DAWN, P_HUNTER, P_SHOT, P_DEBATE, P_VOTE, P_VERDICT,
-       P_END, P_COUNT };
+enum { P_NONE, P_ROLES, P_THIEF, P_CUPID, P_LOVERS, P_SEER, P_WOLVES, P_WITCH, P_DAWN, P_HUNTER, P_SHOT,
+       P_SUCCESSOR, P_ELECTION, P_DEBATE, P_VOTE, P_TIEBREAK, P_VOTE2, P_VERDICT, P_END, P_COUNT };
+#define NEXT_NIGHT P_COUNT  /* After the deaths: the next night */
 
 typedef struct {
     const char *title;  /* After "Nuit n : " / "Jour n : " */
@@ -94,50 +101,66 @@ typedef struct {
 
 static const phase_t PHASES[P_COUNT] = {
     [P_NONE] = {"Début", "start", 0, false, "La partie commence..."},
-    [P_ROLES] = {"Rôles", "roles", 30, false, "Chacun lit son rôle en cachant son écran."},
-    [P_CUPID] = {"Cupidon", "cupid", 30, true, "La nuit tombe. Tous choisissent 2 noms : seul Cupidon compte."},
-    [P_WOLVES] = {"Loups", "wolves", 45, true, "Tous choisissent une cible : seuls les loups comptent."},
-    [P_SEER] = {"Voyante", "seer", 30, true, "Tous choisissent : seule la voyante découvre un rôle."},
-    [P_WITCH] = {"Sorcière", "witch", 30, true, "Tous choisissent : seule la sorcière agit."},
+    [P_ROLES] = {"Rôles", "roles", 30, false, "Chacun lit sa carte en cachant son écran."},
+    [P_THIEF] = {"Voleur", "thief", 30, true, "La nuit tombe. Tous choisissent : seul le voleur compte."},
+    [P_CUPID] = {"Cupidon", "cupid", 30, true, "Tous choisissent 2 noms : seul Cupidon compte."},
+    [P_LOVERS] = {"Amoureux", "lovers", 15, true, "Les amoureux se reconnaissent ; tous valident."},
+    [P_SEER] = {"Voyante", "seer", 30, true, "Tous choisissent : seule la voyante découvre une carte."},
+    [P_WOLVES] = {"Loups", "wolves", 45, true,
+                  "Les loups choisissent leur victime ; la petite fille peut espionner."},
+    [P_WITCH] = {"Sorcière", "witch", 40, true, "Tous choisissent : seule la sorcière agit."},
     [P_DAWN] = {"aube", "dawn", 15, false, "Le jour se lève : annoncez les morts de la nuit."},
     [P_HUNTER] = {"Chasseur", "hunter", 30, false, "Le chasseur est mort : il emporte quelqu'un."},
     [P_SHOT] = {"Chasseur", "shot", 10, false, "Annoncez la victime du chasseur."},
+    [P_SUCCESSOR] = {"Capitaine", "successor", 30, false, "Le capitaine est mort : il désigne son successeur."},
+    [P_ELECTION] = {"capitaine", "election", 60, false, "Le village élit son capitaine (sa voix compte double)."},
     [P_DEBATE] = {"débat", "debate", 0, false, "Le village débat : qui sont les loups ?"},
     [P_VOTE] = {"vote", "vote", 45, false, "Chacun vote sur son badge."},
-    [P_VERDICT] = {"verdict", "verdict", 12, false, "Annoncez l'éliminé et son rôle."},
+    [P_TIEBREAK] = {"égalité", "tiebreak", 30, false, "Égalité : le capitaine tranche."},
+    [P_VOTE2] = {"2e vote", "vote2", 45, false, "Égalité : second vote entre les ex aequo."},
+    [P_VERDICT] = {"verdict", "verdict", 12, false, "Annoncez l'éliminé et sa carte."},
     [P_END] = {"Fin", "end", 0, false, ""},
 };
 
-static const char *ROLE_HELP[WW_ROLES] = {
-    "Trouve les loups et fais-les éliminer au vote du jour.",
-    "Chaque nuit, dévore un villageois avec les autres loups. Reste discret !",
-    "Chaque nuit, tu découvres le rôle d'un joueur.",
-    "Une potion de vie, une potion de mort : une fois chacune dans la partie.",
-    "À ta mort, tu emportes un joueur avec toi.",
-    "La première nuit, tu lies deux amoureux : si l'un meurt, l'autre aussi.",
+/* The options on the setup page, in this order */
+static const struct { uint8_t opt; const char *name; } OPTIONS[] = {
+    {WW_OPT_SEER, "Voyante"}, {WW_OPT_WITCH, "Sorcière"}, {WW_OPT_HUNTER, "Chasseur"}, {WW_OPT_CUPID, "Cupidon"},
+    {WW_OPT_GIRL, "Petite fille"}, {WW_OPT_CAPTAIN, "Capitaine"}, {WW_OPT_THIEF, "Voleur"},
 };
+#define N_OPTIONS ((int)(sizeof(OPTIONS) / sizeof(OPTIONS[0])))
 
 enum { M_NONE, M_NARRATOR, M_PLAYER };
-enum { PG_MENU, PG_SETUP, PG_LOBBY, PG_SCAN, PG_WAIT, PG_GAME, PG_ROLES, PG_QUIT };
+enum { PG_MENU, PG_SETUP, PG_LOBBY, PG_SCAN, PG_WAIT, PG_GAME, PG_ROLES, PG_QUIT, PG_HELP };
+enum { MENU_NARRATE, MENU_JOIN, MENU_HELP, MENU_ROWS };
+enum { SETUP_PRESET, SETUP_OPTIONS, SETUP_DEBATE = SETUP_OPTIONS + N_OPTIONS, SETUP_WOLVES, SETUP_OPEN, SETUP_ROWS };
 
 /* Values of the rows of the lists of choices (below WW_MAX: a player) */
-#define ROW_NOTHING 0xFE  /* Vote blanc / ne rien faire */
-#define ROW_HEAL 0xFD
 #define ROW_POISON 0x80  /* | the player */
+#define ROW_SPY 0xF6
+#define ROW_SLEEP 0xF7
+#define ROW_CARD2 0xF8
+#define ROW_CARD1 0xF9
+#define ROW_KEEP 0xFA
+#define ROW_CONTINUE 0xFB
+#define ROW_NOHEAL 0xFC
+#define ROW_HEAL 0xFD
+#define ROW_NOTHING 0xFE  /* Vote blanc / personne */
 
 /* ------ Shared by the narrator and the players: the game as shown ------ */
 
 static int mode = M_NONE;
 static int page = PG_MENU, quit_back = PG_MENU;
 static bool changed = false;
-static uint8_t flags = 0;
+static uint8_t options = 0;  /* WW_OPT_* | FLAG_DEBUG: the party flags */
+static uint8_t debate = 1;  /* Index in DEBATE_S */
 static char names[WW_MAX][10];
 static uint32_t ids[WW_MAX];
 
 static bool have_state = false;
-static uint8_t phase = P_NONE, step = 0, day = 0, n_players = 0, winner = WW_WIN_NONE, hunter = WW_NONE;
-static uint32_t alive = 0, acted = 0, winners = 0;
-static uint8_t revealed[WW_MAX];  /* The roles of the dead (everybody's at the end), WW_NONE: secret */
+static uint8_t phase = P_NONE, step = 0, day = 0, n_players = 0, winner = WW_WIN_NONE, actor = WW_NONE;
+static uint8_t captain = WW_NONE;
+static uint32_t alive = 0, acted = 0, winners = 0, candidates = 0;
+static uint8_t revealed[WW_MAX];  /* The cards of the dead (everybody's at the end), WW_NONE: secret */
 static uint8_t deaths[MAX_DEATHS], n_deaths = 0;
 static uint8_t lovers_end[2] = {WW_NONE, WW_NONE};
 static bool timed = false;
@@ -145,6 +168,10 @@ static absolute_time_t deadline = 0;
 static int list_sel = 0;  /* Selected row (lists of the pages) */
 static uint8_t notified_step = 0;  /* werewolf_event() */
 static bool notify_pending = false;
+/* The help: a card, its details, where it goes back */
+static int help_card = 0, help_back = PG_MENU;
+static bool help_details = false;
+static absolute_time_t help_until = 0;  /* The card of the player during the game: shown for a while */
 
 /* The chimes: {hz, ms} pairs, 0 to end */
 static const uint16_t TUNE_NIGHT[] = {784, 220, 659, 220, 523, 450, 0};
@@ -155,20 +182,15 @@ static const uint16_t *tune = NULL;
 static absolute_time_t tune_ts = 0;
 
 static bool debug_mode(void) {
-    return flags & FLAG_DEBUG;
-}
-
-static bool advanced(void) {
-    return flags & FLAG_ADVANCED;
+    return options & FLAG_DEBUG;
 }
 
 static uint16_t debate_secs(void) {
-    int i = (flags >> FLAG_DEBATE_SHIFT) & 3;
-    return DEBATE_S[i < 3 ? i : 1];
+    return DEBATE_S[debate < 3 ? debate : 1];
 }
 
 static int min_players(void) {
-    return debug_mode() ? 1 : ww_min_players(advanced());
+    return debug_mode() ? 1 : WW_MIN_PLAYERS;
 }
 
 static const char *pname(int i) {
@@ -186,6 +208,16 @@ static void default_names(void) {
     }
 }
 
+/* The roles of the options, for the pages ("voyante, sorcière..."); \p n: the length of \p buf */
+static void options_text(char *buf, size_t n, uint8_t opts) {
+    buf[0] = 0;
+    for (int i = 0; i < N_OPTIONS; ++i)
+        if (opts & OPTIONS[i].opt)
+            snprintf(buf + strlen(buf), n - strlen(buf), "%s%s", buf[0] ? ", " : "", OPTIONS[i].name);
+    if (! buf[0])
+        snprintf(buf, n, "loups et villageois seulement");
+}
+
 /* XOR with a hash of the key of the player and of a random nonce (sent in clear) */
 static void mask(uint8_t *d, int len, uint32_t key, uint32_t nonce) {
     for (int j = 0; j < len; j += 4) {
@@ -200,12 +232,14 @@ static void phase_title(char *buf, size_t len) {
         snprintf(buf, len, "Fin de partie");
     else if (phase == P_HUNTER || phase == P_SHOT)
         snprintf(buf, len, "Le chasseur");
+    else if (phase == P_SUCCESSOR)
+        snprintf(buf, len, "Le capitaine");
     else if (PHASES[phase].night)
         snprintf(buf, len, "Nuit %u : %s", day, PHASES[phase].title);
     else if (phase >= P_DAWN)
         snprintf(buf, len, "Jour %u : %s", day, PHASES[phase].title);
     else if (phase == P_ROLES)
-        snprintf(buf, len, "Les rôles");
+        snprintf(buf, len, "Ta carte");
     else
         snprintf(buf, len, "Loup-garou");
 }
@@ -234,7 +268,7 @@ static void tune_task(absolute_time_t now) {
     tune += 2;
 }
 
-/* A new phase on this badge: chime, notification, log of the deaths */
+/* A new phase on this badge: chime, notification */
 static void new_phase(uint8_t prev) {
     if (phase == P_END)
         play(TUNE_END);
@@ -267,13 +301,16 @@ static uint32_t pending = 0;  /* PRIV to send */
 static int priv_next = 0, names_next = 0, burst = 0;
 static absolute_time_t state_ts = 0, names_ts = 0, priv_ts = 0, game_ts = 0, grace_ts = 0;
 static bool grace = false;
-static uint8_t victim = WW_NONE, seer_target = WW_NONE, after_shot = P_DEBATE;
-static bool hunter_died = false;
-static uint8_t dead_hunter = WW_NONE;  /* Shoots in P_HUNTER */
-/* Lobby and setup */
+/* The night */
+static uint8_t victim = WW_NONE, seer_target = WW_NONE, spy_seen = WW_NONE;
+static bool spy_caught = false;
+/* The deaths: the hunter shoots, then the game ends or a dead captain names his successor, then \p after */
+static bool hunter_pending = false;
+static uint8_t dead_hunter = WW_NONE, after = P_DEBATE;
+/* Setup and lobby */
 static int setup_row = 0;
-static bool set_advanced = false;
-static int set_debate = 1;
+static uint8_t set_options = WW_OPT_ALL;
+static uint8_t set_debate = 1;
 static party_player_t lobby[PARTY_MAX];
 static int n_lobby = 0;
 
@@ -281,21 +318,27 @@ static uint32_t real_mask(void) {
     return n_real >= 32 ? 0xFFFFFFFFu : (1u << n_real) - 1;
 }
 
-static uint8_t rand_alive(uint32_t except) {
-    int n = 0;
-    uint8_t c[WW_MAX];
+/* A random player of \p mask, alive */
+static uint8_t rand_of(uint32_t mask_) {
+    return ww_pick(mask_ & g.alive, get_rand_32);
+}
+
+/* The players \p actor may harm (vote against, attack, poison, shoot) */
+static uint32_t harmable(int a) {
+    uint32_t m = 0;
     for (int i = 0; i < g.n; ++i)
-        if (ww_alive(&g, i) && ! (except >> i & 1))
-            c[n++] = i;
-    return n ? c[get_rand_32() % n] : WW_NONE;
+        if (ww_may_harm(&g, a, i))
+            m |= 1u << i;
+    return m;
 }
 
 static uint32_t expected(void) {
     switch (phase) {
-    case P_ROLES: case P_CUPID: case P_WOLVES: case P_SEER: case P_WITCH: case P_VOTE:
+    case P_ROLES: case P_THIEF: case P_CUPID: case P_LOVERS: case P_SEER: case P_WOLVES: case P_WITCH:
+    case P_ELECTION: case P_VOTE: case P_VOTE2:
         return g.alive;
-    case P_HUNTER:
-        return hunter < WW_MAX ? 1u << hunter : 0;
+    case P_HUNTER: case P_SUCCESSOR: case P_TIEBREAK:
+        return actor < WW_MAX ? 1u << actor : 0;
     default:
         return 0;
     }
@@ -305,24 +348,59 @@ static uint32_t expected(void) {
 static void sync_view(void) {
     alive = g.alive;
     n_players = g.n;
+    captain = g.captain;
     for (int i = 0; i < g.n; ++i)
         revealed[i] = phase == P_END || ! ww_alive(&g, i) ? g.role[i] : WW_NONE;
 }
 
-/* The robots of the test mode choose at once: the wolves at random, the others nothing (blank votes) */
+static void girl_spies(int i) {
+    if (spy_seen != WW_NONE || g.role[i] != WW_GIRL)
+        return;  /* Once a night */
+    spy_caught = ww_spy(&g, get_rand_32(), &spy_seen);
+    printf("werewolf: the little girl spies on %s%s\n", pname(spy_seen), spy_caught ? ", caught!" : "");
+}
+
+/* The robots of the test mode: they can hold any card, they choose at random (blank votes now and then) */
 static void bots_act(void) {
     for (int i = n_real; i < g.n; ++i) {
         if (! (expected() >> i & 1))
             continue;
+        uint8_t a = WW_NONE, b = WW_NONE, r = g.role[i];
+        uint32_t rnd = get_rand_32();
+        switch (phase) {
+        case P_ROLES: case P_LOVERS: a = 1; break;
+        case P_THIEF:
+            if (r == WW_THIEF)
+                a = ww_thief_must_take(&g) ? 1 + rnd % 2 : rnd % 3;
+            break;
+        case P_CUPID:
+            if (r == WW_CUPID) {
+                a = rand_of(0xFFFFFFFFu);
+                b = a < WW_MAX ? rand_of(~(1u << a)) : WW_NONE;
+            }
+            break;
+        case P_WOLVES:
+            if (r == WW_WOLF)
+                a = rand_of(harmable(i) & ~ww_wolves(&g));
+            else if (r == WW_GIRL && (a = rnd % 2))
+                girl_spies(i);
+            break;
+        case P_WITCH:
+            if (r == WW_WITCH) {
+                a = (victim != WW_NONE && ! g.heal_used && rnd % 2 ? 1 : 0) | (! g.poison_used && rnd % 3 == 0 ? 2 : 0);
+                b = rand_of(harmable(i));
+            }
+            break;
+        case P_ELECTION: a = rand_of(0xFFFFFFFFu); break;
+        case P_VOTE: a = rnd % 2 ? rand_of(harmable(i)) : WW_NONE; break;
+        case P_VOTE2: case P_TIEBREAK: a = rand_of(harmable(i) & candidates); break;
+        case P_HUNTER: a = rand_of(harmable(i)); break;
+        case P_SUCCESSOR: a = rand_of(0xFFFFFFFFu); break;
+        default: break;
+        }
         ch_seq[i] = 1;
-        ch_a[i] = ch_b[i] = WW_NONE;
-        if (phase == P_WOLVES && g.role[i] == WW_WOLF)
-            ch_a[i] = rand_alive(ww_wolves(&g));
-        else if (phase == P_CUPID && g.role[i] == WW_CUPID) {
-            ch_a[i] = rand_alive(0);
-            ch_b[i] = rand_alive(1u << ch_a[i]);
-        } else if (phase == P_HUNTER)
-            ch_a[i] = rand_alive(0);
+        ch_a[i] = a;
+        ch_b[i] = b;
         acted |= 1u << i;
     }
 }
@@ -342,7 +420,9 @@ static void enter(uint8_t p, absolute_time_t now) {
     deadline = delayed_by_ms(now, secs * 1000u);
     if (p != P_DAWN && p != P_VERDICT && p != P_SHOT)
         n_deaths = 0;
-    hunter = p == P_HUNTER || p == P_SHOT ? dead_hunter : WW_NONE;
+    actor = p == P_HUNTER ? dead_hunter : p == P_SUCCESSOR || p == P_TIEBREAK ? g.captain : WW_NONE;
+    if (p != P_TIEBREAK && p != P_VOTE2)
+        candidates = 0;
     sync_view();
     bots_act();
     pending |= (expected() | (p == P_ROLES ? 0xFFFFFFFFu : 0)) & real_mask();
@@ -353,13 +433,12 @@ static void enter(uint8_t p, absolute_time_t now) {
 }
 
 static void set_deaths(const uint8_t *d, int n) {
-    hunter_died = false;
     n_deaths = 0;
     for (int i = 0; i < n; ++i) {
         if (n_deaths < MAX_DEATHS)
             deaths[n_deaths++] = d[i];
         if (g.role[d[i]] == WW_HUNTER) {
-            hunter_died = true;
+            hunter_pending = true;  /* He shoots before the game goes on */
             dead_hunter = d[i];
         }
     }
@@ -375,38 +454,35 @@ static void end_game(absolute_time_t now) {
     lovers_end[0] = g.lovers[0];
     lovers_end[1] = g.lovers[1];
     enter(P_END, now);
-    sync_view();
     timed = false;
     printf("werewolf: end, %s\n", ww_win_text(winner));
 }
 
-static void start_night(absolute_time_t now) {
-    ++day;
-    victim = seer_target = WW_NONE;
-    int c = ww_find(&g, WW_CUPID);
-    enter(day == 1 && c >= 0 && ww_alive(&g, c) ? P_CUPID : P_WOLVES, now);
+/* A phase of the night takes place: its role is in play and not known dead (a card left to the thief keeps its
+ * phase: nobody must learn that it is not held) */
+static bool night_phase_on(uint8_t p) {
+    int h;
+    switch (p) {
+    case P_THIEF: return day == 1 && (g.options & WW_OPT_THIEF);
+    case P_CUPID: case P_LOVERS: return day == 1 && (g.options & WW_OPT_CUPID);
+    case P_SEER: h = ww_find(&g, WW_SEER); return (g.options & WW_OPT_SEER) && (h < 0 || ww_alive(&g, h));
+    case P_WITCH: h = ww_find(&g, WW_WITCH); return (g.options & WW_OPT_WITCH) && (h < 0 || ww_alive(&g, h));
+    case P_WOLVES: return true;
+    default: return false;
+    }
 }
 
-/* The phases of the night that follow the wolves (a dead role has no phase: its death was announced) */
-static void night_after(uint8_t p, absolute_time_t now) {
-    int seer = ww_find(&g, WW_SEER), witch = ww_find(&g, WW_WITCH);
-    if (p < P_SEER && ww_alive(&g, seer)) {
-        enter(P_SEER, now);
-        return;
-    }
-    if (p < P_WITCH && ww_alive(&g, witch)) {
-        enter(P_WITCH, now);
-        return;
-    }
-    /* Dawn: the potions of the witch, then the deaths */
+static void dawn(absolute_time_t now) {
     bool heal = false;
     int poison = WW_NONE;
-    if (p == P_WITCH && ww_alive(&g, witch) && ch_seq[witch]) {
-        if (ch_a[witch] == 1 && victim != WW_NONE && ! g.heal_used) {
+    int w = ww_find(&g, WW_WITCH);
+    if (phase == P_WITCH && w >= 0 && ww_alive(&g, w) && ch_seq[w] && ch_a[w] != WW_NONE) {
+        if ((ch_a[w] & 1) && victim != WW_NONE && ! g.heal_used) {
             heal = true;
             printf("werewolf: the witch heals %s\n", pname(victim));
-        } else if (ch_a[witch] == 2 && ww_alive(&g, ch_b[witch]) && ! g.poison_used) {
-            poison = ch_b[witch];
+        }
+        if ((ch_a[w] & 2) && ww_may_harm(&g, w, ch_b[w]) && ! g.poison_used) {
+            poison = ch_b[w];
             printf("werewolf: the witch poisons %s\n", pname(poison));
         }
     }
@@ -417,23 +493,56 @@ static void night_after(uint8_t p, absolute_time_t now) {
     log_deaths();
 }
 
-/* After the deaths of the dawn or of the verdict: the hunter shoots, the game ends or goes on */
-static void after_deaths(uint8_t next, absolute_time_t now) {
-    if (hunter_died) {
-        hunter_died = false;
-        after_shot = next;
+/* The next phase of the night after \p p (P_NONE: the first one), or the dawn */
+static void night_next(uint8_t p, absolute_time_t now) {
+    static const uint8_t NIGHT[] = {P_THIEF, P_CUPID, P_LOVERS, P_SEER, P_WOLVES, P_WITCH};
+    bool past = p == P_NONE;
+    for (unsigned k = 0; k < sizeof(NIGHT); ++k) {
+        if (past && night_phase_on(NIGHT[k])) {
+            enter(NIGHT[k], now);
+            return;
+        }
+        past |= NIGHT[k] == p;
+    }
+    dawn(now);
+}
+
+static void start_night(absolute_time_t now) {
+    ++day;
+    victim = seer_target = spy_seen = WW_NONE;
+    spy_caught = false;
+    night_next(P_NONE, now);
+}
+
+/* After deaths: the hunter shoots, the game ends, a dead captain names his successor, then \p next */
+static void resolve(uint8_t next, absolute_time_t now) {
+    if (hunter_pending) {
+        hunter_pending = false;
+        after = next;
         enter(P_HUNTER, now);
     } else if (ww_winner(&g) != WW_WIN_NONE) {
         end_game(now);
-    } else if (next == P_DEBATE) {
-        enter(P_DEBATE, now);
-    } else {
+    } else if (g.captain != WW_NONE && ! ww_alive(&g, g.captain)) {
+        after = next;
+        enter(P_SUCCESSOR, now);
+    } else if (next == NEXT_NIGHT) {
         start_night(now);
+    } else {
+        enter(next, now);
     }
 }
 
-static void next_phase(absolute_time_t now) {
+static void eliminate(int out, absolute_time_t now) {
     uint8_t d[WW_MAX];
+    int k = out == WW_NONE ? 0 : ww_kill(&g, out, d, 0);
+    printf("werewolf: the village eliminates %s\n", out == WW_NONE ? "nobody" : pname(out));
+    set_deaths(d, k);
+    enter(P_VERDICT, now);
+    log_deaths();
+}
+
+static void next_phase(absolute_time_t now) {
+    uint8_t d[WW_MAX], votes[WW_MAX];
     switch (phase) {
     case P_NONE:
         enter(P_ROLES, now);
@@ -441,80 +550,130 @@ static void next_phase(absolute_time_t now) {
     case P_ROLES:
         start_night(now);
         break;
+    case P_THIEF: {
+        int t = ww_find(&g, WW_THIEF);
+        if (t >= 0 && ww_alive(&g, t)) {
+            int k = ch_seq[t] && ch_a[t] >= 1 && ch_a[t] <= 2 ? ch_a[t] - 1 : -1;
+            if (k < 0 && ww_thief_must_take(&g))
+                k = get_rand_32() % 2;  /* Two wolves: he must take one */
+            ww_thief_swap(&g, t, k);
+            if (k < 0)
+                printf("werewolf: the thief keeps his card\n");
+            else
+                printf("werewolf: the thief %s takes %s\n", pname(t), ww_role_name(g.role[t]));
+        }
+        night_next(P_THIEF, now);
+        break;
+    }
     case P_CUPID: {
         int c = ww_find(&g, WW_CUPID);
         if (c >= 0 && ch_seq[c] && ww_alive(&g, ch_a[c]) && ww_alive(&g, ch_b[c]) && ww_link(&g, ch_a[c], ch_b[c]))
             printf("werewolf: lovers %s and %s\n", pname(ch_a[c]), pname(ch_b[c]));
         else
             printf("werewolf: no lovers\n");
-        enter(P_WOLVES, now);
+        night_next(P_CUPID, now);
         break;
     }
     case P_WOLVES: {
-        uint8_t votes[WW_MAX];
-        int n = 0;
-        for (int i = 0; i < g.n; ++i)
-            if (ww_alive(&g, i) && g.role[i] == WW_WOLF) {
-                uint8_t t = ch_seq[i] ? ch_a[i] : WW_NONE;
-                votes[n++] = ww_alive(&g, t) && g.role[t] != WW_WOLF ? t : WW_NONE;
-            }
-        victim = ww_tally(votes, n, g.n, get_rand_32);
+        uint32_t wolves = ww_wolves(&g);
+        for (int i = 0; i < g.n; ++i) {
+            uint8_t t = ch_seq[i] ? ch_a[i] : WW_NONE;
+            votes[i] = (wolves >> i & 1) && t < g.n && ww_may_harm(&g, i, t) && ! (wolves >> t & 1) ? t : WW_NONE;
+        }
+        uint32_t tied = 0;
+        victim = ww_count_votes(&g, votes, WW_NONE, &tied);
+        if (victim == WW_NONE && tied)
+            victim = ww_pick(tied, get_rand_32);  /* A tie among the wolves: drawn */
         printf("werewolf: the wolves chose %s\n", victim == WW_NONE ? "nobody" : pname(victim));
-        night_after(P_WOLVES, now);
+        int girl = ww_find(&g, WW_GIRL);
+        if (spy_caught && ww_alive(&g, girl)) {
+            victim = girl;  /* Caught: she dies instead of the victim */
+            printf("werewolf: the little girl was caught, she dies instead\n");
+        }
+        night_next(P_WOLVES, now);
         break;
     }
-    case P_SEER:
+    case P_LOVERS: case P_SEER:
+        night_next(phase, now);
+        break;
     case P_WITCH:
-        night_after(phase, now);
+        dawn(now);
         break;
     case P_DAWN:
-        after_deaths(P_DEBATE, now);
+        resolve(day == 1 && (g.options & WW_OPT_CAPTAIN) && g.captain == WW_NONE ? P_ELECTION : P_DEBATE, now);
         break;
     case P_HUNTER: {
-        int n = 0;
-        if (hunter < WW_MAX && ch_seq[hunter] && ww_alive(&g, ch_a[hunter])) {
-            n = ww_kill(&g, ch_a[hunter], d, 0);
-            printf("werewolf: the hunter shoots %s\n", pname(ch_a[hunter]));
+        int n = 0, t = actor < WW_MAX && ch_seq[actor] ? ch_a[actor] : WW_NONE;
+        if (actor < WW_MAX && ww_may_harm(&g, actor, t)) {
+            n = ww_kill(&g, t, d, 0);
+            printf("werewolf: the hunter shoots %s\n", pname(t));
         } else {
             printf("werewolf: the hunter did not shoot\n");
         }
         set_deaths(d, n);
-        hunter_died = false;
         enter(P_SHOT, now);
         log_deaths();
         break;
     }
     case P_SHOT:
-        if (ww_winner(&g) != WW_WIN_NONE)
-            end_game(now);
-        else if (after_shot == P_DEBATE)
-            enter(P_DEBATE, now);
-        else
-            start_night(now);
+        resolve(after, now);
         break;
+    case P_SUCCESSOR: {
+        int s = actor < WW_MAX && ch_seq[actor] ? ch_a[actor] : WW_NONE;
+        if (! ww_alive(&g, s))
+            s = rand_of(0xFFFFFFFFu);  /* No choice: drawn */
+        g.captain = s;
+        printf("werewolf: the new captain is %s\n", pname(s));
+        sync_view();
+        resolve(after, now);
+        break;
+    }
+    case P_ELECTION: {
+        for (int i = 0; i < g.n; ++i)
+            votes[i] = ch_seq[i] ? ch_a[i] : WW_NONE;
+        uint32_t tied = 0;
+        int c = ww_count_votes(&g, votes, WW_NONE, &tied);
+        if (c == WW_NONE)
+            c = ww_pick(tied ? tied : g.alive, get_rand_32);  /* A tie or no vote: drawn */
+        g.captain = c;
+        printf("werewolf: %s is elected captain\n", pname(c));
+        sync_view();
+        enter(P_DEBATE, now);
+        break;
+    }
     case P_DEBATE:
         enter(P_VOTE, now);
         break;
-    case P_VOTE: {
-        uint8_t votes[WW_MAX];
-        int n = 0;
-        for (int i = 0; i < g.n; ++i)
-            if (ww_alive(&g, i)) {
-                uint8_t t = ch_seq[i] ? ch_a[i] : WW_NONE;
-                votes[n++] = ww_alive(&g, t) ? t : WW_NONE;
-                if (t != WW_NONE && ww_alive(&g, t))
-                    printf("werewolf: vote %s -> %s\n", pname(i), pname(t));
-            }
-        int out = ww_tally(votes, n, g.n, NULL);  /* A tie: nobody */
-        printf("werewolf: the village eliminates %s\n", out == WW_NONE ? "nobody" : pname(out));
-        int k = out == WW_NONE ? 0 : ww_kill(&g, out, d, 0);
-        set_deaths(d, k);
-        enter(P_VERDICT, now);
-        log_deaths();
+    case P_VOTE:
+    case P_VOTE2: {
+        for (int i = 0; i < g.n; ++i) {
+            uint8_t t = ch_seq[i] ? ch_a[i] : WW_NONE;
+            bool ok = t < g.n && ww_may_harm(&g, i, t) && (phase == P_VOTE || (candidates >> t & 1));
+            votes[i] = ok ? t : WW_NONE;
+            if (ok)
+                printf("werewolf: vote %s -> %s\n", pname(i), pname(t));
+        }
+        int out;
+        uint32_t tied;
+        ww_day_t r = ww_day_vote(&g, votes, phase == P_VOTE2, &out, &tied);
+        if (r == WW_DAY_TIEBREAK || r == WW_DAY_REVOTE) {
+            candidates = tied;
+            printf("werewolf: tie, %s\n", r == WW_DAY_TIEBREAK ? "the captain decides" : "second vote");
+            enter(r == WW_DAY_TIEBREAK ? P_TIEBREAK : P_VOTE2, now);
+        } else {
+            if (out != WW_NONE && ww_alive(&g, g.captain) && votes[g.captain] == out && tied)
+                printf("werewolf: tie, the vote of the captain decides\n");
+            eliminate(r == WW_DAY_OUT ? out : WW_NONE, now);
+        }
+        break;
+    }
+    case P_TIEBREAK: {
+        int t = actor < WW_MAX && ch_seq[actor] ? ch_a[actor] : WW_NONE;
+        eliminate(t < g.n && (candidates >> t & 1) && ww_may_harm(&g, actor, t) ? t : WW_NONE, now);
         break;
     }
     case P_VERDICT:
-        after_deaths(P_CUPID /* = the night */, now);
+        resolve(NEXT_NIGHT, now);
         break;
     default:
         break;
@@ -529,16 +688,21 @@ static void send_priv(int i) {
     memset(x, WW_NONE, 16);
     x[0] = step;
     x[1] = g.role[i];
-    x[2] = g.lovers[0] == i ? g.lovers[1] : g.lovers[1] == i ? g.lovers[0] : WW_NONE;
+    x[2] = ww_partner(&g, i);
     net_put_u32(x + 3, g.role[i] == WW_WOLF ? ww_wolves(&g) : 0);
     x[7] = ch_seq[i];
     x[8] = i;
-    if (phase == P_SEER && g.role[i] == WW_SEER && seer_target != WW_NONE) {
+    if (phase == P_THIEF && g.role[i] == WW_THIEF) {
+        x[9] = g.center[0];
+        x[10] = g.center[1];
+    } else if (phase == P_SEER && g.role[i] == WW_SEER && seer_target != WW_NONE) {
         x[9] = seer_target;
         x[10] = g.role[seer_target];
-    }
-    if (phase == P_WITCH && g.role[i] == WW_WITCH)
+    } else if (phase == P_WOLVES && g.role[i] == WW_GIRL) {
+        x[9] = spy_seen;
+    } else if (phase == P_WITCH && g.role[i] == WW_WITCH) {
         x[9] = victim;
+    }
     if (phase == P_WOLVES && g.role[i] == WW_WOLF) {
         int k = 0;
         for (int w = 0; w < g.n && k < 4; ++w)
@@ -551,13 +715,13 @@ static void send_priv(int i) {
 }
 
 static void send_state(void) {
-    uint8_t d[40];
+    uint8_t d[STATE_LEN];
     memset(d, 0, sizeof(d));
     d[0] = phase;
     d[1] = step;
     d[2] = day;
     d[3] = g.n;
-    d[4] = flags;
+    d[4] = options;
     int secs = secs_left(get_absolute_time());
     d[5] = secs < 0 ? 0xFF : secs;
     d[6] = secs < 0 ? 0xFF : secs >> 8;
@@ -568,12 +732,15 @@ static void send_state(void) {
         d[15 + i / 2] |= i & 1 ? r << 4 : r;
     }
     d[25] = winner;
-    d[26] = hunter;
+    d[26] = actor;
     d[27] = n_deaths;
     memcpy(d + 28, deaths, MAX_DEATHS);
     net_put_u32(d + 34, winners);
     d[38] = phase == P_END ? lovers_end[0] : WW_NONE;
     d[39] = phase == P_END ? lovers_end[1] : WW_NONE;
+    d[40] = g.captain;
+    net_put_u32(d + 41, candidates);
+    d[45] = debate;
     party_send(K_STATE, 0, d, sizeof(d));
 }
 
@@ -601,7 +768,7 @@ static void narrator_handle(uint8_t kind, uint32_t from, const uint8_t *data, ui
     int i = party_index(from);
     if (i < 0 || i >= n_real)
         return;
-    if (kind == K_PARTY_LEAVE) {
+    if (kind == PARTY_KIND_LEAVE) {
         if (ww_alive(&g, i) && phase != P_END && phase != P_NONE) {
             g.alive &= ~(1u << i);  /* No lover dies of grief, the hunter does not shoot: he left */
             sync_view();
@@ -629,25 +796,27 @@ static void narrator_handle(uint8_t kind, uint32_t from, const uint8_t *data, ui
     if (! (acted >> i & 1))
         changed = true;
     acted |= 1u << i;
-    if (phase == P_ROLES)
+    if (phase == P_ROLES || phase == P_LOVERS)
         printf("werewolf: %s (%s) is ready\n", pname(i), ww_role_name(g.role[i]));
     else
-        printf("werewolf: %s (%s) chose %s%s%s\n", pname(i), ww_role_name(g.role[i]), a < WW_MAX ? pname(a) : "-",
-               b < WW_MAX ? " and " : "", b < WW_MAX ? pname(b) : "");
+        printf("werewolf: %s (%s) chose %s%s%s\n", pname(i), ww_role_name(g.role[i]),
+               a < WW_MAX ? pname(a) : "-", b < WW_MAX ? " and " : "", b < WW_MAX ? pname(b) : "");
     if (phase == P_SEER && g.role[i] == WW_SEER && seer_target == WW_NONE && ww_alive(&g, a) && a != i) {
-        seer_target = a;  /* The first choice only: the seer sees one role per night */
+        seer_target = a;  /* The first choice only: the seer sees one card per night */
         printf("werewolf: the seer sees %s (%s)\n", pname(a), ww_role_name(g.role[a]));
     }
+    if (phase == P_WOLVES && g.role[i] == WW_GIRL && a == 1)
+        girl_spies(i);
     if (phase == P_WOLVES && g.role[i] == WW_WOLF)
         pending |= g.alive & real_mask();  /* The wolves see the votes of the others; everybody gets a packet alike */
 }
 
 static void narrator_launch(absolute_time_t now) {
     n_lobby = party_players(lobby, PARTY_MAX);
-    n_real = n_lobby > WW_MAX ? WW_MAX : n_lobby;
+    n_real = n_lobby > WW_MAX_PLAYERS ? WW_MAX_PLAYERS : n_lobby;
     int n = n_real;
-    if (debug_mode() && n < ww_min_players(advanced()))
-        n = ww_min_players(advanced());
+    if (debug_mode() && n < WW_MIN_PLAYERS)
+        n = WW_MIN_PLAYERS;
     default_names();
     for (int i = 0; i < n; ++i) {
         if (i < n_real) {
@@ -660,7 +829,7 @@ static void narrator_launch(absolute_time_t now) {
             keys[i] = 0;
         }
     }
-    ww_deal(&g, n, advanced(), get_rand_32);  /* Not party_seed(): it is sent in clear */
+    ww_deal(&g, n, options & WW_OPT_ALL, get_rand_32);  /* Not party_seed(): it is sent in clear */
     party_start(START_DELAY_MS);
     game_ts = party_start_time();
     if (! game_ts)
@@ -670,18 +839,23 @@ static void narrator_launch(absolute_time_t now) {
     day = 0;
     have_state = true;
     winner = WW_WIN_NONE;
-    winners = 0;
-    hunter = WW_NONE;
+    winners = candidates = 0;
+    actor = WW_NONE;
     n_deaths = 0;
     pending = 0;
+    hunter_pending = false;
     names_next = 0;
     names_ts = now;
     timed = false;
     lovers_end[0] = lovers_end[1] = WW_NONE;
     sync_view();
-    printf("werewolf: launch, %d players (%d robots), %s mode\n", n, n - n_real, advanced() ? "advanced" : "simple");
+    char text[96];
+    options_text(text, sizeof(text), options & WW_OPT_ALL);
+    printf("werewolf: launch, %d players (%d robots), %d wolves, %s\n", n, n - n_real, ww_wolves_for(n), text);
     for (int i = 0; i < n; ++i)
         printf("werewolf: %s is %s\n", names[i], ww_role_name(g.role[i]));
+    if (g.options & WW_OPT_THIEF)
+        printf("werewolf: the cards left are %s and %s\n", ww_role_name(g.center[0]), ww_role_name(g.center[1]));
     page = PG_GAME;
     list_sel = 0;
 }
@@ -748,11 +922,10 @@ static uint8_t my_idx = WW_NONE, my_role = WW_NONE, my_lover = WW_NONE;
 static uint32_t my_wolves = 0;
 static uint8_t priv_step = 0, ack_seq = 0, info1 = WW_NONE, info2 = WW_NONE, potions = 0;
 static uint8_t wolf_votes[4];
-static bool have_priv = false;
 static uint8_t my_seq = 0, my_a = WW_NONE, my_b = WW_NONE, pick1 = WW_NONE;
-static uint8_t seen[WW_MAX];  /* The roles seen by the seer */
-static absolute_time_t act_ts = 0, last_state = 0, peek_until = 0;
-static bool peeking = false, lover_news = false, cancelled = false, end_done = false, i_was_alive = true;
+static uint8_t seen[WW_MAX];  /* The cards seen by the seer, the wolves seen by the little girl */
+static absolute_time_t act_ts = 0, last_state = 0;
+static bool cancelled = false, end_done = false, i_was_alive = true;
 /* Parties found */
 static party_open_t found[PARTY_MAX_OPEN];
 static int n_found = 0;
@@ -766,19 +939,23 @@ static bool must_act(void) {
     if (! have_state || my_idx >= WW_MAX)
         return false;
     switch (phase) {
-    case P_ROLES: case P_CUPID: case P_WOLVES: case P_SEER: case P_WITCH: case P_VOTE:
+    case P_ROLES: case P_THIEF: case P_CUPID: case P_LOVERS: case P_SEER: case P_WOLVES: case P_WITCH:
+    case P_ELECTION: case P_VOTE: case P_VOTE2:
         return me_alive();
-    case P_HUNTER:
-        return hunter == my_idx;
+    case P_HUNTER: case P_SUCCESSOR: case P_TIEBREAK:
+        return actor == my_idx;
     default:
         return false;
     }
 }
 
+static bool priv_fresh(void) {
+    return priv_step == step;
+}
+
 static void reset_player(void) {
     my_idx = my_role = my_lover = WW_NONE;
     my_wolves = 0;
-    have_priv = false;
     priv_step = ack_seq = 0;
     my_seq = 0;
     my_a = my_b = pick1 = WW_NONE;
@@ -787,18 +964,18 @@ static void reset_player(void) {
     have_state = false;
     phase = P_NONE;
     step = day = n_players = 0;
-    alive = acted = winners = 0;
+    alive = acted = winners = candidates = 0;
     winner = WW_WIN_NONE;
-    hunter = WW_NONE;
+    actor = captain = WW_NONE;
     n_deaths = 0;
-    cancelled = end_done = lover_news = peeking = false;
+    cancelled = end_done = false;
     i_was_alive = true;
     timed = false;
     default_names();
 }
 
 static void player_state(const uint8_t *d, uint8_t len, absolute_time_t at) {
-    if (len < 40 || d[0] >= P_COUNT || d[3] > WW_MAX)
+    if (len < STATE_LEN || d[0] >= P_COUNT || d[3] > WW_MAX)
         return;
     last_state = at;
     bool fresh = ! have_state || d[1] != step;
@@ -807,7 +984,7 @@ static void player_state(const uint8_t *d, uint8_t len, absolute_time_t at) {
     step = d[1];
     day = d[2];
     n_players = d[3];
-    flags = d[4];
+    options = d[4];
     uint16_t secs = d[5] | d[6] << 8;
     timed = secs != NO_TIMER;
     if (timed)
@@ -819,12 +996,17 @@ static void player_state(const uint8_t *d, uint8_t len, absolute_time_t at) {
         revealed[i] = r < WW_ROLES ? r : WW_NONE;
     }
     winner = d[25];
-    hunter = d[26];
+    actor = d[26];
     n_deaths = d[27] > MAX_DEATHS ? MAX_DEATHS : d[27];
     memcpy(deaths, d + 28, MAX_DEATHS);
     winners = net_u32(d + 34);
     lovers_end[0] = d[38];
     lovers_end[1] = d[39];
+    if (d[40] != captain && d[40] < WW_MAX)
+        printf("werewolf: captain %s\n", pname(d[40]));
+    captain = d[40];
+    candidates = net_u32(d + 41);
+    debate = d[45];
     have_state = true;
     if (my_idx >= WW_MAX) {
         int i = party_index(net_id());
@@ -838,6 +1020,8 @@ static void player_state(const uint8_t *d, uint8_t len, absolute_time_t at) {
         if (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT)
             log_deaths();
         new_phase(prev);
+        if (page == PG_HELP && help_back == PG_GAME)
+            page = PG_GAME;  /* The card shown: the new phase first */
         if (must_act())
             act_ts = delayed_by_ms(at, 1500 + get_rand_32() % 2000);  /* If the PRIV of the phase got lost */
     }
@@ -873,10 +1057,8 @@ static void player_priv(const uint8_t *data, uint8_t len) {
         printf("werewolf: role %s\n", ww_role_name(x[1]));
     my_role = x[1];
     my_idx = x[8];
-    if (x[2] != my_lover && x[2] < WW_MAX) {
-        lover_news = true;
+    if (x[2] != my_lover && x[2] < WW_MAX)
         printf("werewolf: in love with %s\n", pname(x[2]));
-    }
     my_lover = x[2];
     my_wolves = net_u32(x + 3);
     priv_step = x[0];
@@ -885,11 +1067,14 @@ static void player_priv(const uint8_t *data, uint8_t len) {
     info2 = x[10];
     memcpy(wolf_votes, x + 11, 4);
     potions = x[15];
-    have_priv = true;
-    if (priv_step == step && phase == P_SEER && my_role == WW_SEER && info1 < WW_MAX && info2 < WW_ROLES
+    if (priv_fresh() && phase == P_SEER && my_role == WW_SEER && info1 < WW_MAX && info2 < WW_ROLES
             && seen[info1] != info2) {
         seen[info1] = info2;
         printf("werewolf: seen %s is %s\n", pname(info1), ww_role_name(info2));
+    }
+    if (priv_fresh() && phase == P_WOLVES && my_role == WW_GIRL && info1 < WW_MAX && seen[info1] != WW_WOLF) {
+        seen[info1] = WW_WOLF;
+        printf("werewolf: spied %s, a wolf\n", pname(info1));
     }
     changed = true;
 }
@@ -954,15 +1139,11 @@ static void player_task(absolute_time_t now) {
     if (s != PARTY_STARTED || page == PG_WAIT || cancelled || phase == P_END)
         return;
     /* The choice again until the narrator acknowledges it, or a request for the information of the phase */
-    bool unacked = my_seq && (priv_step != step || ack_seq < my_seq);
-    bool missing = my_role == WW_NONE || (must_act() && priv_step != step);
+    bool unacked = my_seq && (! priv_fresh() || ack_seq < my_seq);
+    bool missing = my_role == WW_NONE || (must_act() && ! priv_fresh());
     if ((unacked || missing) && absolute_time_diff_us(act_ts, now) >= 0) {
         send_act();
         act_ts = delayed_by_ms(now, ACT_RESEND_MS + get_rand_32() % ACT_JITTER_MS);
-    }
-    if (peeking && absolute_time_diff_us(peek_until, now) >= 0) {
-        peeking = false;
-        changed = true;
     }
 }
 
@@ -979,7 +1160,7 @@ static void handle(uint8_t kind, uint32_t from, uint32_t to, const uint8_t *data
     if (mode != M_PLAYER || from != party_host_id())
         return;
     absolute_time_t now = get_absolute_time();
-    if ((kind == K_ABORT || kind == K_PARTY_LEAVE) && ! cancelled && phase != P_END) {
+    if ((kind == K_ABORT || kind == PARTY_KIND_LEAVE) && ! cancelled && phase != P_END) {
         cancelled = true;  /* The narrator stopped the game */
         printf("werewolf: the narrator stopped the game\n");
         changed = true;
@@ -1051,27 +1232,86 @@ static void leave_game(void) {
 
 /* ------ The page ------ */
 
-static uint8_t rows[WW_MAX + 2];
+static uint8_t rows[WW_MAX + 3];
 static int n_rows = 0;
+
+static void add_players(uint32_t m) {
+    for (int i = 0; i < n_players; ++i)
+        if (m >> i & 1)
+            rows[n_rows++] = i;
+}
+
+/* The witch chooses in two steps (the potion of life, then the poison); the others pretend the same way */
+static bool second_step(void) {
+    return (phase == P_CUPID || phase == P_WITCH) && pick1 != WW_NONE;
+}
 
 /* The rows of the list of choices of this phase (the same for the role and for those who pretend, if possible) */
 static void build_rows(void) {
     n_rows = 0;
-    if (phase == P_WITCH || phase == P_VOTE)
-        rows[n_rows++] = ROW_NOTHING;
-    if (phase == P_WITCH && my_role == WW_WITCH) {
-        if ((potions & 1) && info1 < WW_MAX)
-            rows[n_rows++] = ROW_HEAL;
-        if (potions & 2)
-            for (int i = 0; i < n_players; ++i)
-                if (is_alive(i))
+    uint32_t living = alive & ((1u << n_players) - 1);
+    uint32_t others = living & ~(my_idx < WW_MAX ? 1u << my_idx : 0);
+    uint32_t harm = others & ~(my_lover < WW_MAX ? 1u << my_lover : 0);  /* Never against the lover */
+    switch (phase) {
+    case P_THIEF:
+        if (my_role == WW_THIEF && priv_fresh() && info1 < WW_ROLES) {
+            if (! (info1 == WW_WOLF && info2 == WW_WOLF))
+                rows[n_rows++] = ROW_KEEP;
+            rows[n_rows++] = ROW_CARD1;
+            rows[n_rows++] = ROW_CARD2;
+        } else {
+            add_players(others);
+        }
+        break;
+    case P_CUPID: case P_ELECTION:
+        add_players(living);
+        break;
+    case P_WOLVES:
+        if (my_role == WW_GIRL) {
+            rows[n_rows++] = ROW_SLEEP;
+            rows[n_rows++] = ROW_SPY;
+        } else {
+            add_players(my_role == WW_WOLF ? harm : others);
+        }
+        break;
+    case P_WITCH:
+        if (my_role != WW_WITCH) {
+            add_players(others);
+        } else if (! second_step()) {
+            if ((potions & 1) && info1 < WW_MAX) {
+                rows[n_rows++] = ROW_HEAL;
+                rows[n_rows++] = ROW_NOHEAL;
+            } else {
+                rows[n_rows++] = ROW_CONTINUE;
+            }
+        } else {
+            rows[n_rows++] = ROW_NOTHING;
+            for (int i = 0; i < n_players && (potions & 2); ++i)
+                if (harm >> i & 1)
                     rows[n_rows++] = ROW_POISON | i;
-        return;
+        }
+        break;
+    case P_VOTE:
+        rows[n_rows++] = ROW_NOTHING;
+        add_players(harm);
+        break;
+    case P_VOTE2:
+        rows[n_rows++] = ROW_NOTHING;
+        add_players(harm & candidates);
+        break;
+    case P_TIEBREAK:
+        add_players(harm & candidates);
+        break;
+    case P_HUNTER:
+        add_players(harm);
+        break;
+    case P_SUCCESSOR:
+        add_players(living);
+        break;
+    default:
+        add_players(others);
+        break;
     }
-    bool with_me = phase == P_CUPID || phase == P_HUNTER;
-    for (int i = 0; i < n_players; ++i)
-        if (is_alive(i) && (with_me || i != my_idx))
-            rows[n_rows++] = i;
 }
 
 static int wolf_votes_for(int t) {
@@ -1082,60 +1322,84 @@ static int wolf_votes_for(int t) {
     return c;
 }
 
+/* My choice of this phase, as a row value (to mark it in the list) */
+static bool chosen_row(uint8_t v) {
+    if (! my_seq)
+        return false;
+    if (phase == P_CUPID)
+        return v == my_a || v == my_b;
+    if (phase == P_THIEF && my_role == WW_THIEF && priv_fresh())
+        return v == (my_a == 1 ? ROW_CARD1 : my_a == 2 ? ROW_CARD2 : ROW_KEEP);
+    if (phase == P_WOLVES && my_role == WW_GIRL)
+        return v == (my_a == 1 ? ROW_SPY : ROW_SLEEP);
+    if (phase == P_WITCH && my_role == WW_WITCH)
+        return v == ((my_a & 2) ? (ROW_POISON | my_b) : ROW_NOTHING);
+    if (v == ROW_NOTHING)
+        return my_a == WW_NONE;
+    return v == my_a;
+}
+
 static void choice_label(int r, char *buf, size_t len) {
     uint8_t v = rows[r];
-    bool chosen = my_seq && (v == my_a || (phase == P_CUPID && v == my_b) || (phase == P_WITCH && my_role == WW_WITCH
-                  && ((v == ROW_HEAL && my_a == 1) || (v == (ROW_POISON | my_b) && my_a == 2))));
-    if (phase == P_WITCH && my_role != WW_WITCH)
-        chosen = my_seq && (v == my_a || (v == ROW_NOTHING && my_a == WW_NONE));
-    if (phase == P_VOTE && v == ROW_NOTHING)
-        chosen = my_seq && my_a == WW_NONE;
-    const char *mark = chosen ? "> " : (phase == P_CUPID && v == pick1) ? "1 " : "";
-    if (v == ROW_NOTHING) {
-        snprintf(buf, len, "%s%s", mark, phase == P_VOTE ? "Vote blanc" : "Ne rien faire");
-    } else if (v == ROW_HEAL) {
-        snprintf(buf, len, "%sSauver %s", mark, pname(info1));
-    } else if (v & ROW_POISON) {
-        snprintf(buf, len, "%sEmpoisonner %s", mark, pname(v & ~ROW_POISON));
-    } else {
-        char tag[24] = "";
-        if (my_role == WW_WOLF && (my_wolves >> v & 1))
-            snprintf(tag, sizeof(tag), " (loup)");
-        else if (seen[v] < WW_ROLES)
-            snprintf(tag, sizeof(tag), " (%s)", ww_role_name(seen[v]));
-        int votes = phase == P_WOLVES && my_role == WW_WOLF && priv_step == step ? wolf_votes_for(v) : 0;
-        if (votes)
-            snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " [%d]", votes);
-        snprintf(buf, len, "%s%s%s", mark, pname(v), tag);
+    const char *mark = chosen_row(v) ? "> " : (phase == P_CUPID && v == pick1) ? "1 " : "";
+    switch (v) {
+    case ROW_NOTHING: snprintf(buf, len, "%s%s", mark, phase == P_WITCH ? "Personne" : "Vote blanc"); return;
+    case ROW_HEAL: snprintf(buf, len, "%sSauver %s", mark, pname(info1)); return;
+    case ROW_NOHEAL: snprintf(buf, len, "%sNe pas sauver", mark); return;
+    case ROW_CONTINUE: snprintf(buf, len, "%sContinuer", mark); return;
+    case ROW_KEEP: snprintf(buf, len, "%sGarder ma carte", mark); return;
+    case ROW_CARD1: case ROW_CARD2:
+        snprintf(buf, len, "%sPrendre : %s", mark, ww_role_name(v == ROW_CARD1 ? info1 : info2));
+        return;
+    case ROW_SLEEP: snprintf(buf, len, "%sDormir", mark); return;
+    case ROW_SPY: snprintf(buf, len, "%sEspionner les loups", mark); return;
+    default: break;
     }
+    if (v & ROW_POISON) {
+        snprintf(buf, len, "%sEmpoisonner %s", mark, pname(v & ~ROW_POISON));
+        return;
+    }
+    char tag[32] = "";
+    if (my_role == WW_WOLF && (my_wolves >> v & 1))
+        snprintf(tag, sizeof(tag), " (loup)");
+    else if (seen[v] < WW_ROLES)
+        snprintf(tag, sizeof(tag), " (%s)", ww_role_name(seen[v]));
+    if (v == my_lover)
+        snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " <3");
+    if (v == captain)
+        snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " (cap.)");
+    int votes = phase == P_WOLVES && my_role == WW_WOLF && priv_fresh() ? wolf_votes_for(v) : 0;
+    if (votes)
+        snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " [%d]", votes);
+    snprintf(buf, len, "%s%s%s", mark, pname(v), tag);
 }
 
-/* The roles (narrator; everybody at the end): "x " dead, "<3" lover */
+/* The cards (narrator; everybody at the end): "x " dead, "<3" lover, "(cap.)" captain */
 static void role_label(int i, char *buf, size_t len) {
     int role = mode == M_NARRATOR ? g.role[i] : revealed[i];
-    bool lover = mode == M_NARRATOR ? (g.lovers[0] == i || g.lovers[1] == i) : (lovers_end[0] == i || lovers_end[1] == i);
-    snprintf(buf, len, "%s%s : %s%s", is_alive(i) ? "" : "x ", pname(i), ww_role_name(role), lover ? " <3" : "");
-}
-
-/* Another group game is in progress (party.c runs one at a time): its name, NULL when none */
-static const char *other_game(void) {
-    party_state_t s = party_state();
-    if (party_game() == PARTY_GAME_WEREWOLF || (s != PARTY_HOSTING && s != PARTY_JOINING && s != PARTY_JOINED
-                                               && s != PARTY_STARTED))
-        return NULL;
-    return party_game() == PARTY_GAME_TUG ? "tir à la corde" : party_game() == PARTY_GAME_ASSASSIN ? "Assassin"
-           : "un autre jeu";
+    bool lover = mode == M_NARRATOR ? ww_partner(&g, i) != WW_NONE : (lovers_end[0] == i || lovers_end[1] == i);
+    snprintf(buf, len, "%s%s : %s%s%s", is_alive(i) ? "" : "x ", pname(i), ww_role_name(role), lover ? " <3" : "",
+             i == captain ? " (cap.)" : "");
 }
 
 static void menu_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, i ? "Rejoindre une partie" : "Mener une partie");
+    snprintf(buf, len, "%s", i == MENU_NARRATE ? "Mener une partie" : i == MENU_JOIN ? "Rejoindre une partie"
+             : "Aide : les rôles");
 }
 
 static void setup_label(int i, char *buf, size_t len) {
-    switch (i) {
-    case 0: snprintf(buf, len, "Mode : %s", set_advanced ? "avancé" : "simple"); break;
-    case 1: snprintf(buf, len, "Débat : %u min", DEBATE_S[set_debate] / 60); break;
-    default: snprintf(buf, len, "> Ouvrir la partie"); break;
+    if (i == SETUP_PRESET) {
+        snprintf(buf, len, "Préréglage : %s", set_options == WW_OPT_ALL ? "classique"
+                 : set_options == WW_OPT_BEGINNER ? "débutant" : "à la carte");
+    } else if (i < SETUP_DEBATE) {
+        const int k = i - SETUP_OPTIONS;
+        snprintf(buf, len, "[%c] %s", set_options & OPTIONS[k].opt ? 'x' : ' ', OPTIONS[k].name);
+    } else if (i == SETUP_DEBATE) {
+        snprintf(buf, len, "Débat : %u min", DEBATE_S[set_debate] / 60);
+    } else if (i == SETUP_WOLVES) {
+        snprintf(buf, len, "Loups : 2, ou 3 dès 12 j.");
+    } else {
+        snprintf(buf, len, "> Ouvrir la partie");
     }
 }
 
@@ -1144,8 +1408,7 @@ static void lobby_label(int i, char *buf, size_t len) {
 }
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s  %u j.  %s", found[i].name, found[i].players,
-             found[i].flags & FLAG_ADVANCED ? "avancé" : "simple");
+    snprintf(buf, len, "%s  %u joueur%s", found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
 }
 
 /* A list from \p y (ui_list() starts below the title) */
@@ -1171,6 +1434,75 @@ static void list_at(uint8_t *fb, int y0, int visible, int count, int sel, void (
     }
 }
 
+/* Left aligned text cut in lines at the spaces to fit \p w pixels (at most \p max_lines), from \p y.
+ * \return the y after the last line */
+static int text_box(uint8_t *fb, int x, int y, int w, const gfx_font_t *font, const char *text, int max_lines) {
+    char line[96];
+    int lines = 0;
+    while (*text && lines < max_lines) {
+        while (*text == ' ')
+            ++text;
+        size_t n = 0, fit = 0;
+        while (text[n] && n < sizeof(line) - 1) {
+            size_t end = n;
+            while (text[end] == ' ')
+                ++end;
+            while (text[end] && text[end] != ' ' && end < sizeof(line) - 1)
+                ++end;
+            memcpy(line, text, end);
+            line[end] = 0;
+            if (gfx_text_width(font, line) > w && fit)
+                break;
+            fit = n = end;
+            if (gfx_text_width(font, line) > w)
+                break;
+        }
+        line[fit] = 0;
+        if (lines == max_lines - 1 && text[fit])
+            ui_check_width(font, text, w, "text cut");  /* The text does not fit: traced */
+        gfx_text(fb, x, y, font, line, GFX_BLACK, GFX_ALIGN_LEFT);
+        ui_check_bottom(y + font->height, line);
+        y += font->height + 3;
+        text += fit;
+        ++lines;
+    }
+    return y;
+}
+
+/* An illustration of a card, twice as big, in a frame */
+static void draw_icon(uint8_t *fb, int x, int y, const uint8_t *icon) {
+    gfx_rect(fb, x - 3, y - 3, 2 * WW_ICON_SIZE + 6, 2 * WW_ICON_SIZE + 6, GFX_BLACK);
+    for (int r = 0; r < WW_ICON_SIZE; ++r)
+        for (int c = 0; c < WW_ICON_SIZE; ++c)
+            if (icon[r * (WW_ICON_SIZE / 8) + c / 8] & (0x80 >> (c % 8)))
+                gfx_fill_rect(fb, x + 2 * c, y + 2 * r, 2, 2, GFX_BLACK);
+}
+
+/* A card: the illustration, the name and the camp beside it, its power below (or \p extra: the other wolves) */
+static void render_card(uint8_t *fb, const char *title, int card, const char *extra) {
+    const ww_card_t *c = &WW_CARD[card];
+    ui_title(fb, title);
+    draw_icon(fb, 7, UI_TITLE_H + 7, c->icon);
+    int y = text_box(fb, 82, UI_TITLE_H + 10, GFX_WIDTH - 86, &gfx_font_medium, c->name, 2);
+    text_box(fb, 82, y + 4, GFX_WIDTH - 86, &gfx_font_small, c->camp, 2);
+    y = UI_TITLE_H + 2 * WW_ICON_SIZE + 12;
+    text_box(fb, 4, y, GFX_WIDTH - 8, &gfx_font_small, extra ? extra : c->power, 3);
+}
+
+static void render_help(uint8_t *fb) {
+    const ww_card_t *c = &WW_CARD[help_card];
+    if (help_details) {
+        ui_title(fb, c->name);
+        text_box(fb, 4, UI_TITLE_H + 2, GFX_WIDTH - 8, &gfx_font_small, c->details, 7);
+        ui_footer(fb, "D : la carte  G : retour");
+        return;
+    }
+    render_card(fb, help_back == PG_GAME && help_card == my_role ? "Ta carte" : "Les rôles", help_card, NULL);
+    char text[40];
+    snprintf(text, sizeof(text), "%d/%d  Flancs, D : détails", help_card + 1, WW_CARDS);
+    ui_footer(fb, help_back == PG_GAME ? "D : détails  G : la partie" : text);
+}
+
 static void timer_text(char *buf, size_t len, absolute_time_t now) {
     int s = secs_left(now);
     if (s < 0)
@@ -1184,7 +1516,7 @@ static int render_deaths(uint8_t *fb, int y) {
     const char *head = phase == P_DAWN ? "Cette nuit :" : phase == P_VERDICT ? "Le village a éliminé :"
                        : "Le chasseur a emporté :";
     if (! n_deaths) {
-        const char *none = phase == P_DAWN ? "Personne n'est mort." : phase == P_VERDICT ? "Égalité : personne."
+        const char *none = phase == P_DAWN ? "Personne n'est mort." : phase == P_VERDICT ? "Personne."
                            : "Personne.";
         y = ui_lines(fb, y, &gfx_font_small, head);
         return ui_lines(fb, y + 2, &gfx_font_medium, none);
@@ -1209,14 +1541,14 @@ static void render_end(uint8_t *fb) {
         snprintf(text, sizeof(text), "Tu étais : %s", ww_role_name(my_role));
         ui_lines(fb, y + 8, &gfx_font_small, text);
     }
-    ui_footer(fb, "D : les rôles  G long : fin");
+    ui_footer(fb, "D : les cartes  G long : fin");
 }
 
 static void render_narrator(uint8_t *fb, absolute_time_t now) {
     char text[64];
     if (phase == P_NONE) {
         ui_title(fb, "Loup-garou");
-        ui_lines(fb, 70, &gfx_font_medium, "Distribution\ndes rôles...");
+        ui_lines(fb, 70, &gfx_font_medium, "Distribution\ndes cartes...");
         return;
     }
     phase_title(text, sizeof(text));
@@ -1246,32 +1578,65 @@ static void render_narrator(uint8_t *fb, absolute_time_t now) {
     ui_footer(fb, "D : suite  X : +30 s");
 }
 
+/* The prompt of a list of choices */
+static const char *prompt_text(char *text, size_t len) {
+    bool real = false;  /* The role of this badge acts (the others pretend) */
+    const char *p = "Fais semblant de choisir";
+    switch (phase) {
+    case P_THIEF:
+        if (my_role == WW_THIEF && priv_fresh() && info1 < WW_ROLES)
+            p = info1 == WW_WOLF && info2 == WW_WOLF ? "Deux loups : prends-en un !" : "Ta carte ou une autre ?";
+        break;
+    case P_CUPID:
+        real = my_role == WW_CUPID;
+        p = real ? (pick1 == WW_NONE ? "1er amoureux ?" : "2e amoureux ?")
+            : pick1 == WW_NONE ? "Fais semblant : 1er nom" : "Fais semblant : 2e nom";
+        break;
+    case P_SEER:
+        if (my_role == WW_SEER && priv_fresh() && info1 < WW_MAX && info2 < WW_ROLES) {
+            snprintf(text, len, "%s : %s", pname(info1), ww_role_name(info2));
+            return text;
+        }
+        if (my_role == WW_SEER)
+            p = "Qui sonder ?";
+        break;
+    case P_WOLVES:
+        if (my_role == WW_WOLF)
+            p = "Votre victime ?";
+        if (my_role == WW_GIRL) {
+            if (priv_fresh() && info1 < WW_MAX) {
+                snprintf(text, len, "Tu as vu %s (loup)", pname(info1));
+                return text;
+            }
+            p = "Espionner ? (risqué)";
+        }
+        break;
+    case P_WITCH:
+        if (my_role != WW_WITCH)
+            p = second_step() ? "Fais semblant (2/2)" : "Fais semblant (1/2)";
+        else if (second_step())
+            p = (potions & 2) ? "Empoisonner ?" : "Plus de poison";
+        else if (info1 < WW_MAX) {
+            snprintf(text, len, "Victime : %s", pname(info1));
+            return text;
+        } else
+            p = "Pas de victime";
+        break;
+    case P_ELECTION: p = "Qui sera capitaine ?"; break;
+    case P_VOTE: p = "Qui éliminer ?"; break;
+    case P_VOTE2: p = "2e vote : qui éliminer ?"; break;
+    case P_TIEBREAK: p = "Égalité : qui éliminer ?"; break;
+    case P_HUNTER: p = "Qui emporter ?"; break;
+    case P_SUCCESSOR: p = "Ton successeur ?"; break;
+    default: break;
+    }
+    return p;
+}
+
 /* The list of choices of a phase: the prompt, the timer, the rows. \return the footer */
 static const char *render_choices(uint8_t *fb, int y, const char *timer, const char *lost_footer) {
     char text[48];
-    const char *prompt = "Fais semblant de choisir";
-    if (phase == P_VOTE)
-        prompt = "Qui éliminer ?";
-    else if (phase == P_HUNTER)
-        prompt = "Qui emporter ?";
-    else if (phase == P_CUPID && my_role == WW_CUPID)
-        prompt = pick1 == WW_NONE ? "1er amoureux ?" : "2e amoureux ?";
-    else if (phase == P_CUPID)
-        prompt = pick1 == WW_NONE ? "Fais semblant : 1er nom" : "Fais semblant : 2e nom";
-    else if (phase == P_WOLVES && my_role == WW_WOLF)
-        prompt = "Votre victime ?";
-    else if (phase == P_SEER && my_role == WW_SEER)
-        prompt = "Qui sonder ?";
-    else if (phase == P_WITCH && my_role == WW_WITCH)
-        prompt = info1 < WW_MAX ? "" : "Pas de victime";
-    if (phase == P_SEER && my_role == WW_SEER && priv_step == step && info1 < WW_MAX && info2 < WW_ROLES) {
-        snprintf(text, sizeof(text), "%s : %s", pname(info1), ww_role_name(info2));
-        prompt = text;
-    } else if (phase == P_WITCH && my_role == WW_WITCH && info1 < WW_MAX) {
-        snprintf(text, sizeof(text), "Victime : %s", pname(info1));
-        prompt = text;
-    }
-    gfx_text(fb, 4, y, &gfx_font_small, prompt, GFX_BLACK, GFX_ALIGN_LEFT);
+    gfx_text(fb, 4, y, &gfx_font_small, prompt_text(text, sizeof(text)), GFX_BLACK, GFX_ALIGN_LEFT);
     gfx_text(fb, GFX_WIDTH - 4, y, &gfx_font_small, timer, GFX_BLACK, GFX_ALIGN_RIGHT);
     build_rows();
     if (list_sel >= n_rows)
@@ -1281,13 +1646,25 @@ static const char *render_choices(uint8_t *fb, int y, const char *timer, const c
         return lost_footer;
     if (! my_seq)
         return "Flancs : choix  D : valider";
-    if (ack_seq < my_seq || priv_step != step)
+    if (ack_seq < my_seq || ! priv_fresh())
         return "Envoi...";
     return phase == P_SEER && my_role == WW_SEER ? "Choix reçu" : "Choix reçu  D : changer";
 }
 
+/* A phase where only one player acts (the hunter, the captain): what the others see */
+static void render_waiting(uint8_t *fb, int y) {
+    char text[64];
+    if (phase == P_HUNTER)
+        snprintf(text, sizeof(text), "Le chasseur %s\nchoisit sa cible...", pname(actor));
+    else if (phase == P_SUCCESSOR)
+        snprintf(text, sizeof(text), "Le capitaine %s\nchoisit son successeur...", pname(actor));
+    else
+        snprintf(text, sizeof(text), "Égalité : le capitaine\n%s tranche...", pname(actor));
+    ui_lines(fb, y + 40, &gfx_font_small, text);
+}
+
 static void render_player(uint8_t *fb, absolute_time_t now) {
-    char text[80];
+    char text[96];
     if (cancelled) {
         ui_title(fb, "Loup-garou");
         ui_box(fb, "Partie arrêtée\npar le meneur");
@@ -1300,6 +1677,25 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
         ui_footer(fb, "G : menu");
         return;
     }
+    if (phase == P_ROLES) {
+        if (my_role >= WW_ROLES) {
+            ui_title(fb, "Ta carte");
+            ui_lines(fb, 80, &gfx_font_medium, "Carte en attente...");
+            ui_footer(fb, "G : menu");
+            return;
+        }
+        text[0] = 0;
+        if (my_role == WW_WOLF && __builtin_popcount(my_wolves) > 1) {
+            snprintf(text, sizeof(text), "Avec toi :");
+            for (int i = 0; i < n_players; ++i)
+                if ((my_wolves >> i & 1) && i != my_idx)
+                    snprintf(text + strlen(text), sizeof(text) - strlen(text), " %s", pname(i));
+        }
+        render_card(fb, "Ta carte", my_role, text[0] ? text : NULL);
+        ui_footer(fb, my_seq ? (ack_seq >= my_seq && priv_fresh() ? "Compris, reçu" : "Envoi...")
+                  : "Cache l'écran !  D : compris");
+        return;
+    }
     phase_title(text, sizeof(text));
     ui_title(fb, text);
     if (phase == P_END) {
@@ -1309,42 +1705,9 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
     char timer[12];
     timer_text(timer, sizeof(timer), now);
     bool lost = absolute_time_diff_us(last_state, now) > LOST_MS * 1000ll;
-    const char *footer = lost ? "Meneur hors de portée !" : "G : menu  D long : rôle";
-
-    if (lover_news && my_lover < WW_MAX) {
-        snprintf(text, sizeof(text), "Cupidon t'a lié(e)\nà %s", pname(my_lover));
-        ui_box(fb, text);
-        ui_footer(fb, "D : compris");
-        return;
-    }
-    if (peeking || phase == P_ROLES) {
-        int y = UI_TITLE_H + 2;
-        if (my_role >= WW_ROLES) {
-            ui_lines(fb, y + 40, &gfx_font_medium, "Rôle en attente...");
-            ui_footer(fb, footer);
-            return;
-        }
-        y = ui_lines(fb, y, &gfx_font_large, ww_role_name(my_role));
-        y = ui_wrapped(fb, y, &gfx_font_small, ROLE_HELP[my_role], 3);
-        text[0] = 0;
-        if (my_role == WW_WOLF && __builtin_popcount(my_wolves) > 1) {
-            snprintf(text, sizeof(text), "Loups :");
-            for (int i = 0; i < n_players; ++i)
-                if ((my_wolves >> i & 1) && i != my_idx)
-                    snprintf(text + strlen(text), sizeof(text) - strlen(text), " %s", pname(i));
-        } else if (my_lover < WW_MAX) {
-            snprintf(text, sizeof(text), "Amoureux : %s", pname(my_lover));
-        }
-        if (text[0])
-            ui_wrapped(fb, y + 2, &gfx_font_small, text, 2);
-        if (phase == P_ROLES && ! peeking)
-            footer = my_seq ? (ack_seq >= my_seq && priv_step == step ? "Compris, reçu" : "Envoi...")
-                     : "Cache l'écran !  D : compris";
-        ui_footer(fb, footer);
-        return;
-    }
+    const char *footer = lost ? "Meneur hors de portée !" : "G : menu  D long : carte";
     int y = UI_TITLE_H + 2;
-    if (my_idx < WW_MAX && ! me_alive() && ! (phase == P_HUNTER && hunter == my_idx)) {
+    if (my_idx < WW_MAX && ! me_alive() && ! must_act()) {
         if (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT) {
             snprintf(text, sizeof(text), "Tu es mort(e)   %s", timer);
             y = ui_lines(fb, y, &gfx_font_small, text);
@@ -1364,58 +1727,78 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
         render_deaths(fb, y + 4);
         break;
     case P_DEBATE:
-        y = ui_lines(fb, y + 8, &gfx_font_medium, "Débattez !");
-        y = ui_lines(fb, y + 4, &gfx_font_large, timer);
+        y = ui_lines(fb, y + 4, &gfx_font_medium, "Débattez !");
+        y = ui_lines(fb, y + 2, &gfx_font_large, timer);
         snprintf(text, sizeof(text), "%d joueurs en vie", __builtin_popcount(alive));
-        y = ui_lines(fb, y + 6, &gfx_font_small, text);
-        ui_wrapped(fb, y + 4, &gfx_font_small, "Qui sont les loups ? Le vote suit.", 2);
+        y = ui_lines(fb, y + 4, &gfx_font_small, text);
+        if (captain < WW_MAX) {
+            snprintf(text, sizeof(text), "Capitaine : %s", pname(captain));
+            y = ui_lines(fb, y, &gfx_font_small, text);
+        }
+        ui_wrapped(fb, y + 2, &gfx_font_small, "Le vote suit.", 1);
+        break;
+    case P_LOVERS:
+        if (my_lover < WW_MAX)
+            snprintf(text, sizeof(text), "Ton amoureux(se) :\n%s", pname(my_lover));
+        else
+            snprintf(text, sizeof(text), "Les amoureux\nse reconnaissent...");
+        ui_lines(fb, y, &gfx_font_small, timer);
+        ui_box(fb, text);
+        if (! lost)
+            footer = my_seq ? (ack_seq >= my_seq && priv_fresh() ? "Vu, reçu" : "Envoi...") : "D : vu";
         break;
     default:
-        if (phase == P_HUNTER && hunter != my_idx) {
-            snprintf(text, sizeof(text), "Le chasseur %s\nchoisit sa cible...", pname(hunter));
-            ui_lines(fb, y + 40, &gfx_font_small, text);
+        if (! must_act()) {
+            if (phase == P_HUNTER || phase == P_SUCCESSOR || phase == P_TIEBREAK)
+                render_waiting(fb, y);
             break;
         }
-        if (must_act())
-            footer = render_choices(fb, y, timer, lost ? footer : NULL);
+        footer = render_choices(fb, y, timer, lost ? footer : NULL);
         break;
     }
     ui_footer(fb, footer);
 }
 
 static void render_roles(uint8_t *fb) {
-    ui_title(fb, "Les rôles");
+    ui_title(fb, "Les cartes");
     list_at(fb, UI_TITLE_H + 3, 7, n_players, list_sel, role_label);
     ui_footer(fb, "G : retour");
 }
 
+/* Another group game is in progress (party.c runs one at a time): its name, NULL when none */
+static const char *other_game(void) {
+    party_state_t s = party_state();
+    if (party_game() == PARTY_GAME_WEREWOLF || (s != PARTY_HOSTING && s != PARTY_JOINING && s != PARTY_JOINED
+                                               && s != PARTY_STARTED))
+        return NULL;
+    return party_game() == PARTY_GAME_TUG ? "tir à la corde" : party_game() == PARTY_GAME_ASSASSIN ? "Assassin"
+           : "un autre jeu";
+}
+
 static void ww_render(uint8_t *fb, absolute_time_t now) {
-    char text[96];
+    char text[128];
     switch (page) {
     case PG_MENU:
         ui_title(fb, "Loup-garou");
-        list_at(fb, UI_TITLE_H + 3, 2, 2, list_sel, menu_label);
-        if (other_game()) {
+        list_at(fb, UI_TITLE_H + 3, MENU_ROWS, MENU_ROWS, list_sel, menu_label);
+        if (other_game())
             snprintf(text, sizeof(text), "Une partie de %s est en cours : quitte-la d'abord.", other_game());
-            ui_wrapped(fb, UI_TITLE_H + 60, &gfx_font_small, text, 4);
-        } else {
-            ui_wrapped(fb, UI_TITLE_H + 60, &gfx_font_small,
-                       "Un meneur (qui ne joue pas) et 5 à 20 joueurs, chacun avec son badge.", 4);
-        }
+        else
+            snprintf(text, sizeof(text), "Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge.");
+        ui_wrapped(fb, UI_TITLE_H + 76, &gfx_font_small, text, 3);
         ui_footer(fb, "G : retour  D : choisir");
         break;
     case PG_SETUP:
         ui_title(fb, "Mener une partie");
-        list_at(fb, UI_TITLE_H + 3, 3, 3, setup_row, setup_label);
-        ui_wrapped(fb, UI_TITLE_H + 74, &gfx_font_small, set_advanced
-                   ? "Loups, voyante, sorcière, chasseur, Cupidon (9+), villageois. 7 à 20 joueurs."
-                   : "Loups, voyante, villageois. 5 à 20 joueurs.", 4);
-        ui_footer(fb, setup_row < 2 ? "Flancs : ligne  D : changer" : "G : retour  D : ouvrir");
+        list_at(fb, UI_TITLE_H + 3, 7, SETUP_ROWS, setup_row, setup_label);
+        ui_footer(fb, setup_row == SETUP_OPEN ? "G : retour  D : ouvrir"
+                  : setup_row == SETUP_WOLVES ? "Selon la règle du jeu" : "Flancs : ligne  D : changer");
         break;
     case PG_LOBBY: {
         ui_title(fb, "Partie ouverte");
         int min = min_players();
-        snprintf(text, sizeof(text), "%d joueur%s (min. %d)", n_lobby, n_lobby > 1 ? "s" : "", min);
+        snprintf(text, sizeof(text), "%d joueur%s (%d à %d), %d loups", n_lobby, n_lobby > 1 ? "s" : "", min,
+                 WW_MAX_PLAYERS, ww_wolves_for(n_lobby < WW_MIN_PLAYERS ? WW_MIN_PLAYERS : n_lobby));
         int y = ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
         if (debug_mode())
             y = ui_lines(fb, y, &gfx_font_small, "Test : des robots complètent");
@@ -1445,10 +1828,14 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
             break;
         }
         bool in = party_state() == PARTY_JOINED;
-        snprintf(text, sizeof(text), "%s\n%d joueurs\nMode %s, débat %u min", in ? "Inscrit(e) !" : "Inscription...",
-                 party_count(), flags & FLAG_ADVANCED ? "avancé" : "simple", debate_secs() / 60);
-        int y = ui_lines(fb, UI_TITLE_H + 14, &gfx_font_small, text);
-        ui_wrapped(fb, y + 12, &gfx_font_small, "En attente du lancement par le meneur...", 2);
+        snprintf(text, sizeof(text), "%s  %d joueur%s", in ? "Inscrit(e) !" : "Inscription...", party_count(),
+                 party_count() > 1 ? "s" : "");
+        int y = ui_lines(fb, UI_TITLE_H + 6, &gfx_font_small, text);
+        char roles[96];
+        options_text(roles, sizeof(roles), options & WW_OPT_ALL);
+        snprintf(text, sizeof(text), "Rôles : %s.", roles);
+        y = ui_wrapped(fb, y + 4, &gfx_font_small, text, 4);
+        ui_wrapped(fb, y + 6, &gfx_font_small, "En attente du meneur...", 1);
         ui_footer(fb, "G : menu  G long : quitter");
         break;
     }
@@ -1459,6 +1846,9 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, "Loup-garou");
         ui_box(fb, mode == M_NARRATOR ? "Arrêter la partie\npour tous ?" : "Quitter\nla partie ?");
         ui_footer(fb, "G : non  D : oui");
+        break;
+    case PG_HELP:
+        render_help(fb);
         break;
     default:
         if (mode == M_NARRATOR)
@@ -1474,28 +1864,58 @@ static void player_choose(absolute_time_t now) {
     if (! n_rows || list_sel >= n_rows)
         return;
     uint8_t v = rows[list_sel];
-    if (phase == P_WOLVES && my_role == WW_WOLF && v < WW_MAX && (my_wolves >> v & 1))
-        return;  /* Not a wolf */
-    if (phase == P_CUPID) {
+    switch (phase) {
+    case P_CUPID:
         if (pick1 == WW_NONE || pick1 == v) {
             pick1 = v;
+            list_sel = 0;
             return;
         }
         my_a = pick1;
         my_b = v;
         pick1 = WW_NONE;
-    } else if (phase == P_WITCH && my_role == WW_WITCH) {
-        my_a = v == ROW_HEAL ? 1 : (v & ROW_POISON) && v != ROW_NOTHING ? 2 : 0;
-        my_b = my_a == 2 ? v & ~ROW_POISON : WW_NONE;
-    } else {
+        break;
+    case P_WITCH:
+        if (pick1 == WW_NONE) {
+            pick1 = v == ROW_HEAL ? 1 : 0;  /* The potion of life; then the poison */
+            list_sel = 0;
+            return;
+        }
+        if (my_role == WW_WITCH) {
+            my_a = (pick1 ? 1 : 0) | ((v & ROW_POISON) && v != ROW_NOTHING ? 2 : 0);
+            my_b = my_a & 2 ? v & ~ROW_POISON : WW_NONE;
+        } else {
+            my_a = v;  /* Pretending: any name */
+            my_b = WW_NONE;
+        }
+        pick1 = WW_NONE;
+        break;
+    case P_THIEF:
+        my_a = my_role != WW_THIEF ? v : v == ROW_CARD1 ? 1 : v == ROW_CARD2 ? 2 : 0;  /* The others pretend */
+        my_b = WW_NONE;
+        break;
+    case P_WOLVES:
+        if (my_role == WW_WOLF && v < WW_MAX && (my_wolves >> v & 1))
+            return;  /* Not a wolf */
+        my_a = my_role == WW_GIRL ? v == ROW_SPY : v;
+        my_b = WW_NONE;
+        break;
+    default:
         my_a = v < WW_MAX ? v : WW_NONE;
         my_b = WW_NONE;
+        break;
     }
     ++my_seq;
     act_ts = now;
-    bool witch = phase == P_WITCH && my_role == WW_WITCH;
-    printf("werewolf: my choice %s%s%s\n", witch ? (my_a == 1 ? "heal" : my_a == 2 ? "poison" : "nothing")
-           : my_a < WW_MAX ? pname(my_a) : "-", my_b < WW_MAX ? " " : "", my_b < WW_MAX ? pname(my_b) : "");
+    printf("werewolf: my choice %u %u\n", my_a, my_b);
+}
+
+static void open_card(int card, int back, absolute_time_t now) {
+    help_card = card;
+    help_details = false;
+    help_back = back;
+    help_until = delayed_by_ms(now, CARD_SHOWN_MS);
+    page = PG_HELP;
 }
 
 static bool game_buttons(const app_buttons_t *b, absolute_time_t now) {
@@ -1529,17 +1949,11 @@ static bool game_buttons(const app_buttons_t *b, absolute_time_t now) {
     }
     if (cancelled)
         return true;
-    if (lover_news) {
-        if (b->released_short & UI_BTN_B)
-            lover_news = false;
+    if ((b->long_pressed & UI_BTN_B) && my_role < WW_ROLES) {
+        open_card(my_role, PG_GAME, now);  /* My card, for a while */
         return true;
     }
-    if (b->long_pressed & UI_BTN_B) {
-        peeking = true;
-        peek_until = delayed_by_ms(now, PEEK_MS);
-        return true;
-    }
-    if (phase == P_ROLES) {
+    if (phase == P_ROLES || phase == P_LOVERS) {
         if ((b->released_short & UI_BTN_B) && my_role < WW_ROLES && me_alive()) {
             my_a = 1;
             my_b = WW_NONE;
@@ -1560,17 +1974,38 @@ static bool game_buttons(const app_buttons_t *b, absolute_time_t now) {
     return true;
 }
 
+static void open_party(void) {
+    bool debug = store_get()->admin == STORE_ADMIN_ON;
+    options = set_options | (debug ? FLAG_DEBUG : 0);
+    debate = set_debate;
+    reset_player();
+    memset(&g, 0, sizeof(g));
+    n_lobby = 0;
+    party_set_handler(handle);
+    party_host(PARTY_GAME_WEREWOLF, false, WW_MAX_PLAYERS, options);
+    mode = M_NARRATOR;
+    page = PG_LOBBY;
+    list_sel = 0;
+    char text[96];
+    options_text(text, sizeof(text), set_options);
+    printf("werewolf: narrator, debate %u s%s, %s\n", debate_secs(), debug ? ", test mode" : "", text);
+}
+
 static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
     switch (page) {
     case PG_MENU:
-        if (b->pressed & (UI_BTN_X | UI_BTN_Y))
-            list_sel ^= 1;
+        if (b->pressed & UI_BTN_Y)
+            list_sel = (list_sel + MENU_ROWS - 1) % MENU_ROWS;
+        if (b->pressed & UI_BTN_X)
+            list_sel = (list_sel + 1) % MENU_ROWS;
         if (b->pressed & UI_BTN_A)
             return false;
-        if ((b->pressed & UI_BTN_B) && other_game()) {
+        if ((b->pressed & UI_BTN_B) && list_sel == MENU_HELP) {
+            open_card(0, PG_MENU, now);
+        } else if ((b->pressed & UI_BTN_B) && other_game()) {
             printf("werewolf: a party of %s is in progress\n", other_game());
         } else if (b->pressed & UI_BTN_B) {
-            if (list_sel == 0) {
+            if (list_sel == MENU_NARRATE) {
                 page = PG_SETUP;
                 setup_row = 0;
             } else {
@@ -1585,32 +2020,22 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
         return true;
     case PG_SETUP:
         if (b->pressed & UI_BTN_Y)
-            setup_row = (setup_row + 2) % 3;
+            setup_row = (setup_row + SETUP_ROWS - 1) % SETUP_ROWS;
         if (b->pressed & UI_BTN_X)
-            setup_row = (setup_row + 1) % 3;
+            setup_row = (setup_row + 1) % SETUP_ROWS;
         if (b->pressed & UI_BTN_A) {
             page = PG_MENU;
-            list_sel = 0;
+            list_sel = MENU_NARRATE;
         }
         if (b->pressed & UI_BTN_B) {
-            if (setup_row == 0) {
-                set_advanced = ! set_advanced;
-            } else if (setup_row == 1) {
+            if (setup_row == SETUP_PRESET)
+                set_options = set_options == WW_OPT_ALL ? WW_OPT_BEGINNER : WW_OPT_ALL;
+            else if (setup_row < SETUP_DEBATE)
+                set_options ^= OPTIONS[setup_row - SETUP_OPTIONS].opt;
+            else if (setup_row == SETUP_DEBATE)
                 set_debate = (set_debate + 1) % 3;
-            } else if (! other_game()) {
-                bool debug = store_get()->admin == STORE_ADMIN_ON;
-                flags = (set_advanced ? FLAG_ADVANCED : 0) | set_debate << FLAG_DEBATE_SHIFT | (debug ? FLAG_DEBUG : 0);
-                reset_player();
-                memset(&g, 0, sizeof(g));
-                n_lobby = 0;
-                party_set_handler(handle);
-                party_host(PARTY_GAME_WEREWOLF, false, WW_MAX, flags);
-                mode = M_NARRATOR;
-                page = PG_LOBBY;
-                list_sel = 0;
-                printf("werewolf: narrator, %s mode, debate %u s%s\n", set_advanced ? "advanced" : "simple",
-                       debate_secs(), debug ? ", test mode" : "");
-            }
+            else if (setup_row == SETUP_OPEN && ! other_game())
+                open_party();
         }
         return true;
     case PG_LOBBY:
@@ -1632,7 +2057,7 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
         if (b->pressed & UI_BTN_A) {
             party_leave();
             page = PG_MENU;
-            list_sel = 1;
+            list_sel = MENU_JOIN;
             return true;
         }
         if (n_found && (b->pressed & UI_BTN_Y))
@@ -1641,7 +2066,7 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
             list_sel = (list_sel + 1) % n_found;
         if (n_found && (b->pressed & UI_BTN_B) && list_sel < n_found) {
             party_join(found[list_sel].host);
-            flags = found[list_sel].flags;
+            options = found[list_sel].flags;
             mode = M_PLAYER;
             page = PG_WAIT;
             printf("werewolf: joining %s\n", found[list_sel].name);
@@ -1671,6 +2096,19 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
             page = quit_back;
         }
         return true;
+    case PG_HELP:
+        if (b->pressed & (UI_BTN_X | UI_BTN_Y)) {
+            help_card = (help_card + ((b->pressed & UI_BTN_X) ? 1 : WW_CARDS - 1)) % WW_CARDS;
+            help_details = false;
+            help_until = delayed_by_ms(now, CARD_SHOWN_MS);
+        }
+        if (b->released_short & UI_BTN_B)
+            help_details = ! help_details;
+        if (b->released_short & UI_BTN_A) {
+            page = help_back;
+            list_sel = help_back == PG_MENU ? MENU_HELP : 0;
+        }
+        return true;
     default:
         return game_buttons(b, now);
     }
@@ -1681,8 +2119,8 @@ static void ww_start(absolute_time_t now) {
     if (mode == M_NONE) {
         page = PG_MENU;
         list_sel = 0;
-    } else if (page == PG_QUIT || page == PG_ROLES) {
-        page = quit_back == PG_LOBBY || quit_back == PG_WAIT ? quit_back : PG_GAME;
+    } else if (page == PG_QUIT || page == PG_ROLES || page == PG_HELP) {
+        page = page == PG_QUIT && (quit_back == PG_LOBBY || quit_back == PG_WAIT) ? quit_back : PG_GAME;
     }
     changed = true;
 }
@@ -1699,6 +2137,10 @@ static bool ww_task(absolute_time_t now) {
             changed |= n != n_found || n > 0;  /* The players of each party change too */
             n_found = n;
         }
+    }
+    if (page == PG_HELP && help_back == PG_GAME && absolute_time_diff_us(help_until, now) >= 0) {
+        page = PG_GAME;  /* The card of the player does not stay on the screen */
+        changed = true;
     }
     /* The timer: every 5 s, every second at the end (the e-Paper refresh shows) */
     static int shown = -2;
