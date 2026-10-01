@@ -135,6 +135,10 @@ class Crawler:
 
     def shot(self, theme, page, name, caption, start):
         self.t.pump(1.5)
+        # A page made to stay is cleaned (black, white, then the page): wait for the page, not a step of the cleaning
+        if any(l.startswith('display: cleaning the page') for l in self.t.lines[start:]):
+            self.t.expect(r'^display: (page cleaned|cleaning stopped)', 15)
+            self.t.pump(0.5)
         fname = f'{slug(theme)}__{slug(page)}{"__" + name if name else ""}.png'
         self.t.screenshot(os.path.splitext(fname)[0], 0.5)
         checks = self.checks_since(start)
