@@ -6,6 +6,8 @@ cigale** (« Écouter la radio pirate »). Trois sources : une mélodie génér�
 domaine public, sans carte SD), une **tonalité de 1 kHz** (pour les mesures) ou un **fichier WAV** de la carte SD
 (dossier `MUSIQUE`).
 
+*English version: [pirate_radio.md](../en/pirate_radio.md).*
+
 > **Note légale.** La bande 433,05 - 434,79 MHz est une bande ISM / SRD (appareils de faible portée) : en France et
 > en Europe, l'émission y est libre sous conditions (puissance apparente ≤ 10 mW, rapport cyclique limité selon
 > l'usage). Ce n'est **pas** une bande de radiodiffusion : réservez la Radio pirate à des **essais courts**, à

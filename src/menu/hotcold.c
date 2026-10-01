@@ -225,7 +225,10 @@ static signal_t follow;
 static absolute_time_t radar_ts = 0;
 
 static void radar_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s  %d dBm%s", near[i].name, near[i].rssi, near[i].met ? "  *" : "");
+    char level[8] = "";
+    if (near[i].level)  /* Sent by the newer firmwares only */
+        snprintf(level, sizeof(level), " N%u", near[i].level);
+    snprintf(buf, len, "%s%s %d dBm%s", near[i].name, level, near[i].rssi, near[i].met ? " *" : "");
 }
 
 static void radar_start(absolute_time_t now) {

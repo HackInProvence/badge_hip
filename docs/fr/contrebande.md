@@ -4,6 +4,8 @@
 badges tenus l'un contre l'autre. Thème : la contrebande pirate en Provence (vivres, rhum, épices, trésors), avec
 trois marchandises légendaires.
 
+*English version: [smuggler.md](../en/smuggler.md).*
+
 ## 1. Pour le joueur
 
 ### Les pages
@@ -133,8 +135,10 @@ arrière-plan (même page fermée), et l'affaire se termine quand les badges se 
 
 **Pire cas** : l'invitant est éteint (ou a décidé 16 autres affaires depuis) avant que l'invité connaisse la
 décision, puis l'invité est éteint aussi : la marchandise scellée est **perdue**, jamais dupliquée.
-Autre limite : le store est écrit en flash 5 s après le dernier changement (store.h) ; un badge éteint dans ces 5 s
-retrouve sa cale d'avant (voir les points ouverts).
+La cale est écrite en flash **tout de suite** à chaque changement dû à une affaire (`store_save_now()`, store.h) :
+un badge éteint juste après un échange ne retrouve pas sa cale d'avant (ce qui pourrait dupliquer une marchandise).
+Les marchandises de la première ouverture et les trouvailles des rencontres sont écrites, elles, 5 s plus tard
+(`store_changed()`) : un badge éteint dans ces 5 s les perd.
 
 Le test hôte simule 3000 affaires sur une radio qui perd jusqu'à 70 % des paquets, en double jusqu'à 40 %, dans le
 désordre, avec des annulations et des séparations : aucune marchandise n'est jamais créée, et à la fin chaque

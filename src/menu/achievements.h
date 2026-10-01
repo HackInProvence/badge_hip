@@ -6,11 +6,11 @@
 /** \file achievements.h
  *
  * \brief The achievements ("Succès") and the level of the cicada, like the level of the dolphin of the Flipper Zero:
- * each achievement gives experience points (XP), the meetings too; the level goes from 1 (Œuf) to 10
- * (Cigale d'or). Shown in Badge > Succès and sent in the beacon (the radar shows the level of the others).
+ * each achievement gives experience points (XP), the meetings too; the level goes from 1 (Oeuf) to 10
+ * (Cigale d'or). Shown in Badge > Succès and sent in the beacon (the radar shows the level of the others: "N3").
  *
- * The features call achv_unlock() when the achievement is reached, or achv_add() on a counter (the achievement
- * comes at its threshold). A new achievement is announced in the footer, with a chime.
+ * The features call achv_unlock() when the achievement is reached; achv_add() counts (games played and won,
+ * trades...: statistics saved for later achievements). A new achievement is announced in the footer, with a chime.
  * */
 
 #ifndef _ACHIEVEMENTS_H

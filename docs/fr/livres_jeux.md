@@ -3,6 +3,8 @@
 Le badge contient des **livres-jeux** : une histoire découpée en sections numérotées, et à la fin de chaque section,
 c'est vous qui choisissez la suite. Certains choix mènent à la victoire, d'autres à une fin moins glorieuse...
 
+*English version: [gamebooks.md](../en/gamebooks.md).*
+
 Un livre est livré avec le badge, **Le Trésor du capitaine Cigalon** (une cigale hackeuse, la Fourmi, un trésor dans
 les calanques de La Ciotat), et vous pouvez en ajouter autant que vous voulez sur la carte SD, ou écrire les vôtres.
 

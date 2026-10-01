@@ -99,9 +99,17 @@ tools/
 ├── crypto_ctf_make.py  génère les défis crypto (fichier des solutions : spoilers)
 ├── ook_sub.py          fichiers .sub du Flipper Zero : télécommandes et sondes météo de test
 ├── flipper_net_sub.py  fichiers .sub du Flipper Zero : paquets du réseau des cigales, préréglage « SecSea »
+├── skills_icons.py     pictogrammes des compétences → src/menu/skills_icons.h
+├── smuggler_icons.py   icônes des marchandises de la contrebande → src/menu/smuggler_goods.c
+├── gamebook_check.py   vérifie un livre-jeu, y joue dans le terminal, génère le livre intégré
+├── test_party_games.py test à deux badges : tir à la corde et assassin
+├── test_werewolf.py    test à deux badges : loup-garou (robots en mode admin)
+├── test_smuggler.py    test à deux badges : contrebande
 └── flipper/            télécommandes du Flipper : SecSea_general.sub, SecSea_talk.sub (§ 6.13)
 docs/           documentation, idées, PVSR, synchronisation du choeur (chorus_sync.md),
-                écrans du badge (fr/ecrans.md, en/screens.md et screens/, générés par badge_screens.py)
+                écrans du badge (fr/ecrans.md, en/screens.md et screens/, générés par badge_screens.py),
+                fonctions détaillées (fr/contrebande.md, fr/loup_garou.md, fr/livres_jeux.md, fr/radio_pirate.md,
+                fr/sonneries.md et leurs traductions dans en/), exemples pour la carte SD (sd/LIVRES, sd/SONNERIES)
 hardware/       schémas et projet KiCad
 ```
 
@@ -122,7 +130,8 @@ while (true) {
     ... traitement des boutons selon la page affichée (app), ou cur_app->buttons() pour une application ...
     radio_tools_task(now); net_task(now); remote_task(now); ook_rx_task(now);
     vote_task(now); infection_task(now); chorus_task(now); ... notifications ...
-    social_task(now); battery_task(now); store_task(now); ...
+    social_task(now); party_task(now); smuggler_task(now); tug_service(now); ... battery_task(now);
+    achv_task(); store_task(now); ...
     switch (app) { ... video_task(now) / rsvp_task(now) / games_task(now) / cur_app->task(now) / display_task(now) ... }
 }
 ```
@@ -164,11 +173,22 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `image_radio.c` | envoi et réception d'une image par radio (§ 6.17) |
 | `crypto_ctf.c`, `crypto_app.c` | défis de cryptographie et leurs pages (§ 6.18) |
 | `lamp.c`, `nametag.c`, `talk.c`, `admin.c` | lampe, badge nominatif, badge de talk, commandes radio et type du badge (admin) |
+| `skills.c`, `skills_icons.h` | compétences et leurs pictogrammes (§ 6.24) |
+| `achievements.c` | succès, XP et niveau de la cigale (§ 6.24) |
+| `party.c` | salon des jeux de groupe (§ 6.25) |
+| `tug.c`, `tug_logic.c` | tir à la corde (§ 6.25) |
+| `assassin.c`, `assassin_logic.c` | assassin (§ 6.25) |
+| `werewolf.c`, `werewolf_logic.c` | loup-garou (§ 6.25, [loup_garou.md](loup_garou.md)) |
+| `smuggler.c`, `smuggler_goods.c`, `smuggler_trade.c` | la cigale contrebandière (§ 6.26, [contrebande.md](contrebande.md)) |
+| `pirate_radio.c` | radio pirate : émission FM et écoute (§ 6.27, [radio_pirate.md](radio_pirate.md)) |
+| `rtttl.c`, `rtttl_parse.c` | sonneries RTTTL (§ 6.28, [sonneries.md](sonneries.md)) |
+| `gamebook.c`, `gamebook_parse.c`, `gamebook_builtin.c` | livres-jeux (§ 6.28, [livres_jeux.md](livres_jeux.md)) |
+| `demo.c` | page du mode démo (admin), la démo elle-même est dans `main.c` (§ 6.29) |
 | `reset.c` | remise à zéro des scores et de la progression (admin) |
 | `credits.c` | pages des crédits |
 | `score_code.c` | scores signés affichés en QR code (§ 6.11) |
-| `battery.c` | niveau de batterie (calibration) |
-| `store.c` | réglages, scores et cartes de visite en flash |
+| `battery.c`, `battcal.c` | niveau de batterie, page de calibration (admin) |
+| `store.c` | réglages, scores, progression et cartes de visite en flash, réglages usine |
 | `ctf.c`, `oled_demo.c`, `screen_demo.c` | CTF, démos OLED, démo de l'écran |
 
 ### Ajouter une application
@@ -212,6 +232,22 @@ Un **service** (réception radio en tâche de fond) s'abonne à son type de paqu
 par `main()`, et signale un événement par une fonction interrogée dans la boucle (`vote_new()`, `duel_invited()`...) :
 `notify()` émet un bip, écrit le texte en bas de l'écran et ouvre l'application si l'on est dans les menus ou la veille.
 
+**Succès** : une nouvelle fonction peut donner un succès ([achievements.h](../../src/menu/achievements.h)) :
+1. ajouter un `ACHV_*` à `achv_id_t` et sa ligne dans `ACHV[]` de `achievements.c` : nom, comment l'obtenir
+   (affiché par la page), XP. Platine (`ACHV_ALL`) demande tous les succès placés **avant** lui ;
+2. appeler `achv_unlock(ACHV_FOO)` quand il est atteint : une seule fois, enregistré, annoncé en bas de l'écran
+   (« Succès : ... » ou « Niveau n : ... ! ») avec un carillon ; ou `achv_add(ACHV_CNT_FOO, n)` pour un compteur
+   (`achv_counter_t`, 16 au plus, `store_t.achv_counters` : affaires, victimes, parties de groupe, victoires, fins de
+   livres, sonneries). `achv_add()` ne fait que compter : aucun succès n'a encore de seuil sur un compteur, il faut
+   le tester après l'appel (`if (achv_add(...) >= 10) achv_unlock(...)`) ;
+3. pour un succès qui découle de l'état du badge (nombre de rencontres...), le vérifier dans `achv_task()`, appelée
+   chaque seconde par la boucle.
+
+Les bits de `store_t.achievements` sont l'index dans `achv_id_t` (64 au plus) : une fois les badges distribués, ne
+jamais réordonner ni retirer un succès. Un succès inséré avant `ACHV_ALL` prend le bit de Platine (un badge qui
+l'avait obtenu aurait alors le nouveau succès) : à faire avant la distribution, ou en ajoutant le succès après
+`ACHV_ALL` (Platine ne le demande pas).
+
 ### Les aides de dessin et l'éditeur de texte (`ui.h`)
 
 [ui.h](../../src/menu/ui.h) donne l'aspect commun des pages : `ui_title()` (bandeau noir), `ui_footer()`,
@@ -246,7 +282,8 @@ et au remède du virus :
 
 Pour une entrée gérée directement par `main.c` (les fonctions historiques) :
 1. Ajouter une valeur à `menu_item_t` et son libellé dans `item_label()`.
-2. La placer dans un thème de `SUBMENUS` (16 entrées au plus par thème, `items[16]` de `submenu_t`).
+2. La placer dans un thème de `SUBMENUS` (24 entrées au plus par thème, `items[24]` de `submenu_t` ; le nombre
+   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 14).
    Le dernier thème, Admin, n'est affiché qu'en mode admin (`store_t.admin == STORE_ADMIN_ON`).
 3. Dans `validate()`, lancer l'action ou passer dans un nouvel état `app` (`app_state_t`).
 4. Si l'état a sa propre page :
@@ -333,7 +370,10 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
   - un tampon circulaire de 8192 échantillons (8 bits) est rempli par `audio_write()`.
 - **Volume** : 0 à 8, 6 par défaut.
 - **Silence** : le temps de silence est compté pour garder la position de lecture juste.
-- `wav.c` lit les WAV PCM ; la vidéo utilise le son comme horloge.
+- `wav.c` lit les WAV PCM 8, 16, 24 et 32 bits, flottants 32 bits (format 3) et `WAVE_FORMAT_EXTENSIBLE`, mono ou
+  stéréo, de 4 à 192 kHz ; au-dessus de 48 kHz, un échantillon sur 2 (96 kHz), 3 ou 4 est joué (décimation).
+  La vidéo utilise le son comme horloge.
+- La sortie peut aussi piloter la radio (`AUDIO_OUT_RADIO`) : c'est la modulation de la radio pirate (§ 6.27).
 - `audio2wav.py` et `video2epaper.py` compressent la dynamique (passe-haut 250 Hz, passe-bas 5 kHz, compresseur,
   normalisation) : le buzzer a peu de rendement, le son doit être fort et médium.
 
@@ -358,11 +398,16 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
   au-dessus de la couche réseau (§ 6.12) :
   - une balise `NET_BEACON` toutes les 2 s ± 0,5 s à +10 dBm (mesuré entre deux badges à 1 m environ : +10 dBm
     arrive vers −70 à −83 dBm, −10 dBm vers −97 dBm, à la limite de la sensibilité, −20 dBm n'arrive pas) ;
-  - paquet de 17 octets : `0xC1`, type 1, identifiant (hash FNV de l'identifiant unique), numéro, score, nom (8 caractères) ;
+  - paquet de 22 octets : `0xC1`, type 1, identifiant (hash FNV de l'identifiant unique), numéro, score, nom
+    (8 caractères), puis les compétences (masque de 4 octets, § 6.24) et le niveau (1 à 10) ; un badge d'un firmware
+    plus ancien envoie 17 octets (`BEACON_LEN`), lus sans compétences ni niveau ;
   - une rencontre = RSSI ≥ −80 dBm (`SOCIAL_RSSI_CLOSE`, provisoire : à calibrer sur place avec le radar)
     sur 3 balises en 10 s ;
   - +10 points pour un nouveau badge, +1 pour un badge connu, au plus une fois par heure ;
-  - les voisins entendus (`social_neighbours()`) servent au radar, aux messages et aux invitations des jeux.
+  - les voisins entendus (`social_neighbours()` : nom, RSSI, déjà rencontré, compétences, niveau) servent au radar,
+    aux messages, aux invitations des jeux, aux compétences, à la jauge de l'assassin et à la contrebande ;
+  - un voisin proche (même seuil) qui partage une compétence est annoncé une fois par visite
+    (`social_event()` : « X aime aussi : ... »).
 
 ### 6.7 Infrarouge
 
@@ -383,12 +428,21 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
   `SPEAKER`, `STAFF`), `admin` (`STORE_ADMIN_ON` = 0xA5 : mode admin), `remote_off` (1 : commandes à distance ignorées),
   `muted` (1 : mode muet), `infection` (état du virus), `crypto_solved` (bit n : défi n résolu),
   `puzzle_records` (records des casse-têtes), `radio_tuned` (`STORE_RADIO_TUNED` = 0xA5 : radio réglée),
-  `radio_noise_dbm` (bruit mesuré, dBm), `radio_freq_offset` (correction de fréquence, FSCTRL0) (§ 6.21).
+  `radio_noise_dbm` (bruit mesuré, dBm), `radio_freq_offset` (correction de fréquence, FSCTRL0) (§ 6.21) ;
+- la **seconde génération** de champs, valide quand `v2_magic` vaut `STORE_V2_MAGIC` (0x5A) : `skills` (bit n :
+  compétence n cochée), `achievements` (64 bits, bit n : succès n), `achv_counters[16]` (compteurs des succès),
+  `book_hash` et `book_section` (livre-jeu en cours et sa section), `cargo[32]` (la cale de la contrebande) et
+  `cargo_seeded`. Quand `v2_magic` est différent (secteur d'une version précédente : 0xFF), `store_init()` met ces
+  champs à 0 et écrit `v2_magic` : sans cela, une flash effacée (0xFF) voudrait dire « tous les succès ».
 
 Principe :
-- l'écriture a lieu 5 s après la dernière modification, avec `flash_safe_execute` (environ 50 ms, interruptions coupées) ;
+- l'écriture a lieu 5 s après la dernière modification (`store_changed()`), avec `flash_safe_execute` (environ 50 ms,
+  interruptions coupées) ;
+- `store_save_now()` écrit tout de suite : pour un changement qui ne doit pas être perdu si le badge est éteint dans
+  les 5 s (la cale après un échange de contrebande : sinon une marchandise pourrait être dupliquée) ;
 - les nouveaux champs sont ajoutés **à la fin** de la structure : dans un secteur écrit par une version précédente,
-  ils valent 0xFF, ce que leurs utilisateurs vérifient ;
+  ils valent 0xFF, ce que leurs utilisateurs vérifient (ou, pour un groupe de champs, un octet magique comme
+  `v2_magic`) ;
 - `_Static_assert` garantit que la structure tient dans le secteur.
 
 Les cartes de visite ne tiennent pas dans ce secteur : elles sont dans un second stockage, `store_ext_t`, de 8 Ko
@@ -400,7 +454,12 @@ prénom + nom). `store_ext_changed()` l'écrit de la même façon, 5 s plus tard
 Les annonces de l'admin (§ 6.23) ont été ajoutées ensuite à la fin de `store_ext_t`, sans changer la version :
 `announce_magic` puis 6 `store_announce_t` (`STORE_ANNOUNCES` : heure 6 octets, texte 112, type du QR code, contenu
 64), valides quand `announce_magic` vaut `STORE_ANNOUNCE_MAGIC` (`"ANNO"`) ; sinon `announce_list()` y met les
-annonces par défaut.
+annonces par défaut. Puis `contact_skills[12]` : les compétences de chaque carte reçue (§ 6.20), déplacées avec les
+cartes.
+
+Le troisième stockage, les **réglages usine** (`store_factory_t`, magique `"FACT"`), a son propre secteur juste avant
+`store_ext_t` : jamais effacé par la Remise à zéro, un changement de version ou un nouveau firmware ; il garde la
+calibration de la batterie (§ 6.9) et s'écrit tout de suite (`store_factory_save()`).
 
 ### 6.9 Batterie
 
@@ -477,19 +536,20 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 
 | Type | Nom | Module | Données |
 |---|---|---|---|
-| 0x01 | `NET_BEACON` | `social.c` | numéro, score (2 octets), nom (8) |
+| 0x01 | `NET_BEACON` | `social.c` | numéro, score (2 octets), nom (8), compétences (4), niveau |
 | 0x02 | `NET_COMMAND` | `remote.c` | commande, nonce (2) |
 | 0x03 | `NET_MESSAGE` | `messages.c` | uid (2), TTL, origine (4), destinataire (4, 0 = tous), nom (8), numéro du message |
 | 0x04 | `NET_VOTE_QUESTION` | `vote.c` | session (2), question, ouverte (0 / 1) ; toutes les 3 s tant que la question est ouverte |
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, réponse ; envoyée 3 fois |
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), genre, destinataire (4), manche ou tour, puis selon le genre (§ 6.16) |
-| 0x07 | `NET_CONTACT` | — | inutilisé, réservé (les cartes passent en mode chat, § 6.20) |
+| 0x07 | `NET_TRADE` | `smuggler.c` | id de l'affaire (4), genre, destinataire (4), données (§ 6.26) ; ancien `NET_CONTACT`, inutilisé depuis que les cartes passent en mode chat (§ 6.20) |
 | 0x08 | `NET_HOTCOLD` | `hotcold.c` | balise chaud - froid, une par seconde |
 | 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |
 | 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, durée 1 (2), durée 2 (2) ; envoyé 5 fois (§ 6.22) |
 | 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux, 48 octets au plus ; le tout 3 fois (§ 6.23) |
+| 0x0E | `NET_PARTY` | `party.c`, puis `tug.c`, `assassin.c`, `werewolf.c` | jeu, session (2), genre, destinataire (4, 0 = tous), 47 octets au plus (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |
 
 Les messages sont relayés par inondation : chaque badge renvoie une fois un message pas encore vu (origine + uid),
@@ -741,7 +801,11 @@ carré sorti directement du PWM (le lecteur audio à 16 kHz ne peut pas dépasse
 - **Format** : une vCard 3.0 (RFC 6350), une ligne par paquet de texte, terminée par `\r\n`, 60 octets au plus
   (`VCARD_PACKET_MAX`) ; une ligne plus longue est pliée (*folding*) : les paquets de suite commencent par une espace.
   Propriétés : `N`, `FN`, `ADR`, `TEL`, `EMAIL`, `ORG`, `TITLE`, `URL;TYPE=linkedin`, `URL;TYPE=git`, `URL`,
-  `X-MASTODON`, `NOTE` ; seuls les champs cochés sont envoyés.
+  `X-MASTODON`, `NOTE` ; seuls les champs cochés sont envoyés. Puis `CATEGORIES` : les compétences cochées
+  (`skills_to_text()` : « Électronique,Flipper Zero »), dès qu'il y en a une ; à la réception,
+  `skills_from_text()` les retrouve (sans tenir compte des majuscules, des accents, des espaces ni des « / - . »,
+  les noms inconnus sont ignorés) et elles sont gardées dans `store_ext_t.contact_skills` ; `contacts_export()`
+  (touche `k`) les rend en `CATEGORIES`.
 - **Contrôle** : avant `END:VCARD`, une ligne `X-SECSEA-CHECK:<lignes>-<crc>` (extension permise par la norme) :
   le nombre de lignes depuis `BEGIN:VCARD` et le CRC-16/CCITT-FALSE (hexadécimal) de ces lignes jointes par `\n`.
   Une carte dont une ligne est perdue ou mélangée avec celles d'une autre carte est rejetée : elle arrivera à l'envoi
@@ -754,7 +818,7 @@ carré sorti directement du PWM (le lecteur audio à 16 kHz ne peut pas dépasse
 - **Tailles** : 512 octets par carte (`CONTACT_BYTES`) ; e-mail 47 caractères, LinkedIn, Git et site web 55,
   Mastodon 47 (tailles de `FIELDS`, 0 final compris) ; l'éditeur de texte va jusqu'à 56 caractères (`UI_EDIT_MAX`).
 - **Vie privée** : pendant l'échange, n'importe quel Flipper à portée en mode chat lit la carte ; seuls les champs
-  cochés sont envoyés. Le type `NET_CONTACT` n'est plus utilisé.
+  cochés sont envoyés. L'ancien type `NET_CONTACT` (0x07) sert maintenant à la contrebande (`NET_TRADE`).
 
 
 ### 6.21 Réglage automatique de la radio
@@ -829,14 +893,150 @@ durées de 50 ms à 5 s par pas de 50 ms.
   orateur » et le lien du talk (QR code URL), et l'envoie avec `announce_send()`.
 
 
+### 6.24 Compétences et succès
+
+- **Compétences** ([skills.c](../../src/menu/skills.c)) : 20 noms (`SKILLS`, `SKILLS_COUNT` ≤ 32), un masque de
+  32 bits dans `store_t.skills`. Les pictogrammes de 16 × 16 pixels sont dessinés en ASCII art dans
+  [tools/skills_icons.py](../../tools/skills_icons.py), qui génère `skills_icons.h` (un `uint16_t` par ligne, bit de
+  poids fort = pixel de gauche ; `--preview icones.png` : une planche de contrôle) ; même ordre que `SKILLS`.
+  `skills_draw_icon()` / `skills_draw_row()` les dessinent (badge nominatif : 10 au plus ; page : 9 ; liste « Qui les
+  partage ? » : 4). Le masque part dans la balise (§ 6.6) et dans la vCard (`CATEGORIES`, § 6.20). Trace :
+  `skills: <nom> on/off`.
+- **Succès** ([achievements.c](../../src/menu/achievements.c)) : 32 succès (`ACHV[]` : nom, comment, XP), XP = somme
+  des succès obtenus + 2 par cigale rencontrée (`XP_PER_MEETING`, `store_t.n_met`) ; 10 niveaux (`LEVEL_XP` : 0, 20,
+  50, 100, 170, 260, 380, 530, 720, 1000 ; `LEVEL_NAMES` : Oeuf ... Cigale d'or). `achievements_init()` donne
+  « Premiers pas » ; `achv_task()` (chaque seconde) donne les succès des rencontres et « Expert » ; `achv_event()`
+  rend une fois le texte de l'annonce, que la boucle écrit en bas de l'écran avec un carillon (sauf si un son joue).
+  Platine est donné dès que tous les succès d'avant `ACHV_ALL` sont obtenus. Le niveau part dans la balise.
+  Trace : `achievement: <nom> (+<xp> XP, level <n>)`. Pour ajouter un succès, voir § 5.
+
+
+### 6.25 Jeux de groupe : le salon (`party.c`) et les jeux
+
+[party.h](../../src/menu/party.h) : un **hôte** ouvre une partie, les cigales autour la rejoignent, l'hôte voit la
+liste des joueurs et lance le jeu ; le jeu échange ensuite ses propres messages par `party_send()`. Un seul salon à la
+fois sur un badge (une page de jeu affiche « Une partie de ... est en cours » si un autre jeu de groupe tourne).
+
+- **Paquet** `NET_PARTY` : `[jeu][session 2][genre][destinataire 4][données ≤ 47]`, destinataire 0 = tous, à +10 dBm.
+  Jeux : `PARTY_GAME_TUG` (1), `PARTY_GAME_ASSASSIN` (2), `PARTY_GAME_WEREWOLF` (3).
+
+  | Genre | De → à | Données |
+  |---|---|---|
+  | OPEN (1) | hôte → tous, chaque seconde tant que le salon est ouvert | joueurs, maximum, options (`flags` du jeu), nom de l'hôte (8) |
+  | JOIN (2) | joueur → hôte, chaque seconde jusqu'à être dans la liste | clé aléatoire (4), nom (8) |
+  | ROSTER (3) | hôte → tous | page, pages, joueurs, puis 3 joueurs au plus (id 4, nom 8) ; 4 pages par seconde pendant le salon et les 10 s qui suivent le départ, puis une par seconde |
+  | START (4) | hôte → tous, 5 fois (300 ms d'écart), puis chaque seconde pendant le jeu | joueurs, délai (2, ms : le jeu commence ce délai après le paquet), graine (4) |
+  | LEAVE (5) | tous | le joueur part ; l'hôte : partie annulée avant le départ ; après le départ, le jeu décide (`PARTY_KIND_LEAVE` donné au gestionnaire) |
+  | ≥ 16 (`PARTY_KIND_GAME`) | selon le jeu | messages du jeu, donnés au gestionnaire de `party_set_handler()` une fois la partie lancée |
+
+- **Départ synchronisé** : chaque badge calcule `party_start_time()` = réception du START + délai (même principe que
+  le choeur) ; `party_seed()` est la même graine sur tous les badges. Elle passe en clair : jamais pour un secret.
+- **Secret** : la clé envoyée par chaque joueur dans son JOIN n'est connue que de l'hôte (les autres reçoivent 0) ;
+  `party_mask(clé, sel)` (FNV-1a) sert à masquer un secret destiné à ce joueur (rôle, cible). La clé passe en clair
+  dans le JOIN : quelqu'un qui a enregistré le salon peut la retrouver (limite assumée, c'est un jeu).
+- **États** (`party_state()`) : IDLE, HOSTING, SCANNING (`party_found()` : les parties entendues, la plus proche en
+  premier), JOINING, JOINED, STARTED, CANCELLED. 40 joueurs au plus (`PARTY_MAX`). Trace : `party: ...`.
+- Chaque jeu a un **service** appelé par la boucle (`tug_service()`, `assassin_service()`, `werewolf_service()`) : la
+  partie continue quand le joueur regarde une autre page ; ses nouvelles passent par `assassin_event()` /
+  `werewolf_event()` et `notify()`.
+
+**Tir à la corde** ([tug.c](../../src/menu/tug.c), règles sans matériel dans [tug_logic.c](../../src/menu/tug_logic.c)) :
+2 joueurs au moins. `tug_teams()` tire les équipes Cigales / Fourmis avec la graine commune (Fisher-Yates, xorshift :
+les mêmes sur tous les badges), l'arbitre est le joueur en trop. Phases calculées depuis l'heure de départ commune :
+équipes 5 s, compte à rebours 3 s, tirage 20 s (`PULL_MS`), décompte final, résultat. Une traction = aile gauche
+puis aile droite (`tug_pull()`). Chaque badge envoie son total (`K_COUNT` : tractions 2 octets, drapeau « arrêté »)
+toutes les 300 ms + 40 ms par joueur ; chaque badge additionne les totaux de chaque équipe : les écrans sont d'accord
+même loin de l'hôte. Une équipe en avance de `tug_margin()` (20 tractions par joueur de l'équipe) arrête la partie
+aussitôt (le drapeau arrête les autres). Après le résultat, le badge quitte la partie (5 s). Trace : `tug: ...`.
+
+**Assassin** ([assassin.c](../../src/menu/assassin.c), [assassin_logic.c](../../src/menu/assassin_logic.c)) : 3 joueurs
+au moins (2 quand l'hôte est en mode admin, pour les essais). L'hôte tire un **cercle secret** avec son propre
+générateur (pas la graine commune) et un code secret par joueur, et envoie à chacun **sa** cible seulement
+(`K_TARGET`, masquée avec `party_mask()` de sa clé) jusqu'à l'accusé (`K_TARGET_ACK`).
+- **Élimination** : aile droite envoie `K_KILL` à la cible (toutes les 400 ms pendant 4 s) avec une preuve (hash du code
+  de la cible et de l'id du tueur). La cible l'accepte avec une preuve juste et un RSSI ≥ `ASSASSIN_KILL_RSSI`
+  (**−50 dBm**, badges presque collés, **à calibrer** : la victime trace `assassin: KILL from <nom>, rssi <n>` à chaque
+  tentative ; `-DASSASSIN_KILL_RSSI=-90` pour un essai). Elle renvoie alors `K_DEAD` au tueur : sa propre cible,
+  scellée avec son code (seul le tueur peut l'ouvrir), jusqu'à `K_DEAD_ACK`.
+- **STATUS** : chaque badge envoie de temps en temps (20 s ± 5 s, en rafale après un événement) les morts, les
+  abandons et le gagnant ; les badges les fusionnent : un paquet perdu ne perd pas la partie. Un joueur qui abandonne
+  met sa cible scellée dans ses STATUS : son chasseur l'ouvre et continue.
+- **Faiblesses connues** (listées en tête de `assassin.c`) : la clé en clair dans le JOIN, une preuve refusée
+  (trop loin) rejouable de près, un émetteur plus fort tue de loin, de faux STATUS. Trace : `assassin: ...`.
+- La jauge chaud - froid suit les balises de la cible (§ 6.6) ou ses paquets du jeu.
+
+**Loup-garou** ([werewolf.c](../../src/menu/werewolf.c), règles dans [werewolf_logic.c](../../src/menu/werewolf_logic.c)) :
+un meneur (qui ne joue pas : `party_host(..., false, ...)`) et 5 à 20 joueurs. Le badge du meneur distribue les rôles
+et enchaîne les phases ; ses messages (STATE, NAMES, PRIV masqué par la clé de chaque joueur, ACT, ABORT) sont
+décrits en tête de `werewolf.c`. La nuit, tous les joueurs vivants choisissent dans une liste et reçoivent le même
+genre de paquet : personne ne devine les rôles. Mode test : meneur en mode admin, des robots complètent la partie.
+Règles et déroulement : [loup_garou.md](loup_garou.md).
+
+
+### 6.26 Contrebande
+
+[smuggler.c](../../src/menu/smuggler.c) : 26 marchandises ([smuggler_goods.c](../../src/menu/smuggler_goods.c),
+icônes 32 × 32 générées par `tools/smuggler_icons.py`), la cale dans `store_t.cargo[32]`, des trouvailles aux
+rencontres, des échanges et des cadeaux entre deux badges « à portée de main » : RSSI des balises ≥
+`SMUGGLER_TRADE_RSSI` (**−55 dBm**, badges collés, **à calibrer** sur place). Le protocole d'échange
+([smuggler_trade.c](../../src/menu/smuggler_trade.c), sans matériel, testé sur PC) passe par `NET_TRADE` (0x07) :
+`[id de l'affaire 4][genre][destinataire 4][données]`, une validation en deux phases où l'invitant décide ; la cale
+est écrite tout de suite après un échange (`store_save_now()`), pour qu'une marchandise ne soit jamais dupliquée.
+Tout est décrit dans [contrebande.md](contrebande.md).
+
+
+### 6.27 Radio pirate
+
+[pirate_radio.c](../../src/menu/pirate_radio.c) (Admin > Radio pirate) émet du son en FM bande étroite : le CC1101
+en 2-FSK, mode série asynchrone, à 500 kbauds, et la sortie audio (`AUDIO_OUT_RADIO`) qui pilote GDO0 avec une PWM
+de ~122 kHz dont le rapport cyclique suit le son ; un récepteur NFM n'en voit que la moyenne, la fréquence
+instantanée suit le son. L'écoute (Radio & IR > Écouter la radio pirate) met le CC1101 d'un autre badge en 2-FSK
+asynchrone en réception (canal de 406 kHz) : GDO2 suit la PWM de l'émetteur, une tranche PWM du RP2040 compte le temps
+haut et un DMA à 16 kHz le recopie ; la boucle en tire le son, mesure la tonalité (Goertzel) et corrige l'écart de
+fréquence (AFC). Le réseau est en pause pendant l'émission et l'écoute ; l'émission s'arrête au bout de 10 minutes.
+
+**Essai entre deux badges** : la tonalité de test de 1 kHz est retrouvée par le badge récepteur avec l'émetteur à
+**+10 dBm** (pureté 84 %) ; à **0 dBm**, elle arrive faible : le canal large (406 kHz) du récepteur du badge le rend
+peu sensible. Détails, réglages et écoute avec un Portapack ou un SDR : [radio_pirate.md](radio_pirate.md).
+
+
+### 6.28 Sonneries et livres-jeux
+
+- **Sonneries** ([rtttl.c](../../src/menu/rtttl.c), analyseur sans matériel
+  [rtttl_parse.c](../../src/menu/rtttl_parse.c)) : 12 sonneries intégrées (`RTTTL_BUILTIN`), puis les fichiers
+  `.txt`, `.rtttl` et `.rtx` du dossier `SONNERIES` (24 fichiers, 128 sonneries). Le son est synthétisé (onde carrée,
+  enveloppe) environ 150 ms en avance dans le tampon audio ; la note affichée et les LEDs suivent `audio_played()`.
+  Trace : `rtttl: ...`. Format : [sonneries.md](sonneries.md).
+- **Livres-jeux** ([gamebook.c](../../src/menu/gamebook.c), analyseur sans matériel
+  [gamebook_parse.c](../../src/menu/gamebook_parse.c)) : le livre intégré
+  ([gamebook_builtin.c](../../src/menu/gamebook_builtin.c), généré par
+  `python tools/gamebook_check.py docs/sd/LIVRES/tresor_cigalon.txt --c src/menu/gamebook_builtin.c`) et les `.txt`
+  du dossier `LIVRES` (16 au plus). Le badge ne lit que la section affichée ; la progression est dans
+  `store_t.book_hash` et `book_section`. Trace : `gamebook: ...`. Format et limites : [livres_jeux.md](livres_jeux.md).
+
+
+### 6.29 Mode démo
+
+Admin > Mode démo ([demo.c](../../src/menu/demo.c)) explique puis appelle `demo_start()` de `main.c` : la boucle
+enchaîne les étapes de `DEMO_STEPS` (nom, durée) : badge nominatif 8 s, succès 6 s, images 18 s (`image_next()`
+toutes les 6 s), vidéo 20 s, compétences 5 s, musique 10 s, démo écran 15 s, programme 6 s, radar 6 s,
+livres-jeux 5 s, crédits 6 s, infos 5 s, puis recommence. Les médias jouent le premier fichier du navigateur (ou de
+son premier dossier) ; sans carte SD ni fichier, l'étape est sautée (`demo: <étape> skipped`). `demo_back()` revient
+au menu pas à pas (une vidéo s'arrête en plusieurs tours). N'importe quel bouton arrête la démo (l'appui n'est pas
+donné à la page) ; les LEDs (arc-en-ciel pendant la démo) reprennent leur mode, la veille est retenue pendant la démo.
+Traces : `demo: on`, `demo: <étape>`, `demo: off`.
+
+
 ## 7. Formats de fichiers
 
 | Format | Contenu |
 |---|---|
 | `.EPI` (image) | en-tête de 16 octets : `EPIMAGE1`, largeur, hauteur, bits par pixel (1 ou 2), 0 (uint16 little endian) ; puis le plan « lsb », puis le plan « msb » (si 2 bits). Chaque plan fait 5000 octets, bit 7 = pixel de gauche, ligne par ligne. Gris = msb×2 + lsb (0 = noir, 3 = blanc). |
 | `.EPV` (vidéo) | en-tête de 512 octets : `EPVIDEO2`, largeur, hauteur, fps, bits par pixel, nombre d'images, fréquence audio, nombre d'échantillons ; puis les images de 5000 octets (1 = blanc) ; puis le son, 8 bits non signé, synchronisé sur la première image. `EPVIDEO1` = sans son. |
-| `.WAV` | PCM 8 ou 16 bits, mono ou stéréo ; 8 bits 16 kHz mono conseillé (`audio2wav.py`). |
+| `.WAV` | PCM 8, 16, 24 ou 32 bits, flottant 32 bits, `WAVE_FORMAT_EXTENSIBLE` ; mono ou stéréo, 4 à 192 kHz (au-dessus de 48 kHz, décimé) ; 8 bits 16 kHz mono conseillé (`audio2wav.py`). |
 | `.TXT` | UTF-8 (avec ou sans BOM) ou Windows-1252, détecté automatiquement. |
+| Sonneries (`.txt`, `.rtttl`, `.rtx`) | une sonnerie RTTTL par ligne, `nom:d=4,o=5,b=120:notes` ; lignes vides et `#` ignorées ; 2048 caractères par ligne au plus ([sonneries.md](sonneries.md)). |
+| Livre-jeu (`.txt`) | titre, auteur, puis des sections `== n [FIN [gagné\|perdu]]`, des choix `-> n [objet\|!objet\|dé a-b] : texte`, des objets `+[x]` / `-[x]` ; 400 sections, 8 choix, 8 objets au plus ([livres_jeux.md](livres_jeux.md)). |
 | `.sub` (Flipper Zero) | fichier Sub-GHz RAW : lignes d'en-tête (`Frequency`, `Preset`, éventuellement `Custom_preset_data`), puis des lignes `RAW_Data:` de 512 durées au plus, en µs, alternativement positives (porteuse) et négatives (silence). Écrit par `ook_sub.py` et `flipper_net_sub.py` (§ 6.19). |
 | `.vcf` (vCard 3.0) | cartes de visite exportées par la touche `k` et `tools/contacts_export.py`. |
 
@@ -876,7 +1076,8 @@ Le badge envoie des lignes de texte :
 - `browser:`, `image:`, `saver: on/off`, `radio:`, `social:`, `game:`, `ctf: code right/wrong`, `credits:`, `name:`...
 - `notify:` (notification), `net:`, `remote:`, `admin:`, `ook:`, `talk:`, `vote:`, `message:`, `program:`,
   `infection:`, `hotcold:`, `hunt433:`, `contacts:`, `chorus:`, `duel:`, `battle:`, `crypto:`, `store:`, `tune:`,
-  `leds:`, `announce:`, `reset:`, `uicheck:`...
+  `leds:`, `announce:`, `reset:`, `uicheck:`, `skills:`, `achievement:`, `party:`, `tug:`, `assassin:`, `werewolf:`,
+  `smuggler:`, `pirate:`, `rtttl:`, `gamebook:`, `demo:`, `wav:`...
 - `version: <numéro> (<commit> <date>)` au démarrage ;
 - `music: end at <n>s of <durée>s` à la fin d'une musique (ou sur une erreur de lecture : la position est alors
   avant la fin), utilisé par `tools/badge_media_test.py`.
@@ -912,8 +1113,13 @@ Des remplaçants du Pico SDK sont fournis dans `tests/host/stubs` : GPIO, SPI en
 | `crypto` | textes qui tiennent à l'écran, chaque réponse pour son seul défi, normalisation, mauvaises réponses, morceaux et flag final |
 | `vcard` | paquets de la vCard (60 octets au plus, pliage, champs cochés), ligne de contrôle : ligne perdue (ou suite de ligne pliée) et valeur altérée rejetées ; carte tapée sur un Flipper acceptée, autres textes du chat ignorés, valeurs les plus longues (55 caractères) |
 | `ookdec` | télécommandes (Princeton, CAME, Nice FLO) et sondes (Nexus-TH, ThermoPRO-TX4, GT-WT02, inFactory, LaCrosse, Acurite) avec gigue, parasites, horloge ±20 %, répétition exigée sans somme de contrôle ; le bruit ne décode rien |
+| `werewolf` | règles du loup-garou (rôles, votes, morts, amoureux, gagnants), puis des parties entières entre badges simulés (`werewolf.c` compilé une fois par badge) sur une radio qui perd des paquets, boutons au hasard, textes vérifiés |
 | `rsvp` | découpage des mots, typographie française, BOM, Windows-1252, durées, mots longs, avance / recul |
+| `gamebook` | format des livres (CRLF, BOM, commentaires, objets, dé, fins), sections manquantes, lignes et textes longs, typographie, coupure des lignes ; le livre intégré : identique à `docs/sd/LIVRES`, liens valides, des parties au hasard arrivent toutes à une fin |
+| `rtttl` | valeurs par défaut, durées, points, dièses, octaves, silences, espaces, majuscules, erreurs et leur position, texte quelconque (pas de plantage), sonneries du firmware et de `docs/sd/SONNERIES` |
 | `screen` | fenêtres RAM, copie de l'écran, rétablissement après `screen_clear` |
+| `party_games` | tir à la corde (équipes identiques sur tous les badges, arbitre, tractions) et assassin (cercle, sceau, parties) |
+| `smuggler` | la cale, les tirages, `smuggler_goods.c` à jour des icônes ; le protocole d'échange sur une radio qui perd, répète et retarde les paquets : aucune marchandise créée ni perdue |
 | `image2epi`, `video2epaper`, `audio2wav` | fichiers produits (en-têtes, tailles, son non vide). Les deux derniers sont ignorés sans ffmpeg. |
 
 ### 9.2 Test du badge (par l'USB)
@@ -956,7 +1162,28 @@ Les groupes (`--only`) :
 | `social` | pages du thème Social (contacts, radar, chaud - froid...) et états du badge de talk |
 | `net` | avec un seul badge, en *loopback* : vote, « Annoncer un talk », virus, message |
 
-### 9.3 Applications de test par module
+### 9.3 Tests à deux badges
+
+Deux badges branchés en USB, `badge_menu` flashé, ports série libres. Les boutons sont simulés et les traces des deux
+badges vérifiées ; captures d'écran dans un dossier daté. Les badges sont redémarrés d'abord (sauf `--no-reboot`).
+
+```bash
+python tools/test_party_games.py --ports COM9 COM11 [--only tug,assassin]   # tir à la corde, assassin
+python tools/test_werewolf.py --ports COM9 COM11 [--advanced]               # loup-garou (meneur + robots)
+python tools/test_smuggler.py --ports COM9 COM11                            # contrebande
+```
+
+- `test_party_games.py` : le badge 1 crée la partie, le badge 2 la rejoint ; au tir à la corde, seul le badge 2 tire
+  et son équipe doit gagner, avec le même résultat sur les deux ; à l'assassin (le badge 1 passe en mode admin pour
+  jouer à 2), le badge 1 élimine le badge 2 : badges côte à côte, le RSSI mesuré par la victime est affiché (pour
+  calibrer `ASSASSIN_KILL_RSSI`).
+- `test_werewolf.py` : le badge 1 est le meneur, passé en mode admin le temps du test (des robots complètent la
+  partie jusqu'au minimum), le badge 2 le seul vrai joueur ; vérifie le rôle reçu, l'accusé de chaque choix, les
+  mêmes phases et la même fin sur les deux badges, et qu'aucun texte n'est coupé.
+- `test_smuggler.py` : badges collés ; un échange, un cadeau, un refus, une annulation après que l'invité a scellé sa
+  marchandise. La cale des badges change : à faire sur des badges de test.
+
+### 9.4 Applications de test par module
 
 `src/tests/*.c` : une application par module (écran, radio, LEDs, son...), à flasher pour explorer un périphérique.
 
@@ -974,6 +1201,10 @@ Les groupes (`--only`) :
 | `tools/crypto_ctf_make.py` | génère la table des défis crypto (`--update`, `--answers`) : fichier des solutions (§ 6.18) |
 | `tools/ook_sub.py` | `.sub` du Flipper : Princeton, CAME, Nice FLO, sondes météo ; `check`, `selftest` (§ 6.19) |
 | `tools/flipper_net_sub.py` | `.sub` du Flipper pour le réseau des cigales (`command`, `ping`, `raw`) et préréglage « SecSea » (`preset`) (§ 6.19) |
+| `tools/skills_icons.py` | pictogrammes 16 × 16 des compétences en ASCII art → `src/menu/skills_icons.h` ; `--preview icones.png` (§ 6.24) |
+| `tools/smuggler_icons.py` | icônes 32 × 32 des marchandises → `src/menu/smuggler_goods.c` ; `--png planche.png`, `--check` (§ 6.26) |
+| `tools/gamebook_check.py` | vérifie un livre-jeu (erreurs, remarques), `--pages`, `--play` (y jouer dans le terminal), `--c` (écrit le livre intégré) (§ 6.28) |
+| `tools/test_party_games.py`, `tools/test_werewolf.py`, `tools/test_smuggler.py` | tests à deux badges (§ 9.3) |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | vidéo → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sons → WAV 8 bits 16 kHz (jokers, dossiers, `--no-filter`, `--start`, `--duration`) |
@@ -998,4 +1229,5 @@ Les groupes (`--only`) :
 | Un code du Flipper n'est pas décodé | touche `O` : tentatives de décodage ; le code doit être vu deux fois (§ 6.14) |
 | Plus aucun badge n'entend ce badge après une écoute OOK | FREND0 resté à 0x11 : la configuration GFSK doit réécrire FREND0, FREND1, MDMCFG0 (§ 6.14) |
 | Le Flipper envoie une autre clé Princeton | `subghz tx` en ligne de commande : utiliser un `.sub` et `subghz tx_from_file` (§ 6.19) |
+| Une élimination de l'assassin ou une cigale « à portée de main » de la contrebande ne passe pas | seuils de RSSI provisoires (`ASSASSIN_KILL_RSSI` −50 dBm, `SMUGGLER_TRADE_RSSI` −55 dBm) : lire les RSSI tracés (`assassin: KILL from ..., rssi`, `smuggler: at hand ...`) et ajuster à la compilation (`-D...`) |
 | Le Flipper n'enregistre rien des badges | les badges émettent en GFSK (modulation de fréquence) : Read RAW en AM650 / AM270 (par défaut) ne les voit pas. Utiliser le préréglage « SecSea » ajouté à `subghz/assets/setting_user` (§ 6.19), ou à défaut FM476. Vérifier l'émission : `subghz chat 433920000 0` sur le Flipper et `M` sur le badge |

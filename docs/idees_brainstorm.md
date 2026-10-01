@@ -22,7 +22,7 @@ USB, ports d'extension, batterie Li-ion.
 
 | # | Idée | Effort |
 |---|---|---|
-| 1 | **Speed-dating de compétences** : chaque cigale annonce 3 tags (« RF », « Web », « Crypto »...) ; deux cigales proches qui partagent un tag clignotent et affichent « Parlez de RF ! » | ★★ |
+| 1 | **Speed-dating de compétences** *(fait en partie : Social > Compétences, 20 compétences ; « X aime aussi : ... » quand une cigale proche en partage une)* : chaque cigale annonce 3 tags (« RF », « Web », « Crypto »...) ; deux cigales proches qui partagent un tag clignotent et affichent « Parlez de RF ! » | ★★ |
 | 2 | **Bingo humain** : grille 4×4 (« un orateur », « quelqu'un venu de plus de 500 km », « un badge staff »...), cochée automatiquement par les rencontres radio | ★★ |
 | 3 | **Poignée de main radio** : coller les deux badges (RSSI très fort) et appuyer en même temps : rencontre « certifiée », qui rapporte plus de points | ★ |
 | 4 | **Arbre généalogique du virus** : qui a contaminé qui, affiché en fin de journée sur le badge admin ou exporté en graphe | ★★ |
@@ -35,7 +35,7 @@ USB, ports d'extension, batterie Li-ion.
 | 11 | **Le ver d'oreille** : une mélodie contagieuse, comme le virus mais en musique ; on « l'attrape » et on la fredonne au buzzer | ★ |
 | 12 | **Livre d'or radio** : chaque cigale garde une phrase de chaque personne rencontrée, à relire après l'événement | ★★ |
 | 13 | **Chaises musicales** : l'admin lance une musique sur toutes les cigales ; à l'arrêt, les dernières à appuyer sont éliminées | ★★ |
-| 14 | **Loup-garou** : rôles distribués par radio, nuits et votes sur le badge, maître du jeu sur le badge admin | ★★★ |
+| 14 | **Loup-garou** *(fait : Jeux > Loup-garou, un meneur et 5 à 20 joueurs)* : rôles distribués par radio, nuits et votes sur le badge, maître du jeu sur le badge admin | ★★★ |
 | 15 | **Mafia des cigales** : version plus légère du loup-garou, jouable entre 2 talks | ★★ |
 | 16 | **Le parrain** : un vétéran parraine un nouveau ; les deux gagnent des points quand le filleul fait des rencontres | ★ |
 
@@ -48,13 +48,13 @@ USB, ports d'extension, batterie Li-ion.
 | 19 | **Pong inter-badges** : la balle sort de l'écran d'une cigale et entre dans celle d'à côté (e-Paper lent : partie au ralenti) | ★★ 🤪 |
 | 20 | **Course de relais** : un « bâton » numérique doit passer par N cigales en un temps record | ★ |
 | 21 | **Capture de drapeau** : 2 équipes, des balises 433 MHz cachées à prendre et à défendre en restant à côté | ★★★ |
-| 22 | **Assassin (le jeu)** : chacun reçoit une cible ; il faut s'approcher à moins d'un mètre sans être repéré | ★★ |
+| 22 | **Assassin (le jeu)** *(fait : Jeux > Assassin)* : chacun reçoit une cible ; il faut s'approcher à moins d'un mètre sans être repéré | ★★ |
 | 23 | **Bombe à retardement** : une « patate chaude » qui explose (son, LEDs rouges) si on la garde trop longtemps | ★ |
 | 24 | **Quiz de salle en direct** : l'orateur pose une question, les réponses sont comptées par radio, histogramme instantané | ★ (proche du vote) |
 | 25 | **Enchères** : chaque cigale mise ses points sociaux sur des goodies réels | ★★ |
 | 26 | **Bourse aux cigales** : le score de chaque cigale est une action ; on achète, on vend, des krachs aléatoires | ★★★ 🤪 |
 | 27 | **Simon collectif** : la séquence de couleurs passe d'un badge à l'autre ; chaque joueur ajoute une note | ★★ |
-| 28 | **Tir à la corde** : deux équipes martèlent les ailes, le compteur radio décide | ★ |
+| 28 | **Tir à la corde** *(fait : Jeux > Tir à la corde, Cigales contre Fourmis)* : deux équipes martèlent les ailes, le compteur radio décide | ★ |
 
 ## 3. Radio et hacking pédagogique
 
@@ -98,7 +98,7 @@ USB, ports d'extension, batterie Li-ion.
 | 59 | **Chasse au QR** : des QR codes dans le lieu, scannés... par un humain, qui tape le code sur la cigale | ★ |
 | 60 | **Escape game de salle** : une salle fermée, les indices arrivent sur les cigales présentes | ★★★ |
 | 61 | **Leaderboard en direct** : écran géant alimenté par une cigale « passerelle » branchée en USB | ★★ |
-| 62 | **Succès (achievements)** : « a vu 50 cigales », « a fini Sokoban », « a écouté toute la musique »... | ★ |
+| 62 | **Succès (achievements)** *(fait : Badge > Succès, 32 succès, 10 niveaux)* : « a vu 50 cigales », « a fini Sokoban », « a écouté toute la musique »... | ★ |
 
 ## 5. Écran e-Paper et image
 
@@ -113,7 +113,7 @@ USB, ports d'extension, batterie Li-ion.
 | 69 | **Mode portrait** : photo + nom + pronoms + « demandez-moi : ... » | ★ |
 | 70 | **Avatar généré** : un identicon unique dessiné à partir de l'identifiant de la cigale | ★ |
 | 71 | **Bande dessinée** : une BD en cases sur la SD, une case par appui | ★ |
-| 72 | **Livre dont vous êtes le héros** : choix avec les ailes, histoire sur la SD | ★ |
+| 72 | **Livre dont vous êtes le héros** *(fait : Médias > Livres-jeux, dossier LIVRES)* : choix avec les ailes, histoire sur la SD | ★ |
 | 73 | **Lecture de l'écran à voix haute** : synthèse vocale très simple (formants) pour l'accessibilité | ★★★ 🤪 |
 | 74 | **Mode « gros caractères »** : polices agrandies, pour l'accessibilité | ★★ |
 | 75 | **Génératif** : fractales (Mandelbrot), automates cellulaires (jeu de la vie) sur la veille | ★ |
@@ -126,12 +126,12 @@ USB, ports d'extension, batterie Li-ion.
 | 77 | **Synthé** : les 4 boutons + accords ; flanc maintenu = octave | ★ |
 | 78 | **Séquenceur 16 pas** affiché sur l'écran, partagé par radio pour faire un groupe | ★★ |
 | 79 | **Lecteur de MOD / chiptune** : de vraies musiques de démo sur la SD | ★★ |
-| 80 | **Lecteur RTTTL** : les sonneries Nokia, téléchargeables | ★ |
+| 80 | **Lecteur RTTTL** *(fait : Médias > Sonneries, dossier SONNERIES)* : les sonneries Nokia, téléchargeables | ★ |
 | 81 | **Cigales en stéréo de salle** : chaque badge joue un instrument différent selon sa place | ★★ |
 | 82 | **Applaudimètre** : avec un micro en extension, mesurer les applaudissements après un talk | ★ 🛠 |
 | 83 | **Diapason / accordeur** avec un micro en extension | ★★ 🛠 |
 | 84 | **Le son d'une vraie cigale** selon la « température » (le RSSI, l'heure...) : plus il fait chaud, plus elle chante | ★ |
-| 85 | **Radio pirate** : une mélodie émise en FM par le CC1101, captée par... les autres cigales | ★★ 🤪 |
+| 85 | **Radio pirate** *(fait : Admin > Radio pirate, Radio & IR > Écouter la radio pirate)* : une mélodie émise en FM par le CC1101, captée par... les autres cigales | ★★ 🤪 |
 
 ## 7. LEDs
 
@@ -190,7 +190,7 @@ USB, ports d'extension, batterie Li-ion.
 | 121 | **Application web** (WebSerial) : remplacer badge_remote.py par une page web, sans Python | ★★ |
 | 122 | **Émulateur PC** du badge : développer et tester les applications sans matériel | ★★★ |
 | 123 | **SDK des applications** documenté, avec un concours d'applications pendant l'événement | ★★ |
-| 124 | **Mode démo** en boucle pour le stand (toutes les fonctionnalités l'une après l'autre) | ★ |
+| 124 | **Mode démo** *(fait : Admin > Mode démo)* en boucle pour le stand (toutes les fonctionnalités l'une après l'autre) | ★ |
 | 125 | **Journal de bord** exporté sur la SD : rencontres, scores, flags, pour des statistiques après l'événement | ★ |
 | 126 | **Économie d'énergie** : mettre en veille le CC1101 et le RP2040 entre deux balises, et afficher l'autonomie estimée | ★★ |
 
@@ -210,7 +210,7 @@ USB, ports d'extension, batterie Li-ion.
 | 136 | **Fantômes** : les cigales éteintes laissent un « fantôme » sur le radar pendant une heure |
 | 137 | **Mode ivre** : après 23 h, les menus tremblent et les lettres se mélangent 🍻 |
 | 138 | **Cigale qui ronfle** : en veille la nuit, un ronflement toutes les 10 minutes (désactivable, promis) |
-| 139 | **Cigale contrebandière** : des objets virtuels rares à échanger en douce entre badges |
+| 139 | **Cigale contrebandière** *(fait : Social > Contrebande)* : des objets virtuels rares à échanger en douce entre badges |
 | 140 | **Le badge maudit** : un seul badge porte une malédiction qui se transmet par rencontre ; le dernier à l'avoir à la clôture gagne un prix |
 
 ---

@@ -459,7 +459,7 @@ void assassin_service(absolute_time_t now) {
             return;
     }
     if (party_state() != PARTY_STARTED && st != S_ENDED && ! leaving) {
-        /* The host cancelled the party (party.c: a LEAVE of the host cancels it, even after the start) */
+        /* The party ended under the game (party.c: a LEAVE of the host before the start, a new party) */
         st = S_ENDED;
         cancelled = true;
         count_game();

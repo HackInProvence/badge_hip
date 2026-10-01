@@ -15,7 +15,7 @@ Toutes les pages du badge en images, avec leurs textes : [les écrans du badge](
 - 4 boutons, 2 LEDs de couleur, un buzzer.
 - Une radio 433 MHz (CC1101) compatible avec le Flipper Zero. Les badges s'en servent pour se parler :
   messages, votes, jeux à deux, échange de cartes de visite, choeur...
-- Un lecteur de carte micro-SD pour les vidéos, musiques, textes et images.
+- Un lecteur de carte micro-SD pour les vidéos, musiques, textes, images, sonneries et livres-jeux.
 - Deux ports d'extension (infrarouge, écran OLED...).
 - Une batterie rechargeable par USB-C.
 
@@ -60,18 +60,20 @@ Le menu principal regroupe les fonctions par thème :
 
 | Thème | Contenu |
 |---|---|
-| **Médias** | Images, Vidéos, Musique, Lecture rapide, Volume |
-| **Jeux** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto, Duel, Bataille navale |
-| **Social** | Réseau des cigales, Messages, Contacts, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces |
-| **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz |
-| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED |
+| **Médias** | Images, Vidéos, Musique, Sonneries, Lecture rapide, Livres-jeux, Volume |
+| **Jeux** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto, Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
+| **Social** | Réseau des cigales, Messages, Contacts, Compétences, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
+| **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
+| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
 | **Réglages** | Veille de l'écran, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un septième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
 
 **Notifications** : quand un message, une question de vote, une invitation à jouer ou une annonce des organisateurs
 arrive, le badge émet un bip et l'écrit en bas de l'écran. Depuis les menus ou la veille, la page concernée s'ouvre
-directement (vote, programme, virus, invitation au duel ou à la bataille navale, annonce en plein écran).
+directement (vote, programme, virus, invitation au duel, à la bataille navale ou à une affaire de contrebande,
+nouvelles de l'assassin et du loup-garou, annonce en plein écran).
+Un nouveau succès (« Succès : Sociable ») ou un nouveau niveau s'affiche aussi en bas de l'écran, avec un carillon.
 
 
 ### 4.1 Médias
@@ -90,6 +92,17 @@ Chaque lecteur affiche la liste des fichiers ; les sous-dossiers sont précédé
 
 **Musique** (dossier `MUSIQUE`)
 - Aile droite : pause ; aile gauche : stop ; flanc gauche : moins fort ; flanc droit : plus fort.
+- Les fichiers WAV sont lus en PCM 8, 16, 24 ou 32 bits, ou en flottant 32 bits, mono ou stéréo, de 4 à 192 kHz ;
+  le mieux reste le 8 bits 16 kHz mono de `audio2wav.py` (voir [§ 7.3](#73-convertir-ses-fichiers)).
+
+**Sonneries** (dossier `SONNERIES`, facultatif) : des sonneries au format RTTTL, celui des vieux téléphones Nokia.
+12 mélodies du domaine public sont dans le badge (Lettre à Élise, Ode à la joie, Frère Jacques, La Marseillaise,
+Korobeiniki...), celles de la carte SD suivent.
+- Flancs : choisir ; aile droite : jouer ; aile gauche : retour. Une sonnerie marquée `(!)` contient une erreur :
+  aile droite affiche la ligne, la colonne et la raison.
+- Pendant la lecture : le nom, la note jouée, une barre de progression ; les LEDs s'allument d'une couleur par note.
+  Aile gauche : arrêter ; flancs : sonnerie précédente / suivante ; aile droite : reprendre au début.
+- Le format et l'ajout de sonneries : [sonneries.md](sonneries.md).
 
 **Lecture rapide** (dossier `TEXTES`)
 - Les mots s'affichent un par un au même endroit, les yeux ne bougent plus : on lit beaucoup plus vite
@@ -98,6 +111,15 @@ Chaque lecteur affiche la liste des fichiers ; les sous-dossiers sont précédé
 - Flancs (appui court) : vitesse −/+ (de 100 à 900 mots par minute, 250 au départ).
 - Flancs (appui long) : recul / avance d'environ 10 secondes de lecture.
 - La position est retenue : un texte reprend là où vous l'avez quitté.
+
+**Livres-jeux** (dossier `LIVRES`, facultatif) : des livres dont vous êtes le héros. Un livre est dans le badge,
+« Le Trésor du capitaine Cigalon », les livres `.txt` de la carte SD suivent (16 au plus).
+- La liste : « Continuer : ... » reprend le dernier livre ; flancs : choisir ; aile droite : ouvrir ; aile gauche : quitter.
+- Le menu d'un livre : Commencer, Reprendre la lecture, Recommencer, Objets, Autres livres.
+- La lecture : flanc droit : page suivante, puis choix suivant ; flanc gauche : choix précédent, puis page précédente ;
+  aile droite : prendre le choix sélectionné ; aile gauche : le menu du livre ; aile gauche maintenue : quitter.
+- Dés, objets, fins gagnées ou perdues ; la progression est gardée même badge éteint (un seul livre à la fois).
+- Lire, ajouter et écrire des livres : [livres_jeux.md](livres_jeux.md).
 
 **Volume** : chaque appui sur l'aile droite augmente le volume (0 à 8, puis retour à 0) et joue un petit carillon.
 
@@ -173,6 +195,51 @@ ultrason).
   qu'il a répondu honnêtement : « Flotte OK » ou « TRICHE ! ».
 - À la fin d'une partie : aile droite : rejouer ; aile gauche : quitter.
 
+**Jeux de groupe** : **Tir à la corde**, **Assassin** et **Loup-garou** se jouent à plusieurs badges, par radio,
+avec le même salon :
+- « Créer une partie » (« Mener une partie » au loup-garou) : votre badge héberge la partie et liste les joueurs
+  qui la rejoignent. Aile droite : lancer (quand il y a assez de joueurs) ; aile gauche : annuler.
+- « Rejoindre une partie » : les parties ouvertes autour (nom de l'hôte, nombre de joueurs), la plus proche en
+  premier. Aile droite : rejoindre ; la « Salle d'attente » attend le lancement ; aile gauche : quitter.
+- Une seule partie de groupe à la fois sur un badge. La partie continue pendant que vous utilisez les autres pages :
+  appui long sur l'aile gauche pour quitter la page sans quitter la partie.
+
+**Tir à la corde** (2 joueurs au moins) : deux équipes, les **Cigales** et les **Fourmis**, tirées au hasard ;
+avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la corde).
+- Les équipes s'affichent 5 s, puis un compte à rebours 3, 2, 1 (bips, LEDs jaune, orange, rouge), puis
+  « Tirez ! » pendant 20 s : **aile gauche puis aile droite** = une traction (les deux en même temps ne comptent pas).
+- Le nœud de la corde se déplace selon les tractions des deux équipes, sur tous les badges. Une équipe qui prend
+  20 tractions d'avance par joueur de l'équipe atteint sa marque et gagne tout de suite ; sinon, la plus forte à la
+  fin des 20 s gagne.
+- Le résultat : l'équipe gagnante, le score « Cigales - Fourmis », vos tractions et le meilleur tireur ; LEDs vertes
+  pour les gagnants, rouges pour les perdants. Aile droite : revenir au choix Créer / Rejoindre ; aile gauche : retour.
+
+**Assassin** (3 joueurs au moins ; 2 quand l'hôte est en mode admin) : un jeu qui dure toute la conférence.
+- Au lancement, l'hôte tire un cercle secret : chaque joueur reçoit une **cible**, et lui-même est la cible
+  d'un autre.
+- La page : « Ta cible : » et son nom, une jauge chaud - froid d'après ses signaux (« Glacial », « Froid », « Tiède »,
+  « Chaud », « Brûlant ! », ou « Pas captée »), le nombre de survivants.
+- **Aile droite : éliminer**. Il faut être tout près de la cible, les badges presque collés (le badge de la cible
+  vérifie la force du signal ; seuil provisoire, à régler sur place). « Cible éliminée ! » : la cible de votre victime
+  devient la vôtre. « Trop loin ou absente » : réessayez plus près.
+- La victime voit « Éliminé par ... » ; sa cible passe à son tueur, puis aile droite : quitter la partie.
+- Flanc : abandonner (confirmer avec l'aile droite) : votre cible passe à votre chasseur.
+- La dernière cigale debout gagne. Les nouvelles (« Éliminé par ... », « Assassin : nouvelle cible »,
+  « Assassin : victoire ! ») arrivent même depuis une autre page.
+- Le badge de l'hôte doit rester allumé ; un badge qui redémarre quitte la partie.
+
+**Loup-garou** (5 à 20 joueurs, 7 à 20 en mode avancé, plus un meneur) : le jeu du loup-garou, sans cartes.
+- Le meneur, qui ne joue pas, choisit « Mener une partie » (mode simple ou avancé, durée du débat : 2, 3 ou
+  5 minutes) puis lance la partie ; les joueurs choisissent « Rejoindre une partie ».
+- Chacun découvre son rôle secret sur son badge (**cachez votre écran**) : loup-garou, voyante, villageois, et en mode
+  avancé sorcière, chasseur, Cupidon. Le badge du meneur enchaîne les phases (nuit, aube, débat, vote, verdict) et
+  tous les badges sonnent à chaque nouvelle phase.
+- La nuit, tous les joueurs vivants choisissent un nom dans une liste (les villageois font semblant) : personne ne
+  devine les rôles en regardant qui appuie. Le jour, chacun vote sur son badge.
+- Aile gauche : retour au menu, la partie continue ; aile gauche maintenue : quitter la partie ; aile droite maintenue :
+  revoir son rôle.
+- Les rôles, les phases, les votes et les conseils au meneur : [loup_garou.md](loup_garou.md).
+
 
 ### 4.3 Social
 
@@ -210,6 +277,19 @@ ultrason).
   Aile droite : voir ; aile droite (appui long) : supprimer.
 - Sur l'ordinateur, `tools/contacts_export.py` exporte les cartes reçues en fichier vCard (`.vcf`),
   à importer dans un téléphone ou un carnet d'adresses.
+- Vos compétences (ci-dessous) partent avec la carte (ligne `CATEGORIES` de la vCard) dès qu'au moins une est
+  cochée ; celles d'une carte reçue s'affichent en pictogrammes en bas de la carte.
+
+**Compétences** : 20 compétences, chacune avec son pictogramme : Électronique, Flipper Zero, Android, iOS,
+Radio / SDR, Web, Réseau, Crypto, Reverse, Pentest, Forensic, OSINT, Linux, Windows, Cloud, IA, Développement, CTF,
+Lockpicking, Défense.
+- « Mes compétences » : la liste avec des cases ; aile droite : cocher / décocher. Les pictogrammes des compétences
+  cochées s'affichent sur la page, sur le badge nominatif et partent dans les signaux du réseau des cigales.
+- « Qui les partage ? » : les cigales entendues qui partagent au moins une de vos compétences, avec les pictogrammes
+  en commun (mis à jour toutes les 3 s).
+- Quand une cigale qui partage une compétence s'approche (aussi près que pour une rencontre), le badge l'annonce
+  en bas de l'écran, avec un carillon : « Marius aime aussi : Radio / SDR » (une fois par visite).
+- Les badges d'un firmware plus ancien n'envoient pas leurs compétences.
 
 **Programme** : le programme de la conférence, sans carte SD. Aile droite : le détail d'un talk, avec le QR code
 de son lien ; flancs : talk précédent / suivant. Quand les organisateurs annoncent le prochain talk,
@@ -220,7 +300,7 @@ Le programme de SecSea 2026 n'est pas encore publié : les talks affichés sont 
 Flancs : choisir la réponse ; aile droite : voter. On peut changer d'avis tant que le vote est ouvert :
 seul le dernier vote de chaque badge compte.
 
-**Radar des cigales** : les cigales entendues, avec la force de leur signal (en dBm, « * » pour une cigale déjà
+**Radar des cigales** : les cigales entendues, avec leur niveau (« N3 ») et la force de leur signal (en dBm, « * » pour une cigale déjà
 rencontrée). Aile droite : suivre une cigale en mode « chaud - froid » ; aile gauche : retour à la liste.
 
 **Chaud - froid** : les organisateurs cachent un badge balise ; trouvez-le à la force de son signal.
@@ -248,6 +328,16 @@ un réseau Wi-Fi...) à scanner avec un téléphone.
   affiche directement la nouvelle annonce.
 - La page garde les 5 dernières annonces reçues (heure et texte). Flancs : choisir ; aile droite : l'afficher ;
   aile gauche : retour.
+
+**Contrebande** : la cigale contrebandière. 26 marchandises virtuelles (vivres, rhum, épices, trésors), communes,
+rares ou légendaires, à collectionner et à échanger **en douce** entre deux badges tenus l'un contre l'autre.
+- L'accueil : Cale, Échanger en douce, Donner, Collection (x / 26), Fortune (en doublons, avec un rang).
+- La cale reçoit 4 marchandises communes à la première ouverture ; chaque nouvelle cigale rencontrée donne une chance
+  sur deux d'en trouver une autre (message discret en bas de l'écran, sans son).
+- « Échanger en douce » : les cigales **à portée de main** (badges collés) ; aile droite : proposer une affaire.
+  L'autre reçoit « Psst... » et accepte (aile droite) ou refuse (aile gauche) ; chacun choisit sa marchandise, les deux
+  offres s'affichent, aile droite : conclure. « Donner » offre une marchandise sans rien en retour.
+- Le détail des pages, des marchandises et du protocole : [contrebande.md](contrebande.md).
 
 
 ### 4.4 Radio & IR
@@ -292,11 +382,20 @@ sonde, brouilleur qui répète son code).
   Sans trame pendant 15 s, il est « hors de portée ». Aile gauche : retour à la liste.
 - Pendant la chasse, le badge n'entend plus les autres cigales.
 
+**Écouter la radio pirate** (réception seule) : le badge reçoit le son FM qu'émet un badge organisateur
+(Admin > Radio pirate) et le joue sur son buzzer.
+- La page : la fréquence, la force du signal (dBm et jauge), la correction de fréquence, la tonalité détectée,
+  le niveau.
+- Flancs : canal précédent / suivant (les 5 canaux de la radio pirate, 433,920 MHz au départ) ; aile droite :
+  silencieux oui / non ; aile gauche : retour.
+- Pendant l'écoute, le badge n'entend plus les autres cigales. Le principe et les essais : [radio_pirate.md](radio_pirate.md).
+
 
 ### 4.5 Badge
 
 - **Badge nominatif** : « SecSea 2026 », le nom de votre cigale en grand et votre type (PARTICIPANT, ORATEUR ou STAFF)
-  dans un bandeau noir. La veille ne le remplace pas : il reste affiché, même badge éteint.
+  dans un bandeau noir, puis les pictogrammes de vos compétences (Social > Compétences, 10 au plus).
+  La veille ne le remplace pas : il reste affiché, même badge éteint.
   Le type est choisi par les organisateurs. Aile gauche : retour.
 - **Lampe** : les 2 LEDs en blanc. Flancs : moins / plus fort, par pas de 10 % (en maintenant : plus vite) ;
   aile droite : éteindre / allumer. La luminosité est retenue et affichée dans le menu (« Lampe : 50 % »).
@@ -318,7 +417,57 @@ sonde, brouilleur qui répète son code).
 - **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, éteintes).
 - **Démo écran** : montre les possibilités de l'écran (noir et blanc, 4 gris, animation rapide).
 - **Écran OLED** : démos sur un petit écran OLED branché sur le port gauche (étoiles, cube 3D, cigale, texte, vidéo).
+- **Succès** : les succès obtenus et le niveau de votre cigale (voir ci-dessous).
 
+**Succès et niveau** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès
+donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau va de 1 à 10 :
+
+| Niveau | Nom | XP | Niveau | Nom | XP |
+|---|---|---|---|---|---|
+| 1 | Oeuf | 0 | 6 | Cigale | 260 |
+| 2 | Larve | 20 | 7 | Chanteuse | 380 |
+| 3 | Nymphe | 50 | 8 | Virtuose | 530 |
+| 4 | Mue | 100 | 9 | Maestro | 720 |
+| 5 | Jeune cigale | 170 | 10 | Cigale d'or | 1000 |
+
+La page montre le niveau, les XP (sur ceux du niveau suivant) avec une jauge, le nombre de succès obtenus, puis la
+liste (case pleine : obtenu). Flancs : choisir ; aile droite : comment l'obtenir et ses XP ; aile gauche : retour.
+Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou le nouveau niveau (« Niveau 3 : Nymphe ! »).
+
+| Succès | Comment l'obtenir | XP |
+|---|---|---|
+| Premiers pas | allumer sa cigale | 5 |
+| Bonjour ! | rencontrer une cigale (rester près d'elle) | 10 |
+| Sociable | rencontrer 10 cigales | 30 |
+| Star du réseau | rencontrer 50 cigales | 80 |
+| Facteur | envoyer un message (Social > Messages) | 10 |
+| Carte de visite | recevoir un contact (Social > Contacts) | 15 |
+| Citoyen | voter (Social > Vote) | 10 |
+| Choriste | chanter dans le choeur | 15 |
+| Patient | attraper le virus des cigales | 10 |
+| Remède | guérir du virus | 20 |
+| Duelliste | gagner un pierre-feuille-ciseaux | 20 |
+| Amiral | gagner une bataille navale | 30 |
+| Pleine lune | jouer au loup-garou | 20 |
+| Survivant | gagner au loup-garou | 40 |
+| Ombre | éliminer sa cible à l'assassin | 20 |
+| Dernier debout | gagner l'assassin | 50 |
+| Costaud | gagner le tir à la corde | 20 |
+| Héros | finir un livre-jeu | 30 |
+| Mélomane | jouer une sonnerie | 5 |
+| Contrebandier | échanger une marchandise (Social > Contrebande) | 20 |
+| Trésor | obtenir une marchandise légendaire | 50 |
+| Collectionneur | posséder toutes les marchandises | 100 |
+| Hacker | trouver un flag du CTF | 30 |
+| Cryptographe | résoudre un défi crypto | 20 |
+| Fin limier | trouver la balise chaud-froid (« BRÛLANT ! ») | 30 |
+| Chasseur d'ondes | entendre une télécommande 433 MHz (Chasse 433 MHz) | 15 |
+| Recordman | battre un record dans un jeu (ou gagner contre la cigale) | 15 |
+| Cinéphile | regarder une vidéo jusqu'au bout | 15 |
+| Photographe | envoyer une image par radio | 15 |
+| Expert | cocher ses compétences (Social > Compétences) | 10 |
+| Âmes soeurs | croiser une cigale qui partage une compétence | 20 |
+| Platine | obtenir tous les autres succès | 200 |
 
 ### 4.6 Réglages
 
@@ -416,6 +565,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM bande étroite sur 433 MHz, à écouter avec un Portapack, un SDR ou une autre cigale (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
+| **Mode démo** | pour un stand : le badge présente ses fonctions en boucle (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 
@@ -464,7 +614,18 @@ l'aile droite** pour confirmer (aile gauche : non) :
 - « Défis CTF et crypto » : les flags du CTF et les défis crypto résolus ;
 - « Contacts reçus » : les cartes de visite reçues (pas votre carte) ;
 - « Virus » : l'état du virus (en forme) ;
-- « Tout » : tout cela à la fois. Le nom, les réglages et votre carte de visite sont gardés.
+- « Succès et niveau » : les succès obtenus et leurs compteurs (le niveau repart de 1 ; les rencontres comptent
+  toujours dans les XP tant que les scores sociaux ne sont pas remis à zéro) ;
+- « Contrebande » : la cale de la contrebande (les marchandises sont distribuées à nouveau à la prochaine ouverture) ;
+- « Tout » : tout cela à la fois, plus la progression du livre-jeu. Le nom, les réglages et votre carte de visite
+  sont gardés ;
+- « Annonces d'origine » : les 6 annonces du menu admin reprennent leurs textes d'origine (pas compris dans « Tout »).
+
+**Mode démo** : aile droite : lancer. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif (8 s),
+succès (6 s), images de la carte SD (18 s, une nouvelle toutes les 6 s), la première vidéo (20 s), compétences (5 s),
+la première musique (10 s), démo de l'écran (15 s), programme (6 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
+infos (5 s). Sans carte SD (ou sans fichier), les images, la vidéo et la musique sont sautées. La veille ne démarre
+pas pendant la démo ; **n'importe quel bouton l'arrête** (« Mode démo arrêté »), et les LEDs reprennent leur animation.
 
 
 ## 5. Batterie
@@ -524,8 +685,13 @@ carte SD
 ├── IMAGES/     images .epi (200×200, 4 gris)
 ├── VIDEOS/     vidéos .epv
 ├── MUSIQUE/    sons .wav (sous-dossiers possibles, pratiques pour le blind test)
-└── TEXTES/     textes .txt pour la lecture rapide
+├── TEXTES/     textes .txt pour la lecture rapide
+├── SONNERIES/  sonneries RTTTL .txt, .rtttl ou .rtx (24 fichiers, 128 sonneries au plus)
+└── LIVRES/     livres-jeux .txt (16 au plus)
 ```
+
+Des exemples de `SONNERIES` et de `LIVRES` sont dans le dépôt, dans [docs/sd/](../sd) : copier ces dossiers à la
+racine de la carte.
 
 ### 7.3 Convertir ses fichiers
 
@@ -571,7 +737,17 @@ python src/audio/audio2wav.py "musiques/*.mp3" -o MUSIQUE/Films
 python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 ```
 
+Un WAV non converti est lu aussi (PCM 8, 16, 24 ou 32 bits, flottant 32 bits, jusqu'à 192 kHz), mais moins fort et
+moins clair sur le buzzer.
+
 **Textes** : n'importe quel fichier `.txt` (UTF-8 ou Windows/Latin-1) dans `TEXTES`.
+
+**Sonneries** : un fichier texte, une sonnerie RTTTL par ligne (`nom:d=4,o=5,b=120:e,e,f,g`), voir
+[sonneries.md](sonneries.md).
+
+**Livres-jeux** : un fichier texte par livre, avec des sections `== 12` et des choix `-> 34 : ...`, voir
+[livres_jeux.md](livres_jeux.md) ; `python tools/gamebook_check.py LIVRES/mon_livre.txt` le vérifie avant de le
+copier.
 
 > Respectez les droits d'auteur : utilisez des œuvres libres de droits ou dont vous avez les droits.
 
@@ -583,12 +759,14 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | Le badge ne s'allume pas | Interrupteur sur ON ? Batterie chargée (brancher en USB) ? |
 | Le badge n'est pas vu par l'ordinateur | Câble USB de données (pas un câble de charge seule) ; interrupteur sur ON. |
 | « Carte SD absente » | Carte bien enfoncée ? Formatée en FAT32 ou exFAT ? |
-| Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`) et bon dossier ? Nom de moins de 64 caractères ? |
+| Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`) et bon dossier ? Nom de moins de 64 caractères ? |
+| Une sonnerie est marquée `(!)` | Une erreur dans la ligne : aile droite affiche la colonne et la raison (voir [sonneries.md](sonneries.md)). |
 | Pas de son | Volume à 0 ? (Médias > Volume). Le buzzer est discret : collez l'oreille. |
 | Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz doit être 26 ou 27 MHz. |
 | Plus de son ni de LEDs | Le mode muet est peut-être actif (commande des organisateurs pendant un talk) : Réglages > Mode muet. |
 | Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ? Code Princeton `0xC16Axx`, envoyé depuis un fichier `.sub` et maintenu une seconde. |
-| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo, la Chasse 433 MHz, le Badge de talk ou l'échange de contacts est ouvert : ils occupent la radio. |
+| Les autres cigales ne sont plus entendues | Normal tant que le Décodeur 433 MHz, la Station météo, la Chasse 433 MHz, le Badge de talk, l'échange de contacts ou la radio pirate (émission ou écoute) est ouvert : ils occupent la radio. |
+| « Trop loin ou absente » à l'assassin, pas de cigale « à portée de main » en contrebande | Collez les badges l'un contre l'autre : ces jeux demandent un signal très fort. |
 | Les télécommandes ou les autres cigales passent mal | Réglages > Réglage radio, près d'autres badges allumés. |
 | L'écran garde des traces | Normal après de nombreux rafraîchissements rapides : il se nettoie au prochain rafraîchissement complet. |
 | Le badge ne répond plus | Bouton RESET, ou éteindre / rallumer. |

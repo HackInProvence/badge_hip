@@ -5,6 +5,8 @@ Nokia. Une douzaine de mélodies du domaine public sont dans le badge (Lettre à
 Au clair de la lune, La Marseillaise, Korobeiniki, Greensleeves...), et on peut en ajouter autant qu'on veut sur la
 carte SD.
 
+*English version: [ringtones.md](../en/ringtones.md).*
+
 ## Utilisation
 
 - **La liste** : les sonneries du badge, puis celles de la carte SD, avec le nom du fichier entre parenthèses.

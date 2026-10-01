@@ -15,7 +15,7 @@ All the pages of the badge in pictures, with their texts: [the screens of the ba
 - 4 buttons, 2 colour LEDs, a buzzer.
 - A 433 MHz radio (CC1101) compatible with the Flipper Zero. The badges use it to talk to each other:
   messages, votes, two-player games, business card exchange, choir...
-- A micro-SD card reader for videos, music, texts and images.
+- A micro-SD card reader for videos, music, texts, images, ringtones and gamebooks.
 - Two extension ports (infrared, OLED screen...).
 - A battery you can recharge over USB-C.
 
@@ -62,18 +62,20 @@ The main menu groups the features by theme:
 
 | Theme | Contents |
 |---|---|
-| **Médias** (Media) | "Images", "Vidéos" (Videos), "Musique" (Music), "Lecture rapide" (Speed reading), "Volume" |
-| **Jeux** (Games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges), Duel, Bataille navale (Battleship) |
-| **Social** | Cicada network, Messages, Contacts, Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir), Annonces (Announcements) |
-| **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared, Chasse 433 MHz (433 MHz hunt) |
-| **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen |
+| **Médias** (Media) | "Images", "Vidéos" (Videos), "Musique" (Music), "Sonneries" (Ringtones), "Lecture rapide" (Speed reading), "Livres-jeux" (Gamebooks), "Volume" |
+| **Jeux** (Games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges), Duel, Bataille navale (Battleship), Loup-garou (Werewolf), Assassin, Tir à la corde (Tug of war) |
+| **Social** | Cicada network, Messages, Contacts, Compétences (Skills), Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir), Annonces (Announcements), Contrebande (Smuggling) |
+| **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared, Chasse 433 MHz (433 MHz hunt), Écouter la radio pirate (Listen to the pirate radio) |
+| **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen, Succès (Achievements) |
 | **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits), "Réglage radio" (Radio tuning) |
 
 A seventh theme, **Admin**, is hidden: it is for the organizers (see [§ 4.8](#48-admin-mode-organizers)).
 
 **Notifications**: when a message, a vote question, an invitation to play or an announcement of the organizers
 arrives, the badge beeps and writes it at the bottom of the screen. From the menus or the screensaver, the relevant
-page opens directly (vote, program, virus, invitation to a duel or a battleship game, full-screen announcement).
+page opens directly (vote, program, virus, invitation to a duel, a battleship game or a smuggling deal, news of the
+assassin and werewolf games, full-screen announcement).
+A new achievement ("Succès : Sociable") or a new level is also shown at the bottom of the screen, with a chime.
 
 
 ### 4.1 Médias (Media)
@@ -92,6 +94,17 @@ Each player shows the list of files; subfolders are marked with "> ".
 
 **Musique** (Music, `MUSIQUE` folder)
 - Right wing: pause; left wing: stop; left flank: quieter; right flank: louder.
+- WAV files are played as 8, 16, 24 or 32-bit PCM, or 32-bit float, mono or stereo, from 4 to 192 kHz;
+  the best is still the 8-bit 16 kHz mono of `audio2wav.py` (see [§ 7.3](#73-converting-your-files)).
+
+**Sonneries** (Ringtones, `SONNERIES` folder, optional): ringtones in the RTTTL format, the one of the old Nokia
+phones. 12 public domain tunes are built into the badge (Lettre à Élise (Für Elise), Ode à la joie (Ode to Joy),
+Frère Jacques, La Marseillaise, Korobeiniki...), those of the SD card follow.
+- Flanks: choose; right wing: play; left wing: back. A ringtone marked `(!)` has an error: the right wing shows the
+  line, the column and the reason.
+- While playing: the name, the note played, a progress bar; the LEDs light up with one colour per note.
+  Left wing: stop; flanks: previous / next ringtone; right wing: start again from the beginning.
+- The format and how to add ringtones: [ringtones.md](ringtones.md).
 
 **Lecture rapide** (Speed reading, `TEXTES` folder)
 - Words appear one at a time in the same spot, so your eyes no longer move: you read much faster
@@ -100,6 +113,17 @@ Each player shows the list of files; subfolders are marked with "> ".
 - Flanks (short press): speed −/+ (from 100 to 900 words per minute, 250 at start).
 - Flanks (long press): go back / forward about 10 seconds of reading.
 - Your position is remembered: a text resumes where you left it.
+
+**Livres-jeux** (Gamebooks, `LIVRES` folder, optional): books in which you are the hero. One book is built into the
+badge, "Le Trésor du capitaine Cigalon" (Captain Cigalon's treasure, in French), the `.txt` books of the SD card
+follow (16 at most).
+- The list: "Continuer : ..." (continue) resumes the last book; flanks: choose; right wing: open; left wing: quit.
+- The menu of a book: Commencer (start), Reprendre la lecture (resume), Recommencer (start over), Objets (items),
+  Autres livres (other books).
+- Reading: right flank: next page, then next choice; left flank: previous choice, then previous page; right wing:
+  take the selected choice; left wing: the menu of the book; left wing held: quit.
+- Dice, items, endings won or lost; the progress is kept even with the badge switched off (one book at a time).
+- Reading, adding and writing books: [gamebooks.md](gamebooks.md).
 
 **Volume**: each press on the right wing raises the volume (0 to 8, then back to 0) and plays a short chime.
 
@@ -177,6 +201,49 @@ The texts are in French.
   "Flotte OK" (fleet OK) or "TRICHE !" (cheat!).
 - At the end of a game: right wing: play again; left wing: quit.
 
+**Group games**: **Tir à la corde** (Tug of war), **Assassin** and **Loup-garou** (Werewolf) are played by several
+badges, over the radio, with the same lobby:
+- "Créer une partie" (create a game; "Mener une partie", lead a game, at the werewolf): your badge hosts the game and
+  lists the players who join it. Right wing: start (when there are enough players); left wing: cancel.
+- "Rejoindre une partie" (join a game): the open games around (name of the host, number of players), the closest
+  first. Right wing: join; the "Salle d'attente" (waiting room) waits for the start; left wing: leave.
+- A single group game at a time on a badge. The game goes on while you use the other pages: long press on the left
+  wing to leave the page without leaving the game.
+
+**Tir à la corde** (Tug of war, 2 players at least): two teams, the **Cigales** (cicadas) and the **Fourmis** (ants),
+drawn at random; with an odd number of players, one of them is the **arbitre** (referee: watches the rope).
+- The teams are shown for 5 s, then a countdown 3, 2, 1 (beeps, LEDs yellow, orange, red), then "Tirez !" (pull!)
+  for 20 s: **left wing then right wing** = one pull (both at the same time do not count).
+- The knot of the rope moves with the pulls of the two teams, on every badge. A team 20 pulls ahead per player of the
+  team reaches its mark and wins at once; otherwise, the strongest at the end of the 20 s wins.
+- The result: the winning team, the score "Cigales - Fourmis", your pulls and the best puller; green LEDs for the
+  winners, red for the losers. Right wing: back to the choice Create / Join; left wing: back.
+
+**Assassin** (3 players at least; 2 when the host is in admin mode): a game that lasts the whole conference.
+- At the start, the host draws a secret ring: each player gets a **target**, and is himself the target of another one.
+- The page: "Ta cible :" (your target) and its name, a hot - cold gauge from its signals ("Glacial", "Froid", "Tiède",
+  "Chaud", "Brûlant !", or "Pas captée": not heard), the number of survivors.
+- **Right wing: eliminate**. You must be very close to the target, the badges almost touching (the badge of the target
+  checks the strength of the signal; provisional threshold, to tune on site). "Cible éliminée !" (target eliminated):
+  the target of your victim becomes yours. "Trop loin ou absente" (too far or absent): try again closer.
+- The victim sees "Éliminé par ..." (eliminated by); its target goes to its killer, then right wing: leave the game.
+- Flank: give up (confirm with the right wing): your target goes to your hunter.
+- The last cicada standing wins. The news ("Éliminé par ...", "Assassin : nouvelle cible" (new target),
+  "Assassin : victoire !" (victory)) arrives even on another page.
+- The badge of the host must stay on; a badge that restarts leaves the game.
+
+**Loup-garou** (Werewolf, 5 to 20 players, 7 to 20 in advanced mode, plus a narrator): the werewolf game, without
+cards.
+- The narrator, who does not play, chooses "Mener une partie" (lead a game: simple or advanced mode, length of the
+  debate: 2, 3 or 5 minutes) then starts the game; the players choose "Rejoindre une partie" (join a game).
+- Each one discovers his secret role on his badge (**hide your screen**): loup-garou (werewolf), voyante (seer),
+  villageois (villager), and in advanced mode sorcière (witch), chasseur (hunter), Cupidon (Cupid). The narrator's
+  badge runs the phases (night, dawn, debate, vote, verdict) and every badge rings at each new phase.
+- At night, every living player chooses a name in a list (the villagers pretend): nobody can guess the roles by
+  watching who presses buttons. During the day, each one votes on his badge.
+- Left wing: back to the menu, the game goes on; left wing held: leave the game; right wing held: see your role again.
+- The roles, the phases, the votes and the tips for the narrator: [loup_garou.md](../fr/loup_garou.md) (in French).
+
 
 ### 4.3 Social
 
@@ -214,6 +281,19 @@ The texts are in French.
   Right wing: view; right wing (long press): delete.
 - On the computer, `tools/contacts_export.py` exports the cards received to a vCard file (`.vcf`),
   to import into a phone or an address book.
+- Your skills (below) go with the card (`CATEGORIES` line of the vCard) as soon as at least one is ticked; those of a
+  card received are shown as pictograms at the bottom of the card.
+
+**Compétences** (Skills): 20 skills, each with its pictogram: Électronique (electronics), Flipper Zero, Android, iOS,
+Radio / SDR, Web, Réseau (network), Crypto, Reverse, Pentest, Forensic, OSINT, Linux, Windows, Cloud, IA (AI),
+Développement (development), CTF, Lockpicking, Défense (defense).
+- "Mes compétences" (my skills): the list with check boxes; right wing: tick / untick. The pictograms of the ticked
+  skills are shown on the page, on the name tag, and go out in the signals of the cicada network.
+- "Qui les partage ?" (who shares them?): the cicadas heard that share at least one of your skills, with the
+  pictograms in common (updated every 3 s).
+- When a cicada sharing a skill comes close (as close as for an encounter), the badge says so at the bottom of the
+  screen, with a chime: "Marius aime aussi : Radio / SDR" (Marius likes it too; once per visit).
+- The badges of an older firmware do not send their skills.
 
 **Programme** (Program): the conference program, no SD card needed. Right wing: the details of a talk, with the
 QR code of its link; flanks: previous / next talk. When the organizers announce the next talk, its page opens
@@ -224,7 +304,7 @@ The SecSea 2026 program is not published yet: the talks shown are placeholders.
 Flanks: choose the answer; right wing: vote. You can change your mind while the vote is open:
 only the last vote of each badge counts.
 
-**Radar des cigales** (Cicada radar): the cicadas heard, with the strength of their signal (in dBm, "*" for a cicada
+**Radar des cigales** (Cicada radar): the cicadas heard, with their level ("N3") and the strength of their signal (in dBm, "*" for a cicada
 already met). Right wing: follow a cicada in "hot - cold" mode; left wing: back to the list.
 
 **Chaud - froid** (Hot - cold): the organizers hide a beacon badge; find it by the strength of its signal.
@@ -252,6 +332,17 @@ network...) to scan with a phone.
   it shows the new announcement right away.
 - The page keeps the last 5 announcements received (time and text). Flanks: choose; right wing: show it;
   left wing: back.
+
+**Contrebande** (Smuggling): the smuggler cicada. 26 virtual goods (food, rum, spices, treasures), common, rare or
+legendary, to collect and to trade **on the quiet** between two badges held against each other.
+- The home page: Cale (hold), Échanger en douce (trade on the quiet), Donner (give), Collection (x / 26), Fortune (in
+  doubloons, with a rank).
+- The hold gets 4 common goods at the first opening; each new cicada met gives a one-in-two chance of finding another
+  one (discreet message at the bottom of the screen, no sound).
+- "Échanger en douce": the cicadas **à portée de main** (within reach: badges touching); right wing: offer a deal.
+  The other one gets "Psst..." and accepts (right wing) or refuses (left wing); each one chooses its good, both offers
+  are shown, right wing: close the deal. "Donner" offers a good with nothing in return.
+- The details of the pages, of the goods and of the protocol: [smuggler.md](smuggler.md).
 
 
 ### 4.4 Radio & IR
@@ -296,12 +387,21 @@ that repeats its code) by "hot - cold".
   sending. Without a frame for 15 s, it is "hors de portée" (out of range). Left wing: back to the list.
 - During the hunt, the badge no longer hears the other cicadas.
 
+**Écouter la radio pirate** (Listen to the pirate radio, receive only): the badge receives the FM sound sent by an
+organizer's badge (Admin > Radio pirate) and plays it on its buzzer.
+- The page: the frequency, the strength of the signal (dBm and gauge), the frequency correction, the tone detected,
+  the level.
+- Flanks: previous / next channel (the 5 channels of the pirate radio, 433.920 MHz at first); right wing:
+  squelch ("Silencieux") on / off; left wing: back.
+- While listening, the badge no longer hears the other cicadas. How it works and the tests: [pirate_radio.md](pirate_radio.md).
+
 
 ### 4.5 Badge
 
 - **Badge nominatif** (Name tag): "SecSea 2026", your cicada's name in large letters and your type (PARTICIPANT,
-  ORATEUR (speaker) or STAFF) in a black band. The screensaver does not replace it: it stays on screen, even with the
-  badge switched off. The type is chosen by the organizers. Left wing: back.
+  ORATEUR (speaker) or STAFF) in a black band, then the pictograms of your skills (Social > Compétences, 10 at most).
+  The screensaver does not replace it: it stays on screen, even with the badge switched off.
+  The type is chosen by the organizers. Left wing: back.
 - **Lampe** (Lamp): the 2 LEDs in white. Flanks: dimmer / brighter, in steps of 10 % (hold: faster);
   right wing: off / on. The brightness is remembered and shown in the menu ("Lampe : 50 %").
   In mute mode, the LEDs stay off.
@@ -322,7 +422,58 @@ that repeats its code) by "hot - cold".
 - **LEDs**: changes the animation (rainbow, breathing, heartbeat, blinking, steady green, off).
 - **Démo écran** (Screen demo): shows what the screen can do (black and white, 4 greys, fast animation).
 - **Écran OLED** (OLED screen): demos on a small OLED screen plugged into the left port (stars, 3D cube, cicada, text, video).
+- **Succès** (Achievements): the achievements obtained and the level of your cicada (see below).
 
+**Achievements and level**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
+achievement gives XP, and each cicada met **2 XP**. The level goes from 1 to 10:
+
+| Level | Name | XP | Level | Name | XP |
+|---|---|---|---|---|---|
+| 1 | Oeuf (egg) | 0 | 6 | Cigale (cicada) | 260 |
+| 2 | Larve (larva) | 20 | 7 | Chanteuse (singer) | 380 |
+| 3 | Nymphe (nymph) | 50 | 8 | Virtuose (virtuoso) | 530 |
+| 4 | Mue (moult) | 100 | 9 | Maestro | 720 |
+| 5 | Jeune cigale (young cicada) | 170 | 10 | Cigale d'or (golden cicada) | 1000 |
+
+The page shows the level, the XP (out of those of the next level) with a gauge, the number of achievements obtained,
+then the list (filled box: obtained). Flanks: choose; right wing: how to get it and its XP; left wing: back.
+A new achievement is announced at the bottom of the screen ("Succès : Sociable"), or the new level
+("Niveau 3 : Nymphe !").
+
+| Achievement | How to get it | XP |
+|---|---|---|
+| Premiers pas (first steps) | switch your cicada on | 5 |
+| Bonjour ! (hello!) | meet a cicada (stay close to it) | 10 |
+| Sociable | meet 10 cicadas | 30 |
+| Star du réseau (network star) | meet 50 cicadas | 80 |
+| Facteur (postman) | send a message (Social > Messages) | 10 |
+| Carte de visite (business card) | receive a contact (Social > Contacts) | 15 |
+| Citoyen (citizen) | vote (Social > Vote) | 10 |
+| Choriste (chorister) | sing in the choir | 15 |
+| Patient | catch the cicada virus | 10 |
+| Remède (cure) | get cured of the virus | 20 |
+| Duelliste (duellist) | win a rock-paper-scissors | 20 |
+| Amiral (admiral) | win a battleship game | 30 |
+| Pleine lune (full moon) | play werewolf | 20 |
+| Survivant (survivor) | win at werewolf | 40 |
+| Ombre (shadow) | eliminate your target at the assassin | 20 |
+| Dernier debout (last one standing) | win the assassin | 50 |
+| Costaud (strong) | win the tug of war | 20 |
+| Héros (hero) | finish a gamebook | 30 |
+| Mélomane (music lover) | play a ringtone | 5 |
+| Contrebandier (smuggler) | trade a good (Social > Contrebande) | 20 |
+| Trésor (treasure) | get a legendary good | 50 |
+| Collectionneur (collector) | own all the goods | 100 |
+| Hacker | find a flag of the CTF | 30 |
+| Cryptographe (cryptographer) | solve a crypto challenge | 20 |
+| Fin limier (sleuth) | find the hot-cold beacon ("BRÛLANT !") | 30 |
+| Chasseur d'ondes (wave hunter) | hear a 433 MHz remote control (Chasse 433 MHz) | 15 |
+| Recordman | beat a record in a game (or win against the cicada) | 15 |
+| Cinéphile (film buff) | watch a video to the end | 15 |
+| Photographe (photographer) | send an image over the radio | 15 |
+| Expert | tick your skills (Social > Compétences) | 10 |
+| Âmes soeurs (soulmates) | come across a cicada that shares a skill | 20 |
+| Platine (platinum) | get all the other achievements | 200 |
 
 ### 4.6 Réglages (Settings)
 
@@ -419,6 +570,8 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |
+| **Radio pirate** (Pirate radio) | sends a melody, a 1 kHz tone or a WAV file of the SD card in narrow band FM on 433 MHz, to listen to with a Portapack, an SDR or another cicada (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
+| **Mode démo** (Demo mode) | for a stand: the badge shows its features in a loop (see below) |
 | **Type du badge** (Badge type) | Participant, Orateur (speaker) or Staff, shown by the name tag |
 | **Quitter le mode admin** (Leave admin mode) | hides the Admin theme again |
 
@@ -467,7 +620,19 @@ right wing** to confirm (left wing: no):
 - "Défis CTF et crypto" (CTF and crypto challenges): the CTF flags and the crypto challenges solved;
 - "Contacts reçus" (contacts received): the business cards received (not your card);
 - "Virus": the state of the virus (healthy);
-- "Tout" (all): all of this at once. The name, the settings and your business card are kept.
+- "Succès et niveau" (achievements and level): the achievements obtained and their counters (the level starts again
+  from 1; the encounters still count in the XP as long as the social scores are not reset);
+- "Contrebande" (smuggling): the hold of the smuggling game (the goods are given again at the next opening);
+- "Tout" (all): all of this at once, plus the progress of the gamebook. The name, the settings and your business card
+  are kept;
+- "Annonces d'origine" (original announcements): the 6 announcements of the admin menu get their original texts back
+  (not part of "Tout").
+
+**Mode démo** (Demo mode): right wing: start. The badge goes through, in a loop, with rainbow LEDs: name tag (8 s),
+achievements (6 s), images of the SD card (18 s, a new one every 6 s), the first video (20 s), skills (5 s),
+the first music (10 s), screen demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s).
+Without an SD card (or without a file), the images, the video and the music are skipped. The screensaver does not
+start during the demo; **any button stops it** ("Mode démo arrêté"), and the LEDs go back to their animation.
 
 
 ## 5. Battery
@@ -527,8 +692,13 @@ SD card
 ├── IMAGES/     .epi images (200×200, 4 greys)
 ├── VIDEOS/     .epv videos
 ├── MUSIQUE/    .wav sounds (subfolders allowed, handy for the blind test)
-└── TEXTES/     .txt texts for speed reading
+├── TEXTES/     .txt texts for speed reading
+├── SONNERIES/  RTTTL ringtones .txt, .rtttl or .rtx (24 files, 128 ringtones at most)
+└── LIVRES/     .txt gamebooks (16 at most)
 ```
+
+Examples of `SONNERIES` and `LIVRES` are in the repository, in [docs/sd/](../sd): copy these folders to the root of
+the card.
 
 ### 7.3 Converting your files
 
@@ -574,7 +744,16 @@ python src/audio/audio2wav.py "musiques/*.mp3" -o MUSIQUE/Films
 python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 ```
 
+A WAV file that was not converted plays too (8, 16, 24 or 32-bit PCM, 32-bit float, up to 192 kHz), but quieter and
+less clear on the buzzer.
+
 **Texts**: any `.txt` file (UTF-8 or Windows/Latin-1) in `TEXTES`.
+
+**Ringtones**: a text file, one RTTTL ringtone per line (`name:d=4,o=5,b=120:e,e,f,g`), see
+[ringtones.md](ringtones.md).
+
+**Gamebooks**: one text file per book, with sections `== 12` and choices `-> 34 : ...`, see
+[gamebooks.md](gamebooks.md); `python tools/gamebook_check.py LIVRES/my_book.txt` checks it before you copy it.
 
 > Respect copyright: use works that are free of rights or that you hold the rights to.
 
@@ -586,12 +765,14 @@ python src/audio/audio2wav.py dossier_complet -o MUSIQUE
 | The badge does not turn on | Is the switch on ON? Is the battery charged (plug it into USB)? |
 | The computer does not see the badge | Use a USB data cable (not a charge-only cable); switch on ON. |
 | "Carte SD absente" (SD card missing) | Is the card pushed all the way in? Formatted as FAT32 or exFAT? |
-| A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`) and right folder? Name shorter than 64 characters? |
+| A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`) and right folder? Name shorter than 64 characters? |
+| A ringtone is marked `(!)` | An error in the line: the right wing shows the column and the reason (see [ringtones.md](ringtones.md)). |
 | No sound | Volume at 0? (Médias > Volume). The buzzer is quiet: put your ear close to it. |
 | The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Infos, the crystal must be 26 or 27 MHz. |
 | No more sound or LEDs | The mute mode may be on (command of the organizers during a talk): Réglages > Mode muet. |
 | The badge does not obey the Flipper | Réglages > Télécommande : oui? Princeton code `0xC16Axx`, sent from a `.sub` file and held for a second. |
-| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station, the 433 MHz hunt, the talk badge or the contact exchange is open: they use the radio. |
+| The other cicadas are no longer heard | Normal while the 433 MHz decoder, the weather station, the 433 MHz hunt, the talk badge, the contact exchange or the pirate radio (sending or listening) is open: they use the radio. |
+| "Trop loin ou absente" at the assassin, no cicada "à portée de main" in the smuggling game | Hold the badges against each other: these games need a very strong signal. |
 | The remote controls or the other cicadas are poorly received | Réglages > Réglage radio, close to other badges switched on. |
 | The screen keeps ghost images | Normal after many fast refreshes: it cleans itself at the next full refresh. |
 | The badge stops responding | Press the RESET button, or switch it off and on again. |

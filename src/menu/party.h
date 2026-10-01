@@ -10,10 +10,12 @@
  * messages through party_send().
  *
  * NET_PARTY [game][session 2][kind][to 4][payload <= 47]; to = 0: everybody. All at +10 dBm (NET_LOUD).
- * - OPEN (host, every second while the lobby is open): [players][max][flags]
+ * - OPEN (host, every second while the lobby is open): [players][max][flags][name of the host 8]
  * - JOIN (player -> host, every second until it is in the roster): [key 4][name 8]
- * - ROSTER (host, every second while the lobby is open, and after the start): [page][pages][players][ids 4 x <= 10]
- * - START (host, 5 times): [players][delay 2, ms: the game starts this long after the packet][seed 4]
+ * - ROSTER (host, 4 pages per second while the lobby is open and 10 s after the start, then 1 per second):
+ *   [page][pages][players][(id 4, name 8) x <= 3]
+ * - START (host, 5 times, then every second during the game for the players who missed it):
+ *   [players][delay 2, ms: the game starts this long after the packet][seed 4]
  * - LEAVE (anybody): the sender leaves the party (the host: the party is cancelled)
  * - kinds >= PARTY_KIND_GAME: messages of the game, given to the handler of party_set_handler()
  *
