@@ -50,6 +50,13 @@ void ui_check_bottom(int bottom, const char *text) {
 }
 
 
+void ui_fit_preview(const gfx_font_t *font, char *dst, size_t len, const char *src, int width) {
+    in_list = true;
+    ui_fit(font, dst, len, src, width);
+    in_list = false;
+}
+
+
 void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int width) {
     snprintf(dst, len, "%s", src);
     size_t n = strlen(dst);
@@ -115,9 +122,7 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
     for (int i = first; i < count && i < first + UI_VISIBLE_ROWS; ++i) {
         int y = UI_TITLE_H + 3 + (i - first)*UI_ROW_H;
         label(i, text, sizeof(text));
-        in_list = true;
-        ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);
-        in_list = false;
+        ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);
         if (i == sel) {
             gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, UI_ROW_H-1, GFX_BLACK);
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_LEFT);

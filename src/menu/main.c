@@ -584,7 +584,7 @@ static void draw_list(int count, int sel, void (*label)(int, char *, size_t)) {
     for (int i = first; i < count && i < first + VISIBLE_ROWS; ++i) {
         int y = TITLE_H + 3 + (i - first)*ROW_H;
         label(i, text, sizeof(text));
-        fit_text(fitted, sizeof(fitted), text, GFX_WIDTH - 20);
+        ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);  /* File names: cut expected */
         if (i == sel) {
             gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, ROW_H-1, GFX_BLACK);
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_LEFT);
@@ -1363,8 +1363,10 @@ static void render_music(void) {
     for (unsigned i = 0; i < AUDIO_VOLUME_MAX; ++i)
         bar[i] = i < vol ? '#' : '-';
     bar[AUDIO_VOLUME_MAX] = 0;
+    char name[48];
+    ui_fit_preview(&gfx_font_small, name, sizeof(name), playing_name, GFX_WIDTH - 12);  /* A file name of the SD */
     snprintf(text, sizeof(text), "%s\n\n%s   %lu:%02lu / %lu:%02lu\n\nVolume : %s",
-             playing_name, wav_is_paused() ? "Pause" : "Lecture",
+             name, wav_is_paused() ? "Pause" : "Lecture",
              (unsigned long)pos/60, (unsigned long)pos%60, (unsigned long)dur/60, (unsigned long)dur%60, bar);
     render_page("Musique", text, "D : pause  G : stop  Flancs : - +");
     /* Progress bar */

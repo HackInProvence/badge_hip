@@ -41,9 +41,11 @@ NOT_PAGES = {('Médias', 4), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglag
 # screen to capture, with its caption. "back" at the end of a step goes back where the page was.
 PAGES = {
     'Images': [('b', 'image', 'Une image de la carte SD', 'a')],
-    'Vidéos': [],
-    'Musique': [('b', 'lecture', 'Lecture d\'une musique', 'a')],
-    'Lecture rapide': [('b', 'lecture', 'Lecture d\'un texte', 'a')],
+    # The SD card of the badge: the musics and the texts are in folders (the first rows), the videos at the root
+    'Vidéos': [('b', 'lecture', 'Lecture d\'une vidéo', 'a')],
+    'Musique': [('b', 'dossier', 'Un dossier de musiques', None), ('b', 'lecture', 'Lecture d\'une musique', 'a')],
+    'Lecture rapide': [('b', 'dossier', 'Un dossier de textes', None),
+                       ('b', 'lecture', 'Lecture d\'un texte', 'a')],
     'Morpion': [('b', 'jeu', 'La partie', None)],
     'Puissance 4': [('b', 'jeu', 'La partie', None)],
     'Simon': [('b', 'jeu', 'La partie', None)],

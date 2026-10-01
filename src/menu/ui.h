@@ -34,6 +34,8 @@ void ui_footer(uint8_t *fb, const char *text);
 
 /** \brief Text truncated with "..." to fit in \p width pixels. */
 void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int width);
+/** \brief ui_fit() for a preview (a row of a list, a file name of the SD card): its cut is expected. */
+void ui_fit_preview(const gfx_font_t *font, char *dst, size_t len, const char *src, int width);
 
 /** \brief Centered lines ('\n' separated) from \p y, returns the y after the last one. */
 int ui_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *text);
