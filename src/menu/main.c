@@ -2254,6 +2254,7 @@ int main() {
             printf("saver: off\n");
             still_render = NULL;
             display_invalidate();
+            display_settle_soon();  /* The still image leaves a ghost under the next page: cleaned soon */
             app = saver_return;
             redraw = true;
             pressed = 0;
@@ -2266,6 +2267,7 @@ int main() {
                 printf("saver: off\n");
                 still_render = NULL;
                 display_invalidate();
+                display_settle_soon();
             }
             if (app == A_APP && cur_app && cur_app->stop)
                 cur_app->stop();

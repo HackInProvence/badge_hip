@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "display.h"
 #include "score_code.h"
 
 typedef struct {
@@ -76,6 +77,7 @@ static void program_render(uint8_t *fb, absolute_time_t now) {
         return;
     }
     const talk_t *t = &TALKS[selected];
+    display_settle_soon();  /* A QR code, read for a while: cleaned like the screensaver */
     char title[32];
     snprintf(title, sizeof(title), "Programme : %s", t->time);
     ui_title(fb, title);

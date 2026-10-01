@@ -9,6 +9,10 @@
  *
  * Updates use a fast refresh (multiframe mode with the 10 fps waveform, ~0.3s) that only changes what differs,
  * and a full refresh every DISPLAY_FULL_EVERY updates (or when requested) to remove the ghosting.
+ * A page that stays (DISPLAY_SETTLE_MS without update, or less when the page asks it with display_settle_soon()) is
+ * cleaned like the screensaver: full refreshes with the waveform of the screen (OTP) in black, in white, then the
+ * page (~9 s, once): the short waveforms leave ghosts that come back. A new update or a user of the screen
+ * (display_is_idle()) stops the cleaning after its current step (~3 s at most).
  * The screen goes to deep sleep after DISPLAY_SLEEP_MS without update, as recommended by the datasheet.
  *
  * Other code can use the screen when display_is_idle() (e.g. the video player), then must call display_invalidate()
@@ -24,7 +28,9 @@
 #include "pico/time.h"
 
 #define DISPLAY_FULL_EVERY 15
-#define DISPLAY_SLEEP_MS 20000
+#define DISPLAY_SLEEP_MS 20000  /* After the cleaning (it counts as an update) */
+#define DISPLAY_SETTLE_MS 15000  /* A page unchanged this long is cleaned */
+#define DISPLAY_SETTLE_SOON_MS 1500
 
 /** \brief Initialize the screen (calls screen_init()). */
 void display_init(void);
@@ -42,7 +48,12 @@ void display_task(absolute_time_t now);
  * (games: the full refresh blinks for ~2s). */
 void display_set_periodic_full(bool allowed);
 
-/** \brief Whether all updates are done and the screen can be used by someone else. */
+/** \brief Whether all updates are done and the screen can be used by someone else (a cleaning in progress is
+ * stopped: ask again until true). */
 bool display_is_idle(void);
+
+/** \brief The next frame shown (display_show()) is a page made to stay (an announcement, a QR code...): cleaned after
+ * DISPLAY_SETTLE_SOON_MS instead of DISPLAY_SETTLE_MS. */
+void display_settle_soon(void);
 
 #endif /* _DISPLAY_H */

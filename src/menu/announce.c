@@ -16,6 +16,7 @@
 
 #include "announce.h"
 #include "app.h"
+#include "display.h"
 #include "net.h"
 #include "score_code.h"
 #include "store.h"
@@ -434,7 +435,8 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
         break;
     }
     default:
-        announce_draw(fb, a);  /* Like on the cicadas (here with the fast refresh) */
+        announce_draw(fb, a);  /* Like on the cicadas (here with the fast refresh, cleaned soon) */
+        display_settle_soon();
         break;
     }
 }
