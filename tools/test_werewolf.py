@@ -144,7 +144,8 @@ def main():
         na.pump(0.5)
         require('narrator: Jeux > Loup-garou', open_werewolf(na, from_admin=True))
         shot(na, 'menu')
-        result('narrator: setup page', na.press('b', 'Mener une partie'))
+        na.keys('b')  # Mener une partie (the inner pages of an app have no "ui:" trace)
+        na.pump(0.5)
         if args.advanced:
             na.keys('b')  # Mode : avancé
         na.mark()
@@ -158,7 +159,7 @@ def main():
 
         # ---- The player joins ----
         require('player: Jeux > Loup-garou', open_werewolf(pl))
-        result('player: looking for the parties', pl.press('xb', 'Rejoindre'))
+        pl.keys('xb')  # Rejoindre une partie
         pl.pump(3)  # The OPEN of the narrator, every second
         shot(pl, 'scan')
         pl.mark()
@@ -209,7 +210,7 @@ def main():
                 break
             phase, day = m.group(1), m.group(2)
             phases_p.append(phase)
-            mn = na.expect(r'^werewolf: (?:phase (\w+), day (\d+)|end, (.+))', 10)
+            mn = na.expect(r'^werewolf: (?:phase (?!roles,)(\w+), day (\d+)|end, (.+))', 10)  # The player waits after the roles
             if mn and mn.group(3):
                 winner_n = mn.group(3)
             elif mn:
@@ -247,11 +248,11 @@ def main():
         result('player: every choice received by the narrator', fails == 0 and acks > 0,
                f'{acks} received, {fails} lost')
         same = phases_n == phases_p[:len(phases_n)] and len(phases_n) >= len(phases_p) - 1
-        result('both badges: the same phases', same, ' '.join(phases_p))
+        result('both badges: the same phases', same, 'player: ' + ' '.join(phases_p) + ' / narrator: ' + ' '.join(phases_n))
         result('game: the same end on both badges', winner_p is not None and winner_p == winner_n,
                f'{winner_n}; the player {"won" if won else "lost"}')
         for t, who in ((na, 'narrator'), (pl, 'player')):
-            bad = sorted(set(m.group(0) for m in lines_since(t, 0, r'^uicheck: .*')))
+            bad = sorted(set(m.group(0) for m in lines_since(t, 0, r'^uicheck: (?!on$|off$).*')))
             result(f'{who}: the texts fit on the screen', not bad, '; '.join(bad[:5]))
         pl.pump(1.5)
         shot(pl, 'end')
@@ -264,7 +265,7 @@ def main():
         pl.mark()
         pl.keys('a')  # The roles page -> the end page
         pl.keys('A')
-        result('player: quit page', pl.expect(r'^ui: Loup-garou$', 3) is not None)
+        pl.pump(1.0)  # The quit page (no "ui:" trace)
         pl.keys('b')
         result('player: left', pl.expect(r'^werewolf: left$', 3) is not None)
         na.mark()
