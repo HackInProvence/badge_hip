@@ -16,11 +16,18 @@
 #include "ook_rx.h"
 #include "remote.h"
 #include "social.h"
+#include "store.h"
 
 #define MASTER_PERIOD_MS 1000
 #define LOST_MS 5000  /* No beacon for this long: lost */
-#define RSSI_MIN (-100)  /* Far */
-#define RSSI_MAX (-45)  /* Next to it (beacon at +10 dBm: ~-70 to -83 at 1 m) */
+/* The scale of the hot / cold gauge: from HOT_SPAN dB below "hot" (glacial) to "hot" (the top of the gauge; "BRÛLANT"
+ * from 85 % of it). The beacon at +10 dBm is heard at ~-70 to -83 dBm at 1 m: the default makes it hot at about 1 m.
+ * The admin sets it on the page of the beacon (store.h hot_dbm), and the beacon sends it to the hunters. */
+#define HOT_DEFAULT_DBM (-70)
+#define HOT_MIN_DBM (-90)
+#define HOT_MAX_DBM (-40)
+#define HOT_STEP_DB 5
+#define HOT_SPAN 30
 
 /* ------ The hot / cold view, shared with the radar ------ */
 
@@ -30,6 +37,7 @@ typedef struct {
     bool valid;
     absolute_time_t beep_ts;
     uint32_t lost_ms;  /* Not heard for this long: lost (0: LOST_MS) */
+    int8_t hot_dbm;  /* The top of the scale (0: HOT_DEFAULT_DBM) */
 } signal_t;
 
 static void signal_add(signal_t *s, int16_t rssi, absolute_time_t now) {
@@ -44,7 +52,8 @@ static bool signal_lost(const signal_t *s, absolute_time_t now) {
 
 /* 0 (far) to 100 (next to it) */
 static int signal_level(const signal_t *s) {
-    int l = (s->rssi - RSSI_MIN) * 100 / (RSSI_MAX - RSSI_MIN);
+    int hot = s->hot_dbm ? s->hot_dbm : HOT_DEFAULT_DBM;
+    int l = (s->rssi - (hot - HOT_SPAN)) * 100 / HOT_SPAN;
     return l < 0 ? 0 : l > 100 ? 100 : l;
 }
 
@@ -94,6 +103,8 @@ static void handle_hotcold(const net_packet_t *p) {
     if (hunt_master && p->src != hunt_master)
         return;  /* Another hunt: keep the first master heard */
     hunt_master = p->src;
+    if (p->len >= 2 && (int8_t)p->data[1] >= HOT_MIN_DBM && (int8_t)p->data[1] <= HOT_MAX_DBM)
+        hunt.hot_dbm = (int8_t)p->data[1];  /* The scale chosen by the admin of the beacon */
     signal_add(&hunt, p->rssi, p->at);
     if (signal_level(&hunt) > 85)
         achv_unlock(ACHV_HOTCOLD);  /* "BRÛLANT !": found */
@@ -166,6 +177,12 @@ const app_t app_hotcold = {
 
 /* ------ Master beacon (admin menu) ------ */
 
+/* The RSSI of "BRÛLANT", set by the admin (flanks) and saved */
+static int8_t hot_dbm(void) {
+    int8_t v = store_get()->hot_dbm;
+    return v >= HOT_MIN_DBM && v <= HOT_MAX_DBM ? v : HOT_DEFAULT_DBM;
+}
+
 static void master_start(absolute_time_t now) {
     hotcold_init();
     master = true;
@@ -179,12 +196,18 @@ static bool master_buttons(const app_buttons_t *b, absolute_time_t now) {
         master = ! master;
         printf("hotcold: master beacon %s\n", master ? "on" : "off");
     }
+    if (b->pressed & (UI_BTN_X | UI_BTN_Y)) {
+        int v = hot_dbm() + ((b->pressed & UI_BTN_X) ? HOT_STEP_DB : -HOT_STEP_DB);
+        store_get()->hot_dbm = v < HOT_MIN_DBM ? HOT_MIN_DBM : v > HOT_MAX_DBM ? HOT_MAX_DBM : v;
+        store_changed();
+        printf("hotcold: hot from %d dBm\n", hot_dbm());
+    }
     return ! (b->pressed & UI_BTN_A);
 }
 
 static bool master_task(absolute_time_t now) {
     if (master && absolute_time_diff_us(master_ts, now) >= 0) {
-        uint8_t data[1] = {1};
+        uint8_t data[2] = {1, (uint8_t)hot_dbm()};  /* The hunters use the scale of the admin */
         net_send(NET_HOTCOLD, data, sizeof(data), NET_LOUD);
         master_ts = delayed_by_ms(now, MASTER_PERIOD_MS);
     }
@@ -194,8 +217,11 @@ static bool master_task(absolute_time_t now) {
 static void master_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, "Balise chaud-froid");
-    gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_large, master ? "Emission" : "Arrêtée", GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_lines(fb, 95, &gfx_font_small, "Une balise par seconde\n(+10 dBm). Cachez ce badge :\nles autres le cherchent avec\nSocial > Chaud - froid.");
+    gfx_text(fb, GFX_WIDTH/2, 40, &gfx_font_large, master ? "Emission" : "Arrêtée", GFX_BLACK, GFX_ALIGN_CENTER);
+    ui_lines(fb, 82, &gfx_font_small, "Une balise par seconde\n(+10 dBm). Cachez ce badge :\nles autres le cherchent avec\nSocial > Chaud - froid.");
+    char text[40];
+    snprintf(text, sizeof(text), "Brûlant dès %d dBm", (hot_dbm() * 100 - 15 * HOT_SPAN) / 100);
+    ui_lines(fb, 150, &gfx_font_small, text);
     ui_footer(fb, master ? "G : quitter  D : arrêter" : "G : quitter  D : émettre");
 }
 

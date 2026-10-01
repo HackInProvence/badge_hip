@@ -79,6 +79,7 @@ typedef struct {
     uint16_t book_section;  /* ...and its current section */
     uint8_t cargo[STORE_CARGO_ITEMS];  /* Smuggler (smuggler.c): how many of each good */
     uint8_t cargo_seeded;  /* 1 once the first goods were given */
+    int8_t hot_dbm;  /* Hot / cold beacon (hotcold.c): the RSSI of "BRÛLANT" set by the admin, outside -90..-40: default */
 } store_t;
 
 #define STORE_V2_MAGIC 0x5A

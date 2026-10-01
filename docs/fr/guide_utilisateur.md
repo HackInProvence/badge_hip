@@ -304,7 +304,8 @@ rencontrée). Aile droite : suivre une cigale en mode « chaud - froid » ; aile
 
 **Chaud - froid** : les organisateurs cachent un badge balise ; trouvez-le à la force de son signal.
 Le badge indique « Glacial », « Froid », « Tiède », « Chaud » ou « BRÛLANT ! » avec une jauge,
-les LEDs passent du bleu au rouge et les bips s'accélèrent en approchant.
+les LEDs passent du bleu au rouge et les bips s'accélèrent en approchant. L'échelle est celle de la balise :
+« BRÛLANT ! » à environ 1 m par défaut (dès -74 dBm), réglable par l'organisateur (voir Admin > Balise chaud-froid).
 Aile droite : chercher une autre balise.
 
 **Virus des cigales** : un virus (inoffensif) circule de cigale en cigale.
@@ -557,7 +558,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
-| **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid |
+| **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid. Flancs : l'échelle (« Brûlant dès -74 dBm » par défaut, par pas de 5 dB, gardée), envoyée aux chercheurs avec la balise : à régler sur place selon la distance voulue |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |

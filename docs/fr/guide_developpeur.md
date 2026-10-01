@@ -551,7 +551,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, réponse ; envoyée 3 fois |
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), genre, destinataire (4), manche ou tour, puis selon le genre (§ 6.16) |
 | 0x07 | `NET_TRADE` | `smuggler.c` | id de l'affaire (4), genre, destinataire (4), données (§ 6.26) ; ancien `NET_CONTACT`, inutilisé depuis que les cartes passent en mode chat (§ 6.20) |
-| 0x08 | `NET_HOTCOLD` | `hotcold.c` | balise chaud - froid, une par seconde |
+| 0x08 | `NET_HOTCOLD` | `hotcold.c` | balise chaud - froid, une par seconde : [1][dBm du haut de l'échelle, signé] (jauge de -30 dB sous cette valeur à cette valeur, « BRÛLANT » dès 85 %) |
 | 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |

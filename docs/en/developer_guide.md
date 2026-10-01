@@ -552,7 +552,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, answer; sent 3 times |
 | 0x06 | `NET_GAME` | `duel.c`, `battle.c` | session (2), kind, recipient (4), round or turn, then depending on the kind (§ 6.16) |
 | 0x07 | `NET_TRADE` | `smuggler.c` | trade id (4), kind, recipient (4), data (§ 6.26); formerly `NET_CONTACT`, unused since the cards go in chat mode (§ 6.20) |
-| 0x08 | `NET_HOTCOLD` | `hotcold.c` | hot - cold beacon, one per second |
+| 0x08 | `NET_HOTCOLD` | `hotcold.c` | hot - cold beacon, one per second: [1][dBm of the top of the scale, signed] (gauge from 30 dB below it to it, "BRÛLANT" from 85 %) |
 | 0x09 | `NET_INFECTION` | `infection.c` | generation (0 = patient zero); a "cough" every 4 to 5 s, at +10 dBm; contagion at RSSI ≥ −80 dBm (provisional) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfer (2), block, 48 bytes (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | song, kind, session (2), ms (4), voices (§ 6.15) |

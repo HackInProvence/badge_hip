@@ -533,15 +533,17 @@ static void render_trade(uint8_t *fb) {
     switch (trade.state) {
     case TS_INVITING:
         dark_page(fb, header, "G : annuler");
+        int y;
         if (gift) {
             draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.my_good, 2, GFX_WHITE, false);
             snprintf(text, sizeof(text), "%s\nproposé à %s...", smuggler_goods[trade.my_good].name, trade.peer_name);
-            dark_lines(fb, UI_TITLE_H + 78, &gfx_font_small, text);
+            y = dark_lines(fb, UI_TITLE_H + 76, &gfx_font_small, text);
         } else {
             snprintf(text, sizeof(text), "Proposition envoyée\nà %s...", trade.peer_name);
-            dark_lines(fb, 60, &gfx_font_medium, text);
+            y = dark_lines(fb, 60, &gfx_font_medium, text);
         }
-        dark_lines(fb, 136, &gfx_font_small, "Gardez les badges\nl'un contre l'autre.");
+        /* Under the text above, with a margin (one line: it must stay above the footer) */
+        dark_lines(fb, y + 12 > 132 ? y + 12 : 132, &gfx_font_small, "Gardez les badges collés.");
         break;
     case TS_CHOOSE:
         snprintf(header, sizeof(header), "Votre offre pour %s ?", trade.peer_name);

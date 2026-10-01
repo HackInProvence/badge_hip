@@ -308,7 +308,8 @@ already met). Right wing: follow a cicada in "hot - cold" mode; left wing: back 
 
 **Chaud - froid** (Hot - cold): the organizers hide a beacon badge; find it by the strength of its signal.
 The badge shows "Glacial" (freezing), "Froid" (cold), "Tiède" (warm), "Chaud" (hot) or "BRÛLANT !" (burning!) with a
-gauge, the LEDs go from blue to red and the beeps speed up as you get closer.
+gauge, the LEDs go from blue to red and the beeps speed up as you get closer. The scale is the beacon's: "BRÛLANT !"
+at about 1 m by default (from -74 dBm), set by the organizer (see Admin > Balise chaud-froid).
 Right wing: look for another beacon.
 
 **Virus des cigales** (Cicada virus): a (harmless) virus spreads from cicada to cicada.
@@ -563,7 +564,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Annonces (admin)** (Announcements) | writes and sends the announcements to all the cicadas (see below) |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
 | **Choeur : lancer** (Choir: start) | starts a song of the choir; this badge sings the first voice |
-| **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid |
+| **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid. Flanks: the scale ("Brûlant dès -74 dBm" by default, 5 dB steps, saved), sent to the hunters with the beacon: set it on site for the distance wanted |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |
