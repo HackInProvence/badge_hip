@@ -202,7 +202,13 @@ static uint8_t buttons_pressed(absolute_time_t now) {
             printf("battery: %u mV, %d %%, ADC raw %u%s\n", battery_mv(), battery_percent(), battery_raw(),
                    battery_charging() ? ", USB" : "");
         else
-            printf("battery: not calibrated, ADC raw %u%s (see battery.h)\n", battery_raw(), battery_charging() ? ", USB" : "");
+            printf("battery: not calibrated, ADC raw %u%s (Admin > Batterie (calibration))\n", battery_raw(),
+                   battery_charging() ? ", USB" : "");
+        {
+            const store_factory_t *f = store_factory_get();
+            printf("battery: factory points %u = %u mV, %u = %u mV\n", f->battery_raw[0], f->battery_mv[0],
+                   f->battery_raw[1], f->battery_mv[1]);
+        }
         break;
     }
     case 'i': {
@@ -673,9 +679,10 @@ static const submenu_t SUBMENUS[] = {
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433)}},
     {"Badge", 7, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED}},
     {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
-    {"Admin", 11, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {"Admin", 12, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_PROGRAM_ANNOUNCE), M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
-                   M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_RESET), M_APP(APP_ADMIN_TYPE),
+                   M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_RESET), M_APP(APP_BATTCAL),
+                   M_APP(APP_ADMIN_TYPE),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
@@ -1954,6 +1961,7 @@ static void cancel(void) {
         break;
     case A_MUSIC:
         wav_stop();
+        printf("music: stopped at %lus of %lus\n", (unsigned long)wav_position_s(), (unsigned long)wav_duration_s());
         app = A_BROWSE;
         break;
     case A_CARRIER:

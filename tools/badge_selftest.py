@@ -32,7 +32,8 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'radio433', 'social', 'net']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'battery',
+          'radio433', 'social', 'net']
 
 
 class Tester:
@@ -397,7 +398,8 @@ def test_social(t):
 SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Programme', 'Vote', 'Radar des cigales', 'Chaud - froid',
           'Virus des cigales', 'Choeur', 'Annonces']
 ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Annoncer un talk', 'Vote (admin)',
-         'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro', 'Type du badge',
+         'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Remise à zéro',
+         'Batterie (calibration)', 'Type du badge',
          'Quitter le mode admin']
 
 
@@ -617,9 +619,45 @@ def test_images(t):
     t.press('a', TOP)
 
 
+def test_battery(t):
+    """Admin > Batterie (calibration): 2 points make the measure calibrated, then they are cleared. Only on a badge
+    not calibrated yet: the points are factory settings, a real calibration is not touched."""
+    t.mark()
+    t.keys('!')
+    m = t.expect(r'^battery: (not calibrated)?', 5)
+    if not m or not m.group(1):
+        t.result('battery: calibration', None, 'already calibrated: left as it is')
+        return
+    if not open_admin(t) or not admin_app(t, 'Batterie (calibration)'):
+        t.result('battery: calibration', False, 'page not opened')
+        return
+    t.screenshot('battery_calibration')
+    t.mark()
+    t.keys('xb')  # Enregistrer le point (the voltage proposed: 4.20 V on USB)
+    p1 = t.expect(r'^battery: point 1 set, ADC raw (\d+) = (\d+) mV', 3)
+    t.expect(r'^store: factory settings saved \(ok\)', 3)
+    t.keys('y' + 'a' * 50 + 'xb')  # 0.50 V less, but the same ADC value...
+    p2 = t.expect(r'^battery: point 1 set', 3)  # ...replaces point 1: 2 points need 2 different charges
+    t.mark()
+    t.keys('!')
+    still = t.expect(r'^battery: not calibrated', 5)  # One point (the same ADC value twice): never a wrong value
+    t.keys('xb')  # Effacer: asks a confirmation...
+    t.pump(0.5)
+    t.mark()
+    t.keys('b')  # ...cleared
+    cleared = t.expect(r'^battery: calibration cleared', 3)
+    t.result('battery: calibration', p1 is not None and p2 is not None and still is not None and cleared is not None,
+             f'point {p1.group(1)} = {p1.group(2)} mV' if p1 else 'no point saved')
+    t.keys('ya')  # Back (from "Enregistrer")
+    t.press('a', TOP)
+    t.mark()
+    t.badge.send('\x01a')
+    t.expect(r'^admin: off$', 3)
+
+
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
-         'apps': test_apps, 'admin': test_admin, 'radio433': test_radio433, 'social': test_social,
+         'apps': test_apps, 'admin': test_admin, 'battery': test_battery, 'radio433': test_radio433, 'social': test_social,
          'net': test_net}
 
 

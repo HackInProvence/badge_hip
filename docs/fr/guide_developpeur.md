@@ -405,13 +405,16 @@ annonces par défaut.
 ### 6.9 Batterie
 
 - La mesure brute (ADC3, 16 échantillons, filtrée) n'est convertie en tension qu'avec une **calibration en deux points**
-  (`BATTERY_CAL_RAW1/MV1/RAW2/MV2` dans [battery.h](../../src/menu/battery.h)).
+  (linéaire entre les points, distants d'au moins `BATTERY_CAL_MIN_RAW` = 150 pas d'ADC).
 - Sans calibration, rien n'est affiché : le badge ne doit jamais afficher de valeur fausse.
-- Pour calibrer :
-  1. lire la ligne `battery:` du diagnostic `!` (valeur `ADC raw`) ;
-  2. relever au même moment la tension de la batterie au multimètre ;
-  3. recommencer une fois en charge et une fois sur batterie ;
-  4. renseigner les quatre valeurs.
+- Les points se règlent sur le badge : Admin > Batterie (calibration) (battcal.c, voir le guide utilisateur § 5).
+  `battery_set_point(mv, raw)` pose le premier point, le second, ou remplace le plus proche.
+- Ce sont des **réglages usine** : `store_factory_t` (magic `"FACT"`), dans son propre secteur de flash juste
+  avant le second store. Écrit tout de suite (`store_factory_save()`), il n'est jamais effacé par la Remise à zéro,
+  un changement de version du store ou un nouveau firmware (picotool n'écrit que les secteurs du programme).
+- Repli pour un badge sans points usine : `BATTERY_CAL_RAW1/MV1/RAW2/MV2` à la compilation
+  ([battery.h](../../src/menu/battery.h)).
+- Le diagnostic `!` affiche la mesure et `battery: factory points <raw> = <mV>, <raw> = <mV>`.
 
 ### 6.10 Texte et polices
 

@@ -3,7 +3,12 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "battery.h"
+#include "store.h"
 
 #include "hardware/adc.h"
 #include "pico/stdio_usb.h"
@@ -35,8 +40,43 @@ void battery_init(void) {
     adc_gpio_init(BADGE_VBAT);
 }
 
+/* The calibration of this badge (factory settings, admin menu), otherwise the one of the build */
+static void points(int32_t raw[2], int32_t mv[2]) {
+    const store_factory_t *f = store_factory_get();
+    bool factory = f->battery_mv[0] && f->battery_mv[1];
+    for (int i = 0; i < 2; ++i) {
+        raw[i] = factory ? f->battery_raw[i] : i ? BATTERY_CAL_RAW2 : BATTERY_CAL_RAW1;
+        mv[i] = factory ? f->battery_mv[i] : i ? BATTERY_CAL_MV2 : BATTERY_CAL_MV1;
+    }
+}
+
 bool battery_calibrated(void) {
-    return BATTERY_CAL_RAW1 != BATTERY_CAL_RAW2 && BATTERY_CAL_MV1 && BATTERY_CAL_MV2;
+    int32_t raw[2], mv[2];
+    points(raw, mv);
+    return abs(raw[1] - raw[0]) >= BATTERY_CAL_MIN_RAW && mv[0] && mv[1];
+}
+
+bool battery_set_point(uint16_t mv, uint16_t raw) {
+    store_factory_t *f = store_factory_get();
+    int i;
+    if (! f->battery_mv[0] || abs(raw - f->battery_raw[0]) < BATTERY_CAL_MIN_RAW)
+        i = 0;  /* First point, or the same one measured again */
+    else if (! f->battery_mv[1] || abs(raw - f->battery_raw[1]) < BATTERY_CAL_MIN_RAW)
+        i = 1;
+    else
+        i = abs(raw - f->battery_raw[0]) < abs(raw - f->battery_raw[1]) ? 0 : 1;  /* Replace the nearest one */
+    f->battery_raw[i] = raw;
+    f->battery_mv[i] = mv;
+    printf("battery: point %d set, ADC raw %u = %u mV\n", i + 1, raw, mv);
+    return store_factory_save();
+}
+
+bool battery_clear_points(void) {
+    store_factory_t *f = store_factory_get();
+    memset(f->battery_raw, 0, sizeof(f->battery_raw));
+    memset(f->battery_mv, 0, sizeof(f->battery_mv));
+    printf("battery: calibration cleared\n");
+    return store_factory_save();
 }
 
 bool battery_charging(void) {
@@ -61,15 +101,12 @@ uint16_t battery_raw(void) {
 }
 
 uint16_t battery_mv(void) {
-#if BATTERY_CAL_RAW1 != BATTERY_CAL_RAW2
     if (! battery_calibrated() || ! filtered_raw)
-        return 0;
-    int32_t mv = BATTERY_CAL_MV1 + ((int32_t)filtered_raw - BATTERY_CAL_RAW1) * (BATTERY_CAL_MV2 - BATTERY_CAL_MV1)
-                                   / (BATTERY_CAL_RAW2 - BATTERY_CAL_RAW1);
-    return mv < 0 ? 0 : mv > 5000 ? 5000 : mv;
-#else
-    return 0;  /* Not calibrated */
-#endif
+        return 0;  /* Not calibrated: no value rather than a wrong one */
+    int32_t raw[2], mv[2];
+    points(raw, mv);
+    int32_t v = mv[0] + ((int32_t)filtered_raw - raw[0]) * (mv[1] - mv[0]) / (raw[1] - raw[0]);
+    return v < 0 ? 0 : v > 5000 ? 5000 : v;
 }
 
 int battery_percent(void) {

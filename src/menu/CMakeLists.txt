@@ -33,6 +33,7 @@ target_sources(badge_menu PRIVATE
     reset.c
     ../radio/ookdec.c
     battery.c
+    battcal.c
     display.c
     credits.c
     ctf.c

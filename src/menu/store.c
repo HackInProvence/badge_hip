@@ -19,6 +19,8 @@
 #define STORE_EXT_MAGIC 0x544E4F43  /* "CONT" */
 #define STORE_EXT_VERSION 2  /* 2: cards of 512 bytes (longer URLs) */
 #define STORE_EXT_OFFSET (STORE_OFFSET - STORE_EXT_SIZE)
+#define STORE_FACTORY_VERSION 1
+#define STORE_FACTORY_OFFSET (STORE_EXT_OFFSET - FLASH_SECTOR_SIZE)
 
 _Static_assert(sizeof(store_t) <= FLASH_SECTOR_SIZE, "the store must fit in a flash sector");
 
@@ -27,6 +29,7 @@ static bool dirty = false;
 static absolute_time_t dirty_ts = 0;
 static uint8_t sector[FLASH_SECTOR_SIZE] __attribute__((aligned(4)));
 static store_ext_t ext __attribute__((aligned(4)));
+static store_factory_t factory;
 static bool ext_dirty = false;
 static absolute_time_t ext_dirty_ts = 0;
 
@@ -51,6 +54,12 @@ void store_init(void) {
         ext.version = STORE_EXT_VERSION;
         ext.send_mask = 0x0003;  /* First name and name */
     }
+    memcpy(&factory, (const void *)(XIP_BASE + STORE_FACTORY_OFFSET), sizeof(factory));
+    if (factory.magic != STORE_FACTORY_MAGIC || factory.version != STORE_FACTORY_VERSION) {
+        memset(&factory, 0, sizeof(factory));  /* Never set (an erased flash reads 0xFF) */
+        factory.magic = STORE_FACTORY_MAGIC;
+        factory.version = STORE_FACTORY_VERSION;
+    }
     for (int i = 0; i < STORE_IR_SLOTS; ++i)
         if (store.ir[i].n > IR_MAX_PULSES)
             store.ir[i].n = 0;
@@ -64,6 +73,31 @@ store_t *store_get(void) {
 
 store_ext_t *store_ext_get(void) {
     return &ext;
+}
+
+
+store_factory_t *store_factory_get(void) {
+    return &factory;
+}
+
+
+static void save_factory(void *param) {
+    (void)param;
+    flash_range_erase(STORE_FACTORY_OFFSET, FLASH_SECTOR_SIZE);
+    flash_range_program(STORE_FACTORY_OFFSET, sector, FLASH_SECTOR_SIZE);
+}
+
+
+bool store_factory_save(void) {
+    if (dirty) {  /* The sector buffer is shared: write the pending store first */
+        dirty_ts = 0;
+        store_task(get_absolute_time());
+    }
+    memset(sector, 0xFF, sizeof(sector));
+    memcpy(sector, &factory, sizeof(factory));
+    int r = flash_safe_execute(save_factory, NULL, 100);
+    printf("store: factory settings saved (%s)\n", r == PICO_OK ? "ok" : "error");
+    return r == PICO_OK;
 }
 
 

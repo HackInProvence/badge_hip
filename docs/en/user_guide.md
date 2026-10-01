@@ -418,6 +418,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Balise chaud-froid** (Hot-cold beacon) | this badge sends a beacon every second: hide it, the others look for it with Social > Chaud - froid |
 | **Virus : patient zéro** (Virus: patient zero) | infects this badge to start the epidemic; left flank: cure it |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
+| **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |
 | **Type du badge** (Badge type) | Participant, Orateur (speaker) or Staff, shown by the name tag |
 | **Quitter le mode admin** (Leave admin mode) | hides the Admin theme again |
 
@@ -474,7 +475,15 @@ right wing** to confirm (left wing: no):
 - The battery charges through the USB-C port, even with the switch on OFF.
   Red LED: charging; green LED: charged.
 - The battery level is only shown (icon at the top right of the menu, and in Infos)
-  if the badge has been calibrated; otherwise it shows "non calibrée" (not calibrated) (see the developer guide).
+  if the badge has been calibrated; otherwise it shows "non calibrée" (not calibrated).
+- **Calibrating** (Admin > Batterie (calibration)), once per badge:
+  1. with the badge on USB (charging), measure the battery voltage with a multimeter;
+  2. on the "Multimètre" line, set this voltage with the wings (- / +, hold: fast);
+  3. flank: "Enregistrer le point" (save the point), right wing;
+  4. do it again on battery, unplugged for a few minutes (the voltage must have dropped by at least 0.2 V):
+     the level is shown from this 2nd point on.
+  A new point replaces the nearest one. "Effacer" (right wing twice) forgets the calibration.
+  The calibration is a "factory" setting: kept by the Reset (even "Tout") and by the firmware updates.
 
 
 ## 6. Controlling the badge from a computer

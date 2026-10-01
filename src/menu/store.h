@@ -106,6 +106,24 @@ typedef union {
     uint8_t raw[STORE_EXT_SIZE];  /* Whole sectors (the flash is written from this buffer) */
 } store_ext_t;
 
+/* Factory settings (the sector before the second store): never erased by the resets (Remise à zéro, new store
+ * versions) nor by a new firmware; written at once, they are rarely changed (admin menu). */
+#define STORE_FACTORY_MAGIC 0x54434146  /* "FACT" */
+typedef struct {
+    uint32_t magic;
+    uint16_t version;
+    uint16_t pad;
+    /* Calibration of the battery measure (battery.c): 2 points (ADC raw value, millivolts), 0 = not set */
+    uint16_t battery_raw[2];
+    uint16_t battery_mv[2];
+} store_factory_t;
+
+/** \brief The factory settings (all 0 when never set). */
+store_factory_t *store_factory_get(void);
+
+/** \brief Write the factory settings to the flash now (~50ms). \return true when done */
+bool store_factory_save(void);
+
 store_ext_t *store_ext_get(void);
 void store_ext_changed(void);
 

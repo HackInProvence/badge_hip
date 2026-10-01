@@ -51,6 +51,7 @@ typedef enum {
     APP_ANNOUNCES,
     APP_ANNOUNCE_ADMIN,
     APP_RESET,
+    APP_BATTCAL,
     APP_COUNT,
 } app_id_t;
 

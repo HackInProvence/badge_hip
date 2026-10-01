@@ -71,13 +71,15 @@ def play_all(t, kind, item_index, max_s, report, path_prefix=''):
                 continue
             info = m.group(1)
             dur = int(re.search(r'(\d+)s$', info).group(1)) if re.search(r'(\d+)s$', info) else 600
-            wait = dur + 20 if not max_s else min(dur, max_s) + 3
+            wait = dur + 20 if not max_s or dur <= max_s + 2 else max_s + 0.5
             end = t.expect(r'^music: end at (\d+)s of (\d+)s', wait)
             if not end:
                 t.keys('a', 1)  # Stop: long enough, or stuck
-                end = t.expect(r'^music: end at (\d+)s of (\d+)s', 5)
-                ok = end is not None and (max_s and dur > max_s)
-                result = f'ok ({max_s} s sur {dur} s)' if ok else 'ERREUR (pas de fin)'
+                stop = t.expect(r'^music: stopped at (\d+)s of (\d+)s', 5)
+                pos = int(stop.group(1)) if stop else -1
+                ok = max_s and pos >= max_s - 1  # The position advanced: the music was played
+                result = f'ok ({pos} s sur {dur} s)' if ok else \
+                    f'ERREUR ({"arrêtée à " + str(pos) + " s" if stop else "pas de fin"})'
             else:
                 pos, d = int(end.group(1)), int(end.group(2))
                 ok = pos + 1 >= d
@@ -101,7 +103,8 @@ def main():
     parser.add_argument('--port', default=None)
     parser.add_argument('--videos', action='store_true')
     parser.add_argument('--music', action='store_true')
-    parser.add_argument('--max', type=int, default=0, help='seconds of each file at most (0: the whole file)')
+    parser.add_argument('--max', type=int, default=0, help='seconds of each video at most (0: the whole file)')
+    parser.add_argument('--music-max', type=int, default=5, help='seconds of each music (default 5: the start; 0: the whole file)')
     args = parser.parse_args()
     kinds = [k for k, on in (('video', args.videos), ('music', args.music)) if on] or ['video', 'music']
     badge = Badge(args.port or find_port())
@@ -124,7 +127,7 @@ def main():
         st.open_theme(t, 'Médias')
         t.mark()
         t.keys(('x' if kind == 'video' else 'xx') + 'b')  # Vidéos, Musique
-        play_all(t, kind, 1 if kind == 'video' else 2, args.max, report)
+        play_all(t, kind, 1 if kind == 'video' else 2, args.max if kind == 'video' else args.music_max, report)
         t.keys('a', 1)
         t.keys('y' * (1 if kind == 'video' else 2))
         st.close_theme(t, 'Médias')

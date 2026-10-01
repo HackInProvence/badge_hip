@@ -407,13 +407,16 @@ default announcements there.
 ### 6.9 Battery
 
 - The raw reading (ADC3, 16 samples, filtered) is only converted to a voltage with a **two-point calibration**
-  (`BATTERY_CAL_RAW1/MV1/RAW2/MV2` in [battery.h](../../src/menu/battery.h)).
+  (linear between the points, which must be at least `BATTERY_CAL_MIN_RAW` = 150 ADC steps apart).
 - Without calibration nothing is displayed: the badge must never show a wrong value.
-- To calibrate:
-  1. read the `battery:` line of the `!` diagnostic (the `ADC raw` value);
-  2. measure the battery voltage with a multimeter at the same time;
-  3. do this once while charging and once on battery;
-  4. fill in the four values.
+- The points are set on the badge: Admin > Batterie (calibration) (battcal.c, see the user guide § 5).
+  `battery_set_point(mv, raw)` sets the first point, the second one, or replaces the nearest one.
+- They are **factory settings**: `store_factory_t` (magic `"FACT"`), in its own flash sector just before the
+  second store. It is written at once (`store_factory_save()`) and never erased by the Remise à zéro, a new
+  store version or a new firmware (picotool only writes the sectors of the program).
+- Fallback for a badge with no factory points: `BATTERY_CAL_RAW1/MV1/RAW2/MV2` at build time
+  ([battery.h](../../src/menu/battery.h)).
+- The `!` diagnostic prints the measure and `battery: factory points <raw> = <mV>, <raw> = <mV>`.
 
 ### 6.10 Text and fonts
 

@@ -414,6 +414,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
+| **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 
@@ -470,7 +471,16 @@ l'aile droite** pour confirmer (aile gauche : non) :
 - La batterie se recharge par le port USB-C, même interrupteur sur OFF.
   LED rouge : en charge ; LED verte : chargée.
 - Le niveau de batterie n'est affiché (icône en haut à droite du menu, et dans Infos)
-  que si le badge a été calibré : sinon « non calibrée » (voir le guide développeur).
+  que si le badge a été calibré : sinon « non calibrée ».
+- **Calibrer** (Admin > Batterie (calibration)), une fois par badge :
+  1. badge branché en USB (en charge), mesurez la tension de la batterie au multimètre ;
+  2. sur la ligne « Multimètre », réglez cette tension avec les ailes (- / +, maintenir : vite) ;
+  3. flanc : « Enregistrer le point », aile droite ;
+  4. recommencez sur batterie, débranché depuis quelques minutes (la tension doit avoir baissé d'au moins
+     0,2 V) : le niveau s'affiche dès ce 2e point.
+  Un nouveau point remplace le plus proche. « Effacer » (aile droite deux fois) oublie la calibration.
+  La calibration est un réglage « usine » : gardée par la Remise à zéro (même « Tout ») et par les mises à jour
+  du firmware.
 
 
 ## 6. Piloter le badge depuis un ordinateur

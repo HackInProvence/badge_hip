@@ -108,6 +108,8 @@ bool wav_start(const char *path) {
 void wav_stop(void) {
     if (! playing)
         return;
+    if (! paused)
+        start_sample += audio_played();  /* wav_position_s() stays the position of the stop */
     audio_close();
     f_close(&file);
     playing = false;
@@ -144,7 +146,7 @@ uint32_t wav_duration_s(void) {
 
 
 uint32_t wav_position_s(void) {
-    return rate ? (start_sample + (paused ? 0 : audio_played())) / rate : 0;
+    return rate ? (start_sample + (playing && ! paused ? audio_played() : 0)) / rate : 0;
 }
 
 
