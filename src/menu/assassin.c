@@ -47,7 +47,9 @@
 /* A KILL is accepted from this RSSI (dBm, measured by the victim on the KILL packet sent at +10 dBm): about -40 to
  * -50 when the badges almost touch, -60 to -70 at 1-2 m. To calibrate with two badges: the victim prints
  * "assassin: KILL from ... rssi N" for every attempt. */
+#ifndef ASSASSIN_KILL_RSSI  /* A test build can relax it (-DASSASSIN_KILL_RSSI=-90) */
 #define ASSASSIN_KILL_RSSI (-50)
+#endif
 #define MIN_PLAYERS 3
 #define MIN_PLAYERS_ADMIN 2  /* The host in admin mode (tests with two badges, tools/test_party_games.py) */
 #define START_DELAY_MS 2500

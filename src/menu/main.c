@@ -441,6 +441,11 @@ static bool notify(const app_t *a, const char *msg) {
     return false;
 }
 
+/* The group games run when their page is not shown (tug.c, assassin.c) */
+void tug_service(absolute_time_t now);
+void assassin_service(absolute_time_t now);
+bool assassin_event(char *buf, int len);
+
 /* The services of the social features (vote.c, program.c, infection.c, messages.c) */
 void vote_task(absolute_time_t now);
 bool vote_new(void);
@@ -2479,6 +2484,8 @@ int main() {
         chorus_task(now);
         /* Notifications of the social features: the page opens from the menus, a status otherwise */
         char notif[64];
+        if (assassin_event(notif, sizeof(notif)))
+            notify(APPS[APP_ASSASSIN], notif);  /* "Éliminé par X", a new target, the victory */
         if (program_announced(notif, sizeof(notif))) {
             if (! notify(APPS[APP_PROGRAM], notif))
                 program_forget();
@@ -2516,6 +2523,8 @@ int main() {
             notify(APPS[APP_BATTLE], notif);
         social_task(now);
         party_task(now);
+        tug_service(now);
+        assassin_service(now);
         battery_task(now);
         static int shown_bars = -2;
         static bool shown_charging = false;

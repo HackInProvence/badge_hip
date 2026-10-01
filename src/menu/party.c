@@ -322,13 +322,14 @@ static void handle(const net_packet_t *p) {
         printf("party: started, %d players, seed %08lx\n", n_roster, (unsigned long)seed);
         return;
     case K_LEAVE:
-        if (p->src == host && state != PARTY_HOSTING) {
-            state = PARTY_CANCELLED;
+        if (state == PARTY_STARTED) {
+            if (handler)
+                handler(kind, p->src, to, x, n, p->rssi);  /* The game decides (a player, or the host, left) */
+        } else if (p->src == host && state != PARTY_HOSTING) {
+            state = PARTY_CANCELLED;  /* The lobby closed before the start */
             printf("party: cancelled by the host\n");
         } else if (state == PARTY_HOSTING) {
             party_kick(p->src);
-        } else if (state == PARTY_STARTED && handler) {
-            handler(kind, p->src, to, x, n, p->rssi);  /* The game decides (a player left) */
         }
         return;
     default:
@@ -357,9 +358,9 @@ void party_task(absolute_time_t now) {
         memcpy(d + 3, social_name(), 8);
         send_raw(K_OPEN, 0, d, sizeof(d));
         send_roster_pages(PAGES_PER_ROUND);
-    } else if (state == PARTY_STARTED && party_is_host()
-               && absolute_time_diff_us(started_at, now) < ROSTER_AFTER_START_MS * 1000ll) {
-        send_roster_pages(PAGES_PER_ROUND);  /* For the players who missed pages */
+    } else if (state == PARTY_STARTED && party_is_host()) {
+        /* For the players who missed pages: all of them at first, then one per second during the game */
+        send_roster_pages(absolute_time_diff_us(started_at, now) < ROSTER_AFTER_START_MS * 1000ll ? PAGES_PER_ROUND : 1);
     } else if (state == PARTY_JOINING || (state == PARTY_JOINED && find(net_id()) < 0)) {
         uint8_t d[12];
         net_put_u32(d, my_key);
