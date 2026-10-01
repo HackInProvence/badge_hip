@@ -437,6 +437,13 @@ static bool two_classes(int s, int n, uint32_t threshold, int want_short, uint32
  * (like the Flipper decoder, which compares with its last_data).
  * The Flipper sends it from Sub-GHz > Add Manually > Princeton_433: random 20 bits key, button 0x4 in the low
  * nibble, te = 400µs, AM650 preset; the code can then be edited in the saved file ("Key: 00 00 00 00 00 12 34 54"). */
+static uint32_t trusted_value = 0, trusted_mask = 0;
+
+void ookdec_trust(uint32_t value, uint32_t mask) {
+    trusted_value = value;
+    trusted_mask = mask;
+}
+
 static bool dec_princeton(ookdec_result_t *r) {
     repeat_t rep = {0};
     for (int g = 49; g <= wn; g += 2) {
@@ -460,7 +467,11 @@ static bool dec_princeton(ookdec_result_t *r) {
             ok = pulse_long != gap_long && in(pulse + gap, te * 4 * 3 / 4, te * 4 * 5 / 4);  /* Period 4te */
             code = code << 1 | pulse_long;
         }
-        if (! ok || ! repeated(&rep, code))
+        if (! ok)
+            continue;
+        /* Seen twice, or once for the trusted codes (a single frame of a short press, see ookdec_trust()) */
+        bool twice = repeated(&rep, code);
+        if (! twice && ! (trusted_mask && (code & trusted_mask) == trusted_value))
             continue;
         set_name(r, "Princeton", code, 24);
         r->te = ms;

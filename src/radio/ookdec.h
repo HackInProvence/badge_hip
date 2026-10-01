@@ -65,4 +65,8 @@ typedef struct {
  * \return true when a frame was decoded (and its checksum, or its repeat, validated), described in \p r */
 bool ookdec_decode(const ookdec_signal_t *s, ookdec_result_t *r);
 
+/** \brief The Princeton codes whose bits under \p mask equal \p value are decoded from a single frame (the others
+ * must be seen twice): the remote commands of the badges (0xC16Axx), a short press sends few frames. mask 0: none. */
+void ookdec_trust(uint32_t value, uint32_t mask);
+
 #endif /* _OOKDEC_H */

@@ -393,6 +393,8 @@ void net_task(absolute_time_t now) {
     if (absolute_time_diff_us(now, next_poll) > 0)
         return;
     next_poll = delayed_by_us(now, POLL_US);
+    if (! gpio_get(BADGE_RADIO_GDO0))
+        gdo0_high_ts = 0;  /* GDO0 went low (between two packets): it is not stuck, see check_radio() */
     if (absolute_time_diff_us(check_ts, now) >= 0) {
         check_ts = delayed_by_ms(now, CHECK_MS);
         if (! check_radio())

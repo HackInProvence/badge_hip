@@ -230,6 +230,9 @@ void remote_send(uint8_t command) {
 
 void remote_init(void) {
     net_subscribe(NET_COMMAND, handle_command);
+    /* Our codes (0xC16Axx) from a single frame: a short press of the Flipper sends ~3 frames, and the moment of
+     * listening starts after the first ones (the 16 bits of the address make a false decoding unlikely) */
+    ookdec_trust(REMOTE_PRINCETON_ADDRESS, 0xFFFF00);
     audio_set_mute(is_muted());
 }
 
