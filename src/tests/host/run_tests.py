@@ -117,12 +117,16 @@ def test_gamebook(work):
                   copy=[(os.path.join('..', 'docs', 'sd', 'LIVRES', 'tresor_cigalon.txt'), 'book.txt')])
 
 
-WEREWOLF_BADGES = 10  # NB of test_werewolf.c
+WEREWOLF_BADGES = 19  # NB of test_werewolf.c
 
 
 def test_werewolf(work):
     # The rules, and whole games between simulated badges: werewolf.c is compiled once per badge, its public
-    # symbols renamed (app_werewolf_<k>...); its printf goes to the simulator, which reads the logs
+    # symbols renamed (app_werewolf_<k>...); its printf goes to the simulator, which reads the logs.
+    # The illustrations of the cards in werewolf_cards.c are the ones of the ASCII art of tools/werewolf_icons.py
+    r = run([sys.executable, os.path.join(SRC, '..', 'tools', 'werewolf_icons.py'), '--check'])
+    if r.returncode:
+        return False, r.stdout + r.stderr
     os.makedirs(os.path.join(work, 'pico'), exist_ok=True)
     with open(os.path.join(work, 'pico', 'rand.h'), 'w') as f:
         f.write('#include <stdint.h>\nuint32_t get_rand_32(void);\n')
@@ -149,7 +153,7 @@ def test_werewolf(work):
     objs.append(obj)
     exe = os.path.join(work, 'test_werewolf' + ('.exe' if os.name == 'nt' else ''))
     r = run([ARGS.cc] + CFLAGS + inc + [os.path.join(HERE, 'test_werewolf.c')] +
-            [os.path.join(SRC, s) for s in ['menu/werewolf_logic.c', 'gfx/gfx.c', 'gfx/gfx_fonts.c']] + objs +
+            [os.path.join(SRC, s) for s in ["menu/werewolf_logic.c", "menu/werewolf_cards.c", "gfx/gfx.c", "gfx/gfx_fonts.c"]] + objs +
             ['-o', exe])
     if r.returncode:
         return False, 'compilation failed:\n' + r.stdout + r.stderr

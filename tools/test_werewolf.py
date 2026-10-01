@@ -8,19 +8,22 @@
 """
 Test of the loup-garou (Jeux > Loup-garou) with 2 badges, through their USB serial ports: the first badge is the
 narrator ("meneur"), the second one the only real player. The narrator badge is put in admin mode: its party then
-starts with a single player, robots complete it up to the minimum (5 in simple mode, 7 in advanced mode); its admin
+starts with a single player, robots (which can hold any card) complete it up to the minimum of 8 players; its admin
 mode is put back as it was at the end.
 
-The player always chooses the first line of the lists (D), the narrator skips the phases without choices (débat,
-aube, verdict...). The script follows the game in the logs ("werewolf: ..." lines) and checks:
-- the role received by the player is the one dealt by the narrator,
+The narrator chooses the roles on the setup page (all of them by default, --without removes some). The player always
+chooses the first line of the lists (D; the witch and Cupidon choose twice), the narrator skips the phases without
+choices (débat, aube, verdict...). The script follows the game in the logs ("werewolf: ..." lines) and checks:
+- the help: the cards of the roles,
+- the card received by the player is the one dealt by the narrator (after the thief),
 - each choice of the player reaches the narrator (acknowledged: "Choix reçu"),
 - both badges see the same phases and the same end,
 - no text is cut or drawn under the footer (the check of the texts of ui.c, "U" key).
 Screenshots of the pages in --out.
 
 Usage:
-    python tools/test_werewolf.py --ports COM9 COM11 [--advanced] [--no-reboot] [--out werewolf_test] [-v]
+    python tools/test_werewolf.py --ports COM9 COM11 [--without voleur,capitaine] [--no-reboot] [--out dir] [-v]
+    roles: voyante, sorciere, chasseur, cupidon, petite-fille, capitaine, voleur
 
 Exit code 0 when no test failed. Close the other applications that use the serial ports first.
 """
@@ -39,10 +42,14 @@ from badge_selftest import Tester  # noqa: E402
 TOP = 'Badge SecSea'
 JEUX_INDEX = 1  # The themes of the main menu (main.c SUBMENUS): Médias, Jeux...
 WEREWOLF_INDEX = 16  # Loup-garou in the Jeux theme (main.c SUBMENUS)
-ACTIONS = ('roles', 'cupid', 'wolves', 'seer', 'witch', 'vote')  # Phases where every living player chooses
+OPTIONS = ['voyante', 'sorciere', 'chasseur', 'cupidon', 'petite-fille', 'capitaine', 'voleur']  # The setup page
+CARDS = 10  # The help: 8 roles, the captain, the lovers
+ACTIONS = {'thief': 'b', 'cupid': 'bxb', 'lovers': 'b', 'seer': 'b', 'wolves': 'b', 'witch': 'bb',
+           'election': 'b', 'vote': 'b', 'vote2': 'b'}  # Every living player chooses (the others pretend)
+ACTORS = ('hunter', 'successor', 'tiebreak')  # Only the hunter / the captain chooses
 SKIPPED = ('dawn', 'debate', 'verdict', 'shot')  # Phases without choices: the narrator skips them
-MAX_PHASES = 80
-ROLES = 'Villageois|Loup-garou|Voyante|Sorcière|Chasseur|Cupidon'
+MAX_PHASES = 120
+ROLES = 'Villageois|Loup-garou|Voyante|Sorcière|Chasseur|Cupidon|Petite fille|Voleur'
 
 
 class Stop(Exception):
@@ -101,11 +108,16 @@ def main():
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     parser = argparse.ArgumentParser(description='Loup-garou with 2 badges: a narrator and a player (+ robots)')
     parser.add_argument('--ports', nargs=2, required=True, metavar=('NARRATOR', 'PLAYER'), help='serial ports')
-    parser.add_argument('--advanced', action='store_true', help='advanced mode (sorcière, chasseur, Cupidon...)')
+    parser.add_argument('--without', default='', help='roles removed on the setup page, comma separated: '
+                        + ', '.join(OPTIONS))
     parser.add_argument('--no-reboot', action='store_true', help='start from the current pages (main menus)')
     parser.add_argument('--out', default=None, help='directory of the screenshots (default: werewolf_<date>)')
     parser.add_argument('--verbose', '-v', action='store_true', help='show the log lines of the badges')
     args = parser.parse_args()
+    without = [w for w in args.without.split(',') if w]
+    for w in without:
+        if w not in OPTIONS:
+            sys.exit(f'unknown role {w}, choose among: {", ".join(OPTIONS)}')
     out = args.out or 'werewolf_' + datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     os.makedirs(out, exist_ok=True)
 
@@ -137,7 +149,19 @@ def main():
         for t in (na, pl):
             t.keys('U')  # The check of the texts: "uicheck: ..." for a text cut or under the footer
 
-        # ---- The narrator opens a party in test mode (admin) ----
+        # ---- The help, on the player badge: every card and its details ----
+        require('player: Jeux > Loup-garou', open_werewolf(pl))
+        pl.keys('yb')  # Aide : les rôles (the last line)
+        for c in range(CARDS):
+            pl.pump(0.6)
+            shot(pl, f'help_{c:02d}')
+            pl.keys('b')  # The details
+            pl.pump(0.6)
+            shot(pl, f'help_{c:02d}_details')
+            pl.keys('bx')  # The card again, the next one
+        pl.keys('a')  # Back to the menu of the game
+
+        # ---- The narrator opens a party in test mode (admin), with the roles chosen ----
         na.mark()
         nb.send('\x01A')
         require('narrator: admin mode', na.expect(r'^admin: on$', 3) is not None)
@@ -145,21 +169,29 @@ def main():
         require('narrator: Jeux > Loup-garou', open_werewolf(na, from_admin=True))
         shot(na, 'menu')
         na.keys('b')  # Mener une partie (the inner pages of an app have no "ui:" trace)
+        for opt in OPTIONS:
+            na.keys('x')
+            if opt in without:
+                na.keys('b')  # [x] -> [ ]
         na.pump(0.5)
-        if args.advanced:
-            na.keys('b')  # Mode : avancé
+        shot(na, 'setup')
         na.mark()
-        na.keys('xxb')  # Ouvrir la partie
-        m = na.expect(r'^werewolf: narrator, (\w+) mode, debate (\d+) s(, test mode)?$', 3)
-        result('narrator: party open in test mode', m is not None and m.group(3) is not None,
+        na.keys('xxxb')  # Débat, Loups, Ouvrir la partie
+        m = na.expect(r'^werewolf: narrator, debate (\d+) s(, test mode)?, (.+)$', 3)
+        result('narrator: party open in test mode', m is not None and m.group(2) is not None,
                m.group(0) if m else 'no "werewolf: narrator" line')
-        require('narrator: mode', m is not None and m.group(1) == ('advanced' if args.advanced else 'simple'),
-                'the mode is kept since the last party: reboot the narrator badge (no --no-reboot)')
+        names = {'voyante': 'Voyante', 'sorciere': 'Sorcière', 'chasseur': 'Chasseur', 'cupidon': 'Cupidon',
+                 'petite-fille': 'Petite fille', 'capitaine': 'Capitaine', 'voleur': 'Voleur'}
+        expected = [names[o] for o in OPTIONS if o not in without]
+        got = m.group(3).split(', ') if m else []
+        none = ['loups et villageois seulement']
+        require('narrator: the roles chosen', got == expected or (not expected and got == none),
+                f'{", ".join(got)} (expected {", ".join(expected) or "none"}; reboot the narrator badge if the '
+                'roles were changed since it started)')
         shot(na, 'lobby_empty')
 
         # ---- The player joins ----
-        require('player: Jeux > Loup-garou', open_werewolf(pl))
-        pl.keys('xb')  # Rejoindre une partie
+        pl.keys('yb')  # Rejoindre une partie (the line above "Aide : les rôles", selected since the help)
         pl.pump(3)  # The OPEN of the narrator, every second
         shot(pl, 'scan')
         pl.mark()
@@ -171,23 +203,27 @@ def main():
         na.pump(1.5)
         shot(na, 'lobby')
 
-        # ---- Launch: roles dealt by the narrator, received by the player ----
+        # ---- Launch: cards dealt by the narrator, received by the player ----
         na.mark()
         pl.mark()
         na.keys('b')
-        m = na.expect(r'^werewolf: launch, (\d+) players \((\d+) robots\)', 3)
-        require('narrator: launch with robots', m is not None and int(m.group(2)) >= 4, m.group(0) if m else '')
+        m = na.expect(r'^werewolf: launch, (\d+) players \((\d+) robots\), (\d+) wolves', 3)
+        require('narrator: launch with robots', m is not None and int(m.group(1)) >= 8 and int(m.group(3)) == 2,
+                m.group(0) if m else '')
         dealt = {}
         start = na.cursor
         na.pump(1)
         for mm in lines_since(na, start, r'^werewolf: (.+) is (' + ROLES + r')$'):
             dealt[mm.group(1)] = mm.group(2)
-        human = [r for n, r in dealt.items() if not n.startswith('Robot')]
+        human = [n for n in dealt if not n.startswith('Robot')]
         m = pl.expect(r'^werewolf: role (.+)$', 15)
         role = m.group(1) if m else None
-        result('player: role received', role is not None and human == [role],
+        result('player: card received', role is not None and [dealt[n] for n in human] == [role],
                f'{role} (dealt: {", ".join(f"{n}={r}" for n, r in dealt.items())})')
-        shot(pl, 'role')
+        pl.pump(1.0)
+        shot(pl, 'card')
+        pl.keys('b')  # Compris
+        result('player: card acknowledged', na.expect(r'^werewolf: .+ is ready$', 8) is not None)
 
         # ---- The phases ----
         alive = True
@@ -198,27 +234,27 @@ def main():
         narrator_roles_shot = False
         for _ in range(MAX_PHASES):
             start = pl.cursor
-            m = pl.expect(r'^werewolf: (?:phase (\w+), day (\d+)|end, (.+), I (won|lost))$', 240)
+            m = pl.expect(r'^werewolf: (?:phase (?!roles,)(\w+), day (\d+)|end, (.+), I (won|lost))$', 300)
             pl.pump(1.0)  # The page is drawn; "I am dead" follows the phase
             if lines_since(pl, start, r'^werewolf: I am dead$'):
                 alive = False
             if not m:
-                result('player: next phase', False, 'nothing for 4 minutes')
+                result('player: next phase', False, 'nothing for 5 minutes')
                 break
             if m.group(3):
                 winner_p, won = m.group(3), m.group(4) == 'won'
                 break
             phase, day = m.group(1), m.group(2)
             phases_p.append(phase)
-            mn = na.expect(r'^werewolf: (?:phase (?!roles,)(\w+), day (\d+)|end, (.+))', 10)  # The player waits after the roles
+            mn = na.expect(r'^werewolf: (?:phase (?!roles,)(\w+), day (\d+)|end, (.+))', 10)
             if mn and mn.group(3):
                 winner_n = mn.group(3)
             elif mn:
                 phases_n.append(mn.group(1))
-            shot(pl, f'{len(phases_p):02d}_{phase}_{day}' + ('' if alive else '_dead'))
+            shot(pl, f'{len(phases_p):03d}_{phase}_{day}' + ('' if alive else '_dead'))
             if phase in ACTIONS and alive:
                 na_start = na.cursor
-                pl.keys('bxb' if phase == 'cupid' else 'b')  # Cupidon: 2 names (the others pretend the same way)
+                pl.keys(ACTIONS[phase])
                 ok = na.expect(r'^werewolf: .+ \((?:' + ROLES + r')\) (?:chose |is ready$)', 8) is not None
                 acks += ok
                 fails += not ok
@@ -226,20 +262,19 @@ def main():
                     print(f'    no choice received by the narrator in phase {phase}')
                     na.cursor = na_start
                 pl.pump(1.0)
-                shot(pl, f'{len(phases_p):02d}_{phase}_{day}_chosen')
+                shot(pl, f'{len(phases_p):03d}_{phase}_{day}_chosen')
                 if phase == 'wolves' and not narrator_roles_shot:
-                    na.keys('B')  # The roles, on a separate page
+                    na.keys('B')  # The cards, on a separate page
                     na.pump(1.0)
-                    shot(na, 'narrator_roles')
+                    shot(na, 'narrator_cards')
                     na.keys('a')
                     narrator_roles_shot = True
-            elif phase == 'hunter':
-                pl.keys('b')  # The player shoots if it is the hunter (the first name), nothing otherwise
-            elif phase in SKIPPED or (phase in ACTIONS and not alive):
+            elif phase in ACTORS:
+                pl.keys('b')  # The player chooses if it is the hunter / the captain (the first name), nothing otherwise
+            elif phase in SKIPPED:
                 na.pump(1.0)
-                shot(na, f'narrator_{len(phases_p):02d}_{phase}')
-                if phase in SKIPPED:
-                    na.keys('b')  # Next phase
+                shot(na, f'narrator_{len(phases_p):03d}_{phase}')
+                na.keys('b')  # Next phase
         else:
             result('game: ends', False, f'still going after {MAX_PHASES} phases')
         if winner_n is None:
@@ -248,9 +283,15 @@ def main():
         result('player: every choice received by the narrator', fails == 0 and acks > 0,
                f'{acks} received, {fails} lost')
         same = phases_n == phases_p[:len(phases_n)] and len(phases_n) >= len(phases_p) - 1
-        result('both badges: the same phases', same, 'player: ' + ' '.join(phases_p) + ' / narrator: ' + ' '.join(phases_n))
+        result('both badges: the same phases', same, 'player: ' + ' '.join(phases_p) + ' / narrator: '
+               + ' '.join(phases_n))
         result('game: the same end on both badges', winner_p is not None and winner_p == winner_n,
                f'{winner_n}; the player {"won" if won else "lost"}')
+        final = [m.group(1) for m in lines_since(pl, 0, r'^werewolf: role (.+)$')]
+        thief = [m.group(2) for m in lines_since(na, 0, r'^werewolf: the thief (.+) takes (.+)$')
+                 if m.group(1) in human]
+        if thief:
+            result('player: the card taken by the thief', final[-1:] == thief[-1:], f'{final} / {thief}')
         for t, who in ((na, 'narrator'), (pl, 'player')):
             bad = sorted(set(m.group(0) for m in lines_since(t, 0, r'^uicheck: (?!on$|off$).*')))
             result(f'{who}: the texts fit on the screen', not bad, '; '.join(bad[:5]))
@@ -259,11 +300,11 @@ def main():
         shot(na, 'end_narrator')
         pl.keys('b')
         pl.pump(1.0)
-        shot(pl, 'end_roles')
+        shot(pl, 'end_cards')
 
         # ---- Both leave (long press on the left wing, then "oui") ----
         pl.mark()
-        pl.keys('a')  # The roles page -> the end page
+        pl.keys('a')  # The cards page -> the end page
         pl.keys('A')
         pl.pump(1.0)  # The quit page (no "ui:" trace)
         pl.keys('b')
