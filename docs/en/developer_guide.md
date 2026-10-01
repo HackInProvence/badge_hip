@@ -345,7 +345,15 @@ their records are in `store_t.puzzle_records`, their tests in
 - `display.c`:
   - chains fast refreshes ("new image" RAM + "displayed image" RAM);
   - does a full refresh every 15 updates to clear ghosting;
-  - suspends that full refresh while a game is being played (`display_set_periodic_full(false)`).
+  - suspends that full refresh while a game is being played (`display_set_periodic_full(false)`);
+  - **cleans a page that stays** like the screensaver: after 15 s without a change (`DISPLAY_SETTLE_MS`), full
+    refreshes with the waveform of the display (OTP) in black, in white, then the page (~9 s, once); the short
+    waveforms leave ghosts that come back. A page made to stay asks for it sooner (1.5 s) with
+    `display_settle_soon()` before it is drawn: the page after the screensaver or a still page (announcement, name
+    tag), the details of a talk with its QR code, the preview of an announcement. A new image, or
+    `display_is_idle()` (someone wants the screen), stops the cleaning after its current step (~3 s at most). Pages
+    that keep changing (radar, games, video) are never cleaned. Trace: `display: cleaning the page that stays` /
+    `page cleaned` / `cleaning stopped`.
 
 ### 6.2 Shared SPI0: display and SD card
 

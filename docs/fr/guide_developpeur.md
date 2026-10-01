@@ -343,7 +343,15 @@ leurs records sont dans `store_t.puzzle_records`, leurs tests dans
 - `display.c` :
   - enchaîne des rafraîchissements rapides (RAM « nouvelle image » + RAM « image affichée ») ;
   - fait un rafraîchissement complet tous les 15, pour effacer les fantômes ;
-  - suspend ce rafraîchissement complet pendant un jeu en action (`display_set_periodic_full(false)`).
+  - suspend ce rafraîchissement complet pendant un jeu en action (`display_set_periodic_full(false)`) ;
+  - **nettoie une page qui reste** comme l'écran de veille : après 15 s sans changement (`DISPLAY_SETTLE_MS`),
+    rafraîchissements complets avec la forme d'onde de l'écran (OTP) en noir, en blanc, puis la page (~9 s, une
+    fois) ; les formes d'onde courtes laissent des fantômes qui reviennent. Une page faite pour rester l'appelle plus
+    tôt (1,5 s) avec `display_settle_soon()` avant de se dessiner : la page qui suit l'écran de veille ou une page
+    fixe (annonce, badge nominatif), le détail d'un talk avec son QR code, l'aperçu d'une annonce. Une nouvelle
+    image, ou `display_is_idle()` (quelqu'un veut l'écran), arrête le nettoyage après son étape en cours (~3 s au
+    plus). Les pages qui changent sans cesse (radar, jeux, vidéo) ne sont jamais nettoyées. Trace :
+    `display: cleaning the page that stays` / `page cleaned` / `cleaning stopped`.
 
 ### 6.2 SPI0 partagé : écran et carte SD
 
