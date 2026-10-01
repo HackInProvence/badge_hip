@@ -1,0 +1,381 @@
+Le Trésor du capitaine Cigalon
+Les cigales de Hack In Provence
+
+// Le livre intégré au badge SecSea : un livre dont vous êtes le héros, à La Ciotat.
+// Format : voir docs/fr/livres_jeux.md. Vérification : python tools/gamebook_check.py ce_fichier.txt
+// Objets : antenne (l'oratrice), carte et navettes (les goodies), indice (la trame radio).
+
+== 1
+Le soleil de La Ciotat tape déjà sur les grues du port quand vous ouvrez un œil. Vous êtes Cigalou, cigale de son état, hackeuse par vocation, venue à SecSea pour les talks... et pour les navettes.
+
+Votre badge vibre. Un message défile :
+
+« Le trésor du capitaine Cigalon dort dans les calanques. Premier indice : écoutez. »
+
+Sur la terrasse d'en face, la Fourmi, votre éternelle rivale, referme son carnet à spirale et file d'un pas décidé.
+
+-> 2 : Foncer à la conférence
+-> 3 : Chanter un peu d'abord, il fait si beau
+-> 4 : « Écoutez » ? Allumer la radio du badge
+
+== 2
+La grande salle sent le café et la crème solaire. Sur scène, une oratrice en chemise à fleurs présente « 433 MHz : les sirènes de la Méditerranée ».
+
+Sa dernière diapo affiche une phrase étrange : « Là où l'oiseau de pierre ouvre le bec, la mer garde le coffre. »
+
+La salle applaudit. L'oratrice range ses câbles ; une antenne télescopique dépasse de son sac.
+
+-> 6 : Aller lui parler
+-> 7 : Filer au stand des goodies
+-> 8 : Rester assise, le talk suivant parle de café
+
+== 3
+Vous grimpez sur un pin parasol et vous chantez. Vous chantez la mer, le mistral et le sirop d'orgeat. Des touristes filment, un enfant applaudit.
+
+La Fourmi passe sous l'arbre, son sac sur le dos.
+
+— Vous chantiez ? J'en suis fort aise. Eh bien, cherchez maintenant ! Moi, j'ai déjà un indice.
+
+-> 9 : Chanter encore, rien ne presse
+-> 2 : Descendre et courir à la conférence
+
+== 4
+Vous lancez le récepteur 433 MHz du badge. Une télécommande de portail, une station météo qui annonce 31 degrés... et une trame qui revient toutes les dix secondes, régulière comme un métronome.
+
+Les LEDs du badge clignotent en rythme : court, long, court, court...
+
+-> 10 : Décoder la trame, ça ressemble à du morse
+-> 11 : La rejouer telle quelle avec un Flipper
+
+== 5 FIN gagné
+Vous refermez le coffre et le serrez contre vous. La Fourmi hausse les épaules et s'en va sans un mot.
+
+Le soir, vous validez le flag : première place du CTF ! On vous applaudit, on vous prend en photo.
+
+Mais à la fin de la soirée, la terrasse est vide, et les navettes centenaires sont bien trop dures pour une seule cigale.
+
+Vous avez gagné. Un peu seule, mais gagné. Une autre fin vous attend peut-être...
+
+== 6
+L'oratrice sourit en voyant votre badge.
+
+— Une cigale ! Le capitaine Cigalon était des vôtres. Il a protégé son coffre par une serrure radio : sans une bonne antenne, aucune chance.
+
+Elle vous tend son antenne télescopique.
+
+— Rendez-la-moi ce soir. Et méfiez-vous des gabians : ils volent tout ce qui brille.
+
++[antenne]
+
+-> 12 : La remercier et partir vers le port
+-> 7 : Passer d'abord au stand des goodies
+
+== 7
+Le stand des goodies déborde de stickers. Un bénévole vous tend un sac en tissu.
+
+— Il reste une carte des calanques et la dernière boîte de navettes. Une seule chose par cigale !
+
+-> 13 : Prendre la carte des calanques
+-> 14 : Prendre les navettes, l'aventure creuse
+
+== 8
+Le talk sur le café est passionnant. Le suivant, sur le café décaféiné, beaucoup moins. Vous vous endormez.
+
+Vous rêvez d'un coffre qui chante. Quand vous rouvrez les yeux, la salle est vide et le soleil est déjà bas.
+
+-> 15 : Courir au port malgré tout
+-> 16 : Tant pis pour le trésor, direction l'apéro
+
+== 9 FIN perdu
+Vous chantez tout l'après-midi. Si bien qu'un producteur vous propose un contrat... pour une publicité de climatiseurs.
+
+Le soir, la Fourmi revient, un coffre sous le bras.
+
+— Vous chantiez ? Eh bien, dansez maintenant !
+
+La bise n'est pas venue, mais le trésor est parti. Morale : même en Provence, il faut parfois descendre de son arbre.
+
+== 10
+Court, long, court, court... Vous notez les points et les traits sur le dos de votre patte : B-E-C-A-I-G-L-E.
+
+« Bec Aigle » ! Le Bec de l'Aigle, ce cap de roche rouge qui ferme la baie. Ce mot-là pourrait bien resservir.
+
+Dans un coin, la Fourmi vous a vue noter. Elle fronce les antennes.
+
++[indice]
+
+-> 12 : Courir au port avant elle
+-> 7 : S'équiper d'abord au stand des goodies
+
+== 11
+Vous rejouez la trame. Rien... puis, dehors, toutes les portes de garage de la rue s'ouvrent en même temps. Un monsieur en marcel sort en criant que c'est la troisième fois cette semaine.
+
+Un gendarme à vélo s'arrête. Il regarde votre badge, puis le Flipper, puis vous.
+
+-> 17 : Lui expliquer calmement le rejeu radio
+-> 18 : Partir en courant
+
+== 12
+Le vieux port de La Ciotat brille sous les grues du chantier naval. Au bout de la baie se dresse le Bec de l'Aigle, avec sa tête d'oiseau en roche rouge.
+
+Marius, un pêcheur, prépare son pointu, un petit bateau en bois peint en bleu. Derrière lui, un sentier grimpe dans la garrigue, en plein soleil.
+
+-> 19 : Demander à Marius de vous emmener
+-> 20 : Prendre le sentier à pied
+
+== 13
+Vous dépliez la carte. Quelqu'un a entouré au crayon le Bec de l'Aigle et dessiné une croix près de l'eau, avec une note : « Grotte. Par mistral, l'entrée se découvre. »
+
++[carte]
+
+-> 12 : Direction le port
+
+== 14
+La boîte sent la fleur d'oranger. Vous croquez une navette : dure comme la roche, délicieuse. Vous gardez les autres, on ne sait jamais.
+
++[navettes]
+
+-> 12 : Direction le port
+
+== 15
+Le port est calme. Marius amarre son pointu.
+
+— Le trésor ? La Fourmi est partie avec le dernier bateau, il y a une heure. Elle avait l'air pressée.
+
+Il hausse les épaules.
+
+— Je peux encore vous emmener, mais la mer se lève.
+
+-> 19 : Embarquer quand même
+-> 16 : Laisser tomber et aller à l'apéro
+
+== 16 FIN
+Sur la terrasse, les cigales de SecSea refont le monde : chiffrement, radio, et pourquoi la navette est le meilleur biscuit de l'univers. Quelqu'un parle d'un trésor trouvé par une fourmi.
+
+Vous haussez les épaules et commandez un sirop de citron. Pas de trésor aujourd'hui, mais un coucher de soleil sur la baie, ça se partage aussi.
+
+L'aventure attendra l'an prochain.
+
+== 17
+Vous expliquez la modulation OOK, les codes fixes des vieux portails, le rejeu. Le gendarme écoute, prend des notes, puis se gratte la tête.
+
+— Mon portail aussi est en code fixe ?
+
+Vous vérifiez : oui. Il vous remercie chaleureusement et vous montre la direction du port.
+
+— Et votre trésor, c'est par là. Tout le monde en parle.
+
+-> 12 : Aller au port
+
+== 18 FIN perdu
+Vous courez. Le gendarme aussi, mais il a un vélo.
+
+Vous passez l'après-midi au poste à expliquer ce qu'est un Flipper Zero, puis ce qu'est un dauphin, puis pourquoi il y a un dauphin sur le Flipper.
+
+Quand on vous relâche, le trésor a été trouvé. Morale : on ne rejoue pas une trame qu'on ne comprend pas.
+
+== 19
+Marius vous fait monter dans le pointu.
+
+— Accrochez-vous, le mistral se lève !
+
+Le bateau tape dans les vagues, l'eau gicle, le moteur tousse. Marius jure en provençal, ce qui semble aider le moteur.
+
+Tout dépend de la mer, maintenant. Le badge lance le dé...
+
+-> 21 [dé 1-2] : Une vague énorme arrive...
+-> 22 [dé 3-6] : La mer se calme un peu
+
+== 20
+Le sentier grimpe entre les pins et les cades. Les pierres sont brûlantes. Vos cousines cigales chantent dans chaque arbre, ce qui n'aide pas à réfléchir.
+
+À un croisement, un chemin monte vers le sommet, un autre descend vers la mer.
+
+-> 24 [carte] : Suivre la croix de la carte
+-> 25 : Monter, on verra mieux de là-haut
+-> 26 : Descendre vers la mer
+
+== 21
+Une vague plus haute que les autres soulève le pointu. Vous passez par-dessus bord... et Marius vous repêche par les ailes avec son épuisette.
+
+— Trempée, mais vivante !
+
+Le bateau rentre au port pour écoper.
+
+-> 20 : Repartir à pied par le sentier
+-> 16 : Aller sécher sur la terrasse, à l'apéro
+
+== 22
+Le pointu file le long des falaises rouges. Au pied du Bec de l'Aigle, une grotte s'ouvre au ras de l'eau : le mistral a poussé la mer au large et l'entrée est dégagée.
+
+Marius coupe le moteur.
+
+— Je vous attends. Quand le vent tombera, l'eau remontera : ne traînez pas.
+
+-> 23 : Entrer dans la grotte
+
+== 23
+La grotte est fraîche et sent le sel. Au fond, sur un rocher plat, un coffre en bois cerclé de cuivre. Pas de serrure, mais un boîtier noir avec une LED rouge et une étiquette : « 433,92 MHz ».
+
+Des pas résonnent derrière vous. C'est la Fourmi, essoufflée, son carnet à la main.
+
+— Ce coffre est à moi ! J'ai tout planifié depuis janvier !
+
+-> 31 [antenne] : Brancher l'antenne et écouter le boîtier
+-> 32 : Ouvrir le coffre de force
+-> 33 : Proposer à la Fourmi de faire équipe
+
+== 24
+Grâce à la carte, vous trouvez un petit chemin caché derrière un buisson de romarin. Il descend en lacets jusqu'à une crique minuscule, au pied du Bec de l'Aigle.
+
+Dans la roche s'ouvre une grotte, juste au-dessus de l'eau.
+
+-> 23 : Entrer dans la grotte
+
+== 25
+Au sommet, la vue est splendide : la baie, l'Île Verte, les grues du port. Un gabian, l'énorme goéland de Provence, se pose à côté de vous et vous fixe d'un œil jaune.
+
+Il regarde votre badge. Il regarde encore votre badge. Il aime ce qui brille.
+
+-> 27 [navettes] : Lui offrir une navette
+-> 28 : Le chasser en battant des ailes
+-> 20 : Redescendre doucement au croisement
+
+== 26
+Le chemin descend, descend... puis s'arrête net au bord d'une falaise. En bas, la mer turquoise.
+
+Vous avez chaud, très chaud. Votre badge affiche une batterie qui transpire.
+
+-> 29 : Sauter : vous êtes une cigale, vous avez des ailes !
+-> 30 : Faire une petite sieste à l'ombre d'un pin
+-> 20 : Remonter au croisement
+
+== 27
+Le gabian attrape la navette, la croque, réfléchit longuement. Puis il pousse un cri et s'envole vers la falaise, en se retournant comme pour dire : « Suivez-moi. »
+
+Il se pose devant une fente dans la roche, juste sous le Bec de l'Aigle. Une grotte !
+
+-> 23 : Entrer dans la grotte
+
+== 28 FIN perdu
+Vous battez des ailes. Le gabian aussi, mais il est cinquante fois plus gros que vous. Il attrape votre badge et s'envole vers l'Île Verte, l'écran encore allumé sur la page du trésor.
+
+Le soir, on raconte qu'un gabian a appris à envoyer des messages radio.
+
+Morale : face à plus gros que soi, une navette vaut mieux qu'un coup d'aile.
+
+== 29
+Vous sautez. Vos ailes vibrent, crépitent... et vous planez ! Bon, surtout vers le bas.
+
+Plouf. Vous refaites surface à deux mètres d'une grotte qui s'ouvre au pied du Bec de l'Aigle. Trempée, mais arrivée.
+
+-> 23 : Entrer dans la grotte à la nage
+
+== 30 FIN perdu
+Vous vous allongez à l'ombre d'un pin. Juste cinq minutes. Le chant de vos cousines vous berce...
+
+Vous vous réveillez à la nuit tombée, avec un coup de soleil sur les antennes. Au loin, sur le port, on fête la Fourmi qui a trouvé le trésor.
+
+Morale : la sieste est un art provençal, mais pas pendant une chasse au trésor.
+
+== 31
+Avec l'antenne, le badge capte le boîtier à merveille. Il émet une courte trame toutes les secondes, comme s'il attendait une réponse. Du morse !
+
+La Fourmi se penche par-dessus votre épaule.
+
+— C'est... malin, admet-elle du bout des mandibules.
+
+-> 34 [indice] : Répondre le mot du matin : BECAIGLE
+-> 36 [!indice] : Tenter le nom du capitaine : CIGALON
+-> 35 : Envoyer 0000, comme tous les codes par défaut
+
+== 32
+Vous tirez, poussez, tapez. La LED du boîtier passe au rouge vif et une sirène hurle dans toute la grotte.
+
+— Bravo, soupire la Fourmi.
+
+Dehors, le vent est en train de tomber. L'eau commence à remonter.
+
+-> 33 : Proposer à la Fourmi de faire équipe, vite
+-> 38 : Insister encore, ça va céder
+
+== 33
+La Fourmi hésite. Elle regarde son carnet, puis votre badge, puis encore son carnet.
+
+— Bon. Moi j'ai la méthode, vous avez... l'enthousiasme. Moitié-moitié ?
+
+Elle tourne une page.
+
+— J'ai noté que le capitaine cachait toujours ses mots de passe près de ses coffres.
+
+-> 31 [antenne] : Sortir l'antenne et écouter le boîtier ensemble
+-> 39 : Fouiller la grotte avec elle
+
+== 34
+Vous tapez B-E-C-A-I-G-L-E et le badge l'envoie en morse radio. La LED du boîtier hésite... puis passe au vert.
+
+Clac ! Le couvercle du coffre se soulève.
+
+-> 37 : Ouvrir le coffre
+
+== 35 FIN perdu
+Vous envoyez 0000. Le boîtier répond aussitôt, en morse : « VRAIMENT ? » Puis la LED devient rouge et le boîtier s'éteint pour vingt-quatre heures. Anti-force brute : le capitaine savait y faire.
+
+La Fourmi écrit dans son carnet : « Ne jamais faire équipe avec une cigale. »
+
+Morale : les codes par défaut, c'est pour les portails des voisins, pas pour les capitaines.
+
+== 36
+Vous tapez C-I-G-A-L-O-N. Un temps. Puis la LED passe au vert. Clac !
+
+— Son propre nom comme mot de passe, soupire la Fourmi. Le capitaine n'aurait pas tenu cinq minutes à un CTF.
+
+-> 37 : Ouvrir le coffre
+
+== 37
+Dans le coffre, pas d'or, mais mieux : un vieux poste radio en laiton, des carnets de schémas, une boîte de navettes centenaires dures comme du granit et, gravé sous le couvercle, un flag : SECSEA{P4RT4G3}.
+
+La Fourmi vous regarde. Vous regardez la Fourmi.
+
+-> 42 : Partager le trésor avec elle
+-> 5 : Tout garder, c'est vous qui l'avez ouvert
+
+== 38 FIN perdu
+Ça ne cède pas. La mer, elle, monte. Vous sortez de la grotte à la nage en tirant la Fourmi par une patte, juste avant que l'entrée ne disparaisse sous l'eau.
+
+Le coffre attendra le prochain coup de mistral.
+
+Morale : un coffre se pirate avec la tête, pas avec les pattes.
+
+== 39
+Derrière un rocher, vous trouvez une bouteille. Dedans, un papier roulé : « Pour ouvrir mon coffre, chante-lui mon nom. Capitaine Cigalon. »
+
+— Chanter ? La Fourmi lève les yeux au ciel.
+
+Vous, vous souriez : chanter, c'est votre spécialité.
+
+-> 40 : Chanter « Cigalon » devant le boîtier
+-> 41 : Laisser la Fourmi essayer d'abord
+
+== 40
+Vous chantez. Fort, juste, avec un trémolo qui ferait pleurer un gabian. La LED passe au vert. Clac ! Le couvercle se soulève.
+
+— Un capteur de son, note la Fourmi. Le capitaine était un artiste.
+
+-> 37 : Ouvrir le coffre
+
+== 41
+La Fourmi se racle la gorge et récite « Ci-ga-lon » d'une voix de répondeur téléphonique. La LED clignote en rouge. Un bip sec : dernier essai.
+
+— Bon, dit-elle. À vous. Il paraît que vous savez faire.
+
+-> 40 : Chanter de tout votre cœur
+
+== 42 FIN gagné
+Vous partagez tout. La Fourmi prend les carnets, vous gardez la radio, et vous invitez Marius et l'oratrice à fêter ça.
+
+Le soir, sur la terrasse de SecSea, vous racontez l'aventure à toute la conférence : elle prend des notes, vous chantez les rebondissements.
+
+L'année suivante, vous ouvrez ensemble un hackerspace sur le port, « La Cigalière ». On y code l'hiver, on y chante l'été.
+
+Morale : la cigale et la fourmi, ensemble, c'est encore mieux. Bravo !
