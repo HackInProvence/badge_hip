@@ -60,8 +60,16 @@ def accent_image(font, accent, height):
         img = img.crop(ink_bbox(img))
         return ImageOps.mirror(img) if accent == 'acute' else img
     if accent == 'circ':
-        img = render_char(font, '^', height)[0]
-        return img.crop(ink_bbox(img))
+        # Drawn: the '^' of the font is a big caret (maths), it floated high above the letter ("rôles")
+        w = max(5, round(font.size * 0.42)) | 1
+        h = (w + 1) // 2
+        t = max(1, round(font.size / 14))
+        img = Image.new('1', (w, h + t - 1), 0)
+        draw = ImageDraw.Draw(img)
+        for k in range(t):
+            draw.line((0, h - 1 + k, w // 2, k), fill=1)
+            draw.line((w // 2, k, w - 1, h - 1 + k), fill=1)
+        return img
     if accent == 'cedilla':
         img = render_char(font, ',', height)[0]
         return img.crop(ink_bbox(img))
