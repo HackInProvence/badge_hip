@@ -94,6 +94,7 @@ def invite(a, kind):
     a.keys('b')
     m = a.expect(r'^smuggler: inviting .+, trade ([0-9A-F]{8}), ' + kind, 3)
     a.result(f'A: invitation ({kind})', m is not None)
+    a.screenshot(f'inviting_{kind.split()[0]}', 0.8)  # The page of the inviter while it waits
     return m.group(1) if m else None
 
 
