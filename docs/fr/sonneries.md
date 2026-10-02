@@ -25,7 +25,8 @@ carte SD.
 ## Ajouter des sonneries sur la carte SD
 
 Créer un dossier `SONNERIES` ou `RTTTL` (ou les deux) à la racine de la carte SD et y mettre des fichiers texte
-`.txt`, `.rtttl` ou `.rtx`, directement ou dans des sous-dossiers :
+`.txt`, `.rtttl` ou `.rtx` (format RTTTL) ou `.bas` (format PICAXE, voir plus bas), directement ou dans des
+sous-dossiers :
 
 ```
 carte SD
@@ -77,6 +78,9 @@ D'autres réglages (`l=` par exemple) sont ignorés. `nom::notes` (sans réglage
 
 Majuscules et minuscules sont équivalentes, les espaces sont permis entre les éléments.
 
+Variantes de certains convertisseurs, acceptées aussi : `_` pour le dièse (`f_5` = `f#5`), le dièse ou le point
+avant la note (`8#d4`, `8.c6`), une partie vide entre le nom et les réglages (`Nom: :d=4,o=5,b=112:...`).
+
 Exemples :
 
 ```
@@ -86,12 +90,48 @@ Gamme::c,d,e,f,g,a,b,c7
 Exemple:d=8,o=5,b=100:c.,16d,f#,p,2g6
 ```
 
+## Le format PICAXE (.bas)
+
+Les fichiers `.bas` sont des programmes BASIC des microcontrôleurs PICAXE ; le badge y lit les commandes `tune`
+(générées par le « Tune Wizard » du PICAXE), chacune nommée par le commentaire `'` qui la précède (sinon par le nom
+du fichier). Les autres lignes sont ignorées.
+
+```
+'Jingle Bells
+tune 0, 2,($EB,$EB,$EB,$EC,$EB,$EB,$EB,$EC,$EB,$C2,$E7,$E9,$AB)
+```
+
+`tune broche, vitesse, [masque des LEDs,] (notes)` : la vitesse va de 1 à 15 (une noire dure vitesse × 73,84 ms) ;
+chaque note est un octet (`$` hexadécimal, `%` binaire ou décimal) :
+
+| Bits | Sens |
+|---|---|
+| 7-6 | durée : `00` noire, `01` croche, `10` ronde, `11` blanche |
+| 5-4 | octave : `00` du milieu (do = 523 Hz), `01` haute, `10` basse |
+| 3-0 | note : 0 = do ... 11 = si, 12 à 15 = silence |
+
+Le badge convertit la commande en RTTTL (`'Jingle Bells` → `Jingle Bells:d=4,o=5,b=406:2b4,2b4,...`). Pas de notes
+pointées ni de doubles croches dans ce format.
+
+## Trier une collection
+
+[`tools/rtttl_sort.py`](../../tools/rtttl_sort.py) range une grande collection de sonneries (des milliers de
+fichiers) pour le badge : il lit les fichiers comme le badge, retire les doublons (même mélodie, même transposée ou à
+un autre tempo), écarte les sonneries invalides, écrit un fichier par sonnerie nommé d'après son meilleur titre et
+les classe en `Dessins animés`, `Génériques de séries`, `Musiques de films` et `Autre` (découpé par initiale) selon
+un fichier de catégories `chemin#ligne<TAB>D|S|F|A`. Un `rapport.tsv` liste chaque fichier écrit, ses copies dans la
+source, les erreurs et les fichiers vides.
+
+```
+python tools/rtttl_sort.py F:/RTTTL_origine F:/RTTTL --categories categories.tsv
+```
+
 ## Les erreurs
 
 Une ligne invalide reste dans la liste, marquée `(!)` ; D affiche sa ligne, sa colonne (en octets depuis le début
 de la ligne) et la raison : `':' manquant après le nom`, `':' manquant avant les notes`, `réglage d, o ou b invalide`,
 `durée invalide`, `note invalide`, `octave invalide`, `',' attendue après la note`, `aucune note`,
-`ligne trop longue`. Le port série (USB) affiche aussi les détails : lignes `rtttl: ...`.
+`ligne trop longue`, `commande tune PICAXE invalide`. Le port série (USB) affiche aussi les détails : lignes `rtttl: ...`.
 
 ## Pour les développeurs
 

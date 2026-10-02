@@ -205,8 +205,88 @@ static void test_errors(void) {
     ERROR("x:d=4:", RTTTL_ERR_EMPTY, 6);
     ERROR("x::  , ,, ", RTTTL_ERR_EMPTY, 3);
     /* The error texts exist */
-    for (int e = RTTTL_OK; e <= RTTTL_ERR_TOO_LONG; ++e)
+    for (int e = RTTTL_OK; e <= RTTTL_ERR_PICAXE; ++e)
         CHECK(strlen(rtttl_error_text((rtttl_err_t)e)) > 0);
+}
+
+/* The variants of some converters (seen in collections of ringtones) */
+static void test_variants(void) {
+    rtttl_t t;
+    rtttl_note_t n[8];
+    int count;
+    /* '_' for the sharp, the sharp or the dot before the letter */
+    CHECK_EQ(parse("x:o=5,b=60:f_,16a_6,8#d4,8.c6,c_.5", &t, n, 8, &count), RTTTL_END);
+    CHECK_EQ(count, 5);
+    CHECK_EQ(n[0].semitone, 6);
+    CHECK_EQ(n[1].semitone, 10);
+    CHECK_EQ(n[1].octave, 6);
+    CHECK_EQ(n[2].semitone, 3);
+    CHECK_EQ(n[2].octave, 4);
+    CHECK_EQ(n[3].semitone, 0);
+    CHECK_EQ(n[3].ms, 750);  /* Dotted eighth */
+    CHECK_EQ(n[4].semitone, 1);
+    CHECK_EQ(n[4].ms, 1500);
+    ERROR("x::#c#", RTTTL_ERR_SEPARATOR, 5);
+    ERROR("x::#p", RTTTL_ERR_NOTE, 4);
+    ERROR("x::p_", RTTTL_ERR_NOTE, 4);
+    /* An empty part between the name and the defaults */
+    CHECK_EQ(parse("Bullet me: :d=8,o=5,b=120:c,d", &t, n, 8, &count), RTTTL_END);
+    CHECK_STR(t.name, "Bullet me");
+    CHECK_EQ(t.bpm, 120);
+    CHECK_EQ(count, 2);
+    CHECK_EQ(n[0].ms, 250);
+    ERROR("x::c:d", RTTTL_ERR_SEPARATOR, 4);  /* No '=': not defaults */
+}
+
+/* The PICAXE "tune" commands of the .bas files */
+static void test_picaxe(void) {
+    char out[256];
+    size_t pos = 0;
+    CHECK(rtttl_is_picaxe("  TUNE 0, 4,($00)", 100));
+    CHECK(! rtttl_is_picaxe("'tune 0, 4", 100));
+    CHECK(! rtttl_is_picaxe("tunes 0, 4", 100));
+    CHECK(! rtttl_is_picaxe("tune", 100));
+    /* Every duration and octave, a pause, the 3 bases; speed 4: 60 s / (4 x 73.84 ms) = 203 bpm */
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($00,$51,$A2,$EB,$1C,%00001001,7)", 200, "Test", out, sizeof(out), &pos),
+             RTTTL_OK);
+    CHECK_STR(out, "Test:d=4,o=5,b=203:4c5,8c#6,1d4,2b4,4p,4a5,4g5");
+    rtttl_t t;
+    uint32_t notes, ms;
+    CHECK_EQ(rtttl_open(&t, out, sizeof(out)), RTTTL_OK);
+    CHECK_EQ(rtttl_check(&t, &notes, &ms), RTTTL_OK);
+    CHECK_EQ(notes, 7);
+    /* Middle C = 523 Hz, the LED mask of the M2 chips, a ':' in the name, speed 15 = 54 bpm */
+    CHECK_EQ(rtttl_from_picaxe("tune B.2, 15, %00000011, ( $40 )", 200, "a:b", out, sizeof(out), &pos), RTTTL_OK);
+    CHECK_STR(out, "a b:d=4,o=5,b=54:8c5");
+    rtttl_note_t n;
+    rtttl_open(&t, out, sizeof(out));
+    CHECK_EQ(rtttl_next(&t, &n), RTTTL_OK);
+    CHECK_EQ(n.freq_mhz, 523251);
+    /* Errors */
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 16,($00)", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($30)", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);  /* Octave 3 */
+    CHECK_EQ(pos, 11);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($100)", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,()", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($00 $01)", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($00", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("print 1", 200, "x", out, sizeof(out), &pos), RTTTL_ERR_PICAXE);
+    CHECK_EQ(rtttl_from_picaxe("tune 0, 4,($00,$00,$00)", 200, "x", out, 24, &pos), RTTTL_ERR_TOO_LONG);
+    /* Garbage: no crash, the output always ends */
+    char text[64];
+    unsigned seed = 7;
+    for (int k = 0; k < 20000; ++k) {
+        int l = snprintf(text, sizeof(text), "tune 0,%d,(", k % 17);
+        for (int c = l; c < (int)sizeof(text) - 1; ++c) {
+            seed = seed * 1103515245u + 12345u;
+            text[c] = "$%0123456789abcdefABCDEF,() \t"[(seed >> 16) % 30];
+        }
+        text[sizeof(text) - 1] = 0;
+        if (rtttl_from_picaxe(text, sizeof(text), "g", out, sizeof(out), &pos) == RTTTL_OK) {
+            CHECK_EQ(rtttl_open(&t, out, sizeof(out)), RTTTL_OK);
+            CHECK_EQ(rtttl_check(&t, NULL, NULL), RTTTL_OK);
+        }
+    }
 }
 
 static void test_name(void) {
@@ -338,6 +418,8 @@ int main(void) {
     test_defaults();
     test_notes();
     test_errors();
+    test_variants();
+    test_picaxe();
     test_name();
     test_labels();
     test_garbage();

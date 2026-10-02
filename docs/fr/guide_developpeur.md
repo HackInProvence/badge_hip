@@ -1012,11 +1012,13 @@ SDR : [radio_pirate.md](radio_pirate.md).
 
 - **Sonneries** ([rtttl.c](../../src/menu/rtttl.c), analyseur sans matériel
   [rtttl_parse.c](../../src/menu/rtttl_parse.c)) : 12 sonneries intégrées (`RTTTL_BUILTIN`), puis les fichiers
-  `.txt`, `.rtttl` et `.rtx` des dossiers `SONNERIES` et `RTTTL`, parcourus comme la radio pirate (sous-dossiers,
-  fichiers par pages de 32 triées par nom, sans tout charger ; lecture de la carte quand l'écran est au repos).
-  Le son est synthétisé (onde carrée,
-  enveloppe) environ 150 ms en avance dans le tampon audio ; la note affichée et les LEDs suivent `audio_played()`.
-  Trace : `rtttl: ...`. Format : [sonneries.md](sonneries.md).
+  `.txt`, `.rtttl`, `.rtx` et `.bas` (PICAXE, convertis par `rtttl_from_picaxe()`) des dossiers `SONNERIES` et
+  `RTTTL`, parcourus comme la radio pirate (sous-dossiers, fichiers par pages de 32 triées par nom, sans tout
+  charger ; lecture de la carte quand l'écran est au repos). Le son est synthétisé (onde carrée, enveloppe) environ
+  150 ms en avance dans le tampon audio ; la note affichée et les LEDs suivent `audio_played()`. Trace : `rtttl: ...`.
+  Format : [sonneries.md](sonneries.md). Tri d'une grande collection (doublons, catégories) :
+  [`tools/rtttl_sort.py`](../../tools/rtttl_sort.py), qui lit les fichiers comme le badge
+  ([`tools/rtttl_lib.py`](../../tools/rtttl_lib.py)).
 - **Livres-jeux** ([gamebook.c](../../src/menu/gamebook.c), analyseur sans matériel
   [gamebook_parse.c](../../src/menu/gamebook_parse.c)) : le livre intégré
   ([gamebook_builtin.c](../../src/menu/gamebook_builtin.c), généré par

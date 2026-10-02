@@ -26,7 +26,7 @@ you can add as many as you like on the SD card.
 ## Adding ringtones on the SD card
 
 Create a `SONNERIES` or `RTTTL` folder (or both) at the root of the SD card and put `.txt`, `.rtttl` or `.rtx` text
-files in it, directly or in sub-folders:
+files (RTTTL format) or `.bas` files (PICAXE format, see below) in it, directly or in sub-folders:
 
 ```
 SD card
@@ -77,6 +77,9 @@ Other settings (`l=` for instance) are ignored. `name::notes` (without settings)
 
 Upper and lower case are the same, spaces are allowed between the elements.
 
+Variants of some converters, accepted too: `_` for the sharp (`f_5` = `f#5`), the sharp or the dot before the note
+(`8#d4`, `8.c6`), an empty part between the name and the defaults (`Name: :d=4,o=5,b=112:...`).
+
 Examples:
 
 ```
@@ -86,13 +89,50 @@ Gamme::c,d,e,f,g,a,b,c7
 Exemple:d=8,o=5,b=100:c.,16d,f#,p,2g6
 ```
 
+## The PICAXE format (.bas)
+
+The `.bas` files are BASIC programs of the PICAXE microcontrollers; the badge reads their `tune` commands (made by
+the PICAXE "Tune Wizard"), each one named by the `'` comment before it (else by the name of the file). The other
+lines are ignored.
+
+```
+'Jingle Bells
+tune 0, 2,($EB,$EB,$EB,$EC,$EB,$EB,$EB,$EC,$EB,$C2,$E7,$E9,$AB)
+```
+
+`tune pin, speed, [LED mask,] (notes)`: the speed goes from 1 to 15 (a quarter lasts speed x 73.84 ms); each note is
+a byte (`$` hexadecimal, `%` binary or decimal):
+
+| Bits | Meaning |
+|---|---|
+| 7-6 | duration: `00` quarter, `01` eighth, `10` whole, `11` half |
+| 5-4 | octave: `00` middle (C = 523 Hz), `01` high, `10` low |
+| 3-0 | note: 0 = C ... 11 = B, 12 to 15 = pause |
+
+The badge converts the command to RTTTL (`'Jingle Bells` → `Jingle Bells:d=4,o=5,b=406:2b4,2b4,...`). No dotted
+notes nor sixteenths in this format.
+
+## Sorting a collection
+
+[`tools/rtttl_sort.py`](../../tools/rtttl_sort.py) sorts a large collection of ringtones (thousands of files) for the
+badge: it reads the files like the badge, removes the duplicates (same melody, even transposed or at another tempo),
+leaves out the invalid ringtones, writes one file per ringtone named after its best title and sorts them into
+`Dessins animés` (cartoons), `Génériques de séries` (TV series), `Musiques de films` (films) and `Autre` (other, split
+by initial) from a categories file `path#line<TAB>D|S|F|A`. A `rapport.tsv` lists each file written, its copies in
+the source, the errors and the empty files.
+
+```
+python tools/rtttl_sort.py F:/RTTTL_origine F:/RTTTL --categories categories.tsv
+```
+
 ## The errors
 
 An invalid line stays in the list, marked `(!)`; D shows its line, its column (in bytes from the beginning of the
 line) and the reason (in French): `':' manquant après le nom` (':' missing after the name), `':' manquant avant les
 notes` (':' missing before the notes), `réglage d, o ou b invalide` (invalid d, o or b setting), `durée invalide`
 (invalid duration), `note invalide` (invalid note), `octave invalide` (invalid octave), `',' attendue après la note`
-(',' expected after the note), `aucune note` (no note), `ligne trop longue` (line too long). The serial port (USB)
+(',' expected after the note), `aucune note` (no note), `ligne trop longue` (line too long), `commande tune PICAXE
+invalide` (invalid PICAXE tune command). The serial port (USB)
 also prints the details: `rtttl: ...` lines.
 
 ## For the developers

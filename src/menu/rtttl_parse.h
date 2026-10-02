@@ -15,6 +15,8 @@
  * - notes, comma separated: [duration] letter [#] [.] [octave] [.]: letters c d e f g a b (h = b) and p (pause),
  *   '#' = sharp, '.' = dotted (x 1.5, twice x 1.75), before or after the octave.
  * Case insensitive, spaces anywhere between the elements, empty notes (",,") ignored.
+ * Variants of some converters, accepted too: '_' for the sharp ("f_5"), the sharp or the dot before the letter
+ * ("8#d4", "8.c6"), an empty part between the name and the defaults ("Name: :d=4,o=5:c").
  * A4 = 440 Hz (scientific pitch notation: "a5" = 880 Hz).
  *
  * Nothing is allocated: the text is read where it is, the notes are given one by one by rtttl_next().
@@ -42,6 +44,7 @@ typedef enum {
     RTTTL_ERR_SEPARATOR,  /* Something after a note before the ',' */
     RTTTL_ERR_EMPTY,  /* No note */
     RTTTL_ERR_TOO_LONG,  /* (used by the readers: the line is too long for their buffer) */
+    RTTTL_ERR_PICAXE,  /* rtttl_from_picaxe(): not a valid PICAXE tune command */
 } rtttl_err_t;
 
 typedef struct {
@@ -81,6 +84,20 @@ void rtttl_rewind(rtttl_t *t);
  * \param total_ms Receives the total duration (NULL: not needed)
  * \return RTTTL_OK, or the first error (offset in t->err_pos), RTTTL_ERR_EMPTY without notes */
 rtttl_err_t rtttl_check(rtttl_t *t, uint32_t *n_notes, uint32_t *total_ms);
+
+/** \brief Whether \p line (\p len bytes, or up to a 0) is a PICAXE "tune" command (BASIC of the PICAXE chips). */
+bool rtttl_is_picaxe(const char *line, size_t len);
+
+/** \brief Converts a PICAXE "tune pin, speed, [mask,] ($xx, ...)" command (.bas files) into an RTTTL text.
+ * The note bytes (PICAXE manual 2, "tune"): bits 7-6 the duration (00 = 1/4, 01 = 1/8, 10 = 1, 11 = 1/2), bits 5-4
+ * the octave (00 = middle, 01 = high, 10 = low; middle C = 523 Hz: "c5" here), bits 3-0 the note (0 = C .. 11 = B,
+ * 12-15 = pause). The speed (1-15): a quarter lasts speed x 73.84 ms. Values in hexadecimal ($), binary (%) or
+ * decimal.
+ * \param name Name of the tune (a ':' in it is replaced)
+ * \param out Receives "name:d=4,o=5,b=bpm:notes"
+ * \return RTTTL_OK, RTTTL_ERR_PICAXE (with the offset in *err_pos when not NULL) or RTTTL_ERR_TOO_LONG */
+rtttl_err_t rtttl_from_picaxe(const char *line, size_t len, const char *name, char *out, size_t out_len,
+                              size_t *err_pos);
 
 /** \brief Short French text of an error, for the screen (e.g. "durée invalide"). */
 const char *rtttl_error_text(rtttl_err_t e);

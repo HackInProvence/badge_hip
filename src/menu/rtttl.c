@@ -5,7 +5,9 @@
 
 /* Sonneries (Médias): an RTTTL ringtone player (docs/fr/sonneries.md). The tunes of the firmware (rtttl_parse.c),
  * and the folders SONNERIES and RTTTL of the SD card, browsed like the pirate radio: in a folder, its sub-folders,
- * then the tunes of its .txt / .rtttl / .rtx files (one tune per line, the lines starting with '#' are comments).
+ * then the tunes of its .txt / .rtttl / .rtx files (one tune per line, the lines starting with '#' are comments)
+ * and of its .bas files (PICAXE programs: each "tune" command is converted to RTTTL by rtttl_from_picaxe(), named by
+ * the comment line ' before it).
  * The files are read by pages of MAX_FILES (in the order of their names), so a folder may hold thousands of them.
  * The files of a page are read and checked when it is shown: only the name and the place of each tune are kept, the
  * line is read again to play it. The card shares its SPI bus with the screen: it is read when the display is idle.
@@ -68,6 +70,8 @@ static char sel_dir[SD_NAME_MAX];  /* SEL_DIR: the folder left, selected again *
 static sd_tune_t sd_tunes[MAX_SD_TUNES];
 static int n_sd = 0;
 static char line[LINE_MAX + 1];  /* A line while scanning, then the text of the tune played */
+static char conv[LINE_MAX + 1];  /* A PICAXE tune converted to RTTTL (.bas files) */
+static char bas_name[RTTTL_NAME_MAX];  /* .bas: the name in the comment before the tune command */
 static char status[48] = "";
 
 static int mode = M_LIST;
@@ -126,7 +130,24 @@ static int n_rows(void) {
 
 /* ------ The files of the SD card ------ */
 
-/* A line of a file: a tune unless it is empty or a comment */
+static bool is_bas(const char *name) {
+    const char *dot = strrchr(name, '.');
+    return dot && ! strcasecmp(dot, ".bas");
+}
+
+/* The name of a .bas tune: the comment before it, else the name of the file */
+static void bas_tune_name(int f, char *name, size_t len) {
+    if (bas_name[0]) {
+        snprintf(name, len, "%s", bas_name);
+        return;
+    }
+    snprintf(name, len, "%s", files[f]);
+    char *dot = strrchr(name, '.');
+    if (dot)
+        *dot = 0;
+}
+
+/* A line of a file: a tune unless it is empty or a comment. In a .bas file: the tune commands only. */
 static void add_line(int f, uint32_t offset, uint16_t line_no, size_t len, bool too_long) {
     line[len] = 0;
     size_t i = 0;
@@ -134,18 +155,42 @@ static void add_line(int f, uint32_t offset, uint16_t line_no, size_t len, bool 
         i = 3;  /* UTF-8 byte order mark */
     while (i < len && (line[i] == ' ' || line[i] == '\t'))
         ++i;
-    if (i >= len || line[i] == '#')
+    const char *text = line;
+    bool bas = is_bas(files[f]);
+    rtttl_err_t bas_err = RTTTL_OK;
+    if (bas) {
+        if (line[i] == '\'') {  /* A comment: the name of the next tune */
+            if (! bas_name[0] && i + 1 < len)
+                snprintf(bas_name, sizeof(bas_name), "%s", line + i + 1);
+            return;
+        }
+        if (too_long || ! rtttl_is_picaxe(line + i, len - i))
+            return;  /* Other BASIC commands */
+        char name[RTTTL_NAME_MAX];
+        bas_tune_name(f, name, sizeof(name));
+        bas_name[0] = 0;
+        bas_err = rtttl_from_picaxe(line + i, len - i, name, conv, sizeof(conv), NULL);
+        if (bas_err != RTTTL_OK)
+            snprintf(conv, sizeof(conv), "%s:", name);  /* The name for the list */
+        text = conv;
+        len = strlen(conv);
+    } else if (i >= len || line[i] == '#') {
         return;
+    }
     if (n_sd >= MAX_SD_TUNES) {
         printf("rtttl: %s line %u: too many tunes, ignored\n", files[f], line_no);
         return;
     }
     sd_tune_t *s = &sd_tunes[n_sd++];
     rtttl_t t;
-    rtttl_err_t e = rtttl_open(&t, line, len);
+    rtttl_err_t e = rtttl_open(&t, text, len);
     uint32_t notes = 0, ms = 0;
     if (e == RTTTL_OK)
         e = rtttl_check(&t, &notes, &ms);
+    if (bas_err != RTTTL_OK) {
+        e = bas_err;
+        t.err_pos = 0;
+    }
     if (too_long) {
         e = RTTTL_ERR_TOO_LONG;
         t.err_pos = LINE_MAX;
@@ -176,6 +221,7 @@ static void scan_file(int f) {
     uint8_t buf[256];
     UINT n = 0;
     size_t len = 0;
+    bas_name[0] = 0;
     uint32_t offset = 0, start = 0;
     uint16_t line_no = 1;
     bool too_long = false;
@@ -202,7 +248,8 @@ static void scan_file(int f) {
 
 static bool tune_file(const char *name) {
     const char *dot = strrchr(name, '.');
-    return dot && (! strcasecmp(dot, ".txt") || ! strcasecmp(dot, ".rtttl") || ! strcasecmp(dot, ".rtx"));
+    return dot && (! strcasecmp(dot, ".txt") || ! strcasecmp(dot, ".rtttl") || ! strcasecmp(dot, ".rtx")
+                   || ! strcasecmp(dot, ".bas"));
 }
 
 /* Inserts \p name in the sorted files[] (not full) */
@@ -358,6 +405,11 @@ static bool read_sd_line(const sd_tune_t *s) {
     f_close(&fil);
     line[n] = 0;
     line[strcspn(line, "\r\n")] = 0;
+    if (n > 0 && is_bas(files[s->file])) {
+        /* A PICAXE tune: converted again, with the name found when the file was read */
+        const char *p = line + strspn(line, " \t");
+        return rtttl_from_picaxe(p, LINE_MAX, s->name, conv, sizeof(conv), NULL) == RTTTL_OK;
+    }
     return n > 0;
 }
 
@@ -471,7 +523,7 @@ static rtttl_err_t load_tune(int i) {
         snprintf(song.name, sizeof(song.name), "%s", s->name);
         return RTTTL_ERR_EMPTY;
     }
-    return rtttl_open(&song, line, LINE_MAX);
+    return rtttl_open(&song, is_bas(files[s->file]) ? conv : line, LINE_MAX);
 }
 
 static void start_playing(int i) {

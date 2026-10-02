@@ -154,6 +154,17 @@ rtttl_err_t rtttl_open(rtttl_t *t, const char *text, size_t len) {
         ++i;
     if (i >= t->len)
         return fail(t, t->len, RTTTL_ERR_SECTION);
+    if (skip_spaces(t, defaults) == i) {
+        /* "Name: :d=4,o=5:c": an empty part, then the defaults (a section with a '=' before another ':') */
+        size_t j = i + 1;
+        bool equal = false;
+        while (j < t->len && text[j] != ':')
+            equal |= text[j++] == '=';
+        if (j < t->len && equal) {
+            defaults = i + 1;
+            i = j;
+        }
+    }
     rtttl_err_t e = parse_defaults(t, defaults, i);
     if (e != RTTTL_OK)
         return e;
@@ -191,7 +202,21 @@ rtttl_err_t rtttl_next(rtttl_t *t, rtttl_note_t *note) {
         i = skip_spaces(t, i);
     }
 
-    /* Letter and sharp */
+    /* The dot or the sharp before the letter, written by some converters: "8.c6", "8#d4" */
+    int dots = 0;
+    bool sharp = false;
+    for (;;) {
+        char d = at(t, i);
+        if (d == '.' && dots < 2)
+            ++dots;
+        else if (d == '#' && ! sharp)
+            sharp = true;
+        else
+            break;
+        i = skip_spaces(t, i + 1);
+    }
+
+    /* Letter and sharp ('_' in some files) */
     char c = lower(at(t, i));
     int semitone = 0;
     if (c == 'p') {
@@ -201,16 +226,20 @@ rtttl_err_t rtttl_next(rtttl_t *t, rtttl_note_t *note) {
     } else {
         return fail(t, i, RTTTL_ERR_NOTE);
     }
+    if (note->rest && sharp)
+        return fail(t, i, RTTTL_ERR_NOTE);
     i = skip_spaces(t, i + 1);
-    if (at(t, i) == '#') {
+    if ((at(t, i) == '#' || at(t, i) == '_') && ! sharp) {
         if (note->rest)
             return fail(t, i, RTTTL_ERR_NOTE);
-        ++semitone;
+        sharp = true;
         i = skip_spaces(t, i + 1);
     }
+    if (sharp)
+        ++semitone;
 
     /* Dots and octave, the dot before or after the octave */
-    int dots = 0, octave = t->octave;
+    int octave = t->octave;
     bool have_octave = false;
     for (;;) {
         char d = at(t, i);
@@ -272,6 +301,120 @@ rtttl_err_t rtttl_check(rtttl_t *t, uint32_t *n_notes, uint32_t *total_ms) {
     return RTTTL_OK;
 }
 
+/* ------ PICAXE "tune" commands ------ */
+
+#define PICAXE_QUARTER_US 73840  /* A quarter at the speed 1: sound 65.64 ms + silence 8.20 ms */
+
+/* A number of a PICAXE program at *i: $hex, %binary or decimal; -1 when there is none or it is too large */
+static long picaxe_number(const rtttl_t *t, size_t *i) {
+    int base = 10;
+    if (at(t, *i) == '$' || at(t, *i) == '%') {
+        base = at(t, *i) == '$' ? 16 : 2;
+        ++*i;
+    }
+    long v = 0;
+    int digits = 0;
+    for (;; ++*i) {
+        char c = lower(at(t, *i));
+        int d = is_digit(c) ? c - '0' : c >= 'a' && c <= 'f' ? c - 'a' + 10 : 99;
+        if (d >= base)
+            break;
+        if (++digits > 9)
+            return -1;
+        v = v * base + d;
+    }
+    return digits ? v : -1;
+}
+
+bool rtttl_is_picaxe(const char *line, size_t len) {
+    rtttl_t t = {.text = line, .len = line ? strnlen(line, len) : 0};
+    size_t i = skip_spaces(&t, 0);
+    static const char TUNE[] = "tune";
+    for (size_t k = 0; k < 4; ++k, ++i)
+        if (lower(at(&t, i)) != TUNE[k])
+            return false;
+    return is_space(at(&t, i));
+}
+
+rtttl_err_t rtttl_from_picaxe(const char *line, size_t len, const char *name, char *out, size_t out_len,
+                              size_t *err_pos) {
+    static const char *const NOTES[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+    static const char DURATIONS[4] = {'4', '8', '1', '2'};
+    static const char OCTAVES[3] = {'5', '6', '4'};  /* Middle, high, low */
+    rtttl_t t = {.text = line, .len = line ? strnlen(line, len) : 0};
+    size_t i = 0;
+    if (! rtttl_is_picaxe(line, len))
+        goto bad;
+    i = skip_spaces(&t, skip_spaces(&t, 0) + 4);
+    /* The pin, then the speed */
+    while (at(&t, i) && at(&t, i) != ',')
+        ++i;
+    if (at(&t, i) != ',')
+        goto bad;
+    i = skip_spaces(&t, i + 1);
+    long speed = picaxe_number(&t, &i);
+    if (speed < 1 || speed > 15)
+        goto bad;
+    i = skip_spaces(&t, i);
+    if (at(&t, i) != ',')
+        goto bad;
+    /* The LED mask of the M2 chips, if any, before the '(' */
+    while (at(&t, i) && at(&t, i) != '(')
+        ++i;
+    if (at(&t, i) != '(')
+        goto bad;
+    ++i;
+
+    /* The name and the defaults: bpm = 60 s / (speed x 73.84 ms), rounded */
+    uint32_t q = (uint32_t)speed * PICAXE_QUARTER_US;
+    size_t n = 0;
+    for (const char *c = name ? name : ""; *c && n < RTTTL_NAME_MAX - 1 && n + 1 < out_len; ++c)
+        out[n++] = *c == ':' ? ' ' : *c;
+    int w = snprintf(out + n, n < out_len ? out_len - n : 0, ":d=4,o=5,b=%lu:",
+                     (unsigned long)((60000000u + q / 2) / q));
+    if (w < 0 || n + (size_t)w >= out_len)
+        return RTTTL_ERR_TOO_LONG;
+    n += (size_t)w;
+
+    /* The notes */
+    bool first = true;
+    for (;;) {
+        i = skip_spaces(&t, i);
+        if (at(&t, i) == ')')
+            break;
+        if (! first) {
+            if (at(&t, i) != ',')
+                goto bad;
+            i = skip_spaces(&t, i + 1);
+        }
+        size_t value = i;
+        long v = picaxe_number(&t, &i);
+        if (v < 0 || v > 255 || ((v >> 4) & 3) == 3) {
+            i = value;
+            goto bad;
+        }
+        char note[8];
+        if ((v & 15) >= 12)
+            w = snprintf(note, sizeof(note), "%s%cp", first ? "" : ",", DURATIONS[v >> 6]);
+        else
+            w = snprintf(note, sizeof(note), "%s%c%s%c", first ? "" : ",", DURATIONS[v >> 6], NOTES[v & 15],
+                         OCTAVES[(v >> 4) & 3]);
+        if (n + (size_t)w >= out_len)
+            return RTTTL_ERR_TOO_LONG;
+        memcpy(out + n, note, (size_t)w + 1);
+        n += (size_t)w;
+        first = false;
+    }
+    if (first)
+        goto bad;  /* No note */
+    return RTTTL_OK;
+
+bad:
+    if (err_pos)
+        *err_pos = i < t.len ? i : t.len;
+    return RTTTL_ERR_PICAXE;
+}
+
 const char *rtttl_error_text(rtttl_err_t e) {
     switch (e) {
     case RTTTL_OK: return "ok";
@@ -285,6 +428,7 @@ const char *rtttl_error_text(rtttl_err_t e) {
     case RTTTL_ERR_SEPARATOR: return "',' attendue après la note";
     case RTTTL_ERR_EMPTY: return "aucune note";
     case RTTTL_ERR_TOO_LONG: return "ligne trop longue";
+    case RTTTL_ERR_PICAXE: return "commande tune PICAXE invalide";
     }
     return "erreur";
 }
