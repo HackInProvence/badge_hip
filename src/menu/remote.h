@@ -13,6 +13,8 @@
  * The badge obeys unless disabled in the settings. Commands:
  * - 0x01 cicada: the cicada sings a few seconds,
  * - 0x02 mute / 0x03 unmute: no sound and no LEDs during the talks,
+ * - 0x05 sleep: everything off (radio, LEDs, sound) until the manual unlock (main.c), except a talk badge; only from
+ *   the network of the badges (a Princeton code is ignored: any Flipper could put the conference to sleep),
  * - 0x10 to 0x14: lights of the talk badge (off, green, orange, red, red angry), see talk.c,
  * - 0x30 + n: starts the song n of the chorus (chorus.c).
  * The buttons of the remote of a Flipper (a saved Princeton file, see remote.c): 0x04 = end of the mute,
@@ -33,6 +35,7 @@ enum {
     REMOTE_CIGALE = 0x01,
     REMOTE_MUTE = 0x02,
     REMOTE_UNMUTE = 0x03,
+    REMOTE_SLEEP = 0x05,
     REMOTE_TALK = 0x10,  /* + state (talk.h) */
     REMOTE_SONG = 0x30,  /* + song number */
 };
@@ -48,6 +51,9 @@ void remote_subscribe(uint8_t group, remote_handler_t handler);
 
 /** \brief Executes a command (received, or local e.g. from the admin menu). */
 void remote_execute(uint8_t command, const char *from);
+
+/** \brief The sleep command was received (once): main.c puts the badge to sleep (not a talk badge). */
+bool remote_sleep_requested(void);
 
 /** \brief Sends a command to all the badges around (admin menu): loud, 5 times over 2 s. */
 void remote_send(uint8_t command);

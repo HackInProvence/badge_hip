@@ -4,7 +4,7 @@ Le jeu du loup-garou joué avec les badges, d'après les règles des *Loups-garo
 reçoit sa carte secrète sur son badge, agit la nuit et vote le jour sur son badge ; un meneur anime la partie, son
 badge distribue les cartes, compte les votes, applique les règles et donne le rythme.
 
-Menu : **Jeux > Loup-garou** : *Mener une partie*, *Rejoindre une partie*, *Aide : les rôles*.
+Menu : **Jeux multi > Loup-garou** : *Mener une partie*, *Rejoindre une partie*, *Aide : les rôles*.
 
 *Les illustrations des cartes sont des dessins originaux faits pour le badge, et les textes sont écrits pour lui :
 ce ne sont pas ceux du jeu édité.*
@@ -33,7 +33,7 @@ ce ne sont pas ceux du jeu édité.*
 
 ## 3. Mettre en place une partie
 
-**Le meneur** : *Jeux > Loup-garou > Mener une partie*.
+**Le meneur** : *Jeux multi > Loup-garou > Mener une partie*.
 
 - *Préréglage* : **classique** (tous les rôles) ou **débutant** (la voyante seule) ; « à la carte » dès qu'on change
   une case.
@@ -44,7 +44,7 @@ ce ne sont pas ceux du jeu édité.*
 - *Ouvrir la partie* : la liste des joueurs inscrits s'affiche, avec le nombre de loups correspondant.
   **D : lancer** à partir de 8 joueurs.
 
-**Les joueurs** : *Jeux > Loup-garou > Rejoindre une partie*, puis choisir la partie du meneur. Le badge affiche les
+**Les joueurs** : *Jeux multi > Loup-garou > Rejoindre une partie*, puis choisir la partie du meneur. Le badge affiche les
 rôles choisis par le meneur et attend le lancement.
 
 Les badges doivent rester à portée radio du meneur (la même salle).

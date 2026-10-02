@@ -283,7 +283,7 @@ et au remède du virus :
 Pour une entrée gérée directement par `main.c` (les fonctions historiques) :
 1. Ajouter une valeur à `menu_item_t` et son libellé dans `item_label()`.
 2. La placer dans un thème de `SUBMENUS` (24 entrées au plus par thème, `items[24]` de `submenu_t` ; le nombre
-   d'entrées `n` est écrit à la main : Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
+   d'entrées `n` est écrit à la main : Médias 7, Jeux solo 14, Jeux multi 5, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
    Le dernier thème, Admin, n'est affiché qu'en mode admin (`store_t.admin == STORE_ADMIN_ON`).
 3. Dans `validate()`, lancer l'action ou passer dans un nouvel état `app` (`app_state_t`).
 4. Si l'état a sa propre page :
@@ -607,6 +607,7 @@ Une commande reçue par les deux voies n'est exécutée qu'une fois (même comma
 |---|---|---|
 | 0x01 | la cigale chante 6 s | `remote.c` |
 | 0x02 / 0x03 | mode muet / fin du mode muet | `remote.c` |
+| 0x05 | mise en sommeil : `store_t.asleep` = `STORE_ASLEEP` et redémarrage ; au démarrage, `sleep_mode()` (main.c) : radio en `SPWD` (`radio_power_down()`), page SOMMEIL (OTP), boutons seulement, jusqu'à 5 × flanc gauche puis 5 × flanc droit ; ignorée en Princeton, par le badge qui l'envoie et par la page du badge de talk | `remote.c`, `main.c` |
 | 0x10 à 0x14 | lumières du badge de talk : éteint, vert, orange, rouge, rouge énervé | `talk.c` (page ouverte) |
 | 0x30 + n | lance le morceau n du choeur | `chorus.c` |
 

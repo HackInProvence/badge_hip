@@ -63,7 +63,8 @@ The main menu groups the features by theme:
 | Theme | Contents |
 |---|---|
 | **Médias** (Media) | "Images", "Vidéos" (Videos), "Musique" (Music), "Sonneries" (Ringtones), "Lecture rapide" (Speed reading), "Livres-jeux" (Gamebooks), "Volume" |
-| **Jeux** (Games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges), Duel, Bataille navale (Battleship), Loup-garou (Werewolf), Assassin, Tir à la corde (Tug of war) |
+| **Jeux solo** (Solo games) | Morpion (tic-tac-toe), Puissance 4 (Connect Four), Simon, Réflexes (Reflexes), Snake, Démineur (Minesweeper), 2048, Taquin (15-puzzle), Sokoban, Mastermind, Pendu (Hangman), Blind test, CTF, Défis crypto (Crypto challenges) |
+| **Jeux multi** (Multiplayer games) | Duel, Bataille navale (Battleship), Loup-garou (Werewolf), Assassin, Tir à la corde (Tug of war) |
 | **Social** | Cicada network, Messages, Contacts, Compétences (Skills), Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir), Annonces (Announcements), Contrebande (Smuggling) |
 | **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared, Chasse 433 MHz (433 MHz hunt), Écouter la radio pirate (Listen to the pirate radio) |
 | **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen, Succès (Achievements) |
@@ -129,6 +130,9 @@ follow (16 at most).
 
 
 ### 4.2 Jeux (Games)
+
+Two themes: **Jeux solo** (against the cicada or alone) and **Jeux multi** (between cicadas, by radio: duel, battleship
+and the group games).
 
 In the games of the table below (except Simon), **the left wing quits the game**.
 In the puzzles, it is a **long press on the left wing**.
@@ -519,6 +523,7 @@ The badge shows the command received at the bottom of the screen.
 | 0x01 | the cicada sings for a few seconds |
 | 0x02 | **mute mode**: no more sound or LEDs (during the talks) |
 | 0x03 | end of the mute mode |
+| 0x05 | **sleep** (by the network of the badges only, not in Princeton): see Admin > Commandes radio |
 | 0x10 to 0x14 | lights of the talk badge (if its page is open): off, OK, 5 min, FINI, STOP ! |
 | 0x30 + n | starts song n of the choir |
 
@@ -563,7 +568,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 
 | Entry | Role |
 |---|---|
-| **Commandes radio** (Radio commands) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge |
+| **Commandes radio** (Radio commands) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge, sleep |
 | **LEDs des cigales** (LEDs of the cicadas) | chooses the colour and the animation of the LEDs of all the cicadas around (see below) |
 | **Annonces (admin)** (Announcements) | writes and sends the announcements to all the cicadas (see below) |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
@@ -616,6 +621,13 @@ two rows): quit.
 - "> Aperçu" (preview): the screen of the announcement, as the cicadas will show it (a wing: back);
 - "> Envoyer à toutes les cigales" (send to all the cicadas): the announcement goes over the radio, 3 times in a row
   (for the cicadas that missed it). This badge does not show it to itself: that is what the preview is for.
+
+**Mise en sommeil** (sleep, the last of the Commandes radio): the other badges switch everything off (radio, LEDs,
+sound, services) and show "SOMMEIL: le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous
+d'un organisateur." (put to sleep by an admin, see an organizer if it stays stuck); a reboot does not wake them up.
+Except a badge on its **talk badge** page, and the admin badge that sends the order. The order goes by the network of
+the badges, not in Princeton: a Flipper cannot put the conference to sleep. **Unlock** (organizers): 5 times the left
+flank, then 5 times the right one (less than 5 s between two presses); the badge restarts normally.
 
 **Remise à zéro** (Reset): before the event or after tests. Flanks: choose; right wing, then a **long press on the
 right wing** to confirm (left wing: no):

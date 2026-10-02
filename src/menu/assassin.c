@@ -458,6 +458,11 @@ void assassin_service(absolute_time_t now) {
         else
             return;
     }
+    if (st == S_ENDED && ! burst && party_state() == PARTY_STARTED && party_game() == PARTY_GAME_ASSASSIN) {
+        /* The end was sent to everybody: out of the party, so that another game can start (the result stays shown) */
+        party_leave();
+        printf("assassin: party left after the end\n");
+    }
     if (party_state() != PARTY_STARTED && st != S_ENDED && ! leaving) {
         /* The party ended under the game (party.c: a LEAVE of the host before the start, a new party) */
         st = S_ENDED;

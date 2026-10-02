@@ -118,7 +118,7 @@ class Tester:
 
 # ---- The tests, grouped. Each group starts and ends at the main menu, on the first theme ----
 
-THEMES = ['Médias', 'Jeux', 'Social', 'Radio & IR', 'Badge', 'Réglages']
+THEMES = ['Médias', 'Jeux solo', 'Jeux multi', 'Social', 'Radio & IR', 'Badge', 'Réglages']
 TOP = 'Badge SecSea'
 
 
@@ -173,8 +173,8 @@ GAMES = ['Morpion', 'Puissance 4', 'Simon', 'Réflexes', 'Snake']
 
 
 def test_games(t):
-    if not open_theme(t, 'Jeux'):
-        return t.result('games', False, 'theme "Jeux" not shown')
+    if not open_theme(t, 'Jeux solo'):
+        return t.result('games', False, 'theme "Jeux solo" not shown')
     for i, name in enumerate(GAMES):
         if not t.press('b', name):
             t.result(f'game: {name}', False, 'not started')
@@ -240,9 +240,9 @@ def test_games(t):
     t.keys('B')
     m = t.expect(r'^game: score code (HIP26:SNAKE:\d+:[0-9A-F]{8}:.+:[0-9A-F]{16})$', 3)
     t.screenshot('record_Snake_qr', 1.5)
-    t.result('game: record QR code', m is not None and t.press('a', 'Jeux'), m.group(1) if m else 'no record shown')
+    t.result('game: record QR code', m is not None and t.press('a', 'Jeux solo'), m.group(1) if m else 'no record shown')
     t.keys('y' * (len(GAMES) - 1))
-    close_theme(t, 'Jeux')
+    close_theme(t, 'Jeux solo')
 
 
 PUZZLES = ['Démineur', '2048', 'Taquin', 'Sokoban', 'Mastermind', 'Pendu']
@@ -250,24 +250,24 @@ PUZZLES = ['Démineur', '2048', 'Taquin', 'Sokoban', 'Mastermind', 'Pendu']
 
 def test_puzzles(t):
     """Each puzzle: help page, start, a move, quit with a long press on the left wing."""
-    if not open_theme(t, 'Jeux'):
-        return t.result('puzzles', False, 'theme "Jeux" not shown')
+    if not open_theme(t, 'Jeux solo'):
+        return t.result('puzzles', False, 'theme "Jeux solo" not shown')
     t.keys('x' * len(GAMES))
     for name in PUZZLES:
         ok = t.press('b', name)
         t.keys('b')  # Help page -> the game
         t.keys('x')  # A move (right)
         t.screenshot('puzzle_' + re.sub(r'\W+', '_', name), 1.0)
-        ok = ok and t.press('A', 'Jeux')
+        ok = ok and t.press('A', 'Jeux solo')
         t.result(f'puzzle: {name}', ok)
         t.keys('x')
     t.keys('y' * (len(GAMES) + len(PUZZLES)))
-    close_theme(t, 'Jeux')
+    close_theme(t, 'Jeux solo')
 
 
 def test_ctf(t):
-    if not open_theme(t, 'Jeux'):
-        return t.result('ctf', False, 'theme "Jeux" not shown')
+    if not open_theme(t, 'Jeux solo'):
+        return t.result('ctf', False, 'theme "Jeux solo" not shown')
     t.keys('x' * (len(GAMES) + len(PUZZLES) + 1))  # After the games, the puzzles and the blind test
     t.press('b', 'CTF')
     t.mark()
@@ -277,9 +277,9 @@ def test_ctf(t):
     t.screenshot('ctf')
     t.result('ctf: Konami code', m is not None and m.group(1) == 'right', m.group(0) if m else 'no answer')
     t.keys('a')  # Page -> CTF list
-    t.press('a', 'Jeux')
+    t.press('a', 'Jeux solo')
     t.keys('y' * (len(GAMES) + len(PUZZLES) + 1))
-    close_theme(t, 'Jeux')
+    close_theme(t, 'Jeux solo')
 
 
 def test_settings(t):

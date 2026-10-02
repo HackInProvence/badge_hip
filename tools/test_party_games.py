@@ -37,9 +37,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge  # noqa: E402
 from badge_selftest import Tester, open_theme, TOP  # noqa: E402
 
-JEUX = ['Morpion', 'Puissance 4', 'Simon', 'Réflexes', 'Snake', 'Démineur', '2048', 'Taquin', 'Sokoban', 'Mastermind',
-        'Pendu', 'Blind test', 'CTF', 'Crypto', 'Duel', 'Bataille navale', 'Loup-garou', 'Assassin', 'Tir à la corde']
-TUG = JEUX.index('Tir à la corde')  # Order of the "Jeux" theme in src/menu/main.c (SUBMENUS)
+JEUX = ['Duel', 'Bataille navale', 'Loup-garou', 'Assassin', 'Tir à la corde']
+TUG = JEUX.index('Tir à la corde')  # Order of the "Jeux multi" theme in src/menu/main.c (SUBMENUS)
 ASSASSIN = JEUX.index('Assassin')
 
 
@@ -96,18 +95,18 @@ def admin_state(t):
 
 
 def open_game(t, index, name):
-    """From the main menu (first theme selected): Jeux, then the game."""
-    if not open_theme(t, 'Jeux'):
+    """From the main menu (first theme selected): Jeux multi, then the game."""
+    if not open_theme(t, 'Jeux multi'):
         return False
     return t.press('x' * index + 'b', name, 5)
 
 
 def close_game(t, index):
     """From the first page of the game: back to the main menu, first theme selected."""
-    t.press('a', 'Jeux', 5)
+    t.press('a', 'Jeux multi', 5)
     t.keys('y' * index)
     t.press('a', TOP, 5)
-    t.keys('y')  # Jeux -> Médias
+    t.keys('yy')  # Jeux multi -> Médias
 
 
 def lobby(d, prefix):

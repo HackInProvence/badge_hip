@@ -107,6 +107,14 @@ void radio_reset(void) {
 }
 
 
+void radio_power_down(void) {
+    /* SPWD is only taken in IDLE; the chip sleeps once CSn goes high (the next SPI access wakes it up) */
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    uint8_t cmd = CC1101_SPWD;
+    ccsend(&cmd, NULL, 1);
+}
+
+
 void radio_set_power(uint8_t patable0) {
     /* Single access to the PATABLE writes PATABLE[0], which is used by FSK modulations (FREND0.PA_POWER = 0) */
     uint8_t cmd[2] = {CC1101_PATABLE, patable0};

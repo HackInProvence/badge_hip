@@ -61,7 +61,8 @@ Le menu principal regroupe les fonctions par thème :
 | Thème | Contenu |
 |---|---|
 | **Médias** | Images, Vidéos, Musique, Sonneries, Lecture rapide, Livres-jeux, Volume |
-| **Jeux** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto, Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
+| **Jeux solo** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto |
+| **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
@@ -125,6 +126,9 @@ Korobeiniki...), celles de la carte SD suivent.
 
 
 ### 4.2 Jeux
+
+Deux thèmes : **Jeux solo** (contre la cigale ou seul) et **Jeux multi** (entre cigales, par radio : duel, bataille
+navale et les jeux de groupe).
 
 Dans les jeux du tableau ci-dessous (sauf Simon), **l'aile gauche quitte le jeu**.
 Dans les casse-têtes, c'est un **appui long sur l'aile gauche**.
@@ -513,6 +517,7 @@ ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écra
 | 0x01 | la cigale chante quelques secondes |
 | 0x02 | **mode muet** : plus de son ni de LEDs (pendant les talks) |
 | 0x03 | fin du mode muet |
+| 0x05 | **mise en sommeil** (réseau des badges seulement, pas en Princeton) : voir Admin > Commandes radio |
 | 0x10 à 0x14 | lumières du badge de talk (si sa page est ouverte) : éteint, OK, 5 min, FINI, STOP ! |
 | 0x30 + n | lance le morceau n du choeur |
 
@@ -557,7 +562,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 
 | Entrée | Rôle |
 |---|---|
-| **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk |
+| **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk, mise en sommeil |
 | **LEDs des cigales** | choisit la couleur et l'animation des LEDs de toutes les cigales autour (voir ci-dessous) |
 | **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
@@ -610,6 +615,13 @@ prix du CTF...). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retou
 - « > Aperçu » : l'écran de l'annonce, tel que les cigales l'afficheront (une aile : retour) ;
 - « > Envoyer à toutes les cigales » : l'annonce part par radio, 3 fois de suite (pour les cigales qui l'auraient
   manquée). Ce badge ne se l'affiche pas : c'est le rôle de l'aperçu.
+
+**Mise en sommeil** (dernière des Commandes radio) : les autres badges coupent tout (radio, LEDs, son, services)
+et affichent « SOMMEIL : le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un
+organisateur. » ; un redémarrage ne les réveille pas. Sauf un badge sur sa page de **badge de talk**, et le badge
+admin qui envoie l'ordre. L'ordre passe par le réseau des badges, pas en Princeton : un Flipper ne peut pas endormir la
+conférence. **Déblocage** (organisateurs) : 5 fois le flanc gauche, puis 5 fois le flanc droit (moins de 5 s entre
+deux appuis) ; le badge redémarre normalement.
 
 **Remise à zéro** : avant l'événement ou après des essais. Flancs : choisir ; aile droite, puis **appui long sur
 l'aile droite** pour confirmer (aile gauche : non) :

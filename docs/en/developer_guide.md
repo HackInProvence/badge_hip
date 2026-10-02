@@ -285,7 +285,7 @@ and the cure of the virus:
 For an entry handled directly by `main.c` (the older features):
 1. Add a value to `menu_item_t` and its label in `item_label()`.
 2. Put it in a `SUBMENUS` theme (at most 24 entries per theme, `items[24]` of `submenu_t`; the number of entries
-   `n` is written by hand: Médias 7, Jeux 19, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
+   `n` is written by hand: Médias 7, Jeux solo 14, Jeux multi 5, Social 12, Radio & IR 9, Badge 8, Réglages 6, Admin 15).
    The last theme, Admin, is only shown in admin mode (`store_t.admin == STORE_ADMIN_ON`).
 3. In `validate()`, run the action or switch to a new `app` state (`app_state_t`).
 4. If the state has its own page:
@@ -607,6 +607,7 @@ A command received both ways is only executed once (same command within 4 s).
 |---|---|---|
 | 0x01 | the cicada sings for 6 s | `remote.c` |
 | 0x02 / 0x03 | mute mode / end of the mute mode | `remote.c` |
+| 0x05 | sleep: `store_t.asleep` = `STORE_ASLEEP` and a reboot; at the start, `sleep_mode()` (main.c): the radio in `SPWD` (`radio_power_down()`), the SOMMEIL page (OTP), the buttons only, until 5 x left flank then 5 x right flank; ignored in Princeton, by the badge that sends it and by the page of the talk badge | `remote.c`, `main.c` |
 | 0x10 to 0x14 | lights of the talk badge: off, green, orange, red, angry red | `talk.c` (page open) |
 | 0x30 + n | starts song n of the choir | `chorus.c` |
 

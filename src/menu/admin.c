@@ -27,6 +27,7 @@ static const command_t COMMANDS[] = {
     {"Talk : orange (5 min)", REMOTE_TALK + 2},
     {"Talk : rouge (fini)", REMOTE_TALK + 3},
     {"Talk : rouge énervé", REMOTE_TALK + 4},
+    {"Mise en sommeil", REMOTE_SLEEP},
 };
 #define N_COMMANDS ((int)(sizeof(COMMANDS) / sizeof(COMMANDS[0])))
 

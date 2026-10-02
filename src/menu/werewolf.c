@@ -1185,9 +1185,24 @@ static void handle(uint8_t kind, uint32_t from, uint32_t to, const uint8_t *data
 }
 
 /* Called by the main loop (and by the page): the game goes on while the page is closed */
+#define END_LEAVE_MS 30000  /* The end shown (and sent by the narrator) this long, then out of the party */
+
 void werewolf_service(absolute_time_t now) {
+    static absolute_time_t end_ts = 0;
     tune_task(now);
     abort_task(now);
+    if (phase == P_END && party_state() == PARTY_STARTED && party_game() == PARTY_GAME_WEREWOLF) {
+        /* The game is over: out of the party, so that another game can start (the result stays shown) */
+        if (! end_ts) {
+            end_ts = delayed_by_ms(now, END_LEAVE_MS);
+        } else if (absolute_time_diff_us(end_ts, now) >= 0) {
+            party_leave();
+            end_ts = 0;
+            printf("werewolf: party left after the end\n");
+        }
+    } else if (phase != P_END) {
+        end_ts = 0;
+    }
     if (mode == M_NARRATOR)
         narrator_task(now);
     else if (mode == M_PLAYER)
@@ -1817,7 +1832,7 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
             list_at(fb, y + 2, (UI_FOOTER_Y - 4 - y) / UI_ROW_H, n_lobby, list_sel < n_lobby ? list_sel : 0,
                     lobby_label);
         else
-            ui_wrapped(fb, y + 20, &gfx_font_small, "Les joueurs : Jeux > Loup-garou > Rejoindre.", 3);
+            ui_wrapped(fb, y + 20, &gfx_font_small, "Les joueurs : Jeux multi > Loup-garou > Rejoindre.", 3);
         ui_footer(fb, n_lobby >= min ? "G long : annuler  D : lancer" : "G long : annuler");
         break;
     }

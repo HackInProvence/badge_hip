@@ -40,8 +40,8 @@ from badge_remote import Badge  # noqa: E402
 from badge_selftest import Tester  # noqa: E402
 
 TOP = 'Badge SecSea'
-JEUX_INDEX = 1  # The themes of the main menu (main.c SUBMENUS): Médias, Jeux...
-WEREWOLF_INDEX = 16  # Loup-garou in the Jeux theme (main.c SUBMENUS)
+JEUX_INDEX = 2  # The themes of the main menu (main.c SUBMENUS): Médias, Jeux solo, Jeux multi...
+WEREWOLF_INDEX = 2  # Loup-garou in the Jeux multi theme (main.c SUBMENUS)
 ADMIN_WEREWOLF_INDEX = 8  # Loup-garou (admin) in the Admin theme (main.c SUBMENUS, badge_selftest.ADMIN)
 OPTIONS = ['voyante', 'sorciere', 'chasseur', 'cupidon', 'petite-fille', 'capitaine', 'voleur']  # The setup page
 CARDS = 10  # The help: 8 roles, the captain, the lovers
@@ -116,7 +116,7 @@ def admin_state(t):
 def open_werewolf(t, from_admin=False):
     """From the main menu (first theme selected, or the Admin theme just after the admin mode): Jeux > Loup-garou."""
     moves = 1 + JEUX_INDEX if from_admin else JEUX_INDEX  # From Admin (the last theme), the next one is the first
-    if not t.press('x' * moves + 'b', 'Jeux'):
+    if not t.press('x' * moves + 'b', 'Jeux multi'):
         return False
     return t.press('x' * WEREWOLF_INDEX + 'b', 'Loup-garou')
 
@@ -340,7 +340,7 @@ def main():
         na.keys('b')
         result('narrator: left', na.expect(r'^werewolf: left$', 3) is not None)
         for t in (na, pl):
-            t.press('a', 'Jeux')
+            t.press('a', 'Jeux multi')
             t.keys('y' * WEREWOLF_INDEX)
             t.press('a', TOP)
     except Stop:

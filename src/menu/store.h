@@ -81,7 +81,10 @@ typedef struct {
     uint8_t cargo_seeded;  /* 1 once the first goods were given */
     int8_t hot_dbm;  /* Hot / cold beacon (hotcold.c): the RSSI of "BRÛLANT" set by the admin, outside -90..-40: default */
     uint8_t ww_unlock;  /* Loup-garou (werewolf.c), set in the admin menu: WW_UNLOCK_*, other values: WW_UNLOCK_RULE */
+    uint8_t asleep;  /* STORE_ASLEEP: put to sleep by an admin (remote command 0x05): main.c starts in the sleep mode */
 } store_t;
+
+#define STORE_ASLEEP 0x5A
 
 #define STORE_V2_MAGIC 0x5A
 

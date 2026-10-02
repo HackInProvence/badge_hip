@@ -679,10 +679,10 @@ typedef struct {
 
 static const submenu_t SUBMENUS[] = {
     {"Médias", 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
-    {"Jeux", 19, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
-                  M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST, M_CTF,
-                  M_APP(APP_CRYPTO), M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
-                  M_APP(APP_TUG)}},
+    {"Jeux solo", 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+                       M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST,
+                       M_CTF, M_APP(APP_CRYPTO)}},
+    {"Jeux multi", 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN), M_APP(APP_TUG)}},
     {"Social", 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
                     M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
@@ -2199,6 +2199,90 @@ static void demo_task(absolute_time_t now, uint8_t pressed) {
 }
 
 
+/* ------ Sleep (Admin > Commandes radio > Mise en sommeil, remote command 0x05): the badge starts in this mode
+ * until the manual unlock, 5 times the left flank then 5 times the right one: only the screen (the page shown
+ * without power) and the buttons; the radio is powered down, no LED, no sound, no service. A talk badge does not
+ * obey. ------ */
+
+#define SLEEP_PRESSES 5
+#define SLEEP_PRESS_GAP_MS 5000  /* Longer between two presses: the sequence starts again */
+
+static void sleep_render(uint8_t *fb) {
+    gfx_clear(fb, GFX_WHITE);
+    gfx_fill_rect(fb, 0, 24, GFX_WIDTH, 44, GFX_BLACK);
+    gfx_text(fb, GFX_WIDTH/2, 30, &gfx_font_large, "SOMMEIL", GFX_WHITE, GFX_ALIGN_CENTER);
+    ui_wrapped(fb, 86, &gfx_font_small, "Le badge a été mis en sommeil par un admin. S'il reste coincé, "
+               "rapprochez-vous d'un organisateur.", 6);
+}
+
+static void sleep_wait_screen(void) {
+    while (! screen_boot() || screen_busy())
+        sleep_ms(10);
+}
+
+static void sleep_mode(void) {
+    printf("sleep: on (unlock: %d x left flank, then %d x right flank)\n", SLEEP_PRESSES, SLEEP_PRESSES);
+    radio_init();
+    radio_reset();
+    radio_power_down();  /* The radio off */
+    noise_gen_set_enabled(false);
+    leds_cancel_anim(true);
+    /* The page, cleaned like the screensaver (black, white, then the page with the waveform of the screen) */
+    sleep_render(fb);
+    sleep_wait_screen();
+    screen_clean(false);
+    sleep_wait_screen();
+    screen_clean(true);
+    sleep_wait_screen();
+    screen_show_image_bw_otp(fb);
+    sleep_wait_screen();
+    screen_deep_sleep();
+    int lefts = 0, rights = 0;
+    absolute_time_t last = get_absolute_time();
+    uint32_t sent_shot = 0;
+    while (true) {
+        absolute_time_t now = get_absolute_time();
+        uint8_t pressed = buttons_pressed(now);  /* Also the keys of the USB serial port (tests, 'R' reboots) */
+        if (fb_send_now || (fb_stream && screen_shot_counter() != sent_shot)) {
+            sent_shot = screen_shot_counter();  /* The page for the PC application (badge_remote.py) */
+            fb_send_now = false;
+            send_screen();
+        }
+        if (pressed) {
+            if (absolute_time_diff_us(last, now) > SLEEP_PRESS_GAP_MS * 1000ll)
+                lefts = rights = 0;
+            last = now;
+            if (pressed == BTN_Y && rights == 0)
+                lefts = lefts < SLEEP_PRESSES ? lefts + 1 : SLEEP_PRESSES;
+            else if (pressed == BTN_X && lefts == SLEEP_PRESSES)
+                ++rights;
+            else
+                lefts = rights = pressed == BTN_Y;
+            printf("sleep: unlock %d/%d %d/%d\n", lefts, SLEEP_PRESSES, rights, SLEEP_PRESSES);
+            if (rights == SLEEP_PRESSES) {
+                store_get()->asleep = 0;
+                store_save_now();
+                printf("sleep: off, rebooting\n");
+                watchdog_reboot(0, 0, 50);
+            }
+        }
+        sleep_ms(5);
+    }
+}
+
+/* The sleep command: saved, then the badge starts again in the sleep mode (everything stopped cleanly) */
+static void sleep_request(void) {
+    if (app == A_APP && cur_app == APPS[APP_TALK]) {
+        printf("sleep: ignored (talk badge)\n");
+        return;
+    }
+    store_get()->asleep = STORE_ASLEEP;
+    store_save_now();
+    printf("sleep: requested, rebooting\n");
+    watchdog_reboot(0, 0, 50);
+}
+
+
 int main() {
     stdio_init_all();
     log_set_level(LOG_LEVEL_WARNING);
@@ -2210,6 +2294,8 @@ int main() {
     noise_gen_set_enabled(false);  /* init_play starts the sound, we start silent */
     display_init();
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
+    if (store_get()->asleep == STORE_ASLEEP)
+        sleep_mode();  /* Put to sleep by an admin: until the manual unlock (it reboots) */
     radio_tools_init();
     net_init();
     remote_init();
@@ -2483,6 +2569,8 @@ int main() {
             set_sound(sound_on);
             redraw = true;
         }
+        if (remote_sleep_requested())
+            sleep_request();
         char remote_msg[40];
         if (remote_event(remote_msg, sizeof(remote_msg)))
             set_status(remote_msg);

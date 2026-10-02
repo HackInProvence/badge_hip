@@ -123,6 +123,14 @@ bool remote_event(char *buf, int len) {
 }
 
 
+static bool sleep_requested = false;
+
+bool remote_sleep_requested(void) {
+    bool r = sleep_requested;
+    sleep_requested = false;
+    return r;
+}
+
 void remote_execute(uint8_t command, const char *from) {
     printf("remote: command 0x%02x from %s\n", command, from);
     last_command = command;
@@ -144,6 +152,14 @@ void remote_execute(uint8_t command, const char *from) {
     case REMOTE_UNMUTE:
         remote_set_muted(false);
         snprintf(event, sizeof(event), "Fin du mode muet");
+        break;
+    case REMOTE_SLEEP:
+        if (strcmp(from, "this badge")) {
+            sleep_requested = true;  /* main.c: not the talk badge */
+            snprintf(event, sizeof(event), "Mise en sommeil");
+        } else {
+            snprintf(event, sizeof(event), "Ordre de sommeil envoyé");  /* The admin badge stays awake */
+        }
         break;
     default:
         if (handlers[command >> 4])
@@ -211,6 +227,8 @@ void remote_princeton(uint32_t code) {
     last_princeton = code;
     last_princeton_at = now;
     uint8_t command = flipper_buttons(code & 0xFF);
+    if (command == REMOTE_SLEEP)
+        return;  /* Only from the network of the badges: any Flipper could put the conference to sleep */
     if (same_command(command, now))
         return;
     remote_execute(command, "Princeton");
@@ -222,7 +240,8 @@ void remote_send(uint8_t command) {
     sends_left = REPEATS;
     send_nonce = get_rand_32();
     next_send = get_absolute_time();
-    ook_pending = true;  /* First the Princeton frames (talk badges listen only in OOK), then the network */
+    ook_pending = command != REMOTE_SLEEP;  /* First the Princeton frames (talk badges listen only in OOK), then the
+                                              * network; the sleep only by the network (the talk badges stay awake) */
     ook_pending_ts = get_absolute_time();
     remote_execute(command, "this badge");  /* The admin badge obeys too */
 }
