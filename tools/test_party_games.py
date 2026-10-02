@@ -237,6 +237,9 @@ def test_assassin(d, admin_was):
     d.result('assassin: game over (badge 2)', t2.expect(r'^assassin: (game over, winner|party cancelled)', 15)
              is not None)
     t1.screenshot('assassin_victory_1')
+    # Out of the party by themselves after the end (another game can start without "Nouvelle partie")
+    left = [t.expect(r'^assassin: party left after the end', 15) is not None for t in d.t]
+    d.result('assassin: out of the party after the end (both)', all(left), f'{left}')
     for t in d.t:
         t.keys('b')  # Nouvelle partie: back to the first page
         t.pump(1)
