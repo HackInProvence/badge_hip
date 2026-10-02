@@ -32,8 +32,8 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge, find_port, save_png  # noqa: E402
 
-GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'apps', 'admin', 'battery',
-          'radio433', 'social', 'net']
+GROUPS = ['diag', 'menus', 'games', 'puzzles', 'ctf', 'settings', 'radio', 'ir', 'images', 'ringtones', 'apps', 'admin',
+          'battery', 'radio433', 'social', 'net']
 
 
 class Tester:
@@ -613,6 +613,58 @@ def test_images(t):
     t.press('a', TOP)
 
 
+def test_ringtones(t):
+    """Médias > Sonneries: the folders SONNERIES / RTTTL of the SD card are browsed, a page of files read, a tune played."""
+    listing = r'^rtttl: /(\S*): (\d+) dir\(s\), (\d+) file\(s\), (\d+) tune\(s\)(.*)$'
+    if not open_theme(t, 'Médias'):
+        return t.result('ringtones', False, 'theme "Médias" not shown')
+    t.mark()
+    t.keys('xxxb')  # Sonneries, the 4th entry
+    m = t.expect(listing, 8)
+    if not m:
+        t.result('ringtones: SD card', False, 'no listing')
+    elif int(m.group(2)) == 0:
+        t.result('ringtones: SD card', None, 'no SD card (or no SONNERIES / RTTTL directory)')
+    else:
+        t.result('ringtones: SD card', True, f'top: {m.group(2)} folder(s)')
+        t.screenshot('ringtones_top', 2)
+        depth = 0
+        # Down the first folders, until one holds tunes
+        while m and int(m.group(2)) and not int(m.group(4)) and depth < 4:
+            t.mark()
+            t.keys('b')
+            m = t.expect(listing, 15)
+            depth += 1
+        ok = m is not None and int(m.group(4)) > 0
+        t.result('ringtones: folder', ok, f'/{m.group(1)}: {m.group(3)} file(s), {m.group(4)} tune(s){m.group(5)}'
+                 if m else 'no listing')
+        if ok:
+            t.screenshot('ringtones_folder', 2)
+            dirs, nexts = int(m.group(2)), 'next page' in m.group(5)
+            if nexts:  # The next page: the row after the last tune
+                t.mark()
+                t.keys('y')  # From the first row, up: the last row, "Suivants >"
+                t.keys('b')
+                p = t.expect(listing, 15)
+                t.result('ringtones: next page', p is not None and 'previous page' in p.group(5),
+                         f'{p.group(3)} file(s), {p.group(4)} tune(s){p.group(5)}' if p else 'no listing')
+                t.keys('a')  # Up: the folder again, first page
+                t.expect(listing, 15)
+                t.keys('b')
+                m = t.expect(listing, 15)
+                t.screenshot('ringtones_page2', 0)
+            t.mark()
+            t.keys('x' * dirs + 'b')  # The first tune
+            playing = t.expect(r'^rtttl: playing "(.*)"', 5)
+            t.result('ringtones: play', playing is not None, playing.group(1) if playing else 'not played')
+            t.pump(1.5)
+            t.screenshot('ringtones_play', 0)
+            t.keys('a')  # Stop
+        t.keys('a' * (depth + 1))  # Up to the top, then out
+    t.keys('a')
+    t.press('a', TOP)
+
+
 def test_battery(t):
     """Admin > Batterie (calibration): 2 points make the measure calibrated, then they are cleared. Only on a badge
     not calibrated yet: the points are factory settings, a real calibration is not touched."""
@@ -651,6 +703,7 @@ def test_battery(t):
 
 TESTS = {'diag': test_diag, 'menus': test_menus, 'games': test_games, 'puzzles': test_puzzles, 'ctf': test_ctf,
          'settings': test_settings, 'radio': test_radio, 'ir': test_ir, 'images': test_images,
+         'ringtones': test_ringtones,
          'apps': test_apps, 'admin': test_admin, 'battery': test_battery, 'radio433': test_radio433, 'social': test_social,
          'net': test_net}
 

@@ -98,7 +98,7 @@ Each player shows the list of files; subfolders are marked with "> ".
 - WAV files are played as 8, 16, 24 or 32-bit PCM, or 32-bit float, mono or stereo, from 4 to 192 kHz;
   the best is still the 8-bit 16 kHz mono of `audio2wav.py` (see [§ 7.3](#73-converting-your-files)).
 
-**Sonneries** (Ringtones, `SONNERIES` folder, optional): ringtones in the RTTTL format, the one of the old Nokia
+**Sonneries** (Ringtones, `SONNERIES` or `RTTTL` folders and their sub-folders, optional): ringtones in the RTTTL format, the one of the old Nokia
 phones. 12 public domain tunes are built into the badge (Lettre à Élise (Für Elise), Ode à la joie (Ode to Joy),
 Frère Jacques, La Marseillaise, Korobeiniki...), those of the SD card follow.
 - Flanks: choose; right wing: play; left wing: back. A ringtone marked `(!)` has an error: the right wing shows the
@@ -711,7 +711,8 @@ SD card
 ├── VIDEOS/     .epv videos
 ├── MUSIQUE/    .wav sounds (subfolders allowed, handy for the blind test)
 ├── TEXTES/     .txt texts for speed reading
-├── SONNERIES/  RTTTL ringtones .txt, .rtttl or .rtx (24 files, 128 ringtones at most)
+├── SONNERIES/  RTTTL ringtones .txt, .rtttl or .rtx, sub-folders allowed, any number of files
+├── RTTTL/      same (either one)
 └── LIVRES/     .txt gamebooks (16 at most)
 ```
 

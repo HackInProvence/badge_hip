@@ -1012,7 +1012,9 @@ SDR : [radio_pirate.md](radio_pirate.md).
 
 - **Sonneries** ([rtttl.c](../../src/menu/rtttl.c), analyseur sans matériel
   [rtttl_parse.c](../../src/menu/rtttl_parse.c)) : 12 sonneries intégrées (`RTTTL_BUILTIN`), puis les fichiers
-  `.txt`, `.rtttl` et `.rtx` du dossier `SONNERIES` (24 fichiers, 128 sonneries). Le son est synthétisé (onde carrée,
+  `.txt`, `.rtttl` et `.rtx` des dossiers `SONNERIES` et `RTTTL`, parcourus comme la radio pirate (sous-dossiers,
+  fichiers par pages de 32 triées par nom, sans tout charger ; lecture de la carte quand l'écran est au repos).
+  Le son est synthétisé (onde carrée,
   enveloppe) environ 150 ms en avance dans le tampon audio ; la note affichée et les LEDs suivent `audio_played()`.
   Trace : `rtttl: ...`. Format : [sonneries.md](sonneries.md).
 - **Livres-jeux** ([gamebook.c](../../src/menu/gamebook.c), analyseur sans matériel

@@ -96,7 +96,7 @@ Chaque lecteur affiche la liste des fichiers ; les sous-dossiers sont précédé
 - Les fichiers WAV sont lus en PCM 8, 16, 24 ou 32 bits, ou en flottant 32 bits, mono ou stéréo, de 4 à 192 kHz ;
   le mieux reste le 8 bits 16 kHz mono de `audio2wav.py` (voir [§ 7.3](#73-convertir-ses-fichiers)).
 
-**Sonneries** (dossier `SONNERIES`, facultatif) : des sonneries au format RTTTL, celui des vieux téléphones Nokia.
+**Sonneries** (dossiers `SONNERIES` ou `RTTTL` et leurs sous-dossiers, facultatif) : des sonneries au format RTTTL, celui des vieux téléphones Nokia.
 12 mélodies du domaine public sont dans le badge (Lettre à Élise, Ode à la joie, Frère Jacques, La Marseillaise,
 Korobeiniki...), celles de la carte SD suivent.
 - Flancs : choisir ; aile droite : jouer ; aile gauche : retour. Une sonnerie marquée `(!)` contient une erreur :
@@ -704,7 +704,8 @@ carte SD
 ├── VIDEOS/     vidéos .epv
 ├── MUSIQUE/    sons .wav (sous-dossiers possibles, pratiques pour le blind test)
 ├── TEXTES/     textes .txt pour la lecture rapide
-├── SONNERIES/  sonneries RTTTL .txt, .rtttl ou .rtx (24 fichiers, 128 sonneries au plus)
+├── SONNERIES/  sonneries RTTTL .txt, .rtttl ou .rtx, sous-dossiers permis, fichiers en nombre quelconque
+├── RTTTL/      idem (au choix)
 └── LIVRES/     livres-jeux .txt (16 au plus)
 ```
 

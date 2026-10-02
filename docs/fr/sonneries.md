@@ -9,8 +9,12 @@ carte SD.
 
 ## Utilisation
 
-- **La liste** : les sonneries du badge, puis celles de la carte SD, avec le nom du fichier entre parenthèses.
-  Flancs : monter / descendre (maintenus : défilement), aile droite (D) : jouer, aile gauche (G) : retour.
+- **La liste** : les dossiers `SONNERIES/` et `RTTTL/` de la carte SD, puis les sonneries du badge. Dans un dossier :
+  ses sous-dossiers (`Nom/`), puis ses sonneries, avec le nom du fichier entre parenthèses. Les fichiers sont lus
+  par pages de 32, dans l'ordre alphabétique : les lignes `< Précédents` et `Suivants >` changent de page (un dossier
+  peut donc contenir des milliers de fichiers).
+  Flancs : monter / descendre (maintenus : défilement), aile droite (D) : ouvrir le dossier ou jouer, aile gauche
+  (G) : dossier parent, puis retour au menu.
   Une sonnerie marquée `(!)` contient une erreur : D affiche la ligne, la colonne et la raison.
 - **Pendant la lecture** : le nom, la note jouée (ex. `La#5`, `Silence`), une barre de progression et le temps.
   Les LEDs s'allument à chaque note, d'une couleur par note (Do rouge, Ré orange, Mi vert clair, Sol cyan, La bleu...).
@@ -20,20 +24,27 @@ carte SD.
 
 ## Ajouter des sonneries sur la carte SD
 
-Créer un dossier `SONNERIES` à la racine de la carte SD et y mettre des fichiers texte `.txt`, `.rtttl` ou `.rtx` :
+Créer un dossier `SONNERIES` ou `RTTTL` (ou les deux) à la racine de la carte SD et y mettre des fichiers texte
+`.txt`, `.rtttl` ou `.rtx`, directement ou dans des sous-dossiers :
 
 ```
 carte SD
 ├── SONNERIES/
 │   ├── classique.txt
 │   └── exemples.rtttl
+├── RTTTL/
+│   ├── Films/
+│   │   └── western.rtx
+│   └── jeux.txt
 └── ...
 ```
 
 - **une sonnerie par ligne** (un fichier peut en contenir plusieurs) ;
 - les lignes vides et celles qui commencent par `#` sont ignorées (commentaires) ;
 - texte en UTF-8 (les accents des noms s'affichent) ou ASCII ; lignes de 2048 caractères au plus ;
-- 24 fichiers et 128 sonneries au plus.
+- dans un dossier : 16 sous-dossiers montrés, des fichiers en nombre quelconque (par pages de 32), 128 sonneries
+  par page au plus ;
+- la page de lecture montre le chemin complet du fichier ; les flancs passent aux sonneries de la même page.
 
 Des exemples sont dans [`docs/sd/SONNERIES`](../sd/SONNERIES) : copier ce dossier sur la carte SD.
 

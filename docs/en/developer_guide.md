@@ -1007,8 +1007,9 @@ purity 95 %, level 95 % (before, 122 kHz PWM and 5 kHz deviation: 32 % / 17 % at
 ### 6.28 Ringtones and gamebooks
 
 - **Ringtones** ([rtttl.c](../../src/menu/rtttl.c), hardware-free parser [rtttl_parse.c](../../src/menu/rtttl_parse.c)):
-  12 built-in ringtones (`RTTTL_BUILTIN`), then the `.txt`, `.rtttl` and `.rtx` files of the `SONNERIES` folder
-  (24 files, 128 ringtones). The sound is synthesized (square wave, envelope) about 150 ms ahead in the audio buffer;
+  12 built-in ringtones (`RTTTL_BUILTIN`), then the `.txt`, `.rtttl` and `.rtx` files of the `SONNERIES` and `RTTTL` folders,
+  browsed like the pirate radio (sub-folders, files by pages of 32 sorted by name, without loading everything; the
+  card is read when the screen is idle). The sound is synthesized (square wave, envelope) about 150 ms ahead in the audio buffer;
   the note shown and the LEDs follow `audio_played()`. Log: `rtttl: ...`. Format: [ringtones.md](ringtones.md).
 - **Gamebooks** ([gamebook.c](../../src/menu/gamebook.c), hardware-free parser
   [gamebook_parse.c](../../src/menu/gamebook_parse.c)): the built-in book

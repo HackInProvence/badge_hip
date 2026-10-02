@@ -9,8 +9,12 @@ you can add as many as you like on the SD card.
 
 ## Use
 
-- **The list**: the ringtones of the badge, then those of the SD card, with the name of the file in brackets.
-  Flanks: up / down (held: scrolling), right wing (D): play, left wing (G): back.
+- **The list**: the `SONNERIES/` and `RTTTL/` folders of the SD card, then the ringtones of the badge. In a folder:
+  its sub-folders (`Name/`), then its ringtones, with the name of the file in brackets. The files are read by pages
+  of 32, in alphabetical order: the `< Précédents` (previous) and `Suivants >` (next) rows change the page (so a
+  folder can hold thousands of files).
+  Flanks: up / down (held: scrolling), right wing (D): open the folder or play, left wing (G): parent folder, then
+  back to the menu.
   A ringtone marked `(!)` has an error: D shows the line, the column and the reason.
 - **While playing**: the name, the note played (e.g. `La#5`, `Silence`; French note names: Do = C, Ré = D, Mi = E,
   Fa = F, Sol = G, La = A, Si = B), a progress bar and the time.
@@ -21,20 +25,26 @@ you can add as many as you like on the SD card.
 
 ## Adding ringtones on the SD card
 
-Create a `SONNERIES` folder at the root of the SD card and put `.txt`, `.rtttl` or `.rtx` text files in it:
+Create a `SONNERIES` or `RTTTL` folder (or both) at the root of the SD card and put `.txt`, `.rtttl` or `.rtx` text
+files in it, directly or in sub-folders:
 
 ```
 SD card
 ├── SONNERIES/
 │   ├── classique.txt
 │   └── exemples.rtttl
+├── RTTTL/
+│   ├── Films/
+│   │   └── western.rtx
+│   └── jeux.txt
 └── ...
 ```
 
 - **one ringtone per line** (a file can hold several);
 - empty lines and those starting with `#` are ignored (comments);
 - UTF-8 text (the accents of the names are shown) or ASCII; lines of 2048 characters at most;
-- 24 files and 128 ringtones at most.
+- in a folder: 16 sub-folders shown, any number of files (by pages of 32), 128 ringtones per page at most;
+- the playing page shows the full path of the file; the flanks go to the ringtones of the same page.
 
 Examples are in [`docs/sd/SONNERIES`](../sd/SONNERIES): copy this folder to the SD card.
 
