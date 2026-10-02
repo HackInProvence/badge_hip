@@ -43,7 +43,7 @@ carte SD
 - **une sonnerie par ligne** (un fichier peut en contenir plusieurs) ;
 - les lignes vides et celles qui commencent par `#` sont ignorées (commentaires) ;
 - texte en UTF-8 (les accents des noms s'affichent) ou ASCII ; lignes de 2048 caractères au plus ;
-- dans un dossier : 16 sous-dossiers montrés, des fichiers en nombre quelconque (par pages de 32), 128 sonneries
+- dans un dossier : 40 sous-dossiers montrés, des fichiers en nombre quelconque (par pages de 32), 128 sonneries
   par page au plus ;
 - la page de lecture montre le chemin complet du fichier ; les flancs passent aux sonneries de la même page.
 

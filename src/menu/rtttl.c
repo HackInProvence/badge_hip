@@ -37,7 +37,7 @@
 #define REDRAW_MS 150  /* The e-Paper can't follow every note */
 
 #define MAX_FILES 32  /* Files of a page of the list */
-#define MAX_DIRS 16  /* Sub-folders shown in a folder */
+#define MAX_DIRS 40  /* Sub-folders shown in a folder (A..Z, 0-9...) */
 #define PATH_MAX_LEN (4 * SD_NAME_MAX)  /* The folder shown, from the root: "RTTTL/Films/Western" */
 #define MAX_SD_TUNES 128
 #define LINE_MAX 2048  /* Bytes of a line (a tune) of a file */

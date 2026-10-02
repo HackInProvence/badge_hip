@@ -43,7 +43,7 @@ SD card
 - **one ringtone per line** (a file can hold several);
 - empty lines and those starting with `#` are ignored (comments);
 - UTF-8 text (the accents of the names are shown) or ASCII; lines of 2048 characters at most;
-- in a folder: 16 sub-folders shown, any number of files (by pages of 32), 128 ringtones per page at most;
+- in a folder: 40 sub-folders shown, any number of files (by pages of 32), 128 ringtones per page at most;
 - the playing page shows the full path of the file; the flanks go to the ringtones of the same page.
 
 Examples are in [`docs/sd/SONNERIES`](../sd/SONNERIES): copy this folder to the SD card.
