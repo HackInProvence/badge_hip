@@ -349,11 +349,18 @@ def main():
         for t in (na, pl):
             t.keys('U')  # The check of the texts off again
         if unlock_before is not None and unlock_before != 2:
-            na.press('A', TOP)
-            nb.send('\x01A')  # The setting of the small games as it was
+            # The setting of the small games as it was: from a rebooted narrator (the menus in a known state), the
+            # admin mode switched off then on selects the Admin theme
+            connect(na, args.ports[0], True)
+            na.mark()
+            nb.send('\x01a')
+            na.expect(r'^admin: off$', 3)
+            nb.send('\x01A')
             na.expect(r'^admin: on$', 3)
             na.pump(0.5)
-            set_unlock(na, unlock_before)
+            restored = set_unlock(na, unlock_before)
+            print(f'    Loup-garou (admin) restored to {unlock_before}' if restored is not None else
+                  '    WARNING: Loup-garou (admin) not restored: set it back by hand')
         if admin_before is False:
             nb.send('\x01a')  # The admin mode as it was
             na.expect(r'^admin: off$', 3)

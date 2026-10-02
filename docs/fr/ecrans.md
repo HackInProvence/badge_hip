@@ -229,6 +229,14 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 
 ![Loup-garou — Mener une partie](../screens/jeux__loup_garou__meneur.png)
 
+### Loup-garou — Aide : une carte de rôle
+
+![Loup-garou — Aide : une carte de rôle](../screens/jeux__loup_garou__aide.png)
+
+### Loup-garou — Aide : le détail du rôle
+
+![Loup-garou — Aide : le détail du rôle](../screens/jeux__loup_garou__aide_detail.png)
+
 ### Assassin
 
 ![Assassin](../screens/jeux__assassin.png)
@@ -526,7 +534,6 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ![Annonces (admin) — Aperçu (l'écran des cigales)](../screens/admin__annonces_admin__apercu.png)
 
 
-
 ### Vote (admin)
 
 ![Vote (admin)](../screens/admin__vote_admin.png)
@@ -542,6 +549,14 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Virus : patient zéro
 
 ![Virus : patient zéro](../screens/admin__virus_patient_zero.png)
+
+### Contrebande (admin)
+
+![Contrebande (admin)](../screens/admin__contrebande_admin.png)
+
+### Loup-garou (admin)
+
+![Loup-garou (admin)](../screens/admin__loup_garou_admin.png)
 
 ### Remise à zéro
 
