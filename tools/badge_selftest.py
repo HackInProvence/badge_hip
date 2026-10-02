@@ -228,7 +228,7 @@ def test_games(t):
         quit_ok = False
         for _ in range(4):
             t.keys('a')
-            if t.expect(r'^ui: Jeux$', 1.5):
+            if t.expect(r'^ui: Jeux solo$', 1.5):
                 quit_ok = True
                 break
         ok &= quit_ok
