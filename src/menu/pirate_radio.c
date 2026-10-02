@@ -47,7 +47,7 @@
 #include "sd.h"
 #include "wav.h"
 
-#define DATA_RATE 500000  /* The highest of 2-FSK: GDO0 sampled at 4 MHz, ~33 samples per period of the PWM */
+#define DATA_RATE 500000  /* The highest of 2-FSK: GDO0 sampled at 4 MHz, ~125 samples per period of the PWM (32 kHz) */
 #define TX_MAX_MS (10 * 60 * 1000)  /* Safety: the transmission stops after 10 minutes */
 #define NET_WAIT_MS 1000  /* A packet of the network on air: wait for its end before taking the radio */
 #define SYNTH_RATE 16000

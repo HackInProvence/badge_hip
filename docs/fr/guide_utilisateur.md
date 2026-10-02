@@ -567,7 +567,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge (pour débloquer une rare ou une légendaire, par exemple) : flancs : choisir, aile droite : ajouter |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
-| **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM bande étroite sur 433 MHz, à écouter avec un Portapack, un SDR ou une autre cigale (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
+| **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM sur 433 MHz, à écouter avec un Flipper Zero (Sub-GHz > Read RAW, FM476, son activé), un Portapack, un SDR ou une autre cigale ; réglages : excursion (47,6 kHz « Flipper » par défaut, 5 kHz pour un récepteur NFM), gain du son x1 / x2 / x4 (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
 | **Mode démo** | pour un stand : le badge présente ses fonctions en boucle (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |

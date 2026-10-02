@@ -573,7 +573,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Contrebande (admin)** (Smuggling, admin) | adds a good of your choice to the cargo of this badge (to unlock a rare or a legendary one, for instance): flanks: choose, right wing: add |
 | **Remise à zéro** (Reset) | erases the scores and the progress of this badge (see below) |
 | **Batterie (calibration)** | calibrates the battery measure with a multimeter (see § 5) |
-| **Radio pirate** (Pirate radio) | sends a melody, a 1 kHz tone or a WAV file of the SD card in narrow band FM on 433 MHz, to listen to with a Portapack, an SDR or another cicada (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
+| **Radio pirate** (Pirate radio) | sends a melody, a 1 kHz tone or a WAV file of the SD card in FM on 433 MHz, to listen to with a Flipper Zero (Sub-GHz > Read RAW, FM476, sound on), a Portapack, an SDR or another cicada; settings: deviation (47.6 kHz "Flipper" by default, 5 kHz for an NFM receiver), sound gain x1 / x2 / x4 (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
 | **Mode démo** (Demo mode) | for a stand: the badge shows its features in a loop (see below) |
 | **Type du badge** (Badge type) | Participant, Orateur (speaker) or Staff, shown by the name tag |
 | **Quitter le mode admin** (Leave admin mode) | hides the Admin theme again |

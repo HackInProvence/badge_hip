@@ -983,18 +983,24 @@ never duplicated. Everything is described in [smuggler.md](smuggler.md).
 
 ### 6.27 Pirate radio
 
-[pirate_radio.c](../../src/menu/pirate_radio.c) (Admin > Radio pirate) sends sound in narrow band FM: the CC1101 in
-2-FSK, asynchronous serial mode, at 500 kBaud, and the audio output (`AUDIO_OUT_RADIO`) that drives GDO0 with a
-~122 kHz PWM whose duty cycle follows the sound; an NFM receiver only sees its average, the instantaneous frequency
-follows the sound. The listening (Radio & IR > Écouter la radio pirate) puts the CC1101 of another badge in 2-FSK
+[pirate_radio.c](../../src/menu/pirate_radio.c) (Admin > Radio pirate) sends sound in FM: the CC1101 in 2-FSK,
+asynchronous serial mode, at 500 kBaud, and the audio output (`AUDIO_OUT_RADIO`) that drives GDO0 with a ~32 kHz PWM
+(clk_sys / 3906, `AUDIO_RADIO_WRAP` = 3905: 2 periods per 16 kHz sample of the receiving badge, no beat) whose duty
+cycle follows the sound, amplified by `audio_set_radio_gain()` (x1, x2, x4, clipped); an NFM receiver only sees its
+average, the instantaneous frequency follows the sound, and the products of the PWM fall at ±32 kHz, outside its
+channel. A receiver that slices the frequency (the receiving badge, a Flipper Zero in Read RAW FM476) follows the PWM
+itself: its duty cycle is the sound. Deviation: 2.5, 5, 12.5, 25 or 47.6 kHz (default, the FM476 preset of the
+Flipper; 5 kHz for an NFM receiver). The listening (Radio & IR > Écouter la radio pirate) puts the CC1101 of another badge in 2-FSK
 asynchronous receive (406 kHz channel): GDO2 follows the PWM of the transmitter, a PWM slice of the RP2040 counts
 the time high and a DMA at 16 kHz copies it; the loop turns it into sound, measures the tone (Goertzel) and corrects
 the frequency offset (AFC). The network is paused while sending and listening; the transmission stops after
 10 minutes.
 
-**Test between two badges**: the 1 kHz test tone is recovered by the receiving badge with the transmitter at
-**+10 dBm** (purity 84 %); at **0 dBm** it arrives weak: the wide channel (406 kHz) of the badge receiver makes it
-not very sensitive. Details, settings and listening with a Portapack or an SDR: [pirate_radio.md](pirate_radio.md).
+**Test between two badges** (1 kHz test tone, same distance): with the 32 kHz PWM, 47.6 kHz of deviation and the
+x2 gain, the receiving badge measures at **0 dBm** a purity of 81 % and a level of 55 %, at **+10 dBm** 1000-1001 Hz,
+purity 95 %, level 95 % (before, 122 kHz PWM and 5 kHz deviation: 32 % / 17 % at 0 dBm, 84 % / 25 % and ~1130 Hz at
++10 dBm). Details, settings and listening with a Flipper Zero, a Portapack or an SDR:
+[pirate_radio.md](pirate_radio.md).
 
 
 ### 6.28 Ringtones and gamebooks
