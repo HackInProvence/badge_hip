@@ -147,7 +147,9 @@ void achievements_init(void) {
 
 /* ------ The page: level, XP, then the list (right wing: how to get the selected one) ------ */
 
-static int sel = 0;
+/* The rows of the list: the meetings (they bring XP too), then the achievements */
+#define LIST_ROWS (ACHV_COUNT + 1)
+static int sel = 0;  /* 0: the meetings, n: the achievement n - 1 */
 static bool detail = false;
 
 static void achv_start(absolute_time_t now) {
@@ -168,22 +170,31 @@ static bool achv_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_B)
         detail = true;
     if (b->pressed & UI_BTN_X)
-        sel = (sel + 1) % ACHV_COUNT;
+        sel = (sel + 1) % LIST_ROWS;
     if (b->pressed & UI_BTN_Y)
-        sel = (sel + ACHV_COUNT - 1) % ACHV_COUNT;
+        sel = (sel + LIST_ROWS - 1) % LIST_ROWS;
     return true;
 }
 
 static void achv_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[64];
+    if (detail && sel == 0) {
+        ui_title(fb, "Rencontres");
+        int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small, "Chaque cigale rencontrée\n(rester près d'elle)\nrapporte 2 XP.");
+        snprintf(text, sizeof(text), "%u rencontre%s : %u XP", social_met_count(), social_met_count() > 1 ? "s" : "",
+                 social_met_count() * XP_PER_MEETING);
+        ui_lines(fb, y + 12, &gfx_font_small, text);
+        ui_footer(fb, "G : retour");
+        return;
+    }
     if (detail) {
-        const achv_t *a = &ACHV[sel];
+        const achv_t *a = &ACHV[sel - 1];
         ui_title(fb, a->name);
         int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small, a->how);
         snprintf(text, sizeof(text), "+%u XP", a->xp);
         y = ui_lines(fb, y + 12, &gfx_font_small, text);
-        ui_lines(fb, y + 8, &gfx_font_small, achv_unlocked(sel) ? "Obtenu !" : "Pas encore obtenu");
+        ui_lines(fb, y + 8, &gfx_font_small, achv_unlocked(sel - 1) ? "Obtenu !" : "Pas encore obtenu");
         ui_footer(fb, "G : retour");
         return;
     }
@@ -206,16 +217,28 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
     /* The list: 6 rows */
     const int rows = 6, row_h = 20, y0 = UI_TITLE_H + 32;
     int first = sel - rows / 2;
-    if (first > ACHV_COUNT - rows)
-        first = ACHV_COUNT - rows;
+    if (first > LIST_ROWS - rows)
+        first = LIST_ROWS - rows;
     if (first < 0)
         first = 0;
-    for (int i = first; i < first + rows && i < ACHV_COUNT; ++i) {
-        int y = y0 + (i - first) * row_h;
-        bool on = i == sel;
+    for (int r = first; r < first + rows && r < LIST_ROWS; ++r) {
+        int y = y0 + (r - first) * row_h;
+        bool on = r == sel;
         if (on)
             gfx_fill_rect(fb, 2, y, GFX_WIDTH - 4, row_h - 1, GFX_BLACK);
         uint8_t fg = on ? GFX_WHITE : GFX_BLACK;
+        if (r == 0) {
+            /* The meetings: two dots for two cicadas, and their XP */
+            gfx_fill_rect(fb, 7, y + 8, 4, 4, fg);
+            gfx_fill_rect(fb, 13, y + 8, 4, 4, fg);
+            snprintf(text, sizeof(text), "Rencontres : %u x 2 = %u XP", social_met_count(),
+                     social_met_count() * XP_PER_MEETING);
+            char fitted[48];
+            ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
+            gfx_text(fb, 22, y + 1, &gfx_font_small, fitted, fg, GFX_ALIGN_LEFT);
+            continue;
+        }
+        int i = r - 1;
         /* A box, filled when obtained */
         gfx_rect(fb, 7, y + 5, 10, 10, fg);
         if (achv_unlocked(i))

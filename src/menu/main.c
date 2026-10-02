@@ -953,6 +953,9 @@ static absolute_time_t last_activity = 0;
 static app_state_t saver_return = A_MENU;  /* Where the screensaver goes back to */
 static bool saver_shown = false;
 static int saver_clean_step = 0;  /* Full refreshes in black then white before the image (erase the ghosts) */
+/* Twice black then white: after the fast refreshes of the menus (a notification), one cycle left a ghost that came
+ * back a few seconds after the page (an announcement) */
+#define SAVER_CLEAN_STEPS 4
 
 static void start_saver(app_state_t back) {
     saver_return = back;
@@ -2245,10 +2248,10 @@ static void sleep_mode(void) {
     leds_cancel_anim(true);
     /* The page, cleaned like the screensaver (black, white, then the page with the waveform of the screen) */
     sleep_render(fb);
-    sleep_wait_screen();
-    screen_clean(false);
-    sleep_wait_screen();
-    screen_clean(true);
+    for (int k = 0; k < SAVER_CLEAN_STEPS; ++k) {
+        sleep_wait_screen();
+        screen_clean(k % 2 == 1);
+    }
     sleep_wait_screen();
     screen_show_image_bw_otp(fb);
     sleep_wait_screen();
@@ -2709,11 +2712,11 @@ int main() {
             /* The display must have finished its updates before giving the screen */
             display_task(now);
             if (display_is_idle() && screen_boot() && ! screen_busy()) {
-                if (saver_clean_step < 2) {
+                if (saver_clean_step < SAVER_CLEAN_STEPS) {
                     /* A clean image: the fast refreshes of the menus leave ghosts that the short custom waveforms
                      * don't erase (they come back a while after the image). Full refreshes with the waveform
                      * of the screen (OTP) in black, then in white, one per loop (non blocking, ~3s each) */
-                    screen_clean(saver_clean_step == 1);
+                    screen_clean(saver_clean_step % 2 == 1);
                     ++saver_clean_step;
                 } else {
                     show_saver();

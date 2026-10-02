@@ -443,7 +443,8 @@ achievement gives XP, and each cicada met **2 XP**. The level goes from 1 to 10:
 | 5 | Jeune cigale (young cicada) | 170 | 10 | Cigale d'or (golden cicada) | 1000 |
 
 The page shows the level, the XP (out of those of the next level) with a gauge, the number of achievements obtained,
-then the list, with the value of each achievement ("Contrebandier (+20 XP)", filled box: obtained). Flanks: choose;
+then the list: first the meetings ("Rencontres : 16 x 2 = 32 XP": each cicada met brings 2 XP), then the value of each
+achievement ("Contrebandier (+20 XP)", filled box: obtained). Flanks: choose;
 right wing: how to get it; left wing: back.
 A new achievement is announced at the bottom of the screen ("Succès : Sociable"), or the new level
 ("Niveau 3 : Nymphe !").

@@ -438,7 +438,8 @@ donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau va de 1 à 10 :
 | 5 | Jeune cigale | 170 | 10 | Cigale d'or | 1000 |
 
 La page montre le niveau, les XP (sur ceux du niveau suivant) avec une jauge, le nombre de succès obtenus, puis la
-liste, avec la valeur de chaque succès (« Contrebandier (+20 XP) », case pleine : obtenu). Flancs : choisir ; aile
+liste : d'abord les rencontres (« Rencontres : 16 x 2 = 32 XP » : chaque cigale rencontrée rapporte 2 XP), puis la valeur
+de chaque succès (« Contrebandier (+20 XP) », case pleine : obtenu). Flancs : choisir ; aile
 droite : comment l'obtenir ; aile gauche : retour.
 Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou le nouveau niveau (« Niveau 3 : Nymphe ! »).
 
