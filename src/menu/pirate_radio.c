@@ -8,9 +8,12 @@
  *
  * Transmitter: the CC1101 in 2-FSK, asynchronous serial mode: it sends f0 + deviation while GDO0 is high,
  * f0 - deviation while it is low, and samples GDO0 at 8 times its data rate (500 kBaud: 4 MHz). The RP2040 drives
- * GDO0 with a PWM of ~122 kHz whose duty cycle follows the samples (audio.c, AUDIO_OUT_RADIO): a receiver with a
+ * GDO0 with a PWM of ~32 kHz whose duty cycle follows the samples (audio.c, AUDIO_OUT_RADIO): a receiver with a
  * narrow channel filter (12.5 kHz) only sees the average frequency f0 + deviation * (2 * duty - 1), i.e. the sound
- * in FM. The products of the PWM fall at +-122 kHz (and multiples), far from the channel, low (~-30 dBc).
+ * in FM; the products of the PWM fall at +-32 kHz (and multiples), out of its channel. A receiver that slices the
+ * frequency (a Flipper Zero in Sub-GHz Read RAW, FM476, with the sound on) follows the PWM itself: its speaker gets
+ * the PWM, the sound at full level, with a deviation as wide as its preset (47.6 kHz: the default here; 5 kHz and
+ * 2.5 kHz for a narrow FM receiver). The gain (x1, x2, x4) raises the WAV files that are often low.
  * Sources: a melody synthesized here ("Au clair de la lune", no SD card needed), a 1 kHz test tone, a WAV file of
  * the SD card (wav.c). The network of the cicadas is paused while transmitting; the radio is given back when the
  * transmission stops (end of the track, button, page left, safety timeout of 10 minutes).
@@ -56,7 +59,7 @@
 #define MAX_FILES 32
 #define TX_REDRAW_MS 5000
 
-/* Channels in the 433.05-434.79 MHz band, with room for the products of the PWM (+-122 kHz) */
+/* Channels in the 433.05-434.79 MHz band, with room for the products of the PWM (+-32 kHz) */
 static const uint32_t FREQS[] = {433300000, 433650000, 433920000, 434200000, 434500000};
 #define N_FREQS ((int)(sizeof(FREQS) / sizeof(FREQS[0])))
 #define FREQ_DEFAULT 2
@@ -66,9 +69,13 @@ static const struct { int8_t dbm; uint8_t pa; } POWERS[] = {{-20, 0x0E}, {-10, 0
 #define N_POWERS ((int)(sizeof(POWERS) / sizeof(POWERS[0])))
 #define POWER_DEFAULT 1  /* -10 dBm */
 
-static const uint32_t DEVIATIONS[] = {2500, 5000};
-#define N_DEVIATIONS 2
-#define DEVIATION_DEFAULT 1
+static const uint32_t DEVIATIONS[] = {2500, 5000, 12500, 25000, 47600};
+static const char *const DEVIATION_TEXTS[] = {"2,5", "5", "12,5", "25", "47,6"};
+#define N_DEVIATIONS ((int)(sizeof(DEVIATIONS) / sizeof(DEVIATIONS[0])))
+#define DEVIATION_DEFAULT 4  /* 47.6 kHz: the FM476 preset of the Flipper Zero; 5 kHz for a narrow FM receiver */
+static const uint8_t GAINS[] = {1, 2, 4};
+#define N_GAINS ((int)(sizeof(GAINS) / sizeof(GAINS[0])))
+#define GAIN_DEFAULT 1  /* x2 */
 
 /* 2-FSK, asynchronous serial mode (registers over the GFSK profile of radio_tools.c) */
 static const uint8_t FM_REGS[] = {
@@ -176,7 +183,7 @@ static void timer_fraction(uint32_t rate, uint16_t *x, uint16_t *y) {
 enum { SRC_MELODY, SRC_TONE, SRC_SD, N_SOURCES };
 static const char *SOURCES[N_SOURCES] = {"Mélodie", "Tonalité 1 kHz", "Fichier SD"};
 
-enum { ROW_SOURCE, ROW_FREQ, ROW_POWER, ROW_DEVIATION, ROW_MONITOR, ROW_START, N_ROWS };
+enum { ROW_SOURCE, ROW_FREQ, ROW_POWER, ROW_DEVIATION, ROW_GAIN, ROW_MONITOR, ROW_START, N_ROWS };
 
 typedef enum { T_SETUP, T_FILES, T_WAIT, T_ON_AIR } tx_page_t;
 
@@ -186,6 +193,7 @@ static int source = SRC_MELODY;
 static int freq_i = FREQ_DEFAULT;
 static int power_i = POWER_DEFAULT;
 static int deviation_i = DEVIATION_DEFAULT;
+static int gain_i = GAIN_DEFAULT;
 static bool monitor = false;  /* The buzzer also plays the sound */
 static char status[48] = "";
 static absolute_time_t on_air_ts = 0, wait_ts = 0, redraw_ts = 0;
@@ -298,6 +306,7 @@ static void tx_begin(absolute_time_t now) {
     }
     uint32_t dev = fm_configure(FREQS[freq_i], DEVIATIONS[deviation_i]);
     radio_set_power(POWERS[power_i].pa);
+    audio_set_radio_gain(GAINS[gain_i]);
     audio_set_outputs(AUDIO_OUT_RADIO | (monitor ? AUDIO_OUT_SPEAKER : 0));  /* GDO0: PWM at 50 % */
     bool ok;
     if (source == SRC_SD) {
@@ -367,6 +376,7 @@ static void change(int delta) {
     case ROW_FREQ: freq_i = (freq_i + N_FREQS + delta) % N_FREQS; break;
     case ROW_POWER: power_i = (power_i + N_POWERS + delta) % N_POWERS; break;
     case ROW_DEVIATION: deviation_i = (deviation_i + N_DEVIATIONS + delta) % N_DEVIATIONS; break;
+    case ROW_GAIN: gain_i = (gain_i + N_GAINS + delta) % N_GAINS; break;
     case ROW_MONITOR: monitor = ! monitor; break;
     default: break;
     }
@@ -468,8 +478,10 @@ static void row_text(int i, char *buf, size_t len) {
     case ROW_FREQ: mhz(f, sizeof(f), FREQS[freq_i]); snprintf(buf, len, "Fréquence : %s", f); break;
     case ROW_POWER: snprintf(buf, len, "Puissance : %d dBm", POWERS[power_i].dbm); break;
     case ROW_DEVIATION:
-        snprintf(buf, len, "Excursion : %s kHz", DEVIATIONS[deviation_i] == 2500 ? "2,5" : "5");
+        snprintf(buf, len, "Excursion : %s kHz%s", DEVIATION_TEXTS[deviation_i],
+                 DEVIATIONS[deviation_i] == 47600 ? " (Flipper)" : "");
         break;
+    case ROW_GAIN: snprintf(buf, len, "Gain du son : x%u", GAINS[gain_i]); break;
     case ROW_MONITOR: snprintf(buf, len, "Haut-parleur : %s", monitor ? "oui" : "non"); break;
     default: snprintf(buf, len, source == SRC_SD ? "> Choisir le fichier" : "> Émettre"); break;
     }
@@ -499,8 +511,7 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), "%s  NFM", f);
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 24;
-        snprintf(text, sizeof(text), "%d dBm, excursion %s kHz", POWERS[power_i].dbm,
-                 DEVIATIONS[deviation_i] == 2500 ? "2,5" : "5");
+        snprintf(text, sizeof(text), "%d dBm, excursion %s kHz", POWERS[power_i].dbm, DEVIATION_TEXTS[deviation_i]);
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 18;
         ui_fit_preview(&gfx_font_small, text, sizeof(text), source == SRC_SD ? files[file_sel] : SOURCES[source],

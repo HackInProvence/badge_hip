@@ -43,9 +43,17 @@ static inline uint16_t level(uint8_t sample) {
     return muted || ! (outputs & AUDIO_OUT_SPEAKER) ? 0 : (uint16_t)((sample * volume) / AUDIO_VOLUME_MAX);
 }
 
-/* The duty cycle of the radio output: the full scale, 128 = 50 % */
+static uint8_t radio_gain = 1;
+
+void audio_set_radio_gain(uint8_t gain) {
+    radio_gain = gain ? gain : 1;
+}
+
+/* The duty cycle of the radio output: the full scale, 128 = 50 %, amplified by radio_gain (clipped) */
 static inline uint16_t radio_level(uint8_t sample) {
-    return (uint16_t)(RADIO_CENTER + ((int)sample - 128) * (int)RADIO_CENTER / 128);
+    int s = ((int)sample - 128) * radio_gain;
+    s = s < -128 ? -128 : s > 127 ? 127 : s;
+    return (uint16_t)(RADIO_CENTER + s * (int)RADIO_CENTER / 128);
 }
 
 /* A sample at the index \p i of the rings */

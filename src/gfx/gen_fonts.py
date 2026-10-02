@@ -33,6 +33,10 @@ FONTS = {  # name: pixel size
 }
 
 
+# Pixels of space added on each side of a glyph: the slash touched its neighbours ("9/32")
+SIDE_SPACE = {'/': 1}
+
+
 def ink_bbox(img):
     return img.getbbox() or (0, 0, 0, 0)
 
@@ -45,23 +49,34 @@ def render_char(font, ch, height):
         ImageDraw.Draw(img).rectangle((0, 0, img.width, top - 1), fill=0)
         return img, adv
     adv = font.getlength(ch)
-    width = max(font.getbbox(ch)[2], round(adv), 1)
-    img = Image.new('1', (width, height), 0)
+    left = font.getbbox(ch)[0]
+    # A glyph that starts left of its origin (the '/' of Aileron) was cut there: shifted right, its spacing kept
+    shift = max(0, -left) + SIDE_SPACE.get(ch, 0)
+    width = max(font.getbbox(ch)[2], round(adv), 1) + shift
+    img = Image.new('1', (width + SIDE_SPACE.get(ch, 0), height), 0)
     draw = ImageDraw.Draw(img)
     draw.fontmode = '1'  # No antialiasing
-    draw.text((0, 0), ch, font=font, fill=1)
-    return img, adv
+    draw.text((shift, 0), ch, font=font, fill=1)
+    return img, adv + 2 * SIDE_SPACE.get(ch, 0)  # The others overlap their neighbour by their bearing, as in the font
 
 
 def accent_image(font, accent, height):
     """Returns the cropped image of an accent."""
     if accent in ('grave', 'acute'):
-        img = render_char(font, '`', height)[0]
-        img = img.crop(ink_bbox(img))
-        return ImageOps.mirror(img) if accent == 'acute' else img
+        # Drawn: the '`' of the font is 1 or 2 pixels in the small sizes, its mirror (the acute) was the same blob
+        n = max(3, round(font.size * 0.22))
+        t = max(1, round(font.size / 14))
+        img = Image.new('1', (n + t - 1, n), 0)
+        draw = ImageDraw.Draw(img)
+        for k in range(t):
+            if accent == 'acute':
+                draw.line((k, n - 1, n - 1 + k, 0), fill=1)
+            else:
+                draw.line((k, 0, n - 1 + k, n - 1), fill=1)
+        return img
     if accent == 'circ':
         # Drawn: the '^' of the font is a big caret (maths), it floated high above the letter ("rôles")
-        w = max(5, round(font.size * 0.42)) | 1
+        w = max(5, round(font.size * 0.36)) | 1
         h = (w + 1) // 2
         t = max(1, round(font.size / 14))
         img = Image.new('1', (w, h + t - 1), 0)

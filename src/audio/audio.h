@@ -63,7 +63,7 @@ void audio_set_mute(bool muted);
 
 
 /* ------ Outputs: the buzzer and/or the radio (pirate radio, see menu/pirate_radio.c) ------
- * The radio output is a fast PWM (clk_sys / (AUDIO_RADIO_WRAP + 1), ~122 kHz at 125 MHz) on the GDO0 pin of the
+ * The radio output is a fast PWM (clk_sys / (AUDIO_RADIO_WRAP + 1), ~32 kHz at 125 MHz) on the GDO0 pin of the
  * CC1101 (its asynchronous TX data input in 2-FSK: high = f0 + deviation, low = f0 - deviation): its duty cycle
  * follows the samples (0 to 255 -> 0 to 100 %), so that the average frequency follows the sound: narrow FM.
  * A second DMA channel and timer copy the samples to it, in step with the buzzer. Neither the volume nor the mute mode
@@ -72,12 +72,16 @@ void audio_set_mute(bool muted);
 
 #define AUDIO_OUT_SPEAKER 0x01
 #define AUDIO_OUT_RADIO 0x02
-#define AUDIO_RADIO_WRAP 1023  /* 10 bit duty cycle: 128 (silence) = 512 = 50 % */
+#define AUDIO_RADIO_WRAP 3905  /* ~32 kHz at 125 MHz: 2 periods per sample of the receiver badge (16 kHz), no beat */
 
 /** \brief Chooses the outputs (AUDIO_OUT_* flags, 0 = the buzzer), call it while the audio is closed: the radio
  * output takes GDO0 at once (PWM at 50 %), leaving it releases GDO0 (input). The buzzer stays silent without
  * AUDIO_OUT_SPEAKER (the samples still give the clock). */
 void audio_set_outputs(uint8_t outputs);
+
+/** \brief Gain of the radio output (1, 2, 4...: the samples are amplified around the silence, clipped): the sound of
+ * a WAV file is often low, and the level of the sound is the loudness heard by the receiver. 1 by default. */
+void audio_set_radio_gain(uint8_t gain);
 uint8_t audio_get_outputs(void);
 
 #endif /* _AUDIO_H */
