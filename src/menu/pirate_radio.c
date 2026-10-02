@@ -38,6 +38,7 @@
 
 #include "app.h"
 #include "audio.h"
+#include "display.h"
 #include "net.h"
 #include "ook_rx.h"
 #include "ook_tx.h"
@@ -348,8 +349,12 @@ static void tx_request(absolute_time_t now) {
     tx_begin(now);
 }
 
+/* The listing waits for the screen: the SD card and the screen share the SPI bus (done in tx_task) */
+enum { LIST_NONE, LIST_DIR, LIST_START };
+static int list_pending = LIST_NONE;
+
 /* The folders, then the .WAV files of \p dir */
-static void load_dir(void) {
+static void do_load_dir(void) {
     int n_dirs = (int)sd_list_dirs(dir, files, MAX_FILES);
     for (int i = 0; i < n_dirs; ++i)
         file_is_dir[i] = true;
@@ -361,14 +366,29 @@ static void load_dir(void) {
     printf("pirate: /%s, %d folder(s), %d file(s)\n", dir, n_dirs, n);
 }
 
+static void load_dir(void) {
+    n_files = 0;
+    list_pending = LIST_DIR;
+}
+
 /* Starts in MUSIQUE (the root of the card without it); the folders can be opened, and left up to the root */
 static void load_files(void) {
     snprintf(dir, sizeof(dir), "%s", MUSIC_DIR);
-    load_dir();
-    if (! n_files) {
-        dir[0] = 0;
-        load_dir();
+    n_files = 0;
+    list_pending = LIST_START;
+}
+
+/* In the task: the listing asked, once the screen is idle. \return true when done (the page must be drawn) */
+static bool list_task(void) {
+    if (list_pending == LIST_NONE || ! display_is_idle())
+        return false;
+    do_load_dir();
+    if (list_pending == LIST_START && ! n_files) {
+        dir[0] = 0;  /* No MUSIQUE folder: the root, like the music player */
+        do_load_dir();
     }
+    list_pending = LIST_NONE;
+    return true;
 }
 
 /* Up to the parent folder; false at the root */
@@ -472,6 +492,8 @@ static bool tx_buttons(const app_buttons_t *b, absolute_time_t now) {
 }
 
 static bool tx_task(absolute_time_t now) {
+    if (page == T_FILES && list_task())
+        return true;
     if (page == T_WAIT) {
         if (! net_transmitting() || absolute_time_diff_us(wait_ts, now) >= 0) {
             tx_begin(now);
@@ -534,7 +556,9 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         ui_fit_preview(&gfx_font_medium, title, sizeof(title), dir[0] ? (sep ? sep + 1 : dir) : "Carte SD",
                        GFX_WIDTH - 8);  /* The folder shown */
         ui_title(fb, title);
-        if (n_files)
+        if (list_pending != LIST_NONE)
+            ui_wrapped(fb, 70, &gfx_font_small, "Lecture de la carte...", 3);
+        else if (n_files)
             ui_list(fb, n_files, file_sel, file_label);
         else
             ui_wrapped(fb, 70, &gfx_font_small, "Ni dossier ni fichier .WAV ici", 3);
