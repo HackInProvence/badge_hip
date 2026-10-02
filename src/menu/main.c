@@ -610,6 +610,8 @@ static void draw_list(int count, int sel, void (*label)(int, char *, size_t)) {
     }
 }
 
+static void saver_delay_text(char *buf, size_t len);
+
 static void item_label(int item, char *buf, size_t len) {
     switch (item) {
     case M_SOUND: snprintf(buf, len, "Cigale : %s", sound_on ? "activée" : "coupée"); break;
@@ -623,7 +625,12 @@ static void item_label(int item, char *buf, size_t len) {
     case M_OLED: snprintf(buf, len, "Écran OLED"); break;
     case M_CTF: snprintf(buf, len, "CTF : %d/%d flags", ctf_found_count(), CTF_N_FLAGS); break;
     case M_RSVP: snprintf(buf, len, "Lecture rapide (PVSR)"); break;
-    case M_SETTINGS: snprintf(buf, len, "Veille de l'écran"); break;
+    case M_SETTINGS: {
+        char delay[16];
+        saver_delay_text(delay, sizeof(delay));
+        snprintf(buf, len, "Veille : %s", delay);  /* The delay of the screensaver, set on its page */
+        break;
+    }
     case M_IMAGES: snprintf(buf, len, "Images"); break;
     case M_TICTACTOE: case M_CONNECT4: case M_SIMON: case M_REFLEX: case M_SNAKE:
         snprintf(buf, len, "%s", games_name(item - M_TICTACTOE));
@@ -937,7 +944,7 @@ static void name_edit_save(void) {
 
 #define SAVER_DEFAULT_MINUTES 5
 #define SAVER_MAX_IMAGES 32
-static const uint8_t SAVER_DELAYS[] = {0, 1, 2, 5, 10, 30};  /* Minutes, 0 = off */
+static const uint8_t SAVER_DELAYS[] = {0, 1, 2, 3, 5, 10, 15, 30, 60};  /* Minutes, 0 = off */
 static int settings_selected = 0;
 static char saver_files[SAVER_MAX_IMAGES][SD_NAME_MAX];
 static size_t n_saver_files = 0;
@@ -960,6 +967,17 @@ static unsigned saver_minutes(void) {
     return m == 0xFF ? SAVER_DEFAULT_MINUTES : m;
 }
 
+/* "5 min", "1 h", "désactivée" */
+static void saver_delay_text(char *buf, size_t len) {
+    unsigned m = saver_minutes();
+    if (! m)
+        snprintf(buf, len, "désactivée");
+    else if (m % 60 == 0)
+        snprintf(buf, len, "%u h", m / 60);
+    else
+        snprintf(buf, len, "%u min", m);
+}
+
 /* The image of the screensaver ("" = the built-in SecSea image) */
 static const char *saver_image(void) {
     const char *p = store_get()->saver_image;
@@ -979,10 +997,8 @@ static void settings_label(int i, char *buf, size_t len) {
     char name[SD_NAME_MAX];
     switch (i) {
     case 0:
-        if (saver_minutes())
-            snprintf(buf, len, "Veille après : %u min", saver_minutes());
-        else
-            snprintf(buf, len, "Veille : désactivée");
+        saver_delay_text(name, sizeof(name));
+        snprintf(buf, len, saver_minutes() ? "Veille après : %s" : "Veille : %s", name);
         break;
     case 1:
         display_name(saver_image(), name, sizeof(name));

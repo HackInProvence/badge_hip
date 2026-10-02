@@ -199,9 +199,10 @@ static char status[48] = "";
 static absolute_time_t on_air_ts = 0, wait_ts = 0, redraw_ts = 0;
 
 static char files[MAX_FILES][SD_NAME_MAX];
+static bool file_is_dir[MAX_FILES];
 static int n_files = 0, file_sel = 0;
-static char dir[16] = "";
-static char path[SD_NAME_MAX + 20] = "";
+static char dir[2 * SD_NAME_MAX] = "";  /* The folder shown ("" = the root of the card) */
+static char path[3 * SD_NAME_MAX] = "";
 
 /* The synthesizer: a sine with an envelope */
 static int8_t sine[256];
@@ -347,14 +348,40 @@ static void tx_request(absolute_time_t now) {
     tx_begin(now);
 }
 
-static void load_files(void) {
-    n_files = (int)sd_list_files(MUSIC_DIR, ".WAV", files, MAX_FILES);
-    snprintf(dir, sizeof(dir), "%s", MUSIC_DIR);
-    if (! n_files) {
-        n_files = (int)sd_list_files("", ".WAV", files, MAX_FILES);  /* The root, like the music player */
-        dir[0] = 0;
-    }
+/* The folders, then the .WAV files of \p dir */
+static void load_dir(void) {
+    int n_dirs = (int)sd_list_dirs(dir, files, MAX_FILES);
+    for (int i = 0; i < n_dirs; ++i)
+        file_is_dir[i] = true;
+    int n = (int)sd_list_files(dir, ".WAV", files + n_dirs, MAX_FILES - n_dirs);
+    for (int i = 0; i < n; ++i)
+        file_is_dir[n_dirs + i] = false;
+    n_files = n_dirs + n;
     file_sel = 0;
+    printf("pirate: /%s, %d folder(s), %d file(s)\n", dir, n_dirs, n);
+}
+
+/* Starts in MUSIQUE (the root of the card without it); the folders can be opened, and left up to the root */
+static void load_files(void) {
+    snprintf(dir, sizeof(dir), "%s", MUSIC_DIR);
+    load_dir();
+    if (! n_files) {
+        dir[0] = 0;
+        load_dir();
+    }
+}
+
+/* Up to the parent folder; false at the root */
+static bool dir_up(void) {
+    if (! dir[0])
+        return false;
+    char *sep = strrchr(dir, '/');
+    if (sep)
+        *sep = 0;
+    else
+        dir[0] = 0;
+    load_dir();
+    return true;
 }
 
 static void tx_start(absolute_time_t now) {
@@ -398,7 +425,8 @@ static bool tx_buttons(const app_buttons_t *b, absolute_time_t now) {
         return true;
     case T_FILES:
         if (b->pressed & UI_BTN_A) {
-            page = T_SETUP;
+            if (! dir_up())
+                page = T_SETUP;  /* At the root: back to the settings */
         } else if (n_files && (b->pressed & (UI_BTN_X | UI_BTN_Y))) {
             file_sel = (file_sel + ((b->pressed & UI_BTN_X) ? 1 : n_files - 1)) % n_files;
         } else if (n_files && (b->pressed & UI_BTN_B)) {
@@ -406,7 +434,12 @@ static bool tx_buttons(const app_buttons_t *b, absolute_time_t now) {
                 snprintf(path, sizeof(path), "%s/%s", dir, files[file_sel]);
             else
                 snprintf(path, sizeof(path), "%s", files[file_sel]);
-            tx_request(now);
+            if (file_is_dir[file_sel]) {
+                snprintf(dir, sizeof(dir), "%s", path);  /* Into the folder */
+                load_dir();
+            } else {
+                tx_request(now);
+            }
         }
         return true;
     default:
@@ -488,18 +521,25 @@ static void row_text(int i, char *buf, size_t len) {
 }
 
 static void file_label(int i, char *buf, size_t len) {
-    ui_fit_preview(&gfx_font_small, buf, len, files[i], GFX_WIDTH - 16);
+    char name[SD_NAME_MAX + 2];
+    snprintf(name, sizeof(name), "%s%s", files[i], file_is_dir[i] ? "/" : "");  /* A folder: "Name/" */
+    ui_fit_preview(&gfx_font_small, buf, len, name, GFX_WIDTH - 16);
 }
 
 static void tx_render(uint8_t *fb, absolute_time_t now) {
     char text[64], f[24];
     if (page == T_FILES) {
-        ui_title(fb, dir[0] ? "MUSIQUE" : "Carte SD");
+        const char *sep = strrchr(dir, '/');
+        char title[24];
+        ui_fit_preview(&gfx_font_medium, title, sizeof(title), dir[0] ? (sep ? sep + 1 : dir) : "Carte SD",
+                       GFX_WIDTH - 8);  /* The folder shown */
+        ui_title(fb, title);
         if (n_files)
             ui_list(fb, n_files, file_sel, file_label);
         else
-            ui_wrapped(fb, 70, &gfx_font_small, "Aucun fichier .WAV (dossier MUSIQUE)", 3);
-        ui_footer(fb, n_files ? "G : retour  D : émettre" : "G : retour");
+            ui_wrapped(fb, 70, &gfx_font_small, "Ni dossier ni fichier .WAV ici", 3);
+        ui_footer(fb, ! n_files ? "G : retour" : file_is_dir[file_sel] ? "G : retour  D : ouvrir"
+                                                                        : "G : retour  D : émettre");
         return;
     }
     if (page == T_ON_AIR) {

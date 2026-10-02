@@ -71,7 +71,9 @@ file), left wing: back. Long press on the left wing: quit.
 - **Mélodie**: "Au clair de la lune" (~23 s), sine with a small envelope, 16 kHz.
 - **Tonalité 1 kHz**: continuous sine at 78 % of the full scale before the gain (until stopped or the 10 minutes):
   for the measures.
-- **Fichier SD**: the `.WAV` files of the `MUSIQUE` folder (or of the root), read by the WAV player of the badge (8,
+- **Fichier SD**: the `.WAV` files of the card: it starts in the `MUSIQUE` folder (or the root) and browses the
+  folders and sub-folders (shown "Name/" first in the list; right wing: open the folder or transmit the file, left
+  wing: the parent folder, then back to the settings from the root). The files are read by the WAV player of the badge (8,
   16, 24 or 32 bits, float, mono or stereo, up to 192 kHz). Recommended: mono 16 kHz, normalized (`audio2wav.py`).
   The sound is sent as is (no pre-emphasis, no filter): a very high-pitched sound widens the spectrum a little.
 

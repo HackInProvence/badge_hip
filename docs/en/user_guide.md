@@ -486,7 +486,8 @@ A new achievement is announced at the bottom of the screen ("Succès : Sociable"
 ### 4.6 Réglages (Settings)
 
 - **Veille de l'écran** (Screen sleep):
-  - the delay before sleep (1, 2, 5, 10 or 30 minutes, or disabled);
+  - the delay before sleep, shown in the menu ("Veille : 5 min"): 1, 2, 3, 5, 10, 15 or 30 minutes, 1 hour, or
+    disabled (right wing: the next one);
   - the image shown while asleep (the SecSea by default, or an image from the `IMAGES` folder);
   - "Aperçu" (Preview) to try it out.
 

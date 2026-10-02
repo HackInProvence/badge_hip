@@ -71,7 +71,9 @@ Flancs : ligne précédente / suivante ; ailes : valeur précédente / suivante 
 - **Mélodie** : « Au clair de la lune » (~23 s), sinus avec une petite enveloppe, 16 kHz.
 - **Tonalité 1 kHz** : sinus continu à 78 % de la pleine échelle avant le gain (jusqu'à l'arrêt ou aux 10 minutes) :
   pour les mesures.
-- **Fichier SD** : les `.WAV` du dossier `MUSIQUE` (ou de la racine), lus par le lecteur WAV du badge (8, 16, 24 ou
+- **Fichier SD** : les `.WAV` de la carte : on part du dossier `MUSIQUE` (ou de la racine) et on navigue dans les
+  dossiers et sous-dossiers (affichés « Nom/ » en tête de liste ; aile droite : ouvrir le dossier ou émettre le
+  fichier, aile gauche : dossier parent, puis retour aux réglages depuis la racine). Les fichiers sont lus par le lecteur WAV du badge (8, 16, 24 ou
   32 bits, float, mono ou stéréo, jusqu'à 192 kHz). Conseillé : mono 16 kHz, normalisé (`audio2wav.py`). Le son est
   émis tel quel (pas de pré-accentuation, pas de filtre) : un son très aigu élargit un peu le spectre.
 

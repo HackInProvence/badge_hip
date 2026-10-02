@@ -480,7 +480,8 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 ### 4.6 Réglages
 
 - **Veille de l'écran** :
-  - le délai avant la veille (1, 2, 5, 10 ou 30 minutes, ou désactivée) ;
+  - le délai avant la veille, affiché dans le menu (« Veille : 5 min ») : 1, 2, 3, 5, 10, 15 ou 30 minutes, 1 heure, ou
+    désactivée (aile droite : le suivant) ;
   - l'image affichée pendant la veille (la SecSea par défaut, ou une image du dossier `IMAGES`) ;
   - « Aperçu » pour l'essayer.
 
