@@ -220,7 +220,11 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         gfx_rect(fb, 7, y + 5, 10, 10, fg);
         if (achv_unlocked(i))
             gfx_fill_rect(fb, 9, y + 7, 6, 6, fg);
-        gfx_text(fb, 24, y + 1, &gfx_font_small, ACHV[i].name, fg, GFX_ALIGN_LEFT);
+        /* The name and its value: "Contrebandier (+20 XP)" (the longest one fits from x = 22) */
+        snprintf(text, sizeof(text), "%s (+%u XP)", ACHV[i].name, ACHV[i].xp);
+        char fitted[48];
+        ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
+        gfx_text(fb, 22, y + 1, &gfx_font_small, fitted, fg, GFX_ALIGN_LEFT);
     }
     ui_footer(fb, "D : comment  G : retour");
 }
