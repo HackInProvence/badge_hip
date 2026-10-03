@@ -55,6 +55,7 @@ static const achv_t ACHV[ACHV_COUNT] = {
     [ACHV_SKILLS] = {N_("Expert"), N_("Cocher ses compétences\n(Social > Compétences)."), 10},
     [ACHV_SKILL_MATCH] = {N_("Âmes soeurs"), N_("Croiser une cigale qui\npartage une compétence."), 20},
     [ACHV_BABBLE] = {N_("Cigale bavarde"), N_("Déchiffrer le code Morse\nde la cigale bavarde."), 30},
+    [ACHV_RADIO_REPLAY] = {N_("Rejeu radio"), N_("Capturer et rejouer le\ncode 433 MHz du CTF."), 30},
     [ACHV_ALL] = {N_("Platine"), N_("Obtenir tous les\nautres succès."), 200},
 };
 

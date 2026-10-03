@@ -10,7 +10,7 @@ const i18n_lang_t I18N_LANGS[] = {
     {"en", "English"},
 };
 
-const int I18N_N_TEXTS = 1281;
+const int I18N_N_TEXTS = 1284;
 
 /* The French texts, by FNV-1a hash */
 const i18n_text_t I18N_TEXTS[] = {
@@ -63,6 +63,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x09FE2B84u, "Cale (admin)"},
     {0x0A18853Fu, "Vote : %d votants"},
     {0x0A237E51u, "Carte reçue :"},
+    {0x0A4CF0A2u, "Balise CTF (radio)"},
     {0x0B489EB6u, "G : menu  D long : carte"},
     {0x0C20BF62u, "Nom de la cigale"},
     {0x0C272C38u, "Ce badge est infecté :\nil tousse toutes les 4 s."},
@@ -380,6 +381,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x4AAE1E97u, "Préréglage : %s"},
     {0x4AB961D6u, "Niveau %d/%d (flancs : changer)"},
     {0x4B028E51u, "Messages envoyés : %u"},
+    {0x4B113E1Fu, "Capturer et rejouer le\ncode 433 MHz du CTF."},
     {0x4B1A67F9u, "G : retour  D : proposer"},
     {0x4B6D5A01u, "fin du morceau"},
     {0x4B9C902Au, "Résoudre un défi crypto."},
@@ -447,6 +449,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x5662286Cu, "Nouveau record !"},
     {0x56640174u, "Partie ouverte"},
     {0x56A33D2Cu, "Pause  D : reprendre"},
+    {0x56F4D13Fu, "Rejeu radio"},
     {0x5758BC27u, "%u rencontre%s : %u XP"},
     {0x576BEB15u, "%u sections"},
     {0x57975F44u, "La cale est vide.\nRencontrez des cigales :\nelles laissent des vivres."},
@@ -1348,6 +1351,7 @@ static const char *const TEXTS_EN[] = {
     "Hold (admin)",
     "Vote: %d voters",
     "Got a card:",
+    "CTF beacon (radio)",
     "L: menu  hold R: card",
     "Cicada name",
     "This badge is infected:\nit coughs every 4 s.",
@@ -1665,6 +1669,7 @@ static const char *const TEXTS_EN[] = {
     "Preset: %s",
     "Level %d/%d (sides: change)",
     "Messages sent: %u",
+    "Capture and replay the\n433 MHz CTF code.",
     "L: back  R: propose",
     "track over",
     "Solve a crypto puzzle.",
@@ -1732,6 +1737,7 @@ static const char *const TEXTS_EN[] = {
     "New record!",
     "Open game",
     "Pause  R: resume",
+    "Radio replay",
     "%u meeting%s: %u XP",
     "%u sections",
     "The hold is empty.\nMeet cicadas:\nthey leave supplies.",

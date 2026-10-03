@@ -368,70 +368,83 @@ msgstr ""
 
 #: src/menu/achievements.c:58
 msgid ""
+"Capturer et rejouer le\n"
+"code 433 MHz du CTF."
+msgstr ""
+"Capture and replay the\n"
+"433 MHz CTF code."
+
+#: src/menu/achievements.c:58
+#: src/menu/ctf.c:75
+msgid "Rejeu radio"
+msgstr "Radio replay"
+
+#: src/menu/achievements.c:59
+msgid ""
 "Obtenir tous les\n"
 "autres succès."
 msgstr ""
 "Get all the other\n"
 "achievements."
 
-#: src/menu/achievements.c:58
+#: src/menu/achievements.c:59
 msgid "Platine"
 msgstr "Platinum"
 
-#: src/menu/achievements.c:63
+#: src/menu/achievements.c:64
 msgid "Larve"
 msgstr "Larva"
 
-#: src/menu/achievements.c:63
+#: src/menu/achievements.c:64
 msgid "Mue"
 msgstr "Molt"
 
-#: src/menu/achievements.c:63
+#: src/menu/achievements.c:64
 msgid "Nymphe"
 msgstr "Nymph"
 
-#: src/menu/achievements.c:63
+#: src/menu/achievements.c:64
 msgid "Oeuf"
 msgstr "Egg"
 
-#: src/menu/achievements.c:64
+#: src/menu/achievements.c:65
 msgid "Chanteuse"
 msgstr "Singer"
 
-#: src/menu/achievements.c:64
+#: src/menu/achievements.c:65
 #: src/menu/oled_demo.c:26
 msgid "Cigale"
 msgstr "Cicada"
 
-#: src/menu/achievements.c:64
+#: src/menu/achievements.c:65
 msgid "Jeune cigale"
 msgstr "Young cicada"
 
-#: src/menu/achievements.c:65
+#: src/menu/achievements.c:66
 msgid "Cigale d'or"
 msgstr "Gold cicada"
 
-#: src/menu/achievements.c:65
+#: src/menu/achievements.c:66
 msgid "Maestro"
 msgstr "Maestro"
 
-#: src/menu/achievements.c:65
+#: src/menu/achievements.c:66
 msgid "Virtuose"
 msgstr "Virtuoso"
 
-#: src/menu/achievements.c:84
+#: src/menu/achievements.c:85
 msgid "Niveau %u : %s !"
 msgstr "Level %u: %s!"
 
-#: src/menu/achievements.c:86
+#: src/menu/achievements.c:87
 msgid "Succès : %s"
 msgstr "Unlocked: %s"
 
-#: src/menu/achievements.c:186
+#: src/menu/achievements.c:187
 msgid "Rencontres"
 msgstr "Meetings"
 
-#: src/menu/achievements.c:188
+#: src/menu/achievements.c:189
 msgid ""
 "Chaque cigale rencontrée\n"
 "(rester près d'elle)\n"
@@ -441,12 +454,12 @@ msgstr ""
 "(stay close to it)\n"
 "gives 2 XP."
 
-#: src/menu/achievements.c:189
+#: src/menu/achievements.c:190
 msgid "%u rencontre%s : %u XP"
 msgstr "%u meeting%s: %u XP"
 
-#: src/menu/achievements.c:192
-#: src/menu/achievements.c:202
+#: src/menu/achievements.c:193
+#: src/menu/achievements.c:203
 #: src/menu/announce.c:288
 #: src/menu/assassin.c:859
 #: src/menu/assassin.c:900
@@ -454,107 +467,111 @@ msgstr "%u meeting%s: %u XP"
 msgid "G : retour"
 msgstr "L: back"
 
-#: src/menu/achievements.c:201
+#: src/menu/achievements.c:202
 msgid "Obtenu !"
 msgstr "Got it!"
 
-#: src/menu/achievements.c:201
+#: src/menu/achievements.c:202
 msgid "Pas encore obtenu"
 msgstr "Not obtained yet"
 
-#: src/menu/achievements.c:207
+#: src/menu/achievements.c:208
 msgid "Niv. %u : %s"
 msgstr "Lv. %u: %s"
 
-#: src/menu/achievements.c:215
+#: src/menu/achievements.c:216
 msgid "%lu / %lu XP   %d/%d succès"
 msgstr "%lu / %lu XP   %d/%d done"
 
-#: src/menu/achievements.c:218
+#: src/menu/achievements.c:219
 msgid "%lu XP   %d/%d succès"
 msgstr "%lu XP   %d/%d done"
 
-#: src/menu/achievements.c:238
+#: src/menu/achievements.c:239
 msgid "Rencontres : %u x 2 = %u XP"
 msgstr "Meetings: %u x 2 = %u XP"
 
-#: src/menu/achievements.c:256
+#: src/menu/achievements.c:257
 msgid "D : comment  G : retour"
 msgstr "R: how  L: back"
 
-#: src/menu/achievements.c:260
+#: src/menu/achievements.c:261
 msgid "Succès"
 msgstr "Achievements"
 
-#: src/menu/admin.c:23
+#: src/menu/admin.c:25
 msgid "Muet (conférence)"
 msgstr "Mute (talk)"
 
-#: src/menu/admin.c:24
-#: src/menu/remote.c:155
+#: src/menu/admin.c:26
+#: src/menu/remote.c:157
 msgid "Fin du mode muet"
 msgstr "Mute mode off"
 
-#: src/menu/admin.c:25
+#: src/menu/admin.c:27
 msgid "Cigale : chanter"
 msgstr "Cicada: sing"
 
-#: src/menu/admin.c:26
+#: src/menu/admin.c:28
 msgid "Talk : éteint"
 msgstr "Talk: off"
 
-#: src/menu/admin.c:27
+#: src/menu/admin.c:29
 msgid "Talk : vert"
 msgstr "Talk: green"
 
-#: src/menu/admin.c:28
+#: src/menu/admin.c:30
 msgid "Talk : orange (5 min)"
 msgstr "Talk: orange (5 min)"
 
-#: src/menu/admin.c:29
+#: src/menu/admin.c:31
 msgid "Talk : rouge (fini)"
 msgstr "Talk: red (over)"
 
-#: src/menu/admin.c:30
+#: src/menu/admin.c:32
 msgid "Talk : rouge énervé"
 msgstr "Talk: angry red"
 
-#: src/menu/admin.c:31
-#: src/menu/remote.c:160
+#: src/menu/admin.c:33
+#: src/menu/remote.c:162
 msgid "Mise en sommeil"
 msgstr "Going to sleep"
 
-#: src/menu/admin.c:62
-#: src/menu/admin.c:68
+#: src/menu/admin.c:34
+msgid "Balise CTF (radio)"
+msgstr "CTF beacon (radio)"
+
+#: src/menu/admin.c:71
+#: src/menu/admin.c:77
 msgid "Commandes radio"
 msgstr "Radio commands"
 
-#: src/menu/admin.c:64
+#: src/menu/admin.c:73
 msgid "G : retour  D : envoyer à tous"
 msgstr "L: back  R: send to all"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:86
 msgid "Orateur"
 msgstr "Speaker"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:86
 msgid "Participant"
 msgstr "Participant"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:86
 msgid "Staff"
 msgstr "Staff"
 
-#: src/menu/admin.c:82
+#: src/menu/admin.c:91
 msgid "  (actuel)"
 msgstr "  (now)"
 
-#: src/menu/admin.c:109
-#: src/menu/admin.c:116
+#: src/menu/admin.c:118
+#: src/menu/admin.c:125
 msgid "Type du badge"
 msgstr "Badge type"
 
-#: src/menu/admin.c:111
+#: src/menu/admin.c:120
 msgid ""
 "Affiché par le\n"
 "badge nominatif."
@@ -562,7 +579,7 @@ msgstr ""
 "Shown by the\n"
 "name tag."
 
-#: src/menu/admin.c:112
+#: src/menu/admin.c:121
 #: src/menu/assassin.c:945
 #: src/menu/lang.c:47
 #: src/menu/messages.c:279
@@ -743,7 +760,7 @@ msgid "Rejoindre une partie"
 msgstr "Join a game"
 
 #: src/menu/assassin.c:608
-#: src/menu/ctf.c:73
+#: src/menu/ctf.c:74
 #: src/menu/tug.c:500
 #: src/menu/tug.c:535
 #: src/menu/tug.c:541
@@ -752,7 +769,7 @@ msgid "Tir à la corde"
 msgstr "Tug of war"
 
 #: src/menu/assassin.c:609
-#: src/menu/ctf.c:71
+#: src/menu/ctf.c:72
 #: src/menu/tug.c:331
 #: src/menu/werewolf.c:258
 #: src/menu/werewolf.c:1580
@@ -1145,7 +1162,7 @@ msgstr "Battery (calibration)"
 
 #: src/menu/battle.c:401
 #: src/menu/battle.c:443
-#: src/menu/ctf.c:70
+#: src/menu/ctf.c:71
 msgid "Bataille navale"
 msgstr "Battleship"
 
@@ -1580,66 +1597,66 @@ msgstr "%d challenge%s left to solve."
 msgid "Défis crypto"
 msgstr "Crypto CTF"
 
-#: src/menu/ctf.c:57
+#: src/menu/ctf.c:58
 msgid "Konami"
 msgstr "Konami"
 
-#: src/menu/ctf.c:58
+#: src/menu/ctf.c:59
 #: src/menu/games.c:22
 msgid "Morpion"
 msgstr "Tic-tac-toe"
 
-#: src/menu/ctf.c:59
+#: src/menu/ctf.c:60
 #: src/menu/games.c:22
 msgid "Puissance 4"
 msgstr "Connect 4"
 
-#: src/menu/ctf.c:60
+#: src/menu/ctf.c:61
 msgid "Simon"
 msgstr "Simon"
 
-#: src/menu/ctf.c:61
+#: src/menu/ctf.c:62
 #: src/menu/games.c:22
 #: src/menu/games.c:872
 msgid "Réflexes"
 msgstr "Reflexes"
 
-#: src/menu/ctf.c:62
+#: src/menu/ctf.c:63
 msgid "Snake"
 msgstr "Snake"
 
-#: src/menu/ctf.c:63
+#: src/menu/ctf.c:64
 #: src/menu/puzzles.c:23
 #: src/menu/puzzles.c:396
 #: src/menu/puzzles_app.c:35
 msgid "Démineur"
 msgstr "Minesweeper"
 
-#: src/menu/ctf.c:64
+#: src/menu/ctf.c:65
 msgid "2048"
 msgstr "2048"
 
-#: src/menu/ctf.c:65
+#: src/menu/ctf.c:66
 #: src/menu/puzzles.c:23
 #: src/menu/puzzles_app.c:37
 msgid "Taquin"
 msgstr "15 puzzle"
 
-#: src/menu/ctf.c:66
+#: src/menu/ctf.c:67
 msgid "Sokoban"
 msgstr "Sokoban"
 
-#: src/menu/ctf.c:67
+#: src/menu/ctf.c:68
 msgid "Mastermind"
 msgstr "Mastermind"
 
-#: src/menu/ctf.c:68
+#: src/menu/ctf.c:69
 #: src/menu/puzzles.c:24
 #: src/menu/puzzles_app.c:40
 msgid "Pendu"
 msgstr "Hangman"
 
-#: src/menu/ctf.c:69
+#: src/menu/ctf.c:70
 #: src/menu/duel.c:393
 msgid "Duel"
 msgstr "Duel"
@@ -4049,19 +4066,19 @@ msgstr ": ok"
 msgid "Restez près d'autres cigales."
 msgstr "Stay near other cicadas."
 
-#: src/menu/remote.c:139
+#: src/menu/remote.c:141
 msgid "Commande 0x%02X reçue"
 msgstr "Got command 0x%02X"
 
-#: src/menu/remote.c:147
+#: src/menu/remote.c:149
 msgid "La cigale chante !"
 msgstr "The cicada sings!"
 
-#: src/menu/remote.c:151
+#: src/menu/remote.c:153
 msgid "Mode muet (conférence)"
 msgstr "Mute mode (talk)"
 
-#: src/menu/remote.c:162
+#: src/menu/remote.c:164
 msgid "Ordre de sommeil envoyé"
 msgstr "Sleep order sent"
 

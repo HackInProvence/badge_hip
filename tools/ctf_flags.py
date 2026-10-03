@@ -54,6 +54,7 @@ BADGE_FLAGS = [
     dict(id='LOUP_GAROU', name='Loup-garou',      cond='achv:ACHV_WEREWOLF_WIN', cat='Jeux multi', flag='L0UP_G4R0U'),
     dict(id='ASSASSIN',   name='Assassin',        cond='achv:ACHV_ASSASSIN_WIN', cat='Jeux multi', flag='4554551N_0MBR3'),
     dict(id='TIR_CORDE',  name='Tir à la corde',  cond='achv:ACHV_TUG_WIN',    cat='Jeux multi', flag='T1R_4_L4_C0RD3'),
+    dict(id='RADIO',      name='Rejeu radio',     cond='achv:ACHV_RADIO_REPLAY', cat='Radio', flag='R4D10_R3J3U_433_C16A'),
 ]
 
 # Revealed by their own modules; only for the CTFd (keep in sync with the modules).

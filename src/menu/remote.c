@@ -8,6 +8,7 @@
 
 #include "pico/rand.h"
 
+#include "achievements.h"
 #include "audio.h"
 #include "i18n.h"
 #include "net.h"
@@ -74,6 +75,7 @@ static uint32_t window_frames = 0;  /* Frames decoded before the window */
 static uint32_t window_period_ms = OOK_PERIOD_MS;
 static uint8_t last_command = 0;  /* Received by the network and in OOK: executed once */
 static absolute_time_t last_command_at = 0;
+static int ctf_beacon_left = 0;  /* OOK bursts of the CTF radio code still to emit (remote_send_ctf_beacon) */
 
 
 static bool is_muted(void) {
@@ -218,6 +220,14 @@ static uint8_t flipper_buttons(uint8_t command) {
 
 
 void remote_princeton(uint32_t code) {
+    if (code == CTF_RADIO_CODE) {  /* CTF: a Flipper replayed the secret code -> reveal the "Rejeu radio" flag */
+        if (! achv_unlocked(ACHV_RADIO_REPLAY)) {
+            printf("remote: CTF radio code 0x%06lX received\n", (unsigned long)code);
+            achv_unlock(ACHV_RADIO_REPLAY);  /* ctf_refresh() (main loop) then reveals FLAG_RADIO in Drapeaux */
+            store_save_now();  /* The player may reboot right after: persist now */
+        }
+        return;
+    }
     if ((code & 0xFFFF00) != REMOTE_PRINCETON_ADDRESS || ! remote_enabled())
         return;
     absolute_time_t now = get_absolute_time();
@@ -245,6 +255,12 @@ void remote_send(uint8_t command) {
                                               * network; the sleep only by the network (the talk badges stay awake) */
     ook_pending_ts = get_absolute_time();
     remote_execute(command, "this badge");  /* The admin badge obeys too */
+}
+
+
+void remote_send_ctf_beacon(void) {
+    ctf_beacon_left = 10;  /* 10 bursts of OOK_FRAMES frames (~6 s of air time): plenty for a Flipper to capture */
+    printf("remote: CTF radio beacon armed (%d bursts)\n", ctf_beacon_left);
 }
 
 
@@ -294,6 +310,11 @@ void remote_task(absolute_time_t now) {
             ook_pending = false;
             printf("remote: princeton 0x%06lX sent\n", (unsigned long)(REMOTE_PRINCETON_ADDRESS | to_send));
         }
+    }
+    /* CTF radio beacon (Admin > Commandes radio > Balise CTF): emit the secret code in OOK for a Flipper to capture */
+    if (ctf_beacon_left && ! window && ! ook_pending && ! ook_tx_busy() && radio_tools_idle()) {
+        if (ook_tx_princeton(CTF_RADIO_CODE, OOK_FRAMES) && --ctf_beacon_left == 0)
+            printf("remote: CTF radio beacon done\n");
     }
     if (ook_tx_busy() || ook_pending) {
         if (window) {

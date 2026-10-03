@@ -14,6 +14,8 @@
 
 /* ------ Remote commands ------ */
 
+#define CMD_CTF_BEACON 0xFF  /* Not a real remote command: emits the CTF radio beacon (remote_send_ctf_beacon) */
+
 typedef struct {
     const char *label;
     uint8_t command;
@@ -29,6 +31,7 @@ static const command_t COMMANDS[] = {
     {N_("Talk : rouge (fini)"), REMOTE_TALK + 3},
     {N_("Talk : rouge énervé"), REMOTE_TALK + 4},
     {N_("Mise en sommeil"), REMOTE_SLEEP},
+    {N_("Balise CTF (radio)"), CMD_CTF_BEACON},
 };
 #define N_COMMANDS ((int)(sizeof(COMMANDS) / sizeof(COMMANDS[0])))
 
@@ -51,8 +54,14 @@ static bool commands_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_X)
         cmd_selected = (cmd_selected + 1) % N_COMMANDS;
     if (b->pressed & UI_BTN_B) {
-        printf("admin: sending command 0x%02x\n", COMMANDS[cmd_selected].command);
-        remote_send(COMMANDS[cmd_selected].command);
+        uint8_t command = COMMANDS[cmd_selected].command;
+        if (command == CMD_CTF_BEACON) {
+            printf("admin: emitting CTF radio beacon\n");
+            remote_send_ctf_beacon();
+        } else {
+            printf("admin: sending command 0x%02x\n", command);
+            remote_send(command);
+        }
     }
     return true;
 }

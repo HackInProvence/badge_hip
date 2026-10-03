@@ -81,7 +81,7 @@ si c'est à construire. Les épreuves notées ✅ existent déjà.
 | I2 | **Rémanence de l'écran** : le flag affiché une fraction de seconde puis effacé ; le *ghosting* le laisse deviner | mode multiframe de l'e-Paper | observe l'écran | écran e-Paper | à construire (nécessite l'écran) |
 | I3 | **Plan mémoire caché** : en N&B le flag est écrit dans la RAM « RED », visible seulement en **4 gris** | `screen` | bascule le mode (menu caché) | écran e-Paper | à construire |
 | I4 | **Écoute radio** : le badge émet périodiquement un message sur une autre fréquence/modulation | `radio` / `net` | le trouve au **Frequency Analyzer** du Flipper puis le décode | Flipper ou SDR | à construire |
-| I5 | **Rejeu radio** : une « porte » (station) s'ouvre sur le bon paquet ; on capture celui d'un badge staff et on le rejoue | `remote` (Princeton) | capture puis rejoue avec le Flipper | Flipper | à construire (+ station) |
+| I5 | **Rejeu radio** : un badge staff émet un code 433 MHz secret ; on le capture et on le rejoue devant son badge, qui révèle le flag | `remote` (Princeton) | capture puis rejoue avec le Flipper | Flipper | ✅ construit (voir § 4 bis) |
 
 ### Avancé (reverse / matériel)
 
@@ -94,6 +94,33 @@ si c'est à construire. Les épreuves notées ✅ existent déjà.
 
 > Remarque faisabilité **sans l'écran** : D1-D4, I1, I4-I5, A1-A4 se testent via `badge_remote.py` (écran à l'image)
 > et les LEDs/buzzer/radio de la carte. I2-I3 ont vraiment besoin de l'e-Paper (à ta réception).
+
+## 4 bis. Épreuve I5 « Rejeu radio » (construite)
+
+Épreuve *capture & rejeu*, 100 % Flipper, sans saisie de texte sur le badge.
+
+**Côté organisateur (émission).** Mode admin (séquence des flancs `LLRRLRLR`) → thème **Admin** → **Commandes radio**
+→ **Balise CTF (radio)** → bouton D. Le badge émet alors en OOK, une dizaine de fois sur ~6 s, un code Princeton
+secret (`CTF_RADIO_CODE = 0x5EC5EA`, clin d'œil à « SECSEA »), **sur le réseau de rien** : seulement les trames OOK,
+sur 433,92 MHz, 24 bits, TE 400 µs — exactement ce qu'un Flipper sait lire. Le même code est fourni en
+[`tools/flipper/SecSea_CTF.sub`](../../tools/flipper/SecSea_CTF.sub) : un orga peut donc aussi l'émettre directement
+depuis un Flipper (SubGhz → ce fichier → Send), sans badge admin.
+
+**Côté joueur (capture et rejeu).**
+1. **Capturer** : Flipper → Sub-GHz → *Read* (433,92 MHz, preset AM650/OOK650) pendant que la balise émet ; le
+   Flipper décode un *Princeton* et propose de l'enregistrer.
+2. **Rejouer** : ouvrir la capture (ou le `.sub` fourni) → *Send*, à côté de **son** badge.
+3. Le badge reçoit le code (récepteur OOK, `remote_princeton()`), débloque le succès **Rejeu radio** et
+   `ctf_refresh()` révèle le flag dans **Drapeaux** → `SECSEA{R4D10_R3J3U_433_C16A}`, à recopier dans le CTFd.
+
+**Comment ça marche (code).** Additif, ne touche pas au protocole du réseau :
+- `src/menu/remote.c` : `remote_princeton()` reconnaît `CTF_RADIO_CODE` (avant le filtre d'adresse des commandes) et
+  débloque `ACHV_RADIO_REPLAY` ; `remote_send_ctf_beacon()` + la boucle `remote_task()` émettent les trames.
+- Le flag est dans la source unique `tools/ctf_flags.py` (`cond='achv:ACHV_RADIO_REPLAY'`, catégorie **Radio**) → il
+  entre tout seul dans le firmware (galerie Drapeaux) **et** dans le CTFd.
+
+> ⚠️ Touche au chemin radio **partagé** (récepteur OOK). À valider avec Tristus1er avant fusion (voir § 7). Le code
+> secret `0x5EC5EA` est distinct des commandes `0xC16Axx` : aucune collision avec les télécommandes existantes.
 
 ## 5. Pour le workshop
 
