@@ -1,3 +1,9 @@
+# badge_secsea: the board of the badge by default (the SDK would take "pico", where the pins of the badge do not
+# exist: src/pinouts.h). Another board: cmake -DPICO_BOARD=badge_proto (or badge_radio).
+if (NOT DEFINED PICO_BOARD AND NOT DEFINED ENV{PICO_BOARD})
+    set(PICO_BOARD badge_secsea CACHE STRING "Board (badge_secsea, badge_proto, badge_radio)")
+endif()
+
 # This is a copy of <PICO_SDK_PATH>/external/pico_sdk_import.cmake
 
 # This can be dropped into an external project to help locate this SDK

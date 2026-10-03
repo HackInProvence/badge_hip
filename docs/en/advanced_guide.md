@@ -10,8 +10,8 @@ many badges. No programming knowledge is needed.
   werewolf ([loup_garou.md](../fr/loup_garou.md), in French), [gamebooks](gamebooks.md),
   and every page of the badge in pictures: [screens](screens.md).
 
-The texts of the badge are in French: menu entries and page names are given in French, with a translation where
-useful.
+The badge shows its texts in English or in French (Settings > Language, see [§ 8](#8-badge-language)): menu entries
+and page names are given as an English badge shows them, with the French label in brackets where useful.
 
 *Version française : [guide avancé](../fr/guide_avance.md).*
 
@@ -37,10 +37,10 @@ buttons with a letter:
 
 | Button | Letter (short press) | Letter (long press) | In the menus |
 |---|---|---|---|
-| Left wing (G) | `a` | `A` | back |
-| Right wing (D) | `b` | `B` | OK |
-| Right flank | `x` | `X` | down |
-| Left flank | `y` | `Y` | up |
+| Left wing (L; G in French) | `a` | `A` | back |
+| Right wing (R; D in French) | `b` | `B` | OK |
+| Right side | `x` | `X` | down |
+| Left side | `y` | `Y` | up |
 
 A long press lasts 0.8 s on the badge.
 
@@ -116,7 +116,7 @@ Precautions:
 
 #### `tools/badge_media_test.py` — playing every medium of the SD card
 
-Opens Médias > Vidéos then Médias > Musique, plays every file (sub-folders included) and checks that it starts and
+Opens Media > Videos (SD card) then Media > Music (SD card), plays every file (sub-folders included) and checks that it starts and
 goes to its end (or to the requested duration): read errors, early stops, frames per second of the videos.
 
 | Option | Purpose |
@@ -160,9 +160,9 @@ buttons simulated, the logs of both badges compared; screenshots in a dated fold
 
 | Script | Tests | Own options |
 |---|---|---|
-| `test_party_games.py` | Tir à la corde (tug of war) and Assassin | `--ports P1 P2` (required), `--only tug,assassin`, `--out` (default `party_<date>`) |
-| `test_werewolf.py` | Loup-garou (werewolf): badge 1 narrator, badge 2 the only real player, robots complete the game | `--ports NARRATOR PLAYER` (required), `--without voleur,capitaine` (roles removed: `voyante`, `sorciere`, `chasseur`, `cupidon`, `petite-fille`, `capitaine`, `voleur`), `--out` (default `werewolf_<date>`) |
-| `test_smuggler.py` | Contrebande (smuggler): exchange, gift, refusal, cancellation | `--ports INVITER GUEST` (required), `--out` (default `smuggler_<date>`) |
+| `test_party_games.py` | Tug of war (Tir à la corde) and Assassin | `--ports P1 P2` (required), `--only tug,assassin`, `--out` (default `party_<date>`) |
+| `test_werewolf.py` | Werewolf (Loup-garou): badge 1 narrator, badge 2 the only real player, robots complete the game | `--ports NARRATOR PLAYER` (required), `--without voleur,capitaine` (roles removed: `voyante`, `sorciere`, `chasseur`, `cupidon`, `petite-fille`, `capitaine`, `voleur`), `--out` (default `werewolf_<date>`) |
+| `test_smuggler.py` | Smuggling (Contrebande): exchange, gift, refusal, cancellation | `--ports INVITER GUEST` (required), `--out` (default `smuggler_<date>`) |
 
 Common options: `--no-reboot`, `--verbose` / `-v`.
 
@@ -176,7 +176,7 @@ Precautions:
 - Assassin and Smuggler need the badges **touching** (very strong signal): lay them side by side. The assassin test
   prints the measured RSSI, useful to tune the threshold on site;
 - `test_party_games.py` puts badge 1 in admin mode (to play with 2), `test_werewolf.py` puts the narrator in admin
-  mode and sets Admin > Loup-garou (admin) to "Test : robots"; both restore the previous state at the end. If the
+  mode and sets Admin > Werewolf (admin) to "Test: robots"; both restore the previous state at the end. If the
   script is interrupted, check these settings by hand;
 - `test_smuggler.py` **changes the cargo** of both badges: run it on test badges.
 
@@ -319,7 +319,7 @@ of the badge, PNG screenshots. Needs: pyserial, Tkinter. How to use it:
 | `--zoom`, `-z` | zoom of the screen, 2 to 4 (default: from the size of the PC display) |
 | `--snapshot`, `-s` `file.png` | saves the current screen and exits, no window |
 
-Keyboard (the window has the focus): up arrow / `y` = left flank, down / `x` = right flank, left / `a` = left wing,
+Keyboard (the window has the focus): up arrow / `y` = left side, down / `x` = right side, left / `a` = left wing,
 right / Enter / `b` = right wing; Shift + key = long press; F5: ask the screen again; F12: screenshot
 (`badge_YYYYMMDD_HHMMSS.png` in the current folder). Buttons "Capture", "Rafraîchir" (refresh), "Diagnostic" (`!`),
 check boxes "Journal" (log), "Mode clavier (saisie de texte)" (keyboard mode) and "Mode admin".
@@ -352,7 +352,7 @@ The skills of the received cards go in the `CATEGORIES` line.
 
 #### `tools/score_check.py` — checking the scores and making a leaderboard
 
-The games Morpion (tic-tac-toe), Puissance 4 (connect four), Simon, Réflexes and Snake show a signed QR code at the
+The games Tic-tac-toe (Morpion), Connect 4 (Puissance 4), Simon, Reflexes (Réflexes) and Snake show a signed QR code at the
 end of a game (or with a long press on the game in the menu, for the record):
 `HIP26:<game>:<score>:<badge id>:<name>:<signature>`. Scan them with a phone, paste the texts in a file, one line per
 QR code, then run the script: it rejects the scores edited by hand and ranks each game (best score of each badge; a
@@ -379,7 +379,7 @@ These scripts rewrite source files of the firmware: the result reaches the badge
 
 | Script | Purpose | Options | Output |
 |---|---|---|---|
-| `tools/crypto_ctf_make.py` | the 13 crypto challenges (Jeux solo > Défis crypto): plaintexts, enciphered by the script, checked against the width of the screen | no option: prints the C table; `--update`: replaces it in `src/menu/crypto_ctf.c`; `--answers`: prints the answers and the final flag | the C table, or the solutions |
+| `tools/crypto_ctf_make.py` | the 13 crypto challenges (Solo games > Crypto CTF): plaintexts, enciphered by the script, checked against the width of the screen | no option: prints the C table; `--update`: replaces it in `src/menu/crypto_ctf.c`; `--answers`: prints the answers and the final flag | the C table, or the solutions |
 | `tools/skills_icons.py` | 16 × 16 pictograms of the 20 skills, drawn in ASCII in the script | `--preview icons.png` (Pillow) | rewrites `src/menu/skills_icons.h` on every run |
 | `tools/smuggler_icons.py` | 32 × 32 icons of the smuggler goods | `--png sheet.png` (contact sheet, instead of writing the C); `--check` (exit code 1 when the C is not up to date) | rewrites the icons in `src/menu/smuggler_goods.c` |
 | `tools/werewolf_icons.py` | 32 × 32 illustrations of the werewolf cards | `--png sheet.png`; `--check` | rewrites the icons in `src/menu/werewolf_cards.c` |
@@ -439,19 +439,27 @@ prints the "SecSea" preset that lets the Flipper record the packets of a badge. 
 |---|---|
 | `command CMD` | a remote command (`NET_COMMAND`), e.g. `0x02` |
 | `ping` | a ping (the badges print it on their serial port) |
+| `pirates [N]` | a **network of N cicadas nearby** (6 by default, 16 at most) with pirate names (Rackham, Barbossa, AnneBony, Surcouf, La Buse...), each with a random score, skills and level, sending their beacons (`NET_BEACON`) `--repeats` times: to test the reception and the decoding of the beacons (Social > Radar, or `!` on the console of the badge) |
 | `raw TYPE BYTES...` | any packet: the type, then the data bytes in hex |
 | `preset` | prints the lines to add to the file `subghz/assets/setting_user` of the SD card of the Flipper |
 | `--id N` | id of the sender, 4 bytes (default `0x5EC5EA26`) |
 | `--repeats N` | packets in the file (default 8) |
 | `--gap MS` | milliseconds between two packets (default 250) |
 | `-o`, `--output` | output file (default `secsea_<kind>.sub`) |
+| `--power DBM` | power of the Flipper: 10 (default, like the badges), 7, 5, 0, -10, -15, -20, -30 |
+| `--send` | copies the file to the Flipper plugged in USB and sends it (its serial console, like `flipper_weather.py`) |
+| `--port COMx` | with `--send`: the port of the Flipper (found by itself) |
 
 ```bash
 python tools/flipper_net_sub.py command 0x02 -o mute_gfsk.sub
 python tools/flipper_net_sub.py preset
+python tools/flipper_net_sub.py pirates 8 --repeats 6 --power -10 --send
 ```
 
 Precautions:
+- `pirates`: close to the Flipper (beacons received above -80 dBm, 3 times within 10 s), the badges count
+  each pirate as a **meeting** (+10 points, kept in their memory). At -10 dBm, the beacons arrive around -85 dBm
+  at one meter: listed, no meeting;
 - **a `0x05` (sleep) command sent this way really puts the badges in range to sleep**: unlike the Princeton code,
   the network packet is obeyed. Do not generate this file outside a controlled test;
 - the nonce of the command is drawn once per file: replaying the same file within 10 s has no effect, after that the
@@ -464,7 +472,7 @@ Precautions:
 Gets the forecast of a town from [Open-Meteo](https://open-meteo.com) (free, no key), turns it into an
 **announcement** of the badges (the time, a short text, a QR code with the next days), then sends it with a Flipper
 Zero plugged in USB: the `.sub` files are copied to its SD card through its serial console, then sent (`subghz
-tx_from_file`). Every badge in range shows it like an announcement (Social > Annonces keeps it).
+tx_from_file`). Every badge in range shows it like an announcement (Social > Announcements keeps it).
 Prerequisites: `pyserial`, Internet; the Flipper on its main screen (no Sub-GHz application open), not used by
 qFlipper.
 
@@ -475,7 +483,7 @@ qFlipper.
 | `--days N` | days in the QR code, from tomorrow (default 4) |
 | `--rounds N` | times each part is sent (default 4) |
 | `--port COMx` | port of the Flipper (found by itself) |
-| `-o FILE.sub` | name of the files written (default `build/secsea_meteo_N.sub`) |
+| `-o FILE.sub` | name of the files written (default `build/flipper/secsea_meteo_N.sub`) |
 | `--no-send` | only writes the files (to send by hand: Sub-GHz > Saved) |
 | `--dry-run` | only shows the forecast and the text |
 | `--id N` | id of the sender (default `0x5EC5EA27`) |
@@ -527,7 +535,7 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 
 | Key | Effect |
 |---|---|
-| `a` `b` `x` `y` | short press: left wing, right wing, right flank, left flank |
+| `a` `b` `x` `y` | short press: left wing, right wing, right side, left side |
 | `A` `B` `X` `Y` | long press of the same button |
 | `!` | diagnostic: OLED and IR, network of the cicadas (name, score, meetings, beacons sent / received, neighbours and their dBm), CTF flags, network counters (`net: sent, received, dropped`), state of the network and the radio (`net state:`), listening to the remotes (`remote state:`), remote enabled / mute / admin mode (`remote:`), `version:`, radio (CC1101 version, crystal used and measured), battery (mV, %, ADC value, or "not calibrated") and the factory calibration points |
 | `?` | sound state: open, samples played, volume, music position |
@@ -538,7 +546,7 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 | `k` | exports the received contact cards as vCards (used by `contacts_export.py`) |
 | `V` | trace of every network packet sent and received: on / off |
 | `r` | CC1101 registers and PATABLE |
-| `M` | sends the "Radio : message" (readable with `subghz chat 433920000 0` on a Flipper) |
+| `M` | sends the "Radio: message" (readable with `subghz chat 433920000 0` on a Flipper) |
 | `P` | ping at +10 dBm: the badges that hear it print `net: ping #n from <id>, rssi ...` |
 | `L` | *loopback* mode (the packets sent come back as from a twin badge, to test alone): on / off |
 | `R` | immediate reboot of the badge |
@@ -589,12 +597,12 @@ Other prefixes exist (`social:`, `contacts:`, `chorus:`, `party:`, `werewolf:`, 
 
 ### 4.1 Opening and leaving it
 
-- **Secret sequence**: in the main menu (the list of the themes, not inside a theme), tap the flanks **left, left,
-  right, right, left, right, left, right** within 8 seconds. "Mode admin activé" is shown and the **Admin** theme
+- **Secret sequence**: in the main menu (the list of the themes, not inside a theme), tap the sides **left, left,
+  right, right, left, right, left, right** within 8 seconds. "Admin mode on" (Mode admin activé) is shown and the **Admin** theme
   appears last, already selected.
 - **Over USB**: the "Mode admin" check box of `badge_remote.py`, or Ctrl+A then `A` in a terminal.
 - The admin mode is **kept when the badge is switched off** and after a firmware update.
-- To leave it: last entry "Quitter le mode admin", or Ctrl+A then `a`.
+- To leave it: last entry "Leave admin mode" (Quitter le mode admin), or Ctrl+A then `a`.
 
 The admin mode also allows starting the Assassin with 2 players (for tests).
 
@@ -604,38 +612,38 @@ In the order of the menu:
 
 | Entry | Purpose | Buttons |
 |---|---|---|
-| **Commandes radio** (radio commands) | sends a command to all the badges around: Muet (conférence) (mute), Fin du mode muet (unmute), Cigale : chanter (sing), Talk : éteint / vert / orange (5 min) / rouge (fini) / rouge énervé, Mise en sommeil (sleep). This badge executes it too (except the sleep) | flanks: choose; D: send; G: back |
-| **LEDs des cigales** (cicada LEDs) | color (9 colors or R, G, B from 0 to 255) and mode (Fixe, Clignotant, Fondu: steady, blink, fade; times from 50 ms to 5 s) forced on the LEDs of the cicadas around, until "Rétablir leurs LEDs" (restore) or their reboot | see the [user guide § 4.8](user_guide.md#48-admin-mode-organizers) |
-| **Annonces (admin)** (announcements) | 6 announcements (time, 56 character text, QR code: link, text, phone, SMS, e-mail, Wi-Fi, GPS position), kept in flash; preview; sent 3 times to all the cicadas | flanks: choose; D: open / edit; G: back |
-| **Vote (admin)** | opens a predefined question, counts the votes (one per badge, the last one counts) and shows the histogram | D: open the vote, then D: close it |
-| **Choeur : lancer** (start the chorus) | starts "Frère Jacques" (4 voices) or "L'Ode à la joie" (3 voices); this badge sings the first voice | D: start / stop |
-| **Balise chaud-froid** (hot / cold beacon) | this badge sends a beacon every second at +10 dBm; the others look for it with Social > Chaud - froid. The scale ("Brûlant dès -74 dBm", burning from -74 dBm, by default, set in 5 dB steps) is kept and sent with the beacon | D: transmit / stop; flanks: scale; G: quit |
-| **Virus : patient zéro** | infects this badge to start the epidemic | D: infect; left flank: cure this badge |
-| **Contrebande (admin)** (smuggler) | adds a good of your choice to the cargo of this badge ([smuggler.md](smuggler.md)) | flanks: choose; D: add |
-| **Loup-garou (admin)** (werewolf) | games under 8 players: "8 joueurs minimum" (default), "Petites parties (4+)" (small games), "Test : robots"; kept in flash | flanks: choose; D: confirm |
-| **Remise à zéro** (reset) | clears part of the progress of this badge (see § 4.4) | D, then long D: confirm; G: no |
-| **Batterie (calibration)** | calibrates the battery measure (see § 4.3) | |
-| **Radio pirate** | transmits a melody, a 1 kHz tone or a WAV of the SD card in FM on 433 MHz ([pirate_radio.md](pirate_radio.md)); low power, short tests | |
-| **Mode démo** (demo mode) | the badge shows its features in a loop (see § 5.4) | D: start |
-| **Type du badge** (badge type) | Participant, Orateur (speaker) or Staff, shown in the banner of the name tag | flanks: choose; D: save |
-| **Quitter le mode admin** | hides the Admin theme | |
+| **Radio commands** (Commandes radio) | sends a command to all the badges around: Mute (talk), Mute mode off, Cicada: sing, Talk: off / green / orange (5 min) / red (over) / angry red, Going to sleep. This badge executes it too (except the sleep) | sides: choose; R: send; L: back |
+| **Cicada LEDs** (LEDs des cigales) | color (9 colors or R, G, B from 0 to 255) and mode (Fixed, Blinking, Fade; times from 50 ms to 5 s) forced on the LEDs of the cicadas around, until "> Restore their LEDs" or their reboot | see the [user guide § 4.8](user_guide.md#48-admin-mode-organizers) |
+| **Notices (admin)** (Annonces (admin)) | 6 announcements (time, 56 character text, QR code: link, text, phone, SMS, e-mail, Wi-Fi, GPS position), kept in flash; preview; sent 3 times to all the cicadas | sides: choose; R: open / edit; L: back |
+| **Vote (admin)** | opens a predefined question, counts the votes (one per badge, the last one counts) and shows the histogram | R: open the vote, then R: close it |
+| **Chorus: start** (Choeur : lancer) | starts "Frère Jacques" (4 voices) or "Ode to Joy" (3 voices); this badge sings the first voice | R: start / stop |
+| **Hot-cold beacon** (Balise chaud-froid) | this badge sends a beacon every second at +10 dBm; the others look for it with Social > Hot - cold. The scale ("Burning from -74 dBm" by default, set in 5 dB steps) is kept and sent with the beacon | R: transmit / stop; sides: scale; L: quit |
+| **Virus: patient 0** (Virus : patient zéro) | infects this badge to start the epidemic | R: infect; left side: cure this badge |
+| **Smuggling (admin)** (Contrebande (admin)) | adds a good of your choice to the cargo of this badge ([smuggler.md](smuggler.md)) | sides: choose; R: add |
+| **Werewolf (admin)** (Loup-garou (admin)) | games under 8 players: "8 players minimum" (default), "Small games (4+)", "Test: robots"; kept in flash | sides: choose; R: confirm |
+| **Reset** (Remise à zéro) | clears part of the progress of this badge (see § 4.4) | R, then long R: confirm; L: no |
+| **Battery (calibration)** (Batterie (calibration)) | calibrates the battery measure (see § 4.3) | |
+| **Pirate radio** (Radio pirate) | transmits a melody, a 1 kHz tone or a WAV of the SD card in FM on 433 MHz ([pirate_radio.md](pirate_radio.md)); low power, short tests | |
+| **Demo mode** (Mode démo) | the badge shows its features in a loop (see § 5.4) | R: start |
+| **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown in the banner of the name tag | sides: choose; R: save |
+| **Leave admin mode** (Quitter le mode admin) | hides the Admin theme | |
 
 ### 4.3 Calibrating the battery
 
-Without a calibration, the badge shows no battery level ("non calibrée"): it never shows a wrong value. Once per
+Without a calibration, the badge shows no battery level ("uncalibrated", non calibrée): it never shows a wrong value. Once per
 badge, with a multimeter:
 
-1. Badge plugged in USB (charging), Admin > Batterie (calibration). The page shows the ADC value (refreshed every
+1. Badge plugged in USB (charging), Admin > Battery (calibration). The page shows the ADC value (refreshed every
    2 s), the measure, and points 1 and 2.
-2. Measure the voltage on the battery terminals. On the "Multimètre" row, set this voltage with the wings
-   (G: −, D: +, by 10 mV; held: faster and faster; from 2.50 to 4.50 V).
-3. Right flank to "> Enregistrer le point" (save the point), right wing: "Il faut un 2e point" (a 2nd point is needed).
+2. Measure the voltage on the battery terminals. On the "Multimeter" row (Multimètre), set this voltage with the wings
+   (L: −, R: +, by 10 mV; held: faster and faster; from 2.50 to 4.50 V).
+3. Right side to "> Save the point" (> Enregistrer le point), right wing: "Need a 2nd point".
 4. Unplug, let the voltage drop for a few minutes (at least 0.2 V apart, 150 ADC steps), measure, set and save:
-   "Point enregistré", the level is shown.
+   "Point saved", the level is shown.
 
-A new point replaces the closest one. "> Effacer" (clear) asks for a confirmation (D again). On the "Multimètre"
+A new point replaces the closest one. "> Clear" (> Effacer) asks for a confirmation ("R again: clear"). On the "Multimeter"
 row, the left wing is used to set the value: leave with a long press on the left wing, or from another row.
-The points are **factory settings**: kept by the reset (even "Tout") and by the updates.
+The points are **factory settings**: kept by the reset (even "All") and by the updates.
 Check from the console: `!` prints `battery: factory points ...`.
 
 ### 4.4 Reset
@@ -645,26 +653,26 @@ wing**:
 
 | Row | Clears |
 |---|---|
-| Scores sociaux | score and meetings of the network of the cicadas |
-| Records des jeux | records of the games and puzzles |
-| Défis CTF et crypto | CTF flags, crypto challenges solved |
-| Contacts reçus | received contact cards (not your own card) |
+| Social scores (Scores sociaux) | score and meetings of the network of the cicadas |
+| Game records (Records des jeux) | records of the games and puzzles |
+| CTF & crypto (Défis CTF et crypto) | CTF flags, crypto challenges solved |
+| Cards received (Contacts reçus) | received contact cards (not your own card) |
 | Virus | virus state (healthy) |
-| Succès et niveau | achievements and their counters |
-| Contrebande | the cargo (new goods at the next opening) |
-| Tout | everything above, plus the gamebook progress |
-| Annonces d'origine | the 6 admin announcements get their original texts back (not part of "Tout") |
+| Achievements (Succès et niveau) | achievements and their counters |
+| Smuggling (Contrebande) | the cargo (new goods at the next opening) |
+| All (Tout) | everything above, plus the gamebook progress |
+| Announcements (Annonces d'origine) | the 6 admin announcements get their original texts back (not part of "All") |
 
 Never cleared: the name, the contact card, the settings (screensaver, volume, remote, mute mode, admin mode, badge
 type, radio tuning) and the battery calibration.
 
 ### 4.5 Preparing a batch of badges (checklist)
 
-1. Flash the same version everywhere ([§ 7](#7-flashing-and-updating-the-firmware)); check Réglages > Infos.
+1. Flash the same version everywhere ([§ 7](#7-flashing-and-updating-the-firmware)); check Settings > Info.
 2. Let the radio tuning of the first boot happen **near other badges switched on**.
 3. Calibrate the battery (§ 4.3), if a multimeter is available.
 4. `python tools/badge_selftest.py --port ...` on each badge (a few minutes).
-5. Admin > Type du badge (Orateur, Staff...), Admin > Remise à zéro > Tout, then Quitter le mode admin.
+5. Admin > Badge type (Speaker, Staff...), Admin > Reset > All, then Leave admin mode.
 6. SD card prepared and validated with `badge_media_test.py` (§ 6).
 
 
@@ -673,7 +681,7 @@ type, radio tuning) and the battery calibration.
 ### 5.1 The remote commands
 
 A command comes in two ways:
-- **from an admin badge** (Admin > Commandes radio): the badge first sends it as a Princeton remote (12 frames,
+- **from an admin badge** (Admin > Radio commands): the badge first sends it as a Princeton remote (12 frames,
   ~0.6 s, for the talk badges that only listen in OOK), then 5 packets of the network of the cicadas over 2 s, at
   +10 dBm;
 - **from a 433 MHz remote**, a Flipper Zero for example: a 24 bit Princeton code `0xC16Axx`, where `xx` is the
@@ -687,12 +695,11 @@ and prints `remote: command 0x.. from ...`.
 | `0x01` | the cicada sings for 6 s (nothing in mute mode) |
 | `0x02` | mute mode |
 | `0x03` | end of mute mode |
-| `0x05` | sleep (network of the badges only: ignored as Princeton) |
 | `0x10` to `0x14` | lights of the talk badge, if its page is open: off, green, orange (5 min), red (finished), angry red |
-| `0x30` + n | starts song n of the chorus (`0x30` Frère Jacques, `0x31` L'Ode à la joie) |
+| `0x30` + n | starts song n of the chorus (`0x30` Frère Jacques, `0x31` Ode to Joy) |
 | `0x04`, `0x18`, `0x1F` (Princeton only) | Flipper buttons: `0x03`, `0x10`, `0x13` (see § 2.5) |
 
-The badge does not obey when Réglages > Télécommande is "non". Other commands from a Flipper: a file generated by
+The badge does not obey when Settings > Remote is "no". Other commands from a Flipper: a file generated by
 `ook_sub.py princeton 0xC16Axx` (§ 2.5), or Sub-GHz > Add Manually > Princeton_433, then edit the `Key:` line of the
 saved file. Do not use `subghz tx` on the command line: it replaces the last 4 bits of the code with 6.
 
@@ -703,26 +710,26 @@ moment. It also opens a listening moment every 10 s for a weak remote. Hence the
 ### 5.2 Mute mode
 
 - Cuts the sound (buzzer, cicada, ringtones, chorus) and the LEDs. The players keep running silently.
-- Switched on by the `0x02` command, off by `0x03` or Réglages > Mode muet.
+- Switched on by the `0x02` command, off by `0x03` or Settings > Mute mode.
 - **Kept when switched off and after an update**: a badge that stays mute probably got the command during a talk.
-- Exception: the talk badge page keeps its LEDs, and its "STOP !" state makes the cicada sing even in mute mode.
+- Exception: the talk badge page keeps its LEDs, and its "STOP!" state makes the cicada sing even in mute mode.
 
 ### 5.3 Sleep and manual wake-up
 
-- Order: Admin > Commandes radio > Mise en sommeil, from an admin badge. It only goes through the network of the
+- Order: Admin > Radio commands > Going to sleep, from an admin badge. It only goes through the network of the
   badges (not as Princeton: a Flipper with a plain remote cannot put the conference to sleep; a
   `flipper_net_sub.py command 0x05` file can, see § 2.5).
 - The badges that receive it save the order and reboot: radio off, LEDs and sound off, services stopped, page
-  "SOMMEIL : le badge a été mis en sommeil par un admin..." (put to sleep by an admin). They no longer answer the
+  "SLEEP: The badge was put to sleep by an admin..." (SOMMEIL on a badge in French). They no longer answer the
   radio commands, a reboot or a firmware update: **the state is kept in flash**.
 - Do not fall asleep: the admin badge that sends the order, and a badge open on the talk badge page.
-- **Manual wake-up**: **left flank 5 times, then right flank 5 times**, less than 5 s between two presses (another
+- **Manual wake-up**: **left side 5 times, then right side 5 times**, less than 5 s between two presses (another
   button starts the sequence again). The badge reboots normally. From the serial console: `yyyyyxxxxx`. The log
   follows the progress (`sleep: unlock 5/5 2/5`).
 
 ### 5.4 Demo mode
 
-For a booth: Admin > Mode démo, right wing. The badge loops, LEDs in rainbow: name tag (8 s), achievements (6 s),
+For a booth: Admin > Demo mode, right wing. The badge loops, LEDs in rainbow: name tag (8 s), achievements (6 s),
 pictures of the SD card (18 s, one every 6 s), the first video (20 s), skills (5 s), the first music (10 s), screen
 demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s). The media steps are skipped
 without an SD card or without a file. The screensaver does not start; **any button stops the demo**. It is not kept
@@ -757,14 +764,14 @@ SD card
 
 | Folder | Format | Limits and remarks | Prepare with |
 |---|---|---|---|
-| `IMAGES` | `.epi`: 200 × 200, 1 or 2 bits per pixel | 48 entries per folder (sub-folders + files) in the viewer; 32 pictures offered for the screensaver; 24 for "Envoyer une image" (send a picture) | `image2epi.py` |
+| `IMAGES` | `.epi`: 200 × 200, 1 or 2 bits per pixel | 48 entries per folder (sub-folders + files) in the viewer; 32 pictures offered for the screensaver; 24 for "Send an image" (Envoyer une image) | `image2epi.py` |
 | `VIDEOS` | `.epv`: 200 × 200 black and white frames + 8 bit sound | 48 entries per folder; the demo mode and the OLED take the first one | `video2epaper.py` |
 | `MUSIQUE` | `.wav` PCM 8, 16, 24 or 32 bits, 32 bit float, mono or stereo, 4 to 192 kHz | 48 entries per folder; blind test: 16 sub-folders and 64 tracks at most; also the source of the pirate radio WAVs. Advised: 8 bit 16 kHz mono | `audio2wav.py` |
 | `TEXTES` | `.txt` UTF-8 (with or without BOM) or Windows-1252 | 48 entries per folder; the reading position is remembered | a text editor |
 | `SONNERIES`, `RTTTL` | one RTTTL tune per line (`#`: comment), or PICAXE `tune` commands (`.bas`) | 2048 characters per line; 40 sub-folders shown per folder; any number of files, in pages of 32; 128 tunes per page | `rtttl_sort.py`, [ringtones.md](ringtones.md) |
 | `LIVRES` | `.txt` gamebook (sections `== n`, choices `-> n : ...`) | 16 books; 400 sections, 8 choices, 8 items; ~2,000 bytes of text per section | `gamebook_check.py`, [gamebooks.md](gamebooks.md) |
 
-A player (Images, Vidéos, Musique, Lecture rapide) whose folder is missing or empty shows the **root** of the card:
+A player (Images, Videos, Music, Speed reading) whose folder is missing or empty shows the **root** of the card:
 a `VIDEO.EPV` video (default name of `video2epaper.py`) copied at the root is played too, but rather put each file in
 its folder. Beyond 48 entries in a folder, some are not listed (the first ones read on the card are kept, then
 sorted): make sub-folders.
@@ -817,8 +824,8 @@ use the button (§ 7.2).
 
 ### 7.4 After the update
 
-- Check the version: Réglages > Infos ("Version 1.0.0 (5d95da4)", build date), or `!` on the console.
-- If the new version brings the radio tuning, or if the settings were initialized, the Réglage radio page opens by
+- Check the version: Settings > Info ("Version 1.0.0 (5d95da4)", build date), or `!` on the console.
+- If the new version brings the radio tuning, or if the settings were initialized, the Radio tuning page opens by
   itself at boot (about 15 s): let it finish near other badges switched on.
 
 ### 7.5 What survives a flash
@@ -834,7 +841,7 @@ The settings are in the last sectors of the flash, which flashing a firmware doe
 
 ### 7.6 Factory settings
 
-- **Radio tuning** (Réglages > Réglage radio): crystal (26 or 27 MHz), noise of the place (remote listening
+- **Radio tuning** (Settings > Radio tuning): crystal (26 or 27 MHz), noise of the place (remote listening
   threshold = noise + 15 dB, between −95 and −70 dBm), frequency offset from the other badges heard for 10 s (at
   least 2 packets, otherwise no correction). Done at the first boot; redo it at the venue if the remotes or the
   badges are heard badly, near other badges switched on. An interrupted tuning starts again at the next boot.
@@ -869,23 +876,23 @@ menu). The serial port logs are not translated: the PC tools work whatever the l
 | A script finds the wrong badge | Several badges plugged in: give `--port` (`--ports` for the two-badge tests). |
 | "the badge does not answer: is the menu application (badge_menu) flashed?" | The badge runs a test application or another firmware: flash `badge_menu.uf2`. |
 | Nothing shows in the terminal | Normal: the badge only talks on events. Type `!`. The lines sent before the port was opened are lost. |
-| The badge shows "SOMMEIL" | Put to sleep by an admin: left flank 5 times then right flank 5 times (§ 5.3). Neither a reboot nor a flash wakes it up. |
-| No sound and no LEDs | Mute mode (command during a talk): Réglages > Mode muet, or command `0x03`. |
-| The Admin theme appeared by itself | The flank sequence was typed by chance: Admin > Quitter le mode admin. |
+| The badge shows "SLEEP" (SOMMEIL) | Put to sleep by an admin: left side 5 times then right side 5 times (§ 5.3). Neither a reboot nor a flash wakes it up. |
+| No sound and no LEDs | Mute mode (command during a talk): Settings > Mute mode, or command `0x03`. |
+| The Admin theme appeared by itself | The side sequence was typed by chance: Admin > Leave admin mode. |
 | The Admin theme disappeared after a test | The test scripts switch the admin mode off at the end: switch it on again (§ 4.1). |
-| The badge does not obey the Flipper | Réglages > Télécommande: oui; a `.sub` file (not `subghz tx`); code `0xC16Axx`; button held for a second; badge close. `O` on the console shows the decoding attempts. The sleep (`0x05`) is never accepted as Princeton. |
-| The badges hear each other badly, the remotes are badly received | Réglages > Réglage radio on site, near other badges switched on. `!`: compare "crystal used" and "measured". |
+| The badge does not obey the Flipper | Settings > Remote: yes; a `.sub` file (not `subghz tx`); code `0xC16Axx`; button held for a second; badge close. `O` on the console shows the decoding attempts. |
+| The badges hear each other badly, the remotes are badly received | Settings > Radio tuning on site, near other badges switched on. `!`: compare "crystal used" and "measured". |
 | The other cicadas are no longer heard | Normal while a page uses the radio: 433 MHz decoder, weather station, 433 MHz hunt, talk badge, contact exchange, pirate radio. |
 | No battery level | Battery not calibrated: § 4.3. |
-| "Carte SD absente" (no SD card), `video: mount failed` | Card fully inserted, FAT32 or exFAT. |
+| "No SD card" (Pas de carte SD), `video: mount failed` | Card fully inserted, FAT32 or exFAT. |
 | A file does not show up | Right folder and extension; name of 63 bytes at most; no more than 48 entries in the folder; file not hidden. |
 | A ringtone is marked `(!)` | Right wing: line, column and reason; the console prints `rtttl: ... error ...` ([ringtones.md](ringtones.md)). |
 | A gamebook does not show up or stops | `python tools/gamebook_check.py LIVRES/book.txt`; 16 books at most. |
 | A video or a music stops before its end | `badge_media_test.py` to find it; convert it again with `video2epaper.py` / `audio2wav.py`. |
-| Sound too low | Médias > Volume; WAV converted by `audio2wav.py` without `--no-filter`. |
+| Sound too low | Media > Volume; WAV converted by `audio2wav.py` without `--no-filter`. |
 | `score_check.py` says every score is invalid | Wrong key, or key of another firmware version (`--make-key` changes the key). |
-| Assassin "Trop loin ou absente" (too far), smuggler with no cicada "à portée de main" (at hand) | Put the badges against each other. The RSSI thresholds are set at build time (developers). |
-| `test_werewolf.py` interrupted, games with robots | Admin > Loup-garou (admin): set "8 joueurs minimum" again. |
+| Assassin "Too far or absent", smuggler with no cicada "Within reach" | Put the badges against each other. The RSSI thresholds are set at build time (developers). |
+| `test_werewolf.py` interrupted, games with robots | Admin > Werewolf (admin): set "8 players minimum" again. |
 | The screen keeps ghosts | Normal after fast refreshes: it is cleaned at the next full refresh. |
 | The badge no longer answers | RESET button, or switch off / on; `R` on the console. |
 

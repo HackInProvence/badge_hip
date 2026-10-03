@@ -1,13 +1,13 @@
 # Gamebooks: the books in which you are the hero
 
-The badge holds **gamebooks** ("Livres-jeux"): a story cut into numbered sections, and at the end of each section,
-you choose what happens next. Some choices lead to victory, others to a less glorious end...
+The badge holds **gamebooks** ("Gamebooks", Livres-jeux): a story cut into numbered sections, and at the end of each
+section, you choose what happens next. Some choices lead to victory, others to a less glorious end...
 
 One book comes with the badge, **Le Trésor du capitaine Cigalon** (Captain Cigalon's treasure, in French: a hacker
 cicada, the Ant, a treasure in the calanques of La Ciotat), and you can add as many as you like on the SD card, or
 write your own.
 
-Menu: **Médias > Livres-jeux**.
+Menu: **Media > Gamebooks** (Médias > Livres-jeux).
 
 *Version française : [livres_jeux.md](../fr/livres_jeux.md).*
 
@@ -17,8 +17,8 @@ Menu: **Médias > Livres-jeux**.
 ### 1.1 The list of the books
 
 - The book built into the badge, then the books of the `LIVRES` folder of the SD card (16 at most).
-- **Continuer : ...** (continue) at the top of the list: resumes the last book where you left it.
-- Flanks: choose a book, **D** (right wing): open it, **G** (left wing): quit.
+- **Continue: ...** (Continuer : ...) at the top of the list: resumes the last book where you left it.
+- Sides: choose a book, **R** (right wing): open it, **L** (left wing): quit.
 
 ### 1.2 The menu of a book
 
@@ -26,11 +26,11 @@ The title, the author, then:
 
 | Row | Effect |
 |---|---|
-| Commencer (start) | The beginning of the story. |
-| Reprendre la lecture (resume) | The section where you were. |
-| Recommencer (start over) | Back to the beginning, without the items picked up. |
-| Objets (items) | The items you carry (if the book has any). |
-| Autres livres (other books) | Back to the list. |
+| Start (Commencer) | The beginning of the story. |
+| Resume reading (Reprendre la lecture) | The section where you were. |
+| Start over (Recommencer) | Back to the beginning, without the items picked up. |
+| Items (Objets) | The items you carry (if the book has any). |
+| Other books (Autres livres) | Back to the list. |
 
 ### 1.3 The reading page
 
@@ -44,24 +44,24 @@ The title, the author, then:
 │ > Open the door             │  the selected choice is in black
 │ > Turn back                 │
 ├─────────────────────────────┤
-│   D : choisir  G : menu     │
+│   R: choose  L: menu        │
 └─────────────────────────────┘
 ```
 
 | Button | Effect |
 |---|---|
-| Right flank | Next page, then next choice. |
-| Left flank | Previous choice, then previous page. |
-| D (right wing) | Take the selected choice (or next page when no choice is on the screen yet). |
-| G (left wing) | The menu of the book. |
-| G held | Quit the gamebooks. |
+| Right side | Next page, then next choice. |
+| Left side | Previous choice, then previous page. |
+| R (right wing) | Take the selected choice (or next page when no choice is on the screen yet). |
+| L (left wing) | The menu of the book. |
+| L held | Quit the gamebooks. |
 
-- When the book rolls a **die**, the result is shown ("Le dé roule... et donne 4.", the die rolls... and gives 4) and
+- When the book rolls a **die**, the result is shown ("The die rolls... 4.", Le dé roule... et donne 4.) and
   only the matching choices are offered.
-- An **item** won or lost is announced ("Vous obtenez : antenne.", you get: antenna); some choices only show up if
+- An **item** won or lost is announced ("You get: antenna.", Vous obtenez : ...); some choices only show up if
   you have (or do not have) an item.
-- At an **ending**: "~ FIN ~", won or lost, then *Recommencer* or *Autres livres*. Each ending reached counts for the
-  achievements (**Héros**, hero, at the first ending).
+- At an **ending**: "~ END ~" (~ FIN ~), won or lost, then *Start over* or *Other books*. Each ending reached counts for the
+  achievements (**Hero**, Héros, at the first ending).
 - The progress (book, section, items) is **saved** at each section, even if the badge is switched off.
   One book at a time: starting another book replaces the saved progress.
 
@@ -144,7 +144,7 @@ The guard recognizes you and lets you in.
 | `== 12` | The start of **section 12** (from 1 to 65535). The **first section of the file** is the beginning of the story. |
 | `== 12 FIN` | A section that is an **ending**. `== 12 FIN gagné`: a victory, `== 12 FIN perdu`: a defeat. |
 | text | The text of the section. Lines that follow each other make a paragraph; an **empty line** starts a new paragraph; a line that starts with a dialogue dash (`—`, `–` or `- `) goes to a new line. |
-| `-> 34 : Open the door` | A **choice** that leads to section 34. Without text (`-> 34`), the choice is called "Continuer" (continue). |
+| `-> 34 : Open the door` | A **choice** that leads to section 34. Without text (`-> 34`), the choice is called "Continue" (Continuer). |
 | `-> 34 [key] : ...` | Choice offered only if you have the item `key`. |
 | `-> 34 [!key] : ...` | Choice offered only if you do **not** have the item `key`. |
 | `-> 34 [dé 1-3] : ...` | The badge rolls a 6-sided die when arriving in the section: this choice is only offered if the die gives 1, 2 or 3 (`[dé 6]`: only 6). Plan a choice for each value. |
@@ -193,8 +193,8 @@ It reports (its messages are in French):
   whose values do not all have a choice, an item tested but never given, a text too long, characters missing from
   the fonts.
 
-On the badge, a missing section does not crash the reading: a page "La section 34 est introuvable" (section 34 cannot
-be found) offers to go back or to start over.
+On the badge, a missing section does not crash the reading: a page "Section 34 is missing: the book is
+incomplete." (La section 34 est introuvable) offers to go back or to start over.
 
 ### 3.5 Changing the book built into the firmware
 

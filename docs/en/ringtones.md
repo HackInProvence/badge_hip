@@ -1,6 +1,6 @@
 # Ringtones (RTTTL player)
 
-Menu **Médias > Sonneries** (Media > Ringtones): the badge plays ringtones in the RTTTL format, the one of the
+Menu **Media > Ringtones** (Médias > Sonneries): the badge plays ringtones in the RTTTL format, the one of the
 ringtones of the old Nokia phones. A dozen public domain tunes are built into the badge (Lettre à Élise (Für Elise),
 Ode à la joie (Ode to Joy), Frère Jacques, Au clair de la lune, La Marseillaise, Korobeiniki, Greensleeves...), and
 you can add as many as you like on the SD card.
@@ -11,17 +11,17 @@ you can add as many as you like on the SD card.
 
 - **The list**: the `SONNERIES/` and `RTTTL/` folders of the SD card, then the ringtones of the badge. In a folder:
   its sub-folders (`Name/`), then its ringtones, with the name of the file in brackets. The files are read by pages
-  of 32, in alphabetical order: the `< Précédents` (previous) and `Suivants >` (next) rows change the page (so a
-  folder can hold thousands of files).
-  Flanks: up / down (held: scrolling), right wing (D): open the folder or play, left wing (G): parent folder, then
+  of 32, in alphabetical order: the `< Previous` and `Next >` rows (`< Précédents`, `Suivants >` in French) change
+  the page (so a folder can hold thousands of files).
+  Sides: up / down (held: scrolling), right wing (R): open the folder or play, left wing (L): parent folder, then
   back to the menu.
-  A ringtone marked `(!)` has an error: D shows the line, the column and the reason.
-- **While playing**: the name, the note played (e.g. `La#5`, `Silence`; French note names: Do = C, Ré = D, Mi = E,
-  Fa = F, Sol = G, La = A, Si = B), a progress bar and the time.
+  A ringtone marked `(!)` has an error: R shows the line, the column and the reason.
+- **While playing**: the name, the note played (e.g. `La#5`, `Rest` (`Silence` in French); the note names stay
+  French: Do = C, Ré = D, Mi = E, Fa = F, Sol = G, La = A, Si = B), a progress bar and the time.
   The LEDs light up at each note, with one colour per note (Do red, Ré orange, Mi light green, Sol cyan, La blue...).
-  G: stop, flanks: previous / next ringtone, D: start again from the beginning.
+  L: stop, sides: previous / next ringtone, R: start again from the beginning.
 - The **mute mode** is respected: no sound nor LEDs (the playback goes on silently).
-- Playing a ringtone unlocks the **Mélomane** (music lover) achievement.
+- Playing a ringtone unlocks the **Music lover** (Mélomane) achievement.
 
 ## Adding ringtones on the SD card
 
@@ -44,7 +44,7 @@ SD card
 - empty lines and those starting with `#` are ignored (comments);
 - UTF-8 text (the accents of the names are shown) or ASCII; lines of 2048 characters at most;
 - in a folder: 40 sub-folders shown, any number of files (by pages of 32), 128 ringtones per page at most;
-- the playing page shows the full path of the file; the flanks go to the ringtones of the same page.
+- the playing page shows the full path of the file; the sides go to the ringtones of the same page.
 
 Examples are in [`docs/sd/SONNERIES`](../sd/SONNERIES): copy this folder to the SD card.
 
@@ -127,12 +127,12 @@ python tools/rtttl_sort.py F:/RTTTL_origine F:/RTTTL --categories categories.tsv
 
 ## The errors
 
-An invalid line stays in the list, marked `(!)`; D shows its line, its column (in bytes from the beginning of the
-line) and the reason (in French): `':' manquant après le nom` (':' missing after the name), `':' manquant avant les
-notes` (':' missing before the notes), `réglage d, o ou b invalide` (invalid d, o or b setting), `durée invalide`
-(invalid duration), `note invalide` (invalid note), `octave invalide` (invalid octave), `',' attendue après la note`
-(',' expected after the note), `aucune note` (no note), `ligne trop longue` (line too long), `commande tune PICAXE
-invalide` (invalid PICAXE tune command). The serial port (USB)
+An invalid line stays in the list, marked `(!)`; R shows its line, its column (in bytes from the beginning of the
+line) and the reason: `':' missing after name` (`':' manquant après le nom` in French), `':' missing before the
+notes` (`':' manquant avant les notes`), `bad d, o or b setting` (`réglage d, o ou b invalide`), `bad duration`
+(`durée invalide`), `bad note` (`note invalide`), `bad octave` (`octave invalide`), `',' expected after note`
+(`',' attendue après la note`), `no note` (`aucune note`), `line too long` (`ligne trop longue`), `bad PICAXE tune
+command` (`commande tune PICAXE invalide`). The serial port (USB)
 also prints the details: `rtttl: ...` lines.
 
 ## For the developers

@@ -1,6 +1,6 @@
-# Contrebande — the smuggler cicada
+# Smuggling — the smuggler cicada
 
-*Social > Contrebande* (smuggling): rare virtual goods, to collect and to trade **on the quiet** between two badges
+*Social > Smuggling* (Contrebande): rare virtual goods, to collect and to trade **on the quiet** between two badges
 held against each other. Theme: pirate smuggling in Provence (food, rum, spices, treasures), with three legendary
 goods.
 
@@ -12,15 +12,15 @@ goods.
 
 | Page | Content | Buttons |
 |---|---|---|
-| Home | Cale (hold, number), Échanger en douce (trade on the quiet), Donner (give), Collection (x / 26), Fortune (doubloons) | flanks: choose, R: open, L: back |
-| Cale (hold) | Grid of the icons owned, with their number; under the grid: name, rarity, value | flanks: choose, R: details, L: back |
+| Home | Hold (Cale, number), Trade on the sly (Échanger en douce), Give (Donner), Collection (x / 26), Fortune (doubloons) | sides: choose, R: open, L: back |
+| Hold (Cale) | Grid of the icons owned, with their number; under the grid: name, rarity, value | sides: choose, R: details, L: back |
 | Collection | All the goods; those never owned as a grey silhouette with "?" | same |
 | Details | Large icon, rarity, value, number in the hold, a short story | L: back |
-| Fortune | Total value in doubloons, rank (Mousse (cabin boy), Matelot (sailor), Contrebandier (smuggler), Capitaine (captain), Roi de la contrebande (king of smuggling)), goods, different ones, deals closed | L: back |
-| À portée de main (within reach) | The cicadas close enough to trade (name, RSSI) | flanks: choose, R: offer, L: back |
+| Fortune | Total value in doubloons, rank (Cabin boy, Sailor, Smuggler, Captain, Smuggling king; in French Mousse, Matelot, Contrebandier, Capitaine, Roi de la contrebande), goods, different ones, deals closed | L: back |
+| Within reach (À portée de main) | The cicadas close enough to trade (name, RSSI) | sides: choose, R: offer, L: back |
 | Trade (dark page) | Offer, choice of the offer, both offers side by side, closing | see below |
 
-R (*D* on the badge) is the right wing, L (*G*) the left wing.
+R is the right wing, L the left wing (*D* and *G* on a badge in French).
 A long press on L leaves the page (a deal in progress is cancelled, unless your good is already sealed).
 
 ### Getting goods
@@ -33,36 +33,36 @@ A long press on L leaves the page (a deal in progress is cancelled, unless your 
 
 ### Trading on the quiet
 
-1. Home > *Échanger en douce*: the list of the cicadas **à portée de main** (badges touching, see § 3).
-2. R on a cicada: it receives "Psst... *name* propose une affaire en douce" (*name* offers a deal on the quiet);
+1. Home > *Trade on the sly*: the list of the cicadas **within reach** (badges touching, see § 3).
+2. R on a cicada: it receives "Psst... *name* offers a deal on the sly" (propose une affaire en douce);
    R accepts, L refuses.
 3. Each one chooses in its hold the good it offers (dark grid, R: offer).
-4. Both badges show both offers ("Votre X contre Y": your X for Y): R closes the deal, L cancels.
-5. When both have closed, the trade happens on both badges: "Affaire conclue" (deal closed), with the good received.
+4. Both badges show both offers ("Your X for Y", Votre X contre Y): R closes the deal, L cancels.
+5. When both have closed, the trade happens on both badges: "Deal done" (Affaire conclue), with the good received.
 
 The one who was invited can no longer cancel after closing: his good is **sealed** (taken out of his hold) until
 the decision of the other one. If he leaves the page, the deal ends in the background, and a discreet message
-announces the good received ("Reçu en douce : ...", received on the quiet).
+announces the good received ("Got on the sly: ...", Reçu en douce).
 
 ### Giving
 
-Home > *Donner*: choose the good, then the cicada within reach. It sees "*name* vous offre :" (*name* offers you)
+Home > *Give*: choose the good, then the cicada within reach. It sees "*name* offers you:" (vous offre :)
 with the icon, R accepts (the good goes from one hold to the other), L refuses.
 
 ### Admin: adding a good
 
-Admin > Contrebande (admin): the 26 goods one by one (flanks), with their rarity and the number in the cargo; the
+Admin > Smuggling (admin): the 26 goods one by one (sides), with their rarity and the number in the cargo; the
 right wing adds one to the cargo of this badge (saved at once), with the achievements of a real acquisition
-("Trésor" for a legendary one, "Collectionneur"). To unlock a rare good, put it in play, or prepare a demonstration
+("Treasure" for a legendary one, "Collector"). To unlock a rare good, put it in play, or prepare a demonstration
 badge. Trace: `smuggler: admin added <name> (<count>)`.
 
 ### Achievements
 
 | Achievement | When |
 |---|---|
-| Contrebandier (smuggler) | a deal closed (trade or gift, given or received); each deal adds 1 to the counter `ACHV_CNT_TRADES` |
-| Trésor (treasure) | a legendary good obtained (trade, gift or found in the hold) |
-| Collectionneur (collector) | all the goods owned at least once (the Collection is complete) |
+| Smuggler (Contrebandier) | a deal closed (trade or gift, given or received); each deal adds 1 to the counter `ACHV_CNT_TRADES` |
+| Treasure (Trésor) | a legendary good obtained (trade, gift or found in the hold) |
+| Collector (Collectionneur) | all the goods owned at least once (the Collection is complete) |
 
 ## 2. The goods
 
@@ -71,9 +71,9 @@ badge. Trace: `smuggler: admin added <name> (<count>)`.
 
 | Rarity | Goods (value in doubloons) |
 |---|---|
-| Common | Biscuit de mer (ship's biscuit, 1), Fromage (cheese, 3), Poisson salé (salted fish, 2), Citrons (lemons, 2), Olives (2), Figues (figs, 3), Navettes (Marseille biscuits, 3), Bouteille de rhum (bottle of rum, 5), Pastis (4), Saucisson (3), Lavande (lavender, 2), Savon de Marseille (Marseille soap, 3) |
-| Rare | Tonneau de rhum (barrel of rum, 20), Calissons (12), Safran (saffron, 30), Poivre (pepper, 15), Vanille (vanilla, 20), Boussole (compass, 18), Longue-vue (spyglass, 20), Carte au trésor (treasure map, 35), Clé du coffre (key of the chest, 25), Perle noire (black pearl, 40), Bourse de doublons (purse of doubloons, 30) |
-| Legendary | La cigale d'or (the golden cicada, 250), Le crâne de cristal (the crystal skull, 180), Le perroquet savant (the learned parrot, 150) |
+| Common | Ship's biscuit (Biscuit de mer, 1), Cheese (Fromage, 3), Salted fish (Poisson salé, 2), Lemons (Citrons, 2), Olives (2), Figs (Figues, 3), Navettes (Marseille biscuits, 3), Bottle of rum (Bouteille de rhum, 5), Pastis (4), Saucisson (3), Lavender (Lavande, 2), Marseille soap (Savon de Marseille, 3) |
+| Rare | Barrel of rum (Tonneau de rhum, 20), Calissons (12), Saffron (Safran, 30), Pepper (Poivre, 15), Vanilla (Vanille, 20), Compass (Boussole, 18), Spyglass (Longue-vue, 20), Treasure map (Carte au trésor, 35), Chest key (Clé du coffre, 25), Black pearl (Perle noire, 40), Purse of doubloons (Bourse de doublons, 30) |
+| Legendary | The gold cicada (La cigale d'or, 250), The crystal skull (Le crâne de cristal, 180), The learned parrot (Le perroquet savant, 150) |
 
 To change an icon: edit the ASCII art (`#` = black, `.` = white), then
 
@@ -89,12 +89,12 @@ order of the table is the index saved in the hold: never reorder nor remove a go
 (the Collection). `cargo_seeded` = 1 after the first opening. These fields are set to 0 when the store is initialized
 (`v2_magic`).
 
-## 3. "À portée de main": the RSSI threshold
+## 3. "Within reach": the RSSI threshold
 
 A trade is only possible with a cicada whose beacons (+10 dBm) arrive with an RSSI ≥ `SMUGGLER_TRADE_RSSI`
 (**-55 dBm** by default, in `smuggler.c`, can be changed at build time: `-DSMUGGLER_TRADE_RSSI=-60`).
 As a reminder, at 1 m the RSSI is -70 to -83 dBm (social.h): -55 dBm means badges touching or a few centimetres
-apart. **To calibrate on site**: *Social > Radar des cigales* shows the RSSI; the *À portée de main* page too, and
+apart. **To calibrate on site**: *Social > Cicada radar* shows the RSSI; the *Within reach* page too, and
 the serial link prints `smuggler: at hand <name>#<id> <rssi> dBm`.
 
 An invitation received is accepted down to `SMUGGLER_TRADE_RSSI - 10` dBm (`SMUGGLER_RSSI_MARGIN`), because the RSSI
@@ -189,6 +189,6 @@ Tests:
     python src/tests/host/run_tests.py smuggler
     python tools/test_smuggler.py --ports COM9 COM11
 
-The two-badge test (badges touching) opens *Social > Contrebande* on both, then goes through: a trade (offers seen on
+The two-badge test (badges touching) opens *Social > Smuggling* on both, then goes through: a trade (offers seen on
 both sides, goods swapped), a gift, a refusal, and a cancellation by the inviter after the guest sealed its good (it
 comes back to it). The screenshots are in `smuggler_<date>/A` and `/B`.

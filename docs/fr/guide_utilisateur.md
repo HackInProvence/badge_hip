@@ -68,7 +68,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
 | **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
-Un septième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
+Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
 
 **Notifications** : quand un message, une question de vote, une invitation à jouer ou une annonce des organisateurs
 arrive, le badge émet un bip et l'écrit en bas de l'écran. Depuis les menus ou la veille, la page concernée s'ouvre
@@ -522,7 +522,6 @@ ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écra
 | 0x01 | la cigale chante quelques secondes |
 | 0x02 | **mode muet** : plus de son ni de LEDs (pendant les talks) |
 | 0x03 | fin du mode muet |
-| 0x05 | **mise en sommeil** (réseau des badges seulement, pas en Princeton) : voir Admin > Commandes radio |
 | 0x10 à 0x14 | lumières du badge de talk (si sa page est ouverte) : éteint, OK, 5 min, FINI, STOP ! |
 | 0x30 + n | lance le morceau n du choeur |
 

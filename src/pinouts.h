@@ -6,6 +6,10 @@
 #ifndef _PINOUTS_H
 #define _PINOUTS_H
 
+#if ! defined(BADGE_SECSEA) && ! defined(BADGE_PROTO) && ! defined(BADGE_RADIO)
+#error "Not a board of the badge: configure with cmake -DPICO_BOARD=badge_secsea (or delete the CMakeCache.txt)"
+#endif
+
 // Our board and prototypes pinouts
 #define BADGE_BUTTON_Y 0
 #define BADGE_BUTTON_A 1

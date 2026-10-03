@@ -439,18 +439,26 @@ Bibliothèque standard.
 | `command CMD` | une commande à distance (`NET_COMMAND`), par exemple `0x02` |
 | `ping` | un ping (les badges l'écrivent sur leur port série) |
 | `raw TYPE OCTETS...` | un paquet quelconque : le type, puis les octets de données en hexadécimal |
+| `pirates [N]` | un **réseau de N cigales proches** (6 par défaut, 16 au plus) aux noms de pirates (Rackham, Barbossa, AnneBony, Surcouf, La Buse...), chacune avec un score, des compétences et un niveau tirés au hasard, qui envoient leurs balises (`NET_BEACON`) `--repeats` fois : pour tester la réception et le décodage des balises (Social > Radar, ou `!` sur la console du badge) |
 | `preset` | affiche les lignes à ajouter au fichier `subghz/assets/setting_user` de la carte SD du Flipper |
 | `--id N` | identifiant de l'émetteur, 4 octets (défaut `0x5EC5EA26`) |
 | `--repeats N` | paquets dans le fichier (défaut 8) |
 | `--gap MS` | millisecondes entre deux paquets (défaut 250) |
 | `-o`, `--output` | fichier de sortie (défaut `secsea_<type>.sub`) |
+| `--power DBM` | puissance du Flipper : 10 (défaut, comme les badges), 7, 5, 0, -10, -15, -20, -30 |
+| `--send` | copie le fichier sur le Flipper branché en USB et l'envoie (sa console série, comme `flipper_weather.py`) |
+| `--port COMx` | avec `--send` : le port du Flipper (trouvé tout seul) |
 
 ```bash
 python tools/flipper_net_sub.py command 0x02 -o muet_gfsk.sub
+python tools/flipper_net_sub.py pirates 8 --repeats 6 --power -10 --send
 python tools/flipper_net_sub.py preset
 ```
 
 Précautions :
+- `pirates` : près du Flipper (balises reçues au-dessus de -80 dBm, 3 fois en 10 s), les badges comptent chaque
+  pirate comme une **rencontre** (+10 points, gardée en mémoire). À -10 dBm, les balises arrivent vers -85 dBm à un
+  mètre : listées, sans rencontre ;
 - **une commande `0x05` (mise en sommeil) envoyée ainsi endort réellement les badges à portée** : contrairement au
   code Princeton, le paquet réseau est obéi. Ne générez pas ce fichier hors d'un essai contrôlé ;
 - le nonce de la commande est tiré une fois par fichier : rejouer le même fichier dans les 10 s n'a pas d'effet,
@@ -474,7 +482,7 @@ utilisé par qFlipper.
 | `--days N` | jours dans le QR code, à partir de demain (défaut 4) |
 | `--rounds N` | nombre d'envois de chaque partie (défaut 4) |
 | `--port COMx` | port du Flipper (trouvé tout seul) |
-| `-o FICHIER.sub` | nom des fichiers écrits (défaut `build/secsea_meteo_N.sub`) |
+| `-o FICHIER.sub` | nom des fichiers écrits (défaut `build/flipper/secsea_meteo_N.sub`) |
 | `--no-send` | écrit seulement les fichiers (à envoyer à la main : Sub-GHz > Saved) |
 | `--dry-run` | affiche seulement les prévisions et le texte |
 | `--id N` | identifiant de l'émetteur (défaut `0x5EC5EA27`) |
@@ -686,7 +694,6 @@ de l'écran et écrit `remote: command 0x.. from ...`.
 | `0x01` | la cigale chante 6 s (rien en mode muet) |
 | `0x02` | mode muet |
 | `0x03` | fin du mode muet |
-| `0x05` | mise en sommeil (réseau des badges seulement : ignorée en Princeton) |
 | `0x10` à `0x14` | lumières du badge de talk, si sa page est ouverte : éteint, vert, orange (5 min), rouge (fini), rouge énervé |
 | `0x30` + n | lance le morceau n du choeur (`0x30` Frère Jacques, `0x31` L'Ode à la joie) |
 | `0x04`, `0x18`, `0x1F` (Princeton seulement) | boutons du Flipper : `0x03`, `0x10`, `0x13` (voir § 2.5) |
@@ -877,7 +884,7 @@ fonctionnent quelle que soit la langue.
 | Plus de son ni de LEDs | Mode muet (commande pendant un talk) : Réglages > Mode muet, ou commande `0x03`. |
 | Le thème Admin est apparu tout seul | La séquence des flancs a été tapée par hasard : Admin > Quitter le mode admin. |
 | Le thème Admin a disparu après un test | Les scripts de test coupent le mode admin à la fin : le réactiver (§ 4.1). |
-| Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ; fichier `.sub` (pas `subghz tx`) ; code `0xC16Axx` ; bouton maintenu une seconde ; badge proche. `O` sur la console montre les tentatives de décodage. Le sommeil (`0x05`) n'est jamais accepté en Princeton. |
+| Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ; fichier `.sub` (pas `subghz tx`) ; code `0xC16Axx` ; bouton maintenu une seconde ; badge proche. `O` sur la console montre les tentatives de décodage. |
 | Les badges s'entendent mal, les télécommandes passent mal | Réglages > Réglage radio sur place, près d'autres badges allumés. `!` : comparer « crystal used » et « measured ». |
 | Les autres cigales ne sont plus entendues | Normal tant qu'une page occupe la radio : Décodeur 433 MHz, Station météo, Chasse 433 MHz, Badge de talk, échange de contacts, radio pirate. |
 | Pas de niveau de batterie | Batterie non calibrée : § 4.3. |

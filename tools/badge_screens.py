@@ -117,7 +117,7 @@ def slug(text):
 def submenus():
     """[(theme, number of entries)] from src/menu/main.c"""
     src = open(os.path.join(ROOT, 'src', 'menu', 'main.c'), encoding='utf-8').read()
-    return [(m.group(1), int(m.group(2))) for m in re.finditer(r'\{"([^"]+)", (\d+), \{M_', src)]
+    return [(m.group(1), int(m.group(2))) for m in re.finditer(r'\{(?:N_\()?"([^"]+)"\)?, (\d+), \{M_', src)]
 
 
 class Crawler:
@@ -188,6 +188,7 @@ def main():
             if not m:
                 sys.exit('the badge does not answer the key N: firmware without the translations?')
             if m.group(1) == code:
+                t.expect(r'^store: saved', 15)  # Saved later: before a restart (or the end), it must be done
                 return had[-1] if had else 'fr'
         sys.exit(f'language {code} not in the firmware')
 

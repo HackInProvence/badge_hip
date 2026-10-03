@@ -238,7 +238,7 @@ def main():
     packets = announcement_packets(hhmm, text, qr, args.id)
     # One small file per part (its packet PART_REPEATS times): the Flipper plays the long RAW files badly (the long
     # packets were lost), the short ones well; the badges put the parts together, whatever the order
-    base = args.output or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'build', 'secsea_meteo.sub')
+    base = args.output or os.path.join(HERE, '..', 'build', 'flipper', 'secsea_meteo.sub')
     os.makedirs(os.path.dirname(os.path.abspath(base)), exist_ok=True)
     files = []
     for k, p in enumerate(packets):
