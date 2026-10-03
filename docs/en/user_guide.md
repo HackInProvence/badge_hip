@@ -597,7 +597,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Pirate radio** (Radio pirate) | sends a melody, a 1 kHz tone or a WAV file of the SD card in FM on 433 MHz, to listen to with a Flipper Zero (Sub-GHz > Read RAW, FM476, sound on), a Portapack, an SDR or another cicada; settings: deviation (47.6 kHz "Flipper" by default, 5 kHz for an NFM receiver), sound gain x1 / x2 / x4 (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
 | **Demo mode** (Mode démo) | for a stand: the badge shows its features in a loop (see below) |
 | **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown by the name tag |
-| **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged |
+| **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged in a computer (a charger alone is not seen) |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme again |
 
 **Cicada LEDs** (LEDs des cigales): a list of settings; sides: choose the row.

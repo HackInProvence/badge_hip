@@ -585,7 +585,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM sur 433 MHz, à écouter avec un Flipper Zero (Sub-GHz > Read RAW, FM476, son activé), un Portapack, un SDR ou une autre cigale ; réglages : excursion (47,6 kHz « Flipper » par défaut, 5 kHz pour un récepteur NFM), gain du son x1 / x2 / x4 (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
 | **Mode démo** | pour un stand : le badge présente ses fonctions en boucle (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
-| **Batteries des cigales** | la batterie des cigales qui la diffusent (Réglages > Batterie par radio) : « 81 % », ou « ADC 2533 » pour un badge non calibré, « USB » s'il est branché |
+| **Batteries des cigales** | la batterie des cigales qui la diffusent (Réglages > Batterie par radio) : « 81 % », ou « ADC 2533 » pour un badge non calibré, « USB » s'il est branché à un ordinateur (un simple chargeur ne se voit pas) |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 
 **LEDs des cigales** : une liste de réglages ; flancs : choisir la ligne.

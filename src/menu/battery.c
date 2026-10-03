@@ -12,6 +12,7 @@
 
 #include "hardware/adc.h"
 #include "pico/stdio_usb.h"
+#include "tusb.h"
 #include "pinouts.h"
 
 #define ADC_SAMPLES 16
@@ -80,7 +81,9 @@ bool battery_clear_points(void) {
 }
 
 bool battery_charging(void) {
-    return stdio_usb_connected();
+    /* Enumerated by a computer (a terminal open or not: stdio_usb_connected() was only the terminal); the board
+     * has no VBUS sense: a charger alone is not seen */
+    return tud_mounted();
 }
 
 void battery_task(absolute_time_t now) {
