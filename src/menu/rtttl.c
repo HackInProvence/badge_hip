@@ -27,6 +27,7 @@
 #include "i18n.h"
 #include "rtttl_parse.h"
 #include "sd.h"
+#include "store.h"
 
 #define RATE 16000
 #define CHUNK 256
@@ -124,8 +125,29 @@ static int first_tune_row(void) {
     return n_dirs + page_prev;
 }
 
-static int n_rows(void) {
+/* At the top folder, after the tunes: the settings (the volume, the brightness of the LEDs) */
+enum { SET_VOLUME, SET_LEDS, N_SETTINGS };
+
+static int n_settings(void) {
+    return dir[0] ? 0 : N_SETTINGS;
+}
+
+static int first_setting_row(void) {
     return first_tune_row() + n_tunes() + page_next;
+}
+
+static int n_rows(void) {
+    return first_setting_row() + n_settings();
+}
+
+/* The brightness of the LEDs with the notes (the full colors were too bright) */
+static const uint8_t LED_LEVELS[] = {0, 10, 25, 50, 100};
+#define LED_LEVEL_DEFAULT 2  /* 25 % */
+#define N_LED_LEVELS ((int)(sizeof(LED_LEVELS) / sizeof(LED_LEVELS[0])))
+
+static int led_level(void) {
+    uint8_t v = store_get()->rtttl_leds;
+    return v >= 1 && v <= N_LED_LEVELS ? v - 1 : LED_LEVEL_DEFAULT;
 }
 
 
@@ -433,8 +455,9 @@ static void note_leds(const rtttl_note_t *n, bool dim) {
     else if (! leds_set)
         return;
     dim = dim || n->rest;
-    uint8_t d = dim ? 12 : 1;
-    leds(led_rgb[0] / d, led_rgb[1] / d, led_rgb[2] / d);
+    uint32_t k = LED_LEVELS[led_level()];  /* % */
+    uint32_t d = (dim ? 12 : 1) * 100;
+    leds(led_rgb[0] * k / d, led_rgb[1] * k / d, led_rgb[2] * k / d);
     leds_dim = dim;
 }
 
@@ -661,7 +684,16 @@ static bool rtttl_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (step && rows)
         sel = (sel + step + rows) % rows;
     if ((b->pressed & UI_BTN_B) && rows) {
-        if (sel < n_dirs)
+        if (sel >= first_setting_row()) {
+            if (sel - first_setting_row() == SET_VOLUME) {
+                audio_set_volume((audio_get_volume() + 1) % (AUDIO_VOLUME_MAX + 1));
+            } else {
+                store_get()->rtttl_leds = (led_level() + 1) % N_LED_LEVELS + 1;
+                store_changed();
+            }
+            printf("rtttl: volume %u/%u, LEDs %u %%\n", audio_get_volume(), AUDIO_VOLUME_MAX,
+                   LED_LEVELS[led_level()]);
+        } else if (sel < n_dirs)
             enter_dir(dirs[sel]);
         else if (page_prev && sel == n_dirs)
             change_page(-1);
@@ -723,6 +755,15 @@ static bool rtttl_task(absolute_time_t now) {
 }
 
 static void row_label(int r, char *buf, size_t len) {
+    if (r >= first_setting_row()) {
+        if (r - first_setting_row() == SET_VOLUME)
+            snprintf(buf, len, _("Volume : %u/%u"), audio_get_volume(), AUDIO_VOLUME_MAX);
+        else if (LED_LEVELS[led_level()])
+            snprintf(buf, len, _("LEDs : %u %%"), LED_LEVELS[led_level()]);
+        else
+            snprintf(buf, len, N_("LEDs : éteintes"));
+        return;
+    }
     if (r < n_dirs) {
         snprintf(buf, len, "%s/", dirs[r]);
         return;

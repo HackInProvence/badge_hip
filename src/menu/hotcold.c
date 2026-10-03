@@ -258,7 +258,12 @@ static void radar_label(int i, char *buf, size_t len) {
     char level[8] = "";
     if (near[i].level)  /* Sent by the newer firmwares only */
         snprintf(level, sizeof(level), " N%u", near[i].level);
-    snprintf(buf, len, "%s%s %d dBm%s", near[i].name, level, near[i].rssi, near[i].met ? " *" : "");
+    char batt[20] = "";
+    if (near[i].batt) {  /* It shares its battery (Réglages > Batterie par radio) */
+        batt[0] = ' ';
+        battradio_text(&near[i], batt + 1, sizeof(batt) - 1);
+    }
+    snprintf(buf, len, "%s%s %d dBm%s%s", near[i].name, level, near[i].rssi, near[i].met ? " *" : "", batt);
 }
 
 static void radar_start(absolute_time_t now) {

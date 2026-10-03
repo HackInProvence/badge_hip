@@ -712,14 +712,14 @@ static const submenu_t SUBMENUS[] = {
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
     {N_("Badge"), 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS)}},
-    {N_("Réglages"), 7, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
-                     M_APP(APP_RADIO_TUNE)}},
-    {N_("Admin"), 15, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
+                     M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
+    {N_("Admin"), 16, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_SMUGGLER_ADMIN),
                    M_APP(APP_WEREWOLF_ADMIN), M_APP(APP_RESET),
                    M_APP(APP_BATTCAL),
-                   M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE),
+                   M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE), M_APP(APP_BATT_VIEW),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */

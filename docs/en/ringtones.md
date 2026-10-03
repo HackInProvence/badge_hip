@@ -16,6 +16,8 @@ you can add as many as you like on the SD card.
   Sides: up / down (held: scrolling), right wing (R): open the folder or play, left wing (L): parent folder, then
   back to the menu.
   A ringtone marked `(!)` has an error: R shows the line, the column and the reason.
+- **The settings**, at the bottom of the main list: "Volume: 6/8" (the volume of the badge) and "LEDs: 25 %" (the
+  brightness of the LEDs while playing: off, 10, 25 (default), 50 or 100 %); R: next value.
 - **While playing**: the name, the note played (e.g. `La#5`, `Rest` (`Silence` in French); the note names stay
   French: Do = C, Ré = D, Mi = E, Fa = F, Sol = G, La = A, Si = B), a progress bar and the time.
   The LEDs light up at each note, with one colour per note (Do red, Ré orange, Mi light green, Sol cyan, La blue...).

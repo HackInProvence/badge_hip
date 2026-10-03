@@ -350,6 +350,28 @@ python tools/contacts_export.py -o my_contacts.vcf
 
 The skills of the received cards go in the `CATEGORIES` line.
 
+#### `tools/battery_log.py` — battery life test
+
+The badge under test runs on its battery, away from the USB, with Settings > Battery by radio: yes (its beacons carry
+its battery every 2 s). Another badge plugged in the PC hears them and writes `battery: <id> <name> raw <ADC> mv <mV>
+usb <0|1> rssi <dBm>`; the script keeps one sample per badge every `--interval` seconds in a CSV (time, elapsed
+minutes, id, name, raw ADC, mV, calibrated mV, USB, RSSI). Prerequisite: `pyserial`.
+
+| Option | Role |
+|---|---|
+| `--port COMx` | port of the listening badge (found by itself) |
+| `--name NAME` | only this badge (its name or the start of its id) |
+| `--interval S` | seconds between two samples of a badge (default 60) |
+| `--cal raw:mV,raw:mV` | two calibration points of the badge under test: converts the raw ADC to mV |
+| `-o FILE.csv` | file (default `battery_<date>.csv`, appended if it exists) |
+
+```bash
+python tools/battery_log.py --port COM11 --name Tristan --interval 300
+```
+
+A badge not calibrated sends 0 mV: the curve of the raw ADC is still usable (and `--cal` converts it after a
+calibration). A badge no longer heard has run out of battery: the last sample gives the battery life.
+
 #### `tools/score_check.py` — checking the scores and making a leaderboard
 
 The games Tic-tac-toe (Morpion), Connect 4 (Puissance 4), Simon, Reflexes (Réflexes) and Snake show a signed QR code at the

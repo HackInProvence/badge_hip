@@ -6,6 +6,7 @@ target_sources(badge_menu PRIVATE
     i18n.c
     i18n_table.c
     lang.c
+    battradio.c
     admin.c
     apps.c
     lamp.c

@@ -16,6 +16,8 @@ carte SD.
   Flancs : monter / descendre (maintenus : défilement), aile droite (D) : ouvrir le dossier ou jouer, aile gauche
   (G) : dossier parent, puis retour au menu.
   Une sonnerie marquée `(!)` contient une erreur : D affiche la ligne, la colonne et la raison.
+- **Les réglages**, en bas de la liste principale : « Volume : 6/8 » (le volume du badge) et « LEDs : 25 % » (la
+  luminosité des LEDs pendant la lecture : éteintes, 10, 25 (par défaut), 50 ou 100 %) ; D : valeur suivante.
 - **Pendant la lecture** : le nom, la note jouée (ex. `La#5`, `Silence`), une barre de progression et le temps.
   Les LEDs s'allument à chaque note, d'une couleur par note (Do rouge, Ré orange, Mi vert clair, Sol cyan, La bleu...).
   G : arrêter, flancs : sonnerie précédente / suivante, D : reprendre au début.

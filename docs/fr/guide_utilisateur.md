@@ -253,7 +253,8 @@ l'organisateur le débloque (Admin > Loup-garou (admin)).
 **Réseau des cigales**
 - Les badges allumés s'envoient discrètement des signaux radio.
 - Approchez votre badge tout près d'un autre pendant quelques secondes : vous gagnez
-  **10 points** pour une nouvelle rencontre, **1 point** pour une cigale déjà rencontrée (une fois par heure au plus).
+  des points pour chaque **nouvelle** cigale, de moins en moins (20, 18, 16, 15, 13... : 10 % de ce qui reste),
+  **200 points au plus** en tout ; une cigale déjà rencontrée ne rapporte plus rien.
 - Aile droite : choisir le **nom de votre cigale** (8 caractères).
   - Flancs : changer la lettre.
   - Aile droite (appui court) : lettre suivante ; aile gauche : lettre précédente.
@@ -510,6 +511,10 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
   à la demande : aile droite : régler à nouveau ; aile gauche : arrêter ou revenir. La page affiche le résultat :
   quartz, bruit, seuil des télécommandes (« Télécommandes : > −90 dBm »...), correction de fréquence, et le nombre
   de paquets d'autres cigales entendus (sans autre cigale, la fréquence n'est pas corrigée).
+- **Batterie par radio : oui / non** : le badge ajoute son niveau de batterie à ses balises (toutes les 2 s, avec son
+  nom), pour suivre un badge laissé sur batterie (test d'autonomie) : Admin > Batteries des cigales, le radar des
+  cigales, ou `tools/battery_log.py` sur un autre badge branché au PC. Un badge non calibré envoie la mesure brute
+  (« ADC 2533 »), jamais un pourcentage qu'il ne connaît pas.
 
 
 ### 4.7 Télécommande et mode muet
@@ -580,12 +585,14 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM sur 433 MHz, à écouter avec un Flipper Zero (Sub-GHz > Read RAW, FM476, son activé), un Portapack, un SDR ou une autre cigale ; réglages : excursion (47,6 kHz « Flipper » par défaut, 5 kHz pour un récepteur NFM), gain du son x1 / x2 / x4 (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
 | **Mode démo** | pour un stand : le badge présente ses fonctions en boucle (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
+| **Batteries des cigales** | la batterie des cigales qui la diffusent (Réglages > Batterie par radio) : « 81 % », ou « ADC 2533 » pour un badge non calibré, « USB » s'il est branché |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 
 **LEDs des cigales** : une liste de réglages ; flancs : choisir la ligne.
 - « Couleur » : ailes : couleur précédente / suivante (rouge, orange, jaune, vert, cyan, bleu, violet, rose, blanc) ;
 - « Rouge (R) », « Vert (G) », « Bleu (B) » : de 0 à 255 ; aile gauche : −, aile droite : + (en maintenant :
   de plus en plus vite) ; la couleur devient « personnalisée » ;
+- « Luminosité » : 5, 10, 25, 50 (par défaut), 75 ou 100 % de la couleur, dans tous les modes (ailes : − / +) ;
 - « Mode » : Fixe, Clignotant ou Fondu (ailes : mode précédent / suivant). En Clignotant ou Fondu, un appui long
   sur l'aile droite ouvre les durées : allumé / éteint, ou vers la couleur / vers le noir, de 50 ms à 5 s par pas
   de 50 ms (flancs : choisir la durée ; ailes : − / + ; appui long sur une aile : retour) ;

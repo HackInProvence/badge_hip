@@ -9,6 +9,7 @@
 #include "pico/rand.h"
 
 #include "achievements.h"
+#include "battery.h"
 #include "i18n.h"
 #include "net.h"
 #include "skills.h"
@@ -18,12 +19,12 @@
 
 #define BEACON_LEN 11  /* Data of the NET_BEACON packets: sequence, score (2 bytes), name (8 bytes)... */
 #define BEACON_LEN2 16  /* ...then (newer firmwares) skills (4 bytes), level */
+#define BEACON_LEN3 21  /* ...then, when shared, the battery: raw ADC (2 bytes), mV (2 bytes, 0: not calibrated), flags */
+#define BATT_USB 0x01
 #define BEACON_PERIOD_MS 2000
 #define BEACON_JITTER_MS 500
 #define NEIGHBOUR_TIMEOUT_MS 15000
-#define POINTS_NEW 10
-#define POINTS_AGAIN 1
-#define AGAIN_MINUTES 60
+#define AGAIN_MINUTES 60  /* A cicada met again: counted (no points) at most once per hour */
 
 typedef struct {
     social_neighbour_t pub;
@@ -60,7 +61,8 @@ void social_init(void) {
     /* Repair: the first loopback tests (net.h) counted meetings with the "twin" of this badge */
     for (uint16_t i = 0; i < s->n_met; ++i)
         if (s->met[i].id == (net_id() ^ NET_TWIN)) {
-            uint32_t points = POINTS_NEW + (s->met[i].meets > 1 ? (s->met[i].meets - 1) * POINTS_AGAIN : 0);
+            /* The points of that time: 10 for a new cicada, 1 for each meeting again */
+            uint32_t points = 10 + (s->met[i].meets > 1 ? (s->met[i].meets - 1) : 0);
             s->score = s->score > points ? s->score - points : 0;
             s->met[i] = s->met[--s->n_met];
             store_changed();
@@ -135,7 +137,29 @@ int social_neighbours(social_neighbour_t *out, int max) {
 }
 
 
-/* Counts a meeting with this badge */
+int social_meeting_points(int n) {
+    int total = 0, points = 0;
+    for (int k = 1; k <= n; ++k) {
+        int rest = SOCIAL_MEETING_POINTS_MAX - total;
+        points = (rest + 5) / 10;  /* 10 % of what remains, rounded */
+        if (points < 1)
+            points = rest > 0 ? 1 : 0;
+        total += points;
+    }
+    return points;
+}
+
+bool social_battery_shared(void) {
+    return store_get()->batt_share == STORE_BATT_SHARE;
+}
+
+void social_share_battery(bool on) {
+    store_get()->batt_share = on ? STORE_BATT_SHARE : 0;
+    store_changed();
+    printf("social: battery %s in the beacons\n", on ? "shared" : "not shared");
+}
+
+/* Counts a meeting with this badge: points for a new one only (fewer and fewer, social_meeting_points()) */
 static void meet(neighbour_t *nb, absolute_time_t now) {
     store_t *s = store_get();
     uint16_t minute = to_ms_since_boot(now) / 60000;
@@ -145,14 +169,14 @@ static void meet(neighbour_t *nb, absolute_time_t now) {
         if (s->met[i].id == nb->pub.id)
             m = &s->met[i];
     if (! m) {
-        points = POINTS_NEW;
+        points = social_meeting_points(s->n_met + 1);
         if (s->n_met < STORE_MAX_MET) {
             m = &s->met[s->n_met++];
             m->id = nb->pub.id;
             m->meets = 0;
         }
     } else if (m->last_minute == 0xFFFF || minute - m->last_minute >= AGAIN_MINUTES) {
-        points = POINTS_AGAIN;
+        points = 0;  /* Already met: counted, no points */
     } else {
         return;  /* Met less than an hour ago */
     }
@@ -163,6 +187,10 @@ static void meet(neighbour_t *nb, absolute_time_t now) {
     s->score += points;
     store_changed();
     nb->pub.met = true;
+    if (! points) {
+        printf("social: met %s again (no points)\n", nb->pub.name);
+        return;
+    }
     snprintf(event, sizeof(event), _("Rencontre : %s +%d"), nb->pub.name, points);
     event_pending = true;
     printf("social: %s (score %lu)\n", event, (unsigned long)s->score);
@@ -203,6 +231,15 @@ static void handle_beacon(const net_packet_t *packet) {
     nb->pub.rssi = rssi;
     nb->pub.skills = packet->len >= BEACON_LEN2 ? net_u32(p + 11) : 0;
     nb->pub.level = packet->len >= BEACON_LEN2 ? p[15] : 0;
+    nb->pub.batt = packet->len >= BEACON_LEN3;
+    if (nb->pub.batt) {
+        nb->pub.batt_raw = p[16] | p[17] << 8;
+        nb->pub.batt_mv = p[18] | p[19] << 8;
+        nb->pub.batt_usb = p[20] & BATT_USB;
+        /* For the PC (tools/battery_log.py): the battery of every cicada heard */
+        printf("battery: %08lX %s raw %u mv %u usb %u rssi %d\n", (unsigned long)id, nb->pub.name, nb->pub.batt_raw,
+               nb->pub.batt_mv, nb->pub.batt_usb, rssi);
+    }
     nb->last_seen = now;
     uint32_t common = nb->pub.skills & store_get()->skills;
     if (common && rssi >= SOCIAL_RSSI_CLOSE && ! nb->skills_told) {
@@ -232,11 +269,21 @@ static void handle_beacon(const net_packet_t *packet) {
 
 static void send_beacon(void) {
     store_t *s = store_get();
-    uint8_t p[BEACON_LEN2] = {seq++, s->score, s->score >> 8};
+    uint8_t p[BEACON_LEN3] = {seq++, s->score, s->score >> 8};
     memcpy(p + 3, s->name, 8);  /* The name is truncated to 8 characters in the beacon */
     net_put_u32(p + 11, s->skills);
     p[15] = achv_level();
-    if (net_send(NET_BEACON, p, sizeof(p), NET_LOUD))  /* +10 dBm: at -10 dBm, ~-97 dBm at 1 m (edge of the sensitivity) */
+    int len = BEACON_LEN2;
+    if (social_battery_shared()) {
+        uint16_t raw = battery_raw(), mv = battery_calibrated() ? battery_mv() : 0;
+        p[16] = raw;
+        p[17] = raw >> 8;
+        p[18] = mv;
+        p[19] = mv >> 8;
+        p[20] = battery_charging() ? BATT_USB : 0;
+        len = BEACON_LEN3;
+    }
+    if (net_send(NET_BEACON, p, len, NET_LOUD))  /* +10 dBm: at -10 dBm, ~-97 dBm at 1 m (edge of the sensitivity) */
         ++n_sent;
 }
 

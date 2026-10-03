@@ -400,7 +400,7 @@ SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Programme'
 ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Vote (admin)',
          'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Contrebande (admin)',
          'Loup-garou (admin)', 'Remise à zéro',
-         'Batterie (calibration)', 'Radio pirate', 'Mode démo', 'Type du badge',
+         'Batterie (calibration)', 'Radio pirate', 'Mode démo', 'Type du badge', 'Batteries des cigales',
          'Quitter le mode admin']
 
 

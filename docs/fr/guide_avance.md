@@ -348,6 +348,28 @@ python tools/contacts_export.py -o mes_contacts.vcf
 
 Les compétences des cartes reçues partent dans la ligne `CATEGORIES`.
 
+#### `tools/battery_log.py` — test d'autonomie de la batterie
+
+Le badge testé tourne sur sa batterie, loin de l'USB, avec Réglages > Batterie par radio : oui (ses balises portent sa
+batterie toutes les 2 s). Un autre badge branché au PC les entend et écrit `battery: <id> <nom> raw <ADC> mv <mV>
+usb <0|1> rssi <dBm>` ; le script garde un relevé par badge toutes les `--interval` secondes dans un CSV (heure,
+minutes écoulées, id, nom, ADC brut, mV, mV calibrés, USB, RSSI). Prérequis : `pyserial`.
+
+| Option | Rôle |
+|---|---|
+| `--port COMx` | port du badge qui écoute (trouvé tout seul) |
+| `--name NOM` | seulement ce badge (son nom ou le début de son id) |
+| `--interval S` | secondes entre deux relevés d'un badge (défaut 60) |
+| `--cal raw:mV,raw:mV` | deux points de calibration du badge testé : convertit l'ADC brut en mV |
+| `-o FICHIER.csv` | fichier (défaut `battery_<date>.csv`, complété s'il existe) |
+
+```bash
+python tools/battery_log.py --port COM11 --name Tristan --interval 300
+```
+
+Un badge non calibré envoie 0 mV : la courbe de l'ADC brut reste exploitable (et `--cal` la convertit après une
+calibration). Le badge qui n'est plus entendu a épuisé sa batterie : le dernier relevé donne l'autonomie.
+
 #### `tools/score_check.py` — vérifier les scores et faire un classement
 
 Les jeux Morpion, Puissance 4, Simon, Réflexes et Snake affichent en fin de partie (ou en appui long sur le jeu dans

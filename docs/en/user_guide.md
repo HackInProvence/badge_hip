@@ -262,7 +262,8 @@ the organizer unlocks it (Admin > Werewolf (admin)).
 **Cicada network** (Réseau cigales)
 - Badges that are switched on quietly send each other radio signals.
 - Hold your badge very close to another one for a few seconds: you earn
-  **10 points** for a new encounter, **1 point** for a cicada you have already met (at most once per hour).
+  points for each **new** cicada, fewer and fewer (20, 18, 16, 15, 13...: 10 % of what remains), **200 points at
+  most** in all; a cicada already met brings nothing more.
 - Right wing: choose your **cicada's name** (8 characters).
   - Sides: change the letter.
   - Right wing (short press): next letter; left wing: previous letter.
@@ -522,6 +523,10 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
   right wing: tune again; left wing: stop or go back. The page shows the result: crystal, noise, threshold of the
   remote controls ("Remotes: > −90 dBm"...), frequency correction, and the number of packets of other
   cicadas heard (with no other cicada, the frequency is not corrected).
+- **Radio battery: yes / no** (Batterie radio): the badge adds its battery level to its beacons (every 2 s, with its
+  name), to follow a badge left on its battery (battery life test): Admin > Cicada batteries, the cicada radar, or
+  `tools/battery_log.py` on another badge plugged in the PC. A badge not calibrated sends the raw measure
+  ("ADC 2533"), never a percentage it does not know.
 
 
 ### 4.7 Remote control and mute mode
@@ -592,12 +597,14 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Pirate radio** (Radio pirate) | sends a melody, a 1 kHz tone or a WAV file of the SD card in FM on 433 MHz, to listen to with a Flipper Zero (Sub-GHz > Read RAW, FM476, sound on), a Portapack, an SDR or another cicada; settings: deviation (47.6 kHz "Flipper" by default, 5 kHz for an NFM receiver), sound gain x1 / x2 / x4 (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
 | **Demo mode** (Mode démo) | for a stand: the badge shows its features in a loop (see below) |
 | **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown by the name tag |
+| **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme again |
 
 **Cicada LEDs** (LEDs des cigales): a list of settings; sides: choose the row.
 - "Color" (Couleur): wings: previous / next colour (red, orange, yellow, green, cyan, blue, purple, pink, white);
 - "Red (R)", "Green (G)", "Blue (B)": from 0 to 255; left wing: −, right wing: + (hold: faster and faster);
   the colour becomes "custom" (personnalisée);
+- "Brightness" (Luminosité): 5, 10, 25, 50 (default), 75 or 100 % of the colour, in every mode (wings: − / +);
 - "Mode": Fixed (Fixe), Blinking (Clignotant) or Fade (Fondu) (wings: previous / next mode). In Blinking or Fade,
   a long press on the right wing opens the times: on / off, or to the colour / to black, from 50 ms to 5 s in steps
   of 50 ms (sides: choose the time; wings: − / +; long press on a wing: back);

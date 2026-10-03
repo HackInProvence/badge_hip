@@ -23,7 +23,7 @@ msgstr "SD-Karte unformatiert (FAT/exFAT)"
 
 #: src/audio/wav.c:105
 #: src/menu/rsvp.c:550
-#: src/menu/rtttl.c:311
+#: src/menu/rtttl.c:333
 #: src/video/video.c:75
 msgid "Pas de carte SD"
 msgstr "Keine SD-Karte"
@@ -556,7 +556,7 @@ msgstr ""
 #: src/menu/lang.c:47
 #: src/menu/messages.c:279
 #: src/menu/reset.c:123
-#: src/menu/rtttl.c:812
+#: src/menu/rtttl.c:853
 msgid "G : retour  D : choisir"
 msgstr "L: zurück  R: wählen"
 
@@ -1086,13 +1086,13 @@ msgid "> Enregistrer le point"
 msgstr "> Punkt speichern"
 
 #: src/menu/battcal.c:146
-#: src/menu/ledcast.c:288
+#: src/menu/ledcast.c:313
 #: src/menu/pirate_radio.c:614
 msgid "Ailes : -  +"
 msgstr "Flügel: -  +"
 
 #: src/menu/battcal.c:146
-#: src/menu/ledcast.c:285
+#: src/menu/ledcast.c:310
 #: src/menu/pirate_radio.c:614
 msgid "G : retour  D : valider"
 msgstr "L: zurück  R: OK"
@@ -1188,6 +1188,74 @@ msgstr "L: aufgeben"
 #: src/menu/battle.c:438
 msgid "%s : bataille navale ?"
 msgstr "%s: Seeschlacht?"
+
+#: src/menu/battradio.c:50
+msgid "ADC %u (non calibrée)"
+msgstr "ADC %u (unkalibriert)"
+
+#: src/menu/battradio.c:56
+#: src/menu/battradio.c:72
+msgid "Batterie par radio"
+msgstr "Akku per Funk"
+
+#: src/menu/battradio.c:57
+msgid "Diffusion : %s"
+msgstr "Senden: %s"
+
+#: src/menu/battradio.c:57
+#: src/menu/battradio.c:68
+#: src/menu/main.c:657
+#: src/menu/main.c:658
+#: src/menu/pirate_radio.c:541
+msgid "non"
+msgstr "aus"
+
+#: src/menu/battradio.c:57
+#: src/menu/battradio.c:68
+#: src/menu/main.c:657
+#: src/menu/main.c:658
+#: src/menu/pirate_radio.c:541
+msgid "oui"
+msgstr "an"
+
+#: src/menu/battradio.c:62
+msgid "USB : en charge"
+msgstr "USB: lädt"
+
+#: src/menu/battradio.c:63
+msgid ""
+"Le nom et la batterie\n"
+"partent avec les balises\n"
+"(toutes les 2 s)."
+msgstr ""
+"Name und Akku gehen\n"
+"mit den Baken raus\n"
+"(alle 2 s)."
+
+#: src/menu/battradio.c:64
+msgid "G : retour  D : oui / non"
+msgstr "L: zurück  R: an / aus"
+
+#: src/menu/battradio.c:68
+msgid "Batterie radio : %s"
+msgstr "Akku-Funk: %s"
+
+#: src/menu/battradio.c:139
+#: src/menu/battradio.c:148
+msgid "Batteries des cigales"
+msgstr "Akkus der Zikaden"
+
+#: src/menu/battradio.c:141
+msgid ""
+"Aucune batterie reçue.\n"
+"Sur le badge à suivre :\n"
+"Réglages > Batterie\n"
+"par radio : oui."
+msgstr ""
+"Kein Akku empfangen.\n"
+"Am Badge, dem du folgst:\n"
+"Optionen > Akku per\n"
+"Funk: an."
 
 #: src/menu/chorus.c:82
 msgid "Frère Jacques"
@@ -2059,21 +2127,21 @@ msgstr "L: Ende  R: stoppen"
 msgid "G : quitter  D : émettre"
 msgstr "L: Ende  R: senden"
 
-#: src/menu/hotcold.c:318
+#: src/menu/hotcold.c:323
 msgid "Radar : %s"
 msgstr "Radar: %s"
 
-#: src/menu/hotcold.c:321
-#: src/menu/hotcold.c:471
+#: src/menu/hotcold.c:326
+#: src/menu/hotcold.c:476
 msgid "G : retour à la liste"
 msgstr "L: zurück zur Liste"
 
-#: src/menu/hotcold.c:324
-#: src/menu/hotcold.c:342
+#: src/menu/hotcold.c:329
+#: src/menu/hotcold.c:347
 msgid "Radar des cigales"
 msgstr "Zikaden-Radar"
 
-#: src/menu/hotcold.c:326
+#: src/menu/hotcold.c:331
 msgid ""
 "Aucune cigale entendue.\n"
 "Les badges proches\n"
@@ -2085,17 +2153,17 @@ msgstr ""
 "erscheinen hier (Baken\n"
 "alle 2 s)."
 
-#: src/menu/hotcold.c:330
+#: src/menu/hotcold.c:335
 msgid "G : quitter  D : suivre"
 msgstr "L: Ende  R: folgen"
 
-#: src/menu/hotcold.c:469
 #: src/menu/hotcold.c:474
-#: src/menu/hotcold.c:486
+#: src/menu/hotcold.c:479
+#: src/menu/hotcold.c:491
 msgid "Chasse 433 MHz"
 msgstr "433-MHz-Jagd"
 
-#: src/menu/hotcold.c:477
+#: src/menu/hotcold.c:482
 msgid ""
 "Écoute des émetteurs\n"
 "433 MHz (télécommandes,\n"
@@ -2105,7 +2173,7 @@ msgstr ""
 "(Fernbedienungen,\n"
 "Sensoren, Störsender)..."
 
-#: src/menu/hotcold.c:482
+#: src/menu/hotcold.c:487
 msgid "G : retour  D : le chasser"
 msgstr "L: zurück  R: jagen"
 
@@ -2306,125 +2374,129 @@ msgstr "Sprache: %s"
 msgid "Langue"
 msgstr "Sprache"
 
-#: src/menu/ledcast.c:30
+#: src/menu/ledcast.c:32
 msgid "Clignotant"
 msgstr "Blinken"
 
-#: src/menu/ledcast.c:30
+#: src/menu/ledcast.c:32
 msgid "Fixe"
 msgstr "Fest"
 
-#: src/menu/ledcast.c:30
-#: src/menu/ledcast.c:266
+#: src/menu/ledcast.c:32
+#: src/menu/ledcast.c:291
 msgid "Fondu"
 msgstr "Dimmen"
 
-#: src/menu/ledcast.c:30
+#: src/menu/ledcast.c:32
 msgid "Rétablir"
 msgstr "Normal"
 
-#: src/menu/ledcast.c:102
+#: src/menu/ledcast.c:112
 msgid "Jaune"
 msgstr "Gelb"
 
-#: src/menu/ledcast.c:102
+#: src/menu/ledcast.c:112
 msgid "Orange"
 msgstr "Orange"
 
-#: src/menu/ledcast.c:102
+#: src/menu/ledcast.c:112
 msgid "Rouge"
 msgstr "Rot"
 
-#: src/menu/ledcast.c:102
+#: src/menu/ledcast.c:112
 msgid "Vert"
 msgstr "Grün"
 
-#: src/menu/ledcast.c:103
+#: src/menu/ledcast.c:113
 msgid "Bleu"
 msgstr "Blau"
 
-#: src/menu/ledcast.c:103
+#: src/menu/ledcast.c:113
 msgid "Cyan"
 msgstr "Cyan"
 
-#: src/menu/ledcast.c:103
+#: src/menu/ledcast.c:113
 msgid "Rose"
 msgstr "Rosa"
 
-#: src/menu/ledcast.c:103
+#: src/menu/ledcast.c:113
 msgid "Violet"
 msgstr "Lila"
 
-#: src/menu/ledcast.c:104
+#: src/menu/ledcast.c:114
 msgid "Blanc"
 msgstr "Weiß"
 
-#: src/menu/ledcast.c:138
+#: src/menu/ledcast.c:152
 msgid "Envoyé aux cigales"
 msgstr "An Zikaden gesendet"
 
-#: src/menu/ledcast.c:138
+#: src/menu/ledcast.c:152
 msgid "LEDs rétablies"
 msgstr "LEDs normal"
 
-#: src/menu/ledcast.c:251
+#: src/menu/ledcast.c:275
 msgid "Couleur : %s"
 msgstr "Farbe: %s"
 
-#: src/menu/ledcast.c:251
+#: src/menu/ledcast.c:275
 msgid "personnalisée"
 msgstr "eigene"
 
-#: src/menu/ledcast.c:253
+#: src/menu/ledcast.c:277
 msgid "Rouge (R) : %u"
 msgstr "Rot (R): %u"
 
-#: src/menu/ledcast.c:254
+#: src/menu/ledcast.c:278
 msgid "Vert (G) : %u"
 msgstr "Grün (G): %u"
 
-#: src/menu/ledcast.c:255
+#: src/menu/ledcast.c:279
 msgid "Bleu (B) : %u"
 msgstr "Blau (B): %u"
 
-#: src/menu/ledcast.c:256
+#: src/menu/ledcast.c:280
+msgid "Luminosité : %u %%"
+msgstr "Helligkeit: %u %%"
+
+#: src/menu/ledcast.c:281
 msgid "Mode : %s"
 msgstr "Modus: %s"
 
-#: src/menu/ledcast.c:257
+#: src/menu/ledcast.c:282
 msgid "> Envoyer aux cigales"
 msgstr "> An Zikaden senden"
 
-#: src/menu/ledcast.c:258
+#: src/menu/ledcast.c:283
 msgid "> Rétablir leurs LEDs"
 msgstr "> LEDs zurücksetzen"
 
-#: src/menu/ledcast.c:266
+#: src/menu/ledcast.c:291
 msgid "Clignotement"
 msgstr "Blinken"
 
-#: src/menu/ledcast.c:267
+#: src/menu/ledcast.c:292
 msgid "Allumé"
 msgstr "An"
 
-#: src/menu/ledcast.c:267
+#: src/menu/ledcast.c:292
 msgid "Vers la couleur"
 msgstr "Zur Farbe"
 
-#: src/menu/ledcast.c:267
+#: src/menu/ledcast.c:292
 msgid "Vers le noir"
 msgstr "Zu Schwarz"
 
-#: src/menu/ledcast.c:267
+#: src/menu/ledcast.c:292
 #: src/menu/talk.c:25
 msgid "Éteint"
 msgstr "Aus"
 
-#: src/menu/ledcast.c:270
+#: src/menu/ledcast.c:295
 msgid "%s : %u ms"
 msgstr "%s: %u ms"
 
-#: src/menu/ledcast.c:279
+#: src/menu/ledcast.c:304
 msgid ""
 "Flancs : choisir\n"
 "Ailes : - / +  (maintenir : vite)"
@@ -2432,20 +2504,20 @@ msgstr ""
 "Seiten: wählen\n"
 "Flügel: - / +  (halten: schnell)"
 
-#: src/menu/ledcast.c:280
+#: src/menu/ledcast.c:305
 msgid "Aile longue : retour"
 msgstr "Flügel lang: zurück"
 
-#: src/menu/ledcast.c:283
-#: src/menu/ledcast.c:293
+#: src/menu/ledcast.c:308
+#: src/menu/ledcast.c:318
 msgid "LEDs des cigales"
 msgstr "Zikaden-LEDs"
 
-#: src/menu/ledcast.c:286
+#: src/menu/ledcast.c:311
 msgid "Ailes : mode"
 msgstr "Fl.: Modus"
 
-#: src/menu/ledcast.c:287
+#: src/menu/ledcast.c:312
 msgid "Ailes : mode  D long : temps"
 msgstr "Flügel: Modus  R lang: Zeit"
 
@@ -2565,6 +2637,7 @@ msgid "Veille : %s"
 msgstr "Schoner: %s"
 
 #: src/menu/main.c:652
+#: src/menu/rtttl.c:760
 msgid "Volume : %u/%u"
 msgstr "Lautst.: %u/%u"
 
@@ -2588,18 +2661,6 @@ msgstr "Credits"
 #: src/menu/main.c:657
 msgid "Télécommande : %s"
 msgstr "Fernbed.: %s"
-
-#: src/menu/main.c:657
-#: src/menu/main.c:658
-#: src/menu/pirate_radio.c:541
-msgid "non"
-msgstr "aus"
-
-#: src/menu/main.c:657
-#: src/menu/main.c:658
-#: src/menu/pirate_radio.c:541
-msgid "oui"
-msgstr "an"
 
 #: src/menu/main.c:658
 msgid "Mode muet : %s"
@@ -3337,7 +3398,7 @@ msgid "Carte SD"
 msgstr "SD-Karte"
 
 #: src/menu/pirate_radio.c:561
-#: src/menu/rtttl.c:812
+#: src/menu/rtttl.c:853
 msgid "Lecture de la carte..."
 msgstr "Lese die Karte..."
 
@@ -4146,60 +4207,68 @@ msgstr "R: nochmal  L: Ende"
 msgid "D : reprendre  G : quitter"
 msgstr "R: weiter  L: Ende"
 
-#: src/menu/rtttl.c:199
+#: src/menu/rtttl.c:221
 msgid "Sans nom"
 msgstr "Namenlos"
 
-#: src/menu/rtttl.c:320
+#: src/menu/rtttl.c:342
 msgid "Ni SONNERIES ni RTTTL"
 msgstr "Kein SONNERIES/RTTTL"
 
-#: src/menu/rtttl.c:327
+#: src/menu/rtttl.c:349
 msgid "Dossier vide"
 msgstr "Ordner leer"
 
-#: src/menu/rtttl.c:357
+#: src/menu/rtttl.c:379
 msgid "Chemin trop long"
 msgstr "Pfad zu lang"
 
-#: src/menu/rtttl.c:547
+#: src/menu/rtttl.c:570
 msgid "Son indisponible"
 msgstr "Kein Ton"
 
-#: src/menu/rtttl.c:731
+#: src/menu/rtttl.c:762
+msgid "LEDs : %u %%"
+msgstr "LEDs: %u %%"
+
+#: src/menu/rtttl.c:764
+msgid "LEDs : éteintes"
+msgstr "LEDs: aus"
+
+#: src/menu/rtttl.c:772
 msgid "< Précédents"
 msgstr "< Vorige"
 
-#: src/menu/rtttl.c:736
+#: src/menu/rtttl.c:777
 msgid "Suivants >"
 msgstr "Nächste >"
 
-#: src/menu/rtttl.c:757
+#: src/menu/rtttl.c:798
 msgid "Sonnerie du badge"
 msgstr "Badge-Klingelton"
 
-#: src/menu/rtttl.c:764
+#: src/menu/rtttl.c:805
 msgid "Sonnerie %d / %d"
 msgstr "Klingelton %d/%d"
 
-#: src/menu/rtttl.c:781
+#: src/menu/rtttl.c:822
 msgid "G : stop  Flancs : préc./suiv."
 msgstr "L: Stopp  Seiten: zurück/vor"
 
-#: src/menu/rtttl.c:786
+#: src/menu/rtttl.c:827
 msgid "Sonnerie invalide"
 msgstr "Klingelton ungültig"
 
-#: src/menu/rtttl.c:793
+#: src/menu/rtttl.c:834
 msgid "Ligne %u, colonne %u :"
 msgstr "Zeile %u, Spalte %u:"
 
-#: src/menu/rtttl.c:796
+#: src/menu/rtttl.c:837
 msgid "Colonne %u :"
 msgstr "Spalte %u:"
 
-#: src/menu/rtttl.c:810
-#: src/menu/rtttl.c:821
+#: src/menu/rtttl.c:851
+#: src/menu/rtttl.c:862
 msgid "Sonneries"
 msgstr "Klingeltöne"
 
@@ -4997,11 +5066,11 @@ msgstr "rar"
 msgid "légendaire"
 msgstr "legendär"
 
-#: src/menu/social.c:166
+#: src/menu/social.c:194
 msgid "Rencontre : %s +%d"
 msgstr "Treffen: %s +%d"
 
-#: src/menu/social.c:213
+#: src/menu/social.c:250
 msgid "%s aime aussi : %s"
 msgstr "%s mag auch: %s"
 

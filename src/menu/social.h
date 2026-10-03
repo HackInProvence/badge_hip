@@ -10,7 +10,8 @@
  * See docs/idees_reseau_extensions_ctf.md. Every ~2s (+-0.5s, to avoid systematic collisions),
  * the badge sends a beacon at low power (-20dBm): only a close badge receives it with a strong RSSI.
  * Between the beacons, the radio listens. A meeting is at least SOCIAL_CLOSE_BEACONS beacons of the same badge
- * above SOCIAL_RSSI_CLOSE within SOCIAL_CLOSE_WINDOW_MS: +10 points for a new badge, +1 for a known one
+ * above SOCIAL_RSSI_CLOSE within SOCIAL_CLOSE_WINDOW_MS: points for a new badge, fewer for each new one
+ * (social_meeting_points(): 20, 18, 16... at most SOCIAL_MEETING_POINTS_MAX in all), none for a known one
  * (at most once per hour). The score and the met badges are persistent (see store.h).
  *
  * The beacons use their own sync word (see radio_tools.h): the Flipper chat does not see them.
@@ -41,7 +42,24 @@ typedef struct {
     bool met;  /* Already met */
     uint32_t skills;  /* Its skills (skills.h), 0 for the badges of an older firmware */
     uint8_t level;  /* Its level (achievements.h), 0 when unknown */
+    bool batt;  /* It sends its battery level (Réglages > Batterie par radio): the next fields are valid */
+    uint16_t batt_raw;  /* ADC of its battery (0..4095), valid even when it is not calibrated */
+    uint16_t batt_mv;  /* Its battery in mV, 0 when not calibrated (then only the raw value means something) */
+    bool batt_usb;  /* Plugged in USB (charging) */
 } social_neighbour_t;
+
+#define SOCIAL_MEETING_POINTS_MAX 200
+
+/** \brief Points of the n-th new cicada met (n from 1): 10 % of what remains up to SOCIAL_MEETING_POINTS_MAX
+ * (20, 18, 16, 15, 13...), at least 1 until the maximum is reached, then 0. */
+int social_meeting_points(int n);
+
+/** \brief Whether the beacons carry the battery level (saved), and change it. */
+bool social_battery_shared(void);
+void social_share_battery(bool on);
+
+/** \brief The battery of a cicada for a list row: "81 %" (calibrated) or "ADC 2533", and " USB" (battradio.c). */
+void battradio_text(const social_neighbour_t *c, char *buf, size_t len);
 
 void social_init(void);
 
