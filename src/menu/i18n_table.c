@@ -10,7 +10,7 @@ const i18n_lang_t I18N_LANGS[] = {
     {"en", "English"},
 };
 
-const int I18N_N_TEXTS = 1261;
+const int I18N_N_TEXTS = 1264;
 
 /* The French texts, by FNV-1a hash */
 const i18n_text_t I18N_TEXTS[] = {
@@ -360,6 +360,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x479B753Bu, "Duel"},
     {0x47F20810u, "Porteuse"},
     {0x47F83901u, "Batterie"},
+    {0x4808B5A7u, "rouge et or"},
     {0x489B4779u, "SecSea (intégrée)"},
     {0x48C6F36Au, "Rôles : %s."},
     {0x48F34BEEu, "Perdu !\nScore : %u\n%s"},
@@ -923,6 +924,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0xB866C4BEu, "En attente du meneur..."},
     {0xB8D6E6B4u, "%u doublon%s"},
     {0xB8DF00CEu, "En plus de ton rôle"},
+    {0xB8FCB437u, "Luminosité LEDs : %u %%"},
     {0xBA2AF89Au, "Attendre 8 s : annuler"},
     {0xBA351BE2u, "Aucune cigale entendue.\nLes badges proches\napparaissent ici (balises\ntoutes les 2 s)."},
     {0xBA3A4C01u, "Programme : %s"},
@@ -1160,6 +1162,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0xE7CB9B28u, "Bof"},
     {0xE808FC6Eu, "Fais semblant : 1er nom"},
     {0xE81E431Du, "Contacts (%u)"},
+    {0xE854BE1Eu, "scintillement"},
     {0xE86F18FCu, "Quartz : %.4f MHz"},
     {0xE8DC8603u, "(privé) "},
     {0xE9015358u, "Volume : %u/%u"},
@@ -1625,6 +1628,7 @@ static const char *const TEXTS_EN[] = {
     "Duel",
     "Carrier",
     "Battery",
+    "red and gold",
     "SecSea (built-in)",
     "Roles: %s.",
     "You lose!\nScore: %u\n%s",
@@ -2188,6 +2192,7 @@ static const char *const TEXTS_EN[] = {
     "Waiting for narrator...",
     "%u doubloon%s",
     "On top of your role",
+    "LED brightness: %u %%",
     "Wait 8 s: cancel",
     "No cicada heard.\nThe nearby badges\nshow up here (beacons\nevery 2 s).",
     "Program: %s",
@@ -2425,6 +2430,7 @@ static const char *const TEXTS_EN[] = {
     "Meh",
     "Pretend: 1st name",
     "Contacts (%u)",
+    "sparkle",
     "Crystal: %.4f MHz",
     "(DM) ",
     "Volume: %u/%u",

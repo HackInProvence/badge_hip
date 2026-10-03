@@ -36,7 +36,7 @@ LANGS = {
            'other': 'Version française', 'source': 'Source'},
 }
 # For the developers: not in the user documentation (their links go to the repository online)
-EXCLUDE = {'guide_developpeur.md', 'developer_guide.md'}
+EXCLUDE = {'guide_developpeur.md', 'developer_guide.md', 'installation_macos.md', 'macos_install.md'}
 IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp')
 LINK = re.compile(r'(!?)\[([^\]]*)\]\(([^)\s]+)(\s+"[^"]*")?\)')
 OTHER_VERSION = re.compile(r'^\*(English version|Version française)\s*:.*\*\s*$', re.M)

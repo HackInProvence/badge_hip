@@ -68,7 +68,7 @@ The main menu groups the features by theme:
 | **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war |
 | **Social** | Cicada network, Messages, Contacts, Skills, Program, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
-| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements |
+| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, LED brightness, Screen demo, OLED screen, Achievements |
 | **Settings** (Réglages) | Screensaver, Language, Remote, Mute mode, Info, Credits, Radio tuning |
 
 Some entries show their value in the menu: "Volume: 4/8", "Cicada network: 12 pts", "CTF: 0/1 flags",
@@ -431,7 +431,10 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
   left side: previous state; right side or right wing: next state. This page works even in mute mode,
   and listens to the remote control all the time while it is open.
 - **Cicada** (Cigale): turns the cicada's song on or off ("Cicada: on" / "Cicada: off").
-- **LEDs**: changes the animation (rainbow, breathing, heartbeat, blinking, green, off).
+- **LEDs**: changes the animation (rainbow, breathing, heartbeat, blinking, green, sparkle, red and gold, off).
+- **LED brightness** (Luminosité LEDs): 10, 25, 50, 75 or 100 % (each press goes to the next step). Applies to every
+  animation, the games and the LEDs sent by the organizers; remembered by the badge. The Lamp keeps its own
+  brightness.
 - **Screen demo** (Démo écran): shows what the screen can do (black and white, 4 greys, fast animation).
 - **OLED screen** (Écran OLED): demos on a small OLED screen plugged into the left port (Stars, 3D cube, Cicada,
   Scrolling text, Video (SD card)).

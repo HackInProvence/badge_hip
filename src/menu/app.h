@@ -67,5 +67,6 @@ const app_t *app_current(void);
 void app_tone(uint16_t hz, uint16_t ms);
 void app_cough(void);  /* The cough of the virus (infection.c) */
 void app_leds(uint8_t r, uint8_t g, uint8_t b);  /* All black: back to the LED animation of the badge */
+unsigned led_brightness(void);  /* Badge > Luminosité LEDs, in percent (the lamp has its own) */
 
 #endif /* _APP_H */

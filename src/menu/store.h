@@ -83,6 +83,7 @@ typedef struct {
     uint8_t ww_unlock;  /* Loup-garou (werewolf.c), set in the admin menu: WW_UNLOCK_*, other values: WW_UNLOCK_RULE */
     uint8_t asleep;  /* STORE_ASLEEP: put to sleep by an admin (remote command 0x05): main.c starts in the sleep mode */
     char lang[2];  /* Language of the texts (i18n.c): "en"...; unknown (0, 0xFF): French */
+    uint8_t leds_percent;  /* Brightness of the LEDs (leds_set_brightness(), not the lamp); 0, 0xFF: 100 % */
 } store_t;
 
 #define STORE_ASLEEP 0x5A
