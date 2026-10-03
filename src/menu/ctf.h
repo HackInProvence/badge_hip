@@ -19,7 +19,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define CTF_N_FLAGS 1
 #define CTF_CODE_LEN 10
 
 /* Inputs of the code */
@@ -46,8 +45,23 @@ void ctf_code_text(char *buf, int len);
 bool ctf_code_check(void);
 
 /** \brief The flag n, in clear (only once found), or NULL. */
-const char *ctf_flag(int n, char *buf, int len);
+/** \brief Number of CTF flags. */
+int ctf_count(void);
 
+/** \brief Name of flag \p i (shown in the "Drapeaux" app and the CTFd), "" if out of range. */
+const char *ctf_flag_name(int i);
+
+/** \brief Whether flag \p i has been found. */
+bool ctf_flag_is_found(int i);
+
+/** \brief The flag \p i (SECSEA{...}) in \p buf if found, NULL otherwise. */
+const char *ctf_flag(int i, char *buf, int len);
+
+/** \brief Number of flags found. */
 int ctf_found_count(void);
+
+/** \brief Reveals one newly earned flag from the saved state (games won, records, victories). Call it regularly.
+ * \return true and its name in \p name when a flag was just revealed (call again to get the next one). */
+bool ctf_refresh(char *name, int len);
 
 #endif /* _CTF_H */

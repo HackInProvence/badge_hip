@@ -191,7 +191,7 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                (unsigned long)sent, (unsigned long)received, n);
         for (int i = 0; i < n; ++i)
             printf("  %s %d dBm%s\n", nb[i].name, nb[i].rssi, nb[i].met ? " (met)" : "");
-        printf("ctf: %d/%d flags\n", ctf_found_count(), CTF_N_FLAGS);
+        printf("ctf: %d/%d flags\n", ctf_found_count(), ctf_count());
         uint32_t ns, nr, nd;
         net_stats(&ns, &nr, &nd);
         printf("net: sent %lu, received %lu, dropped %lu%s\n", (unsigned long)ns, (unsigned long)nr, (unsigned long)nd,
@@ -637,7 +637,7 @@ static void item_label(int item, char *buf, size_t len) {
     case M_SOCIAL: snprintf(buf, len, _("Réseau cigales : %lu pts"), (unsigned long)social_score()); break;
     case M_IR: snprintf(buf, len, N_("Infrarouge")); break;
     case M_OLED: snprintf(buf, len, N_("Écran OLED")); break;
-    case M_CTF: snprintf(buf, len, _("CTF : %d/%d flags"), ctf_found_count(), CTF_N_FLAGS); break;
+    case M_CTF: snprintf(buf, len, _("CTF : %d/%d flags"), ctf_found_count(), ctf_count()); break;
     case M_RSVP: snprintf(buf, len, N_("Lecture rapide (PVSR)")); break;
     case M_SETTINGS: {
         char delay[16];
@@ -700,9 +700,9 @@ typedef struct {
 
 static const submenu_t SUBMENUS[] = {
     {N_("Médias"), 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
-    {N_("Jeux solo"), 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+    {N_("Jeux solo"), 16, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                        M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST,
-                       M_CTF, M_APP(APP_CRYPTO)}},
+                       M_CTF, M_APP(APP_FLAGS), M_APP(APP_CRYPTO), M_APP(APP_BABBLE)}},
     {N_("Jeux multi"), 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
                            M_APP(APP_TUG)}},
     {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
@@ -1342,7 +1342,7 @@ static void ctf_label(int i, char *buf, size_t len) {
     if (i == 0)
         snprintf(buf, len, N_("Saisir un code"));
     else
-        snprintf(buf, len, _("Flags trouvés : %d/%d"), ctf_found_count(), CTF_N_FLAGS);
+        snprintf(buf, len, _("Flags trouvés : %d/%d"), ctf_found_count(), ctf_count());
 }
 
 static void render_ctf(void) {
@@ -2650,6 +2650,12 @@ int main() {
         }
         if (vote_new())
             notify(APPS[APP_VOTE], N_("Vote ouvert : Social > Vote"));
+        char ctf_name[20];
+        if (ctf_refresh(ctf_name, sizeof(ctf_name))) {  /* A game won/record beaten reveals a flag */
+            char ctf_notif[40];
+            snprintf(ctf_notif, sizeof(ctf_notif), _("Flag trouvé : %s"), ctf_name);
+            notify(APPS[APP_FLAGS], ctf_notif);
+        }
         if (app != A_APP && app != A_NAME_EDIT)
             ui_edit_typed_clear();  /* Typed on the PC keyboard, but no text editor on the screen */
         if (admin_request >= 0) {

@@ -60,6 +60,8 @@ target_sources(badge_menu PRIVATE
     display.c
     credits.c
     ctf.c
+    babble.c
+    flags_app.c
     games.c
     puzzles.c
     puzzles_app.c

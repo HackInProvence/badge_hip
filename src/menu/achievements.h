@@ -51,6 +51,8 @@ typedef enum {
     ACHV_IMAGE_SENT,  /* Photographe: an image sent by radio */
     ACHV_SKILLS,  /* Expert: skills checked */
     ACHV_SKILL_MATCH,  /* Âmes sœurs: met a cicada sharing a skill */
+    ACHV_BABBLE,  /* Cigale bavarde: decoded the Morse code challenge */
+    ACHV_RADIO_REPLAY,  /* Rejeu radio: captured and replayed the CTF 433 MHz code */
     ACHV_ALL,  /* Platine: all the others */
     ACHV_COUNT,
 } achv_id_t;

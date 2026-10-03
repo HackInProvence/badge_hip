@@ -31,6 +31,11 @@
 
 #define REMOTE_PRINCETON_ADDRESS 0xC16A00  /* Princeton key = address | command */
 
+/* CTF "capture & rejeu": a secret Princeton code (not a remote command). An organizer badge emits it
+ * (Admin > Commandes radio > Balise CTF), a player captures it with a Flipper Zero (SubGHz Read) and replays it
+ * near a badge, which then reveals the "Rejeu radio" flag (ACHV_RADIO_REPLAY -> ctf_refresh). 0x5EC5EA ~ "SECSEA". */
+#define CTF_RADIO_CODE 0x5EC5EA
+
 enum {
     REMOTE_CIGALE = 0x01,
     REMOTE_MUTE = 0x02,
@@ -57,6 +62,10 @@ bool remote_sleep_requested(void);
 
 /** \brief Sends a command to all the badges around (admin menu): loud, 5 times over 2 s. */
 void remote_send(uint8_t command);
+
+/** \brief Emits the CTF radio beacon (CTF_RADIO_CODE) several times in OOK, so a Flipper Zero can capture it
+ * (Admin > Commandes radio > Balise CTF). Only the OOK Princeton frames, nothing on the network. */
+void remote_send_ctf_beacon(void);
 
 /** \brief The remote commands are obeyed (settings). */
 bool remote_enabled(void);
