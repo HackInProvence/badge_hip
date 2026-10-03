@@ -1,0 +1,659 @@
+The Mistral Beacon
+The cicadas of Hack In Provence
+
+// A gamebook for the SecSea badge: a radio foxhunt in the hills of La Ciotat.
+// Format: see docs/en/gamebooks.md. Check: python tools/gamebook_check.py this_file.txt
+// French version, same numbering: balise_mistral.txt
+// Items: morse card, torch (Momo), bearings (triangulation), yagi (Felicien), goat cheese (Mado).
+// Dice: sections 8, 32, 51 and 66.
+
+== 1
+2:17 in the morning. La Ciotat is asleep, the harbour is asleep, and so are you... until your cicada badge starts buzzing on the bedside table.
+
+The screen lights up by itself: "433.92 MHz - unknown signal". The LEDs blink: long, short, long, short...
+
+Out of the window, other badges light up in the dark, like fireflies.
+
+-> 2 : Read the Morse on the LEDs
+-> 3 : Go back to sleep, it's night
+-> 4 : Call Ines and Momo
+
+== 2
+In your conference bag you find the goodie of the day: a laminated Morse code card. You follow the LEDs with a finger.
+
+-.-. --.- : CQ, the radio amateur's call to anyone listening. Then: CICADAS DE FOX.
+
+On the air, "DE" means "from". And the fox is the hidden transmitter. A fox calling the cicadas in the middle of the night!
+
++[morse card]
+
+-> 5 : Go out and follow the signal
+-> 4 : Wake up Ines and Momo first
+
+== 3
+You flip the pillow. The badge buzzes louder. Then it plays a ringtone: La Cucaracha, in beeps, at full volume.
+
+The neighbour bangs on the wall.
+
+- Switch off your cicada, some of us work tomorrow!
+
+-> 6 : Fine, fine, get up
+-> 7 : Hide the badge under the pillow
+
+== 4
+Ines answers on the first ring: she wasn't asleep, she was already listening to the signal. Momo answers on the fifth, mouth full.
+
+Ten minutes later, the three of you meet under the plane trees of the square. Momo hands you a head torch.
+
+- I always carry two. And biscuits.
+
+Ines has already unfolded a map:
+
+- We each stand somewhere and point at the signal. Where the lines cross, that's the beacon!
+
++[torch]
+
+-> 8 : Triangulate together
+-> 5 : Rush ahead without waiting
+
+== 5
+Outside, the air smells of pine and salt. You open the badge's 433 MHz receiver: the RSSI bar, the signal strength, reads -92 dBm. Weak. The badge says: "Cold".
+
+The beacon transmits every thirty seconds. But from where?
+
+-> 9 : Head down to the harbour
+-> 10 : Head up to the hills
+-> 11 : Turn around on the spot
+
+== 6
+You get up, grumbling, badge in hand. It keeps blinking, patiently: long, short, long, short.
+
+You switch on the lamp and dig into the conference bag. There was a plastic goodie in there somewhere...
+
+-> 2 : Find it and read the Morse
+
+== 7 FIN perdu
+Under the pillow, La Cucaracha turns into a muffled lullaby. You drift back to sleep.
+
+At breakfast, the SecSea terrace talks of nothing else: the mystery beacon, the hills at night, the goats, the old lighthouse keeper... Everybody has a story.
+
+You have a pillow crease on your cheek.
+
+Moral: when a cicada wakes you up, it's rarely for nothing.
+
+== 8
+Ines runs to the end of the jetty, Momo climbs towards the station, you stay in the square. Each of you turns your badge to the strongest signal and draws a line on the map.
+
+Will the three lines meet in one place? The badge rolls the die...
+
+-> 12 [de 1-2] : The lines go everywhere
+-> 13 [de 3-6] : The lines cross!
+
+== 9
+Down at the harbour, the signal goes crazy. Strong by the cranes, gone behind the boats, strong again facing the shipyard.
+
+Radio waves bounce off metal, like an echo in a church. Hams call it multipath: the signal comes from everywhere, and the beacon is nowhere.
+
+-> 14 : Follow the echo to the shipyard
+-> 10 : Head up to the hills instead
+
+== 10
+At the foot of the hills, at the end of the last street, an old camper van is parked under a pine. On its roof, an antenna mast rises higher than the tree.
+
+The lights are on. Beeps come from inside.
+
+On the badge, the RSSI climbs: -84 dBm. "Warm".
+
+-> 15 : Knock on the door
+-> 16 : Keep climbing into the scrub
+
+== 11
+You hold the badge against your chest and turn slowly, like a tired spinning top.
+
+The signal drops when your body is between the badge and the beacon: a human body is mostly water, and water soaks up radio waves.
+
+The dip points to the town. So the beacon is the other way: up in the hills of the Bec de l'Aigle.
+
+-> 10 : Head up to the hills
+
+== 12
+The three lines go three different ways. Momo's points straight at... the kebab shop by the station. Closed.
+
+- I was hungry. It wasn't on purpose.
+
+Ines sighs into the badge:
+
+- Again. Momo, back to the kebab.
+
+-> 13 : Try again, seriously this time
+-> 10 : Never mind, go to the hills
+
+== 13
+This time the three lines meet. Ines sends the map to your badge: the crossing falls in the hills, on the headland above the Figuerolles cove.
+
+- I'll stay in town and listen, says Ines. Momo will get croissants for sunrise. You, go!
+
++[bearings]
+
+-> 10 : Head up to the hills
+
+== 14
+The shipyard is closed off by a tall fence. A night guard steps out of his hut with a torch and a sandwich.
+
+- What are you looking for at this hour?
+
+You show him the badge: "Hot". He laughs. His car, parked right there, talks on 433 MHz too. Those are the tyre pressure sensors!
+
+-> 10 : Apologise, head for the hills
+-> 17 : Explain radio echoes to him
+
+== 15
+A man in striped pyjamas opens the door, headphones round his neck.
+
+- Felicien, F5FEL, radio amateur. Hunting the fox too?
+
+He hands you a strange antenna: three bits of tape measure on a broom handle.
+
+- A yagi. It only listens straight ahead. Point, turn: the loudest way is the way. And right next to the fox, everything saturates: take it off.
+
++[yagi]
+
+-> 18 : Accept a coffee
+-> 16 : Thank him and go
+
+== 16
+The path climbs into the scrub. It smells of thyme and rosemary. Further on, little bells tinkle in the dark.
+
+The badge wavers between "Warm" and "Hot". Three paths: the semaphore station up top, the Figuerolles cove below, the bells to the left.
+
+-> 19 [yagi] : Sweep with the yagi
+-> 23 [bearings] : Follow Ines's bearings
+-> 20 : Climb to the semaphore
+-> 21 : Go down to the cove
+-> 22 : Follow the bells
+
+== 17 FIN
+You tell the guard all about echoes off ship hulls, tyre sensors, and the 433 MHz band where everybody talks at once: gates, weather stations, doorbells...
+
+He loves it. By dawn he has filled a notebook and ordered his first antenna.
+
+A year later you meet him at SecSea, with a badge, a callsign and a cap that says "73": best regards, in radio talk.
+
+The beacon? Somebody else found it.
+
+== 18
+Felicien's coffee is as black as the night and as strong as the mistral.
+
+- That beacon... Last month a kid came round with a hundred questions. Lou, granddaughter of Baptistin, the old lighthouse keeper. She wanted to know what antenna to build for 433 MHz.
+
+- What did you tell her?
+
+- Seventeen centimetres. A quarter wavelength.
+
+-> 16 : Head up to the hills
+
+== 19
+You raise the yagi and turn slowly. Left: nothing. Behind: nothing. Straight ahead: a peak! -71 dBm.
+
+The signal comes neither from the semaphore nor from the cove, but from the slope in between, where the bells are. And a bit further still, towards the headland.
+
+-> 22 : Go towards the bells
+-> 20 : Climb to the semaphore anyway
+
+== 20
+The semaphore station keeps watch at the very top, its black antennas against the stars. The badge says "Hot", then "Warm", then "Hot": the beacon isn't here, but it isn't far.
+
+You sit on a rock to catch your breath. That's when the pines start to whistle.
+
+-> 24 : What's happening?
+
+== 21
+The path goes all the way down to the pebbles of Figuerolles. Black water laps between the rocks. The badge says "Cold": the cliffs block the signal, you're in a radio shadow.
+
+A cove at night is beautiful, though. The stars shine in the water.
+
+-> 16 : Climb back, the signal is up there
+-> 25 : Wait for the signal to come
+
+== 22
+The bells belong to Rove goats: corkscrew horns, ginger coats and endless curiosity. They sleep around a stone sheepfold.
+
+One goat gets up and searches your pocket with her nose. On her collar, a light blinks.
+
+-> 26 : Let her, she's cute
+-> 27 : Wake up the goatherd
+-> 24 : Tiptoe past
+
+== 23
+You follow the lines on the map. The bearings cross on the headland above the cove, where a small white cabin shines under the moon.
+
+The badge goes "Hot". You speed up. But just as you reach the ridge, the pines start to whistle.
+
+-> 24 : What's happening?
+
+== 24
+The mistral! It comes all at once, as it always does: cold, dry, bending the pines and sweeping the sky clean. The stars turn as sharp as pixels.
+
+And the mistral changes everything: the beacon goes wild. It now transmits every five seconds, louder, and the message is different.
+
+-> 28 : Decode the new message
+-> 29 : Shelter from the wind first
+
+== 25 FIN perdu
+You sit on the pebbles. The signal will get through eventually.
+
+Hours go by. The mistral rises, then the sun. The signal never comes: 433 MHz waves don't go through cliffs, and they don't take the stairs either.
+
+At dawn, a fisherman finds you chatting with your badge.
+
+Moral: you hunt a fox, you don't wait for it.
+
+== 26
+The goat sniffs, rummages and chews everything sticking out of your pocket: tickets, paper, plastic. Yum.
+
+Then she wanders off into the night. Her collar blinks every five seconds... like a beacon?
+
+-[morse card]
+
+-> 69 : Follow the blinking goat
+-> 27 : Wake up the goatherd
+-> 24 : Carry on along the path
+
+== 27
+The goatherd comes out of her hut in a woolly hat.
+
+- Mado. You'll wake all my goats with your lights!
+
+But when you mention the beacon, she smiles.
+
+- Oh, that's little Lou. She tinkers with wires at her grandad's cabin, out on the headland. Here, take them this.
+
+She gives you a brousse du Rove, the soft fresh cheese of her goats, wrapped in a cloth.
+
++[goat cheese]
+
+-> 24 : Set off for the headland
+
+== 28
+The message comes every five seconds. It's long, it's fast, and the mistral is howling in your ears.
+
+-> 31 [morse card] : Read it with the card
+-> 32 [!morse card] : Read it from memory
+
+== 29
+You dive behind a dry-stone wall. Someone is already there: a kid, a tiny baby goat, shivering and staring at you with round eyes.
+
+- Meeeh, it says, which can mean a lot of things.
+
+-> 30 : Take it back to the sheepfold
+-> 28 : Keep it warm and decode
+
+== 30
+Kid in your arms, you walk down to the sheepfold. Mado the goatherd is already outside with her lamp.
+
+- Biscotte! I've been looking everywhere!
+
+To thank you, she gives you a brousse du Rove, the soft cheese of her goats, and points at the headland:
+
+- That light is Baptistin's cabin. His little Lou builds antennas.
+
++[goat cheese]
+
+-> 28 : Decode the message at last
+
+== 31
+Dot by dot, dash by dash, the letters come in:
+
+THE FOX SLEEPS WHERE THE WIND SINGS
+
+The fox is the beacon: in radio, the hidden transmitter you have to find is called a fox. But where does the wind sing?
+
+-> 33 : Think about the riddle
+
+== 32
+A is dot-dash. N is dash-dot. Or the other way round? The mistral blows away half the beeps. You count on your fingers.
+
+The badge rolls the die...
+
+-> 34 [de 1-3] : It's all fog...
+-> 31 [de 4-6] : The letters come in!
+
+== 33
+Where does the wind sing? Tonight it sings everywhere: in the pines, in the rocks, in your ears.
+
+But two places sing louder than the rest: the antennas of the semaphore, whistling, and the headland, where something tinkles like a wind chime.
+
+-> 38 : The semaphore
+-> 39 : The headland and its chime
+-> 40 [yagi] : Ask the yagi
+-> 42 [bearings] : Check the bearings
+
+== 34
+You write down what you caught:
+
+TH. FO. SL..PS ... WIN. SI...
+
+Then, on the next pass, clearer:
+
+... SLEEP ... THE WIND SINGS
+
+-> 35 : Call Ines for help
+-> 36 : Listen to the next pass
+-> 37 : "SLEEP"? Obey the badge
+
+== 35
+Ines answers at once, from the harbour:
+
+- Got it! THE FOX SLEEPS WHERE THE WIND SINGS. The fox is the beacon. And down here the wind doesn't sing, it just bangs the shutters. It must be up where you are!
+
+-> 33 : Think about the riddle
+
+== 36
+You turn your back to the wind, close your eyes and listen with all your ears. One pass. Two. Three. The letters finally land, one by one:
+
+THE FOX SLEEPS WHERE THE WIND SINGS
+
+The fox is the beacon, of course.
+
+-> 33 : Think about the riddle
+
+== 37 FIN perdu
+"SLEEP", says the badge. You couldn't agree more.
+
+You curl up at the foot of a pine, out of the mistral, and sleep like a log.
+
+In the morning, Mado's goats wake you up by eating your shoelaces. The badge shows one last message: THANKS EVERYONE.
+
+Everyone... except you.
+
+Moral: learn your Morse before the mistral, not during it.
+
+== 38
+You climb towards the semaphore. The wind howls in its antennas, true. But the badge says "Warm", then "Cold".
+
+Behind the fence, a sign: "French Navy - No entry".
+
+This wind doesn't sing. It shouts.
+
+-> 39 : Go back down to the headland
+-> 41 : Climb the fence, just to see
+
+== 39
+On the headland stands a white cabin with blue shutters. Under the porch, a chime of seashells and old spoons tinkles in the mistral: there's the singing wind!
+
+On the roof, a small wind turbine spins like mad. One window is lit.
+
+The badge says: "Burning".
+
+-> 43 : Knock on the door
+-> 44 : Search around for the beacon
+-> 45 : Shout "Anybody there?"
+
+== 40
+You point the yagi into the wind. It shakes like a sail, but it talks: a huge peak towards the headland, -48 dBm.
+
+And the peak moves a little with the gusts... as if the beacon were swinging in the wind.
+
+-> 39 : Rush to the headland
+
+== 41 FIN perdu
+You climb the fence. Halfway up, a gust of mistral pins you flat against it like a magnet on a fridge. You can't go up, you can't go down.
+
+A Navy sailor on watch unhooks you at sunrise, with a ladder and a lot of patience.
+
+- The beacon? Little Lou's beacon? Somebody found it last night.
+
+Moral: Navy fences are not ladders.
+
+== 42
+You open Ines's map again on the badge. The three lines cross... right on the headland above the cove.
+
+And on the headland there is a cabin. And in front of the cabin, something is tinkling in the wind.
+
+-> 39 : Go to the headland
+
+== 43
+You knock. Footsteps, a cough, the door opens. An old man in a sailor's jumper, a lighthouse keeper's cap on his head.
+
+- Three in the morning? Have you been shipwrecked?
+
+Behind him, on a shelf, an old lighthouse lantern and photos of the Ile Verte.
+
+-> 46 : Tell him about the beacon
+-> 47 [goat cheese] : Offer him Mado's cheese
+-> 48 : Apologise and leave
+
+== 44
+You walk round the cabin. The badge says "Burning" everywhere: in front, behind, on the side. The RSSI bar is stuck at the top.
+
+Felicien called it saturation: too close to the fox, the receiver is dazzled, like your eyes staring into a lighthouse.
+
+-> 49 [yagi] : Take off the yagi, as Felicien said
+-> 50 : Shield the badge with your body
+-> 51 : Walk around searching
+-> 43 : Knock on the door
+
+== 45
+"Anybody there?" The mistral carries your voice all the way to Corsica.
+
+Behind the lit window, a small face appears. It puts a finger to its lips, shh, then points at the garden, under the chime.
+
+-> 44 : Search the garden
+
+== 46
+The old man scratches his head.
+
+- A beacon? I'm Baptistin. I kept the Ile Verte lighthouse for forty years, I know my beacons. But that one, no.
+
+He yawns.
+
+- Ask the little one, she's the tinkerer. I'm going back to bed. Wake me up for coffee.
+
+A girl in pyjamas appears on the stairs, eyes shining.
+
+-> 55 : Follow her outside
+
+== 47
+Baptistin sees the cheese and his face lights up like a lantern.
+
+- Mado's brousse! Come in, you'll catch cold.
+
+He pours you hot milk, tells you about his storms and his forty years in the lighthouse, then yawns and goes back to bed.
+
+As soon as his door closes, a girl in pyjamas tiptoes down the stairs.
+
+-> 55 : Listen to her
+
+== 48 FIN
+You apologise and walk back into the wind. The door closes.
+
+You'll never know who built the beacon, or why.
+
+Well, not until breakfast, when someone tells how, at dawn on the headland, there were goats, croissants, and an old lighthouse keeper crying with joy.
+
+Moral: when you find the fox's den, you knock.
+
+== 49
+You take off the yagi. Without it the badge hears less... and that's exactly what you need. The RSSI drops, the bar moves again.
+
+Towards the sea: weaker. Towards the cabin: stronger. Towards the chime: very, very strong.
+
+-> 52 : Look under the chime
+
+== 50
+You hold the badge against your stomach and turn slowly. Your body is a shield: when the signal drops, the beacon is behind you.
+
+One turn, two turns. The dip faces the sea. So the beacon is right there, by the chime.
+
+-> 52 : Look under the chime
+
+== 51
+You circle the cabin, badge held out like a water diviner's rod. Burning, burning, burning...
+
+It's dark, it's windy, and the garden is full of things sticking out. The badge rolls the die...
+
+-> 53 [de 1-2] : Your foot hits something
+-> 52 [de 3-6] : Your torch catches a glint
+
+== 52
+Under the chime, in a jam jar, a small box is blinking: the beacon! A seventeen-centimetre antenna, a solar panel, and a wire to the turbine on the roof. That's why the mistral woke it up.
+
+A label: "IF YOU FOUND ME, PRESS. LOU, AGE 11".
+
+-> 54 : Press the button
+-> 56 : Take the beacon as a souvenir
+-> 43 : Knock on the cabin door
+
+== 53
+Your foot hits a watering can, which hits a bucket, which hits a stack of flowerpots. A racket worthy of a brass band.
+
+The chime goes wild, Mado's goats bleat in the distance, a light comes on. A door creaks.
+
+-> 43 : Face the music, smiling
+
+== 54
+You press. The beacon plays a little tune, and a light comes on upstairs.
+
+A girl in pyjamas and wellies runs out, a head torch askew on her forehead.
+
+- You found it! You're the first! The very first somebody!
+
+-> 55 : Say hello
+
+== 55
+- I'm Lou. I built the beacon, with Felicien's help.
+
+She whispers, so as not to wake the house.
+
+- At sunrise, Grandad turns eighty. He kept the lighthouse all his life, and he always says a lighthouse is only useful if somebody comes. So I called all the cicadas of La Ciotat.
+
+-> 57 : Alert all the cicadas
+-> 58 [morse card] : Change the beacon's message
+-> 59 : Sing "happy birthday" right now
+-> 60 : Go to bed, mission accomplished
+
+== 56
+You tuck the jar under your arm. At once the cabin door opens: a girl in pyjamas and wellies.
+
+- My beacon! But it's for Grandad! It has to stay there until sunrise!
+
+Her eyes are full of tears.
+
+-> 61 : Give it back and apologise
+-> 62 : "Finders keepers!"
+
+== 57
+You send a message to Ines and Momo from the badge:
+
+- Cabin on the headland, sunrise. Surprise birthday. Shh!
+
+Ines forwards it to every badge in the harbour. Momo, to every open bakery. Soon, on the hill paths, little lights start climbing.
+
+-> 63 : Wait for the day
+
+== 58
+Lou opens the beacon. You take out the Morse card and, together, letter by letter, you program a new message:
+
+CICADAS - HEADLAND CABIN - DAWN - SHH
+
+The mistral spins the turbine flat out: the beacon now reaches for miles. All over town, badges wake up again.
+
+-> 63 : Wait for the day
+
+== 59 FIN perdu
+You sing "happy birthday" at the top of your voice, at four in the morning.
+
+The goats bleat, the chime jingles, the dogs bark, and Baptistin opens the window in his nightcap.
+
+- My birthday? Already? Well. Thank you. Good night.
+
+The window shuts. Lou looks at you: the surprise has gone flat.
+
+Moral: a lighthouse lights up at its hour, and so does a surprise.
+
+== 60 FIN
+You leave Lou to her plan and walk back into the mistral, light of heart. Fox found, riddle solved: bedtime!
+
+Next day on the SecSea terrace, everyone talks about the sunrise party on the headland: goats, croissants, an old lighthouse keeper crying with joy.
+
+You found the fox first... and missed the party.
+
+== 61
+You put the jar back under the chime, nice and straight.
+
+- Sorry. I didn't know. Who is this beacon for?
+
+The girl sniffs, then smiles and holds out her hand.
+
+- Come on, I'll explain. But quietly.
+
+-> 55 : Listen to the girl
+
+== 62 FIN perdu
+You walk off with the jar under your arm. On the way, every badge in town goes quiet: no fox, no hunt.
+
+At sunrise, nobody comes to the cabin. And an empty jam jar on a shelf has never made a great trophy.
+
+Moral: once you've found a fox, let it sing for the next hunters.
+
+== 63
+Lou heats some hot chocolate on a camping stove. The mistral is dying down. To the east, above the Bec de l'Aigle, the sky turns pale blue.
+
+There is still a little time before dawn.
+
+-> 64 [goat cheese] : Lay out a breakfast
+-> 65 [torch] : Guide the cicadas by torch
+-> 66 : Wait and watch the sky
+
+== 64
+You set Mado's cheese on the garden table, with Lou's honey and a loaf of bread. A proper party breakfast.
+
+The smell of hot chocolate drifts off on the wind. On the path you can already hear footsteps, muffled laughter... and little bells.
+
+-> 67 : It's time!
+
+== 65
+You climb onto a rock with Momo's head torch and flash it towards the town, in Morse: dash-dot-dash-dot, dash-dash-dot-dash. CQ, CQ: calling everyone!
+
+On the paths, little lights answer and climb towards you in single file. Like a lighthouse, but the other way round.
+
+-> 67 : It's time!
+
+== 66
+You sit on the headland, Lou beside you. The sea changes colour. The last stars go out one by one.
+
+Will anyone come? The badge rolls the die...
+
+-> 68 [de 1-2] : The path stays empty
+-> 67 [de 3-6] : Footsteps on the path!
+
+== 67 FIN gagne
+They all come: Ines and her antennas, Momo and his croissants, Felicien in pyjamas, Mado and her goats, and dozens of cicadas, badges glowing.
+
+The sun rises out of the sea. Lou opens the door. Baptistin appears in his sailor's jumper and is lost for words.
+
+Every badge plays "happy birthday" at once, a bit out of tune, very loud.
+
+- A lighthouse is only useful if somebody comes, Baptistin whispers. You came.
+
+On the beacon, a new message: THANKS 73. Well done!
+
+== 68 FIN gagne
+Nobody comes. The badges in town have gone back to sleep, and the mistral has blown the messages away.
+
+So when the sun rises out of the sea, it's you and Lou who open the door and sing, a bit out of tune, very loud.
+
+Baptistin laughs, wipes his eyes and takes out three cups.
+
+- A lighthouse is only useful if somebody comes. And one person is enough.
+
+You found the fox, and a friend. Well done!
+
+== 69 FIN perdu
+You follow the goat and her blinking collar. She climbs, goes down, jumps a stream, eats a bush, then another one...
+
+At dawn you're back exactly at the sheepfold. The goatherd hands you a coffee.
+
+- Pistache? She does that round every night. Her collar is a GPS talking on 868 MHz. Not your beacon.
+
+Moral: not everything that blinks is a fox.

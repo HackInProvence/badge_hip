@@ -458,6 +458,41 @@ Précautions :
 - envoyer un fichier depuis le PC par la ligne de commande du Flipper et enregistrer les paquets d'un badge :
   [guide développeur § 6.19](guide_developpeur.md#619-flipper-zero).
 
+#### `tools/flipper_weather.py` — la météo sur tous les badges, par un Flipper
+
+Récupère les prévisions d'une ville sur [Open-Meteo](https://open-meteo.com) (gratuit, sans clé), en fait une
+**annonce** des badges (l'heure, un texte court, un QR code avec les jours suivants), puis l'envoie avec un Flipper Zero
+branché en USB : les fichiers `.sub` sont copiés sur sa carte SD par sa console série, puis émis (`subghz
+tx_from_file`). Tous les badges à portée l'affichent comme une annonce (Social > Annonces la garde).
+Prérequis : `pyserial`, Internet ; le Flipper sur son écran principal (pas d'application Sub-GHz ouverte), pas
+utilisé par qFlipper.
+
+| Argument / option | Rôle |
+|---|---|
+| `VILLE` | la ville (`"La Ciotat"`, `"Marseille"`...) |
+| `--lang fr\|en` | langue du texte de l'annonce (défaut `fr`) |
+| `--days N` | jours dans le QR code, à partir de demain (défaut 4) |
+| `--rounds N` | nombre d'envois de chaque partie (défaut 4) |
+| `--port COMx` | port du Flipper (trouvé tout seul) |
+| `-o FICHIER.sub` | nom des fichiers écrits (défaut `build/secsea_meteo_N.sub`) |
+| `--no-send` | écrit seulement les fichiers (à envoyer à la main : Sub-GHz > Saved) |
+| `--dry-run` | affiche seulement les prévisions et le texte |
+| `--id N` | identifiant de l'émetteur (défaut `0x5EC5EA27`) |
+
+```bash
+python tools/flipper_weather.py "La Ciotat"
+python tools/flipper_weather.py Marseille --lang en --port COM10
+python tools/flipper_weather.py "La Ciotat" --dry-run
+```
+
+Exemple d'annonce : « Météo La Ciotat : 23C, couvert, vent 13 km/h. Demain 21-26C, bruine, pluie 8 %. », QR code
+« dim 21-26C bruine / lun 21-26C bruine / mar 21-27C bruine ». Le symbole ° n'existe pas dans les polices du badge.
+
+Précautions :
+- l'annonce fait 3 paquets ; le Flipper émet mal les longs fichiers RAW (les longs paquets se perdent), d'où un petit
+  fichier par partie, chacun envoyé plusieurs fois : compter une vingtaine de secondes ;
+- elle s'affiche sur **tous** les badges à portée (comme une annonce des organisateurs) : à utiliser avec mesure.
+
 ### 2.6 Aides au développement
 
 | Script | Rôle | Options |

@@ -1,0 +1,698 @@
+Le Robot du marché provençal
+Les cigales de Hack In Provence
+
+// Un livre dont vous êtes le héros pour le badge SecSea : un robot de marché détraqué, un samedi matin d'été.
+// Format : voir docs/fr/livres_jeux.md. Vérification : python tools/gamebook_check.py ce_fichier.txt
+// Version anglaise : market_robot.txt (mêmes numéros de sections).
+// Objets : tournevis (volé par Pacha le chat), sardine (pour Pacha), fougasse (le boulanger), lunettes (du maire),
+// clé USB (le firmware d'origine, gagnée à la pétanque), mot de passe et indice (Zoé), Zoé (quand elle vous aide).
+
+== 1
+Samedi, neuf heures. Sur la place de Sainte-Cigalade, le marché sent le melon, la lavande et le poulet rôti. Les cigales chantent déjà dans les platanes.
+
+Vous flânez, votre badge cigale au cou et votre fidèle tournevis en poche, quand un cri traverse la place :
+
+- Bonne mère ! Le robot est devenu fada !
+
+Olive, le nouveau robot du marché, vend de la lavande à la poissonnière en chantant "cri-cri-cri". Et à midi, le maire fait son discours juste devant lui.
+
++[tournevis]
+
+-> 2 : Aller voir le robot de près
+-> 3 : Interroger la poissonnière
+-> 4 : Filer au café demander conseil
+
+== 2
+Olive ressemble à une grosse olive verte sur roulettes, avec deux bras, un écran en guise de visage et un haut-parleur sur le ventre.
+
+Il pèse un melon, l'écoute, puis le lance sur l'étal des fromages en criant : "Cochonnet !" Puis il chante comme une cigale.
+
+Dans son dos : une trappe fermée par quatre vis, un gros bouton rouge, et un bouquet de lavande scotché un peu bizarrement.
+
+-> 5 : Regarder sous la lavande
+-> 6 [tournevis] : Dévisser la trappe
+-> 7 : Appuyer sur le gros bouton rouge
+-> 57 : Écouter sa chanson de cigale
+-> 48 : Acheter un melon et oublier tout ça
+-> 14 : Faire le tour du marché
+
+== 3
+Fanny la poissonnière agite un bouquet de lavande au-dessus de ses dorades.
+
+- Ce robot m'a vendu de la lavande ! Pour mes poissons ! Et ce matin, à l'aube, un drone tournait au-dessus de lui comme une mouche.
+
+Elle vous glisse une sardine dans un papier.
+
+- Tenez. Si vous croisez Pacha, le chat de la mairie, ça le calmera. Ce voleur m'en chipe une tous les matins.
+
++[sardine]
+
+-> 8 : Chercher le drone vers la fontaine
+-> 9 [!fougasse] : Passer à la boulangerie
+-> 2 : Retourner voir le robot
+-> 14 : Faire le tour du marché
+
+== 4
+Au Café des Platanes, Monsieur Fernand, ingénieur à la retraite, contemple son pastis comme un circuit imprimé.
+
+- Olive ? C'est moi qui l'ai construit ! Quelqu'un a dû changer son firmware. J'ai le programme d'origine sur une clé USB...
+
+Il tapote sa poche, puis montre le boulodrome.
+
+- Mais là, j'ai la finale du tournoi de pétanque, et mon coéquipier a mal au dos. Jouez avec moi, et la clé est à vous si on gagne !
+
+-> 58 : Accepter la partie
+-> 11 : "C'est quoi, un firmware ?"
+-> 47 : S'asseoir et l'écouter raconter
+-> 14 : Retourner au marché
+
+== 5
+Vous écartez la lavande. Dessous, un petit carré noir et blanc plein de pixels : un QR code !
+
+Un QR code, c'est du texte rangé dans des petits carrés, qu'un téléphone lit en un clin d'oeil. Quelqu'un l'a caché ici exprès.
+
+Problème : votre badge a un écran, une radio, des LEDs... mais pas d'appareil photo. Et votre téléphone n'a plus de batterie, évidemment.
+
+-> 60 : Emprunter le téléphone d'un touriste
+-> 61 : Le décoder à la main, case par case
+
+== 6
+Quatre vis plus tard, la trappe s'ouvre. Dedans : une carte électronique, un port USB marqué "MISE À JOUR" et trois petites broches étiquetées "SÉRIE : TX RX GND".
+
+Sur une étiquette : "Olive v2.3 - F. Escudier". Le robot glousse :
+
+- Ça chatouille ! Cri-cri !
+
+-> 15 : Brancher le badge sur le port série
+-> 17 [clé USB] : Brancher la clé de Fernand
+-> 37 [mot de passe] : Ouvrir la page de réglages
+-> 16 : Tirer sur le joli fil rouge
+-> 14 : Refermer et réfléchir
+
+== 7 FIN perdu
+Vous appuyez. Olive se fige, son écran affiche "MODE FARANDOLE", et son haut-parleur lance un air de tambourin endiablé.
+
+Il vous prend par la main. La poissonnière prend votre autre main, le boulanger suit, puis tout le marché. La farandole traverse le village, les champs, le village voisin...
+
+Vous rentrez à la nuit tombée, les pieds en compote. Le discours du maire ? Personne ne l'a entendu.
+
+Morale : on n'appuie jamais sur un gros bouton rouge sans lire l'étiquette.
+
+== 8
+Devant la fontaine, face à la mairie, un bourdonnement passe au-dessus des parasols : un petit drone blanc ! Chaque fois qu'Olive chante, il s'approche, comme pour écouter.
+
+Puis il repart vers l'église.
+
+-> 28 : Lui courir après
+-> 29 : Le suivre discrètement
+-> 30 : Monter au clocher pour voir de haut
+-> 66 : Le brouiller avec la radio du badge
+-> 55 : Entrer à la mairie
+
+== 9
+À la boulangerie, Monsieur Aimé est blanc de farine jusqu'aux sourcils.
+
+- Ce robot a vendu mes baguettes à un centime ! Et il a chanté pour mon levain ! Mon levain, il ne supporte pas la musique !
+
+Il pétrit sa pâte un peu trop fort.
+
+-> 63 : "C'est vous qui l'avez trafiqué !"
+-> 64 : Lui demander ce qu'il a vu ce matin
+
+== 10
+Le boulodrome est en terre battue, à l'ombre des platanes. En face : les frères Pignol, champions du canton, moustaches assorties.
+
+Fernand pointe, vous tirez. Pointer, c'est poser sa boule tout près du cochonnet ; tirer, c'est chasser les boules adverses.
+
+Dix à dix, la partie se joue en treize points. Fernand vous tend une boule :
+
+- À vous. Visez bien...
+
+Le badge lance le dé.
+
+-> 18 [dé 1-2] : La boule part de travers...
+-> 19 [dé 3-5] : Ça se joue à un cheveu...
+-> 20 [dé 6] : Carreau !
+
+== 11
+Fernand pose son verre et prend un air de professeur.
+
+- Le firmware, c'est le programme qui vit dans la mémoire du robot. Comme une recette : "si on te donne un melon, pèse-le et annonce le prix".
+
+- Une mise à jour remplace la recette. Olive peut en recevoir par Wi-Fi, sans fil. Si on lui envoie une recette mélangée, il cuisine de travers !
+
+-> 58 : Jouer la finale avec lui
+-> 14 : Retourner au marché
+
+== 12
+Identifiant : admin. Mot de passe : admin. La page répond :
+
+"Raté ! Ce n'est plus le mot de passe d'usine. Indice : le chat de papi + le numéro du département."
+
+Les mots de passe d'usine, tout le monde les connaît : les changer est la première chose à faire. Au moins, quelqu'un l'a fait.
+
+-> 49 : Taper "pacha13"
+-> 13 : Taper "minou13"
+-> 14 : Chercher un indice ailleurs
+
+== 13
+Raté. Vous essayez encore : 1234, 0000, motdepasse, olive...
+
+L'écran devient rouge : "Trop d'essais. Réessayez dans 15 minutes." Et Olive se met à crier : "Au voleur ! Cri-cri !"
+
+Se bloquer après quelques erreurs protège contre ceux qui essaient tous les mots de passe un par un. Agaçant, mais malin.
+
+-> 14 : Chercher un indice ailleurs
+
+== 14
+La place du marché bourdonne. L'horloge de la mairie avance tranquillement vers midi. Olive chante sous son parasol, et les clients repartent avec des achats très étranges.
+
+Par où continuer ?
+
+-> 2 : Le robot Olive
+-> 3 [!sardine] : L'étal de la poissonnière
+-> 9 [!fougasse] : La boulangerie
+-> 4 [!clé USB] : Le café et le boulodrome
+-> 8 : La fontaine et la mairie
+-> 27 [indice] : Aller trouver Zoé
+-> 21 [!tournevis] : Récupérer votre tournevis
+-> 46 : Laisser tomber et attendre midi
+
+== 15
+Vous reliez le badge aux broches : le TX du robot sur le RX du badge, et l'inverse. L'un parle, l'autre écoute, comme au téléphone.
+
+Le journal du robot défile :
+
+07:12 mise à jour reçue de DRONE-ZOÉ
+
+07:13 fichier : chanson_papi
+
+07:13 ERREUR : table des prix et table des chansons inversées
+
+Zoé ? C'est le prénom de la petite-fille du maire !
+
++[indice]
+
+-> 27 : Aller trouver Zoé
+-> 6 : Revenir à la trappe
+
+== 16 FIN perdu
+Vous tirez sur le fil rouge. Olive émet un "bip" grave, son écran affiche "MODE MARCHE ARRIÈRE"...
+
+Et il part. À reculons. Tout droit. Il traverse le marché, la route, les vignes, en chantant à l'envers : "irc-irc".
+
+Le soir, on le voit aux informations, arrivant à reculons sur le Vieux-Port de Marseille.
+
+Morale : un fil ne se tire pas au hasard. On lit le schéma d'abord !
+
+== 17
+Vous branchez la clé de Fernand. Le badge affiche son contenu : "olive_v2.3.bin". Le firmware d'origine !
+
+Flasher, c'est réécrire la mémoire du robot avec ce programme. Fernand vous a prévenu : "Avant de flasher, on fait toujours une sauvegarde."
+
+-> 50 : Sauvegarder d'abord
+-> 51 : Flasher tout de suite, midi approche
+
+== 18
+La boule roule, roule... et s'arrête à un mètre du cochonnet, à côté d'un melon égaré. Les frères Pignol lèvent les bras : treize !
+
+Fernand soupire, puis vous tapote l'épaule.
+
+- Pas grave. Mais un pari est un pari : la clé, je la garde. Un conseil, quand même : regardez le dos d'Olive. Il y a de la lavande qui n'a rien à faire là.
+
+-> 4 : Demander une revanche
+-> 2 : Aller voir le dos du robot
+-> 14 : Retourner au marché
+
+== 19
+Votre boule frappe une boule adverse, qui roule, qui hésite... Douze à douze !
+
+Il reste une boule. La dernière. Tout le village retient son souffle. Même Olive s'est tu.
+
+Le badge relance le dé.
+
+-> 18 [dé 1-3] : Elle file trop loin...
+-> 20 [dé 4-6] : Elle se pose contre le cochonnet...
+
+== 20
+Treize ! Le public applaudit, Fernand vous serre dans ses bras et les frères Pignol vous serrent la main, beaux joueurs.
+
+- Promis, c'est promis, dit Fernand en vous tendant une clé USB en forme de cigale. Le firmware d'origine d'Olive. Et faites une sauvegarde avant de flasher, hein !
+
+Il vous offre à boire : vous prenez un sirop de menthe.
+
++[clé USB]
+
+-> 2 : Courir au robot
+-> 14 : Retourner au marché
+
+== 21
+Sur l'auvent de la boulangerie, un gros chat roux se lèche la patte. Entre ses dents brille... votre tournevis !
+
+C'est Pacha, le chat de la mairie. Il aime tout ce qui brille, et il ne rend jamais rien.
+
+-> 22 [sardine] : Lui proposer la sardine
+-> 23 : Grimper le chercher
+-> 14 : Tant pis, il le rendra peut-être
+
+== 22
+Vous agitez la sardine. Pacha hésite, lâche le tournevis, attrape la sardine et file sur le toit.
+
+En ramassant votre tournevis, vous découvrez sa cachette dans la gouttière : des capsules, un stylo doré, un autocollant... et une paire de lunettes avec "M. le Maire" gravé sur la branche.
+
+-[sardine]
++[tournevis] +[lunettes]
+
+-> 2 : Retourner au robot
+-> 14 : Retourner au marché
+
+== 23
+Vous montez sur une caisse de tomates, puis sur le rebord d'une fenêtre, puis sur la gouttière. Pacha vous regarde faire, très intéressé.
+
+Le badge lance le dé.
+
+-> 24 [dé 1-2] : La gouttière craque...
+-> 25 [dé 3-4] : Votre pied glisse...
+-> 26 [dé 5-6] : Vous tendez la main...
+
+== 24 FIN perdu
+La gouttière tient, mais vous voilà sur le toit sans aucun moyen de redescendre, avec Pacha qui ronronne à côté de vous. Lui non plus ne sait pas descendre.
+
+Les pompiers arrivent avec la grande échelle à midi pile, sirène hurlante, en plein discours du maire. Tout le village vous filme.
+
+Morale : avec un chat, la sardine marche mieux que l'escalade.
+
+== 25
+Votre pied glisse. Vous tombez sur le store de la boulangerie, qui vous renvoie comme un trampoline jusque dans un cageot de pêches.
+
+Pacha bâille. Il n'a pas bougé d'un poil, et votre tournevis non plus.
+
+-> 21 : Réfléchir à une autre méthode
+-> 14 : Retourner au marché
+
+== 26
+Vous tendez la main, lentement... Pacha, surpris, ouvre la gueule. Le tournevis tombe pile dans votre paume !
+
+Le chat vous lance un regard vexé et disparaît sur les toits.
+
++[tournevis]
+
+-> 2 : Retourner au robot
+-> 14 : Retourner au marché
+
+== 27
+Derrière l'église, sur un banc, une fillette pianote sur un ordinateur couvert d'autocollants. À côté d'elle, une télécommande de drone.
+
+C'est Zoé, douze ans, la petite-fille du maire. En vous voyant, elle devient toute rouge.
+
+- C'est moi... Je voulais que le robot chante une chanson de cigale pour le discours de papi, il adore les cigales. J'ai envoyé la mise à jour avec mon drone, mais tout s'est mélangé ! Le mot de passe, c'est "pacha13"...
+
++[indice] +[mot de passe]
+
+-> 34 : "Comment tu as fait ?"
+-> 33 [fougasse] : Partager la fougasse avec elle
+-> 35 : La gronder
+-> 36 : Lui proposer de réparer ensemble
+
+== 28
+Vous courez après le drone, entre les parasols, par-dessus les cageots. Il vole bas, il tourne, il hésite...
+
+Le badge lance le dé.
+
+-> 31 [dé 1-3] : Attention, la fontaine !
+-> 32 [dé 4-6] : Il descend...
+
+== 29
+Vous suivez le drone de loin, l'air de rien, en faisant semblant de comparer le prix des tomates.
+
+Il passe au-dessus de l'église, fait un petit tour... et descend doucement derrière, vers un banc à l'ombre.
+
+-> 27 : Jeter un oeil derrière l'église
+
+== 30
+Quatre-vingt-sept marches plus tard, tout le village est à vos pieds : la place, les parasols, Olive qui jongle avec des citrons.
+
+Derrière l'église, le drone se pose près d'une fillette assise avec un ordinateur. Et sur les toits, un gros chat roux trotte avec quelque chose de brillant dans la gueule.
+
+-> 27 : Descendre voir la fillette
+-> 21 [!tournevis] : Suivre le chat et son butin
+-> 14 : Redescendre au marché
+
+== 31 FIN perdu
+Les yeux en l'air, vous ne voyez pas la fontaine. Plouf ! L'eau est fraîche, et les poissons rouges très surpris.
+
+Olive arrive aussitôt, vous pèse, et vous colle une étiquette : "Poisson du jour, 3 euros le kilo". Les touristes font la queue pour la photo.
+
+Le temps de vous sécher, midi est passé.
+
+Morale : on ne court pas le nez en l'air. Surtout près d'une fontaine.
+
+== 32
+Le drone se pose sur un sac de farine en clignotant : "Batterie faible". Sous son ventre, une étiquette : "Si vous me trouvez, rendez-moi à Zoé, derrière l'église. Merci !"
+
+Zoé... la petite-fille du maire ?
+
++[indice]
+
+-> 27 : Rapporter le drone à Zoé
+-> 14 : Le laisser là et retourner au marché
+
+== 33
+Vous cassez la fougasse en deux. Zoé renifle, sourit, croque.
+
+- Merci. Personne ne me croyait capable de programmer un robot. Et maintenant, tout le monde va croire que je l'ai cassé...
+
+- Tu ne l'as pas cassé. Tu as fait un bug. Tout le monde fait des bugs. Viens, on le répare !
+
+Elle referme son ordinateur et vous suit, toute contente.
+
++[Zoé]
+
+-> 37 : Aller ensemble au robot
+
+== 34
+Zoé s'anime.
+
+- Olive écoute le Wi-Fi pour recevoir ses mises à jour. Mon drone a volé au-dessus de lui avec un petit ordinateur, et lui a envoyé mon programme. Une mise à jour "OTA" : par les airs !
+
+- Mais j'ai mélangé deux fichiers : la liste des prix et la liste des chansons. Alors il chante les prix et il vend les chansons...
+
+-> 36 : Lui proposer de réparer ensemble
+-> 33 [fougasse] : Lui offrir de la fougasse
+-> 35 : La gronder un peu
+
+== 35
+- Tu te rends compte ? Tout le marché est sens dessus dessous !
+
+Zoé baisse la tête.
+
+- Je voulais juste faire plaisir à papi...
+
+Une larme brille au coin de son oeil. Ah. Vous avez peut-être été un peu sévère.
+
+-> 36 : Se radoucir et l'aider
+-> 14 : La laisser et retourner au marché
+
+== 36
+- On répare ensemble ? Tu connais ton programme, j'ai mon badge. À deux, on ira deux fois plus vite.
+
+Zoé saute du banc.
+
+- C'est vrai ? Allez, on y va !
+
++[Zoé]
+
+-> 37 : Aller ensemble au robot
+
+== 37
+Le badge se connecte au Wi-Fi d'Olive et affiche sa page de réglages :
+
+"Mode : FÊTE. Langue : cigale. Table des prix : chansons. Table des chansons : prix."
+
+Tout est là. Il suffit de toucher aux bons réglages.
+
+-> 38 : Passer le mode sur NORMAL
+-> 39 [Zoé] : Laisser Zoé corriger les tables
+-> 40 : Tout réinitialiser, d'un coup
+
+== 38
+Olive cesse de chanter, roule jusqu'à son étal... et annonce : "Melon : do-ré-mi euros. Tomates : cri-cri le kilo."
+
+Le mode est bon, mais les tables sont toujours inversées : le robot lit les chansons à la place des prix !
+
+-> 39 [Zoé] : Demander à Zoé de corriger
+-> 17 [clé USB] : Remettre le firmware de Fernand
+-> 27 [indice] : Aller chercher Zoé
+-> 53 : Corriger les prix à la main
+
+== 39
+Zoé tape à toute vitesse.
+
+- Voilà : les prix dans la table des prix, les chansons dans la table des chansons. Et maintenant, on teste !
+
+Olive pèse un melon : "Deux euros." Parfait.
+
+- Et ma chanson ? demande Zoé. Je la programme pour midi pile, pour papi ?
+
+-> 42 : "Oui, pour midi pile !"
+-> 65 : "Non, plus de surprises aujourd'hui"
+
+== 40 FIN perdu
+Vous appuyez sur "Réinitialiser". Olive s'éteint, se rallume, et annonce d'une voix douce :
+
+- Bonjour. Je suis un aspirateur. Où sont les miettes ?
+
+Fernand avait construit Olive sur une base d'aspirateur robot. Sans ses réglages, il ne se souvient que de ça. Il passe la journée à aspirer les miettes devant la boulangerie, très heureux.
+
+Morale : tout effacer, ce n'est pas réparer. On cherche d'abord la cause.
+
+== 41
+La barre de progression avance... 100 % ! Olive redémarre, cligne de l'écran et dit :
+
+- Bonjour Fanny. Voici vos sardines. Pardon pour la lavande.
+
+Firmware v2.3, comme au premier jour. Le robot range ses melons, rend la monnaie juste, et ne chante plus que si on le lui demande.
+
+-> 42 : Midi approche : aller au discours
+
+== 42
+Midi sonne au clocher. Le maire, Monsieur Bouscarle, monte sur l'estrade, écharpe tricolore au vent. Il sort son discours de sa poche... et plisse les yeux.
+
+- Mes lunettes... Où sont mes lunettes ? Je ne vois rien !
+
+Olive, sagement garé à côté, attend.
+
+-> 43 [lunettes] : Rendre ses lunettes au maire
+-> 44 [Zoé] : Faire signe à Zoé
+-> 45 : Laisser le maire improviser
+
+== 43 FIN gagné
+Vous tendez les lunettes au maire. Il les chausse, ravi.
+
+- Mais où les avez-vous trouvées ?
+
+- Chez Pacha. Il a toute une collection.
+
+Le maire lit son discours d'un trait, puis vous remercie au micro : "Grâce à vous, notre robot vend des melons, et plus de lavande aux poissons !"
+
+Olive vous offre le plus beau melon du marché. Bravo !
+
+== 44 FIN gagné
+Zoé lève le pouce et appuie sur une touche. Olive s'avance et chante la chanson qu'elle a écrite : les cigales, le soleil, le marché, et "mon papi, le meilleur maire de Provence".
+
+Le maire, très ému, en oublie son discours. Toute la place reprend le refrain, même les frères Pignol, même Pacha sur son toit.
+
+- C'est toi qui as fait ça ? demande-t-il à Zoé.
+
+- Avec de l'aide, dit-elle en vous regardant.
+
+Le soir, Fernand propose d'ouvrir un club de robotique au village. Zoé en sera la présidente, et vous, la marraine ou le parrain. Bravo, c'est la plus belle des fins !
+
+== 45 FIN gagné
+Le maire plie son discours.
+
+- Bon. Sans lunettes, je vais faire court : vive le marché, vive Sainte-Cigalade, et vive le robot !
+
+C'est le discours le plus court de l'histoire du village, et le plus applaudi. Olive vend ses melons au bon prix, et vous offre une barquette de fraises pour la peine.
+
+Vous avez sauvé le marché. Mais il existe peut-être une fin encore plus belle...
+
+== 46 FIN
+Vous vous asseyez à l'ombre et attendez midi. Le maire monte sur l'estrade... et Olive lui prend le micro.
+
+Il chante. Les cigales. Le melon. La lavande. Pendant quarante minutes. La foule adore et scande : "O-live ! O-live !"
+
+À la fin, le conseil municipal vote à main levée : Olive est élu adjoint au maire, chargé des fêtes. Le maire, lui, part à la pêche.
+
+Ce n'était pas vraiment prévu... mais tout le monde a l'air content.
+
+== 47 FIN perdu
+- Vous ai-je raconté le jour où j'ai réparé un satellite avec une épingle à cheveux ? C'était en 1978...
+
+Fernand raconte. Le satellite, puis le grille-pain qui parlait, puis la mobylette volante. Il commande un deuxième pastis, vous un troisième sirop d'orgeat.
+
+Quand l'horloge sonne midi, il en est à 1983. Sur la place, Olive chante dans le micro du maire.
+
+Morale : les histoires de Fernand sont passionnantes, mais elles durent plus longtemps qu'une matinée.
+
+== 48 FIN
+Vous achetez un melon. Olive vous le vend contre une chanson : il faut lui fredonner trois notes. Il est délicieux.
+
+Puis vous en achetez un autre. Puis un troisième. Midi sonne, et vous rentrez chez vous avec cinq melons, un bouquet de lavande et un robot qui vous fait coucou.
+
+Le robot n'est pas réparé, mais votre frigo est plein.
+
+Morale : un bon melon, c'est déjà une petite victoire.
+
+== 49
+Vous tapez "pacha13". La page clignote... et s'ouvre !
+
+Le nom du chat de la mairie et le numéro des Bouches-du-Rhône : un mot de passe facile à deviner pour qui connaît le village. Un bon mot de passe est long, et ne parle pas de soi.
+
++[mot de passe]
+
+-> 37 : Voir les réglages d'Olive
+
+== 50
+Vous copiez d'abord toute la mémoire du robot sur le badge. Si quelque chose tourne mal, vous pourrez revenir en arrière.
+
+Puis vous lancez le flash, l'esprit tranquille. Olive ferme les yeux et fredonne en attendant.
+
+-> 41 : Regarder la barre de progression
+
+== 51
+Pas de temps à perdre : vous lancez le flash tout de suite. La barre avance... 20 %... 50 %...
+
+Olive, impatient, se met à danser. Le câble se tend...
+
+Le badge lance le dé.
+
+-> 52 [dé 1-2] : Le câble se débranche !
+-> 41 [dé 3-6] : Le câble tient bon
+
+== 52
+Clac ! Le câble se débranche à 63 %. L'écran d'Olive devient noir, puis affiche : "MODE DÉMARRAGE. EN ATTENTE D'UN FIRMWARE."
+
+Ouf : comme beaucoup d'appareils, Olive a un petit programme de secours, le bootloader, qui ne s'efface jamais. Il permet de recommencer.
+
+Vous rebranchez le câble, en le tenant bien cette fois.
+
+-> 41 : Relancer le flash
+
+== 53
+Vous ouvrez la table des prix sur le badge. Cent vingt lignes : "Melon : la-si-do", "Tomates : cri-cri"... Il faut tout retaper, une ligne après l'autre.
+
+Fanny vous dicte les prix du poisson, Monsieur Aimé ceux du pain. Y arriverez-vous avant midi ?
+
+Le badge lance le dé.
+
+-> 54 [dé 1-3] : Il reste tellement de lignes...
+-> 42 [dé 4-6] : Dernière ligne... Entrée !
+
+== 54 FIN
+Midi sonne alors qu'il vous reste quarante lignes. Olive vend désormais le melon au bon prix... mais les tomates à "soupir" le kilo et le fromage de chèvre à "fa dièse".
+
+Les clients paient en chantant. Le maire trouve ça très folklorique et en parle dans son discours.
+
+Morale : corriger à la main prend du temps. Les bons outils, et les bons amis, en font gagner beaucoup.
+
+== 55
+Dans la mairie, il fait frais. Madame Roux, la secrétaire, tape le discours du maire en soupirant.
+
+- Le maire a perdu ses lunettes, et le robot devient fou juste avant son discours. Quelle matinée ! Sans parler de Pacha, notre chat, qui vole tout ce qui brille...
+
+Derrière la porte du bureau, on entend le maire répéter son discours en se trompant de page.
+
+-> 56 : Frapper à la porte du maire
+-> 14 : Retourner au marché
+
+== 56
+Monsieur Bouscarle vous serre la main avec beaucoup d'énergie.
+
+- Un badge cigale ? Vous vous y connaissez en électronique, alors ! Réparez-moi ce robot avant midi, je vous en prie.
+
+Il réfléchit.
+
+- Demandez donc à ma petite-fille, Zoé. Elle adore les robots. Elle doit être derrière l'église, avec son drone.
+
+-> 27 : Aller voir derrière l'église
+-> 14 : Retourner au marché
+
+== 57
+Vous écoutez Olive chanter. "Cri... cri-cri... cri..." Ce n'est pas une cigale ordinaire : il y a des cris courts et des cris longs.
+
+Du morse ! Le badge décode : Z-O-É... "Chanson de Zoé pour papi". Le nom du programme, chanté en boucle par erreur.
+
++[indice]
+
+-> 27 : Chercher qui est cette Zoé
+-> 2 : Revenir au robot
+
+== 58
+Au boulodrome, la finale va commencer quand Olive arrive en roulant, un cageot de melons dans les bras.
+
+- PÉTANQUE ! crie-t-il. Il lance un melon, qui atterrit pile sur le cochonnet. Splatch.
+
+Les frères Pignol protestent. Fernand se prend la tête dans les mains.
+
+-> 59 : Donner un ordre au robot
+-> 10 : Changer de cochonnet et jouer
+
+== 59
+- Olive ! Va vendre tes melons !
+
+Le robot s'arrête, réfléchit, puis vend gravement un melon à chaque joueur, et même un à l'arbitre. Puis il repart vers la place en chantant.
+
+Un robot, c'est comme un programme : il fait exactement ce qu'on lui dit, pas ce qu'on voulait dire.
+
+-> 10 : Commencer la partie
+
+== 60
+Un touriste en chapeau de paille photographie Olive sous tous les angles.
+
+- Lovely robot! dit-il en vous prêtant son téléphone avec un grand sourire.
+
+Le téléphone lit le QR code en une seconde : "olive.local/reglages". L'adresse de la page de réglages du robot, sur son propre réseau Wi-Fi.
+
+-> 62 : Y connecter le badge
+
+== 61
+Vous comptez les carrés. Les trois gros carrés dans les coins servent à repérer le sens du code. Les autres, noirs ou blancs, sont des 1 et des 0...
+
+Vingt minutes et un mal de tête plus tard, vous lisez : "olive.local/reglages". Fernand, qui passait par là, siffle d'admiration.
+
+-> 62 : Connecter le badge à cette page
+
+== 62
+Le badge se connecte au Wi-Fi d'Olive et ouvre la page. Elle demande un identifiant et un mot de passe.
+
+Derrière vous, le robot chante : "Cri-cri, qui suis-je ?"
+
+-> 12 : Essayer admin / admin
+-> 13 : Essayer 1234
+-> 37 [mot de passe] : Taper le mot de passe de Zoé
+-> 14 : Chercher le mot de passe ailleurs
+
+== 63
+Monsieur Aimé lâche sa pâte.
+
+- Moi ? Reprogrammer un robot ? Je ne sais même pas envoyer une photo à ma soeur !
+
+Il éclate de rire, et un nuage de farine vous enveloppe. Vous toussez. Il vous tapote le dos.
+
+- Mais j'ai vu quelque chose, ce matin...
+
+-> 64 : "Racontez-moi tout"
+
+== 64
+- À six heures, en sortant mes fournées, j'ai vu Zoé, la petite-fille du maire, derrière la fontaine, avec un drone et un ordinateur. Elle avait l'air très concentrée.
+
+Il vous tend une fougasse aux olives encore tiède. Vous la rangez dans votre sac... quand une ombre rousse file entre vos jambes. Votre poche est soudain plus légère : votre tournevis !
+
+- Pacha ! crie le boulanger. Ce chat vole tout ce qui brille !
+
++[indice] +[fougasse]
+-[tournevis]
+
+-> 21 : Poursuivre le chat
+-> 27 : Aller trouver Zoé
+-> 14 : Retourner au marché
+
+== 65
+- D'accord, soupire Zoé. Pas de surprise. Tu as sans doute raison.
+
+Elle efface la chanson, referme son ordinateur et part rejoindre sa mère au marché, un peu déçue.
+
+Le robot, lui, fonctionne parfaitement.
+
+-[Zoé]
+
+-> 42 : Midi approche : aller au discours
+
+== 66
+Vous ouvrez le menu radio du badge... puis vous arrêtez. Brouiller les ondes est interdit : on gêne les voisins, les secours, les avions. Et un drone qui perd sa télécommande peut tomber sur la tête de quelqu'un.
+
+Mieux vaut trouver son pilote.
+
+-> 29 : Suivre le drone discrètement
+-> 14 : Retourner au marché

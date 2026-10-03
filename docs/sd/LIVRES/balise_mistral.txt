@@ -1,0 +1,659 @@
+La Balise du Mistral
+Les cigales de Hack In Provence
+
+// Un livre dont vous êtes le héros pour le badge SecSea : une chasse au renard radio dans les collines de La Ciotat.
+// Format : voir docs/fr/livres_jeux.md. Vérification : python tools/gamebook_check.py ce_fichier.txt
+// Version anglaise, même numérotation : mistral_beacon.txt
+// Objets : aide-mémoire (morse), lampe (Momo), relevés (triangulation), yagi (Félicien), brousse (Mado).
+// Dés : sections 8, 32, 51 et 66.
+
+== 1
+Deux heures dix-sept. La Ciotat dort, le port dort, et vous dormez aussi... jusqu'à ce que votre badge cigale se mette à vibrer sur la table de nuit.
+
+L'écran s'allume tout seul : "433,92 MHz - signal inconnu". Les LEDs clignotent : long, court, long, court...
+
+Par la fenêtre, d'autres badges s'allument dans la nuit, comme des lucioles.
+
+-> 2 : Lire le morse des LEDs
+-> 3 : Se rendormir, il fait nuit
+-> 4 : Appeler Inès et Momo
+
+== 2
+Dans le sac de la conférence, vous retrouvez le goodie du jour : un aide-mémoire morse plastifié. Vous suivez les LEDs du doigt.
+
+-.-. --.- : CQ, l'appel à tous des radioamateurs. Puis : CIGALES DE FOX.
+
+"DE", en radio, veut dire "de la part de". FOX, c'est le renard. Un renard appelle les cigales en pleine nuit !
+
++[aide-mémoire]
+
+-> 5 : Sortir suivre le signal
+-> 4 : Prévenir d'abord Inès et Momo
+
+== 3
+Vous retournez l'oreiller. Le badge vibre plus fort. Puis il joue une sonnerie : la Cucaracha, en bips, à plein volume.
+
+Le voisin tape au mur.
+
+- Éteignez votre cigale, il y en a qui travaillent demain !
+
+-> 6 : Bon, d'accord, se lever
+-> 7 : Cacher le badge sous l'oreiller
+
+== 4
+Inès répond à la première sonnerie : elle ne dormait pas, elle écoutait déjà le signal. Momo répond à la cinquième, la bouche pleine.
+
+Dix minutes plus tard, vous voilà tous les trois sous les platanes de la place. Momo vous tend une lampe frontale.
+
+- J'en ai toujours deux. Et des biscuits.
+
+Inès, elle, a déjà sorti une carte :
+
+- Chacun se met à un endroit et pointe vers le signal. Là où les traits se croisent, c'est la balise !
+
++[lampe]
+
+-> 8 : Faire la triangulation
+-> 5 : Partir devant sans attendre
+
+== 5
+Dehors, l'air sent le pin et le sel. Vous ouvrez le récepteur 433 MHz du badge : la barre de RSSI, la force du signal, affiche -92 dBm. C'est faible. Le badge écrit : "Froid".
+
+La balise émet toutes les trente secondes. Mais d'où ?
+
+-> 9 : Descendre vers le port
+-> 10 : Monter vers les collines
+-> 11 : Tourner sur soi pour chercher
+
+== 6
+Vous vous levez en grognant, le badge à la main. Il clignote toujours, patient : long, court, long, court.
+
+Vous allumez la lampe de chevet et fouillez le sac de la conférence. Il y avait un goodie en plastique, là-dedans...
+
+-> 2 : Le trouver et lire le morse
+
+== 7 FIN perdu
+Sous l'oreiller, la Cucaracha devient une berceuse étouffée. Vous vous rendormez.
+
+Au petit matin, la terrasse de SecSea ne parle que de ça : la balise mystère, les collines dans la nuit, les chèvres, le vieux gardien de phare... Tout le monde a une histoire.
+
+Vous, vous avez une marque d'oreiller sur la joue.
+
+Morale : quand une cigale vous réveille, c'est rarement pour rien.
+
+== 8
+Inès file au bout de la jetée, Momo grimpe vers la gare, vous restez sur la place. Chacun tourne son badge jusqu'au signal le plus fort, puis trace un trait sur la carte.
+
+Les trois traits vont-ils se croiser au même endroit ? Le badge lance le dé...
+
+-> 12 [dé 1-2] : Les traits partent partout
+-> 13 [dé 3-6] : Les traits se croisent !
+
+== 9
+Sur le port, le signal fait n'importe quoi. Fort près des grues, nul derrière les bateaux, fort encore face au chantier naval.
+
+Les ondes rebondissent sur le métal, comme un écho dans une église. Les radioamateurs appellent ça les trajets multiples : le signal arrive de partout, et la balise n'est nulle part.
+
+-> 14 : Suivre l'écho vers le chantier
+-> 10 : Monter plutôt vers les collines
+
+== 10
+Au pied des collines, au bout de la dernière rue, un vieux camping-car est garé sous un pin. Sur son toit, un mât d'antenne monte plus haut que l'arbre.
+
+Il y a de la lumière. On entend des bips à l'intérieur.
+
+Sur le badge, le RSSI remonte : -84 dBm. "Tiède".
+
+-> 15 : Frapper à la porte
+-> 16 : Continuer dans la garrigue
+
+== 11
+Vous serrez le badge contre votre poitrine et tournez lentement, comme une toupie fatiguée.
+
+Le signal baisse quand votre corps est entre le badge et la balise : le corps humain est plein d'eau, et l'eau arrête bien les ondes.
+
+Le creux est vers la ville. La balise est donc de l'autre côté : vers les collines du Bec de l'Aigle.
+
+-> 10 : Monter vers les collines
+
+== 12
+Les trois traits partent dans trois directions. Celui de Momo pointe tout droit... vers le kebab de la gare, fermé.
+
+- J'avais faim, j'ai pas fait exprès.
+
+Inès soupire dans le badge :
+
+- On recommence. Momo, dos au kebab.
+
+-> 13 : Recommencer, bien sérieusement
+-> 10 : Tant pis, monter aux collines
+
+== 13
+Cette fois, les trois traits se croisent. Inès envoie la carte sur votre badge : le croisement tombe dans les collines, sur la pointe au-dessus de la calanque de Figuerolles.
+
+- Je reste en ville pour écouter, dit Inès. Momo va chercher des croissants pour l'aube. Toi, file !
+
++[relevés]
+
+-> 10 : Monter vers les collines
+
+== 14
+Le chantier naval est fermé par un grand grillage. Un gardien sort de sa guérite avec une lampe et un sandwich.
+
+- Vous cherchez quoi, à cette heure ?
+
+Vous montrez le badge, qui affiche "Chaud". Le gardien rit : sa voiture, garée juste là, parle aussi en 433 MHz. Ce sont les capteurs de pression de ses pneus !
+
+-> 10 : S'excuser et filer aux collines
+-> 17 : Lui expliquer les échos radio
+
+== 15
+Un monsieur en pyjama rayé ouvre, un casque autour du cou.
+
+- Félicien, F5FEL, radioamateur. Vous aussi, vous chassez le renard ?
+
+Il vous tend une antenne bizarre : trois bouts de mètre ruban sur un manche à balai.
+
+- Une yagi : elle n'écoute que devant elle. Pointez, tournez : le plus fort, c'est la direction. Et tout près du renard, tout sature : enlevez-la.
+
++[yagi]
+
+-> 18 : Accepter un café
+-> 16 : Remercier et partir
+
+== 16
+Le sentier grimpe dans la garrigue. Ça sent le thym et le romarin. Plus loin, des clochettes tintent dans le noir.
+
+Le badge hésite entre "Tiède" et "Chaud". Trois chemins : le sémaphore en haut, la calanque de Figuerolles en bas, les clochettes à gauche.
+
+-> 19 [yagi] : Balayer avec la yagi
+-> 23 [relevés] : Suivre les relevés d'Inès
+-> 20 : Monter vers le sémaphore
+-> 21 : Descendre vers la calanque
+-> 22 : Suivre les clochettes
+
+== 17 FIN
+Vous expliquez au gardien les échos sur les coques, les capteurs des pneus, et la bande des 433 MHz où tout le monde parle en même temps : portails, stations météo, sonnettes...
+
+Il est passionné. À l'aube, il a rempli un carnet et commandé sa première antenne.
+
+L'année suivante, vous le retrouvez à SecSea, avec un badge, un indicatif radio et une casquette "73" : les amitiés, en langage radio.
+
+La balise ? Quelqu'un d'autre l'a trouvée.
+
+== 18
+Le café de Félicien est noir comme la nuit et fort comme le mistral.
+
+- Cette balise... Le mois dernier, une gamine est venue me poser plein de questions. Lou, la petite-fille de Baptistin, l'ancien gardien de phare. Elle voulait savoir quelle antenne faire pour 433 MHz.
+
+- Et vous lui avez dit ?
+
+- Dix-sept centimètres. Un quart de longueur d'onde.
+
+-> 16 : Partir vers les collines
+
+== 19
+Vous levez la yagi et tournez lentement. À gauche, rien. Derrière, rien. Droit devant : un pic ! -71 dBm.
+
+Le signal ne vient ni du sémaphore ni de la calanque, mais de la pente entre les deux, là où tintent les clochettes. Et même un peu plus loin, vers la pointe.
+
+-> 22 : Aller vers les clochettes
+-> 20 : Monter quand même au sémaphore
+
+== 20
+Le sémaphore veille tout en haut, ses antennes noires contre les étoiles. Le badge affiche "Chaud", puis "Tiède", puis "Chaud" : la balise n'est pas là, mais elle n'est pas loin.
+
+Vous vous asseyez sur un rocher pour reprendre votre souffle. C'est alors que les pins se mettent à siffler.
+
+-> 24 : Que se passe-t-il ?
+
+== 21
+Le chemin descend jusqu'aux galets de Figuerolles. La mer noire clapote entre les rochers. Le badge affiche "Froid" : les falaises bloquent le signal, vous êtes dans l'ombre radio.
+
+C'est beau, une calanque la nuit. Les étoiles se reflètent dans l'eau.
+
+-> 16 : Remonter, le signal est là-haut
+-> 25 : Attendre que le signal vienne
+
+== 22
+Les clochettes, ce sont des chèvres du Rove : des cornes en tire-bouchon, un poil roux, et une curiosité sans limite. Elles dorment autour d'une bergerie en pierre.
+
+Une chèvre se lève et vient fouiller votre poche avec son nez. À son cou, un collier clignote.
+
+-> 26 : La laisser faire, elle est mignonne
+-> 27 : Réveiller la bergère
+-> 24 : Passer sans bruit
+
+== 23
+Vous suivez les traits de la carte. Le croisement des relevés tombe sur la pointe, au-dessus de la calanque, là où un petit cabanon blanc brille sous la lune.
+
+Le badge passe à "Chaud". Vous pressez le pas. Mais au moment où vous arrivez sur la crête, les pins se mettent à siffler.
+
+-> 24 : Que se passe-t-il ?
+
+== 24
+Le mistral ! Il arrive d'un coup, comme toujours : froid, sec, il plie les pins et nettoie le ciel. Les étoiles deviennent nettes comme des pixels.
+
+Et le mistral change tout : la balise s'emballe. Elle émet maintenant toutes les cinq secondes, plus fort, et le message n'est plus le même.
+
+-> 28 : Décoder le nouveau message
+-> 29 : S'abriter d'abord du vent
+
+== 25 FIN perdu
+Vous vous asseyez sur les galets. Le signal finira bien par passer.
+
+Les heures passent. Le mistral se lève, puis le soleil. Le signal, lui, ne passe pas : les ondes de 433 MHz ne traversent pas les falaises, et elles ne descendent pas les escaliers non plus.
+
+À l'aube, un pêcheur vous trouve en train de parler à votre badge.
+
+Morale : un renard, ça se cherche, ça ne s'attend pas.
+
+== 26
+La chèvre fouille, renifle, et mâchouille tout ce qui dépasse de votre poche : tickets, papiers, plastique. Miam.
+
+Puis elle s'éloigne tranquillement dans la nuit. Son collier clignote toutes les cinq secondes... comme une balise ?
+
+-[aide-mémoire]
+
+-> 69 : Suivre la chèvre au collier
+-> 27 : Réveiller la bergère
+-> 24 : Continuer le chemin
+
+== 27
+La bergère sort de la cabane en bonnet de laine.
+
+- Mado. Vous allez me réveiller toutes mes biques, avec vos lumières !
+
+Mais quand vous parlez de la balise, elle sourit.
+
+- Ah, ça, c'est la petite Lou. Elle bricole des fils au cabanon de son papé, sur la pointe. Tenez, apportez-leur ça.
+
+Elle vous donne une brousse du Rove, le fromage frais de ses chèvres, dans un torchon.
+
++[brousse]
+
+-> 24 : Repartir vers la pointe
+
+== 28
+Le message passe toutes les cinq secondes. Il est long, rapide, et le mistral vous siffle dans les oreilles.
+
+-> 31 [aide-mémoire] : Le lire avec l'aide-mémoire
+-> 32 [!aide-mémoire] : Le lire de mémoire
+
+== 29
+Vous plongez derrière un muret de pierres sèches. Quelqu'un y est déjà : un cabri, un tout petit chevreau, qui tremble et vous regarde avec des yeux ronds.
+
+- Mèèè, dit-il, ce qui peut vouloir dire beaucoup de choses.
+
+-> 30 : Le ramener à la bergerie
+-> 28 : Le garder au chaud et décoder
+
+== 30
+Le cabri dans les bras, vous descendez à la bergerie. Mado, la bergère, est déjà dehors, sa lampe à la main.
+
+- Biscotte ! Je le cherchais partout !
+
+Pour vous remercier, elle vous offre une brousse du Rove, le fromage frais de ses chèvres, et vous montre la pointe :
+
+- La lumière, là-bas, c'est le cabanon de Baptistin. Sa petite Lou bricole des antennes.
+
++[brousse]
+
+-> 28 : Décoder enfin le message
+
+== 31
+Point par point, trait par trait, les lettres arrivent :
+
+LE RENARD DORT OU LE VENT CHANTE
+
+Le renard, c'est la balise : en radio, l'émetteur caché qu'on doit retrouver s'appelle un renard. Mais où le vent chante-t-il ?
+
+-> 33 : Réfléchir à l'énigme
+
+== 32
+Le A, c'est point-trait. Le N, trait-point. Ou l'inverse ? Le mistral emporte la moitié des bips. Vous comptez sur vos doigts.
+
+Le badge lance le dé...
+
+-> 34 [dé 1-3] : C'est le brouillard...
+-> 31 [dé 4-6] : Les lettres arrivent !
+
+== 33
+Où le vent chante-t-il ? Ce soir, il chante partout : dans les pins, dans les rochers, dans vos oreilles.
+
+Mais deux endroits chantent plus fort que les autres : les antennes du sémaphore, qui sifflent, et la pointe, où quelque chose tinte comme un carillon.
+
+-> 38 : Le sémaphore
+-> 39 : La pointe et son carillon
+-> 40 [yagi] : Demander à la yagi
+-> 42 [relevés] : Regarder les relevés
+
+== 34
+Vous notez ce que vous avez compris :
+
+L. RE.ARD DOR. ... VENT CHA...
+
+Puis, au passage suivant, plus clair :
+
+... DORS ... LE VENT CHANTE
+
+-> 35 : Appeler Inès à l'aide
+-> 36 : Écouter le passage suivant
+-> 37 : "DORS" ? Obéir au badge
+
+== 35
+Inès répond aussitôt, depuis le port :
+
+- Je l'ai ! LE RENARD DORT OU LE VENT CHANTE. Le renard, c'est la balise. Et ici, le vent ne chante pas, il fait juste claquer les volets. Ça doit être chez toi !
+
+-> 33 : Réfléchir à l'énigme
+
+== 36
+Vous tournez le dos au vent, fermez les yeux et écoutez de toutes vos oreilles. Un passage. Deux. Trois. Les lettres finissent par se poser, une à une :
+
+LE RENARD DORT OU LE VENT CHANTE
+
+Le renard, c'est la balise, bien sûr.
+
+-> 33 : Réfléchir à l'énigme
+
+== 37 FIN perdu
+"DORS", dit le badge. Vous êtes bien d'accord avec lui.
+
+Vous vous roulez en boule au pied d'un pin, à l'abri du mistral, et vous dormez comme un loir.
+
+Au matin, les chèvres de Mado vous réveillent en mangeant vos lacets. Le badge affiche un dernier message : MERCI A TOUS.
+
+À tous... sauf vous.
+
+Morale : le morse, ça s'apprend avant, pas en plein mistral.
+
+== 38
+Vous grimpez vers le sémaphore. Le vent hurle dans ses antennes, c'est vrai. Mais le badge affiche "Tiède", puis "Froid".
+
+Derrière le grillage, un panneau : "Marine nationale - Accès interdit".
+
+Ce vent-là ne chante pas, il crie.
+
+-> 39 : Redescendre vers la pointe
+-> 41 : Escalader le grillage, pour voir
+
+== 39
+Sur la pointe, un cabanon blanc aux volets bleus. Sous l'auvent, un carillon de coquillages et de vieilles cuillères tinte dans le mistral : voilà le vent qui chante !
+
+Sur le toit, une petite éolienne tourne à toute vitesse. Une fenêtre est éclairée.
+
+Le badge affiche : "Brûlant".
+
+-> 43 : Frapper à la porte
+-> 44 : Chercher la balise autour
+-> 45 : Crier "Il y a quelqu'un ?"
+
+== 40
+Vous pointez la yagi face au vent. Elle tremble comme une voile, mais elle parle : un pic énorme vers la pointe, -48 dBm.
+
+Et le pic bouge un peu, avec les rafales... comme si la balise se balançait dans le vent.
+
+-> 39 : Foncer vers la pointe
+
+== 41 FIN perdu
+Vous escaladez le grillage. À mi-hauteur, une rafale de mistral vous plaque dessus comme un aimant sur un frigo. Impossible de monter, impossible de descendre.
+
+Un marin de garde vous décroche au lever du soleil, avec une échelle et beaucoup de patience.
+
+- La balise ? Celle de la petite Lou ? Elle a été trouvée cette nuit.
+
+Morale : les grillages de la Marine ne sont pas des échelles.
+
+== 42
+Vous rouvrez la carte d'Inès sur l'écran du badge. Les trois traits se croisent... pile sur la pointe, au-dessus de la calanque.
+
+Et sur la pointe, il y a un cabanon. Et devant le cabanon, quelque chose tinte dans le vent.
+
+-> 39 : Aller à la pointe
+
+== 43
+Vous frappez. Des pas, une toux, la porte s'ouvre. Un vieux monsieur en tricot de marin, une casquette de gardien de phare sur la tête.
+
+- À trois heures du matin ? Vous avez fait naufrage ?
+
+Derrière lui, sur une étagère, une vieille lanterne de phare et des photos de l'île Verte.
+
+-> 46 : Lui parler de la balise
+-> 47 [brousse] : Offrir la brousse de Mado
+-> 48 : S'excuser et repartir
+
+== 44
+Vous faites le tour du cabanon. Le badge affiche "Brûlant" partout : devant, derrière, à côté. La barre de RSSI est collée au maximum.
+
+Félicien appelait ça saturer : trop près du renard, le récepteur est ébloui, comme vos yeux face à un phare.
+
+-> 49 [yagi] : Enlever la yagi, comme dit Félicien
+-> 50 : Cacher le badge contre soi
+-> 51 : Tourner en rond en cherchant
+-> 43 : Frapper à la porte
+
+== 45
+"Il y a quelqu'un ?" Le mistral emporte votre voix jusqu'en Corse.
+
+Derrière la fenêtre éclairée, un petit visage apparaît. Il pose un doigt sur sa bouche, chut, puis montre le jardin, sous le carillon.
+
+-> 44 : Chercher dans le jardin
+
+== 46
+Le vieux monsieur se gratte la tête.
+
+- Une balise ? Je suis Baptistin, gardien du phare de l'île Verte pendant quarante ans. Les balises, je connais. Mais celle-là, non.
+
+Il bâille.
+
+- Demandez à la petite, c'est elle qui bricole. Moi, je retourne me coucher. Réveillez-moi pour le café.
+
+Une fillette en pyjama apparaît dans l'escalier, les yeux brillants.
+
+-> 55 : La suivre dehors
+
+== 47
+Baptistin voit la brousse et son visage s'éclaire comme une lanterne.
+
+- La brousse de Mado ! Entrez, vous allez prendre froid.
+
+Il vous sert un lait chaud, raconte ses tempêtes et ses quarante ans de phare, puis bâille et va se recoucher.
+
+Dès que sa porte se ferme, une fillette en pyjama descend l'escalier sur la pointe des pieds.
+
+-> 55 : L'écouter
+
+== 48 FIN
+Vous vous excusez et repartez dans le vent. La porte se referme.
+
+Vous ne saurez jamais qui a construit la balise, ni pourquoi.
+
+Enfin, pas avant le petit-déjeuner, où quelqu'un racontera qu'à l'aube, sur la pointe, il y avait des chèvres, des croissants et un vieux gardien de phare qui pleurait de joie.
+
+Morale : quand on a trouvé le terrier du renard, on frappe.
+
+== 49
+Vous retirez la yagi. Sans elle, le badge entend moins bien... et c'est exactement ce qu'il faut. Le RSSI redescend, la barre bouge à nouveau.
+
+Vers la mer : plus faible. Vers le cabanon : plus fort. Vers le carillon : très, très fort.
+
+-> 52 : Regarder sous le carillon
+
+== 50
+Vous serrez le badge contre votre ventre et tournez lentement. Votre corps fait écran : quand le signal baisse, la balise est dans votre dos.
+
+Un tour, deux tours. Le creux est vers la mer. La balise est donc juste là, du côté du carillon.
+
+-> 52 : Regarder sous le carillon
+
+== 51
+Vous tournez autour du cabanon, le badge brandi comme une baguette de sourcier. Brûlant, brûlant, brûlant...
+
+Il fait nuit, il y a du vent, et le jardin est plein de choses qui dépassent. Le badge lance le dé...
+
+-> 53 [dé 1-2] : Votre pied heurte quelque chose
+-> 52 [dé 3-6] : Votre lampe accroche un reflet
+
+== 52
+Sous le carillon, dans un bocal à confiture, une petite boîte clignote : la balise ! Une antenne de dix-sept centimètres, un panneau solaire, et un fil vers l'éolienne du toit. Voilà pourquoi le mistral l'a réveillée.
+
+Une étiquette : "SI TU M'AS TROUVÉE, APPUIE. LOU, 11 ANS".
+
+-> 54 : Appuyer sur le bouton
+-> 56 : Emporter la balise en souvenir
+-> 43 : Frapper au cabanon
+
+== 53
+Votre pied heurte un arrosoir, qui heurte un seau, qui heurte une pile de pots de fleurs. Un vacarme de fanfare.
+
+Le carillon s'affole, les chèvres de Mado bêlent au loin, une lumière s'allume. Une porte grince.
+
+-> 43 : Faire face, avec un sourire
+
+== 54
+Vous appuyez. La balise joue une petite mélodie, et une lumière s'allume à l'étage.
+
+Une fillette en pyjama et en bottes de pluie sort en courant, une lampe frontale de travers sur le front.
+
+- Tu l'as trouvée ! Le premier ! Enfin, la première ? Le premier quelqu'un !
+
+-> 55 : Faire connaissance
+
+== 55
+- Je m'appelle Lou. La balise, c'est moi qui l'ai faite, avec l'aide de Félicien.
+
+Elle chuchote, pour ne pas réveiller la maison.
+
+- À l'aube, Papé a quatre-vingts ans. Il a gardé le phare toute sa vie, et il dit toujours qu'un phare, ça ne sert que si quelqu'un vient. Alors j'ai appelé toutes les cigales de La Ciotat.
+
+-> 57 : Prévenir toutes les cigales
+-> 58 [aide-mémoire] : Changer le message de la balise
+-> 59 : Chanter "joyeux anniversaire" tout de suite
+-> 60 : Rentrer se coucher, mission accomplie
+
+== 56
+Vous glissez le bocal sous votre bras. Aussitôt, la porte du cabanon s'ouvre : une fillette en pyjama et en bottes de pluie.
+
+- Ma balise ! Mais elle est pour Papé ! Elle doit rester là jusqu'à l'aube !
+
+Elle a les larmes aux yeux.
+
+-> 61 : La lui rendre en s'excusant
+-> 62 : "Trouvée, c'est gagnée !"
+
+== 57
+Vous envoyez un message à Inès et Momo depuis le badge :
+
+- Cabanon de la pointe, à l'aube. Anniversaire surprise. Chut !
+
+Inès le fait suivre à tous les badges du port. Momo, à tous les boulangers ouverts. Bientôt, sur les chemins de la colline, des petites lumières commencent à monter.
+
+-> 63 : Attendre le jour
+
+== 58
+Lou ouvre la balise. Vous sortez l'aide-mémoire et, à deux, lettre par lettre, vous programmez un nouveau message :
+
+CIGALES - CABANON POINTE - AUBE - CHUT
+
+Le mistral fait tourner l'éolienne à fond : la balise porte maintenant à des kilomètres. Dans toute la ville, les badges se rallument.
+
+-> 63 : Attendre le jour
+
+== 59 FIN perdu
+Vous chantez "joyeux anniversaire" à pleine voix, à quatre heures du matin.
+
+Les chèvres bêlent, le carillon tinte, les chiens aboient, et Baptistin ouvre la fenêtre en bonnet de nuit.
+
+- C'est mon anniversaire ? Déjà ? Bon. Merci. Bonne nuit.
+
+La fenêtre se referme. Lou vous regarde : la surprise a fait pschitt.
+
+Morale : un phare s'allume à son heure, une surprise aussi.
+
+== 60 FIN
+Vous laissez Lou à son plan et repartez dans le mistral, le coeur léger. Le renard est trouvé, l'énigme résolue : au lit !
+
+Le lendemain, à la terrasse de SecSea, on ne parle que de la fête de l'aube sur la pointe : des chèvres, des croissants, un vieux gardien de phare qui pleurait de joie.
+
+Vous avez trouvé le renard en premier... et raté la fête.
+
+== 61
+Vous reposez le bocal sous le carillon, bien droit.
+
+- Pardon. Je ne savais pas. C'est pour qui, cette balise ?
+
+La fillette renifle, puis sourit et vous tend la main.
+
+- Viens, je t'explique. Mais tout bas.
+
+-> 55 : Écouter la fillette
+
+== 62 FIN perdu
+Vous repartez, le bocal sous le bras. Sur le chemin, tous les badges de la ville se taisent : plus de renard, plus de chasse.
+
+À l'aube, personne ne vient au cabanon. Et un bocal de confiture vide, sur une étagère, n'a jamais fait un beau trophée.
+
+Morale : un renard trouvé, on le laisse chanter pour les suivants.
+
+== 63
+Lou fait chauffer du chocolat sur un réchaud. Le mistral faiblit. À l'est, au-dessus du Bec de l'Aigle, le ciel devient bleu pâle.
+
+Il reste un peu de temps avant l'aube.
+
+-> 64 [brousse] : Préparer un petit-déjeuner
+-> 65 [lampe] : Guider les cigales à la lampe
+-> 66 : Attendre en regardant le ciel
+
+== 64
+Vous posez la brousse de Mado sur la table du jardin, avec le miel de Lou et une miche de pain. Un vrai petit-déjeuner de fête.
+
+L'odeur du chocolat chaud s'envole dans le vent. Sur le chemin, on entend déjà des pas, des rires étouffés... et des clochettes.
+
+-> 67 : C'est l'heure !
+
+== 65
+Vous montez sur un rocher avec la lampe frontale de Momo et l'allumez vers la ville, en morse : trait-point-trait-point, trait-trait-point-trait. CQ, CQ : appel à tous !
+
+Sur les chemins, des petites lumières vous répondent et montent vers vous en file indienne. Comme un phare, mais à l'envers.
+
+-> 67 : C'est l'heure !
+
+== 66
+Vous vous asseyez sur la pointe, Lou à côté de vous. La mer change de couleur. Les dernières étoiles s'éteignent une à une.
+
+Est-ce que quelqu'un viendra ? Le badge lance le dé...
+
+-> 68 [dé 1-2] : Le chemin reste vide
+-> 67 [dé 3-6] : Des pas sur le chemin !
+
+== 67 FIN gagné
+Ils arrivent tous : Inès et ses antennes, Momo et ses croissants, Félicien en pyjama, Mado et ses chèvres, et des dizaines de cigales, badges allumés.
+
+Le soleil sort de la mer. Lou ouvre la porte. Baptistin apparaît en tricot de marin et reste sans voix.
+
+Tous les badges jouent "joyeux anniversaire" en même temps, un peu faux, très fort.
+
+- Un phare, ça ne sert que si quelqu'un vient, murmure Baptistin. Vous êtes venus.
+
+Sur la balise, un nouveau message : MERCI 73. Bravo !
+
+== 68 FIN gagné
+Personne ne vient. Les badges de la ville se sont rendormis, et le mistral a emporté les messages.
+
+Alors, quand le soleil sort de la mer, c'est vous et Lou qui ouvrez la porte et chantez, un peu faux, très fort.
+
+Baptistin rit, s'essuie les yeux et sort trois tasses.
+
+- Un phare, ça ne sert que si quelqu'un vient. Et il suffit d'une personne.
+
+Vous avez trouvé le renard, et une amie. Bravo !
+
+== 69 FIN perdu
+Vous suivez la chèvre et son collier clignotant. Elle grimpe, descend, saute un ruisseau, mange un buisson, puis un autre...
+
+À l'aube, vous voilà de retour pile à la bergerie. La bergère vous tend un café.
+
+- Pistache ? Elle fait ce tour toutes les nuits. Son collier, c'est un GPS qui parle sur 868 MHz. Pas votre balise.
+
+Morale : tout ce qui clignote n'est pas un renard.

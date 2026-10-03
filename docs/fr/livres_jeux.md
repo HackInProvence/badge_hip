@@ -76,7 +76,15 @@ carte SD
     └── mon_livre.txt
 ```
 
-Le dépôt contient un exemple : `docs/sd/LIVRES/tresor_cigalon.txt` (le livre intégré au badge).
+Le dépôt contient des livres prêts à copier dans `docs/sd/LIVRES/`, chacun en français et en anglais :
+
+| Livre | Fichiers | Sections, fins |
+|---|---|---|
+| Le Trésor du capitaine Cigalon (le livre intégré au badge) | `tresor_cigalon.txt` | |
+| Panique au CTF / CTF Panic : le tableau des scores du CTF piraté la veille de la finale | `panique_ctf.txt`, `ctf_panic.txt` | 66 sections, 13 fins |
+| La Balise du Mistral / The Mistral Beacon : une chasse au renard radio à 433 MHz dans les calanques | `balise_mistral.txt`, `mistral_beacon.txt` | 69 sections, 12 fins |
+| La Cigale des profondeurs / The Deep-Sea Cicada : en sous-marin vers le vieux câble télégraphique d'Alger | `cigale_profondeurs.txt`, `deep_sea_cicada.txt` | 71 sections, 9 fins |
+| Le Robot du marché provençal / The Market Robot : le robot du marché détraqué avant le discours du maire | `robot_marche.txt`, `market_robot.txt` | 66 sections, 12 fins |
 
 > Respectez les droits d'auteur : n'utilisez que vos propres textes ou des œuvres libres de droits.
 

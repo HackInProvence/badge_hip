@@ -1,0 +1,707 @@
+The Deep-Sea Cicada
+The cicadas of Hack In Provence
+
+// A gamebook for the SecSea badge: a cicada in a submarine, off La Ciotat.
+// Format: see docs/en/gamebooks.md (the keywords stay French: FIN gagne, FIN perdu, de 1-3).
+// Check: python tools/gamebook_check.py this_file.txt
+// French version: cigale_profondeurs.txt (same section numbers).
+// Items: lamp, sardines (the shop), chart, Gaston (the gull), code (the buoy), key and Octave (the octopus).
+
+== 1
+The harbour of La Ciotat is waking up. The tall shipyard cranes stand against a pink sky, and the water smells of salt.
+
+You are Cicadina, a young and very curious cicada, and today is your first scientific dive!
+
+At the end of the quay waits a small yellow submarine, the Little Nautilus. On its roof, Professor Hippolyta, a seahorse with glasses, waves a fin.
+
+-> 2 : Climb aboard right now
+-> 3 : Visit the shop first
+-> 4 : Talk to the gull on the quay
+
+== 2
+"Welcome aboard!" says Hippolyta. "Our mission: find the cable station."
+
+In 1871, a telegraph cable ran from this coast to Algiers. A small relay station on the seabed repeated its messages. Then everybody forgot about it.
+
+"If we find it, we can plug in a hydrophone and listen to the sea. Where is it? Painted on an old buoy, in code."
+
+-> 5 : Cast off!
+
+== 3
+The harbour shop smells of rope and varnish. Behind the counter, Madam Mussel, a very old mussel, opens her shell a crack.
+
+"A diving cicada! For an explorer, it's free. But only one thing, mind you."
+
+On the counter: a waterproof signal lamp and a tin of sardines.
+
+-> 6 : Take the signal lamp
+-> 7 : Take the sardines
+-> 2 : Nothing, thanks: all aboard!
+
+== 4
+On a mooring post sits a huge gull with a pirate patch over one eye. It's Gaston, the treasure-hunting seagull.
+
+"Psst, cicada. A submarine, a mysterious look... You're after a treasure, aren't you?"
+
+-> 8 : "No, an old cable."
+-> 9 : "Yes! A chest full of gold!"
+-> 2 : Say hello and walk on
+
+== 5
+The Little Nautilus slides out of the harbour. You pass under the big shipyard crane, then by the Green Island.
+
+Three dolphins leap next to the porthole, as if to wish you a good trip.
+
+Far away, a rusty buoy bobs on the waves. Behind it, the sky is turning grey.
+
+-> 10 : Head for the buoy
+-> 26 : Follow the dolphins
+
+== 6
+Madam Mussel hands you the lamp: a big yellow box with a trigger.
+
+"Short press, long press: that's Morse code. Sailors use it when the radio goes quiet."
+
+You clip it to your belt.
+
++[lamp]
+
+-> 2 : Hurry to the submarine
+-> 4 : Go and see the gull
+
+== 7
+A tin of sardines in olive oil, with a smiling sardine on the lid.
+
+"You never know," says Madam Mussel. "At the bottom of the sea, everybody's hungry."
+
+You slip it into your bag.
+
++[sardines]
+
+-> 2 : Hurry to the submarine
+-> 4 : Go and see the gull
+
+== 8
+"A cable?" Gaston pulls a face. "Copper, wires, pfff. Not one gold coin."
+
+He rummages under his wing and pulls out a yellowed paper.
+
+"Here, found it in a bottle. Just drawings of cables. Boring."
+
+An old sea chart! A cross marks a "chimney" on the roof of the station.
+
++[chart]
+
+-> 2 : Thank him and go aboard
+
+== 9
+Gaston's eye lights up like a lighthouse.
+
+"Gold! I knew it! I'm coming with you, partner. Fifty-fifty, right?"
+
+He lands on the roof of the submarine and refuses to move. You feel a bit guilty: that wasn't exactly true.
+
++[Gaston]
+
+-> 2 : Go aboard, Gaston on the roof
+
+== 10
+The buoy is covered in rust and tiny crabs. On its side, white painted letters:
+
+FDEOH DW WKH FUDQH
+
+And below, smaller: "Jules C. moved forward 3."
+
+"Julius Caesar!" says Hippolyta. "He shifted every letter along the alphabet. To read it, go back 3: F becomes C..."
+
+-> 11 : "CABLE AT THE CRANE"
+-> 12 : "SOUND OF THE WAVES"
+-> 14 [Gaston] : Let Gaston read it
+-> 13 : No time, dive!
+
+== 11
+F, E, D... C! D, C, B... A! Letter by letter, you read:
+
+CABLE AT THE CRANE
+
+"Well done!" Hippolyta does a happy somersault. "An old shipyard crane fell into the sea during a storm. The cable must pass close by!"
+
++[code]
+
+-> 15 : Go on
+
+== 12
+Hippolyta checks her notebook.
+
+"Hmm. S moved forward 3 gives V, not F. That doesn't fit."
+
+You count again on your legs. She's right: start from the letters on the buoy and go back three.
+
+-> 10 : Read the buoy again
+-> 13 : Never mind, dive without it
+
+== 13
+"All right," sighs Hippolyta. "We'll follow the cable along the bottom. It will just take longer."
+
+She closes the hatch. At that very moment, a fat raindrop splashes on the porthole.
+
+-> 15 : Go on
+
+== 14
+Gaston leans over, squints with his one eye and declares:
+
+"Easy. It says: TREASURE HERE."
+
+He dives head first along the buoy's chain... and comes up with an old boot full of seaweed.
+
+"The treasure is in the boot. Obviously."
+
+Hippolyta rolls her eyes.
+
+-> 10 : Decipher it yourself
+
+== 15
+The wind rises all at once. The mistral! The waves grow, the foam flies, the Little Nautilus bobs like a cork.
+
+"Emergency dive!" shouts Hippolyta. "Hold on!"
+
+She pulls the lever. Everything depends on the next wave...
+
+-> 16 [de 1-2] : A huge wave is coming...
+-> 17 [de 3-6] : The submarine dives in time
+
+== 16
+The wave lifts the submarine, turns it half over, drops it again. You roll from the ceiling to the floor. So does your stomach, the other way round.
+
+"Everything all right?" asks Hippolyta, looking very green.
+
+Outside, the storm howls.
+
+-> 17 : Dive anyway!
+-> 18 : Go back to the harbour
+
+== 17
+Ten metres, twenty metres... The noise of the storm fades away. Under the waves, everything is calm, blue and silent.
+
+A school of salema fish glitters past. On the sand, a long black pipe covered in shells stretches away: the cable!
+
+"Which way?" asks Hippolyta.
+
+-> 19 [code] : Head for the sunken crane
+-> 20 : Follow the cable
+-> 21 : Visit the seagrass meadow
+
+== 18 FIN perdu
+You go back to the harbour, soaked to the antennae. Madam Mussel serves you a hot panisse while the rain drums on the roof.
+
+The storm lasts three days. On the fourth, Hippolyta has to give the submarine back to the lab.
+
+The station will wait: it's used to it, after a hundred years.
+
+Moral: under the storm, the sea is calm. You just had to dive.
+
+== 19
+A giant shadow appears: the sunken crane! Lying on the seabed, its steel arm has become a forest of orange sponges and red sea fans.
+
+Hundreds of fish live there. The cable passes under the crane's cabin... but the way is blocked by a huge brown lump that snores.
+
+-> 30 : Get closer to the brown lump
+
+== 20
+The cable winds across the sand. You follow it for a long time, headlights on. A starfish waves at you with one arm.
+
+The cable reaches a fork: to the left, a field of old amphoras; to the right, a big metal shadow.
+
+-> 22 : Left, to the amphoras
+-> 19 : Right, to the big shadow
+
+== 21
+A meadow under the sea! The posidonia waves like long green hair. "It's not seaweed," Hippolyta explains. "It's a flowering plant. It makes oxygen and shelters thousands of baby fish."
+
+Suddenly, BOOM: a boat's anchor drops and drags through the meadow, tearing out whole clumps!
+
+-> 23 [lamp] : Signal to the boat
+-> 24 : Free the anchor with the claw
+-> 25 : That's not our mission
+
+== 22
+The field of amphoras looks like an old sunken market. From inside one of them, two eyes are watching you.
+
+An octopus slowly comes out, changing colour: white, red, striped, spotted.
+
+"Hello! I'm Octave. I collect shiny things and I love puzzles. Want to play?"
+
+-> 37 : Talk with Octave
+
+== 23
+You press the lamp against the roof porthole and flash: short, long, short...
+
+Up on deck, a little girl reads the Morse code with her phone:
+
+"ANCHOR ON SEAGRASS. PLEASE MOVE."
+
+A few minutes later, the anchor goes up, and the boat moves over to a patch of sand.
+
+-> 28 : Go on
+
+== 24
+Hippolyta extends the submarine's robotic claw. You steer with the joystick, tongue between your mandibles.
+
+You must free the anchor without hurting the plants. It's tricky...
+
+-> 28 [de 4-6] : Gently... got it?
+-> 29 [de 1-3] : Oops, the claw is stuck...
+
+== 25
+"Not our mission?" Hippolyta looks at you over her glasses. "One metre of meadow takes a century to grow, Cicadina."
+
+You blush to the tips of your antennae. Too late: the boat is already leaving, and there's a hole in the meadow.
+
+A little sad, you set off along the cable again.
+
+-> 22 : Follow the cable
+
+== 26
+The dolphins circle the submarine, laughing in clicks. They race west, come back, race off again: they want to play!
+
+Hippolyta hesitates.
+
+"It's wonderful... but the buoy is that way, and the sky is getting dark."
+
+-> 10 : Go back to the buoy
+-> 27 : Follow them a little longer
+
+== 27 FIN perdu
+A little longer, then a little longer... The dolphins lead you all the way to the Old Port of Marseille, their favourite place: the fish market.
+
+The Little Nautilus has run out of battery. A water taxi tows you back to La Ciotat, while tourists take pictures.
+
+Moral: dolphins are great guides, but never to where you're going.
+
+== 28
+Peace returns. A small cuttlefish swims up, changes colour to say thank you, then points somewhere with its tentacles.
+
+"She says the octopus of the amphoras knows all about the cable," Hippolyta translates.
+
+A ball of seagrass fibre rolls past the porthole. On the beaches, people call them sea balls.
+
+-> 22 : Go and see the octopus
+
+== 29 FIN perdu
+The claw gets stuck in the anchor. Above, the boat pulls up its anchor... and the Little Nautilus with it!
+
+There you are, dangling under the hull like a giant key ring. The skipper, a man in shorts, can't believe his eyes.
+
+He kindly brings you back to the harbour, where the whole of La Ciotat comes to take pictures.
+
+Moral: the meadow is saved, but the expedition ends here.
+
+== 30
+The brown lump opens one eye. It's a grouper, as big as a fridge, with an old sailor's moustache.
+
+"More tourists! This is MY crane. The passage is closed."
+
+He yawns: the Little Nautilus could almost fit in his mouth.
+
+-> 31 [sardines] : Offer him the sardines
+-> 33 [Octave] : Let Octave talk to him
+-> 32 : Ask him politely
+-> 22 : Try somewhere else
+
+== 31
+You open the tin in front of the porthole. The grouper sniffs. His moustache quivers.
+
+"Olive oil? Hmph. Just this once."
+
+He swallows the lot in one gulp, burps a huge bubble and moves aside.
+
+"The station is behind me, in the crevice. And keep it quiet!"
+
+-[sardines]
+
+-> 47 : Enter the crevice
+
+== 32
+"Politely?" the grouper grumbles. "Answer my question and I'll move. Otherwise, I sleep."
+
+He points a fin at the seagrass meadow in the distance.
+
+"How old can a meadow like that one be?"
+
+-> 35 : Older than the pyramids
+-> 34 : A few months, like grass
+-> 34 : None of your business!
+
+== 33
+Octave swims up to the grouper and pats him on the head.
+
+"Marcel! These are my friends. And you owe me a game of draughts."
+
+The grouper sighs a very, very long sigh.
+
+"Fine, fine. For Octave. But keep it quiet."
+
+He moves aside, revealing a dark crevice behind the crane.
+
+-> 47 : Enter the crevice
+
+== 34
+The grouper closes his eyes.
+
+"Pfff. Tourists. I'm sleeping."
+
+And he snores, so loudly that the sea fans shake.
+
+-> 36 : Wait for him to wake up
+-> 22 : Look for help elsewhere
+
+== 35
+The grouper opens both eyes, surprised.
+
+"Correct. Some meadows are thousands of years old. They were here before the harbour, before the boats, before the cicadas."
+
+He slowly moves aside.
+
+"You're smarter than the others. The station is in the crevice. Treat it with respect."
+
+-> 47 : Enter the crevice
+
+== 36 FIN perdu
+You wait. The grouper snores. You wait some more. A grouper can live fifty years, and this one loves his naps.
+
+In the evening, the battery light of the Little Nautilus blinks: time to go up.
+
+Moral: a grouper only wakes up for a good answer... or a sardine.
+
+== 37
+Octave curls around an amphora.
+
+"The cable? Of course I know it. And the station too: that's where I found my finest treasure."
+
+He gives you a cheeky look.
+
+"But nothing is free down here. A puzzle for my help!"
+
+-> 38 : Accept the puzzle
+-> 39 : "Just tell us the way..."
+
+== 38
+Octave holds shells in all eight arms.
+
+"Listen carefully. This morning, I had 2 shells in each arm. A crab stole 3. How many do I have left?"
+
+He changes colour, impatient.
+
+-> 40 : Thirteen
+-> 41 : Sixteen
+-> 41 : Five
+
+== 39
+"Just the way?" Octave turns grey with disappointment. "Far too easy! Life without puzzles is like the sea without salt."
+
+He crosses four arms over the other four and waits.
+
+-> 38 : All right, the puzzle!
+
+== 40
+"Thirteen! Eight times two is sixteen, minus three!" Octave turns bright pink with joy.
+
+He rummages in his amphora and pulls out a big brass key, all green with age.
+
+"My finest treasure. It comes from the station. Take it!"
+
++[key]
+
+-> 42 : "Come with us, Octave!"
+-> 43 : Thank him and leave
+
+== 41
+"Wrong!" Octave laughs, sending bubbles everywhere. "But I'm a good sport: a rematch?"
+
+He puts three shells on the sand, hides a pebble under one of them and shuffles them with all eight arms, very, very fast.
+
+-> 44 : Play the rematch
+
+== 42
+Octave sticks to the porthole like a giant suction cup.
+
+"With pleasure! I know the guard of the passage, Marcel the grouper. He's grumpy, but he's my draughts partner."
+
++[Octave]
+
+-> 30 : Head for the sunken crane
+
+== 43
+"Good luck!" says Octave. "The station is behind the sunken crane. Watch out for the grouper, he's grumpy."
+
+He vanishes into his amphora, leaving just one arm out to wave goodbye.
+
+-> 30 : Head for the sunken crane
+
+== 44
+Eight arms, three shells: impossible to follow! You point at a shell at random...
+
+-> 40 [de 4-6] : Octave lifts the shell...
+-> 45 [de 1-3] : Octave lifts the shell...
+
+== 45
+Empty! The pebble was under another one.
+
+"One more?" Octave suggests, eyes shining. "Octopuses never get tired of games."
+
+Hippolyta looks at her watch.
+
+-> 38 : Try the puzzle again
+-> 46 : Play again, and again...
+-> 30 : Leave without his help
+
+== 46 FIN
+You play. Shells, riddles, draughts, even Morse code with colours. Octave is delighted, and so are you.
+
+When the battery runs low, Hippolyta takes you back to the harbour. The station will wait, but you are now the champion of octopus games.
+
+Every summer, you come back to play with Octave. It wasn't the mission, but it's a fine friendship.
+
+== 47
+Behind the crane, a crevice plunges into darkness. The Little Nautilus is too big to get in.
+
+"Your turn, Cicadina," says Hippolyta, handing you a bubble helmet. "You're small, you'll fit."
+
+You leave through the airlock. The water is cool, your wings float behind you. Deep down, something gleams.
+
+-> 48 [lamp] : Switch on the lamp
+-> 49 [!lamp] : Feel your way forward
+
+== 48
+The yellow beam lights up the crevice. Shrimps flee, blinking. On the rock wall, an engraved plate:
+
+"RELAY STATION - LA CIOTAT-ALGIERS CABLE - 1871"
+
+In front of you, a metal dome covered in coral, with a round door.
+
+-> 50 : Go up to the door
+
+== 49
+It's as dark as an inkwell. You switch on the LEDs of your badge: a tiny blue glow.
+
+You bump into something soft.
+
+"Excuse me!" says a sea cucumber, very offended.
+
+"Sorry," you reply. And then you finally see it: the round door of a dome covered in coral.
+
+-> 50 : Go up to the door
+
+== 50
+The station door is made of bronze, round like a giant porthole. In the middle, a huge lock. The handle won't move a millimetre.
+
+A thick cable enters the dome from the side, like a root.
+
+-> 51 [key] : Try the brass key
+-> 53 [Octave] : Ask Octave for help
+-> 52 [chart] : Look at Gaston's chart
+-> 54 : Push with all your might
+
+== 51
+The key slides into the lock. You turn it with both legs. It resists... then, with a deep "clonk", the door swings open.
+
+A big air bubble escapes and rushes up to the surface.
+
+-> 56 : Enter the station
+
+== 52
+On the chart, a cross marks a "chimney" on the roof of the dome. You swim up: there is indeed a pipe, just wide enough for a small cicada.
+
+You fold your wings, squeeze in... and land inside the station.
+
+-> 56 : Look around
+
+== 53
+"A lock?" Octave smiles. "Octopuses have no bones: I get in everywhere."
+
+He slips under the door through a tiny gap, like toothpaste. Click, clack: arms are busy inside.
+
+The door opens. Octave waves at you with four arms.
+
+-> 56 : Enter the station
+
+== 54
+You push. You pull. You push again. The door doesn't move, but a family of rainbow wrasse comes to watch, as if at a show.
+
+"You need a key," says Hippolyta over the radio. "Or someone very bendy."
+
+-> 22 : Look for the octopus
+-> 55 : Give up and go back up
+
+== 55 FIN perdu
+You go back up with pictures of the door, the plate and the wrasse. That's already a fine discovery.
+
+But nobody gets into the station this year. Hippolyta is already planning an expedition for next summer.
+
+Moral: you go around a locked door, you don't push it.
+
+== 56
+Surprise: the station is full of air! A bubble trapped for a hundred years. You take off your helmet.
+
+Copper and brass everywhere: a Morse key, coils, a big box where the cable comes in. On a desk lie a leather logbook and a paper tape.
+
+Hippolyta, on the radio: "If you can reconnect the cable, we'll plug in the hydrophone!"
+
+-> 57 : Read the paper tape
+-> 58 : Open the big box
+-> 59 : Leaf through the logbook
+
+== 57
+On the tape, the last message the station received:
+
+-- .. .-. .- -.-. .-.. .
+
+On the wall, an old half-faded chart:
+
+A .-  C -.-.  E .  G --.
+I ..  L .-..  M --  R .-.
+
+Below, in ink: "The word on the tape opens the box."
+
+-> 60 : MIRACLE
+-> 61 : RECLAIM
+-> 61 : MAGICAL
+
+== 58
+The big box is locked with a letter dial, like an old safe. A plate says: "PASSWORD".
+
+You try 1234. Nothing. 0000? Nothing. PASSWORD? A spring goes "boing", offended.
+
+-> 57 : Look for a clue in the room
+
+== 59
+The logbook is written in purple ink. The telegraph operators noted everything: the weather, the messages... and biscuit recipes!
+
+The last page is from 1920: "Storm. We are going up. May the station keep watch."
+
+It's a treasure of history.
+
+-> 63 : Go up with the logbook
+-> 57 : First, read the tape
+
+== 60
+M, I, R, A, C, L, E. A miracle indeed! You turn the dial letter by letter.
+
+Clack! The box opens. Inside, copper contacts well protected by grease. You plug in the hydrophone wire that Hippolyta passed through the airlock.
+
+Relays clatter, a small lamp lights up. A hundred years later, the station wakes up!
+
+-> 62 : Listen
+
+== 61
+You turn the dial. The box goes "brrrt" and stays shut.
+
+"Count the dots and dashes again," says Hippolyta over the radio. "A dot is short, a dash is long, and each group is one letter."
+
+-> 57 : Read the tape again
+
+== 62
+In the headphones, the sea sings. The clicks of the dolphins, the crackle of the shrimps, the distant breath of a fin whale passing far away.
+
+"It works!" shouts Hippolyta. "The sound goes down the cable all the way to the coast!"
+
+The station has become an ear under the sea. All that's left is to tell the harbour.
+
+-> 64 : Go back up to the surface
+
+== 63 FIN gagne
+You go back up with the logbook, safe in a waterproof bag.
+
+In La Ciotat, the museum puts it in a glass case: "Logbook of the cable station, 1871-1920. Found by Cicadina."
+
+The station still sleeps on the seabed, but its story is saved. And the museum throws a biscuit party, using the operators' recipe.
+
+Another ending, a louder one, may be waiting for you...
+
+== 64
+The Little Nautilus surfaces. The storm is over, and the sun sets behind the Eagle's Beak cliff.
+
+But the submarine's radio got wet. How can you tell the harbour that the station works?
+
+"With light signals!" says Hippolyta. "The harbour expects a very simple message: OK."
+
+-> 65 [lamp] : Take out the signal lamp
+-> 65 [!lamp] : Flash the headlights
+-> 66 [Gaston] : Who's screeching up there?
+
+== 65
+You aim at the harbour master's office, at the end of the quay. You must send OK in Morse code.
+
+On the dashboard, a reminder:
+
+K -.-  L .-..
+O ---  S ...
+
+Which signal do you send?
+
+-> 67 : --- -.-
+-> 68 : ... --- ...
+-> 69 : .-.. --- .-..
+
+== 66
+Gaston the seagull lands on the roof, flapping his wings.
+
+"Partner! I've been looking everywhere for you! So, the gold? Where's the gold?"
+
+He stares at your empty legs. His eye patch trembles with outrage.
+
+-> 70 : Let him listen to the sea
+-> 71 : "There's no gold, sorry..."
+
+== 67 FIN gagne
+On the quay, a light answers: --- -.- . OK!
+
+The next day, all of La Ciotat listens to the sea through the harbour loudspeakers: the dolphins, the shrimps, the whale. School classes come to visit the new observatory.
+
+An octopus moves into the station, the old grouper guards the passage, and the cable sings again, a hundred years later.
+
+Well done, Cicadina: the best discovery is the one you share!
+
+== 68 FIN perdu
+Three dots, three dashes, three dots: SOS!
+
+Ten minutes later, a lifeboat, two jet skis and a helicopter surround you. The rescuers are very nice... a little less so once they understand.
+
+The station works, but what everyone remembers is the cicada who called the rescue services to say OK.
+
+Moral: in Morse code, one wrong letter changes everything.
+
+== 69
+Dot dash dot dot, three dashes, dot dash dot dot: L, O, L.
+
+After a long silence, the harbour office replies: .... .- .... .-
+
+H, A, H, A. Hippolyta bursts out laughing. The harbour master has a sense of humour.
+
+-> 65 : Send the right message
+
+== 70
+You hand him the headphones. Gaston listens: the dolphins, the shrimps, the song of the whale...
+
+His eye gets misty.
+
+"It's... it's more beautiful than gold. I must tell every gull in the harbour!"
+
+He flies off, shouting the news across the whole bay.
+
+-[Gaston]
+
+-> 65 : Tell the harbour
+
+== 71
+"No gold?!" Gaston turns red under his feathers. "You lied to me!"
+
+Sulking, he grabs the first shiny thing he sees: Hippolyta's glasses! And off he flies towards the Green Island.
+
+"At least these shine!"
+
+Hippolyta squints. She can't see a thing: you'll have to send the message.
+
+-[Gaston]
+
+-> 65 : Tell the harbour

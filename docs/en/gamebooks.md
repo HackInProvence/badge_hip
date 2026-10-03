@@ -77,7 +77,15 @@ SD card
     └── my_book.txt
 ```
 
-The repository holds an example: `docs/sd/LIVRES/tresor_cigalon.txt` (the book built into the badge).
+The repository holds books ready to copy in `docs/sd/LIVRES/`, each in French and in English:
+
+| Book | Files | Sections, endings |
+|---|---|---|
+| Le Trésor du capitaine Cigalon (the book built into the badge) | `tresor_cigalon.txt` | |
+| CTF Panic / Panique au CTF: the CTF scoreboard hacked the night before the final | `ctf_panic.txt`, `panique_ctf.txt` | 66 sections, 13 endings |
+| The Mistral Beacon / La Balise du Mistral: a 433 MHz radio foxhunt in the calanques | `mistral_beacon.txt`, `balise_mistral.txt` | 69 sections, 12 endings |
+| The Deep-Sea Cicada / La Cigale des profondeurs: by submarine to the old telegraph cable to Algiers | `deep_sea_cicada.txt`, `cigale_profondeurs.txt` | 71 sections, 9 endings |
+| The Market Robot / Le Robot du marché provençal: the market robot gone haywire before the mayor's speech | `market_robot.txt`, `robot_marche.txt` | 66 sections, 12 endings |
 
 > Respect copyright: only use your own texts or works free of rights.
 

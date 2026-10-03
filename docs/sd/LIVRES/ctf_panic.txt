@@ -1,0 +1,620 @@
+CTF Panic
+The cicadas of Hack In Provence
+
+// A gamebook for the SecSea badge, in La Ciotat.
+// Format: see docs/en/gamebooks.md. Check: python tools/gamebook_check.py this_file.txt
+// French version: panique_ctf.txt (same section numbers).
+// Items: USB key and log (server room), navettes (coffee), map (Jojo), Flipper (Lilou),
+// lockpicks (Bernard), signal (Marius's remote), proof (the robot in the shipyard).
+
+== 1
+It's the day of the SecSea CTF final, in La Ciotat. You are still asleep when your cicada badge buzzes:
+
+"ALERT: scoreboard hacked!"
+
+You rush to the conference. On the big screen, every team has zero points. At the top, an ASCII art cicada with 31337 points sings "CHIRP-CHIRP".
+
+Mireille, head of the CTF, grabs your sleeve.
+- No culprit, no final tonight! Your team is still in bed? Then you investigate!
+
+-> 2 : Run to the server room
+-> 3 : Look around the main hall
+-> 4 : Coffee first, it's vital
+
+== 2
+The server room is a closet behind the stage. Jojo, the sysadmin, has red eyes and his t-shirt on inside out.
+- The scores were rewritten last night at 3:12 am, from the conference wifi. But the hall was locked!
+
+Near the rack, something shiny lies on the floor: a USB key with a cicada sticker.
+
+-> 5 [!USB key] : Pick up the USB key
+-> 6 : Question Jojo
+-> 3 : Go to the main hall
+
+== 3
+The hall is buzzing. Stands everywhere, stickers everywhere, cables everywhere. You hear soldering irons, clicking padlocks and a speaker testing a mic.
+
+On the giant screen, the ASCII cicada is still singing. The final starts tonight at 8 pm.
+
+-> 10 : The hardware village
+-> 15 : The lockpicking table
+-> 19 : The talk room
+-> 22 : The sponsor stand
+-> 25 : Go out to the beach
+-> 29 : Go to the old shipyard
+-> 50 : Report to Mireille
+
+== 4
+The coffee line is long. In front of you, a tall guy in a black hoodie whispers on the phone:
+- Tonight I wipe everything. Nobody will ever know what was there.
+
+He takes his coffee and heads for the beach. On the table sits a box of navettes, the orange blossom biscuits of Provence. You grab a handful.
+
++[navettes]
+
+-> 23 : Follow the black hoodie
+-> 2 : Go to the server room
+-> 3 : Go to the main hall
+
+== 5
+You pick up the key. Jojo raises his hands.
+- Not mine. And whatever you do, don't plug it in anywhere! A key found on the floor is the oldest trick in the book.
+
++[USB key]
+
+-> 7 : Plug it into your laptop, quick
+-> 8 : Ask for Jojo's quarantine PC
+-> 3 : Keep it and go to the hall
+
+== 6
+Jojo yawns.
+- At night the hall is locked. But the conference wifi reaches the old shipyard, through a radio link on the roof. Last year the CTF had rooms over there.
+
+His stomach growls.
+- Sorry. Haven't eaten since yesterday.
+
+-> 9 [navettes] : Offer him your navettes
+-> 5 [!USB key] : Pick up the USB key
+-> 8 [USB key] : Show him the USB key
+-> 3 : Go to the main hall
+
+== 7 FIN perdu
+You plug in the key. The screen flickers, a window opens by itself and letters fly across it: a "BadUSB" key, typing on the keyboard for you!
+
+Ten seconds later, your laptop has posted on the CTF chat: "I hacked the scoreboard. CHIRP-CHIRP!"
+
+Mireille puts you on the suspect bench for the day.
+
+Moral: never plug in a key you found on the floor.
+
+== 8
+Jojo pulls out an old laptop with no wifi and no hard drive, kept for dodgy objects. The key can't harm anything there.
+
+Inside: a script called "cigalebot.py", a log, and a blurry photo of a rusty electrical cabinet: "SHIPYARD - CABINET 3".
+
+The log says: "Waiting for 433.92 MHz signal... Signal received! Scoreboard updated."
+
++[log]
+
+-> 29 : Hurry to the old shipyard
+-> 3 : Back to the main hall
+
+== 9
+Jojo wolfs down the navettes in three seconds.
+- You saved my life. Here, take this.
+
+He hands you a map of the old shipyard, printed last year. A service door is circled in marker: "staff entrance".
+
+-[navettes] +[map]
+
+-> 29 : Go to the shipyard
+-> 3 : Back to the main hall
+
+== 10
+The hardware village smells of solder and cold coffee. Lilou, twelve years old, is coding on a Flipper Zero: a small orange gadget with a dolphin on its screen.
+- It reads remotes, badges, gates... I'll lend it to you if you finish my LED kit. My iron is too heavy for me.
+
+-> 11 [!Flipper] : Pick up the soldering iron
+-> 14 : Ask if she caught anything weird
+-> 3 : Back to the main hall
+
+== 11
+You pick up the soldering iron. A drop of solder, one LED leg, then another... You need a steady hand.
+
+The badge rolls the die...
+
+-> 12 [de 1-2] : Hmm, some smoke...
+-> 13 [de 3-6] : The LEDs light up!
+
+== 12
+The LED is soldered backwards. The kit now blinks "SOS" in Morse. Lilou bursts out laughing.
+- That's almost better. But I'm keeping my Flipper for now. Try again?
+
+-> 11 : Pick up the iron again
+-> 14 : Talk about weird signals instead
+-> 3 : Back to the main hall
+
+== 13
+All the LEDs light up, in the shape of a cicada. Lilou claps.
+- A deal is a deal! Here, but give it back tonight.
+
+She shows you: the "Sub-GHz" menu, then "Read", and the Flipper records the radio signals around you.
+
++[Flipper]
+
+-> 14 : Ask if she caught anything weird
+-> 3 : Back to the main hall
+
+== 14
+- Weird? Last night I was camping near the beach with my parents. At 3:12 am my Flipper caught a 433.92 MHz signal. Really strong, right next to the shipyard.
+
+She shrugs.
+- Probably a gate remote. They're everywhere around here.
+
+-> 25 : Check out the beach
+-> 10 : Back to Lilou's workbench
+-> 3 : Back to the main hall
+
+== 15
+Behind the lockpicking table, Bernard, a retired locksmith with a musketeer moustache, lines up see-through padlocks.
+- Rule number one: you only pick your own locks, or with the owner's permission. Rule number two: patience.
+
+-> 16 [!lockpicks] : Try a practice padlock
+-> 3 : Back to the main hall
+
+== 16
+You slide in the tension wrench, then the pick. You feel the pins, one by one. Bernard holds his breath, and so does his moustache.
+
+The badge rolls the die...
+
+-> 17 [de 1-2] : Crack...
+-> 18 [de 3-6] : Click!
+
+== 17
+The pick slips, the padlock stays shut, and you pinch your finger.
+- Patience, little cicada, says Bernard. It took me twenty years.
+
+-> 16 : Try again
+-> 3 : Back to the main hall
+
+== 18
+Click! The padlock opens. Bernard wipes away a tear.
+- Well done! Here, a small set of lockpicks. And remember rule number one.
+
+He adds:
+- At the old shipyard, Fernand the caretaker lost his key in 1987. He'll be glad to see you.
+
++[lockpicks]
+
+-> 3 : Back to the main hall
+
+== 19
+In the talk room, a speaker in a flowery shirt presents "433 MHz: your gates are betraying you".
+
+The room is cool, the seats are soft, the air conditioning purrs...
+
+-> 20 : Ask a question at the end
+-> 21 : Close your eyes, just five minutes
+-> 3 : Back to the main hall
+
+== 20
+- Many remotes always send the same code, the speaker explains. And cheap models often leave the factory with the same default code!
+
+She adds:
+- Never replay a recorded code at random. You don't know what it opens... or where.
+
+-> 25 : Go think on the beach
+-> 3 : Back to the main hall
+
+== 21 FIN perdu
+Five minutes turn into five hours. You wake up in the empty room, with the seat pattern printed on your cheek.
+
+Outside, everyone is heading for drinks: with no culprit, the final has been cancelled.
+
+Moral: the air conditioning of a talk room is more dangerous than any hacker.
+
+== 22
+At the CyberShield 3000 stand, a salesman in a shiny suit jumps on you.
+- Our AI has already found the hacker: the tall guy in the black hoodie! Hackers always wear black hoodies. It's statistics.
+
+He hands you a t-shirt and a forty-page brochure.
+
+-> 23 : Look for the black hoodie
+-> 3 : Politely go back to the hall
+
+== 23
+The black hoodie walks to the beach, coffee in hand. He stops under a palm tree and talks to himself, waving his arms.
+- ...and then I delete everything! All gone!
+
+-> 24 : Walk up and talk to him
+-> 42 : Spy on him from behind a palm
+-> 3 : Forget it
+
+== 24
+- Me, a hacker? He laughs. I'm Zed, I give the closing talk: "How I cleaned up my grandma's PC". I'm rehearsing, that's all!
+
+He thinks for a second.
+- But last night, from my hotel, I saw a little light blinking in the old shipyard. Around 3 am.
+
+-> 29 : Go to the shipyard
+-> 25 : Stay on the beach
+-> 3 : Back to the main hall
+
+== 25
+The beach of La Ciotat sparkles in the sun. At the end of the harbour stand the cranes of the old shipyard.
+
+A fisherman mends a net on his pointu, a little blue wooden boat. A gabian, the huge seagull of Provence, stares at you with a yellow eye. Someone laughs on the bar terrace.
+
+-> 26 : Talk to the fisherman
+-> 46 : Approach the seagull
+-> 61 : Go to the terrace
+-> 66 : Listen to the radio with the badge
+-> 28 : Jump into the sea
+-> 29 : Go to the shipyard
+-> 3 : Back to the main hall
+
+== 26
+- Marius, at your service!
+
+He shows you a brand new little remote.
+- I keep my pointu in the old shipyard dock. Every night at 3:12 I open the gate with this, and off I go fishing! Bought it online last week. Two euros!
+
+-> 27 [Flipper] : Record his remote
+-> 63 : Ask him to open the gate
+-> 25 : Back to the beach
+
+== 27
+With Marius's permission, you start the Flipper and he presses his remote. The screen shows: "433.92 MHz, fixed code 5A3C". Recorded!
+
++[signal]
+
+- Fan de chichoune, you can copy these things? Well, if it's for the shipyard gate, you have my permission. Tell Fernand.
+
+-> 43 : Test the code right now
+-> 29 : Go to the shipyard
+-> 25 : Back to the beach
+
+== 28 FIN perdu
+The water is 24 degrees, crystal clear, perfect. You float on your back. Then a bit of snorkelling. Then a little nap on the sand.
+
+By evening you have a badge-shaped sunburn, and the final has been cancelled.
+
+Moral: the Mediterranean is a detective's worst enemy.
+
+== 29
+The old shipyard is huge: rusty hangars, a giant crane, seagulls everywhere. On a roof, a small antenna points at the conference: the wifi link!
+
+The big gate is shut. Next to it, a small door with an old padlock. In a booth, a caretaker is snoring.
+
+-> 30 : Wake up the caretaker
+-> 35 [map] : Find the staff entrance
+-> 34 : Climb over the fence
+-> 25 : Go to the beach
+-> 3 : Back to the main hall
+
+== 30
+- Fernand, caretaker since 1974. The gate? Only Marius opens it, with his remote. And the small door, I lost the key in 1987.
+
+He sighs.
+- If you can open it, you have my permission. Me, I use a hole in the fence... but that's a secret.
+
+-> 31 [lockpicks] : Pick the small door
+-> 33 [signal] : Replay Marius's code
+-> 62 [navettes] : Share your navettes
+-> 25 : Fetch Marius from the beach
+-> 3 : Back to the main hall
+
+== 31
+Fernand watches you, arms crossed. The padlock is old, rusty and stubborn. Tension wrench, pick, one pin after another...
+
+The badge rolls the die...
+
+-> 32 [de 1] : Crack!
+-> 36 [de 2-6] : Click!
+
+== 32
+Crack! The pick snaps clean inside the padlock. Fernand nods.
+- And that's why I use the fence.
+
+Your lockpicks are done for.
+
+-[lockpicks]
+
+-> 30 : Think of something else with Fernand
+-> 3 : Back to the main hall
+
+== 33
+- It's Marius's code, and I have his permission, you tell Fernand.
+
+You press the Flipper button. The big gate creaks and swings open.
+
+At that very moment your badge buzzes: "ALERT: scoreboard hacked!" Jojo had only just fixed it...
+
+The gate and the hacker obey the same code. Interesting.
+
+-> 36 : Enter the shipyard
+
+== 34 FIN perdu
+You climb the fence. At the top, your t-shirt catches on a spike, and there you stay, between sky and fence, waving your arms.
+
+Firefighters arrive, then tourists, then cameras. By evening the video "The fence cicada" has gone round the whole conference. The final, however, is cancelled.
+
+Moral: you walk around a fence, you don't climb it.
+
+== 35
+The map leads you behind hangar 2, along old rails. The service door isn't even locked: just stuck with a paint bucket.
+
+A faded sign: "CTF 2025 staff entrance".
+
+-> 36 : Go in
+
+== 36
+The hangar is huge and silent. Tables from last year, stacked chairs, a reel of network cable. At the back, a row of electrical cabinets.
+
+On the third one, a small green LED is blinking. Your badge picks up faint radio noise.
+
+-> 37 : Open cabinet 3
+-> 29 : Go back out, it's too quiet
+
+== 37
+In the cabinet, between the circuit breakers, a Raspberry Pi is taped to the wall, with a small antenna and a 433 MHz receiver. A sticker: "CIGALE-BOT".
+
+It runs on the shipyard's power and is connected to the conference wifi. It's waiting.
+
+-> 38 : Unplug it right now
+-> 39 : Examine it first
+
+== 38
+You pull the cable. The LED goes out. No more robot, no more hack!
+
+But when Mireille asks "Who? How? Why?", what will you answer?
+
+-> 39 : Examine it, now it's asleep
+-> 59 : Run and tell the good news
+
+== 39
+On the case, a handwritten label: "Prank for the 2025 closing. Code 5A3C: the cicada wins the CTF! Lea."
+
+A joke from last year that never worked... and was forgotten in the cabinet. You take photos and keep the label.
+
++[proof]
+
+But who sends the code every night?
+
+-> 40 [signal] : Compare with Marius's code
+-> 41 [log] : Compare with the key's log
+-> 64 : Bring the robot to Mireille
+
+== 40
+5A3C. The code on the label is exactly the code of Marius's remote!
+
+It all makes sense: Lea used a two-euro remote. Marius bought the same model this week, with the same factory code. Every night at 3:12, on his way fishing, he hacks the CTF without knowing it!
+
+And the robot still gets onto the wifi, because its password hasn't changed since last year.
+
+-> 64 : Bring the robot to Mireille
+
+== 41
+The log on the USB key and the robot's log match: "Signal received, 3:12". The key is a backup of CIGALE-BOT, lost yesterday in the server room.
+
+Now, who sends that signal at 3:12? An early riser with a remote?
+
+-> 40 [signal] : Compare with Marius's code
+-> 64 : Bring the robot to Mireille
+
+== 42
+You hide behind a palm tree. Very discreetly. Well, almost: a seagull lands on your head and screams.
+
+The black hoodie turns around and stares at you.
+- Er... Do you want an autograph?
+
+-> 24 : Come out from behind the palm
+
+== 43
+You press "Send". Down the boulevard, a garage door opens. Then two. Then five. A man in a vest runs out, shouting.
+
+Your badge buzzes: "ALERT: scoreboard hacked!"
+
+A police officer on a bike rolls up. The badge rolls the die...
+
+-> 44 [de 1-3] : The officer looks angry
+-> 45 [de 4-6] : The officer looks curious
+
+== 44 FIN perdu
+- Replaying a code that isn't yours, on gates that aren't yours? Station, now!
+
+You spend the afternoon explaining what a Flipper Zero is, then why it has a dolphin. Lilou has to come and pick up her Flipper with her parents. The final is cancelled.
+
+Moral: never replay a recorded code at random. The speaker did warn you.
+
+== 45
+The officer listens to your story, then pulls out his own gate remote.
+- Two euros, online. Same code?
+
+Yes. He sighs, makes you promise never to replay anything without permission, and pedals away.
+
+This code opens gates... and hacks the scoreboard. The culprit is not far away.
+
+-> 29 : Rush to the shipyard
+-> 25 : Back to the beach
+
+== 46
+The seagull waddles closer. It looks at your badge. It looks at your badge again. Seagulls love shiny things.
+
+-> 48 [navettes] : Offer it a navette
+-> 47 : Shoo it away, flapping your arms
+-> 25 : Back away slowly
+
+== 47 FIN perdu
+You flap your arms. So does the seagull, but it has wings. It grabs your badge by the lanyard and flies off towards the Ile Verte, out at sea.
+
+No badge, no messages, no radio, no investigation. That evening, people say a seagull won the CTF.
+
+Moral: facing a seagull, a biscuit beats a flap of the arms.
+
+== 48
+The seagull crunches the navette, thinks it over, then spits something shiny at your feet: an old, well-chewed staff badge.
+
+"Lea - CTF Staff 2025".
+
+It must have found it near the shipyard. Who is this Lea?
+
+-[navettes]
+
+-> 61 : Ask on the terrace
+-> 25 : Back to the beach
+
+== 49
+- Lea, that's me! Last year's organiser. I'm on holiday this year.
+
+When you mention the ASCII cicada, she turns pale.
+- Oh no. CIGALE-BOT! My prank for last year's closing. I hid it in a cabinet at the shipyard. It never worked, so I forgot all about it...
+
+-> 29 : Run to the shipyard
+-> 25 : Back to the beach
+
+== 50
+Mireille is waiting in her office, between two boxes of t-shirts.
+- So? Who hacked my scoreboard?
+
+-> 51 : The black hoodie, obviously
+-> 52 : The sponsor, to sell its AI
+-> 65 [!proof] : Lea, last year's organiser
+-> 53 [proof] : A forgotten robot at the shipyard
+-> 54 [!proof] : A robot... somewhere
+-> 3 : I'm not done yet
+
+== 51 FIN perdu
+You accuse Zed in front of the whole conference. Silence. Zed spent the night at his hotel, with three witnesses and his grandma on the phone.
+
+The CyberShield 3000 salesman takes a screenshot for his advert. With no culprit, the final is cancelled, and you spend the evening apologising.
+
+Moral: a black hoodie doesn't make a hacker.
+
+== 52 FIN perdu
+You accuse CyberShield 3000. The offended salesman packs up his t-shirts and cancels the buffet he was offering tonight.
+
+With no culprit, the final is cancelled. And with no buffet, there's nothing left to eat either.
+
+Moral: you can hate sales brochures without accusing people.
+
+== 53
+You put CIGALE-BOT on the desk, with Lea's label. Mireille reads it, reads it again, then bursts out laughing.
+- A prank from last year! Jojo will restore yesterday's scores, and we'll finally change the wifi password.
+
+She looks at you.
+- And for the final, any idea for a show?
+
+-> 55 : No, just start the final
+-> 56 [signal] : A live demo!
+
+== 54
+- A robot? Mireille frowns. I can't announce that without proof. Bring me something real!
+
+-> 3 : Go back to investigating
+
+== 55 FIN gagne
+At 8 pm the final starts with the real scores. Your team fights like seagulls over a chip and finishes fourth.
+
+At the prize giving, Mireille calls you on stage: special "CTF Sherlock" award, a bronze cicada holding a magnifying glass.
+
+CIGALE-BOT, unplugged, sits at the front desk with a sign: "Change your passwords".
+
+Well done!
+
+== 56
+Tonight, in front of the whole conference, you will show how the scoreboard was hacked.
+
+Marius is on stage, very proud, remote in hand. Lilou holds the Flipper. Lea, red as a tomato, has plugged CIGALE-BOT into a test scoreboard.
+
+The badge rolls the die...
+
+-> 57 [de 1-2] : The Flipper is sulking...
+-> 58 [de 3-6] : It works first time!
+
+== 57
+The Flipper shows "Low battery" and switches off. Awkward silence in the room. Someone coughs.
+
+Marius stands up.
+- No problem, I have the original!
+
+He presses his two-euro remote.
+
+-> 58 : Look at the giant screen
+
+== 58 FIN gagne
+On the giant screen, the test scoreboard empties and an ASCII cicada appears: "CHIRP-CHIRP!" The room roars with laughter and applause.
+
+You explain everything: a forgotten robot, a wifi password never changed, and two-euro remotes that all share the same code.
+
+Mireille gives you the "CTF Sherlock" award. Lilou wins a brand new soldering iron, Marius a rolling code remote.
+
+Moral: the best hack is the one you explain. Well done!
+
+== 59 FIN
+- It's fixed! you shout as you burst into Mireille's office. No more hacking!
+- Fixed how? By whom? Why?
+
+You have no idea. Mireille won't take any risk: the final is played on a paper scoreboard, with a marker.
+
+Better than nothing, but the mystery remains.
+
+Moral: fixing is good. Understanding is better.
+
+== 60 FIN
+Panisses, olives, lemon syrup: the drinks are lovely. You tell everyone about your investigation, adding a little more suspense each time.
+
+In the evening, the final is replaced by a petanque contest. Your team finishes third.
+
+No culprit today, but a beautiful sunset over the Bec de l'Aigle. The mystery will wait until next year.
+
+== 61
+On the terrace they serve lemon syrup and panisses, chickpea fries. A woman in an old "CTF Staff 2025" t-shirt is doing a crossword.
+
+Further along, a group is already raising glasses:
+- Cheers! The investigation can wait!
+
+-> 49 : Talk to the woman in the staff t-shirt
+-> 60 : Join the drinks
+-> 25 : Back to the beach
+
+== 62
+Fernand bites into a navette and closes his eyes with delight.
+- Just like my mother's... Right. Follow me, but you didn't see anything.
+
+He leads you to a hole in the fence, hidden behind an oleander.
+
+-[navettes]
+
+-> 36 : Squeeze into the shipyard
+
+== 63
+- The gate? No problem, let's go!
+
+Marius walks you to the shipyard and presses his remote. The big gate creaks and swings open.
+
+At that very moment your badge buzzes: "ALERT: scoreboard hacked!"
+
+Marius scratches his head.
+- Is it the tide doing that?
+
+-> 36 : Enter the shipyard
+
+== 64
+You slip CIGALE-BOT, safely unplugged, into your bag and run all the way to the conference. Fernand tips his cap as you pass.
+
+-> 50 : Go and see Mireille
+
+== 65 FIN perdu
+- Lea? Mireille calls her at once. Lea swears she hacked nothing last night: she was singing karaoke in Marseille, in front of two hundred witnesses.
+
+Without proof, there's nothing more to say. The final is cancelled, and Lea sulks at you all evening.
+
+Moral: accuse with proof, not with hunches.
+
+== 66
+You start the badge's 433 MHz receiver. A weather station says 31 degrees, a car locks itself, a wireless doorbell rings...
+
+Nothing suspicious. What if the hacker's signal only shows up at night? Someone around here may get up very early.
+
+-> 25 : Back to the beach

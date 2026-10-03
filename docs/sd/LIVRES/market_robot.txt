@@ -1,0 +1,698 @@
+The Market Robot
+The cicadas of Hack In Provence
+
+// A gamebook for the SecSea badge: a market robot gone haywire on a summer Saturday morning in Provence.
+// Format: see docs/en/gamebooks.md. Check: python tools/gamebook_check.py this_file.txt
+// French version: robot_marche.txt (same section numbers).
+// Items: screwdriver (stolen by Pacha the cat), sardine (for Pacha), fougasse (the baker), glasses (the mayor's),
+// USB key (the original firmware, won at petanque), password and clue (Zoe), Zoe (when she helps you).
+
+== 1
+Saturday, nine o'clock. On the square of Sainte-Cigalade, the market smells of melons, lavender and roast chicken. The cicadas are already singing in the plane trees.
+
+You stroll along, your cicada badge round your neck and your trusty screwdriver in your pocket, when a cry rings across the square:
+
+- Good heavens! The robot has gone nuts!
+
+Olive, the market's new helper robot, is selling lavender to the fishmonger while singing "chirr-chirr-chirr". And at noon, the mayor gives his speech right in front of it.
+
++[screwdriver]
+
+-> 2 : Take a closer look at the robot
+-> 3 : Ask the fishmonger
+-> 4 : Head to the cafe for advice
+
+== 2
+Olive looks like a big green olive on wheels, with two arms, a screen for a face and a loudspeaker on its belly.
+
+It weighs a melon, listens to it, then rolls it onto the cheese stall shouting: "Jack!" Then it sings like a cicada.
+
+On its back: a hatch held by four screws, a big red button, and a bunch of lavender taped on in a rather odd way.
+
+-> 5 : Look under the lavender
+-> 6 [screwdriver] : Unscrew the hatch
+-> 7 : Press the big red button
+-> 57 : Listen to its cicada song
+-> 48 : Buy a melon and forget about it
+-> 14 : Walk around the market
+
+== 3
+Fanny the fishmonger waves a bunch of lavender over her sea bream.
+
+- That robot sold me lavender! For my fish! And this morning at dawn, a drone was buzzing around it like a fly.
+
+She slips you a sardine wrapped in paper.
+
+- Here. If you meet Pacha, the town hall cat, this will calm him down. That thief pinches one from me every morning.
+
++[sardine]
+
+-> 8 : Look for the drone by the fountain
+-> 9 [!fougasse] : Drop by the bakery
+-> 2 : Go back to the robot
+-> 14 : Walk around the market
+
+== 4
+At the Cafe des Platanes, Monsieur Fernand, a retired engineer, gazes at his pastis as if it were a circuit board.
+
+- Olive? I built it! Someone must have changed its firmware. I have the original program on a USB key...
+
+He pats his pocket, then points at the petanque ground.
+
+- But right now I have the final of the petanque tournament, and my teammate has a bad back. Play with me, and the key is yours if we win!
+
+-> 58 : Accept the match
+-> 11 : "What's a firmware?"
+-> 47 : Sit down and listen to his stories
+-> 14 : Go back to the market
+
+== 5
+You push the lavender aside. Underneath is a little black and white square full of pixels: a QR code!
+
+A QR code is text stored as tiny squares, which a phone can read in the blink of an eye. Someone hid this one here on purpose.
+
+Trouble is, your badge has a screen, a radio, LEDs... but no camera. And your phone's battery is flat, of course.
+
+-> 60 : Borrow a tourist's phone
+-> 61 : Decode it by hand, square by square
+
+== 6
+Four screws later, the hatch swings open. Inside: a circuit board, a USB port labelled "UPDATE" and three little pins marked "SERIAL: TX RX GND".
+
+A sticker reads: "Olive v2.3 - F. Escudier". The robot giggles:
+
+- That tickles! Chirr-chirr!
+
+-> 15 : Plug the badge into the serial port
+-> 17 [USB key] : Plug in Fernand's key
+-> 37 [password] : Open the settings page
+-> 16 : Pull the pretty red wire
+-> 14 : Close it and think
+
+== 7 FIN perdu
+You press it. Olive freezes, its screen shows "FARANDOLE MODE", and its loudspeaker bursts into a wild tambourine tune.
+
+It grabs your hand. The fishmonger grabs your other hand, the baker joins in, then the whole market. The dancing line snakes through the village, the fields, the next village...
+
+You get home at nightfall with aching feet. The mayor's speech? Nobody heard it.
+
+Moral: never press a big red button without reading the label.
+
+== 8
+By the fountain, in front of the town hall, a buzzing sound passes over the parasols: a little white drone! Every time Olive sings, it comes closer, as if it were listening.
+
+Then it flies off towards the church.
+
+-> 28 : Run after it
+-> 29 : Follow it quietly
+-> 30 : Climb the bell tower to look
+-> 66 : Jam it with the badge radio
+-> 55 : Go into the town hall
+
+== 9
+At the bakery, Monsieur Aime is white with flour up to his eyebrows.
+
+- That robot sold my baguettes for one cent! And it sang to my sourdough! My sourdough cannot stand music!
+
+He kneads his dough a little too hard.
+
+-> 63 : "You hacked it, didn't you!"
+-> 64 : Ask what he saw this morning
+
+== 10
+The petanque ground is packed earth, shaded by plane trees. Facing you: the Pignol brothers, county champions, with matching moustaches.
+
+Fernand points, you shoot. Pointing means rolling your ball close to the jack, the little target ball; shooting means knocking the other team's balls away.
+
+Ten all, first to thirteen. Fernand hands you a ball:
+
+- Your turn. Aim well...
+
+The badge rolls the die.
+
+-> 18 [de 1-2] : The ball veers off...
+-> 19 [de 3-5] : It's a close call...
+-> 20 [de 6] : A perfect shot!
+
+== 11
+Fernand puts down his glass and puts on his teacher face.
+
+- Firmware is the program living in the robot's memory. Like a recipe: "if you're given a melon, weigh it and say the price".
+
+- An update replaces the recipe. Olive can get updates over Wi-Fi, without any cable. Send it a muddled recipe, and it cooks everything wrong!
+
+-> 58 : Play the final with him
+-> 14 : Go back to the market
+
+== 12
+Login: admin. Password: admin. The page answers:
+
+"Nope! That's not the factory password any more. Hint: grandpa's cat + the department number."
+
+Everybody knows factory passwords: changing them is the very first thing to do. At least somebody did.
+
+-> 49 : Type "pacha13"
+-> 13 : Type "kitty13"
+-> 14 : Look for a clue elsewhere
+
+== 13
+Wrong. You try again: 1234, 0000, password, olive...
+
+The screen turns red: "Too many attempts. Try again in 15 minutes." And Olive starts shouting: "Stop, thief! Chirr-chirr!"
+
+Locking up after a few mistakes protects against people who try every password one after another. Annoying, but clever.
+
+-> 14 : Look for a clue elsewhere
+
+== 14
+The market square is buzzing. The town hall clock creeps steadily towards noon. Olive sings under its parasol, and shoppers leave with very strange purchases.
+
+Where to next?
+
+-> 2 : Olive the robot
+-> 3 [!sardine] : The fishmonger's stall
+-> 9 [!fougasse] : The bakery
+-> 4 [!USB key] : The cafe and petanque ground
+-> 8 : The fountain and town hall
+-> 27 [clue] : Go and find Zoe
+-> 21 [!screwdriver] : Get your screwdriver back
+-> 46 : Give up and wait for noon
+
+== 15
+You wire the badge to the pins: the robot's TX to the badge's RX, and the other way round. One talks while the other listens, like on the phone.
+
+The robot's log scrolls by:
+
+07:12 update received from DRONE-ZOE
+
+07:13 file: song_for_grandpa
+
+07:13 ERROR: price table and song table swapped
+
+Zoe? That's the name of the mayor's granddaughter!
+
++[clue]
+
+-> 27 : Go and find Zoe
+-> 6 : Back to the hatch
+
+== 16 FIN perdu
+You pull the red wire. Olive gives a deep "beep" and its screen shows "REVERSE MODE"...
+
+And off it goes. Backwards. Straight ahead. It crosses the market, the road, the vineyards, singing backwards: "rrihc-rrihc".
+
+That evening, it is on the news, reversing onto the Old Port of Marseille.
+
+Moral: never pull a wire at random. Read the diagram first!
+
+== 17
+You plug in Fernand's key. The badge shows what's on it: "olive_v2.3.bin". The original firmware!
+
+Flashing means rewriting the robot's memory with this program. Fernand warned you: "Before flashing, always make a backup."
+
+-> 50 : Make a backup first
+-> 51 : Flash it now, noon is coming
+
+== 18
+The ball rolls and rolls... and stops a metre from the jack, next to a stray melon. The Pignol brothers raise their arms: thirteen!
+
+Fernand sighs, then pats you on the shoulder.
+
+- Never mind. But a bet is a bet: I keep the key. A tip, though: look at Olive's back. There's some lavender there that has no business being there.
+
+-> 4 : Ask for a rematch
+-> 2 : Go and look at the robot's back
+-> 14 : Go back to the market
+
+== 19
+Your ball hits one of theirs, which rolls, wobbles... Twelve all!
+
+One ball left. The very last one. The whole village holds its breath. Even Olive has gone quiet.
+
+The badge rolls the die again.
+
+-> 18 [de 1-3] : It rolls too far...
+-> 20 [de 4-6] : It stops right by the jack...
+
+== 20
+Thirteen! The crowd cheers, Fernand hugs you, and the Pignol brothers shake your hand like good sports.
+
+- A promise is a promise, says Fernand, handing you a cicada-shaped USB key. Olive's original firmware. And make a backup before flashing, eh!
+
+He offers you a drink: you have a mint syrup.
+
++[USB key]
+
+-> 2 : Rush to the robot
+-> 14 : Go back to the market
+
+== 21
+On the bakery's awning, a big ginger cat is licking its paw. Between its teeth shines... your screwdriver!
+
+It's Pacha, the town hall cat. He loves anything shiny, and he never gives anything back.
+
+-> 22 [sardine] : Offer him the sardine
+-> 23 : Climb up and get it
+-> 14 : Never mind, he may give it back
+
+== 22
+You wave the sardine. Pacha hesitates, drops the screwdriver, snatches the sardine and dashes up onto the roof.
+
+Picking up your screwdriver, you find his hiding place in the gutter: bottle caps, a golden pen, a sticker... and a pair of glasses with "Mr Mayor" engraved on the arm.
+
+-[sardine]
++[screwdriver] +[glasses]
+
+-> 2 : Go back to the robot
+-> 14 : Go back to the market
+
+== 23
+You climb onto a crate of tomatoes, then a window ledge, then the gutter. Pacha watches you with great interest.
+
+The badge rolls the die.
+
+-> 24 [de 1-2] : The gutter creaks...
+-> 25 [de 3-4] : Your foot slips...
+-> 26 [de 5-6] : You reach out...
+
+== 24 FIN perdu
+The gutter holds, but now you are on the roof with no way down, and Pacha purring next to you. He can't get down either.
+
+The firefighters arrive with their big ladder at noon sharp, sirens wailing, right in the middle of the mayor's speech. The whole village films you.
+
+Moral: with a cat, a sardine works better than climbing.
+
+== 25
+Your foot slips. You land on the bakery's awning, which bounces you like a trampoline straight into a crate of peaches.
+
+Pacha yawns. He hasn't moved a whisker, and neither has your screwdriver.
+
+-> 21 : Think of another way
+-> 14 : Go back to the market
+
+== 26
+You reach out, slowly... Pacha, surprised, opens his mouth. The screwdriver drops right into your palm!
+
+The cat gives you an offended look and vanishes over the rooftops.
+
++[screwdriver]
+
+-> 2 : Go back to the robot
+-> 14 : Go back to the market
+
+== 27
+Behind the church, on a bench, a girl is tapping away on a laptop covered in stickers. Next to her lies a drone remote control.
+
+It's Zoe, twelve, the mayor's granddaughter. When she sees you, she turns bright red.
+
+- It was me... I wanted the robot to sing a cicada song for grandpa's speech, he loves cicadas. I sent the update with my drone, but everything got mixed up! The password is "pacha13"...
+
++[clue] +[password]
+
+-> 34 : "How did you do it?"
+-> 33 [fougasse] : Share the fougasse with her
+-> 35 : Tell her off
+-> 36 : Offer to fix it together
+
+== 28
+You run after the drone, between the parasols, over the crates. It flies low, it turns, it hesitates...
+
+The badge rolls the die.
+
+-> 31 [de 1-3] : Watch out, the fountain!
+-> 32 [de 4-6] : It's coming down...
+
+== 29
+You follow the drone from a distance, casually, pretending to compare tomato prices.
+
+It flies over the church, circles once... and gently comes down behind it, near a shady bench.
+
+-> 27 : Peek behind the church
+
+== 30
+Eighty-seven steps later, the whole village lies at your feet: the square, the parasols, Olive juggling lemons.
+
+Behind the church, the drone lands next to a girl sitting with a laptop. And on the rooftops, a big ginger cat trots along with something shiny in its mouth.
+
+-> 27 : Go down and see the girl
+-> 21 [!screwdriver] : Follow the cat and its loot
+-> 14 : Go back down to the market
+
+== 31 FIN perdu
+Eyes on the sky, you don't see the fountain. Splash! The water is cool, and the goldfish very surprised.
+
+Olive rolls up at once, weighs you, and slaps a label on you: "Catch of the day, 3 euros a kilo". Tourists queue up for photos.
+
+By the time you are dry, noon has come and gone.
+
+Moral: don't run with your head in the clouds. Especially near a fountain.
+
+== 32
+The drone lands on a sack of flour, blinking: "Low battery". Under its belly, a label: "If you find me, please return me to Zoe, behind the church. Thank you!"
+
+Zoe... the mayor's granddaughter?
+
++[clue]
+
+-> 27 : Bring the drone back to Zoe
+-> 14 : Leave it and go back to the market
+
+== 33
+You break the fougasse in two. Zoe sniffs, smiles, takes a bite.
+
+- Thanks. Nobody believed I could program a robot. And now everyone will think I broke it...
+
+- You didn't break it. You made a bug. Everybody makes bugs. Come on, let's fix it!
+
+She closes her laptop and follows you, all smiles.
+
++[Zoe]
+
+-> 37 : Go to the robot together
+
+== 34
+Zoe lights up.
+
+- Olive listens to the Wi-Fi to get its updates. My drone flew over it carrying a tiny computer, and sent it my program. An "OTA" update: over the air!
+
+- But I mixed up two files: the price list and the song list. So now it sings the prices and sells the songs...
+
+-> 36 : Offer to fix it together
+-> 33 [fougasse] : Offer her some fougasse
+-> 35 : Tell her off a little
+
+== 35
+- Do you realise? The whole market is upside down!
+
+Zoe hangs her head.
+
+- I just wanted to make grandpa happy...
+
+A tear glints in the corner of her eye. Oh. Maybe that was a bit harsh.
+
+-> 36 : Soften up and help her
+-> 14 : Leave her and go back to the market
+
+== 36
+- Shall we fix it together? You know your program, I have my badge. Two of us will be twice as fast.
+
+Zoe jumps off the bench.
+
+- Really? Come on, let's go!
+
++[Zoe]
+
+-> 37 : Go to the robot together
+
+== 37
+The badge joins Olive's Wi-Fi and shows its settings page:
+
+"Mode: PARTY. Language: cicada. Price table: songs. Song table: prices."
+
+It's all there. You just have to change the right settings.
+
+-> 38 : Set the mode to NORMAL
+-> 39 [Zoe] : Let Zoe fix the tables
+-> 40 : Reset everything at once
+
+== 38
+Olive stops singing, rolls back to its stall... and announces: "Melons: do-re-mi euros. Tomatoes: chirr-chirr a kilo."
+
+The mode is right, but the tables are still swapped: the robot reads the songs instead of the prices!
+
+-> 39 [Zoe] : Ask Zoe to fix it
+-> 17 [USB key] : Put back Fernand's firmware
+-> 27 [clue] : Go and fetch Zoe
+-> 53 : Fix the prices by hand
+
+== 39
+Zoe types at top speed.
+
+- There: prices in the price table, songs in the song table. And now we test it!
+
+Olive weighs a melon: "Two euros." Perfect.
+
+- And my song? asks Zoe. Shall I set it for noon sharp, for grandpa?
+
+-> 42 : "Yes, noon sharp!"
+-> 65 : "No more surprises today"
+
+== 40 FIN perdu
+You press "Reset". Olive switches off, switches back on, and says in a gentle voice:
+
+- Hello. I am a vacuum cleaner. Where are the crumbs?
+
+Fernand built Olive on top of a robot vacuum. Without its settings, that's all it remembers. It spends the day happily vacuuming crumbs outside the bakery.
+
+Moral: wiping everything is not fixing. Look for the cause first.
+
+== 41
+The progress bar fills up... 100 %! Olive reboots, blinks its screen and says:
+
+- Good morning Fanny. Here are your sardines. Sorry about the lavender.
+
+Firmware v2.3, just like on day one. The robot tidies its melons, gives the right change, and only sings when asked.
+
+-> 42 : Noon is near: go to the speech
+
+== 42
+Noon rings from the bell tower. The mayor, Monsieur Bouscarle, climbs onto the stage, his tricolour sash fluttering. He pulls his speech from his pocket... and squints.
+
+- My glasses... Where are my glasses? I can't see a thing!
+
+Olive, parked nicely nearby, waits.
+
+-> 43 [glasses] : Give the mayor his glasses
+-> 44 [Zoe] : Give Zoe a sign
+-> 45 : Let the mayor improvise
+
+== 43 FIN gagne
+You hand the mayor his glasses. He puts them on, delighted.
+
+- Wherever did you find them?
+
+- At Pacha's. He has quite a collection.
+
+The mayor reads his speech in one go, then thanks you over the microphone: "Thanks to you, our robot sells melons again, and no more lavender for the fish!"
+
+Olive gives you the finest melon in the market. Well done!
+
+== 44 FIN gagne
+Zoe gives a thumbs up and presses a key. Olive rolls forward and sings the song she wrote: the cicadas, the sun, the market, and "my grandpa, the best mayor in Provence".
+
+Deeply moved, the mayor forgets his speech altogether. The whole square joins in the chorus, even the Pignol brothers, even Pacha on his roof.
+
+- You did this? he asks Zoe.
+
+- With some help, she says, looking at you.
+
+That evening, Fernand suggests starting a robotics club in the village. Zoe will be its president, and you its proud sponsor. Well done, this is the best ending of all!
+
+== 45 FIN gagne
+The mayor folds up his speech.
+
+- Well. Without glasses, I'll keep it short: long live the market, long live Sainte-Cigalade, and long live the robot!
+
+It is the shortest speech in the village's history, and the most applauded. Olive sells its melons at the right price, and gives you a punnet of strawberries for your trouble.
+
+You saved the market. But there may be an even better ending...
+
+== 46 FIN
+You sit in the shade and wait for noon. The mayor climbs onto the stage... and Olive grabs the microphone.
+
+It sings. About cicadas. Melons. Lavender. For forty minutes. The crowd loves it and chants: "O-live! O-live!"
+
+In the end, the town council votes by show of hands: Olive is elected deputy mayor in charge of festivities. The mayor goes fishing.
+
+Not quite what was planned... but everyone looks happy.
+
+== 47 FIN perdu
+- Did I ever tell you about the day I fixed a satellite with a hairpin? It was back in 1978...
+
+Fernand talks. The satellite, then the talking toaster, then the flying moped. He orders a second pastis, you a third almond syrup.
+
+When the clock strikes noon, he has only reached 1983. On the square, Olive is singing into the mayor's microphone.
+
+Moral: Fernand's stories are fascinating, but they last longer than a morning.
+
+== 48 FIN
+You buy a melon. Olive sells it to you for a song: you have to hum it three notes. It is delicious.
+
+Then you buy another. Then a third. Noon strikes, and you go home with five melons, a bunch of lavender and a robot waving goodbye.
+
+The robot isn't fixed, but your fridge is full.
+
+Moral: a good melon is already a small victory.
+
+== 49
+You type "pacha13". The page flickers... and opens!
+
+The name of the town hall cat and the number of the Bouches-du-Rhone department: an easy password to guess for anyone who knows the village. A good password is long, and says nothing about you.
+
++[password]
+
+-> 37 : See Olive's settings
+
+== 50
+First you copy the robot's whole memory onto the badge. If anything goes wrong, you can go back.
+
+Then you start flashing, with peace of mind. Olive closes its eyes and hums while it waits.
+
+-> 41 : Watch the progress bar
+
+== 51
+No time to lose: you start flashing right away. The bar moves... 20 %... 50 %...
+
+Olive gets impatient and starts dancing. The cable pulls tight...
+
+The badge rolls the die.
+
+-> 52 [de 1-2] : The cable comes out!
+-> 41 [de 3-6] : The cable holds
+
+== 52
+Clack! The cable comes out at 63 %. Olive's screen goes black, then shows: "BOOT MODE. WAITING FOR FIRMWARE."
+
+Phew: like many devices, Olive has a small rescue program, the bootloader, which is never erased. It lets you start again.
+
+You plug the cable back in, holding it firmly this time.
+
+-> 41 : Start flashing again
+
+== 53
+You open the price table on the badge. A hundred and twenty lines: "Melons: la-ti-do", "Tomatoes: chirr-chirr"... Every one must be retyped, line after line.
+
+Fanny reads out the fish prices, Monsieur Aime the bread prices. Can you make it before noon?
+
+The badge rolls the die.
+
+-> 54 [de 1-3] : So many lines left...
+-> 42 [de 4-6] : Last line... Enter!
+
+== 54 FIN
+Noon strikes with forty lines still to go. Olive now sells melons at the right price... but tomatoes at "a rest" per kilo and goat's cheese at "F sharp".
+
+Customers pay by singing. The mayor finds it charmingly folksy and mentions it in his speech.
+
+Moral: fixing things by hand takes time. Good tools, and good friends, save a lot of it.
+
+== 55
+Inside the town hall it is cool. Madame Roux, the secretary, is typing up the mayor's speech with a sigh.
+
+- The mayor has lost his glasses, and the robot goes crazy right before his speech. What a morning! Not to mention Pacha, our cat, who steals anything shiny...
+
+Through the office door, you can hear the mayor rehearsing his speech and getting the pages mixed up.
+
+-> 56 : Knock on the mayor's door
+-> 14 : Go back to the market
+
+== 56
+Monsieur Bouscarle shakes your hand very energetically.
+
+- A cicada badge? So you know about electronics! Please fix that robot before noon, I beg you.
+
+He thinks for a moment.
+
+- Ask my granddaughter, Zoe. She loves robots. She must be behind the church with her drone.
+
+-> 27 : Go behind the church
+-> 14 : Go back to the market
+
+== 57
+You listen to Olive singing. "Chirr... chirr-chirr... chirr..." This is no ordinary cicada: there are short chirps and long chirps.
+
+Morse code! The badge decodes it: Z-O-E... "Zoe's song for grandpa". The program's name, sung over and over by mistake.
+
++[clue]
+
+-> 27 : Find out who this Zoe is
+-> 2 : Back to the robot
+
+== 58
+At the petanque ground, the final is about to start when Olive rolls up with a crate of melons in its arms.
+
+- PETANQUE! it shouts. It throws a melon, which lands right on the jack. Splat.
+
+The Pignol brothers protest. Fernand holds his head in his hands.
+
+-> 59 : Give the robot an order
+-> 10 : Get a new jack and play
+
+== 59
+- Olive! Go and sell your melons!
+
+The robot stops, thinks, then solemnly sells a melon to each player, and even one to the referee. Then it rolls back to the square, singing.
+
+A robot is like a program: it does exactly what you say, not what you meant.
+
+-> 10 : Start the match
+
+== 60
+A tourist in a straw hat is photographing Olive from every angle.
+
+- Ah, un robot! he says in a terrible French accent, lending you his phone with a big smile.
+
+The phone reads the QR code in a second: "olive.local/settings". The address of the robot's settings page, on its own Wi-Fi network.
+
+-> 62 : Connect the badge to it
+
+== 61
+You count the squares. The three big squares in the corners show which way up the code is. The others, black or white, are 1s and 0s...
+
+Twenty minutes and a headache later, you read: "olive.local/settings". Fernand, passing by, whistles in admiration.
+
+-> 62 : Connect the badge to this page
+
+== 62
+The badge joins Olive's Wi-Fi and opens the page. It asks for a login and a password.
+
+Behind you, the robot sings: "Chirr-chirr, who am I?"
+
+-> 12 : Try admin / admin
+-> 13 : Try 1234
+-> 37 [password] : Type Zoe's password
+-> 14 : Look for the password elsewhere
+
+== 63
+Monsieur Aime drops his dough.
+
+- Me? Reprogram a robot? I can't even send a photo to my sister!
+
+He bursts out laughing, and a cloud of flour engulfs you. You cough. He pats you on the back.
+
+- But I did see something this morning...
+
+-> 64 : "Tell me everything"
+
+== 64
+- At six, taking out my first batch, I saw Zoe, the mayor's granddaughter, behind the fountain with a drone and a laptop. She looked very focused.
+
+He hands you an olive fougasse, still warm. You put it in your bag... just as a ginger shadow darts between your legs. Your pocket feels lighter: your screwdriver!
+
+- Pacha! shouts the baker. That cat steals anything shiny!
+
++[clue] +[fougasse]
+-[screwdriver]
+
+-> 21 : Chase the cat
+-> 27 : Go and find Zoe
+-> 14 : Go back to the market
+
+== 65
+- All right, sighs Zoe. No surprises. You're probably right.
+
+She deletes the song, closes her laptop and goes off to join her mum at the market, a little disappointed.
+
+The robot, for its part, works perfectly.
+
+-[Zoe]
+
+-> 42 : Noon is near: go to the speech
+
+== 66
+You open the badge's radio menu... then stop. Jamming radio waves is against the law: it disturbs the neighbours, emergency services, planes. And a drone that loses its remote could fall on someone's head.
+
+Better to find its pilot.
+
+-> 29 : Follow the drone quietly
+-> 14 : Go back to the market

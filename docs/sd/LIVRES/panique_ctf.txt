@@ -1,0 +1,620 @@
+Panique au CTF
+Les cigales de Hack In Provence
+
+// Un livre dont vous êtes le héros pour le badge SecSea, à La Ciotat.
+// Format : voir docs/fr/livres_jeux.md. Vérification : python tools/gamebook_check.py ce_fichier.txt
+// Version anglaise : ctf_panic.txt (mêmes numéros de sections).
+// Objets : clé USB et journal (la salle serveur), navettes (le café), plan (Jojo), Flipper (Lilou),
+// crochets (Bernard), trame (la télécommande de Marius), preuve (le robot du chantier).
+
+== 1
+Veille de la finale du CTF de SecSea, à La Ciotat. Vous dormez encore quand votre badge cigale vibre :
+
+"ALERTE : tableau des scores piraté !"
+
+Vous filez à la conférence. Sur le grand écran, toutes les équipes sont à zéro. En tête, une cigale en ASCII art, 31337 points, chante "CRI-CRI".
+
+Mireille, la cheffe du CTF, vous attrape par la manche.
+- Sans coupable, pas de finale ce soir ! Votre équipe dort encore ? Alors enquêtez !
+
+-> 2 : Foncer à la salle serveur
+-> 3 : Faire un tour dans le hall
+-> 4 : Un café d'abord, c'est vital
+
+== 2
+La salle serveur est un placard derrière la scène. Jojo, l'admin système, a les yeux rouges et le t-shirt à l'envers.
+- Les scores ont été réécrits cette nuit à 3 h 12, depuis le wifi de la conférence. Mais le hall était fermé à clé !
+
+Près de la baie, quelque chose brille par terre : une clé USB avec un autocollant de cigale.
+
+-> 5 [!clé USB] : Ramasser la clé USB
+-> 6 : Questionner Jojo
+-> 3 : Aller dans le hall
+
+== 3
+Le hall bourdonne. Des stands partout, des stickers partout, des câbles partout. On entend des fers à souder, des cadenas qui cliquent et un orateur qui teste son micro.
+
+Sur l'écran géant, la cigale en ASCII chante toujours. La finale, c'est ce soir à 20 h.
+
+-> 10 : Le village hardware
+-> 15 : La table de crochetage
+-> 19 : La salle des talks
+-> 22 : Le stand du sponsor
+-> 25 : Sortir sur la plage
+-> 29 : Aller au vieux chantier naval
+-> 50 : Faire votre rapport à Mireille
+
+== 4
+La file du café est longue. Devant vous, un grand gars en hoodie noir chuchote au téléphone :
+- Ce soir, j'efface tout. Personne ne saura ce qu'il y avait avant.
+
+Il prend son café et sort vers la plage. Sur la table, une boîte de navettes, les biscuits provençaux à la fleur d'oranger. Vous en prenez une poignée.
+
++[navettes]
+
+-> 23 : Suivre le hoodie noir
+-> 2 : Aller à la salle serveur
+-> 3 : Aller dans le hall
+
+== 5
+Vous ramassez la clé. Jojo lève les mains.
+- Pas à moi. Et surtout, ne la branchez nulle part ! Une clé trouvée par terre, c'est le plus vieux piège du monde.
+
++[clé USB]
+
+-> 7 : La brancher sur votre portable, vite
+-> 8 : Demander le PC de quarantaine de Jojo
+-> 3 : La garder et aller dans le hall
+
+== 6
+Jojo bâille.
+- La nuit, le hall est fermé. Mais le wifi de la conférence va jusqu'au vieux chantier naval, par un pont radio sur le toit. L'an dernier, le CTF avait des salles là-bas.
+
+Son ventre gargouille.
+- Pardon. Pas mangé depuis hier.
+
+-> 9 [navettes] : Lui offrir vos navettes
+-> 5 [!clé USB] : Ramasser la clé USB
+-> 8 [clé USB] : Lui montrer la clé USB
+-> 3 : Aller dans le hall
+
+== 7 FIN perdu
+Vous branchez la clé. L'écran clignote, une fenêtre s'ouvre toute seule et des lettres défilent à toute vitesse : c'est une clé "BadUSB", qui tape au clavier à votre place !
+
+En dix secondes, votre portable écrit sur le chat du CTF : "C'est moi qui ai piraté le tableau. CRI-CRI !"
+
+Mireille vous met sur le banc des suspects pour la journée.
+
+Morale : une clé trouvée par terre ne se branche jamais.
+
+== 8
+Jojo sort un vieux portable sans wifi ni disque dur, réservé aux objets douteux. La clé ne risque rien là-dessus.
+
+Dedans : un script "cigalebot.py", un journal, et la photo floue d'une armoire électrique rouillée : "CHANTIER - ARMOIRE 3".
+
+Le journal dit : "Attente du signal 433,92 MHz... Signal reçu ! Tableau mis à jour."
+
++[journal]
+
+-> 29 : Filer au vieux chantier naval
+-> 3 : Retourner dans le hall
+
+== 9
+Jojo dévore les navettes en trois secondes.
+- Vous me sauvez la vie. Tenez, en échange.
+
+Il vous tend un plan du vieux chantier naval, imprimé l'an dernier. Une porte de service y est entourée au feutre : "entrée des orgas".
+
+-[navettes] +[plan]
+
+-> 29 : Aller au chantier naval
+-> 3 : Retourner dans le hall
+
+== 10
+Au village hardware, ça sent la soudure et le café froid. Lilou, douze ans, programme un Flipper Zero : un petit boîtier orange avec un dauphin sur l'écran.
+- Il capte les télécommandes, les badges, les portails... Je vous le prête si vous finissez mon kit de LEDs. Mon fer est trop lourd pour moi.
+
+-> 11 [!Flipper] : Prendre le fer à souder
+-> 14 : Demander si elle a capté des choses bizarres
+-> 3 : Retourner dans le hall
+
+== 11
+Vous prenez le fer à souder. Une goutte d'étain, une patte de LED, puis une autre... Il faut une main sûre.
+
+Le badge lance le dé...
+
+-> 12 [dé 1-2] : Ça fume un peu...
+-> 13 [dé 3-6] : Les LEDs s'allument !
+
+== 12
+La LED est soudée à l'envers. Le kit clignote "SOS" en morse. Lilou éclate de rire.
+- C'est presque mieux. Mais je garde mon Flipper pour l'instant. On réessaie ?
+
+-> 11 : Reprendre le fer à souder
+-> 14 : Parler plutôt des signaux bizarres
+-> 3 : Retourner dans le hall
+
+== 13
+Toutes les LEDs s'allument, en forme de cigale. Lilou applaudit.
+- Promis, juré ! Tenez, mais rendez-le-moi ce soir.
+
+Elle vous montre : menu "Sub-GHz", puis "Lire", et le Flipper enregistre les signaux radio autour de vous.
+
++[Flipper]
+
+-> 14 : Demander si elle a capté des choses bizarres
+-> 3 : Retourner dans le hall
+
+== 14
+- Bizarre ? Cette nuit, je campais près de la plage avec mes parents. À 3 h 12, mon Flipper a capté un signal à 433,92 MHz. Très fort, juste à côté du chantier naval.
+
+Elle hausse les épaules.
+- Sûrement une télécommande de portail. Il y en a partout, ici.
+
+-> 25 : Aller voir du côté de la plage
+-> 10 : Revenir à l'établi de Lilou
+-> 3 : Retourner dans le hall
+
+== 15
+Derrière la table de crochetage, Bernard, serrurier à la retraite et moustache de mousquetaire, aligne des cadenas transparents.
+- Règle numéro un : on ne crochète que ses propres serrures, ou avec la permission du propriétaire. Règle numéro deux : patience.
+
+-> 16 [!crochets] : Essayer un cadenas d'entraînement
+-> 3 : Retourner dans le hall
+
+== 16
+Vous glissez le tendeur, puis le crochet. Vous sentez les goupilles, une par une. Bernard retient son souffle, et sa moustache aussi.
+
+Le badge lance le dé...
+
+-> 17 [dé 1-2] : Crac...
+-> 18 [dé 3-6] : Clic !
+
+== 17
+Le crochet ripe, le cadenas reste fermé, et vous vous pincez le doigt.
+- Patience, petite cigale, dit Bernard. Moi, j'ai mis vingt ans.
+
+-> 16 : Réessayer
+-> 3 : Retourner dans le hall
+
+== 18
+Clic ! Le cadenas s'ouvre. Bernard essuie une larme.
+- Bravo ! Tenez, un petit jeu de crochets. Et n'oubliez pas la règle numéro un.
+
+Il ajoute :
+- Au vieux chantier naval, Fernand le gardien a perdu sa clé en 1987. Il sera ravi de vous voir.
+
++[crochets]
+
+-> 3 : Retourner dans le hall
+
+== 19
+Dans la salle des talks, une oratrice en chemise à fleurs présente "433 MHz : vos portails vous trahissent".
+
+La salle est fraîche, les fauteuils sont moelleux, la clim ronronne...
+
+-> 20 : Poser une question à la fin
+-> 21 : Fermer les yeux, juste cinq minutes
+-> 3 : Retourner dans le hall
+
+== 20
+- Beaucoup de télécommandes envoient toujours le même code, explique l'oratrice. Et les modèles pas chers sortent souvent d'usine avec le même code par défaut !
+
+Elle ajoute :
+- Un code enregistré, on ne le rejoue jamais au hasard. On ne sait pas ce qu'il ouvre... ni où.
+
+-> 25 : Sortir sur la plage pour réfléchir
+-> 3 : Retourner dans le hall
+
+== 21 FIN perdu
+Cinq minutes deviennent cinq heures. Vous vous réveillez dans la salle vide, avec la marque du fauteuil sur la joue.
+
+Dehors, tout le monde part à l'apéro : sans coupable, la finale a été annulée.
+
+Morale : la clim d'une salle de conférence est plus dangereuse qu'un pirate.
+
+== 22
+Au stand de CyberBouclier 3000, un vendeur en costume brillant vous saute dessus.
+- Notre IA a déjà trouvé le pirate : le grand en hoodie noir ! Les pirates portent toujours des hoodies noirs, c'est statistique.
+
+Il vous tend un t-shirt et une plaquette de quarante pages.
+
+-> 23 : Chercher le hoodie noir
+-> 3 : Retourner dans le hall, poliment
+
+== 23
+Le hoodie noir marche vers la plage, son café à la main. Il s'arrête sous un palmier et parle tout seul en faisant de grands gestes.
+- ...et là, je supprime tout ! Plus rien !
+
+-> 24 : L'aborder franchement
+-> 42 : L'espionner derrière un palmier
+-> 3 : Laisser tomber
+
+== 24
+- Moi, un pirate ? Il éclate de rire. Je m'appelle Zed, je donne le talk de clôture : "Comment j'ai nettoyé le PC de ma grand-mère". Je répète, c'est tout !
+
+Il réfléchit.
+- Par contre, cette nuit, de mon hôtel, j'ai vu une petite lumière clignoter dans le vieux chantier naval. Vers 3 h.
+
+-> 29 : Aller au chantier naval
+-> 25 : Rester sur la plage
+-> 3 : Retourner dans le hall
+
+== 25
+La plage de La Ciotat brille au soleil. Au bout du port se dressent les grues du vieux chantier naval.
+
+Un pêcheur répare un filet sur son pointu, un petit bateau bleu. Un gabian, l'énorme goéland de Provence, vous fixe d'un oeil jaune. Sur la terrasse du bar, quelqu'un rit.
+
+-> 26 : Parler au pêcheur
+-> 46 : Approcher le gabian
+-> 61 : Aller sur la terrasse
+-> 66 : Écouter la radio avec le badge
+-> 28 : Piquer une tête dans la mer
+-> 29 : Aller au chantier naval
+-> 3 : Retourner dans le hall
+
+== 26
+- Marius, pour vous servir !
+
+Il montre une petite télécommande toute neuve.
+- Je range mon pointu dans le bassin du vieux chantier. Chaque nuit à 3 h 12, j'ouvre le portail avec ça, et hop, à la pêche ! Achetée sur internet la semaine dernière. Deux euros !
+
+-> 27 [Flipper] : Enregistrer sa télécommande
+-> 63 : Lui demander d'ouvrir le portail
+-> 25 : Retourner sur la plage
+
+== 27
+Avec la permission de Marius, vous lancez le Flipper et il appuie sur sa télécommande. L'écran affiche : "433,92 MHz, code fixe 5A3C". Enregistré !
+
++[trame]
+
+- Fan de chichoune, ça se copie, ces trucs ? Bon, si c'est pour le portail du chantier, vous avez ma permission. Dites-le à Fernand.
+
+-> 43 : Tester le code tout de suite
+-> 29 : Aller au chantier naval
+-> 25 : Retourner sur la plage
+
+== 28 FIN perdu
+L'eau est à 24 degrés, transparente, parfaite. Vous faites la planche. Puis un peu de masque et tuba. Puis une petite sieste sur le sable.
+
+Le soir, vous avez un coup de soleil en forme de badge, et la finale est annulée.
+
+Morale : la Méditerranée est la pire ennemie des enquêteurs.
+
+== 29
+Le vieux chantier naval est immense : des hangars rouillés, une grue géante, des gabians partout. Sur un toit, une petite antenne pointe vers la conférence : le pont wifi !
+
+Le grand portail est fermé. À côté, une petite porte avec un vieux cadenas. Dans une guérite, un gardien ronfle.
+
+-> 30 : Réveiller le gardien
+-> 35 [plan] : Chercher l'entrée des orgas du plan
+-> 34 : Escalader la grille
+-> 25 : Aller sur la plage
+-> 3 : Retourner dans le hall
+
+== 30
+- Fernand, gardien depuis 1974. Le portail ? Seul Marius l'ouvre, avec sa télécommande. Et la petite porte, j'ai perdu la clé en 1987.
+
+Il soupire.
+- Si vous arrivez à l'ouvrir, vous avez ma permission. Moi, je passe par un trou de la grille... mais ça, c'est secret.
+
+-> 31 [crochets] : Crocheter la petite porte
+-> 33 [trame] : Rejouer le code de Marius
+-> 62 [navettes] : Partager vos navettes
+-> 25 : Aller chercher Marius à la plage
+-> 3 : Retourner dans le hall
+
+== 31
+Fernand vous regarde faire, les bras croisés. Le cadenas est vieux, rouillé, têtu. Tendeur, crochet, goupille après goupille...
+
+Le badge lance le dé...
+
+-> 32 [dé 1] : Crac !
+-> 36 [dé 2-6] : Clic !
+
+== 32
+Crac ! Le crochet se casse net dans le cadenas. Fernand hoche la tête.
+- Voilà pourquoi je passe par la grille.
+
+Vos crochets sont fichus.
+
+-[crochets]
+
+-> 30 : Chercher une autre idée avec Fernand
+-> 3 : Retourner dans le hall
+
+== 33
+- C'est le code de Marius, et j'ai sa permission, expliquez-vous à Fernand.
+
+Vous appuyez sur le Flipper. Le grand portail grince et s'ouvre.
+
+Au même moment, votre badge vibre : "ALERTE : tableau des scores piraté !" Jojo venait pourtant de le remettre en état...
+
+Le portail et le pirate obéissent au même code. Intéressant.
+
+-> 36 : Entrer dans le chantier
+
+== 34 FIN perdu
+Vous escaladez la grille. En haut, votre t-shirt s'accroche à une pointe, et vous restez là, entre ciel et grille, à agiter les bras.
+
+Les pompiers arrivent, puis les touristes, puis les photos. Le soir, la vidéo "La cigale de la grille" fait le tour de la conférence. La finale, elle, est annulée.
+
+Morale : une grille, ça se contourne, ça ne s'escalade pas.
+
+== 35
+Le plan vous guide derrière le hangar 2, le long de vieux rails. La porte de service n'est même pas fermée : juste coincée par un seau de peinture.
+
+Une affichette délavée : "Entrée des orgas, CTF 2025".
+
+-> 36 : Entrer
+
+== 36
+Le hangar est immense et silencieux. Des tables de l'an dernier, des chaises empilées, un rouleau de câble réseau. Au fond, une rangée d'armoires électriques.
+
+Sur la troisième, une petite LED verte clignote. Votre badge capte un faible bruit radio.
+
+-> 37 : Ouvrir l'armoire 3
+-> 29 : Ressortir, c'est trop calme
+
+== 37
+Dans l'armoire, entre les disjoncteurs, un Raspberry Pi est scotché au mur, avec une petite antenne et un récepteur 433 MHz. Un autocollant : "CIGALE-BOT".
+
+Il est branché sur le courant du chantier et connecté au wifi de la conférence. Il attend.
+
+-> 38 : Le débrancher tout de suite
+-> 39 : L'examiner d'abord
+
+== 38
+Vous tirez sur le câble. La LED s'éteint. Plus de robot, plus de piratage !
+
+Mais quand Mireille vous demandera "Qui ? Comment ? Pourquoi ?", qu'allez-vous répondre ?
+
+-> 39 : L'examiner, maintenant qu'il dort
+-> 59 : Courir annoncer la bonne nouvelle
+
+== 39
+Sur le boîtier, une étiquette écrite à la main : "Blague pour la clôture 2025. Code 5A3C : la cigale gagne le CTF ! Léa."
+
+Une blague de l'an dernier, qui n'a jamais marché... et qu'on a oubliée dans l'armoire. Vous prenez des photos et vous gardez l'étiquette.
+
++[preuve]
+
+Mais qui envoie le code, chaque nuit ?
+
+-> 40 [trame] : Comparer avec le code de Marius
+-> 41 [journal] : Comparer avec le journal de la clé
+-> 64 : Rapporter le robot à Mireille
+
+== 40
+5A3C. Le code de l'étiquette est exactement celui de la télécommande de Marius !
+
+Tout s'éclaire : Léa avait pris une télécommande à deux euros. Marius a acheté la même cette semaine, avec le même code d'usine. Chaque nuit à 3 h 12, en partant à la pêche, il pirate le CTF sans le savoir !
+
+Et le robot entre encore dans le wifi, car son mot de passe n'a pas changé depuis l'an dernier.
+
+-> 64 : Rapporter le robot à Mireille
+
+== 41
+Le journal de la clé USB et celui du robot sont identiques : "Signal reçu, 3 h 12". La clé est une sauvegarde du CIGALE-BOT, perdue hier dans la salle serveur.
+
+Reste à savoir qui envoie le signal à 3 h 12... Un lève-tôt avec une télécommande ?
+
+-> 40 [trame] : Comparer avec le code de Marius
+-> 64 : Rapporter le robot à Mireille
+
+== 42
+Vous vous cachez derrière un palmier. Très discrètement. Enfin presque : un gabian se pose sur votre tête et crie.
+
+Le hoodie noir se retourne et vous fixe.
+- Euh... Vous voulez un autographe ?
+
+-> 24 : Sortir de derrière le palmier
+
+== 43
+Vous appuyez sur "Envoyer". Sur le boulevard, un portail de garage s'ouvre. Puis deux. Puis cinq. Un monsieur en marcel sort en criant.
+
+Votre badge vibre : "ALERTE : tableau des scores piraté !"
+
+Un gendarme à vélo arrive. Le badge lance le dé...
+
+-> 44 [dé 1-3] : Le gendarme a l'air fâché
+-> 45 [dé 4-6] : Le gendarme a l'air curieux
+
+== 44 FIN perdu
+- Rejouer un code qui n'est pas à vous, sur des portails qui ne sont pas à vous ? Au poste !
+
+Vous passez l'après-midi à expliquer ce qu'est un Flipper Zero, puis pourquoi il a un dauphin. Lilou vient récupérer son Flipper avec ses parents. La finale est annulée.
+
+Morale : un code enregistré ne se rejoue pas au hasard. L'oratrice l'avait bien dit.
+
+== 45
+Le gendarme écoute votre explication, puis sort sa propre télécommande de portail.
+- Deux euros, sur internet. Elle a le même code ?
+
+Oui. Il soupire, vous fait promettre de ne plus rien rejouer sans permission, et repart en pédalant.
+
+Ce code ouvre les portails... et pirate le tableau. Le coupable n'est pas loin.
+
+-> 29 : Foncer au chantier naval
+-> 25 : Retourner sur la plage
+
+== 46
+Le gabian s'approche en se dandinant. Il regarde votre badge. Il regarde encore votre badge. Les gabians adorent ce qui brille.
+
+-> 48 [navettes] : Lui offrir une navette
+-> 47 : Le chasser en battant des bras
+-> 25 : Reculer doucement
+
+== 47 FIN perdu
+Vous battez des bras. Le gabian aussi, mais lui, il a des ailes. Il attrape votre badge par le tour de cou et s'envole vers l'île Verte, au large.
+
+Sans badge, pas de messages, pas de radio, pas d'enquête. Le soir, on raconte qu'un gabian a fini premier du CTF.
+
+Morale : face à un gabian, une navette vaut mieux qu'un coup de bras.
+
+== 48
+Le gabian croque la navette, réfléchit longuement, puis recrache à vos pieds quelque chose de brillant : un vieux badge d'orga tout mâchouillé.
+
+"Léa - Orga CTF 2025".
+
+Il a dû le trouver du côté du chantier naval. Qui est cette Léa ?
+
+-[navettes]
+
+-> 61 : Demander sur la terrasse
+-> 25 : Retourner sur la plage
+
+== 49
+- Léa, c'est moi ! L'orga de l'an dernier. Je suis en vacances, cette année.
+
+Quand vous parlez de la cigale en ASCII, elle devient toute pâle.
+- Oh non. CIGALE-BOT ! Ma blague pour la clôture de l'an dernier. Je l'avais cachée dans une armoire du chantier. Elle n'a jamais marché, alors je l'ai oubliée...
+
+-> 29 : Courir au chantier naval
+-> 25 : Retourner sur la plage
+
+== 50
+Mireille vous attend dans son bureau, entre deux cartons de t-shirts.
+- Alors ? Qui a piraté mon tableau ?
+
+-> 51 : Le hoodie noir, c'est évident
+-> 52 : Le sponsor, pour vendre son IA
+-> 65 [!preuve] : Léa, l'orga de l'an dernier
+-> 53 [preuve] : Un robot oublié au chantier
+-> 54 [!preuve] : Un robot... quelque part
+-> 3 : Je n'ai pas encore fini
+
+== 51 FIN perdu
+Vous accusez Zed devant toute la conférence. Silence. Zed a passé la nuit à son hôtel, avec trois témoins et sa grand-mère au téléphone.
+
+Le vendeur de CyberBouclier 3000 fait une capture d'écran pour sa publicité. Sans coupable, la finale est annulée, et vous passez la soirée à vous excuser.
+
+Morale : un hoodie noir ne fait pas un pirate.
+
+== 52 FIN perdu
+Vous accusez CyberBouclier 3000. Le vendeur, vexé, remballe ses t-shirts et annule le buffet qu'il offrait ce soir.
+
+Sans coupable, la finale est annulée. Et sans buffet, il n'y a même plus rien à manger.
+
+Morale : on peut détester les plaquettes commerciales sans accuser les gens.
+
+== 53
+Vous posez le CIGALE-BOT sur le bureau, avec l'étiquette de Léa. Mireille lit, relit, puis éclate de rire.
+- Une blague de l'an dernier ! Jojo remet les scores d'hier, et on change enfin le mot de passe du wifi.
+
+Elle vous regarde.
+- Et pour la finale, une idée de mise en scène ?
+
+-> 55 : Non, juste lancer la finale
+-> 56 [trame] : Une démonstration en direct !
+
+== 54
+- Un robot ? Mireille fronce les sourcils. Je ne peux pas annoncer ça sans preuve. Rapportez-moi quelque chose de concret !
+
+-> 3 : Retourner enquêter
+
+== 55 FIN gagné
+À 20 h, la finale commence avec les vrais scores. Votre équipe se bat comme des gabians sur une frite et finit quatrième.
+
+À la remise des prix, Mireille vous appelle sur scène : prix spécial "Sherlock du CTF", une cigale en bronze avec une loupe.
+
+Le CIGALE-BOT, débranché, est exposé à l'accueil avec une pancarte : "Changez vos mots de passe".
+
+Bravo !
+
+== 56
+Ce soir, devant toute la conférence, vous allez montrer comment le tableau a été piraté.
+
+Marius est sur scène, très fier, sa télécommande à la main. Lilou tient le Flipper. Léa, rouge comme une tomate, a branché le CIGALE-BOT sur un tableau de test.
+
+Le badge lance le dé...
+
+-> 57 [dé 1-2] : Le Flipper fait la tête...
+-> 58 [dé 3-6] : Tout marche du premier coup !
+
+== 57
+Le Flipper affiche "Batterie faible" et s'éteint. Silence gêné dans la salle. Quelqu'un tousse.
+
+Marius se lève.
+- Pas de souci, j'ai l'original !
+
+Il appuie sur sa télécommande à deux euros.
+
+-> 58 : Regarder l'écran géant
+
+== 58 FIN gagné
+Sur l'écran géant, le tableau de test se vide et une cigale en ASCII apparaît : "CRI-CRI !" La salle hurle de rire et applaudit.
+
+Vous expliquez tout : un robot oublié, un mot de passe wifi jamais changé, et des télécommandes à deux euros qui ont toutes le même code.
+
+Mireille vous remet le prix "Sherlock du CTF". Lilou gagne un fer à souder tout neuf, Marius une télécommande à code tournant.
+
+Morale : le meilleur hack, c'est celui qu'on explique. Bravo !
+
+== 59 FIN
+- C'est réglé ! criez-vous en entrant chez Mireille. Plus de piratage !
+- Réglé comment ? Par qui ? Pourquoi ?
+
+Vous n'en savez rien. Mireille ne veut prendre aucun risque : la finale se joue avec un tableau en papier, au feutre.
+
+C'est mieux que rien, mais le mystère reste entier.
+
+Morale : réparer, c'est bien. Comprendre, c'est mieux.
+
+== 60 FIN
+Panisses, olives, sirop de citron : l'apéro est délicieux. Vous racontez votre enquête à tout le monde, avec un peu plus de suspense à chaque fois.
+
+Le soir, la finale est remplacée par un concours de pétanque. Votre équipe finit troisième.
+
+Pas de coupable aujourd'hui, mais un beau coucher de soleil sur le Bec de l'Aigle. Le mystère attendra l'an prochain.
+
+== 61
+Sur la terrasse, on sert des sirops de citron et des panisses. Une femme en vieux t-shirt "Orga CTF 2025" fait des mots croisés.
+
+Plus loin, un groupe trinque déjà :
+- À l'apéro ! L'enquête attendra !
+
+-> 49 : Parler à la femme au t-shirt d'orga
+-> 60 : Rejoindre l'apéro
+-> 25 : Retourner sur la plage
+
+== 62
+Fernand croque une navette et ferme les yeux de bonheur.
+- Comme celles de ma mère... Bon. Suivez-moi, mais vous n'avez rien vu.
+
+Il vous mène à un trou dans la grille, caché derrière un laurier-rose.
+
+-[navettes]
+
+-> 36 : Se faufiler dans le chantier
+
+== 63
+- Le portail ? Pas de souci, on y va !
+
+Marius vous accompagne jusqu'au chantier et appuie sur sa télécommande. Le grand portail grince et s'ouvre.
+
+Au même moment, votre badge vibre : "ALERTE : tableau des scores piraté !"
+
+Marius se gratte la tête.
+- C'est la marée qui fait ça ?
+
+-> 36 : Entrer dans le chantier
+
+== 64
+Vous glissez le CIGALE-BOT, bien débranché, dans votre sac, et vous courez jusqu'à la conférence. Fernand vous salue de la casquette.
+
+-> 50 : Aller voir Mireille
+
+== 65 FIN perdu
+- Léa ? Mireille l'appelle aussitôt. Léa jure qu'elle n'a rien piraté cette nuit : elle chantait au karaoké, à Marseille, devant deux cents témoins.
+
+Sans preuve, impossible d'en dire plus. La finale est annulée, et Léa vous boude tout l'apéro.
+
+Morale : on accuse avec des preuves, pas avec des intuitions.
+
+== 66
+Vous lancez le récepteur 433 MHz du badge. Une station météo annonce 31 degrés, une voiture se verrouille, une sonnette sans fil tinte...
+
+Rien de suspect. Et si le signal du pirate ne passait que la nuit ? Quelqu'un, par ici, se lève peut-être très tôt.
+
+-> 25 : Retourner sur la plage

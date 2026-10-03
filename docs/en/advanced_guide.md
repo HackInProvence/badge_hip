@@ -459,6 +459,41 @@ Precautions:
 - sending a file from the PC through the Flipper command line, and recording the packets of a badge:
   [developer guide § 6.19](developer_guide.md#619-flipper-zero).
 
+#### `tools/flipper_weather.py` — the weather on every badge, from a Flipper
+
+Gets the forecast of a town from [Open-Meteo](https://open-meteo.com) (free, no key), turns it into an
+**announcement** of the badges (the time, a short text, a QR code with the next days), then sends it with a Flipper
+Zero plugged in USB: the `.sub` files are copied to its SD card through its serial console, then sent (`subghz
+tx_from_file`). Every badge in range shows it like an announcement (Social > Annonces keeps it).
+Prerequisites: `pyserial`, Internet; the Flipper on its main screen (no Sub-GHz application open), not used by
+qFlipper.
+
+| Argument / option | Role |
+|---|---|
+| `TOWN` | the town (`"La Ciotat"`, `"Marseille"`...) |
+| `--lang fr\|en` | language of the text of the announcement (default `fr`) |
+| `--days N` | days in the QR code, from tomorrow (default 4) |
+| `--rounds N` | times each part is sent (default 4) |
+| `--port COMx` | port of the Flipper (found by itself) |
+| `-o FILE.sub` | name of the files written (default `build/secsea_meteo_N.sub`) |
+| `--no-send` | only writes the files (to send by hand: Sub-GHz > Saved) |
+| `--dry-run` | only shows the forecast and the text |
+| `--id N` | id of the sender (default `0x5EC5EA27`) |
+
+```bash
+python tools/flipper_weather.py "La Ciotat"
+python tools/flipper_weather.py Marseille --lang en --port COM10
+python tools/flipper_weather.py "La Ciotat" --dry-run
+```
+
+Example: "Weather Marseille: 24C, cloudy, wind 12 km/h. Tomorrow 22-26C, drizzle, rain 15%.", QR code
+"Sun 22-26C drizzle / Mon 21-26C rain / Tue 20-27C drizzle". The ° sign does not exist in the fonts of the badge.
+
+Precautions:
+- the announcement is 3 packets; the Flipper sends long RAW files badly (the long packets are lost), hence one small
+  file per part, each sent several times: about twenty seconds;
+- it shows on **every** badge in range (like an announcement of the organizers): use it with care.
+
 ### 2.6 Development helpers
 
 | Script | Purpose | Options |

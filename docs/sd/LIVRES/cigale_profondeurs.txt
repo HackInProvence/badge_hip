@@ -1,0 +1,706 @@
+La Cigale des profondeurs
+Les cigales de Hack In Provence
+
+// Un livre dont vous êtes le héros pour le badge SecSea : une cigale en sous-marin, au large de La Ciotat.
+// Format : voir docs/fr/livres_jeux.md. Vérification : python tools/gamebook_check.py ce_fichier.txt
+// Version anglaise : deep_sea_cicada.txt (mêmes numéros de sections).
+// Objets : lampe, sardines (la boutique), carte, Gaston (le goéland), code (la bouée), clé et Octave (le poulpe).
+
+== 1
+Le port de La Ciotat s'éveille. Les grandes grues du chantier naval découpent le ciel rose, et l'eau sent le sel.
+
+Vous êtes Cigaline, jeune cigale curieuse, et aujourd'hui, c'est votre première plongée scientifique !
+
+Au bout du quai attend un petit sous-marin jaune, le Petit Nautile. Sur son toit, la professeure Hippolyte, un hippocampe à lunettes, agite une nageoire.
+
+-> 2 : Monter à bord tout de suite
+-> 3 : Passer d'abord à la boutique
+-> 4 : Parler au goéland du quai
+
+== 2
+- Bienvenue à bord ! dit Hippolyte. Notre mission : retrouver la station du câble.
+
+En 1871, un câble télégraphique reliait la côte à Alger. Une petite station, posée au fond de la mer, répétait les messages. Puis on l'a oubliée.
+
+- Si on la retrouve, on y branchera un hydrophone pour écouter la mer. Sa position ? Peinte sur une vieille bouée, en code.
+
+-> 5 : Larguer les amarres !
+
+== 3
+La boutique du port sent la corde et le vernis. Derrière le comptoir, Madame Moule, une très vieille moule, entrouvre sa coquille.
+
+- Une cigale qui plonge ! Pour une exploratrice, c'est cadeau. Mais une seule chose, hein.
+
+Sur le comptoir : une lampe à signaux étanche et une boîte de sardines.
+
+-> 6 : Prendre la lampe à signaux
+-> 7 : Prendre les sardines
+-> 2 : Rien, merci : à bord !
+
+== 4
+Sur une bitte d'amarrage trône un énorme goéland, un bandeau de pirate sur l'oeil. C'est Gaston, le gabian chasseur de trésors.
+
+- Psst, la cigale. Un sous-marin, un air mystérieux... Vous cherchez un trésor, pas vrai ?
+
+-> 8 : "Non, un vieux câble."
+-> 9 : "Oui ! Un coffre plein d'or !"
+-> 2 : Le saluer et partir
+
+== 5
+Le Petit Nautile glisse hors du port. Vous passez sous la grande grue du chantier, puis devant l'île Verte.
+
+Trois dauphins sautent près du hublot, comme pour vous souhaiter bon voyage.
+
+Au loin, une bouée rouillée danse sur les vagues. Derrière elle, le ciel devient gris.
+
+-> 10 : S'approcher de la bouée
+-> 26 : Suivre les dauphins
+
+== 6
+Madame Moule vous tend la lampe : un gros boîtier jaune avec une gâchette.
+
+- Appui court, appui long : c'est du morse. Les marins s'en servent quand la radio se tait.
+
+Vous la clipsez à votre ceinture.
+
++[lampe]
+
+-> 2 : Filer au sous-marin
+-> 4 : Aller voir le goéland
+
+== 7
+Une boîte de sardines à l'huile d'olive, avec une sardine qui sourit sur le couvercle.
+
+- On ne sait jamais, dit Madame Moule. Au fond de la mer, tout le monde a faim.
+
+Vous la glissez dans votre sac.
+
++[sardines]
+
+-> 2 : Filer au sous-marin
+-> 4 : Aller voir le goéland
+
+== 8
+- Un câble ? Gaston fait la moue. Du cuivre, des fils, pfff. Pas un doublon d'or.
+
+Il fouille sous son aile et en sort un papier jauni.
+
+- Tenez, trouvé dans une bouteille. Rien que des dessins de câbles, ça ne m'intéresse pas.
+
+Une vieille carte marine ! Une croix y marque une "cheminée" sur le toit de la station.
+
++[carte]
+
+-> 2 : Le remercier et monter à bord
+
+== 9
+L'oeil de Gaston s'allume comme un phare.
+
+- De l'or ! Je le savais ! Je vous suis, associée. Moitié-moitié, hein ?
+
+Il se pose sur le toit du sous-marin et refuse d'en descendre. Vous avez un peu honte : ce n'était pas tout à fait vrai.
+
++[Gaston]
+
+-> 2 : Monter à bord, Gaston sur le toit
+
+== 10
+La bouée est couverte de rouille et de petits crabes. Sur son flanc, des lettres peintes en blanc :
+
+FDEOH D OD JUXH
+
+Et dessous, plus petit : "Jules C. a avancé de 3."
+
+- Jules César ! dit Hippolyte. Il décalait chaque lettre dans l'alphabet. Pour lire, on recule de 3 : F devient C...
+
+-> 11 : "CABLE A LA GRUE"
+-> 12 : "SONDE A LA BAIE"
+-> 14 [Gaston] : Laisser Gaston lire
+-> 13 : Pas le temps, plonger !
+
+== 11
+F, E, D... C ! D, C, B... A ! Lettre par lettre, vous lisez :
+
+CABLE A LA GRUE
+
+- Bravo ! Hippolyte fait un salto de joie. Une vieille grue du chantier est tombée à l'eau pendant une tempête. Le câble doit passer tout près !
+
++[code]
+
+-> 15 : Continuer
+
+== 12
+Hippolyte vérifie dans son carnet.
+
+- Hmm. S, si on avance de 3, ça donne V, pas F. Ça ne colle pas.
+
+Vous recomptez sur vos pattes. Elle a raison : il faut partir des lettres de la bouée et reculer de trois.
+
+-> 10 : Relire la bouée
+-> 13 : Tant pis, plonger sans le code
+
+== 13
+- Bon, soupire Hippolyte. On suivra le câble sur le fond. Ce sera juste plus long.
+
+Elle ferme l'écoutille. Au même moment, une grosse goutte de pluie s'écrase sur le hublot.
+
+-> 15 : Continuer
+
+== 14
+Gaston se penche, plisse son oeil unique et déclare :
+
+- Facile. Ça dit : TRESOR ICI.
+
+Il plonge tête la première le long de la chaîne de la bouée... et remonte avec une vieille botte pleine d'algues.
+
+- Le trésor est dans la botte, c'est sûr.
+
+Hippolyte lève les yeux au ciel.
+
+-> 10 : Déchiffrer soi-même
+
+== 15
+Le vent se lève d'un coup. Le mistral ! Les vagues se creusent, l'écume vole, le Petit Nautile tangue comme un bouchon.
+
+- Plongée d'urgence ! crie Hippolyte. Accroche-toi !
+
+Elle tire le levier. Tout dépend de la prochaine vague...
+
+-> 16 [dé 1-2] : Une vague énorme arrive...
+-> 17 [dé 3-6] : Le sous-marin plonge à temps
+
+== 16
+La vague soulève le sous-marin, le retourne à moitié, le repose. Vous roulez du plafond au plancher. Votre estomac aussi, mais dans l'autre sens.
+
+- Tout va bien ? demande Hippolyte, toute verte.
+
+Dehors, la tempête hurle.
+
+-> 17 : Plonger quand même !
+-> 18 : Rentrer au port à l'abri
+
+== 17
+Dix mètres, vingt mètres... Le bruit de la tempête disparaît. Sous les vagues, tout est calme, bleu et silencieux.
+
+Un banc de saupes passe en scintillant. Sur le sable, un long tuyau noir couvert de coquillages s'éloigne : le câble !
+
+- Par où ? demande Hippolyte.
+
+-> 19 [code] : Cap sur la grue engloutie
+-> 20 : Suivre le câble sur le fond
+-> 21 : Visiter l'herbier de posidonies
+
+== 18 FIN perdu
+Vous rentrez au port, trempée jusqu'aux antennes. Madame Moule vous sert une panisse chaude pendant que la pluie tambourine.
+
+La tempête dure trois jours. Le quatrième, Hippolyte doit rendre le sous-marin au laboratoire.
+
+La station attendra : elle a l'habitude, ça fait cent ans.
+
+Morale : sous la tempête, la mer est calme. Il suffisait de plonger.
+
+== 19
+Une ombre géante apparaît : la grue engloutie ! Couchée sur le fond, son bras d'acier est devenu une forêt d'éponges orange et de gorgones rouges.
+
+Des centaines de poissons y vivent. Le câble passe sous la cabine de la grue... mais le passage est bouché par une énorme masse brune qui ronfle.
+
+-> 30 : S'approcher de la masse brune
+
+== 20
+Le câble serpente sur le sable. Vous le suivez longtemps, phares allumés. Une étoile de mer vous fait coucou d'une branche.
+
+Le câble arrive à un croisement : à gauche, un champ de vieilles amphores ; à droite, une grande ombre de métal.
+
+-> 22 : À gauche, vers les amphores
+-> 19 : À droite, vers la grande ombre
+
+== 21
+Une prairie sous la mer ! Les posidonies ondulent comme des cheveux verts. Ce n'est pas une algue, explique Hippolyte : c'est une plante à fleurs, qui fait de l'oxygène et abrite des milliers de bébés poissons.
+
+Soudain, BOUM : une ancre de bateau tombe et racle l'herbier, arrachant des touffes entières !
+
+-> 23 [lampe] : Faire des signaux au bateau
+-> 24 : Décrocher l'ancre avec la pince
+-> 25 : Ce n'est pas notre mission
+
+== 22
+Le champ d'amphores ressemble à un vieux marché englouti. Dans l'une d'elles, deux yeux vous observent.
+
+Un poulpe en sort lentement, en changeant de couleur : blanc, rouge, rayé, à pois.
+
+- Bonjour ! Je suis Octave. Je collectionne les objets brillants et j'adore les énigmes. On joue ?
+
+-> 37 : Discuter avec Octave
+
+== 23
+Vous collez la lampe contre le hublot du toit et vous appuyez : court, long, court...
+
+À la surface, une petite fille sur le pont lit le morse avec son téléphone :
+
+"ANCRE SUR HERBIER. MERCI DE BOUGER."
+
+Quelques minutes plus tard, l'ancre remonte, et le bateau va se poser sur une tache de sable.
+
+-> 28 : Continuer
+
+== 24
+Hippolyte sort la pince articulée du sous-marin. Vous pilotez avec la manette, la langue entre les mandibules.
+
+Il faut décrocher l'ancre sans abîmer les plantes. C'est délicat...
+
+-> 28 [dé 4-6] : Doucement... ça y est ?
+-> 29 [dé 1-3] : Oups, la pince se coince...
+
+== 25
+- Pas notre mission ? Hippolyte vous regarde par-dessus ses lunettes. Un mètre d'herbier met un siècle à pousser, Cigaline.
+
+Vous rougissez jusqu'aux antennes. Trop tard : le bateau repart déjà, laissant un trou dans la prairie.
+
+Un peu tristes, vous repartez le long du câble.
+
+-> 22 : Suivre le câble
+
+== 26
+Les dauphins tournent autour du sous-marin en riant avec des clics. Ils filent vers l'ouest, reviennent, repartent : ils veulent jouer !
+
+Hippolyte hésite.
+
+- C'est merveilleux... mais la bouée est par là, et le ciel se gâte.
+
+-> 10 : Revenir vers la bouée
+-> 27 : Les suivre encore un peu
+
+== 27 FIN perdu
+Encore un peu, puis encore un peu... Les dauphins vous emmènent jusqu'au Vieux-Port de Marseille, leur endroit préféré : le marché aux poissons.
+
+Le Petit Nautile n'a plus de batterie. Un bateau-taxi vous ramène à La Ciotat, à la remorque, sous le regard des touristes.
+
+Morale : les dauphins sont de très bons guides, mais jamais vers là où vous allez.
+
+== 28
+Le calme revient. Une petite seiche s'approche, change de couleur pour dire merci, puis montre une direction avec ses tentacules.
+
+- Elle dit que le poulpe des amphores sait tout sur le câble, traduit Hippolyte.
+
+Une boule de posidonie roule devant le hublot. Sur les plages, on les appelle des pelotes de mer.
+
+-> 22 : Aller voir le poulpe
+
+== 29 FIN perdu
+La pince se coince dans l'ancre. Au-dessus, le bateau remonte son ancre... et le Petit Nautile avec !
+
+Vous voilà pendus sous la coque comme un porte-clés géant. Le capitaine, un monsieur en short, n'en croit pas ses yeux.
+
+Il vous ramène gentiment au port, où toute La Ciotat vient prendre des photos.
+
+Morale : l'herbier est sauvé, mais l'expédition s'arrête là.
+
+== 30
+La masse brune ouvre un oeil. C'est un mérou, gros comme un frigo, avec une moustache de vieux marin.
+
+- Encore des touristes ! Ici, c'est MA grue. Le passage est fermé.
+
+Il bâille : le Petit Nautile pourrait presque entrer dans sa bouche.
+
+-> 31 [sardines] : Lui offrir les sardines
+-> 33 [Octave] : Laisser Octave lui parler
+-> 32 : Demander poliment
+-> 22 : Aller voir ailleurs
+
+== 31
+Vous ouvrez la boîte devant le hublot. Le mérou renifle. Sa moustache frémit.
+
+- À l'huile d'olive ? Bon. Pour une fois.
+
+Il avale tout d'un coup, rote une bulle énorme et se pousse.
+
+- La station est derrière, dans la crevasse. Et pas de bruit !
+
+-[sardines]
+
+-> 47 : Entrer dans la crevasse
+
+== 32
+- Poliment ? Le mérou grogne. Répondez à ma question et je bouge. Sinon, je dors.
+
+Il pointe une nageoire vers la prairie de posidonies, au loin.
+
+- Quel âge peut avoir un herbier comme celui-là ?
+
+-> 35 : Plus vieux que les pyramides
+-> 34 : Quelques mois, comme l'herbe
+-> 34 : Ça ne vous regarde pas !
+
+== 33
+Octave file vers le mérou et lui tapote la tête.
+
+- Marcel ! Ce sont mes amis. Et tu me dois une revanche aux dames.
+
+Le mérou soupire très, très longuement.
+
+- Bon, bon. Pour Octave. Mais pas de bruit.
+
+Il se pousse et dévoile une crevasse sombre derrière la grue.
+
+-> 47 : Entrer dans la crevasse
+
+== 34
+Le mérou ferme les yeux.
+
+- Pfff. Touristes. Je dors.
+
+Et il ronfle, si fort que les gorgones tremblent.
+
+-> 36 : Attendre qu'il se réveille
+-> 22 : Chercher de l'aide ailleurs
+
+== 35
+Le mérou ouvre les deux yeux, surpris.
+
+- Exact. Certains herbiers ont des milliers d'années. Ils étaient là avant le port, avant les bateaux, avant les cigales.
+
+Il se pousse lentement.
+
+- Vous êtes moins bête que les autres. La station est dans la crevasse. Respectez-la.
+
+-> 47 : Entrer dans la crevasse
+
+== 36 FIN perdu
+Vous attendez. Le mérou ronfle. Vous attendez encore. Un mérou peut vivre cinquante ans, et celui-là adore dormir.
+
+Le soir, la batterie du Petit Nautile clignote : il faut remonter.
+
+Morale : un mérou ne se réveille que pour une bonne réponse... ou pour une sardine.
+
+== 37
+Octave s'enroule autour d'une amphore.
+
+- Le câble ? Bien sûr que je le connais. Et la station aussi : c'est là que j'ai trouvé mon plus bel objet.
+
+Il vous regarde avec malice.
+
+- Mais ici, rien n'est gratuit. Une énigme contre mon aide !
+
+-> 38 : Accepter l'énigme
+-> 39 : "Dis-nous juste le chemin..."
+
+== 38
+Octave tient des coquillages dans ses huit bras.
+
+- Écoutez bien. Ce matin, j'avais 2 coquillages dans chaque bras. Un crabe m'en a volé 3. Combien m'en reste-t-il ?
+
+Il change de couleur, impatient.
+
+-> 40 : Treize
+-> 41 : Seize
+-> 41 : Cinq
+
+== 39
+- Juste le chemin ? Octave devient tout gris. Trop simple ! La vie sans énigmes, c'est comme la mer sans sel.
+
+Il croise quatre bras sur quatre autres et attend.
+
+-> 38 : D'accord, l'énigme !
+
+== 40
+- Treize ! Huit fois deux, seize, moins trois ! Octave devient rose fluo de joie.
+
+Il fouille dans son amphore et en sort une grosse clé de laiton, toute verte.
+
+- Ma plus belle trouvaille. Elle vient de la station. Prenez-la !
+
++[clé]
+
+-> 42 : "Viens avec nous, Octave !"
+-> 43 : Le remercier et partir
+
+== 41
+- Perdu ! Octave rit, ce qui fait des bulles partout. Mais je suis beau joueur : une revanche ?
+
+Il pose trois coquilles sur le sable, cache un caillou sous l'une d'elles et les mélange avec ses huit bras, très, très vite.
+
+-> 44 : Jouer la revanche
+
+== 42
+Octave se colle au hublot comme une ventouse géante.
+
+- Avec plaisir ! Je connais le gardien du passage, Marcel le mérou. Il est grognon, mais c'est mon partenaire de dames.
+
++[Octave]
+
+-> 30 : Aller vers la grue engloutie
+
+== 43
+- Bonne chance ! dit Octave. La station est derrière la grue engloutie. Attention au mérou, il est grognon.
+
+Il disparaît dans son amphore, ne laissant dépasser qu'un bras qui fait au revoir.
+
+-> 30 : Aller vers la grue engloutie
+
+== 44
+Huit bras, trois coquilles : impossible de suivre ! Vous montrez une coquille au hasard...
+
+-> 40 [dé 4-6] : Octave soulève la coquille...
+-> 45 [dé 1-3] : Octave soulève la coquille...
+
+== 45
+Vide ! Le caillou était sous une autre.
+
+- Encore une ? propose Octave, les yeux brillants. Les poulpes ne se lassent jamais des jeux.
+
+Hippolyte regarde sa montre.
+
+-> 38 : Retenter l'énigme
+-> 46 : Jouer encore, et encore...
+-> 30 : Partir sans son aide
+
+== 46 FIN
+Vous jouez. Aux coquilles, aux devinettes, aux dames, et même au morse avec les couleurs. Octave est ravi, vous aussi.
+
+Quand la batterie s'épuise, Hippolyte vous ramène au port. La station attendra, mais vous voilà championne des jeux de poulpe.
+
+Chaque été, vous revenez jouer avec Octave. Ce n'était pas la mission, mais c'est une belle amitié.
+
+== 47
+Derrière la grue, une crevasse plonge dans le noir. Le Petit Nautile est trop gros pour y entrer.
+
+- À toi, Cigaline, dit Hippolyte en vous tendant un casque-bulle. Tu es petite, tu passeras.
+
+Vous sortez par le sas. L'eau est fraîche, vos ailes flottent derrière vous. Au fond, quelque chose brille.
+
+-> 48 [lampe] : Allumer la lampe
+-> 49 [!lampe] : Avancer à tâtons
+
+== 48
+Le faisceau jaune éclaire la crevasse. Des crevettes s'enfuient en clignant des yeux. Sur la paroi, une plaque gravée :
+
+"STATION DE RELAIS - CABLE LA CIOTAT-ALGER - 1871"
+
+Devant vous, un dôme de métal couvert de corail, avec une porte ronde.
+
+-> 50 : S'approcher de la porte
+
+== 49
+Il fait noir comme dans un encrier. Vous allumez les LEDs de votre badge : une petite lueur bleue.
+
+Vous vous cognez contre quelque chose de mou.
+
+- Pardon, dit une holothurie, un concombre de mer, très vexée.
+
+Puis vous la voyez enfin : la porte ronde d'un dôme couvert de corail.
+
+-> 50 : S'approcher de la porte
+
+== 50
+La porte de la station est en bronze, ronde comme un hublot géant. Au milieu, une énorme serrure. La poignée ne bouge pas d'un millimètre.
+
+Un câble épais entre dans le dôme par le côté, comme une racine.
+
+-> 51 [clé] : Essayer la clé de laiton
+-> 53 [Octave] : Demander de l'aide à Octave
+-> 52 [carte] : Regarder la carte de Gaston
+-> 54 : Pousser de toutes ses forces
+
+== 51
+La clé entre dans la serrure. Vous tournez à deux pattes. Ça résiste... puis, avec un "clonk" profond, la porte pivote.
+
+Une grosse bulle d'air s'échappe et file vers la surface.
+
+-> 56 : Entrer dans la station
+
+== 52
+Sur la carte, une croix marque une "cheminée" sur le toit du dôme. Vous nagez vers le haut : il y a bien un tuyau, juste assez large pour une petite cigale.
+
+Vous rentrez les ailes, vous vous faufilez... et vous atterrissez dans la station.
+
+-> 56 : Regarder autour de vous
+
+== 53
+- Une serrure ? Octave sourit. Les poulpes n'ont pas d'os : je passe partout.
+
+Il glisse sous la porte par une fente minuscule, comme du dentifrice. Clic, clac : des bras s'activent à l'intérieur.
+
+La porte s'ouvre. Octave vous salue de quatre bras.
+
+-> 56 : Entrer dans la station
+
+== 54
+Vous poussez. Vous tirez. Vous poussez encore. La porte ne bouge pas, mais une famille de girelles vient vous regarder comme au spectacle.
+
+- Il faut une clé, dit Hippolyte à la radio. Ou quelqu'un de très souple.
+
+-> 22 : Chercher le poulpe des amphores
+-> 55 : Remonter, tant pis
+
+== 55 FIN perdu
+Vous remontez avec des photos de la porte, de la plaque et des girelles. C'est déjà une belle découverte.
+
+Mais personne n'entre dans la station cette année. Hippolyte prépare déjà une expédition pour l'été prochain.
+
+Morale : une porte fermée se contourne, elle ne se pousse pas.
+
+== 56
+Surprise : la station est pleine d'air ! Une bulle prisonnière depuis cent ans. Vous enlevez votre casque.
+
+Partout, du cuivre et du laiton : un manipulateur morse, des bobines, un grand boîtier où arrive le câble. Sur un bureau, un registre de cuir et un ruban de papier.
+
+À la radio, Hippolyte : "Si tu reconnectes le câble, on branche l'hydrophone !"
+
+-> 57 : Lire le ruban de papier
+-> 58 : Ouvrir le grand boîtier
+-> 59 : Feuilleter le registre
+
+== 57
+Sur le ruban, le dernier message reçu par la station :
+
+-.-. .. --. .- .-.. .
+
+Au mur, un vieux tableau à moitié effacé :
+
+A .-  C -.-.  E .  G --.
+I ..  L .-..  M --  R .-.
+
+En dessous, à la plume : "Le mot du ruban ouvre le boîtier."
+
+-> 60 : CIGALE
+-> 61 : MIRAGE
+-> 61 : GALERE
+
+== 58
+Le grand boîtier est fermé par un cadran à lettres, comme un vieux coffre-fort. Une plaque dit : "MOT DE PASSE".
+
+Vous essayez 1234. Rien. 0000 ? Rien. MOTDEPASSE ? Un ressort fait "boing", vexé.
+
+-> 57 : Chercher un indice dans la pièce
+
+== 59
+Le registre est écrit à l'encre violette. Les télégraphistes y notaient tout : la météo, les messages... et des recettes de navettes !
+
+La dernière page date de 1920 : "Tempête. Nous remontons. Que la station veille."
+
+C'est un trésor d'histoire.
+
+-> 63 : Remonter avec le registre
+-> 57 : D'abord, lire le ruban
+
+== 60
+C, I, G, A, L, E. Vous tournez le cadran lettre par lettre.
+
+Clac ! Le boîtier s'ouvre. Dedans, des contacts de cuivre bien protégés par la graisse. Vous y branchez le fil de l'hydrophone qu'Hippolyte a fait passer par le sas.
+
+Les relais claquent, une petite lampe s'allume. Cent ans après, la station se réveille !
+
+-> 62 : Écouter
+
+== 61
+Vous tournez le cadran. Le boîtier fait "brrrt" et reste fermé.
+
+- Recompte les points et les traits, dit Hippolyte à la radio. Le point est court, le trait est long, et chaque groupe fait une lettre.
+
+-> 57 : Relire le ruban
+
+== 62
+Dans les écouteurs, la mer chante. Les clics des dauphins, le grésillement des crevettes, le souffle lointain d'un rorqual qui passe au large.
+
+- Ça marche ! crie Hippolyte. Le son part dans le câble jusqu'à la côte !
+
+La station est devenue une oreille sous la mer. Il ne reste qu'à prévenir le port.
+
+-> 64 : Remonter à la surface
+
+== 63 FIN gagné
+Vous remontez avec le registre, bien à l'abri dans un sac étanche.
+
+À La Ciotat, le musée l'expose dans une vitrine : "Registre de la station du câble, 1871-1920. Retrouvé par Cigaline."
+
+La station dort encore au fond, mais son histoire est sauvée. Et le musée organise une soirée navettes, d'après la recette des télégraphistes.
+
+Une autre fin, plus sonore, vous attend peut-être...
+
+== 64
+Le Petit Nautile fait surface. La tempête est passée, le soleil se couche sur le Bec de l'Aigle.
+
+Mais la radio du sous-marin a pris l'eau. Comment dire au port que la station fonctionne ?
+
+- Avec des signaux lumineux ! dit Hippolyte. Le port attend un message tout simple : OK.
+
+-> 65 [lampe] : Sortir la lampe à signaux
+-> 65 [!lampe] : Faire clignoter les phares
+-> 66 [Gaston] : Qui crie, là-haut ?
+
+== 65
+Vous visez la capitainerie, au bout du quai. Il faut envoyer OK en morse.
+
+Sur le tableau de bord, un aide-mémoire :
+
+K -.-  L .-..
+O ---  S ...
+
+Quel signal envoyer ?
+
+-> 67 : --- -.-
+-> 68 : ... --- ...
+-> 69 : .-.. --- .-..
+
+== 66
+Gaston le gabian se pose sur le toit en battant des ailes.
+
+- Associée ! Je vous ai cherchée partout ! Alors, l'or ? Où est l'or ?
+
+Il regarde vos pattes vides. Son bandeau tremble d'indignation.
+
+-> 70 : Lui faire écouter la mer
+-> 71 : "Il n'y a pas d'or, pardon..."
+
+== 67 FIN gagné
+Sur le quai, une lumière répond : --- -.- . OK !
+
+Le lendemain, toute La Ciotat écoute la mer dans les haut-parleurs du port : les dauphins, les crevettes, le rorqual. Les écoles viennent visiter le nouvel observatoire.
+
+Un poulpe s'installe dans la station, le vieux mérou garde le passage, et le câble chante de nouveau, cent ans après.
+
+Bravo, Cigaline : la plus belle découverte, c'est celle qu'on partage !
+
+== 68 FIN perdu
+Trois points, trois traits, trois points : SOS !
+
+Dix minutes plus tard, un canot de sauvetage, deux jet-skis et un hélicoptère vous entourent. Les sauveteurs sont très gentils... un peu moins quand ils comprennent.
+
+La station marche, mais ce que tout le monde retient, c'est la cigale qui a appelé les secours pour dire OK.
+
+Morale : en morse, une lettre de travers et tout change.
+
+== 69
+Point trait point point, trois traits, point trait point point : L, O, L.
+
+Après un long silence, la capitainerie répond : -- -.. .-.
+
+Hippolyte éclate de rire : M, D, R. Le capitaine du port a de l'humour.
+
+-> 65 : Envoyer le bon message
+
+== 70
+Vous lui tendez les écouteurs. Gaston écoute : les dauphins, les crevettes, le chant du rorqual...
+
+Son oeil se mouille.
+
+- C'est... c'est plus beau que l'or. Il faut que je le raconte à tous les gabians du port !
+
+Il s'envole en criant la nouvelle à toute la baie.
+
+-[Gaston]
+
+-> 65 : Prévenir le port
+
+== 71
+- Pas d'or ?! Gaston devient tout rouge sous ses plumes. Vous m'avez menti !
+
+Vexé, il attrape la première chose qui brille : les lunettes d'Hippolyte ! Et il s'envole vers l'île Verte.
+
+- Ça, au moins, ça brille !
+
+Hippolyte plisse les yeux. Elle ne voit plus rien : c'est vous qui enverrez le message.
+
+-[Gaston]
+
+-> 65 : Prévenir le port

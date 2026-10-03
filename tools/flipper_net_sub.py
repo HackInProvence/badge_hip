@@ -86,8 +86,11 @@ def raw_durations(bits, repeats, gap_us):
                 runs[-1][1] += 1
             else:
                 runs.append([b, 1])
+        # Rounded on the time since the start of the packet, not run by run: no drift on the long packets
+        t = 0
         for b, n in runs:
-            d = round(n * bit_us)
+            d = round((t + n) * bit_us) - round(t * bit_us)
+            t += n
             out.append(d if b else -d)
         if out[-1] < 0:
             out[-1] -= gap_us  # The gap between the repeats
@@ -97,11 +100,14 @@ def raw_durations(bits, repeats, gap_us):
 
 
 def write_sub(path, durations, comment):
+    """durations: a list of durations, or a list of lists (one per packet): each packet then starts a RAW_Data line"""
     lines = ['Filetype: Flipper SubGhz RAW File', 'Version: 1', f'# {comment}', f'Frequency: {FREQUENCY}',
              'Preset: FuriHalSubGhzPresetCustom', 'Custom_preset_module: CC1101',
              f'Custom_preset_data: {preset_data()}', 'Protocol: RAW']
-    for i in range(0, len(durations), 512):
-        lines.append('RAW_Data: ' + ' '.join(str(d) for d in durations[i:i + 512]))
+    chunks = durations if durations and isinstance(durations[0], list) else [durations]
+    for chunk in chunks:
+        for i in range(0, len(chunk), 512):
+            lines.append('RAW_Data: ' + ' '.join(str(d) for d in chunk[i:i + 512]))
     with open(path, 'w', newline='\n') as f:
         f.write('\n'.join(lines) + '\n')
 
@@ -136,10 +142,10 @@ def main():
         if not args.args:
             sys.exit('the type, then the data bytes in hex')
         packet = header + [int(args.args[0], 0)] + sender + [int(b, 16) for b in args.args[1:]]
-    durations = raw_durations(packet_bits(packet), args.repeats, args.gap * 1000)
+    durations = [raw_durations(packet_bits(packet), 1, args.gap * 1000) for _ in range(args.repeats)]
     out = args.output or f'secsea_{args.kind}.sub'
     write_sub(out, durations, f'SecSea {args.kind} {" ".join(args.args)}: packet {bytes(packet).hex()}')
-    print(f'{out}: {len(packet)} bytes, {len(durations)} durations')
+    print(f'{out}: {len(packet)} bytes, {sum(len(d) for d in durations)} durations')
 
 
 if __name__ == '__main__':
