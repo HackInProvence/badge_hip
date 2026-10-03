@@ -475,75 +475,87 @@ msgstr "D: cómo  I: volver"
 msgid "Succès"
 msgstr "Logros"
 
-#: src/menu/admin.c:23
+#: src/menu/admin.c:24
 msgid "Muet (conférence)"
 msgstr "Silencio (charla)"
 
-#: src/menu/admin.c:24
-#: src/menu/remote.c:155
+#: src/menu/admin.c:25
+#: src/menu/remote.c:158
 msgid "Fin du mode muet"
 msgstr "Fin del silencio"
 
-#: src/menu/admin.c:25
+#: src/menu/admin.c:26
 msgid "Cigale : chanter"
 msgstr "Cigarra: cantar"
 
-#: src/menu/admin.c:26
+#: src/menu/admin.c:27
 msgid "Talk : éteint"
 msgstr "Charla: apagado"
 
-#: src/menu/admin.c:27
+#: src/menu/admin.c:28
 msgid "Talk : vert"
 msgstr "Charla: verde"
 
-#: src/menu/admin.c:28
+#: src/menu/admin.c:29
 msgid "Talk : orange (5 min)"
 msgstr "Charla: naranja (5 min)"
 
-#: src/menu/admin.c:29
+#: src/menu/admin.c:30
 msgid "Talk : rouge (fini)"
 msgstr "Charla: rojo (fin)"
 
-#: src/menu/admin.c:30
+#: src/menu/admin.c:31
 msgid "Talk : rouge énervé"
 msgstr "Charla: rojo airado"
 
-#: src/menu/admin.c:31
-#: src/menu/remote.c:160
+#: src/menu/admin.c:32
+#: src/menu/remote.c:163
 msgid "Mise en sommeil"
 msgstr "Suspender"
 
-#: src/menu/admin.c:62
-#: src/menu/admin.c:68
+#: src/menu/admin.c:42
+msgid "Relais : %u saut(s)"
+msgstr "Relevo: %u saltos"
+
+#: src/menu/admin.c:44
+msgid "Relais : aucun"
+msgstr "Relevo: ninguno"
+
+#: src/menu/admin.c:74
+#: src/menu/admin.c:80
 msgid "Commandes radio"
 msgstr "Órdenes remotas"
 
-#: src/menu/admin.c:64
+#: src/menu/admin.c:76
+msgid "G : retour  D : changer"
+msgstr "I: volver  D: cambiar"
+
+#: src/menu/admin.c:76
 msgid "G : retour  D : envoyer à tous"
 msgstr "I: volver  D: enviar a todos"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:89
 msgid "Orateur"
 msgstr "Ponente"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:89
 msgid "Participant"
 msgstr "Participante"
 
-#: src/menu/admin.c:77
+#: src/menu/admin.c:89
 msgid "Staff"
 msgstr "Staff"
 
-#: src/menu/admin.c:82
+#: src/menu/admin.c:94
 msgid "  (actuel)"
 msgstr "  (actual)"
 
-#: src/menu/admin.c:109
-#: src/menu/admin.c:116
+#: src/menu/admin.c:121
+#: src/menu/admin.c:128
 msgid "Type du badge"
 msgstr "Tipo de badge"
 
-#: src/menu/admin.c:111
+#: src/menu/admin.c:123
 msgid ""
 "Affiché par le\n"
 "badge nominatif."
@@ -551,7 +563,7 @@ msgstr ""
 "Lo muestra la\n"
 "acreditación."
 
-#: src/menu/admin.c:112
+#: src/menu/admin.c:124
 #: src/menu/assassin.c:946
 #: src/menu/lang.c:47
 #: src/menu/messages.c:279
@@ -776,7 +788,7 @@ msgstr "Mínimo %d jugadores."
 
 #: src/menu/assassin.c:817
 #: src/menu/assassin.c:822
-#: src/menu/main.c:2944
+#: src/menu/main.c:2946
 #: src/menu/smuggler.c:536
 #: src/menu/smuggler.c:553
 #: src/menu/smuggler.c:561
@@ -1086,13 +1098,13 @@ msgid "> Enregistrer le point"
 msgstr "> Guardar el punto"
 
 #: src/menu/battcal.c:146
-#: src/menu/ledcast.c:313
+#: src/menu/ledcast.c:329
 #: src/menu/pirate_radio.c:614
 msgid "Ailes : -  +"
 msgstr "Alas: -  +"
 
 #: src/menu/battcal.c:146
-#: src/menu/ledcast.c:310
+#: src/menu/ledcast.c:326
 #: src/menu/pirate_radio.c:614
 msgid "G : retour  D : valider"
 msgstr "I: volver  D: OK"
@@ -1204,16 +1216,16 @@ msgstr "Emisión: %s"
 
 #: src/menu/battradio.c:57
 #: src/menu/battradio.c:68
-#: src/menu/main.c:657
 #: src/menu/main.c:658
+#: src/menu/main.c:659
 #: src/menu/pirate_radio.c:541
 msgid "non"
 msgstr "no"
 
 #: src/menu/battradio.c:57
 #: src/menu/battradio.c:68
-#: src/menu/main.c:657
 #: src/menu/main.c:658
+#: src/menu/main.c:659
 #: src/menu/pirate_radio.c:541
 msgid "oui"
 msgstr "sí"
@@ -1441,7 +1453,7 @@ msgstr ""
 "¡Acerca los badges!"
 
 #: src/menu/contacts.c:352
-#: src/menu/main.c:2961
+#: src/menu/main.c:2963
 #: src/menu/pirate_radio.c:593
 #: src/menu/radio_tune.c:196
 msgid "G : arrêter"
@@ -1633,8 +1645,8 @@ msgstr ""
 "Un botón lo detiene."
 
 #: src/menu/demo.c:32
-#: src/menu/main.c:842
-#: src/menu/main.c:1338
+#: src/menu/main.c:843
+#: src/menu/main.c:1339
 msgid "D : lancer  G : retour"
 msgstr "D: lanzar  I: volver"
 
@@ -1844,7 +1856,7 @@ msgid "%u sections"
 msgstr "%u secciones"
 
 #: src/menu/gamebook.c:722
-#: src/menu/main.c:1059
+#: src/menu/main.c:1060
 msgid "D : choisir  G : retour"
 msgstr "D: elegir  I: volver"
 
@@ -2035,7 +2047,7 @@ msgid "Pause  D : reprendre"
 msgstr "Pausa  D: reanudar"
 
 #: src/menu/games.c:1106
-#: src/menu/main.c:1878
+#: src/menu/main.c:1879
 #: src/menu/puzzles.c:1328
 msgid "Pas encore de record"
 msgstr "Aún no hay récord"
@@ -2178,7 +2190,7 @@ msgid "G : retour  D : le chasser"
 msgstr "I: volver  D: cazarlo"
 
 #: src/menu/image_radio.c:209
-#: src/menu/main.c:1043
+#: src/menu/main.c:1044
 msgid "SecSea (intégrée)"
 msgstr "SecSea (interna)"
 
@@ -2374,129 +2386,129 @@ msgstr "Idioma: %s"
 msgid "Langue"
 msgstr "Idioma"
 
-#: src/menu/ledcast.c:32
+#: src/menu/ledcast.c:35
 msgid "Clignotant"
 msgstr "Parpadeo"
 
-#: src/menu/ledcast.c:32
+#: src/menu/ledcast.c:35
 msgid "Fixe"
 msgstr "Fijo"
 
-#: src/menu/ledcast.c:32
-#: src/menu/ledcast.c:291
+#: src/menu/ledcast.c:35
+#: src/menu/ledcast.c:307
 msgid "Fondu"
 msgstr "Fundido"
 
-#: src/menu/ledcast.c:32
+#: src/menu/ledcast.c:35
 msgid "Rétablir"
 msgstr "Restaurar"
 
-#: src/menu/ledcast.c:112
+#: src/menu/ledcast.c:126
 msgid "Jaune"
 msgstr "Amarillo"
 
-#: src/menu/ledcast.c:112
+#: src/menu/ledcast.c:126
 msgid "Orange"
 msgstr "Naranja"
 
-#: src/menu/ledcast.c:112
+#: src/menu/ledcast.c:126
 msgid "Rouge"
 msgstr "Rojo"
 
-#: src/menu/ledcast.c:112
+#: src/menu/ledcast.c:126
 msgid "Vert"
 msgstr "Verde"
 
-#: src/menu/ledcast.c:113
+#: src/menu/ledcast.c:127
 msgid "Bleu"
 msgstr "Azul"
 
-#: src/menu/ledcast.c:113
+#: src/menu/ledcast.c:127
 msgid "Cyan"
 msgstr "Cian"
 
-#: src/menu/ledcast.c:113
+#: src/menu/ledcast.c:127
 msgid "Rose"
 msgstr "Rosa"
 
-#: src/menu/ledcast.c:113
+#: src/menu/ledcast.c:127
 msgid "Violet"
 msgstr "Violeta"
 
-#: src/menu/ledcast.c:114
+#: src/menu/ledcast.c:128
 msgid "Blanc"
 msgstr "Blanco"
 
-#: src/menu/ledcast.c:152
+#: src/menu/ledcast.c:168
 msgid "Envoyé aux cigales"
 msgstr "Enviado a todas"
 
-#: src/menu/ledcast.c:152
+#: src/menu/ledcast.c:168
 msgid "LEDs rétablies"
 msgstr "LED restaurados"
 
-#: src/menu/ledcast.c:275
+#: src/menu/ledcast.c:291
 msgid "Couleur : %s"
 msgstr "Color: %s"
 
-#: src/menu/ledcast.c:275
+#: src/menu/ledcast.c:291
 msgid "personnalisée"
 msgstr "personalizado"
 
-#: src/menu/ledcast.c:277
+#: src/menu/ledcast.c:293
 msgid "Rouge (R) : %u"
 msgstr "Rojo (R): %u"
 
-#: src/menu/ledcast.c:278
+#: src/menu/ledcast.c:294
 msgid "Vert (G) : %u"
 msgstr "Verde (G): %u"
 
-#: src/menu/ledcast.c:279
+#: src/menu/ledcast.c:295
 msgid "Bleu (B) : %u"
 msgstr "Azul (B): %u"
 
-#: src/menu/ledcast.c:280
+#: src/menu/ledcast.c:296
 msgid "Luminosité : %u %%"
 msgstr "Brillo: %u %%"
 
-#: src/menu/ledcast.c:281
+#: src/menu/ledcast.c:297
 msgid "Mode : %s"
 msgstr "Modo: %s"
 
-#: src/menu/ledcast.c:282
+#: src/menu/ledcast.c:298
 msgid "> Envoyer aux cigales"
 msgstr "> Enviar a todas"
 
-#: src/menu/ledcast.c:283
+#: src/menu/ledcast.c:299
 msgid "> Rétablir leurs LEDs"
 msgstr "> Restaurar sus LED"
 
-#: src/menu/ledcast.c:291
+#: src/menu/ledcast.c:307
 msgid "Clignotement"
 msgstr "Parpadeo"
 
-#: src/menu/ledcast.c:292
+#: src/menu/ledcast.c:308
 msgid "Allumé"
 msgstr "Encendido"
 
-#: src/menu/ledcast.c:292
+#: src/menu/ledcast.c:308
 msgid "Vers la couleur"
 msgstr "Al color"
 
-#: src/menu/ledcast.c:292
+#: src/menu/ledcast.c:308
 msgid "Vers le noir"
 msgstr "A negro"
 
-#: src/menu/ledcast.c:292
+#: src/menu/ledcast.c:308
 #: src/menu/talk.c:25
 msgid "Éteint"
 msgstr "Apagado"
 
-#: src/menu/ledcast.c:295
+#: src/menu/ledcast.c:311
 msgid "%s : %u ms"
 msgstr "%s: %u ms"
 
-#: src/menu/ledcast.c:304
+#: src/menu/ledcast.c:320
 msgid ""
 "Flancs : choisir\n"
 "Ailes : - / +  (maintenir : vite)"
@@ -2504,397 +2516,397 @@ msgstr ""
 "Lados: elegir\n"
 "Alas: - / +  (mantén: rápido)"
 
-#: src/menu/ledcast.c:305
+#: src/menu/ledcast.c:321
 msgid "Aile longue : retour"
 msgstr "Mantén ala: volver"
 
-#: src/menu/ledcast.c:308
-#: src/menu/ledcast.c:318
+#: src/menu/ledcast.c:324
+#: src/menu/ledcast.c:334
 msgid "LEDs des cigales"
 msgstr "LED de cigarras"
 
-#: src/menu/ledcast.c:311
+#: src/menu/ledcast.c:327
 msgid "Ailes : mode"
 msgstr "Alas: modo"
 
-#: src/menu/ledcast.c:312
+#: src/menu/ledcast.c:328
 msgid "Ailes : mode  D long : temps"
 msgstr "Alas: modo  mantén D: tiempo"
 
-#: src/menu/main.c:329
+#: src/menu/main.c:330
 msgid "arc-en-ciel"
 msgstr "arcoíris"
 
-#: src/menu/main.c:329
+#: src/menu/main.c:330
 msgid "battement"
 msgstr "latido"
 
-#: src/menu/main.c:329
+#: src/menu/main.c:330
 msgid "respiration"
 msgstr "respiración"
 
-#: src/menu/main.c:329
+#: src/menu/main.c:330
 msgid "éteintes"
 msgstr "apagados"
 
-#: src/menu/main.c:330
+#: src/menu/main.c:331
 msgid "clignotement"
 msgstr "parpadeo"
 
-#: src/menu/main.c:330
+#: src/menu/main.c:331
 msgid "vert fixe"
 msgstr "verde"
 
-#: src/menu/main.c:515
-#: src/menu/main.c:648
-#: src/menu/main.c:2791
+#: src/menu/main.c:516
+#: src/menu/main.c:649
+#: src/menu/main.c:2793
 msgid "Images"
 msgstr "Imágenes"
 
-#: src/menu/main.c:515
-#: src/menu/main.c:2842
+#: src/menu/main.c:516
+#: src/menu/main.c:2844
 msgid "Lecture rapide"
 msgstr "Lectura rápida"
 
-#: src/menu/main.c:515
-#: src/menu/main.c:1429
-#: src/menu/main.c:1535
+#: src/menu/main.c:516
+#: src/menu/main.c:1430
+#: src/menu/main.c:1536
 msgid "Musique"
 msgstr "Música"
 
-#: src/menu/main.c:515
+#: src/menu/main.c:516
 msgid "Vidéos"
 msgstr "Vídeos"
 
-#: src/menu/main.c:518
+#: src/menu/main.c:519
 msgid "un fichier texte"
 msgstr "un archivo txt"
 
-#: src/menu/main.c:631
+#: src/menu/main.c:632
 msgid "Cigale : %s"
 msgstr "Cigarra: %s"
 
-#: src/menu/main.c:631
+#: src/menu/main.c:632
 msgid "activée"
 msgstr "activada"
 
-#: src/menu/main.c:631
+#: src/menu/main.c:632
 msgid "coupée"
 msgstr "apagada"
 
-#: src/menu/main.c:632
+#: src/menu/main.c:633
 msgid "LEDs : %s"
 msgstr "LED: %s"
 
-#: src/menu/main.c:633
+#: src/menu/main.c:634
 msgid "Démo écran"
 msgstr "Demo visual"
 
-#: src/menu/main.c:634
+#: src/menu/main.c:635
 msgid "Vidéos (carte SD)"
 msgstr "Vídeos (SD)"
 
-#: src/menu/main.c:635
+#: src/menu/main.c:636
 msgid "Musique (carte SD)"
 msgstr "Música (SD)"
 
-#: src/menu/main.c:636
-#: src/menu/main.c:840
-#: src/menu/main.c:848
-#: src/menu/main.c:1545
-#: src/menu/main.c:1591
-#: src/menu/main.c:1616
+#: src/menu/main.c:637
+#: src/menu/main.c:841
+#: src/menu/main.c:849
+#: src/menu/main.c:1546
+#: src/menu/main.c:1592
+#: src/menu/main.c:1617
 msgid "Blind test"
 msgstr "Blind test"
 
-#: src/menu/main.c:637
+#: src/menu/main.c:638
 msgid "Réseau cigales : %lu pts"
 msgstr "Red de cigarras: %lu pts"
 
-#: src/menu/main.c:638
-#: src/menu/main.c:1325
-#: src/menu/main.c:2941
+#: src/menu/main.c:639
+#: src/menu/main.c:1326
+#: src/menu/main.c:2943
 msgid "Infrarouge"
 msgstr "Infrarrojos"
 
-#: src/menu/main.c:639
-#: src/menu/main.c:1336
-#: src/menu/main.c:1939
+#: src/menu/main.c:640
+#: src/menu/main.c:1337
+#: src/menu/main.c:1940
 msgid "Écran OLED"
 msgstr "Pantalla OLED"
 
-#: src/menu/main.c:640
+#: src/menu/main.c:641
 msgid "CTF : %d/%d flags"
 msgstr "CTF: %d/%d flags"
 
-#: src/menu/main.c:641
+#: src/menu/main.c:642
 msgid "Lecture rapide (PVSR)"
 msgstr "Lectura rápida (RSVP)"
 
-#: src/menu/main.c:645
-#: src/menu/main.c:1029
+#: src/menu/main.c:646
+#: src/menu/main.c:1030
 msgid "Veille : %s"
 msgstr "Salvapantallas: %s"
 
-#: src/menu/main.c:652
+#: src/menu/main.c:653
 #: src/menu/rtttl.c:760
 msgid "Volume : %u/%u"
 msgstr "Volumen: %u/%u"
 
-#: src/menu/main.c:653
+#: src/menu/main.c:654
 msgid "Radio : message"
 msgstr "Radio: mensaje"
 
-#: src/menu/main.c:654
+#: src/menu/main.c:655
 msgid "Radio : porteuse"
 msgstr "Radio: portadora"
 
-#: src/menu/main.c:655
-#: src/menu/main.c:1413
+#: src/menu/main.c:656
+#: src/menu/main.c:1414
 msgid "Infos"
 msgstr "Info"
 
-#: src/menu/main.c:656
+#: src/menu/main.c:657
 msgid "Crédits"
 msgstr "Créditos"
 
-#: src/menu/main.c:657
+#: src/menu/main.c:658
 msgid "Télécommande : %s"
 msgstr "Mando: %s"
 
-#: src/menu/main.c:658
+#: src/menu/main.c:659
 msgid "Mode muet : %s"
 msgstr "Silencio: %s"
 
-#: src/menu/main.c:659
+#: src/menu/main.c:660
 msgid "Quitter le mode admin"
 msgstr "Salir del modo admin"
 
-#: src/menu/main.c:680
+#: src/menu/main.c:681
 #: src/menu/reset.c:19
 msgid "Tout"
 msgstr "Todo"
 
-#: src/menu/main.c:702
+#: src/menu/main.c:703
 msgid "Médias"
 msgstr "Multimedia"
 
-#: src/menu/main.c:703
+#: src/menu/main.c:704
 msgid "Jeux solo"
 msgstr "Un jugador"
 
-#: src/menu/main.c:706
+#: src/menu/main.c:707
 msgid "Jeux multi"
 msgstr "Multijugador"
 
-#: src/menu/main.c:708
+#: src/menu/main.c:709
 msgid "Social"
 msgstr "Social"
 
-#: src/menu/main.c:711
+#: src/menu/main.c:712
 msgid "Radio & IR"
 msgstr "Radio & IR"
 
-#: src/menu/main.c:713
+#: src/menu/main.c:714
 msgid "Badge"
 msgstr "Badge"
 
-#: src/menu/main.c:715
+#: src/menu/main.c:716
 msgid "Réglages"
 msgstr "Ajustes"
 
-#: src/menu/main.c:717
+#: src/menu/main.c:718
 msgid "Admin"
 msgstr "Admin"
 
-#: src/menu/main.c:774
+#: src/menu/main.c:775
 msgid "Mode admin activé"
 msgstr "Admin activado"
 
-#: src/menu/main.c:774
+#: src/menu/main.c:775
 msgid "Mode admin désactivé"
 msgstr "Admin desactivado"
 
-#: src/menu/main.c:820
+#: src/menu/main.c:821
 msgid "Flancs : choix  D : OK  G : retour"
 msgstr "Lados: elegir  D: OK  I: volver"
 
-#: src/menu/main.c:835
+#: src/menu/main.c:836
 #: src/menu/skills.c:188
 msgid "D : ouvrir  G : retour"
 msgstr "D: abrir  I: volver"
 
-#: src/menu/main.c:849
+#: src/menu/main.c:850
 msgid "Morceau %u / %u"
 msgstr "Pista %u / %u"
 
-#: src/menu/main.c:872
+#: src/menu/main.c:873
 msgid "Lecture..."
 msgstr "Sonando..."
 
-#: src/menu/main.c:872
-#: src/menu/main.c:1427
+#: src/menu/main.c:873
+#: src/menu/main.c:1428
 #: src/menu/rsvp.c:718
 msgid "Pause"
 msgstr "Pausa"
 
-#: src/menu/main.c:872
+#: src/menu/main.c:873
 msgid "Terminé"
 msgstr "Fin"
 
-#: src/menu/main.c:874
+#: src/menu/main.c:875
 msgid "D : titre  Flanc D : suivant"
 msgstr "D: título  Lado D: siguiente"
 
-#: src/menu/main.c:880
+#: src/menu/main.c:881
 msgid "Réseau cigales"
 msgstr "Red de cigarras"
 
-#: src/menu/main.c:881
+#: src/menu/main.c:882
 msgid "%s : %lu pts, %u rencontres"
 msgstr "%s: %lu pts, %u encuentros"
 
-#: src/menu/main.c:886
+#: src/menu/main.c:887
 msgid "Balises : actives"
 msgstr "Balizas: activas"
 
-#: src/menu/main.c:886
+#: src/menu/main.c:887
 msgid "Balises : coupées"
 msgstr "Balizas: apagadas"
 
-#: src/menu/main.c:892
+#: src/menu/main.c:893
 msgid "Aucune cigale à portée"
 msgstr "Ninguna cigarra cerca"
 
-#: src/menu/main.c:902
+#: src/menu/main.c:903
 msgid "D : nom  Flanc D : balises"
 msgstr "D: nombre  Lado D: balizas"
 
-#: src/menu/main.c:907
+#: src/menu/main.c:908
 msgid "Nom de la cigale"
 msgstr "Tu nombre"
 
-#: src/menu/main.c:923
+#: src/menu/main.c:924
 msgid "Flancs : changer la lettre"
 msgstr "Lados: cambiar la letra"
 
-#: src/menu/main.c:924
+#: src/menu/main.c:925
 msgid "Aile D : case suivante"
 msgstr "Ala D: siguiente"
 
-#: src/menu/main.c:925
+#: src/menu/main.c:926
 msgid "Aile G : case précédente"
 msgstr "Ala I: anterior"
 
-#: src/menu/main.c:926
+#: src/menu/main.c:927
 msgid "Aile D longue : enregistrer"
 msgstr "Mantén ala D: guardar"
 
-#: src/menu/main.c:930
+#: src/menu/main.c:931
 msgid "Aile G ici : annuler"
 msgstr "Ala I aquí: cancelar"
 
-#: src/menu/main.c:930
+#: src/menu/main.c:931
 msgid "Espace = effacer une lettre"
 msgstr "Espacio = borrar una letra"
 
-#: src/menu/main.c:1002
+#: src/menu/main.c:1003
 msgid "désactivée"
 msgstr "nunca"
 
-#: src/menu/main.c:1004
+#: src/menu/main.c:1005
 msgid "%u h"
 msgstr "%u h"
 
-#: src/menu/main.c:1006
+#: src/menu/main.c:1007
 msgid "%u min"
 msgstr "%u min"
 
-#: src/menu/main.c:1029
+#: src/menu/main.c:1030
 msgid "Veille après : %s"
 msgstr "Activar tras: %s"
 
-#: src/menu/main.c:1033
+#: src/menu/main.c:1034
 msgid "Image : %s"
 msgstr "Imagen: %s"
 
-#: src/menu/main.c:1036
+#: src/menu/main.c:1037
 msgid "Aperçu de la veille"
 msgstr "Vista previa"
 
-#: src/menu/main.c:1050
+#: src/menu/main.c:1051
 msgid "Veille de l'écran"
 msgstr "Salvapantallas"
 
-#: src/menu/main.c:1052
+#: src/menu/main.c:1053
 msgid "D : changer  G : retour"
 msgstr "D: cambiar  I: volver"
 
-#: src/menu/main.c:1057
+#: src/menu/main.c:1058
 msgid "Image de veille"
 msgstr "Imagen de reposo"
 
-#: src/menu/main.c:1309
+#: src/menu/main.c:1310
 msgid "Enregistrer un signal"
 msgstr "Grabar una señal"
 
-#: src/menu/main.c:1316
+#: src/menu/main.c:1317
 msgid "%d : vide"
 msgstr "%d: vacío"
 
-#: src/menu/main.c:1318
+#: src/menu/main.c:1319
 msgid "%d : NEC %04X / %02X"
 msgstr "%d: NEC %04X / %02X"
 
-#: src/menu/main.c:1320
+#: src/menu/main.c:1321
 msgid "%d : brut, %u impulsions"
 msgstr "%d: bruto, %u impulsos"
 
-#: src/menu/main.c:1327
+#: src/menu/main.c:1328
 msgid "D : enregistrer/émettre"
 msgstr "D: grabar/emitir"
 
-#: src/menu/main.c:1327
+#: src/menu/main.c:1328
 msgid "Emission..."
 msgstr "Emitiendo..."
 
-#: src/menu/main.c:1343
+#: src/menu/main.c:1344
 msgid "Saisir un code"
 msgstr "Teclear código"
 
-#: src/menu/main.c:1345
+#: src/menu/main.c:1346
 msgid "Flags trouvés : %d/%d"
 msgstr "Flags hallados: %d/%d"
 
-#: src/menu/main.c:1352
+#: src/menu/main.c:1353
 msgid "D : OK  G : retour"
 msgstr "D: OK  I: volver"
 
-#: src/menu/main.c:1359
+#: src/menu/main.c:1360
 msgid "Code secret"
 msgstr "Código secreto"
 
-#: src/menu/main.c:1360
+#: src/menu/main.c:1361
 msgid "Tapez le code avec"
 msgstr "Pon el código con"
 
-#: src/menu/main.c:1361
+#: src/menu/main.c:1362
 msgid "les 4 boutons."
 msgstr "los 4 botones."
 
-#: src/menu/main.c:1363
+#: src/menu/main.c:1364
 msgid "Attendre 8 s : annuler"
 msgstr "Esperar 8 s: cancelar"
 
-#: src/menu/main.c:1395
+#: src/menu/main.c:1396
 msgid "non calibrée"
 msgstr "sin calibrar"
 
-#: src/menu/main.c:1399
+#: src/menu/main.c:1400
 msgid "mesure..."
 msgstr "midiendo..."
 
-#: src/menu/main.c:1408
+#: src/menu/main.c:1409
 msgid ""
 "Version %s (%s)\n"
 "Compilée le %s\n"
@@ -2910,19 +2922,19 @@ msgstr ""
 "Tarjeta SD: %s\n"
 "Batería: %s"
 
-#: src/menu/main.c:1412
+#: src/menu/main.c:1413
 msgid "absente"
 msgstr "ausente"
 
-#: src/menu/main.c:1412
+#: src/menu/main.c:1413
 msgid "prête"
 msgstr "lista"
 
-#: src/menu/main.c:1413
+#: src/menu/main.c:1414
 msgid "D : crédits  G : retour"
 msgstr "D: créditos  I: volver"
 
-#: src/menu/main.c:1426
+#: src/menu/main.c:1427
 msgid ""
 "%s\n"
 "\n"
@@ -2936,20 +2948,20 @@ msgstr ""
 "\n"
 "Volumen: %s"
 
-#: src/menu/main.c:1427
+#: src/menu/main.c:1428
 msgid "Lecture"
 msgstr "Sonando"
 
-#: src/menu/main.c:1429
+#: src/menu/main.c:1430
 msgid "D : pause  G : stop  Flancs : - +"
 msgstr "D: pausa  I: stop  Lados: - +"
 
-#: src/menu/main.c:1474
-#: src/menu/main.c:1546
+#: src/menu/main.c:1475
+#: src/menu/main.c:1547
 msgid "Pas de carte SD."
 msgstr "Sin tarjeta SD."
 
-#: src/menu/main.c:1476
+#: src/menu/main.c:1477
 msgid ""
 "Aucun fichier %s dans\n"
 "/%s ni à la racine.\n"
@@ -2961,7 +2973,7 @@ msgstr ""
 "\n"
 "Ver %s."
 
-#: src/menu/main.c:1592
+#: src/menu/main.c:1593
 msgid ""
 "Aucun fichier .WAV ici.\n"
 "\n"
@@ -2971,7 +2983,7 @@ msgstr ""
 "\n"
 "Ver audio2wav.py."
 
-#: src/menu/main.c:1617
+#: src/menu/main.c:1618
 msgid ""
 "Terminé !\n"
 "\n"
@@ -2981,55 +2993,55 @@ msgstr ""
 "\n"
 "Han sonado %u pistas."
 
-#: src/menu/main.c:1814
+#: src/menu/main.c:1815
 msgid "%lu s"
 msgstr "%lu s"
 
-#: src/menu/main.c:1816
+#: src/menu/main.c:1817
 msgid "%lu min"
 msgstr "%lu min"
 
-#: src/menu/main.c:1816
+#: src/menu/main.c:1817
 msgid "%lu min %02lu s"
 msgstr "%lu min %02lu s"
 
-#: src/menu/main.c:1819
+#: src/menu/main.c:1820
 msgid "%lu h %02lu min"
 msgstr "%lu h %02lu min"
 
-#: src/menu/main.c:1825
+#: src/menu/main.c:1826
 msgid "Test radio"
 msgstr "Prueba de radio"
 
-#: src/menu/main.c:1826
+#: src/menu/main.c:1827
 msgid "Un message toutes les"
 msgstr "Un mensaje cada"
 
-#: src/menu/main.c:1829
+#: src/menu/main.c:1830
 msgid "Flancs : - / +  (maintenir : vite)"
 msgstr "Lados: - / +  (mantén: rápido)"
 
-#: src/menu/main.c:1831
+#: src/menu/main.c:1832
 msgid "Messages envoyés : %u"
 msgstr "Mensajes enviados: %u"
 
-#: src/menu/main.c:1842
+#: src/menu/main.c:1843
 msgid "En pause"
 msgstr "En pausa"
 
-#: src/menu/main.c:1847
+#: src/menu/main.c:1848
 msgid "Prochain dans %s"
 msgstr "Siguiente en %s"
 
-#: src/menu/main.c:1850
+#: src/menu/main.c:1851
 msgid "G : quitter  D : pause"
 msgstr "I: salir  D: pausa"
 
-#: src/menu/main.c:1850
+#: src/menu/main.c:1851
 msgid "G : quitter  D : reprendre"
 msgstr "I: salir  D: reanudar"
 
-#: src/menu/main.c:1941
+#: src/menu/main.c:1942
 msgid ""
 "Aucun écran détecté.\n"
 "\n"
@@ -3045,33 +3057,33 @@ msgstr ""
 "SDA pin 4, SCL pin 3,\n"
 "3,3 V pin 1, GND 11."
 
-#: src/menu/main.c:1991
+#: src/menu/main.c:1992
 #: src/menu/pirate_radio.c:306
 #: src/menu/pirate_radio.c:939
 msgid "Radio occupée"
 msgstr "Radio ocupada"
 
-#: src/menu/main.c:2016
+#: src/menu/main.c:2017
 msgid "Son et LEDs coupés"
 msgstr "Sin sonido ni LED"
 
-#: src/menu/main.c:2223
+#: src/menu/main.c:2224
 msgid "Mode démo arrêté"
 msgstr "Demo detenida"
 
-#: src/menu/main.c:2259
+#: src/menu/main.c:2260
 msgid "SOMMEIL"
 msgstr "DORMIDO"
 
-#: src/menu/main.c:2260
+#: src/menu/main.c:2261
 msgid "Le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un organisateur."
 msgstr "Un admin ha puesto el badge a dormir. Si se queda bloqueado, acude a un organizador."
 
-#: src/menu/main.c:2384
+#: src/menu/main.c:2385
 msgid "Langue : English"
 msgstr "Idioma: English"
 
-#: src/menu/main.c:2472
+#: src/menu/main.c:2473
 msgid ""
 "Bravo, code Konami !\n"
 "\n"
@@ -3083,7 +3095,7 @@ msgstr ""
 "Flag:\n"
 "%s"
 
-#: src/menu/main.c:2477
+#: src/menu/main.c:2478
 msgid ""
 "Code incorrect.\n"
 "\n"
@@ -3095,27 +3107,27 @@ msgstr ""
 "Pista: un código\n"
 "famoso de videojuegos..."
 
-#: src/menu/main.c:2531
+#: src/menu/main.c:2532
 msgid "Flags trouvés"
 msgstr "Flags hallados"
 
-#: src/menu/main.c:2533
+#: src/menu/main.c:2534
 msgid "Aucun pour l'instant."
 msgstr "Ninguno por ahora."
 
-#: src/menu/main.c:2652
+#: src/menu/main.c:2654
 msgid "Vote ouvert : Social > Vote"
 msgstr "A votar: Social > Votar"
 
-#: src/menu/main.c:2669
+#: src/menu/main.c:2671
 msgid "Kof kof ! (virus des cigales)"
 msgstr "¡Cof cof! (virus de cigarras)"
 
-#: src/menu/main.c:2673
+#: src/menu/main.c:2675
 msgid "Vous êtes infecté !"
 msgstr "¡Estás infectado!"
 
-#: src/menu/main.c:2792
+#: src/menu/main.c:2794
 msgid ""
 "%s\n"
 "\n"
@@ -3127,11 +3139,11 @@ msgstr ""
 ".EPI no válido\n"
 "(ver image2epi.py)."
 
-#: src/menu/main.c:2828
+#: src/menu/main.c:2830
 msgid "Vidéo"
 msgstr "Vídeo"
 
-#: src/menu/main.c:2942
+#: src/menu/main.c:2944
 msgid ""
 "Enregistrement...\n"
 "\n"
@@ -3145,11 +3157,11 @@ msgstr ""
 "derecho) con el mando\n"
 "y pulsa una tecla."
 
-#: src/menu/main.c:2958
+#: src/menu/main.c:2960
 msgid "Porteuse"
 msgstr "Portadora"
 
-#: src/menu/main.c:2959
+#: src/menu/main.c:2961
 msgid ""
 "433,92 MHz + 19 kHz\n"
 "en continu, +10 dBm\n"
@@ -3165,7 +3177,7 @@ msgstr ""
 "(analizador de frec.).\n"
 "Se para a los 30 s."
 
-#: src/menu/main.c:2963
+#: src/menu/main.c:2965
 msgid "G ou D : retour"
 msgstr "I o D: volver"
 
@@ -4032,19 +4044,19 @@ msgstr ": ok"
 msgid "Restez près d'autres cigales."
 msgstr "Acércate a otras cigarras."
 
-#: src/menu/remote.c:139
+#: src/menu/remote.c:142
 msgid "Commande 0x%02X reçue"
 msgstr "Orden 0x%02X recibida"
 
-#: src/menu/remote.c:147
+#: src/menu/remote.c:150
 msgid "La cigale chante !"
 msgstr "¡La cigarra canta!"
 
-#: src/menu/remote.c:151
+#: src/menu/remote.c:154
 msgid "Mode muet (conférence)"
 msgstr "Modo silencio (charla)"
 
-#: src/menu/remote.c:162
+#: src/menu/remote.c:165
 msgid "Ordre de sommeil envoyé"
 msgstr "Orden de dormir enviada"
 

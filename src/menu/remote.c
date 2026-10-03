@@ -16,6 +16,7 @@
 #include "ook_tx.h"
 #include "radio.h"
 #include "radio_tools.h"
+#include "relay.h"
 #include "remote.h"
 #include "store.h"
 
@@ -127,6 +128,8 @@ bool remote_event(char *buf, int len) {
 static bool sleep_requested = false;
 
 bool remote_sleep_requested(void) {
+    if (sleep_requested && relay_pending())
+        return false;  /* Asleep, the radio is off: the order is relayed first */
     bool r = sleep_requested;
     sleep_requested = false;
     return r;
@@ -188,11 +191,23 @@ static bool already_seen(uint32_t src, uint16_t nonce, absolute_time_t now) {
 }
 
 
+/* NET_COMMAND [command][nonce 2][TTL][origin 4]: the TTL and the origin (the admin badge, the relays send its id)
+ * since the relay (relay.h); the older firmwares send the first 3 bytes only (origin: the sender, no relay) */
+#define COMMAND_LEN 8
+
 static void handle_command(const net_packet_t *p) {
     if (p->len < 3 || ! remote_enabled())
         return;
     uint16_t nonce = p->data[1] | p->data[2] << 8;
-    if (already_seen(p->src, nonce, p->at))
+    uint8_t ttl = p->len >= COMMAND_LEN ? p->data[3] : 0;
+    uint32_t origin = p->len >= COMMAND_LEN ? net_u32(p->data + 4) : p->src;
+    if (p->len >= COMMAND_LEN) {
+        uint8_t again[COMMAND_LEN];
+        memcpy(again, p->data, COMMAND_LEN);
+        again[3] = ttl ? ttl - 1 : 0;
+        relay_offer(NET_COMMAND, again, COMMAND_LEN, p->src, origin, nonce, p->data[0], ttl, p->at);
+    }
+    if (already_seen(origin, nonce, p->at))
         return;
     if (same_command(p->data[0], p->at))
         return;
@@ -350,7 +365,8 @@ void remote_task(absolute_time_t now) {
         cigale_on = false;
     }
     if (sends_left && absolute_time_diff_us(next_send, now) >= 0) {
-        uint8_t data[3] = {to_send, send_nonce, send_nonce >> 8};
+        uint8_t data[COMMAND_LEN] = {to_send, send_nonce, send_nonce >> 8, relay_admin_ttl()};
+        net_put_u32(data + 4, net_id());
         if (net_send(NET_COMMAND, data, sizeof(data), NET_LOUD)) {
             --sends_left;
             next_send = delayed_by_ms(now, REPEAT_MS);

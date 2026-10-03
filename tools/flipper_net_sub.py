@@ -9,7 +9,8 @@
 Flipper Zero and the network of the cicadas (GFSK 9.99 kbps, sync word 0xC16A, see src/menu/net.h):
 
 1. Writes .sub files (RAW, custom GFSK preset) that make a Flipper send packets of the badges:
-       python tools/flipper_net_sub.py command 0x02 -o mute.sub        (remote command: 0x02 mute, 0x03 unmute...)
+       python tools/flipper_net_sub.py command 0x02 -o mute.sub        (remote command: 0x02 mute, 0x03 unmute...;
+                                                                        relayed by the cicadas, --ttl hops: 2)
        python tools/flipper_net_sub.py ping -o ping.sub
        python tools/flipper_net_sub.py raw 0x0F 01 -o any.sub           (type, then the data bytes in hex)
        python tools/flipper_net_sub.py pirates 8 --send                 (8 cicadas with pirate names, see below)
@@ -137,6 +138,8 @@ def main():
     parser.add_argument('-o', '--output', default=None)
     parser.add_argument('--power', type=int, default=10, choices=sorted(POWERS),
                         help='power of the Flipper in dBm (default +10, like the badges)')
+    parser.add_argument('--ttl', type=int, default=2, choices=range(0, 5),
+                        help='command: hops of the relay by the cicadas (default 2, 0: no relay)')
     parser.add_argument('--send', action='store_true', help='copy the file to the Flipper plugged in USB and send it')
     parser.add_argument('--port', default=None, help='with --send: serial port of the Flipper (found by itself)')
     args = parser.parse_args()
@@ -162,7 +165,8 @@ def main():
         if not args.args:
             sys.exit('the command, e.g. 0x02')
         nonce = random.randrange(65536)
-        packet = header + [TYPES['command']] + sender + [int(args.args[0], 0), nonce & 0xFF, nonce >> 8]
+        # [command][nonce 2][TTL][origin 4]: the cicadas relay it TTL times (src/menu/relay.h)
+        packet = header + [TYPES['command']] + sender + [int(args.args[0], 0), nonce & 0xFF, nonce >> 8, args.ttl]             + sender
     elif args.kind == 'ping':
         packet = header + [TYPES['ping']] + sender + [1]
     else:

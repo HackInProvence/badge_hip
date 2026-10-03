@@ -466,6 +466,7 @@ Bibliothèque standard.
 | `--id N` | identifiant de l'émetteur, 4 octets (défaut `0x5EC5EA26`) |
 | `--repeats N` | paquets dans le fichier (défaut 8) |
 | `--gap MS` | millisecondes entre deux paquets (défaut 250) |
+| `--ttl N` | `command` : sauts du relais par les cigales, 0 à 4 (défaut 2, 0 : pas de relais) |
 | `-o`, `--output` | fichier de sortie (défaut `secsea_<type>.sub`) |
 | `--power DBM` | puissance du Flipper : 10 (défaut, comme les badges), 7, 5, 0, -10, -15, -20, -30 |
 | `--send` | copie le fichier sur le Flipper branché en USB et l'envoie (sa console série, comme `flipper_weather.py`) |

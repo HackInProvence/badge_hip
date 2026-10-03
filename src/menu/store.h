@@ -85,6 +85,7 @@ typedef struct {
     char lang[2];  /* Language of the texts (i18n.c): "en"...; unknown (0, 0xFF): French */
     uint8_t batt_share;  /* STORE_BATT_SHARE: the battery level is in the beacons (Réglages > Batterie par radio) */
     uint8_t rtttl_leds;  /* Sonneries: brightness of the LEDs, index + 1 in rtttl.c LED_LEVELS (0, 0xFF: default) */
+    uint8_t admin_ttl;  /* Admin: hops of the relay of its messages (relay.h), + 1 (0, 0xFF: default) */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1

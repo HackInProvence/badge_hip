@@ -7,6 +7,7 @@ target_sources(badge_menu PRIVATE
     i18n_table.c
     lang.c
     battradio.c
+    relay.c
     admin.c
     apps.c
     lamp.c

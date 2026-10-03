@@ -534,6 +534,13 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
 The organizers can send commands to all the badges in the room, from a badge in admin mode or from a Flipper Zero.
 The badge shows the command received at the bottom of the screen.
 
+**Relay from cicada to cicada**: a command of an admin badge (and an order of the cicada LEDs) carries a number of
+hops (Admin > Radio commands > "Relay: 2 hop(s)" by default, from 0 to 4). Each cicada that receives it sends it
+again once, after a random delay (0.1 to 0.9 s), with one hop less: the whole conference hears it, even far from
+the admin badge. It does not relay it when it heard 2 other cicadas relay it during that delay (the place is
+covered), nor when it already relayed the same command (or the same LED order) in the last 10 seconds. A command
+coming through several relays is executed once. The sleep order is relayed before the badge falls asleep.
+
 | Command | Effect |
 |---|---|
 | 0x01 | the cicada sings for a few seconds |
@@ -583,7 +590,7 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 
 | Entry | Role |
 |---|---|
-| **Radio commands** (Commandes radio) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge, sleep |
+| **Radio commands** (Commandes radio) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge, sleep; last row: "Relay" (hops of the relay by the cicadas, 0 to 4) |
 | **Cicada LEDs** (LEDs des cigales) | chooses the colour and the animation of the LEDs of all the cicadas around (see below) |
 | **Notices (admin)** (Annonces (admin)) | writes and sends the announcements to all the cicadas (see below) |
 | **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |

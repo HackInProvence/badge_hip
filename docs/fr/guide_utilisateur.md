@@ -522,6 +522,14 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 Les organisateurs peuvent envoyer des commandes à tous les badges de la salle, depuis un badge en mode admin
 ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écran.
 
+**Relais de cigale en cigale** : une commande d'un badge admin (et un ordre des LEDs des cigales) porte un nombre de
+sauts (Admin > Commandes radio > « Relais : 2 saut(s) » par défaut, de 0 à 4). Chaque cigale qui la reçoit la
+ré-émet une fois, après un délai aléatoire (0,1 à 0,9 s), avec un saut de moins : toute la conférence l'entend, même
+loin du badge admin. Elle ne la relaie pas si elle a entendu 2 autres cigales la relayer pendant ce délai (l'endroit
+est couvert), ni si elle a déjà relayé la même commande (ou le même ordre de LEDs) dans les 10 dernières secondes.
+Une commande arrivée par plusieurs relais n'est exécutée qu'une fois. La mise en sommeil est relayée avant que le
+badge ne s'endorme.
+
 | Commande | Effet |
 |---|---|
 | 0x01 | la cigale chante quelques secondes |
@@ -571,7 +579,7 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 
 | Entrée | Rôle |
 |---|---|
-| **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk, mise en sommeil |
+| **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk, mise en sommeil ; dernière ligne : « Relais » (sauts du relais par les cigales, 0 à 4) |
 | **LEDs des cigales** | choisit la couleur et l'animation des LEDs de toutes les cigales autour (voir ci-dessous) |
 | **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
 | **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |

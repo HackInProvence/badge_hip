@@ -546,7 +546,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | Type | Name | Module | Data |
 |---|---|---|---|
 | 0x01 | `NET_BEACON` | `social.c` | sequence, score (2 bytes), name (8), skills (4), level |
-| 0x02 | `NET_COMMAND` | `remote.c` | command, nonce (2) |
+| 0x02 | `NET_COMMAND` | `remote.c` | command, nonce (2), TTL, origin (4): relay by the cicadas (`relay.c`) |
 | 0x03 | `NET_MESSAGE` | `messages.c` | uid (2), TTL, origin (4), recipient (4, 0 = everybody), name (8), message number |
 | 0x04 | `NET_VOTE_QUESTION` | `vote.c` | session (2), question, open (0 / 1); every 3 s while the question is open |
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, answer; sent 3 times |
@@ -556,7 +556,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | 0x09 | `NET_INFECTION` | `infection.c` | generation (0 = patient zero); a "cough" every 4 to 5 s, at +10 dBm; contagion at RSSI ≥ −80 dBm (provisional) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfer (2), block, 48 bytes (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | song, kind, session (2), ms (4), voices (§ 6.15) |
-| 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, time 1 (2), time 2 (2); sent 5 times (§ 6.22) |
+| 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, time 1 (2), time 2 (2), brightness %, TTL, origin (4); sent 5 times (§ 6.22) |
 | 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), part, number of parts, at most 48 bytes; the whole 3 times (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, then `tug.c`, `assassin.c`, `werewolf.c` | game, session (2), kind, recipient (4, 0 = everybody), at most 47 bytes (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | number (`P` key) |

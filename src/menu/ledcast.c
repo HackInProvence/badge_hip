@@ -5,8 +5,9 @@
 
 /* The LEDs of all the cicadas driven by an admin badge (Admin > LEDs des cigales): a color (from a list, or R, G,
  * B from 0 to 255) and a mode: fixed, blinking (time on / off) or fading (time to light up / to go black).
- * NET_LEDS [nonce 2][mode][r][g][b][time 1, ms, u16 LE][time 2, ms, u16 LE][brightness %], +10 dBm, sent 5 times
- * over 2 s (the brightness, 1 to 100 %, applies to the color in every mode; absent from the older firmwares: 100 %).
+ * NET_LEDS [nonce 2][mode][r][g][b][time 1, ms, u16 LE][time 2, ms, u16 LE][brightness %][TTL][origin 4], +10 dBm,
+ * sent 5 times over 2 s (the brightness, 1 to 100 %, applies to the color in every mode; absent from the older
+ * firmwares: 100 %; the TTL and the origin: the relay from cicada to cicada, relay.h).
  * The cicadas show it instead of their own LED animation until "Rétablir" (mode 0) or a restart; the mute mode
  * still turns the LEDs off, and the pages that drive the LEDs themselves (games, talk badge) keep them. */
 
@@ -19,11 +20,13 @@
 #include "i18n.h"
 #include "leds.h"
 #include "net.h"
+#include "relay.h"
 
 #define REPEATS 5
 #define REPEAT_MS 450
-#define PACKET_LEN 11
+#define PACKET_LEN 16
 #define PACKET_LEN_OLD 10  /* Without the brightness */
+#define PACKET_LEN_RELAY 16  /* With the TTL and the origin */
 #define TIME_MIN_MS 50
 #define TIME_MAX_MS 5000
 #define TIME_STEP_MS 50
@@ -79,9 +82,20 @@ static void handle_leds(const net_packet_t *p) {
         return;
     const uint8_t *d = p->data;
     uint16_t nonce = d[0] | d[1] << 8;
-    if (p->src == last_src && nonce == last_nonce)
-        return;  /* The same order, repeated */
-    last_src = p->src;
+    uint32_t origin = p->src;
+    if (p->len >= PACKET_LEN_RELAY) {
+        origin = net_u32(d + 12);
+        uint8_t again[PACKET_LEN_RELAY];
+        memcpy(again, d, PACKET_LEN_RELAY);
+        again[11] = d[11] ? d[11] - 1 : 0;
+        uint32_t key = 0x811C9DC5u;  /* The kind: the order itself (mode, color, times, brightness) */
+        for (int i = 2; i < 11; ++i)
+            key = (key ^ d[i]) * 0x01000193u;
+        relay_offer(NET_LEDS, again, PACKET_LEN_RELAY, p->src, origin, nonce, key, d[11], p->at);
+    }
+    if (origin == last_src && nonce == last_nonce)
+        return;  /* The same order, repeated (or relayed) */
+    last_src = origin;
     last_nonce = nonce;
     ledcast_t l = {d[2], d[3], d[4], d[5], d[6] | d[7] << 8, d[8] | d[9] << 8, p->len > PACKET_LEN_OLD ? d[10] : 100};
     if (l.level < 1 || l.level > 100)
@@ -93,7 +107,7 @@ static void handle_leds(const net_packet_t *p) {
     if (l.t1 > TIME_MAX_MS) l.t1 = TIME_MAX_MS;
     if (l.t2 > TIME_MAX_MS) l.t2 = TIME_MAX_MS;
     char from[12];
-    snprintf(from, sizeof(from), "%08lX", (unsigned long)p->src);
+    snprintf(from, sizeof(from), "%08lX", (unsigned long)origin);
     apply(&l, from);
 }
 
@@ -144,7 +158,9 @@ static void send(uint8_t mode, absolute_time_t now) {
     uint16_t nonce = get_rand_32();
     ledcast_t l = order;
     l.mode = mode;
-    uint8_t d[PACKET_LEN] = {nonce, nonce >> 8, l.mode, l.r, l.g, l.b, l.t1, l.t1 >> 8, l.t2, l.t2 >> 8, l.level};
+    uint8_t d[PACKET_LEN] = {nonce, nonce >> 8, l.mode, l.r, l.g, l.b, l.t1, l.t1 >> 8, l.t2, l.t2 >> 8, l.level,
+                             relay_admin_ttl()};
+    net_put_u32(d + 12, net_id());
     memcpy(packet, d, sizeof(packet));
     sends_left = REPEATS;
     send_ts = now;

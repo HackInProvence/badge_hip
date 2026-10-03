@@ -59,6 +59,7 @@
 #include "social.h"
 #include "store.h"
 #include "i18n.h"
+#include "relay.h"
 #include "version.h"  /* Generated at each build (version.cmake) */
 #include "video.h"
 #include "wav.h"
@@ -2615,6 +2616,7 @@ int main() {
         }
         net_task(now);
         remote_task(now);
+        relay_task(now);
         ook_rx_task(now);
         if (ledcast_changed() && ! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
             set_leds(led_mode);  /* An admin badge set the LEDs */

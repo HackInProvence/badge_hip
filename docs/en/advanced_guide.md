@@ -467,6 +467,7 @@ prints the "SecSea" preset that lets the Flipper record the packets of a badge. 
 | `--id N` | id of the sender, 4 bytes (default `0x5EC5EA26`) |
 | `--repeats N` | packets in the file (default 8) |
 | `--gap MS` | milliseconds between two packets (default 250) |
+| `--ttl N` | `command`: hops of the relay by the cicadas, 0 to 4 (default 2, 0: no relay) |
 | `-o`, `--output` | output file (default `secsea_<kind>.sub`) |
 | `--power DBM` | power of the Flipper: 10 (default, like the badges), 7, 5, 0, -10, -15, -20, -30 |
 | `--send` | copies the file to the Flipper plugged in USB and sends it (its serial console, like `flipper_weather.py`) |

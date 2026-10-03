@@ -545,7 +545,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | Type | Nom | Module | Données |
 |---|---|---|---|
 | 0x01 | `NET_BEACON` | `social.c` | numéro, score (2 octets), nom (8), compétences (4), niveau |
-| 0x02 | `NET_COMMAND` | `remote.c` | commande, nonce (2) |
+| 0x02 | `NET_COMMAND` | `remote.c` | commande, nonce (2), TTL, origine (4) : relais par les cigales (`relay.c`) |
 | 0x03 | `NET_MESSAGE` | `messages.c` | uid (2), TTL, origine (4), destinataire (4, 0 = tous), nom (8), numéro du message |
 | 0x04 | `NET_VOTE_QUESTION` | `vote.c` | session (2), question, ouverte (0 / 1) ; toutes les 3 s tant que la question est ouverte |
 | 0x05 | `NET_VOTE_ANSWER` | `vote.c` | session (2), question, réponse ; envoyée 3 fois |
@@ -555,7 +555,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x09 | `NET_INFECTION` | `infection.c` | génération (0 = patient zéro) ; une « toux » toutes les 4 à 5 s, à +10 dBm ; contagion à RSSI ≥ −80 dBm (provisoire) |
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |
-| 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, durée 1 (2), durée 2 (2) ; envoyé 5 fois (§ 6.22) |
+| 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, durée 1 (2), durée 2 (2), luminosité %, TTL, origine (4) ; envoyé 5 fois (§ 6.22) |
 | 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux, 48 octets au plus ; le tout 3 fois (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, puis `tug.c`, `assassin.c`, `werewolf.c` | jeu, session (2), genre, destinataire (4, 0 = tous), 47 octets au plus (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |
@@ -593,8 +593,10 @@ d'un paquet qui ne venait jamais).
 ### 6.13 Commandes à distance et mode muet (`remote.c`)
 
 Une commande arrive de deux façons :
-- d'un **badge admin** : un paquet `NET_COMMAND` `[commande][nonce 2]`, à +10 dBm, envoyé 5 fois en 2 s
-  (`remote_send()`) ; la même paire émetteur + nonce n'est exécutée qu'une fois (pendant 10 s) ;
+- d'un **badge admin** : un paquet `NET_COMMAND` `[commande][nonce 2][TTL][origine 4]`, à +10 dBm, envoyé 5 fois en
+  2 s (`remote_send()`) ; la même paire origine + nonce n'est exécutée qu'une fois (pendant 10 s), et les cigales la
+  relaient TTL fois (`relay.c` : délai aléatoire 0,1 à 0,9 s, pas de relais après 2 copies entendues ni pour une
+  commande déjà relayée depuis moins de 10 s) ;
 - d'une **télécommande 433 MHz**, un Flipper Zero par exemple : un code Princeton 24 bits `0xC16A00 | commande`,
   décodé par le récepteur OOK (§ 6.14) ; le même code répété (bouton maintenu) n'est exécuté qu'une fois (1,5 s).
 

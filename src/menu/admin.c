@@ -9,6 +9,7 @@
 
 #include "app.h"
 #include "i18n.h"
+#include "relay.h"
 #include "remote.h"
 #include "store.h"
 
@@ -31,10 +32,18 @@ static const command_t COMMANDS[] = {
     {N_("Mise en sommeil"), REMOTE_SLEEP},
 };
 #define N_COMMANDS ((int)(sizeof(COMMANDS) / sizeof(COMMANDS[0])))
+#define ROW_TTL N_COMMANDS  /* After the commands: the relay by the cicadas (relay.h) */
 
 static int cmd_selected = 0;
 
 static void cmd_label(int i, char *buf, size_t len) {
+    if (i == ROW_TTL) {
+        if (relay_admin_ttl())
+            snprintf(buf, len, _("Relais : %u saut(s)"), relay_admin_ttl());
+        else
+            snprintf(buf, len, N_("Relais : aucun"));
+        return;
+    }
     snprintf(buf, len, "%s", COMMANDS[i].label);
 }
 
@@ -47,10 +56,13 @@ static bool commands_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_A)
         return false;
     if (b->pressed & UI_BTN_Y)
-        cmd_selected = (cmd_selected + N_COMMANDS - 1) % N_COMMANDS;
+        cmd_selected = (cmd_selected + N_COMMANDS) % (N_COMMANDS + 1);
     if (b->pressed & UI_BTN_X)
-        cmd_selected = (cmd_selected + 1) % N_COMMANDS;
-    if (b->pressed & UI_BTN_B) {
+        cmd_selected = (cmd_selected + 1) % (N_COMMANDS + 1);
+    if ((b->pressed & UI_BTN_B) && cmd_selected == ROW_TTL) {
+        relay_set_admin_ttl((relay_admin_ttl() + 1) % (RELAY_TTL_MAX + 1));
+        printf("admin: relay TTL %u\n", relay_admin_ttl());
+    } else if (b->pressed & UI_BTN_B) {
         printf("admin: sending command 0x%02x\n", COMMANDS[cmd_selected].command);
         remote_send(COMMANDS[cmd_selected].command);
     }
@@ -60,8 +72,8 @@ static bool commands_buttons(const app_buttons_t *b, absolute_time_t now) {
 static void commands_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, N_("Commandes radio"));
-    ui_list(fb, N_COMMANDS, cmd_selected, cmd_label);
-    ui_footer(fb, N_("G : retour  D : envoyer à tous"));
+    ui_list(fb, N_COMMANDS + 1, cmd_selected, cmd_label);
+    ui_footer(fb, cmd_selected == ROW_TTL ? N_("G : retour  D : changer") : N_("G : retour  D : envoyer à tous"));
 }
 
 const app_t app_admin_commands = {
