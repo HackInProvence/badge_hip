@@ -185,7 +185,8 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Rencontres"));
         int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small,
                          N_("Chaque cigale rencontrée\n(rester près d'elle)\nrapporte 2 XP."));
-        snprintf(text, sizeof(text), _("%u rencontre%s : %u XP"), social_met_count(), social_met_count() > 1 ? "s" : "",
+        snprintf(text, sizeof(text), social_met_count() > 1 ? _("%u rencontres : %u XP")
+                                     : _("%u rencontre : %u XP"), social_met_count(),
                  social_met_count() * XP_PER_MEETING);
         ui_lines(fb, y + 12, &gfx_font_small, text);
         ui_footer(fb, N_("G : retour"));

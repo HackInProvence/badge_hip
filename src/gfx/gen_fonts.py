@@ -25,7 +25,15 @@ COMPOSED = {
     'ê': ('e', 'circ'), 'ë': ('e', 'diaeresis'), 'î': ('ı', 'circ'), 'ï': ('ı', 'diaeresis'), 'ô': ('o', 'circ'),
     'ù': ('u', 'grave'), 'û': ('u', 'circ'), 'ü': ('u', 'diaeresis'),
     'À': ('A', 'grave'), 'É': ('E', 'acute'), 'È': ('E', 'grave'), 'Ê': ('E', 'circ'), 'Ç': ('C', 'cedilla'),
+    # Italian, Spanish, German (src/menu/lang/it.po, es.po, de.po)
+    'á': ('a', 'acute'), 'í': ('ı', 'acute'), 'ó': ('o', 'acute'), 'ú': ('u', 'acute'), 'ì': ('ı', 'grave'),
+    'ò': ('o', 'grave'), 'ä': ('a', 'diaeresis'), 'ö': ('o', 'diaeresis'), 'ñ': ('n', 'tilde'),
+    'Á': ('A', 'acute'), 'Í': ('I', 'acute'), 'Ó': ('O', 'acute'), 'Ú': ('U', 'acute'), 'Ì': ('I', 'grave'),
+    'Ò': ('O', 'grave'), 'Ù': ('U', 'grave'), 'Ä': ('A', 'diaeresis'), 'Ö': ('O', 'diaeresis'),
+    'Ü': ('U', 'diaeresis'), 'Ñ': ('N', 'tilde'),
 }
+# Drawn from other glyphs (glyph_image): the sharp s, the inverted ? and ! of Spanish, the degree sign
+SPECIAL = ['ß', '¿', '¡', '°']
 FONTS = {  # name: pixel size
     'gfx_font_small': 14,
     'gfx_font_medium': 18,
@@ -88,6 +96,16 @@ def accent_image(font, accent, height):
     if accent == 'cedilla':
         img = render_char(font, ',', height)[0]
         return img.crop(ink_bbox(img))
+    if accent == 'tilde':
+        # Drawn: the '~' of the font is wide and low (maths); a small wave above the letter
+        w = max(5, round(font.size * 0.36)) | 1
+        t = max(1, round(font.size / 14))
+        img = Image.new('1', (w, 2 + t), 0)
+        draw = ImageDraw.Draw(img)
+        q = w // 4
+        for k in range(t):
+            draw.line([(0, 1 + k), (q, k), (2 * q, 1 + k), (3 * q, 2 + k - 1), (w - 1, k)], fill=1)
+        return img
     if accent == 'diaeresis':
         dot = max(1, round(font.size / 10))
         img = Image.new('1', (3*dot + dot, dot), 0)
@@ -123,6 +141,32 @@ def compose(font, ch, height):
 def glyph_image(font, ch, height):
     if ch in COMPOSED:
         return compose(font, ch, height)
+    if ch in '¿¡':
+        # The ? and the ! turned upside down, hanging from the x height down under the baseline
+        img, adv = render_char(font, '?' if ch == '¿' else '!', height)
+        ink = img.crop(ink_bbox(img)).rotate(180)
+        x_top = ink_bbox(render_char(font, 'x', height)[0])[1]
+        baseline = ink_bbox(render_char(font, 'x', height)[0])[3]
+        y = min(height - ink.height, x_top + max(0, (baseline - x_top) - ink.height + (height - baseline) // 2 + 1))
+        out = Image.new('1', (img.width, height), 0)
+        out.paste(ink, (ink_bbox(img)[0], max(0, y)))
+        return out, adv
+    if ch == 'ß':
+        # Drawn from the B (Aileron has no sharp s): the top left corner rounded, the bottom bowl open on the stem,
+        # the stem a little under the baseline
+        img, adv = render_char(font, 'B', height)
+        left, top, right, bottom = ink_bbox(img)
+        t = max(1, round(font.size / 9))  # Stroke
+        r = max(1, round(font.size / 9))
+        draw = ImageDraw.Draw(img)
+        draw.rectangle((left, top, left + r - 1, top + r - 1), fill=0)  # Rounded corner
+        draw.rectangle((left + r, top, left + r, top), fill=1)
+        # The bottom bar from the stem to the bowl removed: the bowl ends free
+        draw.rectangle((left + t, bottom - t + 1, left + t + max(1, (right - left) // 4), bottom), fill=0)
+        # The middle bar to the stem removed: an open 3 on a stem
+        mid = (top + bottom) // 2
+        draw.rectangle((left + t, mid - t // 2, left + t + max(1, (right - left) // 5), mid + (t - 1) // 2), fill=0)
+        return img, adv
     if ch == '°':
         img, _ = render_char(font, 'o', height)
         o = img.crop(ink_bbox(img))
@@ -139,7 +183,7 @@ def render(name, size, preview):
     ascent, descent = font.getmetrics()
     height = ascent + descent
     glyphs, bitmap = [], bytearray()
-    for ch in ASCII + list(COMPOSED) + ['°']:
+    for ch in ASCII + list(COMPOSED) + SPECIAL:
         img, adv = glyph_image(font, ch, height)
         # Rows are packed on whole bytes, bit 7 is the leftmost pixel, 1 = ink
         w8 = (img.width + 7) // 8

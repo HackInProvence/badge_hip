@@ -1437,7 +1437,8 @@ static void lobby_label(int i, char *buf, size_t len) {
 }
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, _("%s  %u joueur%s"), found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
+    snprintf(buf, len, found[i].players > 1 ? _("%s  %u joueurs")
+                       : _("%s  %u joueur"), found[i].name, found[i].players);
 }
 
 /* A list from \p y (ui_list() starts below the title) */
@@ -1828,7 +1829,8 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
     case PG_LOBBY: {
         ui_title(fb, N_("Partie ouverte"));
         int min = min_players();
-        snprintf(text, sizeof(text), _("%d joueur%s (%d à %d), %d loups"), n_lobby, n_lobby > 1 ? "s" : "", min,
+        snprintf(text, sizeof(text), n_lobby > 1 ? _("%d joueurs (%d à %d), %d loups")
+                                     : _("%d joueur (%d à %d), %d loups"), n_lobby, min,
                  WW_MAX_PLAYERS, ww_wolves_for(debug_mode() && n_lobby < WW_MIN_PLAYERS ? WW_MIN_PLAYERS
                                                : n_lobby < min_players() ? min_players() : n_lobby));
         int y = ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
@@ -1860,8 +1862,9 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
             break;
         }
         bool in = party_state() == PARTY_JOINED;
-        snprintf(text, sizeof(text), _("%s  %d joueur%s"), in ? _("Inscrit(e) !") : _("Inscription..."),
-                 party_count(), party_count() > 1 ? "s" : "");
+        snprintf(text, sizeof(text), party_count() > 1 ? _("%s  %d joueurs")
+                                     : _("%s  %d joueur"), in ? _("Inscrit(e) !") : _("Inscription..."),
+                 party_count());
         int y = ui_lines(fb, UI_TITLE_H + 6, &gfx_font_small, text);
         char roles[96];
         options_text(roles, sizeof(roles), options & WW_OPT_ALL);

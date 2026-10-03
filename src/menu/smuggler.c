@@ -480,9 +480,9 @@ static void draw_grid(uint8_t *fb, bool dark, bool collection, int sel) {
         snprintf(text, sizeof(text), _("Inconnu  (%d / %d)"), sel + 1, n);
     } else {
         fitted_text(fb, INFO_Y, &gfx_font_small, smuggler_goods[good].name, fg);
-        snprintf(text, sizeof(text), _("x%d  %s  %u doublon%s"), cargo_count(cargo(), good),
-                 tr(smuggler_rarity_name(smuggler_goods[good].rarity)), smuggler_goods[good].value,
-                 smuggler_goods[good].value > 1 ? "s" : "");
+        snprintf(text, sizeof(text), smuggler_goods[good].value > 1 ? _("x%d  %s  %u doublons")
+                                     : _("x%d  %s  %u doublon"), cargo_count(cargo(), good),
+                 tr(smuggler_rarity_name(smuggler_goods[good].rarity)), smuggler_goods[good].value);
     }
     fitted_text(fb, INFO_Y + 15, &gfx_font_small, text, fg);
 }
@@ -624,7 +624,8 @@ static void home_label(int i, char *buf, size_t len) {
     const uint8_t *c = cargo();
     switch (i) {
     case H_CARGO:
-        snprintf(buf, len, _("Cale : %d marchandise%s"), cargo_total(c), cargo_total(c) > 1 ? "s" : "");
+        snprintf(buf, len, cargo_total(c) > 1 ? _("Cale : %d marchandises")
+                           : _("Cale : %d marchandise"), cargo_total(c));
         break;
     case H_TRADE: snprintf(buf, len, N_("Échanger en douce")); break;
     case H_GIFT: snprintf(buf, len, N_("Donner")); break;
@@ -656,7 +657,7 @@ static void render_detail(uint8_t *fb) {
     } else {
         static const char *RARITY_TITLES[RARITIES] = {N_("Commun"), N_("Rare"), N_("Légendaire !")};
         gfx_text(fb, 80, UI_TITLE_H + 10, &gfx_font_medium, RARITY_TITLES[g->rarity], GFX_BLACK, GFX_ALIGN_LEFT);
-        snprintf(text, sizeof(text), _("%u doublon%s"), g->value, g->value > 1 ? "s" : "");
+        snprintf(text, sizeof(text), g->value > 1 ? _("%u doublons") : _("%u doublon"), g->value);
         gfx_text(fb, 80, UI_TITLE_H + 32, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
         snprintf(text, sizeof(text), _("En cale : %d"), cargo_count(cargo(), detail_good));
         gfx_text(fb, 80, UI_TITLE_H + 50, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
@@ -727,7 +728,7 @@ static void render(uint8_t *fb, absolute_time_t now) {
                      "cigale.%s"), n_far ? _("\n\nTrop loin :") : "");
             int y = ui_lines(fb, 50, &gfx_font_small, text);
             if (n_far) {
-                snprintf(text, sizeof(text), _("%d cigale%s"), n_far, n_far > 1 ? "s" : "");
+                snprintf(text, sizeof(text), n_far > 1 ? _("%d cigales") : _("%d cigale"), n_far);
                 ui_lines(fb, y, &gfx_font_small, text);
             }
             ui_footer(fb, N_("G : retour"));

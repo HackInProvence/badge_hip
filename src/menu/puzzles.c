@@ -674,7 +674,7 @@ static void taq_buttons(uint8_t pressed) {
 
 static void taq_render(uint8_t *fb) {
     char text[64];
-    snprintf(text, sizeof(text), _("Taquin : %u coup%s"), taq_moves, taq_moves > 1 ? "s" : "");
+    snprintf(text, sizeof(text), taq_moves > 1 ? _("Taquin : %u coups") : _("Taquin : %u coup"), taq_moves);
     pz_draw_title(fb, text);
     for (int i = 0; i < 16; ++i) {
         int x = T48_X0 + (i % 4)*(T48_CELL + T48_GAP), y = T48_Y0 + (i / 4)*(T48_CELL + T48_GAP);
@@ -1047,7 +1047,7 @@ static void mm_symbol(uint8_t *fb, int x, int y, int s) {
 static void mm_render(uint8_t *fb) {
     char text[32];
     if (mm_state == MM_WON)
-        snprintf(text, sizeof(text), _("Gagné en %d essai%s !"), mm_try + 1, mm_try ? "s" : "");
+        snprintf(text, sizeof(text), mm_try ? _("Gagné en %d essais !") : _("Gagné en %d essai !"), mm_try + 1);
     else
         snprintf(text, sizeof(text), "Mastermind %d/%d", mm_try + 1, MM_TRIES);
     pz_draw_title(fb, mm_state == MM_LOST ? N_("Perdu...") : text);
@@ -1231,7 +1231,8 @@ static void pendu_render(uint8_t *fb) {
     if (pz_records[PUZZLE_PENDU] == GAMES_NO_RECORD)
         snprintf(text, sizeof(text), "-");
     else
-        snprintf(text, sizeof(text), _("%u mot%s"), pz_records[PUZZLE_PENDU], pz_records[PUZZLE_PENDU] > 1 ? "s" : "");
+        snprintf(text, sizeof(text), pz_records[PUZZLE_PENDU] > 1 ? _("%u mots")
+                                     : _("%u mot"), pz_records[PUZZLE_PENDU]);
     gfx_text(fb, px, 92, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     /* The word: the letters found, the others when lost (in a black box) */
     const char *word = PENDU_WORDS[pendu_word];
@@ -1332,9 +1333,9 @@ void puzzles_record_text(puzzle_t p, char *buf, int len) {
     else if (p == PUZZLE_SOKOBAN)
         snprintf(buf, len, _("Niveaux réussis : %u / %d"), r, SOKO_LEVELS_N);
     else if (p == PUZZLE_MASTERMIND)
-        snprintf(buf, len, _("Record : %u essai%s"), r, r > 1 ? "s" : "");
+        snprintf(buf, len, r > 1 ? _("Record : %u essais") : _("Record : %u essai"), r);
     else if (p == PUZZLE_PENDU)
-        snprintf(buf, len, _("Record : %u mot%s d'affilée"), r, r > 1 ? "s" : "");
+        snprintf(buf, len, r > 1 ? _("Record : %u mots d'affilée") : _("Record : %u mot d'affilée"), r);
     else
         snprintf(buf, len, _("Record : %u"), r);
 }

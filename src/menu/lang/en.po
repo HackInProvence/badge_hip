@@ -215,7 +215,7 @@ msgid "Mélomane"
 msgstr "Music lover"
 
 #: src/menu/achievements.c:45
-#: src/menu/smuggler.c:641
+#: src/menu/smuggler.c:642
 msgid "Contrebandier"
 msgstr "Smuggler"
 
@@ -427,47 +427,51 @@ msgstr ""
 "gives 2 XP."
 
 #: src/menu/achievements.c:188
-msgid "%u rencontre%s : %u XP"
-msgstr "%u meeting%s: %u XP"
+msgid "%u rencontres : %u XP"
+msgstr "%u meetings: %u XP"
 
-#: src/menu/achievements.c:191
-#: src/menu/achievements.c:201
+#: src/menu/achievements.c:189
+msgid "%u rencontre : %u XP"
+msgstr "%u meeting: %u XP"
+
+#: src/menu/achievements.c:192
+#: src/menu/achievements.c:202
 #: src/menu/announce.c:288
-#: src/menu/assassin.c:859
-#: src/menu/assassin.c:900
-#: src/menu/assassin.c:907
+#: src/menu/assassin.c:860
+#: src/menu/assassin.c:901
+#: src/menu/assassin.c:908
 msgid "G : retour"
 msgstr "L: back"
 
-#: src/menu/achievements.c:200
+#: src/menu/achievements.c:201
 msgid "Obtenu !"
 msgstr "Got it!"
 
-#: src/menu/achievements.c:200
+#: src/menu/achievements.c:201
 msgid "Pas encore obtenu"
 msgstr "Not obtained yet"
 
-#: src/menu/achievements.c:206
+#: src/menu/achievements.c:207
 msgid "Niv. %u : %s"
 msgstr "Lv. %u: %s"
 
-#: src/menu/achievements.c:214
+#: src/menu/achievements.c:215
 msgid "%lu / %lu XP   %d/%d succès"
 msgstr "%lu / %lu XP   %d/%d done"
 
-#: src/menu/achievements.c:217
+#: src/menu/achievements.c:218
 msgid "%lu XP   %d/%d succès"
 msgstr "%lu XP   %d/%d done"
 
-#: src/menu/achievements.c:237
+#: src/menu/achievements.c:238
 msgid "Rencontres : %u x 2 = %u XP"
 msgstr "Meetings: %u x 2 = %u XP"
 
-#: src/menu/achievements.c:255
+#: src/menu/achievements.c:256
 msgid "D : comment  G : retour"
 msgstr "R: how  L: back"
 
-#: src/menu/achievements.c:259
+#: src/menu/achievements.c:260
 msgid "Succès"
 msgstr "Achievements"
 
@@ -548,8 +552,8 @@ msgstr ""
 "name tag."
 
 #: src/menu/admin.c:112
-#: src/menu/assassin.c:945
-#: src/menu/lang.c:46
+#: src/menu/assassin.c:946
+#: src/menu/lang.c:47
 #: src/menu/messages.c:279
 #: src/menu/reset.c:123
 #: src/menu/rtttl.c:812
@@ -681,7 +685,7 @@ msgstr "Announcement text"
 #: src/menu/announce.c:437
 #: src/menu/contacts.c:376
 #: src/menu/messages.c:118
-#: src/menu/werewolf.c:1628
+#: src/menu/werewolf.c:1629
 msgid "%s : %s"
 msgstr "%s: %s"
 
@@ -713,115 +717,122 @@ msgstr "Killed by %s"
 #: src/menu/assassin.c:597
 #: src/menu/tug.c:305
 #: src/menu/werewolf.c:1440
-msgid "%s  %u joueur%s"
-msgstr "%s  %u player%s"
+msgid "%s  %u joueurs"
+msgstr "%s  %u players"
 
-#: src/menu/assassin.c:601
-#: src/menu/tug.c:309
+#: src/menu/assassin.c:598
+#: src/menu/tug.c:306
+#: src/menu/werewolf.c:1441
+msgid "%s  %u joueur"
+msgstr "%s  %u player"
+
+#: src/menu/assassin.c:602
+#: src/menu/tug.c:310
 msgid "Créer une partie"
 msgstr "Create a game"
 
-#: src/menu/assassin.c:601
-#: src/menu/tug.c:309
+#: src/menu/assassin.c:602
+#: src/menu/tug.c:310
 #: src/menu/werewolf.c:1416
 msgid "Rejoindre une partie"
 msgstr "Join a game"
 
-#: src/menu/assassin.c:608
-#: src/menu/tug.c:500
-#: src/menu/tug.c:535
-#: src/menu/tug.c:541
-#: src/menu/tug.c:625
-#: src/menu/tug.c:669
+#: src/menu/assassin.c:609
+#: src/menu/tug.c:501
+#: src/menu/tug.c:536
+#: src/menu/tug.c:542
+#: src/menu/tug.c:626
+#: src/menu/tug.c:670
 msgid "Tir à la corde"
 msgstr "Tug of war"
 
-#: src/menu/assassin.c:609
-#: src/menu/tug.c:331
+#: src/menu/assassin.c:610
+#: src/menu/tug.c:332
 #: src/menu/werewolf.c:258
-#: src/menu/werewolf.c:1580
-#: src/menu/werewolf.c:1700
-#: src/menu/werewolf.c:1706
+#: src/menu/werewolf.c:1581
+#: src/menu/werewolf.c:1701
+#: src/menu/werewolf.c:1707
 msgid "Loup-garou"
 msgstr "Werewolf"
 
-#: src/menu/assassin.c:796
-#: src/menu/tug.c:463
+#: src/menu/assassin.c:797
+#: src/menu/tug.c:464
 msgid "+%d autres"
 msgstr "+%d more"
 
-#: src/menu/assassin.c:809
-#: src/menu/tug.c:479
+#: src/menu/assassin.c:810
+#: src/menu/tug.c:480
 msgid "Ta partie"
 msgstr "Your game"
 
-#: src/menu/assassin.c:811
+#: src/menu/assassin.c:812
+#: src/menu/tug.c:481
 msgid "%d joueurs"
 msgstr "%d players"
 
-#: src/menu/assassin.c:813
+#: src/menu/assassin.c:814
 msgid "Il faut %d joueurs au moins."
 msgstr "At least %d players needed."
 
-#: src/menu/assassin.c:816
-#: src/menu/assassin.c:821
-#: src/menu/main.c:2956
+#: src/menu/assassin.c:817
+#: src/menu/assassin.c:822
+#: src/menu/main.c:2944
 #: src/menu/smuggler.c:536
 #: src/menu/smuggler.c:553
 #: src/menu/smuggler.c:561
 msgid "G : annuler"
 msgstr "L: cancel"
 
-#: src/menu/assassin.c:816
-#: src/menu/tug.c:484
+#: src/menu/assassin.c:817
+#: src/menu/tug.c:485
 msgid "G : annuler  D : lancer"
 msgstr "L: cancel  R: start"
 
-#: src/menu/assassin.c:819
-#: src/menu/assassin.c:950
-#: src/menu/tug.c:487
-#: src/menu/tug.c:641
-#: src/menu/werewolf.c:1846
+#: src/menu/assassin.c:820
+#: src/menu/assassin.c:951
+#: src/menu/tug.c:488
+#: src/menu/tug.c:642
+#: src/menu/werewolf.c:1848
 msgid "Rejoindre"
 msgstr "Join"
 
-#: src/menu/assassin.c:820
-#: src/menu/tug.c:488
+#: src/menu/assassin.c:821
+#: src/menu/tug.c:489
 msgid "Connexion..."
 msgstr "Joining..."
 
-#: src/menu/assassin.c:824
-#: src/menu/tug.c:492
+#: src/menu/assassin.c:825
+#: src/menu/tug.c:493
 msgid "Salle d'attente"
 msgstr "Waiting room"
 
-#: src/menu/assassin.c:825
-#: src/menu/tug.c:493
+#: src/menu/assassin.c:826
+#: src/menu/tug.c:494
 msgid "Partie de %s"
 msgstr "%s's game"
 
-#: src/menu/assassin.c:827
-#: src/menu/tug.c:495
+#: src/menu/assassin.c:828
+#: src/menu/tug.c:496
 msgid "En attente du lancement..."
 msgstr "Waiting for the start..."
 
-#: src/menu/assassin.c:829
+#: src/menu/assassin.c:830
 #: src/menu/games.c:873
-#: src/menu/tug.c:497
+#: src/menu/tug.c:498
 msgid "G : quitter"
 msgstr "L: quit"
 
-#: src/menu/assassin.c:832
-#: src/menu/assassin.c:856
-#: src/menu/assassin.c:862
-#: src/menu/assassin.c:904
-#: src/menu/assassin.c:932
-#: src/menu/assassin.c:973
+#: src/menu/assassin.c:833
+#: src/menu/assassin.c:857
+#: src/menu/assassin.c:863
+#: src/menu/assassin.c:905
+#: src/menu/assassin.c:933
+#: src/menu/assassin.c:974
 msgid "Assassin"
 msgstr "Assassin"
 
-#: src/menu/assassin.c:833
-#: src/menu/tug.c:501
+#: src/menu/assassin.c:834
+#: src/menu/tug.c:502
 msgid ""
 "Partie annulée par l'hôte\n"
 "(ou lancée sans toi)."
@@ -829,53 +840,53 @@ msgstr ""
 "Cancelled by the host\n"
 "(or started without you)."
 
-#: src/menu/assassin.c:834
-#: src/menu/tug.c:502
+#: src/menu/assassin.c:835
+#: src/menu/tug.c:503
 msgid "D : OK"
 msgstr "R: OK"
 
-#: src/menu/assassin.c:840
+#: src/menu/assassin.c:841
 msgid "Brûlant !"
 msgstr "Burning!"
 
-#: src/menu/assassin.c:840
+#: src/menu/assassin.c:841
 #: src/menu/hotcold.c:62
 msgid "Chaud"
 msgstr "Hot"
 
-#: src/menu/assassin.c:840
+#: src/menu/assassin.c:841
 #: src/menu/hotcold.c:62
 msgid "Tiède"
 msgstr "Warm"
 
-#: src/menu/assassin.c:841
+#: src/menu/assassin.c:842
 #: src/menu/hotcold.c:63
 msgid "Froid"
 msgstr "Cold"
 
-#: src/menu/assassin.c:841
+#: src/menu/assassin.c:842
 #: src/menu/hotcold.c:63
 msgid "Glacial"
 msgstr "Icy"
 
-#: src/menu/assassin.c:848
+#: src/menu/assassin.c:849
 msgid "Abandonner ?"
 msgstr "Give up?"
 
-#: src/menu/assassin.c:849
+#: src/menu/assassin.c:850
 msgid "Tu quittes la partie : ta cible ira à ton chasseur. Pas de retour possible."
 msgstr "You leave the game: your target goes to your hunter. No way back."
 
-#: src/menu/assassin.c:851
+#: src/menu/assassin.c:852
 msgid "G : non  D : abandonner"
 msgstr "L: no  R: give up"
 
-#: src/menu/assassin.c:857
+#: src/menu/assassin.c:858
 msgid "Distribution des cibles..."
 msgstr "Dealing the targets..."
 
-#: src/menu/assassin.c:857
-#: src/menu/tug.c:542
+#: src/menu/assassin.c:858
+#: src/menu/tug.c:543
 msgid ""
 "Réception de la liste\n"
 "des joueurs..."
@@ -883,48 +894,48 @@ msgstr ""
 "Receiving the list\n"
 "of players..."
 
-#: src/menu/assassin.c:863
+#: src/menu/assassin.c:864
 msgid "Ta cible :"
 msgstr "Target:"
 
-#: src/menu/assassin.c:872
+#: src/menu/assassin.c:873
 msgid "Pas captée"
 msgstr "No signal"
 
-#: src/menu/assassin.c:874
-#: src/menu/assassin.c:892
+#: src/menu/assassin.c:875
+#: src/menu/assassin.c:893
 msgid "Survivants : %d / %d"
 msgstr "Survivors: %d / %d"
 
-#: src/menu/assassin.c:877
+#: src/menu/assassin.c:878
 msgid "Tentative..."
 msgstr "Trying..."
 
-#: src/menu/assassin.c:879
+#: src/menu/assassin.c:880
 msgid "Trop loin ou absente"
 msgstr "Too far or absent"
 
-#: src/menu/assassin.c:881
+#: src/menu/assassin.c:882
 msgid "Cible éliminée !"
 msgstr "Target killed!"
 
-#: src/menu/assassin.c:883
+#: src/menu/assassin.c:884
 msgid "Flanc : abandonner"
 msgstr "Side: give up"
 
-#: src/menu/assassin.c:883
+#: src/menu/assassin.c:884
 msgid "Victimes : %d"
 msgstr "Kills: %d"
 
-#: src/menu/assassin.c:885
+#: src/menu/assassin.c:886
 msgid "G : retour  D : éliminer"
 msgstr "L: back  R: kill"
 
-#: src/menu/assassin.c:889
+#: src/menu/assassin.c:890
 msgid "Éliminé"
 msgstr "Killed"
 
-#: src/menu/assassin.c:890
+#: src/menu/assassin.c:891
 msgid ""
 "Éliminé par\n"
 "%s"
@@ -932,24 +943,24 @@ msgstr ""
 "Killed by\n"
 "%s"
 
-#: src/menu/assassin.c:894
-#: src/menu/assassin.c:920
+#: src/menu/assassin.c:895
+#: src/menu/assassin.c:921
 msgid "Tes victimes : %d"
 msgstr "Your kills: %d"
 
-#: src/menu/assassin.c:897
+#: src/menu/assassin.c:898
 msgid "Ta cible passe à ton tueur..."
 msgstr "Target goes to your killer..."
 
-#: src/menu/assassin.c:899
+#: src/menu/assassin.c:900
 msgid "Ton badge héberge la partie : garde-le allumé."
 msgstr "Your badge hosts the game: keep it on."
 
-#: src/menu/assassin.c:900
+#: src/menu/assassin.c:901
 msgid "G : retour  D : quitter"
 msgstr "L: back  R: leave"
 
-#: src/menu/assassin.c:905
+#: src/menu/assassin.c:906
 msgid ""
 "Tu as abandonné.\n"
 "Survivants : %d / %d"
@@ -957,11 +968,11 @@ msgstr ""
 "You gave up.\n"
 "Survivors: %d / %d"
 
-#: src/menu/assassin.c:910
+#: src/menu/assassin.c:911
 msgid "Fin de la partie"
 msgstr "Game over"
 
-#: src/menu/assassin.c:912
+#: src/menu/assassin.c:913
 msgid ""
 "L'hôte a quitté la partie :\n"
 "elle est terminée."
@@ -969,13 +980,13 @@ msgstr ""
 "The host left the game:\n"
 "it is over."
 
-#: src/menu/assassin.c:914
+#: src/menu/assassin.c:915
 #: src/menu/battle.c:424
 #: src/menu/duel.c:381
 msgid "Victoire !"
 msgstr "Victory!"
 
-#: src/menu/assassin.c:915
+#: src/menu/assassin.c:916
 msgid ""
 "Dernière cigale debout\n"
 "Victimes : %d"
@@ -983,7 +994,7 @@ msgstr ""
 "Last cicada standing\n"
 "Kills: %d"
 
-#: src/menu/assassin.c:918
+#: src/menu/assassin.c:919
 msgid ""
 "Gagnant :\n"
 "%s"
@@ -991,25 +1002,25 @@ msgstr ""
 "Winner:\n"
 "%s"
 
-#: src/menu/assassin.c:923
+#: src/menu/assassin.c:924
 msgid "G : retour  D : nouvelle partie"
 msgstr "L: back  R: new game"
 
-#: src/menu/assassin.c:935
+#: src/menu/assassin.c:936
 msgid "Une partie de %s est en cours sur ton badge : termine-la d'abord."
 msgstr "A game of %s is running on your badge: finish it first."
 
-#: src/menu/assassin.c:942
+#: src/menu/assassin.c:943
 msgid "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %d joueurs min."
 msgstr "Everyone has a secret target: get very close to kill it. %d players min."
 
-#: src/menu/assassin.c:953
-#: src/menu/tug.c:644
-#: src/menu/werewolf.c:1849
+#: src/menu/assassin.c:954
+#: src/menu/tug.c:645
+#: src/menu/werewolf.c:1851
 msgid "G : retour  D : rejoindre"
 msgstr "L: back  R: join"
 
-#: src/menu/assassin.c:955
+#: src/menu/assassin.c:956
 msgid ""
 "Recherche des parties\n"
 "d'assassin..."
@@ -1327,7 +1338,7 @@ msgstr "Contacts"
 #: src/menu/contacts.c:330
 #: src/menu/crypto_app.c:194
 #: src/menu/pirate_radio.c:566
-#: src/menu/werewolf.c:1825
+#: src/menu/werewolf.c:1826
 msgid "G : retour  D : ouvrir"
 msgstr "L: back  R: open"
 
@@ -1362,7 +1373,7 @@ msgstr ""
 "Bring the badges close!"
 
 #: src/menu/contacts.c:352
-#: src/menu/main.c:2973
+#: src/menu/main.c:2961
 #: src/menu/pirate_radio.c:593
 #: src/menu/radio_tune.c:196
 msgid "G : arrêter"
@@ -1519,8 +1530,12 @@ msgid "Tous les défis sont résolus :"
 msgstr "All challenges solved:"
 
 #: src/menu/crypto_app.c:231
-msgid "Encore %d défi%s à résoudre."
-msgstr "%d challenge%s left to solve."
+msgid "Encore %d défis à résoudre."
+msgstr "%d challenges left to solve."
+
+#: src/menu/crypto_app.c:232
+msgid "Encore %d défi à résoudre."
+msgstr "%d challenge left to solve."
 
 #: src/menu/crypto_app.c:242
 msgid "Défis crypto"
@@ -1550,8 +1565,8 @@ msgstr ""
 "Any button stops it."
 
 #: src/menu/demo.c:32
-#: src/menu/main.c:857
-#: src/menu/main.c:1353
+#: src/menu/main.c:842
+#: src/menu/main.c:1338
 msgid "D : lancer  G : retour"
 msgstr "R: start  L: back"
 
@@ -1621,14 +1636,14 @@ msgstr "Draw"
 
 #: src/menu/duel.c:376
 #: src/menu/games.c:146
-#: src/menu/werewolf.c:1569
+#: src/menu/werewolf.c:1570
 msgid "Gagné !"
 msgstr "You win!"
 
 #: src/menu/duel.c:376
 #: src/menu/games.c:146
 #: src/menu/puzzles.c:1053
-#: src/menu/werewolf.c:1569
+#: src/menu/werewolf.c:1570
 msgid "Perdu..."
 msgstr "You lose"
 
@@ -1742,9 +1757,9 @@ msgid "Flancs, D : suite  G : menu"
 msgstr "Sides, R: next  L: menu"
 
 #: src/menu/gamebook.c:693
-#: src/menu/werewolf.c:1708
-#: src/menu/werewolf.c:1715
-#: src/menu/werewolf.c:1752
+#: src/menu/werewolf.c:1709
+#: src/menu/werewolf.c:1716
+#: src/menu/werewolf.c:1753
 msgid "G : menu"
 msgstr "L: menu"
 
@@ -1761,7 +1776,7 @@ msgid "%u sections"
 msgstr "%u sections"
 
 #: src/menu/gamebook.c:722
-#: src/menu/main.c:1074
+#: src/menu/main.c:1059
 msgid "D : choisir  G : retour"
 msgstr "R: choose  L: back"
 
@@ -1952,8 +1967,8 @@ msgid "Pause  D : reprendre"
 msgstr "Pause  R: resume"
 
 #: src/menu/games.c:1106
-#: src/menu/main.c:1893
-#: src/menu/puzzles.c:1327
+#: src/menu/main.c:1878
+#: src/menu/puzzles.c:1328
 msgid "Pas encore de record"
 msgstr "No record yet"
 
@@ -1962,7 +1977,7 @@ msgid "Victoires : %u"
 msgstr "Wins: %u"
 
 #: src/menu/games.c:1110
-#: src/menu/puzzles.c:1339
+#: src/menu/puzzles.c:1340
 msgid "Record : %u"
 msgstr "Record: %u"
 
@@ -2095,7 +2110,7 @@ msgid "G : retour  D : le chasser"
 msgstr "L: back  R: hunt it"
 
 #: src/menu/image_radio.c:209
-#: src/menu/main.c:1058
+#: src/menu/main.c:1043
 msgid "SecSea (intégrée)"
 msgstr "SecSea (built-in)"
 
@@ -2283,11 +2298,11 @@ msgstr "L: quit  R: turn off"
 msgid "Lampe : %d %%"
 msgstr "Lamp: %d %%"
 
-#: src/menu/lang.c:50
+#: src/menu/lang.c:51
 msgid "Langue : %s"
 msgstr "Language: %s"
 
-#: src/menu/lang.c:54
+#: src/menu/lang.c:55
 msgid "Langue"
 msgstr "Language"
 
@@ -2460,18 +2475,18 @@ msgstr "green"
 
 #: src/menu/main.c:515
 #: src/menu/main.c:648
-#: src/menu/main.c:2803
+#: src/menu/main.c:2791
 msgid "Images"
 msgstr "Images"
 
 #: src/menu/main.c:515
-#: src/menu/main.c:2854
+#: src/menu/main.c:2842
 msgid "Lecture rapide"
 msgstr "Speed reading"
 
 #: src/menu/main.c:515
-#: src/menu/main.c:1444
-#: src/menu/main.c:1550
+#: src/menu/main.c:1429
+#: src/menu/main.c:1535
 msgid "Musique"
 msgstr "Music"
 
@@ -2512,11 +2527,11 @@ msgid "Musique (carte SD)"
 msgstr "Music (SD card)"
 
 #: src/menu/main.c:636
-#: src/menu/main.c:855
-#: src/menu/main.c:863
-#: src/menu/main.c:1560
-#: src/menu/main.c:1606
-#: src/menu/main.c:1631
+#: src/menu/main.c:840
+#: src/menu/main.c:848
+#: src/menu/main.c:1545
+#: src/menu/main.c:1591
+#: src/menu/main.c:1616
 msgid "Blind test"
 msgstr "Blind test"
 
@@ -2525,14 +2540,14 @@ msgid "Réseau cigales : %lu pts"
 msgstr "Cicada network: %lu pts"
 
 #: src/menu/main.c:638
-#: src/menu/main.c:1340
-#: src/menu/main.c:2953
+#: src/menu/main.c:1325
+#: src/menu/main.c:2941
 msgid "Infrarouge"
 msgstr "Infrared"
 
 #: src/menu/main.c:639
-#: src/menu/main.c:1351
-#: src/menu/main.c:1954
+#: src/menu/main.c:1336
+#: src/menu/main.c:1939
 msgid "Écran OLED"
 msgstr "OLED screen"
 
@@ -2545,7 +2560,7 @@ msgid "Lecture rapide (PVSR)"
 msgstr "Speed reading (RSVP)"
 
 #: src/menu/main.c:645
-#: src/menu/main.c:1044
+#: src/menu/main.c:1029
 msgid "Veille : %s"
 msgstr "Screensaver: %s"
 
@@ -2562,7 +2577,7 @@ msgid "Radio : porteuse"
 msgstr "Radio: carrier"
 
 #: src/menu/main.c:655
-#: src/menu/main.c:1428
+#: src/menu/main.c:1413
 msgid "Infos"
 msgstr "Info"
 
@@ -2631,194 +2646,194 @@ msgstr "Settings"
 msgid "Admin"
 msgstr "Admin"
 
-#: src/menu/main.c:789
+#: src/menu/main.c:774
 msgid "Mode admin activé"
 msgstr "Admin mode on"
 
-#: src/menu/main.c:789
+#: src/menu/main.c:774
 msgid "Mode admin désactivé"
 msgstr "Admin mode off"
 
-#: src/menu/main.c:835
+#: src/menu/main.c:820
 msgid "Flancs : choix  D : OK  G : retour"
 msgstr "Sides: choose  R: OK  L: back"
 
-#: src/menu/main.c:850
+#: src/menu/main.c:835
 #: src/menu/skills.c:188
 msgid "D : ouvrir  G : retour"
 msgstr "R: open  L: back"
 
-#: src/menu/main.c:864
+#: src/menu/main.c:849
 msgid "Morceau %u / %u"
 msgstr "Track %u / %u"
 
-#: src/menu/main.c:887
+#: src/menu/main.c:872
 msgid "Lecture..."
 msgstr "Playing..."
 
-#: src/menu/main.c:887
-#: src/menu/main.c:1442
+#: src/menu/main.c:872
+#: src/menu/main.c:1427
 #: src/menu/rsvp.c:718
 msgid "Pause"
 msgstr "Pause"
 
-#: src/menu/main.c:887
+#: src/menu/main.c:872
 msgid "Terminé"
 msgstr "Done"
 
-#: src/menu/main.c:889
+#: src/menu/main.c:874
 msgid "D : titre  Flanc D : suivant"
 msgstr "R: title  Right side: next"
 
-#: src/menu/main.c:895
+#: src/menu/main.c:880
 msgid "Réseau cigales"
 msgstr "Cicada network"
 
-#: src/menu/main.c:896
+#: src/menu/main.c:881
 msgid "%s : %lu pts, %u rencontres"
 msgstr "%s: %lu pts, %u meetings"
 
-#: src/menu/main.c:901
+#: src/menu/main.c:886
 msgid "Balises : actives"
 msgstr "Beacons: on"
 
-#: src/menu/main.c:901
+#: src/menu/main.c:886
 msgid "Balises : coupées"
 msgstr "Beacons: off"
 
-#: src/menu/main.c:907
+#: src/menu/main.c:892
 msgid "Aucune cigale à portée"
 msgstr "No cicada in range"
 
-#: src/menu/main.c:917
+#: src/menu/main.c:902
 msgid "D : nom  Flanc D : balises"
 msgstr "R: name  R side: beacons"
 
-#: src/menu/main.c:922
+#: src/menu/main.c:907
 msgid "Nom de la cigale"
 msgstr "Cicada name"
 
-#: src/menu/main.c:938
+#: src/menu/main.c:923
 msgid "Flancs : changer la lettre"
 msgstr "Sides: change the letter"
 
-#: src/menu/main.c:939
+#: src/menu/main.c:924
 msgid "Aile D : case suivante"
 msgstr "Right wing: next cell"
 
-#: src/menu/main.c:940
+#: src/menu/main.c:925
 msgid "Aile G : case précédente"
 msgstr "Left wing: previous cell"
 
-#: src/menu/main.c:941
+#: src/menu/main.c:926
 msgid "Aile D longue : enregistrer"
 msgstr "Hold right wing: save"
 
-#: src/menu/main.c:945
+#: src/menu/main.c:930
 msgid "Aile G ici : annuler"
 msgstr "Left wing: cancel"
 
-#: src/menu/main.c:945
+#: src/menu/main.c:930
 msgid "Espace = effacer une lettre"
 msgstr "Space = erase a letter"
 
-#: src/menu/main.c:1017
+#: src/menu/main.c:1002
 msgid "désactivée"
 msgstr "off"
 
-#: src/menu/main.c:1019
+#: src/menu/main.c:1004
 msgid "%u h"
 msgstr "%u h"
 
-#: src/menu/main.c:1021
+#: src/menu/main.c:1006
 msgid "%u min"
 msgstr "%u min"
 
-#: src/menu/main.c:1044
+#: src/menu/main.c:1029
 msgid "Veille après : %s"
 msgstr "Start after: %s"
 
-#: src/menu/main.c:1048
+#: src/menu/main.c:1033
 msgid "Image : %s"
 msgstr "Image: %s"
 
-#: src/menu/main.c:1051
+#: src/menu/main.c:1036
 msgid "Aperçu de la veille"
 msgstr "Screensaver preview"
 
-#: src/menu/main.c:1065
+#: src/menu/main.c:1050
 msgid "Veille de l'écran"
 msgstr "Screensaver"
 
-#: src/menu/main.c:1067
+#: src/menu/main.c:1052
 msgid "D : changer  G : retour"
 msgstr "R: change  L: back"
 
-#: src/menu/main.c:1072
+#: src/menu/main.c:1057
 msgid "Image de veille"
 msgstr "Saver image"
 
-#: src/menu/main.c:1324
+#: src/menu/main.c:1309
 msgid "Enregistrer un signal"
 msgstr "Record a signal"
 
-#: src/menu/main.c:1331
+#: src/menu/main.c:1316
 msgid "%d : vide"
 msgstr "%d: empty"
 
-#: src/menu/main.c:1333
+#: src/menu/main.c:1318
 msgid "%d : NEC %04X / %02X"
 msgstr "%d: NEC %04X / %02X"
 
-#: src/menu/main.c:1335
+#: src/menu/main.c:1320
 msgid "%d : brut, %u impulsions"
 msgstr "%d: raw, %u pulses"
 
-#: src/menu/main.c:1342
+#: src/menu/main.c:1327
 msgid "D : enregistrer/émettre"
 msgstr "R: record/send"
 
-#: src/menu/main.c:1342
+#: src/menu/main.c:1327
 msgid "Emission..."
 msgstr "Sending..."
 
-#: src/menu/main.c:1358
+#: src/menu/main.c:1343
 msgid "Saisir un code"
 msgstr "Enter a code"
 
-#: src/menu/main.c:1360
+#: src/menu/main.c:1345
 msgid "Flags trouvés : %d/%d"
 msgstr "Flags found: %d/%d"
 
-#: src/menu/main.c:1367
+#: src/menu/main.c:1352
 msgid "D : OK  G : retour"
 msgstr "R: OK  L: back"
 
-#: src/menu/main.c:1374
+#: src/menu/main.c:1359
 msgid "Code secret"
 msgstr "Secret code"
 
-#: src/menu/main.c:1375
+#: src/menu/main.c:1360
 msgid "Tapez le code avec"
 msgstr "Type the code with"
 
-#: src/menu/main.c:1376
+#: src/menu/main.c:1361
 msgid "les 4 boutons."
 msgstr "the 4 buttons."
 
-#: src/menu/main.c:1378
+#: src/menu/main.c:1363
 msgid "Attendre 8 s : annuler"
 msgstr "Wait 8 s: cancel"
 
-#: src/menu/main.c:1410
+#: src/menu/main.c:1395
 msgid "non calibrée"
 msgstr "uncalibrated"
 
-#: src/menu/main.c:1414
+#: src/menu/main.c:1399
 msgid "mesure..."
 msgstr "wait..."
 
-#: src/menu/main.c:1423
+#: src/menu/main.c:1408
 msgid ""
 "Version %s (%s)\n"
 "Compilée le %s\n"
@@ -2834,19 +2849,19 @@ msgstr ""
 "SD card: %s\n"
 "Battery: %s"
 
-#: src/menu/main.c:1427
+#: src/menu/main.c:1412
 msgid "absente"
 msgstr "missing"
 
-#: src/menu/main.c:1427
+#: src/menu/main.c:1412
 msgid "prête"
 msgstr "ready"
 
-#: src/menu/main.c:1428
+#: src/menu/main.c:1413
 msgid "D : crédits  G : retour"
 msgstr "R: credits  L: back"
 
-#: src/menu/main.c:1441
+#: src/menu/main.c:1426
 msgid ""
 "%s\n"
 "\n"
@@ -2860,20 +2875,20 @@ msgstr ""
 "\n"
 "Volume: %s"
 
-#: src/menu/main.c:1442
+#: src/menu/main.c:1427
 msgid "Lecture"
 msgstr "Playing"
 
-#: src/menu/main.c:1444
+#: src/menu/main.c:1429
 msgid "D : pause  G : stop  Flancs : - +"
 msgstr "R: pause  L: stop  Sides: - +"
 
-#: src/menu/main.c:1489
-#: src/menu/main.c:1561
+#: src/menu/main.c:1474
+#: src/menu/main.c:1546
 msgid "Pas de carte SD."
 msgstr "No SD card."
 
-#: src/menu/main.c:1491
+#: src/menu/main.c:1476
 msgid ""
 "Aucun fichier %s dans\n"
 "/%s ni à la racine.\n"
@@ -2885,7 +2900,7 @@ msgstr ""
 "\n"
 "See %s."
 
-#: src/menu/main.c:1607
+#: src/menu/main.c:1592
 msgid ""
 "Aucun fichier .WAV ici.\n"
 "\n"
@@ -2895,7 +2910,7 @@ msgstr ""
 "\n"
 "See audio2wav.py."
 
-#: src/menu/main.c:1632
+#: src/menu/main.c:1617
 msgid ""
 "Terminé !\n"
 "\n"
@@ -2905,55 +2920,55 @@ msgstr ""
 "\n"
 "%u tracks played."
 
-#: src/menu/main.c:1829
+#: src/menu/main.c:1814
 msgid "%lu s"
 msgstr "%lu s"
 
-#: src/menu/main.c:1831
+#: src/menu/main.c:1816
 msgid "%lu min"
 msgstr "%lu min"
 
-#: src/menu/main.c:1831
+#: src/menu/main.c:1816
 msgid "%lu min %02lu s"
 msgstr "%lu min %02lu s"
 
-#: src/menu/main.c:1834
+#: src/menu/main.c:1819
 msgid "%lu h %02lu min"
 msgstr "%lu h %02lu min"
 
-#: src/menu/main.c:1840
+#: src/menu/main.c:1825
 msgid "Test radio"
 msgstr "Radio test"
 
-#: src/menu/main.c:1841
+#: src/menu/main.c:1826
 msgid "Un message toutes les"
 msgstr "One message every"
 
-#: src/menu/main.c:1844
+#: src/menu/main.c:1829
 msgid "Flancs : - / +  (maintenir : vite)"
 msgstr "Sides: - / +  (hold: fast)"
 
-#: src/menu/main.c:1846
+#: src/menu/main.c:1831
 msgid "Messages envoyés : %u"
 msgstr "Messages sent: %u"
 
-#: src/menu/main.c:1857
+#: src/menu/main.c:1842
 msgid "En pause"
 msgstr "Paused"
 
-#: src/menu/main.c:1862
+#: src/menu/main.c:1847
 msgid "Prochain dans %s"
 msgstr "Next in %s"
 
-#: src/menu/main.c:1865
+#: src/menu/main.c:1850
 msgid "G : quitter  D : pause"
 msgstr "L: quit  R: pause"
 
-#: src/menu/main.c:1865
+#: src/menu/main.c:1850
 msgid "G : quitter  D : reprendre"
 msgstr "L: quit  R: resume"
 
-#: src/menu/main.c:1956
+#: src/menu/main.c:1941
 msgid ""
 "Aucun écran détecté.\n"
 "\n"
@@ -2969,29 +2984,33 @@ msgstr ""
 "SDA pin 4, SCL pin 3,\n"
 "3.3 V pin 1, GND 11."
 
-#: src/menu/main.c:2006
+#: src/menu/main.c:1991
 #: src/menu/pirate_radio.c:306
 #: src/menu/pirate_radio.c:939
 msgid "Radio occupée"
 msgstr "Radio busy"
 
-#: src/menu/main.c:2031
+#: src/menu/main.c:2016
 msgid "Son et LEDs coupés"
 msgstr "Sound and LEDs off"
 
-#: src/menu/main.c:2238
+#: src/menu/main.c:2223
 msgid "Mode démo arrêté"
 msgstr "Demo mode off"
 
-#: src/menu/main.c:2274
+#: src/menu/main.c:2259
 msgid "SOMMEIL"
 msgstr "SLEEP"
 
-#: src/menu/main.c:2275
+#: src/menu/main.c:2260
 msgid "Le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un organisateur."
 msgstr "The badge was put to sleep by an admin. If it stays stuck, see an organizer."
 
-#: src/menu/main.c:2479
+#: src/menu/main.c:2384
+msgid "Langue : English"
+msgstr "Language: English"
+
+#: src/menu/main.c:2472
 msgid ""
 "Bravo, code Konami !\n"
 "\n"
@@ -3003,7 +3022,7 @@ msgstr ""
 "Flag:\n"
 "%s"
 
-#: src/menu/main.c:2484
+#: src/menu/main.c:2477
 msgid ""
 "Code incorrect.\n"
 "\n"
@@ -3015,31 +3034,27 @@ msgstr ""
 "Hint: a famous code\n"
 "of video games..."
 
-#: src/menu/main.c:2538
+#: src/menu/main.c:2531
 msgid "Flags trouvés"
 msgstr "Flags found"
 
-#: src/menu/main.c:2540
+#: src/menu/main.c:2533
 msgid "Aucun pour l'instant."
 msgstr "None yet."
 
-#: src/menu/main.c:2568
-msgid "Langue : English"
-msgstr "Language: English"
-
-#: src/menu/main.c:2664
+#: src/menu/main.c:2652
 msgid "Vote ouvert : Social > Vote"
 msgstr "Vote open: Social > Vote"
 
-#: src/menu/main.c:2681
+#: src/menu/main.c:2669
 msgid "Kof kof ! (virus des cigales)"
 msgstr "Cough cough! (cicada virus)"
 
-#: src/menu/main.c:2685
+#: src/menu/main.c:2673
 msgid "Vous êtes infecté !"
 msgstr "You are infected!"
 
-#: src/menu/main.c:2804
+#: src/menu/main.c:2792
 msgid ""
 "%s\n"
 "\n"
@@ -3051,11 +3066,11 @@ msgstr ""
 "Invalid .EPI image\n"
 "(see image2epi.py)."
 
-#: src/menu/main.c:2840
+#: src/menu/main.c:2828
 msgid "Vidéo"
 msgstr "Video"
 
-#: src/menu/main.c:2954
+#: src/menu/main.c:2942
 msgid ""
 "Enregistrement...\n"
 "\n"
@@ -3069,11 +3084,11 @@ msgstr ""
 "port) with the remote\n"
 "and press a key."
 
-#: src/menu/main.c:2970
+#: src/menu/main.c:2958
 msgid "Porteuse"
 msgstr "Carrier"
 
-#: src/menu/main.c:2971
+#: src/menu/main.c:2959
 msgid ""
 "433,92 MHz + 19 kHz\n"
 "en continu, +10 dBm\n"
@@ -3089,7 +3104,7 @@ msgstr ""
 "frequency analyzer.\n"
 "Auto stop after 30 s."
 
-#: src/menu/main.c:2975
+#: src/menu/main.c:2963
 msgid "G ou D : retour"
 msgstr "L or R: back"
 
@@ -3486,8 +3501,8 @@ msgid "Programme"
 msgstr "Program"
 
 #: src/menu/program.c:78
-#: src/menu/smuggler.c:705
-#: src/menu/smuggler.c:711
+#: src/menu/smuggler.c:706
+#: src/menu/smuggler.c:712
 msgid "G : retour  D : détails"
 msgstr "L: back  R: details"
 
@@ -3579,8 +3594,12 @@ msgid "Un bouton : continuer"
 msgstr "Any button: continue"
 
 #: src/menu/puzzles.c:677
-msgid "Taquin : %u coup%s"
-msgstr "Puzzle: %u move%s"
+msgid "Taquin : %u coup"
+msgstr "Puzzle: %u move"
+
+#: src/menu/puzzles.c:677
+msgid "Taquin : %u coups"
+msgstr "Puzzle: %u moves"
 
 #: src/menu/puzzles.c:694
 msgid ""
@@ -3623,8 +3642,12 @@ msgid "Long : fl. G annuler, D refaire"
 msgstr "Hold: L side undo, R restart"
 
 #: src/menu/puzzles.c:1050
-msgid "Gagné en %d essai%s !"
-msgstr "Won in %d attempt%s!"
+msgid "Gagné en %d essai !"
+msgstr "Won in %d attempt!"
+
+#: src/menu/puzzles.c:1050
+msgid "Gagné en %d essais !"
+msgstr "Won in %d attempts!"
 
 #: src/menu/puzzles.c:1094
 msgid "Ailes : symbole  D long : ok"
@@ -3647,18 +3670,22 @@ msgid "Erreurs"
 msgstr "Misses"
 
 #: src/menu/puzzles.c:1234
-msgid "%u mot%s"
-msgstr "%u word%s"
+msgid "%u mots"
+msgstr "%u words"
 
-#: src/menu/puzzles.c:1265
+#: src/menu/puzzles.c:1235
+msgid "%u mot"
+msgstr "%u word"
+
+#: src/menu/puzzles.c:1266
 msgid "D long : proposer la lettre"
 msgstr "Hold R: try the letter"
 
-#: src/menu/puzzles.c:1266
+#: src/menu/puzzles.c:1267
 msgid "G : menu  D : mot suivant"
 msgstr "L: menu  R: next word"
 
-#: src/menu/puzzles.c:1275
+#: src/menu/puzzles.c:1276
 msgid ""
 "Ouvrez les cases sans mine.\n"
 "Le chiffre : mines autour.\n"
@@ -3676,7 +3703,7 @@ msgstr ""
 "Hold L side: flag\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1278
+#: src/menu/puzzles.c:1279
 msgid ""
 "Deux tuiles égales qui se\n"
 "touchent fusionnent.\n"
@@ -3694,7 +3721,7 @@ msgstr ""
 "All slides toward the key.\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1281
+#: src/menu/puzzles.c:1282
 msgid ""
 "Remettez les cases de 1 à 15\n"
 "dans l'ordre, trou à la fin.\n"
@@ -3712,7 +3739,7 @@ msgstr ""
 "Wings: up (L), down (R)\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1284
+#: src/menu/puzzles.c:1285
 msgid ""
 "Poussez les caisses sur les\n"
 "cibles, une à la fois.\n"
@@ -3730,7 +3757,7 @@ msgstr ""
 "Hold R wing: restart\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1287
+#: src/menu/puzzles.c:1288
 msgid ""
 "Trouvez le code secret :\n"
 "4 symboles parmi 6, 10 essais.\n"
@@ -3748,7 +3775,7 @@ msgstr ""
 "Hold R wing: OK\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1289
+#: src/menu/puzzles.c:1290
 msgid ""
 "Trouvez le mot, lettre par\n"
 "lettre, avant d'être pendu\n"
@@ -3764,33 +3791,41 @@ msgstr ""
 "Hold R wing: guess\n"
 "Hold: L quits, R side help"
 
-#: src/menu/puzzles.c:1298
+#: src/menu/puzzles.c:1299
 msgid "Niveau %d/%d (flancs : changer)"
 msgstr "Level %d/%d (sides: change)"
 
-#: src/menu/puzzles.c:1303
+#: src/menu/puzzles.c:1304
 msgid "G : menu  D : jouer"
 msgstr "L: menu  R: play"
 
-#: src/menu/puzzles.c:1329
+#: src/menu/puzzles.c:1330
 msgid "Record : %u s"
 msgstr "Record: %u s"
 
-#: src/menu/puzzles.c:1331
+#: src/menu/puzzles.c:1332
 msgid "Record : %u coups"
 msgstr "Record: %u moves"
 
-#: src/menu/puzzles.c:1333
+#: src/menu/puzzles.c:1334
 msgid "Niveaux réussis : %u / %d"
 msgstr "Levels done: %u / %d"
 
-#: src/menu/puzzles.c:1335
-msgid "Record : %u essai%s"
-msgstr "Record: %u attempt%s"
+#: src/menu/puzzles.c:1336
+msgid "Record : %u essai"
+msgstr "Record: %u attempt"
 
-#: src/menu/puzzles.c:1337
-msgid "Record : %u mot%s d'affilée"
-msgstr "Record: %u word%s in a row"
+#: src/menu/puzzles.c:1336
+msgid "Record : %u essais"
+msgstr "Record: %u attempts"
+
+#: src/menu/puzzles.c:1338
+msgid "Record : %u mot d'affilée"
+msgstr "Record: %u word in a row"
+
+#: src/menu/puzzles.c:1338
+msgid "Record : %u mots d'affilée"
+msgstr "Record: %u words in a row"
 
 #: src/menu/radio433.c:105
 #: src/menu/radio433.c:161
@@ -3965,8 +4000,8 @@ msgid "Scores sociaux"
 msgstr "Social scores"
 
 #: src/menu/reset.c:18
-#: src/menu/smuggler.c:691
-#: src/menu/smuggler.c:743
+#: src/menu/smuggler.c:692
+#: src/menu/smuggler.c:744
 msgid "Contrebande"
 msgstr "Smuggling"
 
@@ -4293,8 +4328,12 @@ msgid "Inconnu  (%d / %d)"
 msgstr "Unknown  (%d / %d)"
 
 #: src/menu/smuggler.c:483
-msgid "x%d  %s  %u doublon%s"
-msgstr "x%d  %s  %u doubloon%s"
+msgid "x%d  %s  %u doublons"
+msgstr "x%d  %s  %u doubloons"
+
+#: src/menu/smuggler.c:484
+msgid "x%d  %s  %u doublon"
+msgstr "x%d  %s  %u doubloon"
 
 #: src/menu/smuggler.c:517
 msgid "Psst..."
@@ -4441,49 +4480,53 @@ msgid "Affaire annulée."
 msgstr "Deal cancelled."
 
 #: src/menu/smuggler.c:627
-msgid "Cale : %d marchandise%s"
-msgstr "Hold: %d item%s"
+msgid "Cale : %d marchandises"
+msgstr "Hold: %d items"
 
-#: src/menu/smuggler.c:629
+#: src/menu/smuggler.c:628
+msgid "Cale : %d marchandise"
+msgstr "Hold: %d item"
+
+#: src/menu/smuggler.c:630
 msgid "Échanger en douce"
 msgstr "Trade on the sly"
 
-#: src/menu/smuggler.c:630
+#: src/menu/smuggler.c:631
 msgid "Donner"
 msgstr "Give"
 
-#: src/menu/smuggler.c:631
+#: src/menu/smuggler.c:632
 msgid "Collection : %d / %d"
 msgstr "Collection: %d / %d"
 
-#: src/menu/smuggler.c:632
+#: src/menu/smuggler.c:633
 msgid "Fortune : %lu doublons"
 msgstr "Fortune: %lu doubloons"
 
-#: src/menu/smuggler.c:641
+#: src/menu/smuggler.c:642
 msgid "Matelot"
 msgstr "Sailor"
 
-#: src/menu/smuggler.c:641
+#: src/menu/smuggler.c:642
 msgid "Mousse"
 msgstr "Cabin boy"
 
-#: src/menu/smuggler.c:642
+#: src/menu/smuggler.c:643
 #: src/menu/werewolf.c:117
 #: src/menu/werewolf.c:132
 #: src/menu/werewolf_cards.c:150
 msgid "Capitaine"
 msgstr "Captain"
 
-#: src/menu/smuggler.c:642
+#: src/menu/smuggler.c:643
 msgid "Roi de la contrebande"
 msgstr "Smuggling king"
 
-#: src/menu/smuggler.c:649
+#: src/menu/smuggler.c:650
 msgid "Marchandise inconnue"
 msgstr "Unknown goods"
 
-#: src/menu/smuggler.c:654
+#: src/menu/smuggler.c:655
 msgid ""
 "Jamais vue\n"
 "dans votre cale."
@@ -4491,7 +4534,7 @@ msgstr ""
 "Never seen\n"
 "in your hold."
 
-#: src/menu/smuggler.c:655
+#: src/menu/smuggler.c:656
 msgid ""
 "Échangez avec les autres\n"
 "cigales pour la découvrir."
@@ -4499,35 +4542,39 @@ msgstr ""
 "Trade with the other\n"
 "cicadas to discover it."
 
-#: src/menu/smuggler.c:657
+#: src/menu/smuggler.c:658
 msgid "Commun"
 msgstr "Common"
 
-#: src/menu/smuggler.c:657
+#: src/menu/smuggler.c:658
 msgid "Légendaire !"
 msgstr "Legendary!"
 
-#: src/menu/smuggler.c:657
+#: src/menu/smuggler.c:658
 msgid "Rare"
 msgstr "Rare"
 
-#: src/menu/smuggler.c:659
-msgid "%u doublon%s"
-msgstr "%u doubloon%s"
+#: src/menu/smuggler.c:660
+msgid "%u doublon"
+msgstr "%u doubloon"
 
-#: src/menu/smuggler.c:661
+#: src/menu/smuggler.c:660
+msgid "%u doublons"
+msgstr "%u doubloons"
+
+#: src/menu/smuggler.c:662
 msgid "En cale : %d"
 msgstr "In hold: %d"
 
-#: src/menu/smuggler.c:671
+#: src/menu/smuggler.c:672
 msgid "Fortune"
 msgstr "Fortune"
 
-#: src/menu/smuggler.c:675
+#: src/menu/smuggler.c:676
 msgid "doublons"
 msgstr "doubloons"
 
-#: src/menu/smuggler.c:676
+#: src/menu/smuggler.c:677
 msgid ""
 "Rang : %s\n"
 "Marchandises : %d\n"
@@ -4539,19 +4586,19 @@ msgstr ""
 "Different: %d / %d\n"
 "Deals done: %u"
 
-#: src/menu/smuggler.c:693
+#: src/menu/smuggler.c:694
 msgid "Badge contre badge..."
 msgstr "Badge against badge..."
 
-#: src/menu/smuggler.c:698
+#: src/menu/smuggler.c:699
 msgid "Cale"
 msgstr "Hold"
 
-#: src/menu/smuggler.c:698
+#: src/menu/smuggler.c:699
 msgid "Que donner ?"
 msgstr "Give what?"
 
-#: src/menu/smuggler.c:701
+#: src/menu/smuggler.c:702
 msgid ""
 "La cale est vide.\n"
 "Rencontrez des cigales :\n"
@@ -4561,28 +4608,28 @@ msgstr ""
 "Meet cicadas:\n"
 "they leave supplies."
 
-#: src/menu/smuggler.c:705
-#: src/menu/smuggler.c:723
+#: src/menu/smuggler.c:706
+#: src/menu/smuggler.c:724
 msgid "G : retour  D : donner"
 msgstr "L: back  R: give"
 
-#: src/menu/smuggler.c:709
+#: src/menu/smuggler.c:710
 msgid "Collection"
 msgstr "Collection"
 
-#: src/menu/smuggler.c:720
+#: src/menu/smuggler.c:721
 msgid "Donner à qui ?"
 msgstr "Give to whom?"
 
-#: src/menu/smuggler.c:720
+#: src/menu/smuggler.c:721
 msgid "À portée de main"
 msgstr "Within reach"
 
-#: src/menu/smuggler.c:723
+#: src/menu/smuggler.c:724
 msgid "G : retour  D : proposer"
 msgstr "L: back  R: propose"
 
-#: src/menu/smuggler.c:726
+#: src/menu/smuggler.c:727
 msgid ""
 "Personne à portée de main.\n"
 "Collez votre badge contre\n"
@@ -4592,7 +4639,7 @@ msgstr ""
 "Hold your badge against\n"
 "another cicada's.%s"
 
-#: src/menu/smuggler.c:727
+#: src/menu/smuggler.c:728
 msgid ""
 "\n"
 "\n"
@@ -4602,35 +4649,39 @@ msgstr ""
 "\n"
 "Too far:"
 
-#: src/menu/smuggler.c:730
-msgid "%d cigale%s"
-msgstr "%d cicada%s"
+#: src/menu/smuggler.c:731
+msgid "%d cigale"
+msgstr "%d cicada"
 
-#: src/menu/smuggler.c:779
+#: src/menu/smuggler.c:731
+msgid "%d cigales"
+msgstr "%d cicadas"
+
+#: src/menu/smuggler.c:780
 msgid "Ajouté à la cale"
 msgstr "Added to the hold"
 
-#: src/menu/smuggler.c:781
+#: src/menu/smuggler.c:782
 msgid "Cale pleine pour celle-ci"
 msgstr "Hold full for this one"
 
-#: src/menu/smuggler.c:790
+#: src/menu/smuggler.c:791
 msgid "Cale (admin)"
 msgstr "Hold (admin)"
 
-#: src/menu/smuggler.c:795
+#: src/menu/smuggler.c:796
 msgid "%s, %u doublons"
 msgstr "%s, %u doubloons"
 
-#: src/menu/smuggler.c:799
+#: src/menu/smuggler.c:800
 msgid "Dans la cale : %d  (%d/%d)"
 msgstr "In the hold: %d  (%d/%d)"
 
-#: src/menu/smuggler.c:802
+#: src/menu/smuggler.c:803
 msgid "Flancs : choisir  D : ajouter"
 msgstr "Sides: choose  R: add"
 
-#: src/menu/smuggler.c:806
+#: src/menu/smuggler.c:807
 msgid "Contrebande (admin)"
 msgstr "Smuggling (admin)"
 
@@ -5008,7 +5059,7 @@ msgid "G : quitter  Flancs/D : état"
 msgstr "L: quit  Sides/R: state"
 
 #: src/menu/tug.c:41
-#: src/menu/tug.c:587
+#: src/menu/tug.c:588
 msgid "Arbitre"
 msgstr "Referee"
 
@@ -5020,104 +5071,108 @@ msgstr "Cicadas"
 msgid "Fourmis"
 msgstr "Ants"
 
-#: src/menu/tug.c:480
-msgid "%d joueur%s"
-msgstr "%d player%s"
+#: src/menu/tug.c:481
+msgid "%d joueur"
+msgstr "%d player"
 
-#: src/menu/tug.c:482
+#: src/menu/tug.c:483
 msgid "Il faut 2 joueurs au moins."
 msgstr "At least 2 players needed."
 
-#: src/menu/tug.c:536
+#: src/menu/tug.c:537
 msgid "Partie annulée par l'hôte."
 msgstr "Cancelled by the host."
 
-#: src/menu/tug.c:537
+#: src/menu/tug.c:538
 msgid "G : retour  D : OK"
 msgstr "L: back  R: OK"
 
-#: src/menu/tug.c:543
+#: src/menu/tug.c:544
 msgid "G long : quitter la page"
 msgstr "Hold L: leave the page"
 
-#: src/menu/tug.c:550
+#: src/menu/tug.c:551
 msgid "Les équipes"
 msgstr "The teams"
 
-#: src/menu/tug.c:552
+#: src/menu/tug.c:553
 msgid "Tu es l'arbitre !"
 msgstr "You're the ref!"
 
-#: src/menu/tug.c:553
+#: src/menu/tug.c:554
 msgid "Nombre impair de joueurs : tu ne tires pas, tu regardes la corde."
 msgstr "Odd number of players: you don't pull, you watch the rope."
 
-#: src/menu/tug.c:556
+#: src/menu/tug.c:557
 msgid "Tu es dans l'équipe des"
 msgstr "You are on the team"
 
-#: src/menu/tug.c:563
+#: src/menu/tug.c:564
 msgid "Avec :"
 msgstr "With:"
 
-#: src/menu/tug.c:563
+#: src/menu/tug.c:564
 msgid "Seul contre tous !"
 msgstr "Alone against all!"
 
-#: src/menu/tug.c:566
+#: src/menu/tug.c:567
 msgid "Prépare-toi..."
 msgstr "Get ready..."
 
-#: src/menu/tug.c:570
+#: src/menu/tug.c:571
 msgid "Prêts ?"
 msgstr "Ready?"
 
-#: src/menu/tug.c:573
+#: src/menu/tug.c:574
 msgid "Tu es l'arbitre"
 msgstr "You're the ref"
 
-#: src/menu/tug.c:573
+#: src/menu/tug.c:574
 msgid "Équipe des %s"
 msgstr "Team %s"
 
-#: src/menu/tug.c:575
+#: src/menu/tug.c:576
 msgid "G puis D : une traction"
 msgstr "L then R: one pull"
 
-#: src/menu/tug.c:575
-#: src/menu/tug.c:591
+#: src/menu/tug.c:576
+#: src/menu/tug.c:592
 msgid "Regarde la corde"
 msgstr "Watch the rope"
 
-#: src/menu/tug.c:581
+#: src/menu/tug.c:582
 msgid "Tirez ! %d s"
 msgstr "Pull! %d s"
 
-#: src/menu/tug.c:583
+#: src/menu/tug.c:584
 msgid "Terminé !"
 msgstr "Finished!"
 
-#: src/menu/tug.c:589
-msgid "Toi : %u traction%s"
-msgstr "You: %u pull%s"
+#: src/menu/tug.c:590
+msgid "Toi : %u traction"
+msgstr "You: %u pull"
 
-#: src/menu/tug.c:591
+#: src/menu/tug.c:590
+msgid "Toi : %u tractions"
+msgstr "You: %u pulls"
+
+#: src/menu/tug.c:592
 msgid "Décompte final..."
 msgstr "Final count..."
 
-#: src/menu/tug.c:592
+#: src/menu/tug.c:593
 msgid "G puis D, vite !"
 msgstr "L then R, fast!"
 
-#: src/menu/tug.c:596
+#: src/menu/tug.c:597
 msgid "Résultat"
 msgstr "Result"
 
-#: src/menu/tug.c:598
+#: src/menu/tug.c:599
 msgid "Égalité !"
 msgstr "Draw!"
 
-#: src/menu/tug.c:600
+#: src/menu/tug.c:601
 msgid ""
 "Victoire des\n"
 "%s !"
@@ -5125,39 +5180,39 @@ msgstr ""
 "Victory for\n"
 "%s!"
 
-#: src/menu/tug.c:603
+#: src/menu/tug.c:604
 msgid "Ton équipe a gagné !"
 msgstr "Your team won!"
 
-#: src/menu/tug.c:604
+#: src/menu/tug.c:605
 msgid "Ton équipe a perdu..."
 msgstr "Your team lost..."
 
-#: src/menu/tug.c:605
+#: src/menu/tug.c:606
 msgid "Cigales %lu - %lu Fourmis"
 msgstr "Cicadas %lu - %lu Ants"
 
-#: src/menu/tug.c:609
+#: src/menu/tug.c:610
 msgid "Tes tractions : %u"
 msgstr "Your pulls: %u"
 
-#: src/menu/tug.c:613
+#: src/menu/tug.c:614
 msgid "Meilleur : %u, %s"
 msgstr "Best: %u, %s"
 
-#: src/menu/tug.c:616
+#: src/menu/tug.c:617
 msgid "G : retour  D : rejouer"
 msgstr "L: back  R: play again"
 
-#: src/menu/tug.c:628
+#: src/menu/tug.c:629
 msgid "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la d'abord."
 msgstr "A game of %s is running on your badge: finish or leave it first."
 
-#: src/menu/tug.c:634
+#: src/menu/tug.c:635
 msgid "Deux équipes tirent sur la corde : appuie sur G puis D, le plus vite possible !"
 msgstr "Two teams pull the rope: press L then R, as fast as you can!"
 
-#: src/menu/tug.c:646
+#: src/menu/tug.c:647
 msgid ""
 "Recherche des parties\n"
 "de tir à la corde..."
@@ -5494,9 +5549,9 @@ msgid "Jour %u : %s"
 msgstr "Day %u: %s"
 
 #: src/menu/werewolf.c:256
-#: src/menu/werewolf.c:1529
-#: src/menu/werewolf.c:1713
-#: src/menu/werewolf.c:1725
+#: src/menu/werewolf.c:1530
+#: src/menu/werewolf.c:1714
+#: src/menu/werewolf.c:1726
 msgid "Ta carte"
 msgstr "Your card"
 
@@ -5558,7 +5613,7 @@ msgid "%s%s : %s%s%s"
 msgstr "%s%s: %s%s%s"
 
 #: src/menu/werewolf.c:1415
-#: src/menu/werewolf.c:1823
+#: src/menu/werewolf.c:1824
 msgid "Mener une partie"
 msgstr "Host a game"
 
@@ -5594,52 +5649,52 @@ msgstr "Wolves: 2, 3 from 12 p."
 msgid "> Ouvrir la partie"
 msgstr "> Open the game"
 
-#: src/menu/werewolf.c:1526
+#: src/menu/werewolf.c:1527
 msgid "D : la carte  G : retour"
 msgstr "R: the card  L: back"
 
-#: src/menu/werewolf.c:1529
+#: src/menu/werewolf.c:1530
 msgid "Les rôles"
 msgstr "The roles"
 
-#: src/menu/werewolf.c:1532
+#: src/menu/werewolf.c:1533
 msgid "%d/%d  Flancs, D : détails"
 msgstr "%d/%d  Sides, R: details"
 
-#: src/menu/werewolf.c:1533
+#: src/menu/werewolf.c:1534
 msgid "D : détails  G : la partie"
 msgstr "R: details  L: the game"
 
-#: src/menu/werewolf.c:1546
+#: src/menu/werewolf.c:1547
 msgid "Cette nuit :"
 msgstr "Tonight:"
 
-#: src/menu/werewolf.c:1546
+#: src/menu/werewolf.c:1547
 msgid "Le village a éliminé :"
 msgstr "Village eliminated:"
 
-#: src/menu/werewolf.c:1547
+#: src/menu/werewolf.c:1548
 msgid "Le chasseur a emporté :"
 msgstr "The hunter took:"
 
-#: src/menu/werewolf.c:1549
+#: src/menu/werewolf.c:1550
 msgid "Personne n'est mort."
 msgstr "Nobody died."
 
-#: src/menu/werewolf.c:1549
 #: src/menu/werewolf.c:1550
+#: src/menu/werewolf.c:1551
 msgid "Personne."
 msgstr "Nobody."
 
-#: src/menu/werewolf.c:1571
+#: src/menu/werewolf.c:1572
 msgid "Tu étais : %s"
 msgstr "You were: %s"
 
-#: src/menu/werewolf.c:1574
+#: src/menu/werewolf.c:1575
 msgid "D : les cartes  G long : fin"
 msgstr "R: the cards  hold L: end"
 
-#: src/menu/werewolf.c:1581
+#: src/menu/werewolf.c:1582
 msgid ""
 "Distribution\n"
 "des cartes..."
@@ -5647,133 +5702,133 @@ msgstr ""
 "Dealing\n"
 "the cards..."
 
-#: src/menu/werewolf.c:1594
+#: src/menu/werewolf.c:1595
 msgid "%s   En vie : %d / %u"
 msgstr "%s   Alive: %d / %u"
 
-#: src/menu/werewolf.c:1601
+#: src/menu/werewolf.c:1602
 msgid "En vie : %d / %u"
 msgstr "Alive: %d / %u"
 
-#: src/menu/werewolf.c:1603
+#: src/menu/werewolf.c:1604
 msgid "   Choix : %d / %d"
 msgstr "   Chosen: %d / %d"
 
-#: src/menu/werewolf.c:1608
+#: src/menu/werewolf.c:1609
 msgid "D : suite  X : +30 s"
 msgstr "R: next  X: +30 s"
 
-#: src/menu/werewolf.c:1614
+#: src/menu/werewolf.c:1615
 msgid "Fais semblant de choisir"
 msgstr "Pretend to choose"
 
-#: src/menu/werewolf.c:1618
+#: src/menu/werewolf.c:1619
 msgid "Deux loups : prends-en un !"
 msgstr "Two wolves: take one!"
 
-#: src/menu/werewolf.c:1619
+#: src/menu/werewolf.c:1620
 msgid "Ta carte ou une autre ?"
 msgstr "Your card or another?"
 
-#: src/menu/werewolf.c:1623
+#: src/menu/werewolf.c:1624
 msgid "1er amoureux ?"
 msgstr "1st lover?"
 
-#: src/menu/werewolf.c:1623
+#: src/menu/werewolf.c:1624
 msgid "2e amoureux ?"
 msgstr "2nd lover?"
 
-#: src/menu/werewolf.c:1624
+#: src/menu/werewolf.c:1625
 msgid "Fais semblant : 1er nom"
 msgstr "Pretend: 1st name"
 
-#: src/menu/werewolf.c:1624
+#: src/menu/werewolf.c:1625
 msgid "Fais semblant : 2e nom"
 msgstr "Pretend: 2nd name"
 
-#: src/menu/werewolf.c:1632
+#: src/menu/werewolf.c:1633
 msgid "Qui sonder ?"
 msgstr "Probe whom?"
 
-#: src/menu/werewolf.c:1636
+#: src/menu/werewolf.c:1637
 msgid "Votre victime ?"
 msgstr "Your victim?"
 
-#: src/menu/werewolf.c:1639
+#: src/menu/werewolf.c:1640
 msgid "Tu as vu %s (loup)"
 msgstr "You saw %s (wolf)"
 
-#: src/menu/werewolf.c:1642
+#: src/menu/werewolf.c:1643
 msgid "Espionner ? (risqué)"
 msgstr "Spy? (risky)"
 
-#: src/menu/werewolf.c:1647
+#: src/menu/werewolf.c:1648
 msgid "Fais semblant (1/2)"
 msgstr "Pretend (1/2)"
 
-#: src/menu/werewolf.c:1647
+#: src/menu/werewolf.c:1648
 msgid "Fais semblant (2/2)"
 msgstr "Pretend (2/2)"
 
-#: src/menu/werewolf.c:1649
+#: src/menu/werewolf.c:1650
 msgid "Empoisonner ?"
 msgstr "Poison?"
 
-#: src/menu/werewolf.c:1649
+#: src/menu/werewolf.c:1650
 msgid "Plus de poison"
 msgstr "No more poison"
 
-#: src/menu/werewolf.c:1651
+#: src/menu/werewolf.c:1652
 msgid "Victime : %s"
 msgstr "Victim: %s"
 
-#: src/menu/werewolf.c:1654
+#: src/menu/werewolf.c:1655
 msgid "Pas de victime"
 msgstr "No victim"
 
-#: src/menu/werewolf.c:1656
+#: src/menu/werewolf.c:1657
 msgid "Qui sera capitaine ?"
 msgstr "Who is captain?"
 
-#: src/menu/werewolf.c:1657
+#: src/menu/werewolf.c:1658
 msgid "Qui éliminer ?"
 msgstr "Who goes out?"
 
-#: src/menu/werewolf.c:1658
+#: src/menu/werewolf.c:1659
 msgid "2e vote : qui éliminer ?"
 msgstr "2nd vote: who goes out?"
 
-#: src/menu/werewolf.c:1659
+#: src/menu/werewolf.c:1660
 msgid "Égalité : qui éliminer ?"
 msgstr "Tie: who goes out?"
 
-#: src/menu/werewolf.c:1660
+#: src/menu/werewolf.c:1661
 msgid "Qui emporter ?"
 msgstr "Who to take?"
 
-#: src/menu/werewolf.c:1661
+#: src/menu/werewolf.c:1662
 msgid "Ton successeur ?"
 msgstr "Your successor?"
 
-#: src/menu/werewolf.c:1679
+#: src/menu/werewolf.c:1680
 msgid "Flancs : choix  D : valider"
 msgstr "Sides: choice  R: OK"
 
-#: src/menu/werewolf.c:1681
-#: src/menu/werewolf.c:1726
-#: src/menu/werewolf.c:1779
+#: src/menu/werewolf.c:1682
+#: src/menu/werewolf.c:1727
+#: src/menu/werewolf.c:1780
 msgid "Envoi..."
 msgstr "Sending..."
 
-#: src/menu/werewolf.c:1682
+#: src/menu/werewolf.c:1683
 msgid "Choix reçu"
 msgstr "Received"
 
-#: src/menu/werewolf.c:1682
+#: src/menu/werewolf.c:1683
 msgid "Choix reçu  D : changer"
 msgstr "Received  R: change"
 
-#: src/menu/werewolf.c:1689
+#: src/menu/werewolf.c:1690
 msgid ""
 "Le chasseur %s\n"
 "choisit sa cible..."
@@ -5781,7 +5836,7 @@ msgstr ""
 "The hunter %s\n"
 "chooses a target..."
 
-#: src/menu/werewolf.c:1691
+#: src/menu/werewolf.c:1692
 msgid ""
 "Le capitaine %s\n"
 "choisit son successeur..."
@@ -5789,7 +5844,7 @@ msgstr ""
 "The captain %s\n"
 "chooses a successor..."
 
-#: src/menu/werewolf.c:1693
+#: src/menu/werewolf.c:1694
 msgid ""
 "Égalité : le capitaine\n"
 "%s tranche..."
@@ -5797,7 +5852,7 @@ msgstr ""
 "Tie: the captain\n"
 "%s decides..."
 
-#: src/menu/werewolf.c:1701
+#: src/menu/werewolf.c:1702
 msgid ""
 "Partie arrêtée\n"
 "par le meneur"
@@ -5805,12 +5860,12 @@ msgstr ""
 "Game stopped\n"
 "by the narrator"
 
-#: src/menu/werewolf.c:1702
-#: src/menu/werewolf.c:1859
+#: src/menu/werewolf.c:1703
+#: src/menu/werewolf.c:1861
 msgid "G long : quitter"
 msgstr "Hold L: quit"
 
-#: src/menu/werewolf.c:1707
+#: src/menu/werewolf.c:1708
 msgid ""
 "La partie\n"
 "commence..."
@@ -5818,39 +5873,39 @@ msgstr ""
 "The game\n"
 "starts..."
 
-#: src/menu/werewolf.c:1714
+#: src/menu/werewolf.c:1715
 msgid "Carte en attente..."
 msgstr "Waiting for card..."
 
-#: src/menu/werewolf.c:1720
+#: src/menu/werewolf.c:1721
 msgid "Avec toi :"
 msgstr "With you:"
 
-#: src/menu/werewolf.c:1726
+#: src/menu/werewolf.c:1727
 msgid "Compris, reçu"
 msgstr "OK, received"
 
-#: src/menu/werewolf.c:1727
+#: src/menu/werewolf.c:1728
 msgid "Cache l'écran !  D : compris"
 msgstr "Hide the screen!  R: got it"
 
-#: src/menu/werewolf.c:1739
+#: src/menu/werewolf.c:1740
 msgid "G : menu  D long : carte"
 msgstr "L: menu  hold R: card"
 
-#: src/menu/werewolf.c:1739
+#: src/menu/werewolf.c:1740
 msgid "Meneur hors de portée !"
 msgstr "Narrator out of range!"
 
-#: src/menu/werewolf.c:1743
+#: src/menu/werewolf.c:1744
 msgid "Tu es mort(e)   %s"
 msgstr "You are dead   %s"
 
-#: src/menu/werewolf.c:1747
+#: src/menu/werewolf.c:1748
 msgid "Tu es mort(e)"
 msgstr "You are dead"
 
-#: src/menu/werewolf.c:1748
+#: src/menu/werewolf.c:1749
 msgid ""
 "Chut ! Tu ne joues plus,\n"
 "mais tu suis la partie."
@@ -5858,23 +5913,23 @@ msgstr ""
 "Hush! You are out,\n"
 "but follow the game."
 
-#: src/menu/werewolf.c:1761
+#: src/menu/werewolf.c:1762
 msgid "Débattez !"
 msgstr "Debate!"
 
-#: src/menu/werewolf.c:1763
+#: src/menu/werewolf.c:1764
 msgid "%d joueurs en vie"
 msgstr "%d players alive"
 
-#: src/menu/werewolf.c:1766
+#: src/menu/werewolf.c:1767
 msgid "Capitaine : %s"
 msgstr "Captain: %s"
 
-#: src/menu/werewolf.c:1769
+#: src/menu/werewolf.c:1770
 msgid "Le vote suit."
 msgstr "Vote next."
 
-#: src/menu/werewolf.c:1773
+#: src/menu/werewolf.c:1774
 msgid ""
 "Ton amoureux(se) :\n"
 "%s"
@@ -5882,7 +5937,7 @@ msgstr ""
 "Your lover:\n"
 "%s"
 
-#: src/menu/werewolf.c:1775
+#: src/menu/werewolf.c:1776
 msgid ""
 "Les amoureux\n"
 "se reconnaissent..."
@@ -5890,67 +5945,71 @@ msgstr ""
 "The lovers\n"
 "see each other..."
 
-#: src/menu/werewolf.c:1779
+#: src/menu/werewolf.c:1780
 msgid "D : vu"
 msgstr "R: OK"
 
-#: src/menu/werewolf.c:1779
+#: src/menu/werewolf.c:1780
 msgid "Vu, reçu"
 msgstr "Seen, OK"
 
-#: src/menu/werewolf.c:1794
+#: src/menu/werewolf.c:1795
 msgid "Les cartes"
 msgstr "The cards"
 
-#: src/menu/werewolf.c:1805
+#: src/menu/werewolf.c:1806
 msgid "tir à la corde"
 msgstr "tug of war"
 
-#: src/menu/werewolf.c:1806
+#: src/menu/werewolf.c:1807
 msgid "un autre jeu"
 msgstr "another game"
 
-#: src/menu/werewolf.c:1816
+#: src/menu/werewolf.c:1817
 msgid "Une partie de %s est en cours : quitte-la d'abord."
 msgstr "A game of %s is in progress: leave it first."
 
-#: src/menu/werewolf.c:1818
+#: src/menu/werewolf.c:1819
 msgid "Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge."
 msgstr "A narrator (not playing) and 8 to 18 players, each with a badge."
 
-#: src/menu/werewolf.c:1826
+#: src/menu/werewolf.c:1827
 msgid "Flancs : ligne  D : changer"
 msgstr "Sides: row  R: change"
 
-#: src/menu/werewolf.c:1826
+#: src/menu/werewolf.c:1827
 msgid "Selon la règle du jeu"
 msgstr "As in the game rules"
 
-#: src/menu/werewolf.c:1829
+#: src/menu/werewolf.c:1830
 msgid "Partie ouverte"
 msgstr "Open game"
 
-#: src/menu/werewolf.c:1831
-msgid "%d joueur%s (%d à %d), %d loups"
-msgstr "%d player%s (%d-%d), %d wolves"
+#: src/menu/werewolf.c:1832
+msgid "%d joueurs (%d à %d), %d loups"
+msgstr "%d players (%d-%d), %d wolves"
 
-#: src/menu/werewolf.c:1836
+#: src/menu/werewolf.c:1833
+msgid "%d joueur (%d à %d), %d loups"
+msgstr "%d player (%d-%d), %d wolves"
+
+#: src/menu/werewolf.c:1838
 msgid "Test : des robots complètent"
 msgstr "Test: robots fill in"
 
-#: src/menu/werewolf.c:1841
+#: src/menu/werewolf.c:1843
 msgid "Les joueurs : Jeux multi > Loup-garou > Rejoindre."
 msgstr "Players: Multiplayer > Werewolf > Join."
 
-#: src/menu/werewolf.c:1842
+#: src/menu/werewolf.c:1844
 msgid "G long : annuler"
 msgstr "Hold L: cancel"
 
-#: src/menu/werewolf.c:1842
+#: src/menu/werewolf.c:1844
 msgid "G long : annuler  D : lancer"
 msgstr "Hold L: cancel  R: start"
 
-#: src/menu/werewolf.c:1851
+#: src/menu/werewolf.c:1853
 msgid ""
 "Recherche des parties...\n"
 "Le meneur doit ouvrir\n"
@@ -5960,35 +6019,39 @@ msgstr ""
 "The narrator must open\n"
 "theirs."
 
-#: src/menu/werewolf.c:1858
+#: src/menu/werewolf.c:1860
 msgid "Partie annulée"
 msgstr "Game cancelled"
 
-#: src/menu/werewolf.c:1863
-msgid "%s  %d joueur%s"
-msgstr "%s  %d player%s"
+#: src/menu/werewolf.c:1865
+msgid "%s  %d joueurs"
+msgstr "%s  %d players"
 
-#: src/menu/werewolf.c:1863
+#: src/menu/werewolf.c:1866
+msgid "%s  %d joueur"
+msgstr "%s  %d player"
+
+#: src/menu/werewolf.c:1866
 msgid "Inscription..."
 msgstr "Joining..."
 
-#: src/menu/werewolf.c:1863
+#: src/menu/werewolf.c:1866
 msgid "Inscrit(e) !"
 msgstr "Joined!"
 
-#: src/menu/werewolf.c:1868
+#: src/menu/werewolf.c:1871
 msgid "Rôles : %s."
 msgstr "Roles: %s."
 
-#: src/menu/werewolf.c:1870
+#: src/menu/werewolf.c:1873
 msgid "En attente du meneur..."
 msgstr "Waiting for narrator..."
 
-#: src/menu/werewolf.c:1871
+#: src/menu/werewolf.c:1874
 msgid "G : menu  G long : quitter"
 msgstr "L: menu  hold L: quit"
 
-#: src/menu/werewolf.c:1879
+#: src/menu/werewolf.c:1882
 msgid ""
 "Arrêter la partie\n"
 "pour tous ?"
@@ -5996,7 +6059,7 @@ msgstr ""
 "Stop the game\n"
 "for everyone?"
 
-#: src/menu/werewolf.c:1879
+#: src/menu/werewolf.c:1882
 msgid ""
 "Quitter\n"
 "la partie ?"
@@ -6004,23 +6067,23 @@ msgstr ""
 "Leave\n"
 "the game?"
 
-#: src/menu/werewolf.c:1880
+#: src/menu/werewolf.c:1883
 msgid "G : non  D : oui"
 msgstr "L: no  R: yes"
 
-#: src/menu/werewolf.c:2208
+#: src/menu/werewolf.c:2211
 msgid "8 joueurs minimum"
 msgstr "8 players minimum"
 
-#: src/menu/werewolf.c:2208
+#: src/menu/werewolf.c:2211
 msgid "Petites parties (4+)"
 msgstr "Small games (4+)"
 
-#: src/menu/werewolf.c:2209
+#: src/menu/werewolf.c:2212
 msgid "Test : robots"
 msgstr "Test: robots"
 
-#: src/menu/werewolf.c:2211
+#: src/menu/werewolf.c:2214
 msgid ""
 "La règle du jeu :\n"
 "de 8 à 18 joueurs."
@@ -6028,7 +6091,7 @@ msgstr ""
 "The game rules:\n"
 "8 to 18 players."
 
-#: src/menu/werewolf.c:2212
+#: src/menu/werewolf.c:2215
 msgid ""
 "Dès 4 joueurs, avec\n"
 "1 loup-garou sous 8."
@@ -6036,7 +6099,7 @@ msgstr ""
 "From 4 players, with\n"
 "1 werewolf below 8."
 
-#: src/menu/werewolf.c:2213
+#: src/menu/werewolf.c:2216
 msgid ""
 "Dès 1 joueur : des robots\n"
 "complètent jusqu'à 8."
@@ -6044,12 +6107,12 @@ msgstr ""
 "From 1 player: robots\n"
 "fill in up to 8."
 
-#: src/menu/werewolf.c:2245
-#: src/menu/werewolf.c:2252
+#: src/menu/werewolf.c:2248
+#: src/menu/werewolf.c:2255
 msgid "Loup-garou (admin)"
 msgstr "Werewolf (admin)"
 
-#: src/menu/werewolf.c:2248
+#: src/menu/werewolf.c:2251
 msgid "Flancs : choisir  D : valider"
 msgstr "Sides: choose  R: OK"
 
@@ -6194,3 +6257,51 @@ msgstr "Invalid .EPV file"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Video format not supported"
+
+#~ msgid "%u rencontre%s : %u XP"
+#~ msgstr "%u meeting%s: %u XP"
+
+#~ msgid "%s  %u joueur%s"
+#~ msgstr "%s  %u player%s"
+
+#~ msgid "Encore %d défi%s à résoudre."
+#~ msgstr "%d challenge%s left to solve."
+
+#~ msgid "Taquin : %u coup%s"
+#~ msgstr "Puzzle: %u move%s"
+
+#~ msgid "Gagné en %d essai%s !"
+#~ msgstr "Won in %d attempt%s!"
+
+#~ msgid "%u mot%s"
+#~ msgstr "%u word%s"
+
+#~ msgid "Record : %u essai%s"
+#~ msgstr "Record: %u attempt%s"
+
+#~ msgid "Record : %u mot%s d'affilée"
+#~ msgstr "Record: %u word%s in a row"
+
+#~ msgid "x%d  %s  %u doublon%s"
+#~ msgstr "x%d  %s  %u doubloon%s"
+
+#~ msgid "Cale : %d marchandise%s"
+#~ msgstr "Hold: %d item%s"
+
+#~ msgid "%u doublon%s"
+#~ msgstr "%u doubloon%s"
+
+#~ msgid "%d cigale%s"
+#~ msgstr "%d cicada%s"
+
+#~ msgid "%d joueur%s"
+#~ msgstr "%d player%s"
+
+#~ msgid "Toi : %u traction%s"
+#~ msgstr "You: %u pull%s"
+
+#~ msgid "%d joueur%s (%d à %d), %d loups"
+#~ msgstr "%d player%s (%d-%d), %d wolves"
+
+#~ msgid "%s  %d joueur%s"
+#~ msgstr "%s  %d player%s"

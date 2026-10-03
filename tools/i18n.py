@@ -31,7 +31,7 @@ SOURCE_LANG = ('fr', 'Français')
 EXTRA_DIRS = ('audio', 'video')  # Modules outside src/menu whose messages are shown (wav_message()...)
 
 # Characters of the fonts of the badge (src/gfx/gen_fonts.py): ASCII, the accented letters and a few symbols
-FONT_EXTRA = 'àâçéèêëîïôùûüÀÉÈÊÇ'
+FONT_EXTRA = 'àâçéèêëîïôùûüÀÉÈÊÇáíóúìòäöñÁÍÓÚÌÒÙÄÖÜÑß¿¡°'  # src/gfx/gen_fonts.py: COMPOSED and SPECIAL
 
 MARK = re.compile(r'(?<![A-Za-z0-9_])(N_|_)\(\s*"')
 FORMAT = re.compile(r'%[-+ #0]*(\d+|\*)?(\.(\d+|\*))?(hh|h|ll|l|z|j|t)?[diouxXcspfeEgG%]')

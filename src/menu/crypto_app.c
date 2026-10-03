@@ -228,8 +228,8 @@ static void crypto_render(uint8_t *fb, absolute_time_t now) {
             ui_lines(fb, 50, &gfx_font_small, N_("Tous les défis sont résolus :"));
             ui_lines(fb, 80, &gfx_font_small, flag);
         } else {
-            snprintf(text, sizeof(text), _("Encore %d défi%s à résoudre."), crypto_ctf_count() - n_solved(),
-                     crypto_ctf_count() - n_solved() > 1 ? "s" : "");
+            snprintf(text, sizeof(text), crypto_ctf_count() - n_solved() > 1 ? _("Encore %d défis à résoudre.")
+                                         : _("Encore %d défi à résoudre."), crypto_ctf_count() - n_solved());
             ui_lines(fb, 60, &gfx_font_small, text);
         }
         ui_footer(fb, N_("G : retour"));

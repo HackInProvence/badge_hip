@@ -594,7 +594,8 @@ static int min_players(void) {
 }
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, _("%s  %u joueur%s"), found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
+    snprintf(buf, len, found[i].players > 1 ? _("%s  %u joueurs")
+                       : _("%s  %u joueur"), found[i].name, found[i].players);
 }
 
 static void home_label(int i, char *buf, size_t len) {

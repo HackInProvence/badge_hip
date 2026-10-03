@@ -302,7 +302,8 @@ void tug_service(absolute_time_t now) {
 /* ------ The page ------ */
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, _("%s  %u joueur%s"), found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
+    snprintf(buf, len, found[i].players > 1 ? _("%s  %u joueurs")
+                       : _("%s  %u joueur"), found[i].name, found[i].players);
 }
 
 static void home_label(int i, char *buf, size_t len) {
@@ -477,7 +478,7 @@ static void render_lobby(uint8_t *fb) {
     switch (party_state()) {
     case PARTY_HOSTING:
         ui_title(fb, N_("Ta partie"));
-        snprintf(text, sizeof(text), _("%d joueur%s"), n_lobby, n_lobby > 1 ? "s" : "");
+        snprintf(text, sizeof(text), n_lobby > 1 ? _("%d joueurs") : _("%d joueur"), n_lobby);
         ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text
                  : N_("Il faut 2 joueurs au moins."));
         draw_names(fb, UI_TITLE_H + 24, (const char (*)[9])list, n_lobby);
@@ -586,7 +587,7 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
         if (referee)
             snprintf(text, sizeof(text), N_("Arbitre"));
         else
-            snprintf(text, sizeof(text), _("Toi : %u traction%s"), my_pulls, my_pulls > 1 ? "s" : "");
+            snprintf(text, sizeof(text), my_pulls > 1 ? _("Toi : %u tractions") : _("Toi : %u traction"), my_pulls);
         ui_lines(fb, 150, &gfx_font_small, text);
         ui_footer(fb, phase == PH_FINAL ? N_("Décompte final...") : referee ? N_("Regarde la corde")
                   : N_("G puis D, vite !"));
