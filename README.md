@@ -19,6 +19,7 @@
 |---|---|---|
 | Utiliser le badge (menus, jeux, médias, carte SD) | [Guide utilisateur](docs/fr/guide_utilisateur.md) | [User guide](docs/en/user_guide.md) |
 | Développer (architecture, mécanismes, formats, protocole USB, tests) | [Guide développeur](docs/fr/guide_developpeur.md) | [Developer guide](docs/en/developer_guide.md) |
+| Installer la chaîne de compilation sur macOS (pas à pas, dépannage) | [Installation macOS](docs/fr/installation_macos.md) | [macOS install](docs/en/macos_install.md) |
 
 Autres documents :
 - [lecture rapide PVSR](docs/pvsr.md) ;

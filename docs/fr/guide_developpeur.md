@@ -40,8 +40,9 @@ Points d'attention :
 
 ## 2. Compiler et flasher
 
-Pré-requis : le Pico SDK 2.x (par l'extension VS Code « Raspberry Pi Pico » ou `pico_setup.sh`, voir le README),
-Python 3 avec Pillow (conversion des images à la compilation).
+Pré-requis : le Pico SDK 2.2 ou plus (`src/badge_secsea.h` utilise `pico_board_cmake_set`), par l'extension VS Code
+« Raspberry Pi Pico » ou `pico_setup.sh` (voir le README), Python 3 avec Pillow (conversion des images à la
+compilation). Sur macOS : pas à pas et pièges dans [installation_macos.md](installation_macos.md).
 
 ```bash
 mkdir build && cd build
@@ -54,7 +55,8 @@ Sous Windows, si `python3` n'est que l'alias du Microsoft Store, préciser l'int
 
 Pour flasher :
 - **avec picotool**, badge allumé et branché : `picotool load -f -x build/src/menu/badge_menu.uf2`
-  (`-f` redémarre le badge en mode flash, `-x` lance l'application) ;
+  (`-f` redémarre le badge en mode flash, `-x` lance l'application) ; si picotool ne retrouve pas le badge après le
+  redémarrage (fréquent sur macOS), `picotool reboot -f -u` puis copier le `.uf2` comme ci-dessous ;
 - **sans picotool** : maintenir BOOTLOADER en branchant le badge, puis copier le `.uf2` sur le disque « RPI-RP2 » qui apparaît.
 
 Autres exécutables : les applications de test de chaque module (`src/tests/*.c`, cibles `test_screen`, `test_radio`...).

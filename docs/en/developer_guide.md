@@ -40,8 +40,9 @@ Things to watch out for:
 
 ## 2. Building and flashing
 
-Prerequisites: Pico SDK 2.x (through the "Raspberry Pi Pico" VS Code extension or `pico_setup.sh`, see the README),
-Python 3 with Pillow (images are converted at build time).
+Prerequisites: Pico SDK 2.2 or later (`src/badge_secsea.h` uses `pico_board_cmake_set`), through the "Raspberry Pi
+Pico" VS Code extension or `pico_setup.sh` (see the README), Python 3 with Pillow (images are converted at build
+time). On macOS: step by step and pitfalls in [macos_install.md](macos_install.md).
 
 ```bash
 mkdir build && cd build
@@ -54,7 +55,8 @@ On Windows, if `python3` is only the Microsoft Store alias, point CMake to the i
 
 To flash:
 - **with picotool**, badge switched on and plugged in: `picotool load -f -x build/src/menu/badge_menu.uf2`
-  (`-f` reboots the badge into flash mode, `-x` starts the application);
+  (`-f` reboots the badge into flash mode, `-x` starts the application); if picotool does not find the badge again
+  after the reboot (frequent on macOS), `picotool reboot -f -u` then copy the `.uf2` as below;
 - **without picotool**: hold BOOTLOADER while plugging in the badge, then copy the `.uf2` to the "RPI-RP2" drive that shows up.
 
 Other executables: the per-module test applications (`src/tests/*.c`, targets `test_screen`, `test_radio`...).
