@@ -557,7 +557,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfer (2), block, 48 bytes (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | song, kind, session (2), ms (4), voices (§ 6.15) |
 | 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, time 1 (2), time 2 (2), brightness %, TTL, origin (4); sent 5 times (§ 6.22) |
-| 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), part, number of parts, at most 48 bytes; the whole 3 times (§ 6.23) |
+| 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), part, number of parts \| 0x80, TTL, origin (4), at most 46 bytes, relayed part by part (`relay.c`); the older format (number of parts without 0x80, 48 bytes, no TTL) is still received; the whole 3 times (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, then `tug.c`, `assassin.c`, `werewolf.c` | game, session (2), kind, recipient (4, 0 = everybody), at most 47 bytes (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | number (`P` key) |
 

@@ -88,9 +88,7 @@ static void handle_leds(const net_packet_t *p) {
         uint8_t again[PACKET_LEN_RELAY];
         memcpy(again, d, PACKET_LEN_RELAY);
         again[11] = d[11] ? d[11] - 1 : 0;
-        uint32_t key = 0x811C9DC5u;  /* The kind: the order itself (mode, color, times, brightness) */
-        for (int i = 2; i < 11; ++i)
-            key = (key ^ d[i]) * 0x01000193u;
+        uint32_t key = relay_hash(0x811C9DC5u, d + 2, 9);  /* The kind: the order (mode, color, times, brightness) */
         relay_offer(NET_LEDS, again, PACKET_LEN_RELAY, p->src, origin, nonce, key, d[11], p->at);
     }
     if (origin == last_src && nonce == last_nonce)

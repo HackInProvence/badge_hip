@@ -509,6 +509,7 @@ utilisé par qFlipper.
 | `--no-send` | écrit seulement les fichiers (à envoyer à la main : Sub-GHz > Saved) |
 | `--dry-run` | affiche seulement les prévisions et le texte |
 | `--id N` | identifiant de l'émetteur (défaut `0x5EC5EA27`) |
+| `--ttl N` | sauts du relais par les cigales, 0 à 4 (défaut 2 ; 0 : ancien format, pour des badges d'un firmware plus ancien) |
 
 ```bash
 python tools/flipper_weather.py "La Ciotat"

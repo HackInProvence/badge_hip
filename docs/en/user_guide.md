@@ -534,7 +534,8 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
 The organizers can send commands to all the badges in the room, from a badge in admin mode or from a Flipper Zero.
 The badge shows the command received at the bottom of the screen.
 
-**Relay from cicada to cicada**: a command of an admin badge (and an order of the cicada LEDs) carries a number of
+**Relay from cicada to cicada**: a command of an admin badge (like an order of the cicada LEDs and an announcement, part
+by part; never the exchanges between cicadas: games, contacts, messages, votes) carries a number of
 hops (Admin > Radio commands > "Relay: 2 hop(s)" by default, from 0 to 4). Each cicada that receives it sends it
 again once, after a random delay (0.1 to 0.9 s), with one hop less: the whole conference hears it, even far from
 the admin badge. It does not relay it when it heard 2 other cicadas relay it during that delay (the place is

@@ -522,7 +522,8 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 Les organisateurs peuvent envoyer des commandes à tous les badges de la salle, depuis un badge en mode admin
 ou depuis un Flipper Zero. Le badge affiche la commande reçue en bas de l'écran.
 
-**Relais de cigale en cigale** : une commande d'un badge admin (et un ordre des LEDs des cigales) porte un nombre de
+**Relais de cigale en cigale** : une commande d'un badge admin (comme un ordre des LEDs des cigales et une annonce, morceau
+par morceau ; jamais les échanges entre cigales : jeux, contacts, messages, votes) porte un nombre de
 sauts (Admin > Commandes radio > « Relais : 2 saut(s) » par défaut, de 0 à 4). Chaque cigale qui la reçoit la
 ré-émet une fois, après un délai aléatoire (0,1 à 0,9 s), avec un saut de moins : toute la conférence l'entend, même
 loin du badge admin. Elle ne la relaie pas si elle a entendu 2 autres cigales la relayer pendant ce délai (l'endroit

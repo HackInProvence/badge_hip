@@ -14,7 +14,7 @@
 #include "relay.h"
 #include "store.h"
 
-#define PENDING 4  /* Messages waiting for their relay */
+#define PENDING 8  /* Messages waiting for their relay (the parts of an announcement: 5 at most) */
 #define DONE 8  /* Kinds of message relayed recently */
 #define PENDING_GIVE_UP_MS 3000  /* The network stayed busy: dropped */
 
@@ -24,7 +24,7 @@ typedef struct {
     uint8_t data[RELAY_DATA_MAX];
     uint8_t len;
     uint32_t origin;
-    uint16_t nonce;
+    uint32_t id;
     uint32_t key;
     uint8_t copies;  /* Relays of the same message heard from other cicadas while waiting */
     absolute_time_t at, give_up;
@@ -48,13 +48,19 @@ static bool relayed_recently(uint8_t type, uint32_t key, absolute_time_t now) {
     return false;
 }
 
-void relay_offer(uint8_t type, const uint8_t *data, int len, uint32_t src, uint32_t origin, uint16_t nonce,
+uint32_t relay_hash(uint32_t h, const uint8_t *data, int len) {
+    for (int i = 0; i < len; ++i)
+        h = (h ^ data[i]) * 0x01000193u;
+    return h;
+}
+
+void relay_offer(uint8_t type, const uint8_t *data, int len, uint32_t src, uint32_t origin, uint32_t id,
                  uint32_t key, uint8_t ttl, absolute_time_t now) {
     if (origin == net_id())
         return;  /* Our own message, coming back */
     /* A copy of a message waiting for its relay: another cicada relayed it */
     for (int i = 0; i < PENDING; ++i)
-        if (pending[i].used && pending[i].origin == origin && pending[i].nonce == nonce) {
+        if (pending[i].used && pending[i].type == type && pending[i].origin == origin && pending[i].id == id) {
             if (src != origin)
                 ++pending[i].copies;
             return;
@@ -70,7 +76,7 @@ void relay_offer(uint8_t type, const uint8_t *data, int len, uint32_t src, uint3
         memcpy(p->data, data, len);
         p->len = len;
         p->origin = origin;
-        p->nonce = nonce;
+        p->id = id;
         p->key = key;
         p->copies = 0;
         uint32_t delay = RELAY_DELAY_MIN_MS + get_rand_32() % (RELAY_DELAY_MAX_MS - RELAY_DELAY_MIN_MS + 1);

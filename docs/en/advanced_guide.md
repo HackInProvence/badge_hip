@@ -510,6 +510,7 @@ qFlipper.
 | `--no-send` | only writes the files (to send by hand: Sub-GHz > Saved) |
 | `--dry-run` | only shows the forecast and the text |
 | `--id N` | id of the sender (default `0x5EC5EA27`) |
+| `--ttl N` | hops of the relay by the cicadas, 0 to 4 (default 2; 0: older format, for badges of an older firmware) |
 
 ```bash
 python tools/flipper_weather.py "La Ciotat"

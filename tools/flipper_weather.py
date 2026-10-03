@@ -42,7 +42,9 @@ import flipper_net_sub as fns  # noqa: E402
 import i18n  # noqa: E402  (the characters of the fonts of the badge)
 
 NET_ANNOUNCE = 0x0D
-PART = 48  # Bytes of an announcement per packet (announce.c)
+PART = 46  # Bytes of an announcement per packet, with the relay (announce.c)
+PART_OLD = 48  # The older format, without relay (--ttl 0: for the badges of an older firmware)
+RELAYED = 0x80  # In the byte of the parts: the format with the TTL and the origin
 MAX_PARTS = 5
 TEXT_MAX = 111  # store_announce_t.text: 112 bytes with the final 0
 QR_MAX = 63
@@ -152,16 +154,22 @@ def messages(place, data, lang, days):
     return hhmm, text, qr
 
 
-def announcement_packets(hhmm, text, qr, sender):
-    """The NET_ANNOUNCE packets: "time\\0text\\0<type>qr\\0" in parts of 48 bytes, one nonce."""
+def announcement_packets(hhmm, text, qr, sender, ttl=2):
+    """The NET_ANNOUNCE packets: "time\\0text\\0<type>qr\\0" in parts, one nonce. With a TTL: parts of 46 bytes,
+    [nonce 2][part][parts | 0x80][TTL][origin 4], relayed TTL times by the cicadas; ttl 0: the older format (parts of
+    48 bytes, no relay), for the badges of an older firmware."""
     body = hhmm.encode() + b'\0' + text.encode('utf-8') + b'\0' + bytes([QR_TEXT if qr else QR_NONE]) + \
         qr.encode() + b'\0'
-    parts = [body[i:i + PART] for i in range(0, len(body), PART)]
+    size = PART if ttl else PART_OLD
+    parts = [body[i:i + size] for i in range(0, len(body), size)]
     if len(parts) > MAX_PARTS:
         sys.exit('announcement too long')
     nonce = random.randrange(65536)
     ids = [(sender >> (8 * i)) & 0xFF for i in range(4)]
-    return [[fns.MAGIC, NET_ANNOUNCE] + ids + [nonce & 0xFF, nonce >> 8, k, len(parts)] + list(p)
+    if not ttl:
+        return [[fns.MAGIC, NET_ANNOUNCE] + ids + [nonce & 0xFF, nonce >> 8, k, len(parts)] + list(p)
+                for k, p in enumerate(parts)]
+    return [[fns.MAGIC, NET_ANNOUNCE] + ids + [nonce & 0xFF, nonce >> 8, k, len(parts) | RELAYED, ttl] + ids + list(p)
             for k, p in enumerate(parts)]
 
 
@@ -221,6 +229,8 @@ def main():
     parser.add_argument('--days', type=int, default=4, help='days in the QR code, from tomorrow (4)')
     parser.add_argument('--rounds', type=int, default=4, help='times each part is sent (4; 3 packets each time)')
     parser.add_argument('--id', type=lambda v: int(v, 0), default=0x5EC5EA27, help='sender id (4 bytes)')
+    parser.add_argument('--ttl', type=int, default=2, choices=range(0, 5),
+                        help='hops of the relay by the cicadas (default 2; 0: older format, no relay)')
     parser.add_argument('--port', default=None, help='serial port of the Flipper (found by itself)')
     parser.add_argument('-o', '--output', default=None, help='also writes the .sub file here')
     parser.add_argument('--no-send', action='store_true', help='only write the .sub file (-o)')
@@ -235,7 +245,7 @@ def main():
     print('QR code: ' + (qr.replace('\n', ' | ') if qr else '(none)'))
     if args.dry_run:
         return
-    packets = announcement_packets(hhmm, text, qr, args.id)
+    packets = announcement_packets(hhmm, text, qr, args.id, args.ttl)
     # One small file per part (its packet PART_REPEATS times): the Flipper plays the long RAW files badly (the long
     # packets were lost), the short ones well; the badges put the parts together, whatever the order
     base = args.output or os.path.join(HERE, '..', 'build', 'flipper', 'secsea_meteo.sub')

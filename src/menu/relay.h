@@ -8,8 +8,10 @@
  * \brief Relay of the messages of an admin badge (remote commands, LEDs of the cicadas) from cicada to cicada, so
  * that a whole conference hears them even out of reach of the admin badge.
  *
+ * The admin messages relayed: the remote commands, the LEDs of the cicadas, the announcements (each part); never the
+ * messages between cicadas (games, contacts, messages, votes...).
  * The admin message carries a TTL (number of hops still allowed, Admin > Commandes radio: "Relais") and its origin
- * (the id of the admin badge: the duplicates are found by origin + nonce, whoever relays them). A cicada that
+ * (the id of the admin badge: the duplicates are found by origin + message id, whoever relays them). A cicada that
  * receives it with a TTL above 0 sends it again once with TTL - 1, after a random delay (RELAY_DELAY_MIN_MS to
  * RELAY_DELAY_MAX_MS), unless:
  * - during that delay it heard RELAY_ENOUGH_COPIES relays of the same message by other cicadas (the place is
@@ -32,16 +34,20 @@
 #define RELAY_DELAY_MAX_MS 900
 #define RELAY_ENOUGH_COPIES 2
 #define RELAY_SAME_MS 10000
-#define RELAY_DATA_MAX 24
+#define RELAY_DATA_MAX 55  /* NET_MAX_DATA */
 
 /** \brief An admin message received (each copy, including the duplicates).
  * \param type the packet type (NET_COMMAND, NET_LEDS)
  * \param data the data to relay, its TTL already decremented by the caller
  * \param src the sender of this copy (the admin badge or a relay), \p origin the admin badge
- * \param key what makes two messages "the same kind" (the command, a hash of the LEDs order)
+ * \param id the message: its nonce (and the part of an announcement: nonce | part << 16)
+ * \param key what makes two messages "the same kind" (the command, a hash of the LEDs order or of the part)
  * \param ttl the TTL received (0: not relayed) */
-void relay_offer(uint8_t type, const uint8_t *data, int len, uint32_t src, uint32_t origin, uint16_t nonce,
+void relay_offer(uint8_t type, const uint8_t *data, int len, uint32_t src, uint32_t origin, uint32_t id,
                  uint32_t key, uint8_t ttl, absolute_time_t now);
+
+/** \brief FNV-1a hash of bytes (the key of a message), from \p h (0x811C9DC5 to start). */
+uint32_t relay_hash(uint32_t h, const uint8_t *data, int len);
 
 /** \brief Sends the relays that are due, to call in the main loop. */
 void relay_task(absolute_time_t now);

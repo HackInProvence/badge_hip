@@ -556,7 +556,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x0A | `NET_IMAGE` | `image_radio.c` | transfert (2), bloc, 48 octets (§ 6.17) |
 | 0x0B | `NET_SONG` | `chorus.c` | morceau, genre, session (2), ms (4), voix (§ 6.15) |
 | 0x0C | `NET_LEDS` | `ledcast.c` | nonce (2), mode, R, G, B, durée 1 (2), durée 2 (2), luminosité %, TTL, origine (4) ; envoyé 5 fois (§ 6.22) |
-| 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux, 48 octets au plus ; le tout 3 fois (§ 6.23) |
+| 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux \| 0x80, TTL, origine (4), 46 octets au plus, relayé morceau par morceau (`relay.c`) ; l'ancien format (nombre de morceaux sans 0x80, 48 octets, pas de TTL) est encore reçu ; le tout 3 fois (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, puis `tug.c`, `assassin.c`, `werewolf.c` | jeu, session (2), genre, destinataire (4, 0 = tous), 47 octets au plus (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |
 

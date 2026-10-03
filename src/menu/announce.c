@@ -6,8 +6,10 @@
 /* Announcements (coffee break, next talk...): written on an admin badge (Admin > Annonces: 6 of them, editable,
  * saved in the store), sent to all the cicadas which build the screen from what they received: the time, the text,
  * a QR code made from a content and a standard type (URL, text, phone, SMS, e-mail, Wi-Fi, position).
- * NET_ANNOUNCE [nonce 2][part][parts][up to 48 bytes]: the announcement "time\0text\0<type>qr\0" cut in parts, the
- * whole sent 3 times; the cicadas keep the last 5 (Social > Annonces). */
+ * NET_ANNOUNCE [nonce 2][part][parts | 0x80][TTL][origin 4][up to 46 bytes]: the announcement
+ * "time\0text\0<type>qr\0" cut in parts, the whole sent 3 times, each part relayed by the cicadas (relay.h); the
+ * cicadas keep the last 5 (Social > Annonces). The older format [nonce 2][part][parts][up to 48 bytes] (no relay) is
+ * still received; the older firmwares reject the new one (parts over MAX_PARTS) rather than mix the parts. */
 
 #include <stdio.h>
 #include <string.h>
@@ -19,12 +21,16 @@
 #include "display.h"
 #include "i18n.h"
 #include "net.h"
+#include "relay.h"
 #include "score_code.h"
 #include "store.h"
 
-#define PART 48
+#define PART 46  /* With the relay: 9 bytes of header, 55 bytes at most */
+#define PART_OLD 48  /* The older format: 4 bytes of header */
+#define RELAYED 0x80  /* In the byte of the parts: the format with the TTL and the origin */
+#define HEADER 9
 #define MAX_PARTS 5
-#define SERIAL_MAX (PART * MAX_PARTS)
+#define SERIAL_MAX (PART_OLD * MAX_PARTS)
 #define ROUNDS 3
 #define PART_GAP_MS 70
 #define ROUND_GAP_MS 600
@@ -172,29 +178,41 @@ static void handle_announce(const net_packet_t *p) {
         return;
     const uint8_t *d = p->data;
     uint16_t nonce = d[0] | d[1] << 8;
-    uint8_t part = d[2], parts = d[3];
-    int n = p->len - 4;
-    if (parts == 0 || parts > MAX_PARTS || part >= parts || n > PART)
+    uint8_t part = d[2], parts = d[3] & ~RELAYED;
+    bool relayed = d[3] & RELAYED;  /* The format with the TTL and the origin */
+    int header = relayed ? HEADER : 4, size = relayed ? PART : PART_OLD;
+    int n = p->len - header;
+    if (parts == 0 || parts > MAX_PARTS || part >= parts || n < 1 || n > size)
         return;
-    if (p->src == done_src && nonce == done_nonce)
-        return;  /* Already shown (it is sent 3 times) */
-    if (p->src != rx_src || nonce != rx_nonce || parts != rx_parts) {
-        rx_src = p->src;  /* Another announcement */
+    uint32_t origin = relayed ? net_u32(d + 5) : p->src;
+    if (relayed) {
+        /* Each part is relayed by itself (in any order: the cicadas put them together) */
+        uint8_t again[HEADER + PART];
+        memcpy(again, d, p->len);
+        again[4] = d[4] ? d[4] - 1 : 0;
+        uint32_t key = relay_hash(0x811C9DC5u, d + 2, 2);  /* The kind: the part (its place and its bytes) */
+        key = relay_hash(key, d + HEADER, n);
+        relay_offer(NET_ANNOUNCE, again, p->len, p->src, origin, nonce | (uint32_t)part << 16, key, d[4], p->at);
+    }
+    if (origin == done_src && nonce == done_nonce)
+        return;  /* Already shown (it is sent 3 times, and relayed) */
+    if (origin != rx_src || nonce != rx_nonce || parts != rx_parts) {
+        rx_src = origin;  /* Another announcement */
         rx_nonce = nonce;
         rx_parts = parts;
         rx_have = 0;
         rx_len = 0;
     }
-    memcpy(rx_buf + part * PART, d + 4, n);
+    memcpy(rx_buf + part * size, d + header, n);
     if (part == parts - 1)
-        rx_len = part * PART + n;
+        rx_len = part * size + n;
     rx_have |= 1 << part;
     if (rx_have != (1 << parts) - 1 || ! rx_len)
         return;
     store_announce_t a;
     if (! deserialize(rx_buf, rx_len, &a))
         return;
-    done_src = p->src;
+    done_src = origin;
     done_nonce = nonce;
     memmove(&received[1], &received[0], sizeof(received[0]) * (HISTORY - 1));
     received[0] = a;
@@ -212,10 +230,11 @@ void announce_task(absolute_time_t now) {
     if (! tx_rounds || absolute_time_diff_us(tx_ts, now) < 0)
         return;
     int parts = (tx_len + PART - 1) / PART;
-    uint8_t d[4 + PART] = {tx_nonce, tx_nonce >> 8, tx_part, parts};
+    uint8_t d[HEADER + PART] = {tx_nonce, tx_nonce >> 8, tx_part, parts | RELAYED, relay_admin_ttl()};
+    net_put_u32(d + 5, net_id());
     int n = tx_len - tx_part * PART < PART ? tx_len - tx_part * PART : PART;
-    memcpy(d + 4, tx_buf + tx_part * PART, n);
-    if (! net_send(NET_ANNOUNCE, d, 4 + n, NET_LOUD))
+    memcpy(d + HEADER, tx_buf + tx_part * PART, n);
+    if (! net_send(NET_ANNOUNCE, d, HEADER + n, NET_LOUD))
         return;
     if (++tx_part == parts) {
         tx_part = 0;
