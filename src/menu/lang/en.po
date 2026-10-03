@@ -743,20 +743,20 @@ msgid "Rejoindre une partie"
 msgstr "Join a game"
 
 #: src/menu/assassin.c:608
+#: src/menu/ctf.c:73
 #: src/menu/tug.c:500
 #: src/menu/tug.c:535
 #: src/menu/tug.c:541
 #: src/menu/tug.c:625
-#: src/menu/tug.c:669
 msgid "Tir à la corde"
 msgstr "Tug of war"
 
 #: src/menu/assassin.c:609
+#: src/menu/ctf.c:71
 #: src/menu/tug.c:331
 #: src/menu/werewolf.c:258
 #: src/menu/werewolf.c:1580
 #: src/menu/werewolf.c:1700
-#: src/menu/werewolf.c:1706
 msgid "Loup-garou"
 msgstr "Werewolf"
 
@@ -780,7 +780,7 @@ msgstr "At least %d players needed."
 
 #: src/menu/assassin.c:816
 #: src/menu/assassin.c:821
-#: src/menu/main.c:2944
+#: src/menu/main.c:2950
 #: src/menu/smuggler.c:536
 #: src/menu/smuggler.c:553
 #: src/menu/smuggler.c:561
@@ -1145,6 +1145,7 @@ msgstr "Battery (calibration)"
 
 #: src/menu/battle.c:401
 #: src/menu/battle.c:443
+#: src/menu/ctf.c:70
 msgid "Bataille navale"
 msgstr "Battleship"
 
@@ -1415,7 +1416,7 @@ msgstr ""
 "Bring the badges close!"
 
 #: src/menu/contacts.c:352
-#: src/menu/main.c:2961
+#: src/menu/main.c:2967
 #: src/menu/pirate_radio.c:593
 #: src/menu/radio_tune.c:196
 msgid "G : arrêter"
@@ -1579,6 +1580,70 @@ msgstr "%d challenge%s left to solve."
 msgid "Défis crypto"
 msgstr "Crypto CTF"
 
+#: src/menu/ctf.c:57
+msgid "Konami"
+msgstr "Konami"
+
+#: src/menu/ctf.c:58
+#: src/menu/games.c:22
+msgid "Morpion"
+msgstr "Tic-tac-toe"
+
+#: src/menu/ctf.c:59
+#: src/menu/games.c:22
+msgid "Puissance 4"
+msgstr "Connect 4"
+
+#: src/menu/ctf.c:60
+msgid "Simon"
+msgstr "Simon"
+
+#: src/menu/ctf.c:61
+#: src/menu/games.c:22
+#: src/menu/games.c:872
+msgid "Réflexes"
+msgstr "Reflexes"
+
+#: src/menu/ctf.c:62
+msgid "Snake"
+msgstr "Snake"
+
+#: src/menu/ctf.c:63
+#: src/menu/puzzles.c:23
+#: src/menu/puzzles.c:396
+#: src/menu/puzzles_app.c:35
+msgid "Démineur"
+msgstr "Minesweeper"
+
+#: src/menu/ctf.c:64
+msgid "2048"
+msgstr "2048"
+
+#: src/menu/ctf.c:65
+#: src/menu/puzzles.c:23
+#: src/menu/puzzles_app.c:37
+msgid "Taquin"
+msgstr "15 puzzle"
+
+#: src/menu/ctf.c:66
+msgid "Sokoban"
+msgstr "Sokoban"
+
+#: src/menu/ctf.c:67
+msgid "Mastermind"
+msgstr "Mastermind"
+
+#: src/menu/ctf.c:68
+#: src/menu/puzzles.c:24
+#: src/menu/puzzles_app.c:40
+msgid "Pendu"
+msgstr "Hangman"
+
+#: src/menu/ctf.c:69
+#: src/menu/duel.c:393
+msgid "Duel"
+msgstr "Duel"
+
 #: src/menu/demo.c:28
 #: src/menu/demo.c:36
 msgid "Mode démo"
@@ -1697,9 +1762,29 @@ msgstr ""
 msgid "Flancs : choix  D : jouer"
 msgstr "Sides: choose  R: play"
 
-#: src/menu/duel.c:393
-msgid "Duel"
-msgstr "Duel"
+#: src/menu/flags_app.c:51
+msgid "Drapeaux : %d / %d"
+msgstr "Flags: %d / %d"
+
+#: src/menu/flags_app.c:54
+msgid "Flancs : choix  D : voir  G : retour"
+msgstr "Sides: choose  R: view  L: back"
+
+#: src/menu/flags_app.c:66
+msgid "Flag (à saisir dans CTFd) :"
+msgstr "Flag (type it in CTFd):"
+
+#: src/menu/flags_app.c:69
+msgid ""
+"Pas encore trouvé.\n"
+"Gagne ce défi !"
+msgstr ""
+"Not found yet.\n"
+"Win this challenge!"
+
+#: src/menu/flags_app.c:75
+msgid "Drapeaux"
+msgstr "Flags"
 
 #: src/menu/gamebook.c:138
 msgid "Livre intégré %d"
@@ -1835,19 +1920,6 @@ msgstr "R: open  L: quit"
 #: src/menu/gamebook_parse.c:619
 msgid "Continuer"
 msgstr "Continue"
-
-#: src/menu/games.c:22
-msgid "Morpion"
-msgstr "Tic-tac-toe"
-
-#: src/menu/games.c:22
-msgid "Puissance 4"
-msgstr "Connect 4"
-
-#: src/menu/games.c:22
-#: src/menu/games.c:872
-msgid "Réflexes"
-msgstr "Reflexes"
 
 #: src/menu/games.c:146
 msgid "Match nul"
@@ -2513,12 +2585,12 @@ msgstr "green"
 
 #: src/menu/main.c:515
 #: src/menu/main.c:648
-#: src/menu/main.c:2791
+#: src/menu/main.c:2797
 msgid "Images"
 msgstr "Images"
 
 #: src/menu/main.c:515
-#: src/menu/main.c:2842
+#: src/menu/main.c:2848
 msgid "Lecture rapide"
 msgstr "Speed reading"
 
@@ -2579,7 +2651,7 @@ msgstr "Cicada network: %lu pts"
 
 #: src/menu/main.c:638
 #: src/menu/main.c:1325
-#: src/menu/main.c:2941
+#: src/menu/main.c:2947
 msgid "Infrarouge"
 msgstr "Infrared"
 
@@ -3084,15 +3156,19 @@ msgstr "None yet."
 msgid "Vote ouvert : Social > Vote"
 msgstr "Vote open: Social > Vote"
 
-#: src/menu/main.c:2669
+#: src/menu/main.c:2656
+msgid "Flag trouvé : %s"
+msgstr "Flag found: %s"
+
+#: src/menu/main.c:2675
 msgid "Kof kof ! (virus des cigales)"
 msgstr "Cough cough! (cicada virus)"
 
-#: src/menu/main.c:2673
+#: src/menu/main.c:2679
 msgid "Vous êtes infecté !"
 msgstr "You are infected!"
 
-#: src/menu/main.c:2792
+#: src/menu/main.c:2798
 msgid ""
 "%s\n"
 "\n"
@@ -3104,11 +3180,11 @@ msgstr ""
 "Invalid .EPI image\n"
 "(see image2epi.py)."
 
-#: src/menu/main.c:2828
+#: src/menu/main.c:2834
 msgid "Vidéo"
 msgstr "Video"
 
-#: src/menu/main.c:2942
+#: src/menu/main.c:2948
 msgid ""
 "Enregistrement...\n"
 "\n"
@@ -3122,11 +3198,11 @@ msgstr ""
 "port) with the remote\n"
 "and press a key."
 
-#: src/menu/main.c:2958
+#: src/menu/main.c:2964
 msgid "Porteuse"
 msgstr "Carrier"
 
-#: src/menu/main.c:2959
+#: src/menu/main.c:2965
 msgid ""
 "433,92 MHz + 19 kHz\n"
 "en continu, +10 dBm\n"
@@ -3142,7 +3218,7 @@ msgstr ""
 "frequency analyzer.\n"
 "Auto stop after 30 s."
 
-#: src/menu/main.c:2963
+#: src/menu/main.c:2969
 msgid "G ou D : retour"
 msgstr "L or R: back"
 
@@ -3551,22 +3627,6 @@ msgstr "Program: %s"
 #: src/menu/program.c:97
 msgid "G : liste  Flancs : autre talk"
 msgstr "L: list  Sides: other talk"
-
-#: src/menu/puzzles.c:23
-#: src/menu/puzzles.c:396
-#: src/menu/puzzles_app.c:35
-msgid "Démineur"
-msgstr "Minesweeper"
-
-#: src/menu/puzzles.c:23
-#: src/menu/puzzles_app.c:37
-msgid "Taquin"
-msgstr "15 puzzle"
-
-#: src/menu/puzzles.c:24
-#: src/menu/puzzles_app.c:40
-msgid "Pendu"
-msgstr "Hangman"
 
 #: src/menu/puzzles.c:33
 msgid "G : menu  D : rejouer"

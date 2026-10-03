@@ -66,6 +66,7 @@ typedef enum {
     APP_WEREWOLF_ADMIN,
     APP_LANG,
     APP_BABBLE,
+    APP_FLAGS,
     APP_COUNT,
 } app_id_t;
 
