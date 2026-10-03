@@ -164,9 +164,11 @@ def main():
     parser.add_argument('--port', default=None)
     parser.add_argument('--only', default=None, help='comma separated themes (French names)')
     parser.add_argument('--lang', default='fr', help='language of the badge during the capture (fr, en...)')
+    parser.add_argument('--out', default=None, help='folder of the screenshots and checks.txt, the docs not written '
+                        '(to check the texts of a language)')
     args = parser.parse_args()
     port = args.port or find_port()
-    out = OUT if args.lang == 'fr' else os.path.join(OUT, args.lang)
+    out = args.out or (OUT if args.lang == 'fr' else os.path.join(OUT, args.lang))
     os.makedirs(out, exist_ok=True)
     badge = Badge(port)
     badge.start()
@@ -268,7 +270,7 @@ def main():
     if restore != args.lang:
         set_lang(restore)  # The language the badge had
     badge.stop()
-    write_docs(c, args.lang, out)
+    write_docs(c, args.lang, out, docs=not args.out)
 
 
 def english_names():
@@ -308,7 +310,7 @@ CAPTIONS_EN = {
 }
 
 
-def write_docs(c, lang_run, out):
+def write_docs(c, lang_run, out, docs=True):
     # The rows of the lists cut with "..." are previews (the page of the row shows it all): listed apart
     problems = [ch for ch in c.checks if ': list row cut ' not in ch]
     rows = [ch for ch in c.checks if ': list row cut ' in ch]
@@ -333,7 +335,7 @@ def write_docs(c, lang_run, out):
              'port, user and admin modes). The language is chosen in Settings > Language '
              '([translation](translation.md)).', 'Texts to fix',
              'Rows of lists shortened (previews: the page of the row shows it all)')):
-        if lang != lang_run:
+        if lang != lang_run or not docs:
             continue
         lines = [f'# {title}', '', intro, '']
         if lang == 'fr':
