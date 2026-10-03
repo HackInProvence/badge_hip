@@ -40,12 +40,12 @@ def run(cmd, **kw):
 
 # ---- C tests ----
 
-def c_test(name, sources, includes, work, copy=()):
+def c_test(name, sources, includes, work, copy=(), defines=()):
     """Compiles then runs tests/host/<name>.c, returns (ok, output)."""
     for src, dst in copy:
         shutil.copy(os.path.join(SRC, src), os.path.join(work, dst))
     exe = os.path.join(work, name + ('.exe' if os.name == 'nt' else ''))
-    cmd = [ARGS.cc] + CFLAGS + ['-I' + i for i in includes + [HERE]] + \
+    cmd = [ARGS.cc] + CFLAGS + ['-D' + d for d in defines] + ['-I' + i for i in includes + [HERE]] + \
           [os.path.join(HERE, name + '.c')] + [os.path.join(SRC, s) for s in sources] + ['-o', exe]
     r = run(cmd)
     if r.returncode:
@@ -93,6 +93,17 @@ def test_ookdec(work):
 
 def test_vcard(work):
     return c_test('test_vcard', ['menu/vcard.c'], [os.path.join(SRC, 'menu')], work)
+
+
+def test_i18n(work):
+    # The table of the translations is up to date with the code and the .po files (formats, characters of the
+    # fonts), then the lookup in every language
+    r = run([sys.executable, os.path.join(SRC, '..', 'tools', 'i18n.py'), 'check', '--show', '0'])
+    if r.returncode:
+        return False, r.stdout + r.stderr
+    ok, out = c_test('test_i18n', ['menu/i18n.c', 'menu/i18n_table.c'], [os.path.join(SRC, 'menu')], work,
+                     defines=['I18N_NO_STORE'])
+    return ok, r.stdout + out
 
 
 def test_rtttl(work):
@@ -154,7 +165,8 @@ def test_werewolf(work):
     objs.append(obj)
     exe = os.path.join(work, 'test_werewolf' + ('.exe' if os.name == 'nt' else ''))
     r = run([ARGS.cc] + CFLAGS + inc + [os.path.join(HERE, 'test_werewolf.c')] +
-            [os.path.join(SRC, s) for s in ["menu/werewolf_logic.c", "menu/werewolf_cards.c", "gfx/gfx.c", "gfx/gfx_fonts.c"]] + objs +
+            [os.path.join(SRC, s) for s in ["menu/werewolf_logic.c", "menu/werewolf_cards.c", "gfx/gfx.c", "gfx/gfx_fonts.c",
+                                            "menu/i18n.c", "menu/i18n_table.c"]] + ['-DI18N_NO_STORE'] + objs +
             ['-o', exe])
     if r.returncode:
         return False, 'compilation failed:\n' + r.stdout + r.stderr
@@ -269,7 +281,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 

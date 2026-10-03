@@ -82,6 +82,7 @@ typedef struct {
     int8_t hot_dbm;  /* Hot / cold beacon (hotcold.c): the RSSI of "BRÛLANT" set by the admin, outside -90..-40: default */
     uint8_t ww_unlock;  /* Loup-garou (werewolf.c), set in the admin menu: WW_UNLOCK_*, other values: WW_UNLOCK_RULE */
     uint8_t asleep;  /* STORE_ASLEEP: put to sleep by an admin (remote command 0x05): main.c starts in the sleep mode */
+    char lang[2];  /* Language of the texts (i18n.c): "en"...; unknown (0, 0xFF): French */
 } store_t;
 
 #define STORE_ASLEEP 0x5A

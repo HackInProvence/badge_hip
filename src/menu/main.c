@@ -58,6 +58,7 @@
 #include "party.h"
 #include "social.h"
 #include "store.h"
+#include "i18n.h"
 #include "version.h"  /* Generated at each build (version.cmake) */
 #include "video.h"
 #include "wav.h"
@@ -136,6 +137,8 @@ static int admin_request = -1;  /* The serial port asked for the admin mode on (
 
 /* Returns the buttons that were pressed since the last call (debounced rising edges), or simulated on USB
  * (keys a, b, x, y: press and release, B, X, Y: long press) */
+static bool lang_redraw = false;  /* The language changed (serial port): the page is drawn again */
+
 static uint8_t buttons_pressed(absolute_time_t now) {
     uint8_t raw = btns_get_state();
     uint8_t pressed = 0;
@@ -297,6 +300,16 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         printf("ook: debug %s\n", ook_debug ? "on" : "off");
         break;
     }
+    case 'E':
+        /* The language back to English (a badge left in a language nobody here can read) */
+        i18n_set(i18n_find("en"), true);
+        lang_redraw = true;
+        break;
+    case 'N':
+        /* Next language (screenshots of every language: tools/badge_screens.py --lang) */
+        i18n_set((i18n_current() + 1) % I18N_N_LANGS, true);
+        lang_redraw = true;
+        break;
     case '?':
         /* Debug: state of the audio */
         printf("audio: %s, played %lu samples, queued %u, volume %u/%u, music %lus/%lus\n",
@@ -697,7 +710,8 @@ static const submenu_t SUBMENUS[] = {
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
     {"Badge", 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS)}},
-    {"Réglages", 6, {M_SETTINGS, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS, M_APP(APP_RADIO_TUNE)}},
+    {"Réglages", 7, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
+                     M_APP(APP_RADIO_TUNE)}},
     {"Admin", 15, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_SMUGGLER_ADMIN),
@@ -729,6 +743,27 @@ static bool admin_sequence(uint8_t flank, absolute_time_t now) {
     admin_keys[n + 1] = 0;
     return ! strcmp(admin_keys, ADMIN_SEQUENCE);
 }
+/* Sequence of the flanks in the main menu that sets the language back to English, for a badge left in a language
+ * that the user can't read (docs: G five times to come back to the main menu, then R four times, L four times) */
+#define LANG_SEQUENCE "RRRRLLLL"
+static char lang_keys[sizeof(LANG_SEQUENCE)] = "";
+static absolute_time_t lang_keys_ts = 0;
+
+static bool lang_sequence(uint8_t flank, absolute_time_t now) {
+    size_t n = strlen(lang_keys);
+    if (n && absolute_time_diff_us(lang_keys_ts, now) > ADMIN_SEQUENCE_MS * 1000ll)
+        n = 0;  /* Too slow: start again */
+    if (n == sizeof(lang_keys) - 1) {
+        memmove(lang_keys, lang_keys + 1, n);
+        --n;
+    }
+    if (! n)
+        lang_keys_ts = now;
+    lang_keys[n] = flank == BTN_Y ? 'L' : 'R';
+    lang_keys[n + 1] = 0;
+    return ! strcmp(lang_keys, LANG_SEQUENCE);
+}
+
 static int menu_level = 0;  /* 0: the themes, 1: the features of the theme */
 static int top_selected = 0;
 static int sub_selected = 0;
@@ -2313,6 +2348,7 @@ int main() {
     noise_gen_set_enabled(false);  /* init_play starts the sound, we start silent */
     display_init();
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
+    i18n_init();  /* The language of the texts */
     if (store_get()->asleep == STORE_ASLEEP)
         sleep_mode();  /* Put to sleep by an admin: until the manual unlock (it reboots) */
     radio_tools_init();
@@ -2514,8 +2550,13 @@ int main() {
         } else if (pressed & (BTN_UP | BTN_DOWN)) {
             int delta = (pressed & BTN_UP) ? -1 : 1;
             if (app == A_MENU) {
+                bool lang_reset = menu_level == 0 && lang_sequence(pressed & (BTN_UP | BTN_DOWN), now);
                 if (menu_level == 0 && admin_sequence(pressed & (BTN_UP | BTN_DOWN), now)) {
                     set_admin(true);
+                } else if (lang_reset) {
+                    i18n_set(i18n_find("en"), true);  /* Back to English */
+                    top_selected = 0;
+                    set_status(N_("Langue : English"));
                 } else if (menu_level == 0)
                     top_selected = (top_selected + delta + N_SUBMENUS) % N_SUBMENUS;
                 else
@@ -2622,6 +2663,10 @@ int main() {
             redraw_menu = false;
             if (app == A_MENU)
                 redraw = true;
+        }
+        if (lang_redraw) {
+            lang_redraw = false;
+            redraw = true;
         }
         if (infection_coughed()) {
             set_status("Kof kof ! (virus des cigales)");

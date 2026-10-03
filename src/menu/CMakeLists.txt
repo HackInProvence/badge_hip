@@ -3,6 +3,9 @@
 add_executable(badge_menu)
 target_sources(badge_menu PRIVATE
     main.c
+    i18n.c
+    i18n_table.c
+    lang.c
     admin.c
     apps.c
     lamp.c

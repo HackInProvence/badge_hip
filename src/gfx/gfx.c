@@ -97,7 +97,11 @@ static const gfx_glyph_t *find_glyph(const gfx_font_t *font, uint16_t cp) {
 }
 
 
+const char *(*gfx_translate)(const char *utf8) = NULL;
+
 int gfx_text_width(const gfx_font_t *font, const char *utf8) {
+    if (gfx_translate)
+        utf8 = gfx_translate(utf8);
     int w16 = 0;  /* In 1/16 pixels */
     while (*utf8) {
         const gfx_glyph_t *g = find_glyph(font, next_codepoint(&utf8));
@@ -109,6 +113,8 @@ int gfx_text_width(const gfx_font_t *font, const char *utf8) {
 
 
 int gfx_text(uint8_t *fb, int x, int y, const gfx_font_t *font, const char *utf8, gfx_color_t color, gfx_align_t align) {
+    if (gfx_translate)
+        utf8 = gfx_translate(utf8);
     if (align == GFX_ALIGN_CENTER)
         x -= gfx_text_width(font, utf8) / 2;
     else if (align == GFX_ALIGN_RIGHT)

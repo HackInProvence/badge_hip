@@ -74,6 +74,9 @@ void gfx_rect(uint8_t *fb, int x, int y, int w, int h, gfx_color_t color);
 /** \brief Width of the text in pixels. */
 int gfx_text_width(const gfx_font_t *font, const char *utf8);
 
+/** \brief Translation of the texts drawn and measured (menu/i18n.c sets it), NULL: none. */
+extern const char *(*gfx_translate)(const char *utf8);
+
 /** \brief Draw text, (x, y) is the top of the line (at the left, center or right of the text depending on \p align).
  *
  * Only the pixels of the glyphs are drawn (the background is kept).

@@ -9,6 +9,7 @@
 #include "pico/time.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "ui.h"
 
 const char UI_CHARSET_TEXT[] = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_+/:'!?#&()";
@@ -58,6 +59,7 @@ void ui_fit_preview(const gfx_font_t *font, char *dst, size_t len, const char *s
 
 
 void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int width) {
+    src = tr(src);  /* Translated before it is cut */
     snprintf(dst, len, "%s", src);
     size_t n = strlen(dst);
     if (ui_check && (strlen(src) >= len || gfx_text_width(font, dst) > width))
@@ -88,6 +90,7 @@ static const char *next_line(const char *text, char *line, size_t len) {
 
 int ui_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *text) {
     char line[64], fitted[64];
+    text = tr(text);  /* Translated before it is split */
     while (*text) {
         text = next_line(text, line, sizeof(line));
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
@@ -101,6 +104,7 @@ int ui_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *text) {
 
 int ui_text(uint8_t *fb, int x, int y, const gfx_font_t *font, const char *text) {
     char line[64], fitted[64];
+    text = tr(text);
     while (*text) {
         text = next_line(text, line, sizeof(line));
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - x - 2);
@@ -142,6 +146,7 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
 int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int max_lines) {
     char line[96];
     int lines = 0;
+    text = tr(text);
     while (*text && lines < max_lines) {
         while (*text == ' ')
             ++text;
@@ -182,6 +187,7 @@ int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int
 
 
 void ui_box(uint8_t *fb, const char *text) {
+    text = tr(text);
     int lines = 1;
     for (const char *c = text; *c; ++c)
         lines += *c == '\n';

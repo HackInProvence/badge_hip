@@ -1,0 +1,31 @@
+# Translation of the badge texts (tools/i18n.py, docs/fr/traduction.md).
+# Translate each msgstr; keep the formats (%d, %s...) in the same order; empty = not translated (French).
+msgid ""
+msgstr ""
+"Language: en\n"
+"Language-Name: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: src/menu/i18n.h:11
+msgid "Réglages"
+msgstr ""
+
+#: src/menu/i18n.h:14
+msgid "Sonnerie %d / %d"
+msgstr ""
+
+#: src/menu/lang.c:46
+msgid "G : retour  D : choisir"
+msgstr ""
+
+#: src/menu/lang.c:50
+msgid "Langue : %s"
+msgstr ""
+
+#: src/menu/lang.c:54
+msgid "Langue"
+msgstr ""
+
+#: src/menu/main.c:2559
+msgid "Langue : English"
+msgstr ""
