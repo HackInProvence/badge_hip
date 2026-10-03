@@ -700,9 +700,9 @@ typedef struct {
 
 static const submenu_t SUBMENUS[] = {
     {N_("Médias"), 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
-    {N_("Jeux solo"), 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+    {N_("Jeux solo"), 15, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                        M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST,
-                       M_CTF, M_APP(APP_CRYPTO)}},
+                       M_CTF, M_APP(APP_CRYPTO), M_APP(APP_BABBLE)}},
     {N_("Jeux multi"), 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
                            M_APP(APP_TUG)}},
     {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
