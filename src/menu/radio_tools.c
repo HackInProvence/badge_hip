@@ -9,6 +9,7 @@
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
 
+#include "i18n.h"
 #include "ook_rx.h"
 #include "ook_tx.h"
 #include "pinouts.h"
@@ -179,7 +180,7 @@ unsigned radio_tools_send(void) {
     snprintf(last_text, sizeof(last_text), "%.*s", len - 1, msg);  /* Without the newline */
     state = R_SENDING;
     start_ts = get_absolute_time();
-    snprintf(message, sizeof(message), "Envoi du message #%u", count);
+    snprintf(message, sizeof(message), _("Envoi du message #%u"), count);
     printf("radio: sending message #%u\n", count);
     return count;
 }
@@ -199,7 +200,7 @@ void radio_tools_carrier_start(uint32_t max_ms) {
     state = R_CARRIER;
     start_ts = get_absolute_time();
     carrier_max_us = max_ms * 1000;
-    snprintf(message, sizeof(message), "Porteuse sur %.2f MHz", RADIO_TOOLS_FREQ_HZ / 1e6);
+    snprintf(message, sizeof(message), _("Porteuse sur %.2f MHz"), RADIO_TOOLS_FREQ_HZ / 1e6);
     printf("radio: carrier on\n");
 }
 
@@ -211,7 +212,7 @@ void radio_tools_carrier_stop(void) {
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
     configure();  /* Back to the packet mode */
     back_to_idle();
-    snprintf(message, sizeof(message), "Porteuse arrêtée");
+    snprintf(message, sizeof(message), N_("Porteuse arrêtée"));
     printf("radio: carrier off\n");
 }
 
@@ -243,7 +244,7 @@ void radio_tools_measure_xosc(void) {
     irq_set_enabled(IO_IRQ_BANK0, true);
     state = R_MEASURING;
     start_ts = get_absolute_time();
-    snprintf(message, sizeof(message), "Mesure du quartz...");
+    snprintf(message, sizeof(message), N_("Mesure du quartz..."));
 }
 
 
@@ -267,13 +268,13 @@ void radio_tools_task(absolute_time_t now) {
         radio_state_t st = radio_state();
         if (st == CC1101_STATE_IDLE) {
             back_to_idle();
-            snprintf(message, sizeof(message), "Message #%u envoyé", count);
+            snprintf(message, sizeof(message), _("Message #%u envoyé"), count);
             printf("radio: message #%u sent in %lld ms\n", count, elapsed / 1000);
         } else if (st == CC1101_STATE_TXFIFO_UNDERFLOW || elapsed > TX_TIMEOUT_US) {
             radio_write_registers((const uint8_t[]){CC1101_SIDLE}, 1);
             radio_write_registers((const uint8_t[]){CC1101_SFTX}, 1);
             back_to_idle();
-            snprintf(message, sizeof(message), "Echec de l'envoi (état %d)", st);
+            snprintf(message, sizeof(message), _("Echec de l'envoi (état %d)"), st);
             printf("radio: %s\n", message);
         }
         break;
@@ -300,7 +301,7 @@ void radio_tools_task(absolute_time_t now) {
         }
         configure();  /* Recompute the frequency and baud rate, and restore GDO0 */
         back_to_idle();
-        snprintf(message, sizeof(message), "Quartz : %.4f MHz", xosc_hz / 1e6);
+        snprintf(message, sizeof(message), _("Quartz : %.4f MHz"), xosc_hz / 1e6);
         printf("radio: crystal measured %lu Hz (default CC1101_fXOSC = %d Hz), using %lu Hz\n",
                (unsigned long)xosc_hz, CC1101_fXOSC, (unsigned long)radio_get_xosc());
         break;

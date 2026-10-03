@@ -10,15 +10,16 @@
 
 #include "achievements.h"
 #include "app.h"
+#include "i18n.h"
 #include "skills.h"
 #include "social.h"
 #include "store.h"
 
 /* Same order as the drawings of tools/skills_icons.py */
 static const char *const SKILLS[SKILLS_COUNT] = {
-    "Électronique", "Flipper Zero", "Android", "iOS", "Radio / SDR", "Web", "Réseau", "Crypto", "Reverse",
-    "Pentest", "Forensic", "OSINT", "Linux", "Windows", "Cloud", "IA", "Développement", "CTF", "Lockpicking",
-    "Défense",
+    N_("Électronique"), "Flipper Zero", "Android", "iOS", "Radio / SDR", "Web", N_("Réseau"), "Crypto", "Reverse",
+    "Pentest", "Forensic", "OSINT", "Linux", "Windows", "Cloud", N_("IA"), N_("Développement"), "CTF",
+    "Lockpicking", N_("Défense"),
 };
 _Static_assert(SKILLS_COUNT <= 32, "the skills are a 32 bit mask");
 
@@ -173,27 +174,27 @@ static bool skills_task(absolute_time_t now) {
 
 static void main_label(int i, char *buf, size_t len) {
     if (i == 0)
-        snprintf(buf, len, "Mes compétences (%d)", skills_count(store_get()->skills));
+        snprintf(buf, len, _("Mes compétences (%d)"), skills_count(store_get()->skills));
     else
-        snprintf(buf, len, "Qui les partage ?");
+        snprintf(buf, len, N_("Qui les partage ?"));
 }
 
 static void skills_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     if (view == V_MAIN) {
-        ui_title(fb, "Compétences");
+        ui_title(fb, N_("Compétences"));
         ui_list(fb, 2, sel, main_label);
         skills_draw_row(fb, GFX_WIDTH/2, UI_FOOTER_Y - 24, store_get()->skills, 9, GFX_BLACK);
-        ui_footer(fb, "D : ouvrir  G : retour");
+        ui_footer(fb, N_("D : ouvrir  G : retour"));
         return;
     }
     const int rows = 7, row_h = UI_ROW_H, y0 = UI_TITLE_H + 3;
     int count = view == V_MINE ? SKILLS_COUNT : n_near;
-    ui_title(fb, view == V_MINE ? "Mes compétences" : "Qui les partage ?");
+    ui_title(fb, view == V_MINE ? N_("Mes compétences") : N_("Qui les partage ?"));
     if (view == V_NEAR && ! n_near) {
-        ui_lines(fb, 60, &gfx_font_small, store_get()->skills ? "Aucune cigale proche\nne partage vos\ncompétences."
-                                                              : "Cochez d'abord vos\ncompétences.");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, 60, &gfx_font_small, store_get()->skills ? N_("Aucune cigale proche\nne partage vos\ncompétences.")
+                                                              : N_("Cochez d'abord vos\ncompétences."));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     int first = sel - rows / 2;
@@ -221,11 +222,11 @@ static void skills_render(uint8_t *fb, absolute_time_t now) {
             skills_draw_row(fb, 150, y + 2, near[i].skills & mine, 4, fg);
         }
     }
-    ui_footer(fb, view == V_MINE ? "D : cocher  G : retour" : "G : retour");
+    ui_footer(fb, view == V_MINE ? N_("D : cocher  G : retour") : N_("G : retour"));
 }
 
 const app_t app_skills = {
-    .name = "Compétences",
+    .name = N_("Compétences"),
     .start = skills_start,
     .buttons = skills_buttons,
     .task = skills_task,

@@ -21,6 +21,7 @@
 #include "ff.h"
 #include "gamebook_builtin.h"
 #include "gamebook_parse.h"
+#include "i18n.h"
 #include "sd.h"
 #include "store.h"
 
@@ -134,7 +135,7 @@ static void scan_books(void) {
         b->key = key_of(gamebook_builtins[i].key);
         gb_src_init(&src, read_builtin, (void *)&gamebook_builtins[i]);
         if (! gb_read_title(&src, b->title, sizeof(b->title)))
-            snprintf(b->title, sizeof(b->title), "Livre intégré %d", i + 1);
+            snprintf(b->title, sizeof(b->title), _("Livre intégré %d"), i + 1);
     }
     int n_sd = sd_mount() == FR_OK ? (int)sd_list_files(BOOK_DIR, ".TXT", sd_names, MAX_SD_BOOKS) : 0;
     for (int i = 0; i < n_sd; ++i) {
@@ -222,17 +223,17 @@ static int n_pages = 0, page = 0, sel = -1;
 static const char *opt_label(int i) {
     switch (opts[i].kind) {
     case OPT_CHOICE: return sec.choices[opts[i].choice].label;
-    case OPT_BACK: return "Revenir en arrière";
-    case OPT_RESTART: return "Recommencer";
-    default: return "Autres livres";
+    case OPT_BACK: return _("Revenir en arrière");
+    case OPT_RESTART: return _("Recommencer");
+    default: return _("Autres livres");
     }
 }
 
 static const char *end_text(int i) {
     if (i == 0)
-        return "~ FIN ~";
-    return sec.end == GB_END_WIN ? "Bravo, vous avez gagné !" : sec.end == GB_END_LOSE ? "Perdu... Réessayez !"
-                                                                                       : "Merci d'avoir joué !";
+        return N_("~ FIN ~");
+    return sec.end == GB_END_WIN ? N_("Bravo, vous avez gagné !")
+           : sec.end == GB_END_LOSE ? N_("Perdu... Réessayez !") : N_("Merci d'avoir joué !");
 }
 
 /* The text of a line */
@@ -385,8 +386,9 @@ static void enter_section(uint16_t number, bool by_choice) {
     sec_valid = ok;
     if (! ok) {
         bool missing = gb_find(&book, number) < 0;
-        snprintf(sec.text, sizeof(sec.text), missing ? "La section %u est introuvable : le livre est incomplet."
-                                                     : "Impossible de lire la section %u. La carte SD a-t-elle été retirée ?",
+        snprintf(sec.text, sizeof(sec.text),
+                 missing ? _("La section %u est introuvable : le livre est incomplet.")
+                         : _("Impossible de lire la section %u. La carte SD a-t-elle été retirée ?"),
                  number);
         sec.number = number;
         sec.end = GB_END_NONE;
@@ -400,21 +402,21 @@ static void enter_section(uint16_t number, bool by_choice) {
         items = (items | sec.gain) & ~sec.lose;
         if (sec.has_dice) {
             roll = 1 + get_rand_32() % 6;
-            snprintf(text, sizeof(text), "Le dé roule... et donne %u.", roll);
+            snprintf(text, sizeof(text), _("Le dé roule... et donne %u."), roll);
             append_note(text);
         }
         if (got) {
             item_names(got, names, sizeof(names));
-            snprintf(text, sizeof(text), "Vous obtenez : %s.", names);
+            snprintf(text, sizeof(text), _("Vous obtenez : %s."), names);
             append_note(text);
         }
         if (lost) {
             item_names(lost, names, sizeof(names));
-            snprintf(text, sizeof(text), "Vous perdez : %s.", names);
+            snprintf(text, sizeof(text), _("Vous perdez : %s."), names);
             append_note(text);
         }
         if (sec.text_cut)
-            append_note("(Texte trop long, coupé.)");
+            append_note(_("(Texte trop long, coupé.)"));
         printf("gamebook: section %u, %u choices, items 0x%02x%s\n", number, sec.n_choices, items,
                roll ? ", die rolled" : "");
         save_progress();
@@ -464,7 +466,7 @@ static int list_count(void) {
 static void list_label(int i, char *buf, size_t len) {
     if (list_resume >= 0) {
         if (i == 0) {
-            snprintf(buf, len, "Continuer : %s", books[list_resume].title);
+            snprintf(buf, len, _("Continuer : %s"), books[list_resume].title);
             return;
         }
         --i;
@@ -500,16 +502,16 @@ static void show_menu(void) {
 
 static const char *menu_label(int row) {
     switch (row) {
-    case M_RESUME: return "Reprendre la lecture";
-    case M_START: return "Commencer";
-    case M_RESTART: return "Recommencer";
-    case M_ITEMS: return "Objets";
-    default: return "Autres livres";
+    case M_RESUME: return N_("Reprendre la lecture");
+    case M_START: return N_("Commencer");
+    case M_RESTART: return N_("Recommencer");
+    case M_ITEMS: return N_("Objets");
+    default: return N_("Autres livres");
     }
 }
 
 static void open_failed(void) {
-    snprintf(message, sizeof(message), "Ce livre est illisible\nou n'a aucune section.\n(une ligne \"== 1\")");
+    snprintf(message, sizeof(message), N_("Ce livre est illisible\nou n'a aucune section.\n(une ligne \"== 1\")"));
     view = V_MESSAGE;
 }
 
@@ -687,7 +689,8 @@ static void render_read(uint8_t *fb) {
             break;
         }
     }
-    ui_footer(fb, sel >= 0 ? "D : choisir  G : menu" : page < n_pages - 1 ? "Flancs, D : suite  G : menu" : "G : menu");
+    ui_footer(fb, sel >= 0 ? N_("D : choisir  G : menu")
+              : page < n_pages - 1 ? N_("Flancs, D : suite  G : menu") : N_("G : menu"));
 }
 
 static void render_menu(uint8_t *fb) {
@@ -696,15 +699,15 @@ static void render_menu(uint8_t *fb) {
     ui_title(fb, fitted);
     int y = UI_TITLE_H + 4;
     if (book.author[0]) {
-        snprintf(text, sizeof(text), "par %s", book.author);
+        snprintf(text, sizeof(text), _("par %s"), book.author);
         ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 4);
         gfx_text(fb, GFX_WIDTH / 2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
     }
     y += 20;
     if (has_progress())
-        snprintf(text, sizeof(text), "Section %u", store_get()->book_section);
+        snprintf(text, sizeof(text), _("Section %u"), store_get()->book_section);
     else
-        snprintf(text, sizeof(text), "%u sections", book.n_sections);
+        snprintf(text, sizeof(text), _("%u sections"), book.n_sections);
     gfx_text(fb, GFX_WIDTH / 2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     y += 28;
     for (int i = 0; i < n_menu; ++i, y += 22) {
@@ -716,11 +719,11 @@ static void render_menu(uint8_t *fb) {
             gfx_text(fb, GFX_WIDTH / 2, y, &gfx_font_small, label, GFX_BLACK, GFX_ALIGN_CENTER);
         }
     }
-    ui_footer(fb, "D : choisir  G : retour");
+    ui_footer(fb, N_("D : choisir  G : retour"));
 }
 
 static void render_items(uint8_t *fb) {
-    ui_title(fb, "Objets");
+    ui_title(fb, N_("Objets"));
     int y = UI_TITLE_H + 8, shown = 0;
     uint8_t held = has_progress() ? (uint8_t)(store_get()->book_hash >> 24) : 0;  /* Saved at each section */
     for (int i = 0; i < book.n_items && y < UI_FOOTER_Y - 20; ++i)
@@ -732,17 +735,17 @@ static void render_items(uint8_t *fb) {
             ++shown;
         }
     if (! shown)
-        ui_lines(fb, 80, &gfx_font_small, "Aucun objet pour l'instant.");
-    ui_footer(fb, "G : retour");
+        ui_lines(fb, 80, &gfx_font_small, N_("Aucun objet pour l'instant."));
+    ui_footer(fb, N_("G : retour"));
 }
 
 static void gamebook_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     switch (view) {
     case V_LIST:
-        ui_title(fb, "Livres-jeux");
+        ui_title(fb, N_("Livres-jeux"));
         ui_list(fb, list_count(), list_sel, list_label);
-        ui_footer(fb, "D : ouvrir  G : quitter");
+        ui_footer(fb, N_("D : ouvrir  G : quitter"));
         break;
     case V_MENU:
         render_menu(fb);
@@ -754,9 +757,9 @@ static void gamebook_render(uint8_t *fb, absolute_time_t now) {
         render_items(fb);
         break;
     case V_MESSAGE:
-        ui_title(fb, "Livres-jeux");
+        ui_title(fb, N_("Livres-jeux"));
         ui_lines(fb, 70, &gfx_font_small, message);
-        ui_footer(fb, "G : retour");
+        ui_footer(fb, N_("G : retour"));
         break;
     }
 }
@@ -766,7 +769,7 @@ static void gamebook_stop(void) {
 }
 
 const app_t app_gamebook = {
-    .name = "Livres-jeux",
+    .name = N_("Livres-jeux"),
     .start = gamebook_start,
     .buttons = gamebook_buttons,
     .render = gamebook_render,

@@ -21,6 +21,7 @@
 
 #include "achievements.h"
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "smuggler_goods.h"
 #include "smuggler_trade.h"
@@ -89,7 +90,7 @@ static void finished(trade_t *t, uint8_t gave, uint8_t got) {
     achv_add(ACHV_CNT_TRADES, 1);
     obtained(got);
     if (app_current() != &app_smuggler && got < SMUGGLER_GOODS)
-        set_event("Reçu en douce : %s", smuggler_goods[got].name);  /* A sealed trade ended in the background */
+        set_event(_("Reçu en douce : %s"), tr(smuggler_goods[got].name));  /* A sealed trade ended in the background */
     (void)t;
 }
 
@@ -119,7 +120,7 @@ static void meetings(void) {
         dirty = true;
         printf("smuggler: found %s (%s) in the hold\n", smuggler_goods[good].name,
                smuggler_rarity_name(smuggler_goods[good].rarity));
-        set_event("Dans la cale : %s", smuggler_goods[good].name);
+        set_event(_("Dans la cale : %s"), tr(smuggler_goods[good].name));
         obtained(good);
     }
 }
@@ -140,7 +141,7 @@ bool smuggler_invited(char *buf, int len) {
     if (! ready || ! trade.invited || trade_busy(&trade) || notified == trade.inv_id)
         return false;
     notified = trade.inv_id;
-    snprintf(buf, len, "Psst... %s : Contrebande", trade.inv_name);
+    snprintf(buf, len, _("Psst... %s : Contrebande"), trade.inv_name);
     return true;
 }
 
@@ -476,11 +477,11 @@ static void draw_grid(uint8_t *fb, bool dark, bool collection, int sel) {
     char text[64];
     if (! cargo_seen(cargo(), good)) {
         fitted_text(fb, INFO_Y, &gfx_font_small, "???", fg);
-        snprintf(text, sizeof(text), "Inconnu  (%d / %d)", sel + 1, n);
+        snprintf(text, sizeof(text), _("Inconnu  (%d / %d)"), sel + 1, n);
     } else {
         fitted_text(fb, INFO_Y, &gfx_font_small, smuggler_goods[good].name, fg);
-        snprintf(text, sizeof(text), "x%d  %s  %u doublon%s", cargo_count(cargo(), good),
-                 smuggler_rarity_name(smuggler_goods[good].rarity), smuggler_goods[good].value,
+        snprintf(text, sizeof(text), _("x%d  %s  %u doublon%s"), cargo_count(cargo(), good),
+                 tr(smuggler_rarity_name(smuggler_goods[good].rarity)), smuggler_goods[good].value,
                  smuggler_goods[good].value > 1 ? "s" : "");
     }
     fitted_text(fb, INFO_Y + 15, &gfx_font_small, text, fg);
@@ -513,107 +514,108 @@ static int dark_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *te
 
 static void render_invite(uint8_t *fb) {
     char text[64];
-    dark_page(fb, "Psst...", "G : refuser  D : accepter");
+    dark_page(fb, N_("Psst..."), N_("G : refuser  D : accepter"));
     if (trade.inv_mode == TRADE_GIFT) {
-        snprintf(text, sizeof(text), "%s vous offre :", trade.inv_name);
+        snprintf(text, sizeof(text), _("%s vous offre :"), trade.inv_name);
         dark_lines(fb, UI_TITLE_H + 4, &gfx_font_small, text);
         draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 24, trade.inv_good, 2, GFX_WHITE, false);
         dark_lines(fb, UI_TITLE_H + 94, &gfx_font_medium, smuggler_goods[trade.inv_good].name);
         dark_lines(fb, UI_TITLE_H + 118, &gfx_font_small, smuggler_rarity_name(smuggler_goods[trade.inv_good].rarity));
     } else {
-        snprintf(text, sizeof(text), "%s\npropose une affaire\nen douce.", trade.inv_name);
+        snprintf(text, sizeof(text), _("%s\npropose une affaire\nen douce."), trade.inv_name);
         dark_lines(fb, 60, &gfx_font_medium, text);
     }
 }
 
 static void render_trade(uint8_t *fb) {
     char header[40], text[96];
-    snprintf(header, sizeof(header), "En douce avec %s", trade.peer_name);
+    snprintf(header, sizeof(header), _("En douce avec %s"), trade.peer_name);
     bool gift = trade.mode == TRADE_GIFT;
     switch (trade.state) {
     case TS_INVITING:
-        dark_page(fb, header, "G : annuler");
+        dark_page(fb, header, N_("G : annuler"));
         int y;
         if (gift) {
             draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.my_good, 2, GFX_WHITE, false);
-            snprintf(text, sizeof(text), "%s\nproposé à %s...", smuggler_goods[trade.my_good].name, trade.peer_name);
+            snprintf(text, sizeof(text), _("%s\nproposé à %s..."), tr(smuggler_goods[trade.my_good].name),
+                     trade.peer_name);
             y = dark_lines(fb, UI_TITLE_H + 76, &gfx_font_small, text);
         } else {
-            snprintf(text, sizeof(text), "Proposition envoyée\nà %s...", trade.peer_name);
+            snprintf(text, sizeof(text), _("Proposition envoyée\nà %s..."), trade.peer_name);
             y = dark_lines(fb, 60, &gfx_font_medium, text);
         }
         /* Under the text above, with a margin (one line: it must stay above the footer) */
-        dark_lines(fb, y + 12 > 132 ? y + 12 : 132, &gfx_font_small, "Gardez les badges collés.");
+        dark_lines(fb, y + 12 > 132 ? y + 12 : 132, &gfx_font_small, N_("Gardez les badges collés."));
         break;
     case TS_CHOOSE:
-        snprintf(header, sizeof(header), "Votre offre pour %s ?", trade.peer_name);
+        snprintf(header, sizeof(header), _("Votre offre pour %s ?"), trade.peer_name);
         if (! cargo_kinds(cargo())) {
-            dark_page(fb, header, "G : annuler");
-            dark_lines(fb, 70, &gfx_font_medium, "Cale vide :\nrien à offrir.");
+            dark_page(fb, header, N_("G : annuler"));
+            dark_lines(fb, 70, &gfx_font_medium, _("Cale vide :\nrien à offrir."));
         } else {
-            dark_page(fb, header, "G : annuler  D : offrir");
+            dark_page(fb, header, N_("G : annuler  D : offrir"));
             draw_grid(fb, true, false, grid_sel);
         }
         break;
     case TS_OFFERED:
-        dark_page(fb, header, "G : annuler");
+        dark_page(fb, header, N_("G : annuler"));
         draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.my_good, 2, GFX_WHITE, false);
         dark_lines(fb, UI_TITLE_H + 78, &gfx_font_small, smuggler_goods[trade.my_good].name);
-        snprintf(text, sizeof(text), "En attente de l'offre\nde %s...", trade.peer_name);
+        snprintf(text, sizeof(text), _("En attente de l'offre\nde %s..."), trade.peer_name);
         dark_lines(fb, UI_TITLE_H + 104, &gfx_font_small, text);
         break;
     case TS_REVIEW:
     case TS_CONFIRMED:
         if (gift) {
             /* The guest of a gift: it waits for the good */
-            dark_page(fb, header, "G : retour");
+            dark_page(fb, header, N_("G : retour"));
             draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.peer_good, 2, GFX_WHITE, false);
-            snprintf(text, sizeof(text), "%s\nRéception en cours...", smuggler_goods[trade.peer_good].name);
+            snprintf(text, sizeof(text), _("%s\nRéception en cours..."), tr(smuggler_goods[trade.peer_good].name));
             dark_lines(fb, UI_TITLE_H + 78, &gfx_font_small, text);
             break;
         }
-        dark_page(fb, header, trade.state == TS_REVIEW ? "G : annuler  D : conclure" :
-                  trade_cancellable(&trade) ? "G : annuler" : "G : retour (scellé)");
+        dark_page(fb, header, trade.state == TS_REVIEW ? N_("G : annuler  D : conclure") :
+                  trade_cancellable(&trade) ? N_("G : annuler") : N_("G : retour (scellé)"));
         draw_icon(fb, 12, UI_TITLE_H + 2, trade.my_good, 2, GFX_WHITE, false);
         draw_icon(fb, GFX_WIDTH - 76, UI_TITLE_H + 2, trade.peer_good, 2, GFX_WHITE, false);
         gfx_text(fb, GFX_WIDTH / 2, UI_TITLE_H + 22, &gfx_font_medium, "<>", GFX_WHITE, GFX_ALIGN_CENTER);
-        snprintf(text, sizeof(text), "Votre %s", smuggler_goods[trade.my_good].name);
+        snprintf(text, sizeof(text), _("Votre %s"), tr(smuggler_goods[trade.my_good].name));
         dark_lines(fb, UI_TITLE_H + 70, &gfx_font_small, text);
-        snprintf(text, sizeof(text), "contre %s", smuggler_goods[trade.peer_good].name);
+        snprintf(text, sizeof(text), _("contre %s"), tr(smuggler_goods[trade.peer_good].name));
         dark_lines(fb, UI_TITLE_H + 86, &gfx_font_small, text);
         if (trade.state == TS_CONFIRMED)
-            snprintf(text, sizeof(text), trade.inviter ? "En attente de %s..." : "Scellé. En attente\nde %s...",
+            snprintf(text, sizeof(text), trade.inviter ? _("En attente de %s...") : _("Scellé. En attente\nde %s..."),
                      trade.peer_name);
         else if (trade.peer_confirmed)
-            snprintf(text, sizeof(text), "%s a conclu.", trade.peer_name);
+            snprintf(text, sizeof(text), _("%s a conclu."), trade.peer_name);
         else
             text[0] = 0;
         dark_lines(fb, UI_TITLE_H + 108, &gfx_font_small, text);
         break;
     case TS_DONE: {
-        dark_page(fb, NULL, "D : continuer");
+        dark_page(fb, NULL, N_("D : continuer"));
         bool gave = gift && trade.inviter;
         uint8_t good = gave ? trade.my_good : trade.peer_good;
-        dark_lines(fb, 8, &gfx_font_medium, gave ? "Cadeau remis" : "Affaire conclue");
+        dark_lines(fb, 8, &gfx_font_medium, gave ? N_("Cadeau remis") : N_("Affaire conclue"));
         draw_icon(fb, GFX_WIDTH / 2 - 32, 36, good, 2, GFX_WHITE, false);
-        snprintf(text, sizeof(text), "%s %s", gave ? "Remis :" : "Reçu :", smuggler_goods[good].name);
+        snprintf(text, sizeof(text), "%s %s", gave ? _("Remis :") : _("Reçu :"), tr(smuggler_goods[good].name));
         dark_lines(fb, 108, &gfx_font_small, text);
         dark_lines(fb, 126, &gfx_font_small, smuggler_rarity_name(smuggler_goods[good].rarity));
         break;
     }
     case TS_REFUSED:
-        dark_page(fb, header, "D : continuer");
-        snprintf(text, sizeof(text), "%s\nrefuse l'affaire.", trade.peer_name);
+        dark_page(fb, header, N_("D : continuer"));
+        snprintf(text, sizeof(text), _("%s\nrefuse l'affaire."), trade.peer_name);
         dark_lines(fb, 70, &gfx_font_medium, text);
         break;
     case TS_LOST:
-        dark_page(fb, header, "D : continuer");
-        snprintf(text, sizeof(text), "%s est\nhors de portée.\nAffaire annulée.", trade.peer_name);
+        dark_page(fb, header, N_("D : continuer"));
+        snprintf(text, sizeof(text), _("%s est\nhors de portée.\nAffaire annulée."), trade.peer_name);
         dark_lines(fb, 56, &gfx_font_medium, text);
         break;
     default:
-        dark_page(fb, header, "D : continuer");
-        dark_lines(fb, 70, &gfx_font_medium, "Affaire annulée.");
+        dark_page(fb, header, N_("D : continuer"));
+        dark_lines(fb, 70, &gfx_font_medium, N_("Affaire annulée."));
         break;
     }
 }
@@ -621,11 +623,13 @@ static void render_trade(uint8_t *fb) {
 static void home_label(int i, char *buf, size_t len) {
     const uint8_t *c = cargo();
     switch (i) {
-    case H_CARGO: snprintf(buf, len, "Cale : %d marchandise%s", cargo_total(c), cargo_total(c) > 1 ? "s" : ""); break;
-    case H_TRADE: snprintf(buf, len, "Échanger en douce"); break;
-    case H_GIFT: snprintf(buf, len, "Donner"); break;
-    case H_COLLECTION: snprintf(buf, len, "Collection : %d / %d", cargo_seen_kinds(c), SMUGGLER_GOODS); break;
-    default: snprintf(buf, len, "Fortune : %lu doublons", (unsigned long)cargo_value(c)); break;
+    case H_CARGO:
+        snprintf(buf, len, _("Cale : %d marchandise%s"), cargo_total(c), cargo_total(c) > 1 ? "s" : "");
+        break;
+    case H_TRADE: snprintf(buf, len, N_("Échanger en douce")); break;
+    case H_GIFT: snprintf(buf, len, N_("Donner")); break;
+    case H_COLLECTION: snprintf(buf, len, _("Collection : %d / %d"), cargo_seen_kinds(c), SMUGGLER_GOODS); break;
+    default: snprintf(buf, len, _("Fortune : %lu doublons"), (unsigned long)cargo_value(c)); break;
     }
 }
 
@@ -634,46 +638,46 @@ static void near_label(int i, char *buf, size_t len) {
 }
 
 static const char *rank(uint32_t value) {
-    return value < 20 ? "Mousse" : value < 60 ? "Matelot" : value < 150 ? "Contrebandier" : value < 400 ? "Capitaine" :
-           "Roi de la contrebande";
+    return value < 20 ? _("Mousse") : value < 60 ? _("Matelot") : value < 150 ? _("Contrebandier") :
+           value < 400 ? _("Capitaine") : _("Roi de la contrebande");
 }
 
 static void render_detail(uint8_t *fb) {
     const smuggler_good_t *g = &smuggler_goods[detail_good];
     bool known = cargo_seen(cargo(), detail_good);
     char text[48];
-    ui_fit(&gfx_font_medium, text, sizeof(text), known ? g->name : "Marchandise inconnue", GFX_WIDTH - 4);
+    ui_fit(&gfx_font_medium, text, sizeof(text), known ? g->name : N_("Marchandise inconnue"), GFX_WIDTH - 4);
     ui_title(fb, text);
     draw_icon(fb, 6, UI_TITLE_H + 6, detail_good, 2, GFX_BLACK, ! known);
     if (! known) {
         gfx_text(fb, 38, UI_TITLE_H + 26, &gfx_font_large, "?", GFX_BLACK, GFX_ALIGN_CENTER);
-        ui_text(fb, 80, UI_TITLE_H + 14, &gfx_font_small, "Jamais vue\ndans votre cale.");
-        ui_lines(fb, UI_TITLE_H + 84, &gfx_font_small, "Échangez avec les autres\ncigales pour la découvrir.");
+        ui_text(fb, 80, UI_TITLE_H + 14, &gfx_font_small, N_("Jamais vue\ndans votre cale."));
+        ui_lines(fb, UI_TITLE_H + 84, &gfx_font_small, N_("Échangez avec les autres\ncigales pour la découvrir."));
     } else {
-        static const char *RARITY_TITLES[RARITIES] = {"Commun", "Rare", "Légendaire !"};
+        static const char *RARITY_TITLES[RARITIES] = {N_("Commun"), N_("Rare"), N_("Légendaire !")};
         gfx_text(fb, 80, UI_TITLE_H + 10, &gfx_font_medium, RARITY_TITLES[g->rarity], GFX_BLACK, GFX_ALIGN_LEFT);
-        snprintf(text, sizeof(text), "%u doublon%s", g->value, g->value > 1 ? "s" : "");
+        snprintf(text, sizeof(text), _("%u doublon%s"), g->value, g->value > 1 ? "s" : "");
         gfx_text(fb, 80, UI_TITLE_H + 32, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
-        snprintf(text, sizeof(text), "En cale : %d", cargo_count(cargo(), detail_good));
+        snprintf(text, sizeof(text), _("En cale : %d"), cargo_count(cargo(), detail_good));
         gfx_text(fb, 80, UI_TITLE_H + 50, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
         ui_lines(fb, UI_TITLE_H + 84, &gfx_font_small, g->story);
     }
-    ui_footer(fb, "G : retour");
+    ui_footer(fb, N_("G : retour"));
 }
 
 static void render_fortune(uint8_t *fb) {
     const uint8_t *c = cargo();
     char text[128];
-    ui_title(fb, "Fortune");
+    ui_title(fb, N_("Fortune"));
     draw_icon(fb, 14, UI_TITLE_H + 8, 22, 1, GFX_BLACK, false);  /* The purse of doublons */
     snprintf(text, sizeof(text), "%lu", (unsigned long)cargo_value(c));
     gfx_text(fb, 120, UI_TITLE_H + 6, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, 120, UI_TITLE_H + 32, &gfx_font_small, "doublons", GFX_BLACK, GFX_ALIGN_CENTER);
-    snprintf(text, sizeof(text), "Rang : %s\nMarchandises : %d\nDifférentes : %d / %d\nAffaires conclues : %u",
+    gfx_text(fb, 120, UI_TITLE_H + 32, &gfx_font_small, N_("doublons"), GFX_BLACK, GFX_ALIGN_CENTER);
+    snprintf(text, sizeof(text), _("Rang : %s\nMarchandises : %d\nDifférentes : %d / %d\nAffaires conclues : %u"),
              rank(cargo_value(c)), cargo_total(c), cargo_kinds(c), SMUGGLER_GOODS,
              store_get()->achv_counters[ACHV_CNT_TRADES]);
     ui_text(fb, 10, UI_TITLE_H + 56, &gfx_font_small, text);
-    ui_footer(fb, "G : retour");
+    ui_footer(fb, N_("G : retour"));
 }
 
 static void render(uint8_t *fb, absolute_time_t now) {
@@ -684,26 +688,27 @@ static void render(uint8_t *fb, absolute_time_t now) {
     }
     switch (page) {
     case P_HOME:
-        ui_title(fb, "Contrebande");
+        ui_title(fb, N_("Contrebande"));
         ui_list(fb, H_ROWS, home_sel, home_label);
-        ui_lines(fb, UI_TITLE_H + 3 + H_ROWS * UI_ROW_H + 10, &gfx_font_small, "Badge contre badge...");
-        ui_footer(fb, "G : retour  D : choisir");
+        ui_lines(fb, UI_TITLE_H + 3 + H_ROWS * UI_ROW_H + 10, &gfx_font_small, N_("Badge contre badge..."));
+        ui_footer(fb, N_("G : retour  D : choisir"));
         break;
     case P_CARGO:
     case P_GIFT_PICK:
-        ui_title(fb, page == P_CARGO ? "Cale" : "Que donner ?");
+        ui_title(fb, page == P_CARGO ? N_("Cale") : N_("Que donner ?"));
         if (! cargo_kinds(cargo())) {
-            ui_lines(fb, 70, &gfx_font_small, "La cale est vide.\nRencontrez des cigales :\nelles laissent des vivres.");
-            ui_footer(fb, "G : retour");
+            ui_lines(fb, 70, &gfx_font_small,
+                     N_("La cale est vide.\nRencontrez des cigales :\nelles laissent des vivres."));
+            ui_footer(fb, N_("G : retour"));
         } else {
             draw_grid(fb, false, false, grid_sel);
-            ui_footer(fb, page == P_CARGO ? "G : retour  D : détails" : "G : retour  D : donner");
+            ui_footer(fb, page == P_CARGO ? N_("G : retour  D : détails") : N_("G : retour  D : donner"));
         }
         break;
     case P_COLLECTION:
-        ui_title(fb, "Collection");
+        ui_title(fb, N_("Collection"));
         draw_grid(fb, false, true, grid_sel);
-        ui_footer(fb, "G : retour  D : détails");
+        ui_footer(fb, N_("G : retour  D : détails"));
         break;
     case P_DETAIL:
         render_detail(fb);
@@ -712,20 +717,20 @@ static void render(uint8_t *fb, absolute_time_t now) {
         render_fortune(fb);
         break;
     case P_NEAR:
-        ui_title(fb, near_mode == TRADE_GIFT ? "Donner à qui ?" : "À portée de main");
+        ui_title(fb, near_mode == TRADE_GIFT ? N_("Donner à qui ?") : N_("À portée de main"));
         if (n_near) {
             ui_list(fb, n_near, near_sel, near_label);
-            ui_footer(fb, near_mode == TRADE_GIFT ? "G : retour  D : donner" : "G : retour  D : proposer");
+            ui_footer(fb, near_mode == TRADE_GIFT ? N_("G : retour  D : donner") : N_("G : retour  D : proposer"));
         } else {
             char text[96];
-            snprintf(text, sizeof(text), "Personne à portée de main.\nCollez votre badge contre\ncelui d'une autre "
-                     "cigale.%s", n_far ? "\n\nTrop loin :" : "");
+            snprintf(text, sizeof(text), _("Personne à portée de main.\nCollez votre badge contre\ncelui d'une autre "
+                     "cigale.%s"), n_far ? _("\n\nTrop loin :") : "");
             int y = ui_lines(fb, 50, &gfx_font_small, text);
             if (n_far) {
-                snprintf(text, sizeof(text), "%d cigale%s", n_far, n_far > 1 ? "s" : "");
+                snprintf(text, sizeof(text), _("%d cigale%s"), n_far, n_far > 1 ? "s" : "");
                 ui_lines(fb, y, &gfx_font_small, text);
             }
-            ui_footer(fb, "G : retour");
+            ui_footer(fb, N_("G : retour"));
         }
         break;
     default:
@@ -735,7 +740,7 @@ static void render(uint8_t *fb, absolute_time_t now) {
 }
 
 const app_t app_smuggler = {
-    .name = "Contrebande",
+    .name = N_("Contrebande"),
     .start = start,
     .buttons = buttons,
     .task = task,
@@ -771,9 +776,9 @@ static bool admin_buttons(const app_buttons_t *b, absolute_time_t now) {
             cargo_changed();
             obtained(admin_sel);
             printf("smuggler: admin added %s (%d)\n", smuggler_goods[admin_sel].name, cargo_count(cargo(), admin_sel));
-            snprintf(admin_status, sizeof(admin_status), "Ajouté à la cale");
+            snprintf(admin_status, sizeof(admin_status), N_("Ajouté à la cale"));
         } else {
-            snprintf(admin_status, sizeof(admin_status), "Cale pleine pour celle-ci");
+            snprintf(admin_status, sizeof(admin_status), N_("Cale pleine pour celle-ci"));
         }
     }
     return true;
@@ -782,23 +787,23 @@ static bool admin_buttons(const app_buttons_t *b, absolute_time_t now) {
 static void admin_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[48];
-    ui_title(fb, "Cale (admin)");
+    ui_title(fb, N_("Cale (admin)"));
     draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, admin_sel, 2, GFX_BLACK, false);
     int y = UI_TITLE_H + 76;
     fitted_text(fb, y, &gfx_font_medium, smuggler_goods[admin_sel].name, GFX_BLACK);
     y += gfx_font_medium.height + 2;
-    snprintf(text, sizeof(text), "%s, %u doublons", smuggler_rarity_name(smuggler_goods[admin_sel].rarity),
+    snprintf(text, sizeof(text), _("%s, %u doublons"), tr(smuggler_rarity_name(smuggler_goods[admin_sel].rarity)),
              smuggler_goods[admin_sel].value);
     fitted_text(fb, y, &gfx_font_small, text, GFX_BLACK);
     y += gfx_font_small.height + 2;
-    snprintf(text, sizeof(text), "Dans la cale : %d  (%d/%d)", cargo_count(cargo(), admin_sel), admin_sel + 1,
+    snprintf(text, sizeof(text), _("Dans la cale : %d  (%d/%d)"), cargo_count(cargo(), admin_sel), admin_sel + 1,
              SMUGGLER_GOODS);
     fitted_text(fb, y, &gfx_font_small, text, GFX_BLACK);
-    ui_footer(fb, admin_status[0] ? admin_status : "Flancs : choisir  D : ajouter");
+    ui_footer(fb, admin_status[0] ? admin_status : N_("Flancs : choisir  D : ajouter"));
 }
 
 const app_t app_smuggler_admin = {
-    .name = "Contrebande (admin)",
+    .name = N_("Contrebande (admin)"),
     .start = admin_start,
     .buttons = admin_buttons,
     .render = admin_render,

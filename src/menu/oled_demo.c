@@ -11,6 +11,7 @@
 
 #include "ff.h"
 #include "gfx.h"
+#include "i18n.h"
 #include "oled.h"
 #include "oled_demo.h"
 #include "screen_demo.h"
@@ -22,7 +23,8 @@
 #define EPV_HEADER_SIZE 512
 #define N_STARS 60
 
-static const char *NAMES[OLED_DEMO_COUNT] = {"Étoiles", "Cube 3D", "Cigale", "Texte défilant", "Vidéo (carte SD)"};
+static const char *NAMES[OLED_DEMO_COUNT] = {N_("Étoiles"), N_("Cube 3D"), N_("Cigale"), N_("Texte défilant"),
+                                            N_("Vidéo (carte SD)")};
 
 static int demo = -1;
 static absolute_time_t next_frame = 0;
@@ -41,7 +43,7 @@ static uint8_t epv_frame[EPV_FRAME_SIZE];
 
 
 const char *oled_demo_name(int d) {
-    return d >= 0 && d < OLED_DEMO_COUNT ? NAMES[d] : "";
+    return d >= 0 && d < OLED_DEMO_COUNT ? tr(NAMES[d]) : "";  /* Concatenated in the list of main.c */
 }
 
 
@@ -187,8 +189,8 @@ static void draw_text(void) {
 
 static void draw_video(void) {
     if (! video_open) {
-        gfx_text(fb, OLED_WIDTH/2, 12, &gfx_font_small, "Pas de vidéo", GFX_WHITE, GFX_ALIGN_CENTER);
-        gfx_text(fb, OLED_WIDTH/2, 34, &gfx_font_small, "sur la carte SD", GFX_WHITE, GFX_ALIGN_CENTER);
+        gfx_text(fb, OLED_WIDTH/2, 12, &gfx_font_small, N_("Pas de vidéo"), GFX_WHITE, GFX_ALIGN_CENTER);
+        gfx_text(fb, OLED_WIDTH/2, 34, &gfx_font_small, N_("sur la carte SD"), GFX_WHITE, GFX_ALIGN_CENTER);
         return;
     }
     /* The video runs at its own frame rate: read a new frame every 30/fps demo frames */

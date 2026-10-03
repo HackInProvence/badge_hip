@@ -6,6 +6,7 @@
 /* The puzzles (puzzles.c) as applications of the menus: one application per puzzle */
 
 #include "app.h"
+#include "i18n.h"
 #include "puzzles.h"
 
 static bool pz_buttons(const app_buttons_t *b, absolute_time_t now) {
@@ -31,9 +32,9 @@ static bool pz_calm(void) {
     const app_t var = {.name = title, .start = var##_start, .buttons = pz_buttons, \
                        .task = pz_task, .render = pz_render, .calm = pz_calm};
 
-PUZZLE_APP(PUZZLE_MINES, app_mines, "Démineur")
+PUZZLE_APP(PUZZLE_MINES, app_mines, N_("Démineur"))
 PUZZLE_APP(PUZZLE_2048, app_2048, "2048")
-PUZZLE_APP(PUZZLE_TAQUIN, app_taquin, "Taquin")
+PUZZLE_APP(PUZZLE_TAQUIN, app_taquin, N_("Taquin"))
 PUZZLE_APP(PUZZLE_SOKOBAN, app_sokoban, "Sokoban")
 PUZZLE_APP(PUZZLE_MASTERMIND, app_mastermind, "Mastermind")
-PUZZLE_APP(PUZZLE_PENDU, app_pendu, "Pendu")
+PUZZLE_APP(PUZZLE_PENDU, app_pendu, N_("Pendu"))

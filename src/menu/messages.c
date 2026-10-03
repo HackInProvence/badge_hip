@@ -15,6 +15,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "social.h"
 
@@ -26,9 +27,10 @@
 #define RESEND_MS 600  /* Longer than a listening window of the OOK remotes (220 ms) */
 
 static const char *MESSAGES[] = {
-    "Salut !", "Café ?", "On se retrouve au stand HIP", "Qui fait le CTF ?", "Je cherche un binôme",
-    "Super talk !", "Où es-tu ?", "RDV à l'accueil", "Pause déjeuner ?", "Au bar ?", "Merci !", "Bravo !",
-    "Besoin d'aide", "Qui a un chargeur USB-C ?", "Photo de groupe !", "A plus tard",
+    N_("Salut !"), N_("Café ?"), N_("On se retrouve au stand HIP"), N_("Qui fait le CTF ?"),
+    N_("Je cherche un binôme"), N_("Super talk !"), N_("Où es-tu ?"), N_("RDV à l'accueil"), N_("Pause déjeuner ?"),
+    N_("Au bar ?"), N_("Merci !"), N_("Bravo !"), N_("Besoin d'aide"), N_("Qui a un chargeur USB-C ?"),
+    N_("Photo de groupe !"), N_("A plus tard"),
 };
 #define N_MESSAGES ((int)(sizeof(MESSAGES) / sizeof(MESSAGES[0])))
 
@@ -113,7 +115,7 @@ bool messages_new(char *buf, int len) {
     if (! new_message)
         return false;
     new_message = false;
-    snprintf(buf, len, "%s : %s", inbox[0].name, MESSAGES[inbox[0].message]);
+    snprintf(buf, len, _("%s : %s"), inbox[0].name, tr(MESSAGES[inbox[0].message]));
     return true;
 }
 
@@ -152,7 +154,7 @@ static int sel = 0;
 static contact_t recipients[1 + SOCIAL_MAX_NEIGHBOURS + INBOX];  /* Everybody, the neighbours, the senders */
 static int n_recipients = 0;
 static int recipient = 0;
-static const char EVERYBODY[] = "Tout le monde";
+static const char *const EVERYBODY = N_("Tout le monde");
 
 static void add_recipient(uint32_t id, const char *name) {
     for (int i = 0; i < n_recipients; ++i)
@@ -176,11 +178,11 @@ static void list_recipients(void) {
 
 static void inbox_label(int i, char *buf, size_t len) {
     if (i == 0) {
-        snprintf(buf, len, "> Écrire un message");
+        snprintf(buf, len, N_("> Écrire un message"));
         return;
     }
     const inbox_t *m = &inbox[i - 1];
-    snprintf(buf, len, "%s%s: %s", m->to_me ? "(privé) " : "", m->name, MESSAGES[m->message]);
+    snprintf(buf, len, "%s%s: %s", m->to_me ? _("(privé) ") : "", m->name, tr(MESSAGES[m->message]));
 }
 
 static void recipient_label(int i, char *buf, size_t len) {
@@ -266,32 +268,33 @@ static void msg_render(uint8_t *fb, absolute_time_t now) {
     char text[48];
     switch (view) {
     case V_INBOX:
-        snprintf(text, sizeof(text), "Messages (%d)", n_inbox);
+        snprintf(text, sizeof(text), _("Messages (%d)"), n_inbox);
         ui_title(fb, text);
         ui_list(fb, n_inbox + 1, sel, inbox_label);
-        ui_footer(fb, sel ? "G : retour  D : répondre" : "G : retour  D : écrire");
+        ui_footer(fb, sel ? N_("G : retour  D : répondre") : N_("G : retour  D : écrire"));
         break;
     case V_RECIPIENT:
-        ui_title(fb, "A qui ?");
+        ui_title(fb, N_("A qui ?"));
         ui_list(fb, n_recipients, sel, recipient_label);
-        ui_footer(fb, "G : retour  D : choisir");
+        ui_footer(fb, N_("G : retour  D : choisir"));
         break;
     case V_MESSAGE:
         recipient_label(recipient, text, sizeof(text));
         ui_title(fb, text);
         ui_list(fb, N_MESSAGES, sel, message_label);
-        ui_footer(fb, "G : retour  D : envoyer");
+        ui_footer(fb, N_("G : retour  D : envoyer"));
         break;
     default:
-        ui_title(fb, "Message envoyé");
-        ui_lines(fb, 60, &gfx_font_small, "Les cigales le relaient\njusqu'à 3 fois pour qu'il\narrive à destination.");
-        ui_footer(fb, "D : boîte de réception");
+        ui_title(fb, N_("Message envoyé"));
+        ui_lines(fb, 60, &gfx_font_small,
+                 N_("Les cigales le relaient\njusqu'à 3 fois pour qu'il\narrive à destination."));
+        ui_footer(fb, N_("D : boîte de réception"));
         break;
     }
 }
 
 const app_t app_messages = {
-    .name = "Messages",
+    .name = N_("Messages"),
     .start = msg_start,
     .buttons = msg_buttons,
     .task = msg_task,

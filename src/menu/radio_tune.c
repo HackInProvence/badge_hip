@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "radio.h"
 #include "radio_tools.h"
@@ -161,42 +162,42 @@ static bool tune_buttons(const app_buttons_t *b, absolute_time_t now) {
 }
 
 static void tune_render(uint8_t *fb, absolute_time_t now) {
-    ui_title(fb, "Réglage radio");
+    ui_title(fb, N_("Réglage radio"));
     char text[200];
     const store_t *s = store_get();
     if (step == T_DONE) {
         if (s->radio_tuned != STORE_RADIO_TUNED) {
-            ui_lines(fb, 50, &gfx_font_small, "Pas encore réglée.");
+            ui_lines(fb, 50, &gfx_font_small, N_("Pas encore réglée."));
         } else {
-            snprintf(text, sizeof(text), "Quartz : %.4f MHz\nBruit : %d dBm\nTélécommandes : > %d dBm\n"
-                     "Fréquence : %+d", radio_get_xosc() / 1e6, s->radio_noise_dbm, remote_trigger_dbm(),
+            snprintf(text, sizeof(text), _("Quartz : %.4f MHz\nBruit : %d dBm\nTélécommandes : > %d dBm\n"
+                     "Fréquence : %+d"), radio_get_xosc() / 1e6, s->radio_noise_dbm, remote_trigger_dbm(),
                      s->radio_freq_offset);
             int y = ui_text(fb, 4, UI_TITLE_H + 6, &gfx_font_small, text);
             if (measured) {
-                snprintf(text, sizeof(text), freq_packets >= FREQ_MIN_PACKETS ? "(%d paquets d'autres cigales)"
-                         : "(pas d'autre cigale)", freq_packets);
+                snprintf(text, sizeof(text), freq_packets >= FREQ_MIN_PACKETS ? _("(%d paquets d'autres cigales)")
+                         : _("(pas d'autre cigale)"), freq_packets);
                 ui_text(fb, 4, y, &gfx_font_small, text);
             }
         }
-        ui_footer(fb, "D : régler  G : retour");
+        ui_footer(fb, N_("D : régler  G : retour"));
         return;
     }
-    static const char *STEPS[] = {"1. Quartz", "2. Bruit radio", "3. Fréquence"};
+    static const char *STEPS[] = {N_("1. Quartz"), N_("2. Bruit radio"), N_("3. Fréquence")};
     int y = UI_TITLE_H + 8;
     for (int i = 0; i < 3; ++i) {
-        snprintf(text, sizeof(text), "%s%s", STEPS[i], i < step ? " : ok" : i == step ? "..." : "");
+        snprintf(text, sizeof(text), "%s%s", tr(STEPS[i]), i < step ? _(" : ok") : i == step ? "..." : "");
         y = ui_text(fb, 10, y, &gfx_font_small, text) + 4;
     }
     int total = 1500 + NOISE_MS + FREQ_MS, done = step == T_XOSC ? 0 : step == T_NOISE ? 1500 : 1500 + NOISE_MS;
     if (step == T_FREQ)
         done += (int)(absolute_time_diff_us(step_ts, now) / 1000);
     ui_gauge(fb, 14, y + 6, GFX_WIDTH - 28, 16, done, total);
-    ui_lines(fb, y + 30, &gfx_font_small, "Restez près d'autres cigales.");
-    ui_footer(fb, "G : arrêter");
+    ui_lines(fb, y + 30, &gfx_font_small, N_("Restez près d'autres cigales."));
+    ui_footer(fb, N_("G : arrêter"));
 }
 
 const app_t app_radio_tune = {
-    .name = "Réglage radio",
+    .name = N_("Réglage radio"),
     .start = tune_start,
     .buttons = tune_buttons,
     .task = tune_task,

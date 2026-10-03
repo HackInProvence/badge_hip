@@ -17,6 +17,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "remote.h"
 #include "skills.h"
@@ -36,19 +37,19 @@ typedef struct {
 } field_t;
 
 static const field_t FIELDS[] = {
-    {"Prénom", NULL, 20, UI_CHARSET_TEXT},
-    {"Nom", NULL, 24, UI_CHARSET_TEXT},
-    {"Téléphone", "TEL", 20, UI_CHARSET_PHONE},
-    {"E-mail", "EMAIL", 48, UI_CHARSET_TEXT},
-    {"Société", "ORG", 32, UI_CHARSET_TEXT},
-    {"Poste", "TITLE", 32, UI_CHARSET_TEXT},
-    {"Adresse", NULL, 48, UI_CHARSET_TEXT},
-    {"Ville", NULL, 24, UI_CHARSET_TEXT},
+    {N_("Prénom"), NULL, 20, UI_CHARSET_TEXT},
+    {N_("Nom"), NULL, 24, UI_CHARSET_TEXT},
+    {N_("Téléphone"), "TEL", 20, UI_CHARSET_PHONE},
+    {N_("E-mail"), "EMAIL", 48, UI_CHARSET_TEXT},
+    {N_("Société"), "ORG", 32, UI_CHARSET_TEXT},
+    {N_("Poste"), "TITLE", 32, UI_CHARSET_TEXT},
+    {N_("Adresse"), NULL, 48, UI_CHARSET_TEXT},
+    {N_("Ville"), NULL, 24, UI_CHARSET_TEXT},
     {"LinkedIn", "URL;TYPE=linkedin", 56, UI_CHARSET_TEXT},
     {"Git", "URL;TYPE=git", 56, UI_CHARSET_TEXT},
-    {"Site web", "URL", 56, UI_CHARSET_TEXT},
+    {N_("Site web"), "URL", 56, UI_CHARSET_TEXT},
     {"Mastodon", "X-MASTODON", 48, UI_CHARSET_TEXT},
-    {"Commentaire", "NOTE", 48, UI_CHARSET_TEXT},
+    {N_("Commentaire"), "NOTE", 48, UI_CHARSET_TEXT},
 };
 #define N_FIELDS ((int)(sizeof(FIELDS) / sizeof(FIELDS[0])))
 _Static_assert(N_FIELDS == VCARD_FIELDS, "the fields of vcard.c");
@@ -64,7 +65,7 @@ static char *field(contact_card_t *c, int f) {
 static void card_name(contact_card_t *c, char *buf, size_t len) {
     snprintf(buf, len, "%s %s", field(c, 0), field(c, 1));
     if (! strcmp(buf, " "))
-        snprintf(buf, len, "%s", field(c, 4)[0] ? field(c, 4) : "(sans nom)");
+        snprintf(buf, len, "%s", field(c, 4)[0] ? field(c, 4) : N_("(sans nom)"));
 }
 
 /* ------ Radio: vCards on the chat profile ------ */
@@ -178,9 +179,9 @@ static int sel = 0, card_sel = 0, list_sel = 0;
 static ui_edit_t edit;
 
 static void main_label(int i, char *buf, size_t len) {
-    static const char *L[] = {"Ma carte", "Échanger les cartes", "Contacts reçus"};
+    static const char *L[] = {N_("Ma carte"), N_("Échanger les cartes"), N_("Contacts reçus")};
     if (i == 2)
-        snprintf(buf, len, "%s (%u)", L[i], store_ext_get()->n_contacts);
+        snprintf(buf, len, "%s (%u)", tr(L[i]), store_ext_get()->n_contacts);
     else
         snprintf(buf, len, "%s", L[i]);
 }
@@ -188,7 +189,8 @@ static void main_label(int i, char *buf, size_t len) {
 static void card_label(int i, char *buf, size_t len) {
     store_ext_t *e = store_ext_get();
     const char *v = field(&e->mine, i);
-    snprintf(buf, len, "%s %s : %s", e->send_mask & (1 << i) ? "[x]" : "[ ]", FIELDS[i].label, v[0] ? v : "-");
+    snprintf(buf, len, _("%s %s : %s"), e->send_mask & (1 << i) ? "[x]" : "[ ]", tr(FIELDS[i].label),
+             v[0] ? v : "-");
 }
 
 static void list_label(int i, char *buf, size_t len) {
@@ -323,39 +325,42 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
     char text[64];
     switch (view) {
     case V_MAIN:
-        ui_title(fb, "Contacts");
+        ui_title(fb, N_("Contacts"));
         ui_list(fb, 3, sel, main_label);
-        ui_footer(fb, "G : retour  D : ouvrir");
+        ui_footer(fb, N_("G : retour  D : ouvrir"));
         break;
     case V_CARD:
-        ui_title(fb, "Ma carte");
+        ui_title(fb, N_("Ma carte"));
         ui_list(fb, N_FIELDS, card_sel, card_label);
-        ui_footer(fb, "D : modifier  D long : cocher");
+        ui_footer(fb, N_("D : modifier  D long : cocher"));
         break;
     case V_EDIT:
         ui_edit_render(fb, &edit, FIELDS[card_sel].label, "");
         break;
     case V_EXCHANGE:
-        ui_title(fb, "Échange de cartes");
+        ui_title(fb, N_("Échange de cartes"));
         if (rx_done) {
             card_name(&rx_card, text, sizeof(text));
-            ui_lines(fb, 40, &gfx_font_small, "Carte reçue :");
+            ui_lines(fb, 40, &gfx_font_small, N_("Carte reçue :"));
             ui_lines(fb, 60, &gfx_font_medium, text);
             ui_lines(fb, 90, &gfx_font_small, field(&rx_card, 4));
-            ui_footer(fb, "G : ignorer  D : garder");
+            ui_footer(fb, N_("G : ignorer  D : garder"));
         } else {
-            ui_lines(fb, 40, &gfx_font_small, "Votre carte (vCard) est\nenvoyée aux cigales en mode\néchange, et lisible par un\nFlipper (subghz chat).\nRapprochez les badges !");
-            ui_footer(fb, "G : arrêter");
+            ui_lines(fb, 40, &gfx_font_small, N_("Votre carte (vCard) est\nenvoyée aux cigales en mode\n"
+                                                 "échange, et lisible par un\nFlipper (subghz chat).\n"
+                                                 "Rapprochez les badges !"));
+            ui_footer(fb, N_("G : arrêter"));
         }
         break;
     case V_LIST:
-        snprintf(text, sizeof(text), "Contacts (%u)", e->n_contacts);
+        snprintf(text, sizeof(text), _("Contacts (%u)"), e->n_contacts);
         ui_title(fb, text);
         if (e->n_contacts)
             ui_list(fb, e->n_contacts, list_sel, list_label);
         else
-            ui_lines(fb, 60, &gfx_font_small, "Aucun contact reçu.\nExport USB : touche k\n(tools/contacts_export.py)");
-        ui_footer(fb, e->n_contacts ? "D : voir  D long : supprimer" : "G : retour");
+            ui_lines(fb, 60, &gfx_font_small,
+                     N_("Aucun contact reçu.\nExport USB : touche k\n(tools/contacts_export.py)"));
+        ui_footer(fb, e->n_contacts ? N_("D : voir  D long : supprimer") : N_("G : retour"));
         break;
     default: {
         contact_card_t *c = &e->contacts[list_sel];
@@ -368,17 +373,17 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
         for (int f = 2; f < N_FIELDS && y < UI_FOOTER_Y - (skills ? 36 : 16); ++f) {
             if (! field(c, f)[0])
                 continue;
-            snprintf(text, sizeof(text), "%s : %s", FIELDS[f].label, field(c, f));
+            snprintf(text, sizeof(text), _("%s : %s"), tr(FIELDS[f].label), field(c, f));
             y = ui_text(fb, 3, y, &gfx_font_small, text) - 1;
         }
-        ui_footer(fb, "G : retour");
+        ui_footer(fb, N_("G : retour"));
         break;
     }
     }
 }
 
 const app_t app_contacts = {
-    .name = "Contacts",
+    .name = N_("Contacts"),
     .start = contacts_start,
     .buttons = contacts_buttons,
     .task = contacts_task,

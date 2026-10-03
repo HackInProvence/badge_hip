@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "i18n.h"
 #include "rtttl_parse.h"
 
 #define DEFAULT_DURATION 4
@@ -418,25 +419,25 @@ bad:
 const char *rtttl_error_text(rtttl_err_t e) {
     switch (e) {
     case RTTTL_OK: return "ok";
-    case RTTTL_END: return "fin";
-    case RTTTL_ERR_NAME: return "':' manquant après le nom";
-    case RTTTL_ERR_SECTION: return "':' manquant avant les notes";
-    case RTTTL_ERR_DEFAULT: return "réglage d, o ou b invalide";
-    case RTTTL_ERR_DURATION: return "durée invalide";
-    case RTTTL_ERR_NOTE: return "note invalide";
-    case RTTTL_ERR_OCTAVE: return "octave invalide";
-    case RTTTL_ERR_SEPARATOR: return "',' attendue après la note";
-    case RTTTL_ERR_EMPTY: return "aucune note";
-    case RTTTL_ERR_TOO_LONG: return "ligne trop longue";
-    case RTTTL_ERR_PICAXE: return "commande tune PICAXE invalide";
+    case RTTTL_END: return N_("fin");
+    case RTTTL_ERR_NAME: return N_("':' manquant après le nom");
+    case RTTTL_ERR_SECTION: return N_("':' manquant avant les notes");
+    case RTTTL_ERR_DEFAULT: return N_("réglage d, o ou b invalide");
+    case RTTTL_ERR_DURATION: return N_("durée invalide");
+    case RTTTL_ERR_NOTE: return N_("note invalide");
+    case RTTTL_ERR_OCTAVE: return N_("octave invalide");
+    case RTTTL_ERR_SEPARATOR: return N_("',' attendue après la note");
+    case RTTTL_ERR_EMPTY: return N_("aucune note");
+    case RTTTL_ERR_TOO_LONG: return N_("ligne trop longue");
+    case RTTTL_ERR_PICAXE: return N_("commande tune PICAXE invalide");
     }
-    return "erreur";
+    return N_("erreur");
 }
 
 void rtttl_note_label(const rtttl_note_t *n, char *buf, size_t len) {
     static const char *const NAMES[12] = {"Do", "Do#", "Ré", "Ré#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"};
     if (n->rest)
-        snprintf(buf, len, "Silence");
+        snprintf(buf, len, N_("Silence"));
     else
         snprintf(buf, len, "%s%u", NAMES[n->semitone % 12], n->octave);
 }

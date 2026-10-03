@@ -28,6 +28,7 @@ SRC = os.path.join(ROOT, 'src', 'menu')
 LANG_DIR = os.path.join(SRC, 'lang')
 TABLE = os.path.join(SRC, 'i18n_table.c')
 SOURCE_LANG = ('fr', 'Français')
+EXTRA_DIRS = ('audio', 'video')  # Modules outside src/menu whose messages are shown (wav_message()...)
 
 # Characters of the fonts of the badge (src/gfx/gen_fonts.py): ASCII, the accented letters and a few symbols
 FONT_EXTRA = 'àâçéèêëîïôùûüÀÉÈÊÇ'
@@ -110,10 +111,13 @@ def read_literals(src, pos):
 
 
 def extract():
-    """{text: [(file, line)]} of the marked texts of src/menu."""
+    """{text: [(file, line)]} of the marked texts of src/menu (and EXTRA_DIRS)."""
     texts = {}
-    for path in sorted(glob.glob(os.path.join(SRC, '*.c')) + glob.glob(os.path.join(SRC, '*.h'))):
-        if os.path.basename(path) == 'i18n_table.c':
+    paths = glob.glob(os.path.join(SRC, '*.c')) + glob.glob(os.path.join(SRC, '*.h'))
+    for d in EXTRA_DIRS:
+        paths += glob.glob(os.path.join(ROOT, 'src', d, '*.c'))
+    for path in sorted(paths):
+        if os.path.basename(path) in ('i18n_table.c', 'i18n.h'):  # i18n.h: examples in its comments
             continue
         src = open(path, encoding='utf-8').read()
         for m in MARK.finditer(src):

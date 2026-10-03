@@ -10,6 +10,7 @@
 
 #include "achievements.h"
 #include "app.h"
+#include "i18n.h"
 #include "social.h"
 #include "store.h"
 
@@ -22,44 +23,45 @@ typedef struct {
 } achv_t;
 
 static const achv_t ACHV[ACHV_COUNT] = {
-    [ACHV_FIRST_BOOT] = {"Premiers pas", "Allumer sa cigale.", 5},
-    [ACHV_MEET_1] = {"Bonjour !", "Rencontrer une cigale\n(rester près d'elle).", 10},
-    [ACHV_MEET_10] = {"Sociable", "Rencontrer 10 cigales.", 30},
-    [ACHV_MEET_50] = {"Star du réseau", "Rencontrer 50 cigales.", 80},
-    [ACHV_MESSAGE] = {"Facteur", "Envoyer un message\n(Social > Messages).", 10},
-    [ACHV_CONTACT] = {"Carte de visite", "Recevoir un contact\n(Social > Contacts).", 15},
-    [ACHV_VOTE] = {"Citoyen", "Voter (Social > Vote).", 10},
-    [ACHV_CHORUS] = {"Choriste", "Chanter dans le choeur.", 15},
-    [ACHV_INFECTED] = {"Patient", "Attraper le virus\ndes cigales.", 10},
-    [ACHV_CURED] = {"Remède", "Guérir du virus.", 20},
-    [ACHV_DUEL_WIN] = {"Duelliste", "Gagner un pierre-feuille-\nciseaux.", 20},
-    [ACHV_BATTLE_WIN] = {"Amiral", "Gagner une bataille navale.", 30},
-    [ACHV_WEREWOLF_PLAY] = {"Pleine lune", "Jouer au loup-garou.", 20},
-    [ACHV_WEREWOLF_WIN] = {"Survivant", "Gagner au loup-garou.", 40},
-    [ACHV_ASSASSIN_KILL] = {"Ombre", "Éliminer sa cible\nà l'assassin.", 20},
-    [ACHV_ASSASSIN_WIN] = {"Dernier debout", "Gagner l'assassin.", 50},
-    [ACHV_TUG_WIN] = {"Costaud", "Gagner le tir à la corde.", 20},
-    [ACHV_BOOK_END] = {"Héros", "Finir un livre-jeu.", 30},
-    [ACHV_RTTTL] = {"Mélomane", "Jouer une sonnerie.", 5},
-    [ACHV_TRADE] = {"Contrebandier", "Échanger une marchandise\n(Social > Contrebande).", 20},
-    [ACHV_TRADE_RARE] = {"Trésor", "Obtenir une marchandise\nlégendaire.", 50},
-    [ACHV_CARGO_FULL] = {"Collectionneur", "Posséder toutes les\nmarchandises.", 100},
-    [ACHV_CTF_FLAG] = {"Hacker", "Trouver un flag du CTF.", 30},
-    [ACHV_CRYPTO] = {"Cryptographe", "Résoudre un défi crypto.", 20},
-    [ACHV_HOTCOLD] = {"Fin limier", "Trouver la balise\nchaud-froid.", 30},
-    [ACHV_HUNT433] = {"Chasseur d'ondes", "Entendre une télécommande\n433 MHz (Chasse 433 MHz).", 15},
-    [ACHV_RECORD] = {"Recordman", "Battre un record\ndans un jeu.", 15},
-    [ACHV_VIDEO] = {"Cinéphile", "Regarder une vidéo\njusqu'au bout.", 15},
-    [ACHV_IMAGE_SENT] = {"Photographe", "Envoyer une image\npar radio.", 15},
-    [ACHV_SKILLS] = {"Expert", "Cocher ses compétences\n(Social > Compétences).", 10},
-    [ACHV_SKILL_MATCH] = {"Âmes soeurs", "Croiser une cigale qui\npartage une compétence.", 20},
-    [ACHV_ALL] = {"Platine", "Obtenir tous les\nautres succès.", 200},
+    [ACHV_FIRST_BOOT] = {N_("Premiers pas"), N_("Allumer sa cigale."), 5},
+    [ACHV_MEET_1] = {N_("Bonjour !"), N_("Rencontrer une cigale\n(rester près d'elle)."), 10},
+    [ACHV_MEET_10] = {N_("Sociable"), N_("Rencontrer 10 cigales."), 30},
+    [ACHV_MEET_50] = {N_("Star du réseau"), N_("Rencontrer 50 cigales."), 80},
+    [ACHV_MESSAGE] = {N_("Facteur"), N_("Envoyer un message\n(Social > Messages)."), 10},
+    [ACHV_CONTACT] = {N_("Carte de visite"), N_("Recevoir un contact\n(Social > Contacts)."), 15},
+    [ACHV_VOTE] = {N_("Citoyen"), N_("Voter (Social > Vote)."), 10},
+    [ACHV_CHORUS] = {N_("Choriste"), N_("Chanter dans le choeur."), 15},
+    [ACHV_INFECTED] = {N_("Patient"), N_("Attraper le virus\ndes cigales."), 10},
+    [ACHV_CURED] = {N_("Remède"), N_("Guérir du virus."), 20},
+    [ACHV_DUEL_WIN] = {N_("Duelliste"), N_("Gagner un pierre-feuille-\nciseaux."), 20},
+    [ACHV_BATTLE_WIN] = {N_("Amiral"), N_("Gagner une bataille navale."), 30},
+    [ACHV_WEREWOLF_PLAY] = {N_("Pleine lune"), N_("Jouer au loup-garou."), 20},
+    [ACHV_WEREWOLF_WIN] = {N_("Survivant"), N_("Gagner au loup-garou."), 40},
+    [ACHV_ASSASSIN_KILL] = {N_("Ombre"), N_("Éliminer sa cible\nà l'assassin."), 20},
+    [ACHV_ASSASSIN_WIN] = {N_("Dernier debout"), N_("Gagner l'assassin."), 50},
+    [ACHV_TUG_WIN] = {N_("Costaud"), N_("Gagner le tir à la corde."), 20},
+    [ACHV_BOOK_END] = {N_("Héros"), N_("Finir un livre-jeu."), 30},
+    [ACHV_RTTTL] = {N_("Mélomane"), N_("Jouer une sonnerie."), 5},
+    [ACHV_TRADE] = {N_("Contrebandier"), N_("Échanger une marchandise\n(Social > Contrebande)."), 20},
+    [ACHV_TRADE_RARE] = {N_("Trésor"), N_("Obtenir une marchandise\nlégendaire."), 50},
+    [ACHV_CARGO_FULL] = {N_("Collectionneur"), N_("Posséder toutes les\nmarchandises."), 100},
+    [ACHV_CTF_FLAG] = {N_("Hacker"), N_("Trouver un flag du CTF."), 30},
+    [ACHV_CRYPTO] = {N_("Cryptographe"), N_("Résoudre un défi crypto."), 20},
+    [ACHV_HOTCOLD] = {N_("Fin limier"), N_("Trouver la balise\nchaud-froid."), 30},
+    [ACHV_HUNT433] = {N_("Chasseur d'ondes"), N_("Entendre une télécommande\n433 MHz (Chasse 433 MHz)."), 15},
+    [ACHV_RECORD] = {N_("Recordman"), N_("Battre un record\ndans un jeu."), 15},
+    [ACHV_VIDEO] = {N_("Cinéphile"), N_("Regarder une vidéo\njusqu'au bout."), 15},
+    [ACHV_IMAGE_SENT] = {N_("Photographe"), N_("Envoyer une image\npar radio."), 15},
+    [ACHV_SKILLS] = {N_("Expert"), N_("Cocher ses compétences\n(Social > Compétences)."), 10},
+    [ACHV_SKILL_MATCH] = {N_("Âmes soeurs"), N_("Croiser une cigale qui\npartage une compétence."), 20},
+    [ACHV_ALL] = {N_("Platine"), N_("Obtenir tous les\nautres succès."), 200},
 };
 
 /* XP needed for each level (level n: LEVEL_XP[n - 1]) */
 static const uint16_t LEVEL_XP[ACHV_LEVELS] = {0, 20, 50, 100, 170, 260, 380, 530, 720, 1000};
-static const char *LEVEL_NAMES[ACHV_LEVELS] = {"Oeuf", "Larve", "Nymphe", "Mue", "Jeune cigale", "Cigale",
-                                               "Chanteuse", "Virtuose", "Maestro", "Cigale d'or"};
+static const char *LEVEL_NAMES[ACHV_LEVELS] = {N_("Oeuf"), N_("Larve"), N_("Nymphe"), N_("Mue"),
+                                               N_("Jeune cigale"), N_("Cigale"), N_("Chanteuse"),
+                                               N_("Virtuose"), N_("Maestro"), N_("Cigale d'or")};
 
 static char event[48];
 static bool event_pending = false;
@@ -78,9 +80,9 @@ void achv_unlock(achv_id_t id) {
     store_changed();
     uint8_t after = achv_level();
     if (after > before)
-        snprintf(event, sizeof(event), "Niveau %u : %s !", after, LEVEL_NAMES[after - 1]);
+        snprintf(event, sizeof(event), _("Niveau %u : %s !"), after, tr(LEVEL_NAMES[after - 1]));
     else
-        snprintf(event, sizeof(event), "Succès : %s", ACHV[id].name);
+        snprintf(event, sizeof(event), _("Succès : %s"), tr(ACHV[id].name));
     event_pending = true;
     printf("achievement: %s (+%u XP, level %u)\n", ACHV[id].name, ACHV[id].xp, after);
     bool all = true;
@@ -180,12 +182,13 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[64];
     if (detail && sel == 0) {
-        ui_title(fb, "Rencontres");
-        int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small, "Chaque cigale rencontrée\n(rester près d'elle)\nrapporte 2 XP.");
-        snprintf(text, sizeof(text), "%u rencontre%s : %u XP", social_met_count(), social_met_count() > 1 ? "s" : "",
+        ui_title(fb, N_("Rencontres"));
+        int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small,
+                         N_("Chaque cigale rencontrée\n(rester près d'elle)\nrapporte 2 XP."));
+        snprintf(text, sizeof(text), _("%u rencontre%s : %u XP"), social_met_count(), social_met_count() > 1 ? "s" : "",
                  social_met_count() * XP_PER_MEETING);
         ui_lines(fb, y + 12, &gfx_font_small, text);
-        ui_footer(fb, "G : retour");
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     if (detail) {
@@ -194,13 +197,13 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         int y = ui_lines(fb, UI_TITLE_H + 12, &gfx_font_small, a->how);
         snprintf(text, sizeof(text), "+%u XP", a->xp);
         y = ui_lines(fb, y + 12, &gfx_font_small, text);
-        ui_lines(fb, y + 8, &gfx_font_small, achv_unlocked(sel - 1) ? "Obtenu !" : "Pas encore obtenu");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, y + 8, &gfx_font_small, achv_unlocked(sel - 1) ? N_("Obtenu !") : N_("Pas encore obtenu"));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     uint8_t level = achv_level();
     uint32_t xp = achv_xp();
-    snprintf(text, sizeof(text), "Niv. %u : %s", level, LEVEL_NAMES[level - 1]);
+    snprintf(text, sizeof(text), _("Niv. %u : %s"), level, tr(LEVEL_NAMES[level - 1]));
     ui_title(fb, text);
     /* Progress to the next level */
     uint32_t lo = LEVEL_XP[level - 1], hi = level < ACHV_LEVELS ? LEVEL_XP[level] : lo;
@@ -208,10 +211,10 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
     for (int i = 0; i < ACHV_COUNT; ++i)
         done += achv_unlocked(i);
     if (level < ACHV_LEVELS)
-        snprintf(text, sizeof(text), "%lu / %lu XP   %d/%d succès", (unsigned long)xp, (unsigned long)hi, done,
+        snprintf(text, sizeof(text), _("%lu / %lu XP   %d/%d succès"), (unsigned long)xp, (unsigned long)hi, done,
                  ACHV_COUNT);
     else
-        snprintf(text, sizeof(text), "%lu XP   %d/%d succès", (unsigned long)xp, done, ACHV_COUNT);
+        snprintf(text, sizeof(text), _("%lu XP   %d/%d succès"), (unsigned long)xp, done, ACHV_COUNT);
     gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 2, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     ui_gauge(fb, 6, UI_TITLE_H + 21, GFX_WIDTH - 12, 6, hi > lo ? xp - lo : 1, hi > lo ? hi - lo : 1);
     /* The list: 6 rows */
@@ -231,7 +234,7 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
             /* The meetings: two dots for two cicadas, and their XP */
             gfx_fill_rect(fb, 7, y + 8, 4, 4, fg);
             gfx_fill_rect(fb, 13, y + 8, 4, 4, fg);
-            snprintf(text, sizeof(text), "Rencontres : %u x 2 = %u XP", social_met_count(),
+            snprintf(text, sizeof(text), _("Rencontres : %u x 2 = %u XP"), social_met_count(),
                      social_met_count() * XP_PER_MEETING);
             char fitted[48];
             ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
@@ -244,16 +247,16 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         if (achv_unlocked(i))
             gfx_fill_rect(fb, 9, y + 7, 6, 6, fg);
         /* The name and its value: "Contrebandier (+20 XP)" (the longest one fits from x = 22) */
-        snprintf(text, sizeof(text), "%s (+%u XP)", ACHV[i].name, ACHV[i].xp);
+        snprintf(text, sizeof(text), "%s (+%u XP)", tr(ACHV[i].name), ACHV[i].xp);
         char fitted[48];
         ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
         gfx_text(fb, 22, y + 1, &gfx_font_small, fitted, fg, GFX_ALIGN_LEFT);
     }
-    ui_footer(fb, "D : comment  G : retour");
+    ui_footer(fb, N_("D : comment  G : retour"));
 }
 
 const app_t app_achievements = {
-    .name = "Succès",
+    .name = N_("Succès"),
     .start = achv_start,
     .buttons = achv_buttons,
     .render = achv_render,

@@ -68,7 +68,7 @@ The main menu groups the features by theme:
 | **Social** | Cicada network, Messages, Contacts, Compétences (Skills), Programme (Program), Vote, Radar des cigales (Cicada radar), Chaud - froid (Hot - cold), Virus des cigales (Cicada virus), Choeur (Choir), Annonces (Announcements), Contrebande (Smuggling) |
 | **Radio & IR** | Radio message, radio carrier, Décodeur 433 MHz (433 MHz decoder), Station météo (Weather station), Envoyer une image (Send an image), Recevoir une image (Receive an image), Infrared, Chasse 433 MHz (433 MHz hunt), Écouter la radio pirate (Listen to the pirate radio) |
 | **Badge** | Badge nominatif (Name tag), Lampe (Lamp), Badge de talk (Talk badge), cicada song, LED animations, screen demo, OLED screen, Succès (Achievements) |
-| **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits), "Réglage radio" (Radio tuning) |
+| **Réglages** (Settings) | "Veille de l'écran" (Screen sleep), "Langue" (Language), "Télécommande" (Remote control), "Mode muet" (Mute mode), "Infos" (Info), "Crédits" (Credits), "Réglage radio" (Radio tuning) |
 
 A seventh theme, **Admin**, is hidden: it is for the organizers (see [§ 4.8](#48-admin-mode-organizers)).
 
@@ -496,6 +496,9 @@ A new achievement is announced at the bottom of the screen ("Succès : Sociable"
   it is the most stable display of the screen, the image stays sharp for hours without power.
 
   While asleep, any button wakes the badge up.
+- **Langue** (Language): French or English ("Langue / Language", each language written in itself; sides then right
+  wing). A badge left in a language you can't read: left wing 5 times (back to the main menu), then the sides
+  in turn left, right × 4: it switches to English. See [translation](translation.md).
 - **Télécommande : oui / non** (Remote control: yes / no): the badge obeys (or not) the radio commands of the
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mode muet : oui / non** (Mute mode: yes / no): turns off the sound and the LEDs. The organizers can switch it on
@@ -628,7 +631,8 @@ two rows): quit.
 sound, services) and show "SOMMEIL: le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous
 d'un organisateur." (put to sleep by an admin, see an organizer if it stays stuck); a reboot does not wake them up.
 Except a badge on its **talk badge** page, and the admin badge that sends the order. The order goes by the network of
-the badges, not in Princeton: a Flipper cannot put the conference to sleep. **Unlock** (organizers): 5 times the left
+the badges, not in Princeton: the Princeton remote of a Flipper cannot put the conference to sleep (a network
+`.sub` file made by `tools/flipper_net_sub.py command 0x05` can: keep it for the organizers). **Unlock** (organizers): 5 times the left
 flank, then 5 times the right one (less than 5 s between two presses); the badge restarts normally.
 
 **Remise à zéro** (Reset): before the event or after tests. Flanks: choose; right wing, then a **long press on the
@@ -684,8 +688,8 @@ python tools/badge_remote.py
 - **Badge :** the list of the badges plugged in, to choose the one to control when there are several.
 - **Mode clavier (saisie de texte)** (keyboard mode, text input): when a text editor is open on the badge (business
   card, answer to a challenge...), the characters typed on the computer are inserted at the cursor; Enter: done;
-  Escape: cancel; Backspace: erase. The arrow keys are still the buttons. Only the characters without accent go
-  through the keyboard: the accented letters are chosen with the flanks.
+  Escape: cancel; Backspace: erase. The arrow keys are still the buttons. Through the keyboard: the characters
+  without accent and the letters é è ê à â ç ô î ù û ë ï É È À Ç; the others are chosen with the flanks.
 - **Mode admin**: turns the admin mode of the badge on or off (see [§ 4.8](#48-admin-mode-organizers));
   the box follows the state of the badge.
 - A connection problem (badge unplugged, port busy) is shown in the status line and in the log;
@@ -711,7 +715,7 @@ SD card
 ├── VIDEOS/     .epv videos
 ├── MUSIQUE/    .wav sounds (subfolders allowed, handy for the blind test)
 ├── TEXTES/     .txt texts for speed reading
-├── SONNERIES/  RTTTL ringtones .txt, .rtttl or .rtx, sub-folders allowed, any number of files
+├── SONNERIES/  RTTTL ringtones .txt, .rtttl, .rtx or PICAXE .bas, sub-folders allowed, any number of files
 ├── RTTTL/      same (either one)
 └── LIVRES/     .txt gamebooks (16 at most)
 ```
@@ -784,7 +788,7 @@ less clear on the buzzer.
 | The badge does not turn on | Is the switch on ON? Is the battery charged (plug it into USB)? |
 | The computer does not see the badge | Use a USB data cable (not a charge-only cable); switch on ON. |
 | "Carte SD absente" (SD card missing) | Is the card pushed all the way in? Formatted as FAT32 or exFAT? |
-| A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`) and right folder? Name shorter than 64 characters? |
+| A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`, `.bas`) and right folder? Name shorter than 64 characters? |
 | A ringtone is marked `(!)` | An error in the line: the right wing shows the column and the reason (see [ringtones.md](ringtones.md)). |
 | No sound | Volume at 0? (Médias > Volume). The buzzer is quiet: put your ear close to it. |
 | The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Infos, the crystal must be 26 or 27 MHz. |

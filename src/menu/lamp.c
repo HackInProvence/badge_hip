@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "remote.h"
 #include "store.h"
 
@@ -66,15 +67,15 @@ static bool lamp_buttons(const app_buttons_t *b, absolute_time_t now) {
 static void lamp_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[32];
-    ui_title(fb, "Lampe");
-    snprintf(text, sizeof(text), on ? "%d %%" : "Eteinte", percent());
+    ui_title(fb, N_("Lampe"));
+    snprintf(text, sizeof(text), on ? "%d %%" : _("Eteinte"), percent());
     gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
     ui_gauge(fb, 20, 90, GFX_WIDTH - 40, 16, on ? percent() : 0, 100);
     if (remote_muted())
-        ui_lines(fb, 118, &gfx_font_small, "Mode muet : LEDs coupées\n(Réglages)");
+        ui_lines(fb, 118, &gfx_font_small, N_("Mode muet : LEDs coupées\n(Réglages)"));
     else
-        ui_lines(fb, 118, &gfx_font_small, "Flancs : - / +\n(maintenir : vite)");
-    ui_footer(fb, on ? "G : quitter  D : éteindre" : "G : quitter  D : allumer");
+        ui_lines(fb, 118, &gfx_font_small, N_("Flancs : - / +\n(maintenir : vite)"));
+    ui_footer(fb, on ? N_("G : quitter  D : éteindre") : N_("G : quitter  D : allumer"));
 }
 
 static void lamp_stop(void) {
@@ -82,11 +83,11 @@ static void lamp_stop(void) {
 }
 
 static void lamp_label(char *buf, int len) {
-    snprintf(buf, len, "Lampe : %d %%", percent());
+    snprintf(buf, len, _("Lampe : %d %%"), percent());
 }
 
 const app_t app_lamp = {
-    .name = "Lampe",
+    .name = N_("Lampe"),
     .label = lamp_label,
     .start = lamp_start,
     .buttons = lamp_buttons,

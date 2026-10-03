@@ -18,6 +18,7 @@
 #include "app.h"
 #include "ff.h"
 #include "gfx.h"
+#include "i18n.h"
 #include "net.h"
 #include "remote.h"
 #include "screen_demo.h"
@@ -205,7 +206,7 @@ static void send_task(absolute_time_t now) {
 
 static void file_label(int i, char *buf, size_t len) {
     if (i == 0)
-        snprintf(buf, len, "SecSea (intégrée)");
+        snprintf(buf, len, N_("SecSea (intégrée)"));
     else
         snprintf(buf, len, "%s", files[i - 1]);
 }
@@ -255,17 +256,17 @@ static void send_render(uint8_t *fb, absolute_time_t now) {
     if (send_block >= 0) {
         memcpy(fb, image, GFX_FB_SIZE);  /* The image being sent */
         gfx_fill_rect(fb, 0, GFX_HEIGHT - 20, GFX_WIDTH, 20, GFX_WHITE);
-        gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, rounds_left > 1 ? "Envoi (1/2)... G : arrêter" :
-                 "Envoi (2/2)... G : arrêter", GFX_BLACK, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, rounds_left > 1 ? N_("Envoi (1/2)... G : arrêter") :
+                 N_("Envoi (2/2)... G : arrêter"), GFX_BLACK, GFX_ALIGN_CENTER);
         return;
     }
-    ui_title(fb, "Envoyer une image");
+    ui_title(fb, N_("Envoyer une image"));
     ui_list(fb, n_files + 1, sel, file_label);
-    ui_footer(fb, "G : retour  D : envoyer");
+    ui_footer(fb, N_("G : retour  D : envoyer"));
 }
 
 const app_t app_image_send = {
-    .name = "Envoyer une image",
+    .name = N_("Envoyer une image"),
     .start = send_start,
     .buttons = send_buttons,
     .task = send_task_page,
@@ -303,7 +304,7 @@ static bool recv_buttons(const app_buttons_t *b, absolute_time_t now) {
 static void recv_still(uint8_t *fb) {
     memcpy(fb, image, GFX_FB_SIZE);
     char text[48];
-    snprintf(text, sizeof(text), "Reçue (%d bloc%s corrigé%s)", rebuilt, rebuilt > 1 ? "s" : "", rebuilt > 1 ? "s" : "");
+    snprintf(text, sizeof(text), rebuilt > 1 ? _("Reçue (%d blocs corrigés)") : _("Reçue (%d bloc corrigé)"), rebuilt);
     gfx_fill_rect(fb, 0, GFX_HEIGHT - 20, GFX_WIDTH, 20, GFX_WHITE);
     gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
 }
@@ -324,23 +325,24 @@ static bool recv_task(absolute_time_t now) {
 
 static void recv_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Recevoir une image");
+    ui_title(fb, N_("Recevoir une image"));
     if (! transfer) {
-        ui_lines(fb, 50, &gfx_font_small, "En attente d'une image...\nSur l'autre badge :\nRadio & IR > Envoyer\nune image.");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, 50, &gfx_font_small,
+                 N_("En attente d'une image...\nSur l'autre badge :\nRadio & IR > Envoyer\nune image."));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     /* Only the progress: the image comes at the end, drawn cleanly (the fast refreshes leave ghosts) */
     int ok = data_blocks_ok();
     char text[48];
-    snprintf(text, sizeof(text), "Réception...\n%d / %d blocs", ok, DATA_BLOCKS);
+    snprintf(text, sizeof(text), _("Réception...\n%d / %d blocs"), ok, DATA_BLOCKS);
     ui_lines(fb, 60, &gfx_font_medium, text);
     ui_gauge(fb, 20, 125, GFX_WIDTH - 40, 16, ok, DATA_BLOCKS);
-    ui_footer(fb, "G : arrêter  D : recommencer");
+    ui_footer(fb, N_("G : arrêter  D : recommencer"));
 }
 
 const app_t app_image_recv = {
-    .name = "Recevoir une image",
+    .name = N_("Recevoir une image"),
     .start = recv_start,
     .buttons = recv_buttons,
     .task = recv_task,

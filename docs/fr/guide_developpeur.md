@@ -1168,7 +1168,9 @@ Les groupes (`--only`) :
 | `radio` | message radio, mode test, balises du réseau des cigales |
 | `ir` | décodage et émission d'une trame NEC |
 | `images` | images de la carte SD |
+| `ringtones` | Médias > Sonneries : dossiers SONNERIES / RTTTL de la carte SD, page suivante, lecture d'une sonnerie |
 | `apps` | badge nominatif et lampe |
+| `battery` | mesure de la batterie ; sur un badge non calibré, écrit puis efface le secteur de calibration usine (test de l'écriture) |
 | `admin` | séquence secrète, commandes mode muet / fin du mode muet, sortie du mode admin |
 | `radio433` | pages Décodeur 433 MHz et Station météo, puis retour des balises du réseau |
 | `social` | pages du thème Social (contacts, radar, chaud - froid...) et états du badge de talk |
@@ -1181,7 +1183,7 @@ badges vérifiées ; captures d'écran dans un dossier daté. Les badges sont re
 
 ```bash
 python tools/test_party_games.py --ports COM9 COM11 [--only tug,assassin]   # tir à la corde, assassin
-python tools/test_werewolf.py --ports COM9 COM11 [--advanced]               # loup-garou (meneur + robots)
+python tools/test_werewolf.py --ports COM9 COM11 [--without voyante,...]    # loup-garou (meneur + robots)
 python tools/test_smuggler.py --ports COM9 COM11                            # contrebande
 ```
 
@@ -1207,7 +1209,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # co
 | `tools/badge_remote.py` | fenêtre avec l'écran du badge en grand (zoom 2–4), flèches / Entrée = boutons, Maj = appui long (et boutons « appui long » à l'écran), capture PNG ; liste « Badge : » pour choisir parmi plusieurs badges (ou `--port`) ; case « Mode clavier » : le texte tapé va à l'éditeur du badge (0x02 + caractère ; Entrée : terminé, Échap : annuler, retour arrière : effacer) ; case « Mode admin » (0x01 + `A` / `a`), qui suit l'état du badge (lignes `admin: on/off`, et `!` envoyé à la connexion) ; le fil de lecture ne s'arrête jamais (erreurs dans la ligne d'état et le journal) ; `--snapshot fichier.png` pour une capture seule |
 | `tools/badge_selftest.py` | test automatique du badge (§ 9.2) |
 | `tools/badge_screens.py` | parcourt tous les thèmes, toutes les entrées (Admin compris) et les pages des applications, enregistre une image PNG de chaque écran dans `docs/screens/` et écrit [docs/fr/ecrans.md](ecrans.md) et [docs/en/screens.md](../en/screens.md) ; avec la vérification des textes (`U`), liste les textes coupés, trop larges ou sous le pied de page (`docs/screens/checks.txt` et fin des pages) ; `--port`, `--only Jeux,Social`. Le badge est redémarré ; les interrupteurs des menus ne sont pas pressés |
-| `tools/badge_media_test.py` | lit toutes les vidéos et musiques de la carte SD (sous-dossiers compris) et vérifie que chacune va jusqu'au bout (erreur de lecture, arrêt avant la fin, images par seconde des vidéos) ; `--videos`, `--music` (les deux par défaut), `--max N` (N secondes de chaque fichier au plus, 0 = en entier), `--port` ; rapport affiché et écrit dans `media_report.txt` |
+| `tools/badge_media_test.py` | lit toutes les vidéos et musiques de la carte SD (sous-dossiers compris) et vérifie que chacune va jusqu'au bout (erreur de lecture, arrêt avant la fin, images par seconde des vidéos) ; `--videos`, `--music` (les deux par défaut), `--max N` (N secondes de chaque vidéo au plus, 0 = en entier), `--music-max N` (N secondes de chaque musique, 5 par défaut : le début ; 0 = en entier), `--port` ; rapport affiché et écrit dans `media_report.txt` |
 | `tools/score_check.py` | vérifie les QR codes de score et fait le classement (§ 6.11) |
 | `tools/contacts_export.py` | cartes de visite reçues par le badge → `.vcf` (`--port`, `-o`) |
 | `tools/crypto_ctf_make.py` | génère la table des défis crypto (`--update`, `--answers`) : fichier des solutions (§ 6.18) |

@@ -16,6 +16,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "social.h"
 
@@ -26,7 +27,7 @@
 
 enum { K_INVITE = 1, K_ACCEPT, K_COMMIT, K_REVEAL, K_BYE };
 enum { S_LOBBY, S_INVITING, S_INVITED, S_CHOOSE, S_WAIT, S_RESULT, S_END, S_LOST };
-static const char *CHOICES[3] = {"Pierre", "Feuille", "Ciseaux"};
+static const char *CHOICES[3] = {N_("Pierre"), N_("Feuille"), N_("Ciseaux")};
 
 void battle_handle(const net_packet_t *p);
 
@@ -177,7 +178,7 @@ bool duel_invited(char *buf, int len) {
     if (! invited || notified == invite_session)
         return false;
     notified = invite_session;
-    snprintf(buf, len, "%s vous défie : Social > Duel", inviter_name);
+    snprintf(buf, len, _("%s vous défie : Social > Duel"), inviter_name);
     return true;
 }
 
@@ -329,29 +330,30 @@ static void duel_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[64];
     if (state == S_LOBBY) {
-        ui_title(fb, "Pierre-feuille-ciseaux");
+        ui_title(fb, N_("Pierre-feuille-ciseaux"));
         if (invited) {
-            snprintf(text, sizeof(text), "%s vous défie !", inviter_name);
+            snprintf(text, sizeof(text), _("%s vous défie !"), inviter_name);
             ui_lines(fb, 60, &gfx_font_medium, text);
-            ui_footer(fb, "G : refuser  D : accepter");
+            ui_footer(fb, N_("G : refuser  D : accepter"));
         } else if (n_near) {
             ui_list(fb, n_near, sel, near_label);
-            ui_footer(fb, "G : retour  D : défier");
+            ui_footer(fb, N_("G : retour  D : défier"));
         } else {
-            ui_lines(fb, 60, &gfx_font_small, "Aucune cigale à portée.\nApprochez-vous d'un autre\nbadge pour le défier.");
-            ui_footer(fb, "G : retour");
+            ui_lines(fb, 60, &gfx_font_small, N_("Aucune cigale à portée.\nApprochez-vous d'un autre\n"
+                                                 "badge pour le défier."));
+            ui_footer(fb, N_("G : retour"));
         }
         return;
     }
-    snprintf(text, sizeof(text), "Vous %d - %d %s", my_score, peer_score, peer_name);
+    snprintf(text, sizeof(text), _("Vous %d - %d %s"), my_score, peer_score, peer_name);
     ui_title(fb, text);
     switch (state) {
     case S_INVITING:
-        snprintf(text, sizeof(text), "Invitation envoyée\nà %s...", peer_name);
+        snprintf(text, sizeof(text), _("Invitation envoyée\nà %s..."), peer_name);
         ui_lines(fb, 60, &gfx_font_small, text);
         break;
     case S_CHOOSE:
-        snprintf(text, sizeof(text), "Manche %u : votre choix ?", round_n);
+        snprintf(text, sizeof(text), _("Manche %u : votre choix ?"), round_n);
         ui_lines(fb, UI_TITLE_H + 6, &gfx_font_small, text);
         for (int i = 0; i < 3; ++i) {
             int y = 62 + i * 34;
@@ -364,31 +366,31 @@ static void duel_render(uint8_t *fb, absolute_time_t now) {
         }
         break;
     case S_WAIT:
-        snprintf(text, sizeof(text), "%s\n\nEn attente de %s...", CHOICES[my_choice], peer_name);
+        snprintf(text, sizeof(text), _("%s\n\nEn attente de %s..."), tr(CHOICES[my_choice]), peer_name);
         ui_lines(fb, 60, &gfx_font_small, text);
         break;
     case S_RESULT: {
         int w = winner(my_choice, peer_choice);
-        snprintf(text, sizeof(text), "%s contre %s", CHOICES[my_choice], CHOICES[peer_choice]);
+        snprintf(text, sizeof(text), _("%s contre %s"), tr(CHOICES[my_choice]), tr(CHOICES[peer_choice]));
         ui_lines(fb, 50, &gfx_font_small, text);
-        gfx_text(fb, GFX_WIDTH/2, 85, &gfx_font_large, w > 0 ? "Gagné !" : w < 0 ? "Perdu..." : "Egalité",
+        gfx_text(fb, GFX_WIDTH/2, 85, &gfx_font_large, w > 0 ? N_("Gagné !") : w < 0 ? N_("Perdu...") : N_("Egalité"),
                  GFX_BLACK, GFX_ALIGN_CENTER);
         break;
     }
     case S_END:
-        ui_box(fb, my_score > peer_score ? "Victoire !" : "Défaite...");
+        ui_box(fb, my_score > peer_score ? N_("Victoire !") : N_("Défaite..."));
         break;
     default:
-        snprintf(text, sizeof(text), "%s est parti\n(ou hors de portée).", peer_name);
+        snprintf(text, sizeof(text), _("%s est parti\n(ou hors de portée)."), peer_name);
         ui_lines(fb, 60, &gfx_font_small, text);
         break;
     }
-    ui_footer(fb, state == S_CHOOSE ? "Flancs : choix  D : jouer" : state >= S_END ? "G : quitter  D : rejouer" :
-              "G : abandonner");
+    ui_footer(fb, state == S_CHOOSE ? N_("Flancs : choix  D : jouer") : state >= S_END ? N_("G : quitter  D : rejouer")
+              : N_("G : abandonner"));
 }
 
 const app_t app_duel = {
-    .name = "Duel",
+    .name = N_("Duel"),
     .start = duel_start,
     .buttons = duel_buttons,
     .task = duel_task,

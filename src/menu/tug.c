@@ -19,6 +19,7 @@
 
 #include "app.h"
 #include "achievements.h"
+#include "i18n.h"
 #include "net.h"
 #include "party.h"
 #include "tug_logic.h"
@@ -37,7 +38,7 @@
 
 enum { P_HOME, P_SCAN, P_LOBBY, P_GAME };
 enum { PH_WAIT, PH_TEAMS, PH_COUNTDOWN, PH_PULL, PH_FINAL, PH_RESULT };
-static const char *TEAMS[3] = {"Cigales", "Fourmis", "Arbitre"};
+static const char *TEAMS[3] = {N_("Cigales"), N_("Fourmis"), N_("Arbitre")};
 
 extern const app_t app_tug;
 void tug_service(absolute_time_t now);
@@ -301,11 +302,11 @@ void tug_service(absolute_time_t now) {
 /* ------ The page ------ */
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s  %u joueur%s", found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
+    snprintf(buf, len, _("%s  %u joueur%s"), found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
 }
 
 static void home_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s", i ? "Rejoindre une partie" : "Créer une partie");
+    snprintf(buf, len, "%s", i ? N_("Rejoindre une partie") : N_("Créer une partie"));
 }
 
 static void tug_start(absolute_time_t now) {
@@ -327,7 +328,8 @@ static void tug_start(absolute_time_t now) {
 static const char *busy_game(void) {
     if (party_state() != PARTY_STARTED || party_game() == PARTY_GAME_TUG)
         return NULL;
-    return party_game() == PARTY_GAME_ASSASSIN ? "Assassin" : party_game() == PARTY_GAME_WEREWOLF ? "Loup-garou" : "?";
+    return party_game() == PARTY_GAME_ASSASSIN ? N_("Assassin") : party_game() == PARTY_GAME_WEREWOLF ? N_("Loup-garou")
+           : "?";
 }
 
 static void back_home(void) {
@@ -458,7 +460,7 @@ static void draw_names(uint8_t *fb, int y, const char (*list)[9], int count) {
     char text[24], fitted[24];
     for (int i = 0; i < count && i < 2 * rows; ++i) {
         if (i == 2 * rows - 1 && count > 2 * rows)
-            snprintf(text, sizeof(text), "+%d autres", count - i);
+            snprintf(text, sizeof(text), _("+%d autres"), count - i);
         else
             snprintf(text, sizeof(text), "%s", list[i]);
         ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH/2 - 10);
@@ -474,29 +476,30 @@ static void render_lobby(uint8_t *fb) {
         snprintf(list[i], sizeof(list[i]), "%s", lobby[i].id ? lobby[i].name : "...");
     switch (party_state()) {
     case PARTY_HOSTING:
-        ui_title(fb, "Ta partie");
-        snprintf(text, sizeof(text), "%d joueur%s", n_lobby, n_lobby > 1 ? "s" : "");
-        ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text : "Il faut 2 joueurs au moins.");
+        ui_title(fb, N_("Ta partie"));
+        snprintf(text, sizeof(text), _("%d joueur%s"), n_lobby, n_lobby > 1 ? "s" : "");
+        ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text
+                 : N_("Il faut 2 joueurs au moins."));
         draw_names(fb, UI_TITLE_H + 24, (const char (*)[9])list, n_lobby);
-        ui_footer(fb, n_lobby >= MIN_PLAYERS ? "G : annuler  D : lancer" : "G : annuler");
+        ui_footer(fb, n_lobby >= MIN_PLAYERS ? N_("G : annuler  D : lancer") : N_("G : annuler"));
         break;
     case PARTY_JOINING:
-        ui_title(fb, "Rejoindre");
-        ui_lines(fb, 70, &gfx_font_small, "Connexion...");
-        ui_footer(fb, "G : annuler");
+        ui_title(fb, N_("Rejoindre"));
+        ui_lines(fb, 70, &gfx_font_small, N_("Connexion..."));
+        ui_footer(fb, N_("G : annuler"));
         break;
     case PARTY_JOINED:
-        ui_title(fb, "Salle d'attente");
-        snprintf(text, sizeof(text), "Partie de %s", party_name(party_host_id()));
+        ui_title(fb, N_("Salle d'attente"));
+        snprintf(text, sizeof(text), _("Partie de %s"), party_name(party_host_id()));
         ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
-        ui_lines(fb, UI_TITLE_H + 21, &gfx_font_small, "En attente du lancement...");
+        ui_lines(fb, UI_TITLE_H + 21, &gfx_font_small, N_("En attente du lancement..."));
         draw_names(fb, UI_TITLE_H + 44, (const char (*)[9])list, n_lobby);
-        ui_footer(fb, "G : quitter");
+        ui_footer(fb, N_("G : quitter"));
         break;
     default:
-        ui_title(fb, "Tir à la corde");
-        ui_lines(fb, 60, &gfx_font_small, "Partie annulée par l'hôte\n(ou lancée sans toi).");
-        ui_footer(fb, "D : OK");
+        ui_title(fb, N_("Tir à la corde"));
+        ui_lines(fb, 60, &gfx_font_small, N_("Partie annulée par l'hôte\n(ou lancée sans toi)."));
+        ui_footer(fb, N_("D : OK"));
         break;
     }
 }
@@ -529,87 +532,88 @@ static void draw_rope(uint8_t *fb) {
 static void render_game(uint8_t *fb, absolute_time_t now) {
     char text[64];
     if (cancelled && phase != PH_RESULT) {
-        ui_title(fb, "Tir à la corde");
-        ui_lines(fb, 60, &gfx_font_small, "Partie annulée par l'hôte.");
-        ui_footer(fb, "G : retour  D : OK");
+        ui_title(fb, N_("Tir à la corde"));
+        ui_lines(fb, 60, &gfx_font_small, N_("Partie annulée par l'hôte."));
+        ui_footer(fb, N_("G : retour  D : OK"));
         return;
     }
     if (! ready) {
-        ui_title(fb, "Tir à la corde");
-        ui_lines(fb, 60, &gfx_font_small, "Réception de la liste\ndes joueurs...");
-        ui_footer(fb, "G long : quitter la page");
+        ui_title(fb, N_("Tir à la corde"));
+        ui_lines(fb, 60, &gfx_font_small, N_("Réception de la liste\ndes joueurs..."));
+        ui_footer(fb, N_("G long : quitter la page"));
         return;
     }
     bool referee = team[me] == TUG_REFEREE;
     switch (phase) {
     case PH_WAIT:
     case PH_TEAMS: {
-        ui_title(fb, "Les équipes");
+        ui_title(fb, N_("Les équipes"));
         if (referee) {
-            ui_lines(fb, UI_TITLE_H + 8, &gfx_font_medium, "Tu es l'arbitre !");
-            ui_wrapped(fb, UI_TITLE_H + 40, &gfx_font_small, "Nombre impair de joueurs : tu ne tires pas, tu "
-                       "regardes la corde.", 4);
+            ui_lines(fb, UI_TITLE_H + 8, &gfx_font_medium, N_("Tu es l'arbitre !"));
+            ui_wrapped(fb, UI_TITLE_H + 40, &gfx_font_small, N_("Nombre impair de joueurs : tu ne tires pas, "
+                       "tu regardes la corde."), 4);
         } else {
-            ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, "Tu es dans l'équipe des");
+            ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, N_("Tu es dans l'équipe des"));
             ui_lines(fb, UI_TITLE_H + 22, &gfx_font_medium, TEAMS[team[me]]);
             static char mates[PARTY_MAX][9];
             int k = 0;
             for (int i = 0; i < n; ++i)
                 if (team[i] == team[me] && i != me)
                     snprintf(mates[k++], sizeof(mates[0]), "%s", names[i]);
-            ui_lines(fb, UI_TITLE_H + 46, &gfx_font_small, k ? "Avec :" : "Seul contre tous !");
+            ui_lines(fb, UI_TITLE_H + 46, &gfx_font_small, k ? N_("Avec :") : N_("Seul contre tous !"));
             draw_names(fb, UI_TITLE_H + 66, (const char (*)[9])mates, k);
         }
-        ui_footer(fb, "Prépare-toi...");
+        ui_footer(fb, N_("Prépare-toi..."));
         break;
     }
     case PH_COUNTDOWN:
-        ui_title(fb, "Prêts ?");
+        ui_title(fb, N_("Prêts ?"));
         snprintf(text, sizeof(text), "%d", countdown_shown);
         gfx_text(fb, GFX_WIDTH/2, 70, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
-        snprintf(text, sizeof(text), referee ? "Tu es l'arbitre" : "Équipe des %s", TEAMS[team[me]]);
+        snprintf(text, sizeof(text), referee ? _("Tu es l'arbitre") : _("Équipe des %s"), tr(TEAMS[team[me]]));
         ui_lines(fb, 120, &gfx_font_small, text);
-        ui_footer(fb, referee ? "Regarde la corde" : "G puis D : une traction");
+        ui_footer(fb, referee ? N_("Regarde la corde") : N_("G puis D : une traction"));
         break;
     case PH_PULL:
     case PH_FINAL: {
         int64_t left = absolute_time_diff_us(now, delayed_by_ms(pull_start(), PULL_MS));
         if (phase == PH_PULL)
-            snprintf(text, sizeof(text), "Tirez ! %d s", left > 0 ? (int)((left + 999999) / 1000000) : 0);
+            snprintf(text, sizeof(text), _("Tirez ! %d s"), left > 0 ? (int)((left + 999999) / 1000000) : 0);
         else
-            snprintf(text, sizeof(text), "Terminé !");
+            snprintf(text, sizeof(text), N_("Terminé !"));
         ui_title(fb, text);
         draw_rope(fb);
         if (referee)
-            snprintf(text, sizeof(text), "Arbitre");
+            snprintf(text, sizeof(text), N_("Arbitre"));
         else
-            snprintf(text, sizeof(text), "Toi : %u traction%s", my_pulls, my_pulls > 1 ? "s" : "");
+            snprintf(text, sizeof(text), _("Toi : %u traction%s"), my_pulls, my_pulls > 1 ? "s" : "");
         ui_lines(fb, 150, &gfx_font_small, text);
-        ui_footer(fb, phase == PH_FINAL ? "Décompte final..." : referee ? "Regarde la corde" : "G puis D, vite !");
+        ui_footer(fb, phase == PH_FINAL ? N_("Décompte final...") : referee ? N_("Regarde la corde")
+                  : N_("G puis D, vite !"));
         break;
     }
     default:
-        ui_title(fb, "Résultat");
+        ui_title(fb, N_("Résultat"));
         if (winner < 0)
-            snprintf(text, sizeof(text), "Égalité !");
+            snprintf(text, sizeof(text), N_("Égalité !"));
         else
-            snprintf(text, sizeof(text), "Victoire des\n%s !", TEAMS[winner]);
+            snprintf(text, sizeof(text), _("Victoire des\n%s !"), tr(TEAMS[winner]));
         int y = ui_lines(fb, UI_TITLE_H + 4, &gfx_font_medium, text);
         if (! referee && winner >= 0)
-            y = ui_lines(fb, y + 2, &gfx_font_small, team[me] == winner ? "Ton équipe a gagné !" :
-                         "Ton équipe a perdu...");
-        snprintf(text, sizeof(text), "Cigales %lu - %lu Fourmis", (unsigned long)final_totals[0],
+            y = ui_lines(fb, y + 2, &gfx_font_small, team[me] == winner ? N_("Ton équipe a gagné !") :
+                         N_("Ton équipe a perdu..."));
+        snprintf(text, sizeof(text), _("Cigales %lu - %lu Fourmis"), (unsigned long)final_totals[0],
                  (unsigned long)final_totals[1]);
         y = ui_lines(fb, y + 4, &gfx_font_small, text);
         if (! referee) {
-            snprintf(text, sizeof(text), "Tes tractions : %u", my_pulls);
+            snprintf(text, sizeof(text), _("Tes tractions : %u"), my_pulls);
             y = ui_lines(fb, y, &gfx_font_small, text);
         }
         if (best >= 0) {
-            snprintf(text, sizeof(text), "Meilleur : %u, %s", counts[best], names[best]);
+            snprintf(text, sizeof(text), _("Meilleur : %u, %s"), counts[best], names[best]);
             ui_lines(fb, y, &gfx_font_small, text);
         }
-        ui_footer(fb, "G : retour  D : rejouer");
+        ui_footer(fb, N_("G : retour  D : rejouer"));
         break;
     }
 }
@@ -618,29 +622,29 @@ static void tug_render(uint8_t *fb, absolute_time_t now) {
     switch (page) {
     case P_HOME: {
         const char *busy = busy_game();
-        ui_title(fb, "Tir à la corde");
+        ui_title(fb, N_("Tir à la corde"));
         if (busy) {
             char text[80];
-            snprintf(text, sizeof(text), "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la "
-                     "d'abord.", busy);
+            snprintf(text, sizeof(text), _("Une partie de %s est en cours sur ton badge : termine-la ou quitte-la "
+                     "d'abord."), tr(busy));
             ui_wrapped(fb, 60, &gfx_font_small, text, 5);
-            ui_footer(fb, "G : retour");
+            ui_footer(fb, N_("G : retour"));
         } else {
             ui_list(fb, 2, sel, home_label);
-            ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 16, &gfx_font_small, "Deux équipes tirent sur la corde : "
-                       "appuie sur G puis D, le plus vite possible !", 4);
-            ui_footer(fb, "G : retour  D : choisir");
+            ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 16, &gfx_font_small, N_("Deux équipes tirent sur la corde : "
+                       "appuie sur G puis D, le plus vite possible !"), 4);
+            ui_footer(fb, N_("G : retour  D : choisir"));
         }
         break;
     }
     case P_SCAN:
-        ui_title(fb, "Rejoindre");
+        ui_title(fb, N_("Rejoindre"));
         if (n_found) {
             ui_list(fb, n_found, sel, found_label);
-            ui_footer(fb, "G : retour  D : rejoindre");
+            ui_footer(fb, N_("G : retour  D : rejoindre"));
         } else {
-            ui_lines(fb, 60, &gfx_font_small, "Recherche des parties\nde tir à la corde...");
-            ui_footer(fb, "G : retour");
+            ui_lines(fb, 60, &gfx_font_small, N_("Recherche des parties\nde tir à la corde..."));
+            ui_footer(fb, N_("G : retour"));
         }
         break;
     case P_LOBBY:
@@ -662,7 +666,7 @@ static void tug_stop(void) {
 }
 
 const app_t app_tug = {
-    .name = "Tir à la corde",
+    .name = N_("Tir à la corde"),
     .start = tug_start,
     .buttons = tug_buttons,
     .task = tug_task,

@@ -15,6 +15,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "leds.h"
 #include "net.h"
 
@@ -26,7 +27,7 @@
 #define TIME_STEP_MS 50
 
 enum { MODE_RESTORE, MODE_FIXED, MODE_BLINK, MODE_FADE, N_MODES };
-static const char *MODES[N_MODES] = {"Rétablir", "Fixe", "Clignotant", "Fondu"};
+static const char *MODES[N_MODES] = {N_("Rétablir"), N_("Fixe"), N_("Clignotant"), N_("Fondu")};
 
 typedef struct {
     uint8_t mode;
@@ -98,9 +99,9 @@ typedef struct {
 } preset_t;
 
 static const preset_t PRESETS[] = {
-    {"Rouge", 255, 0, 0}, {"Orange", 255, 80, 0}, {"Jaune", 255, 200, 0}, {"Vert", 0, 255, 0},
-    {"Cyan", 0, 255, 255}, {"Bleu", 0, 0, 255}, {"Violet", 160, 0, 255}, {"Rose", 255, 0, 120},
-    {"Blanc", 255, 255, 255},
+    {N_("Rouge"), 255, 0, 0}, {N_("Orange"), 255, 80, 0}, {N_("Jaune"), 255, 200, 0}, {N_("Vert"), 0, 255, 0},
+    {N_("Cyan"), 0, 255, 255}, {N_("Bleu"), 0, 0, 255}, {N_("Violet"), 160, 0, 255}, {N_("Rose"), 255, 0, 120},
+    {N_("Blanc"), 255, 255, 255},
 };
 #define N_PRESETS ((int)(sizeof(PRESETS) / sizeof(PRESETS[0])))
 
@@ -134,7 +135,7 @@ static void send(uint8_t mode, absolute_time_t now) {
     sends_left = REPEATS;
     send_ts = now;
     apply(&l, "this badge");  /* The admin badge too */
-    snprintf(status, sizeof(status), mode == MODE_RESTORE ? "LEDs rétablies" : "Envoyé aux cigales");
+    snprintf(status, sizeof(status), mode == MODE_RESTORE ? N_("LEDs rétablies") : N_("Envoyé aux cigales"));
 }
 
 static void ledcast_start(absolute_time_t now) {
@@ -246,13 +247,15 @@ static bool ledcast_task(absolute_time_t now) {
 
 static void row_label(int i, char *buf, size_t len) {
     switch (i) {
-    case ROW_COLOR: snprintf(buf, len, "Couleur : %s", preset < 0 ? "personnalisée" : PRESETS[preset].name); break;
-    case ROW_R: snprintf(buf, len, "Rouge (R) : %u", order.r); break;
-    case ROW_G: snprintf(buf, len, "Vert (G) : %u", order.g); break;
-    case ROW_B: snprintf(buf, len, "Bleu (B) : %u", order.b); break;
-    case ROW_MODE: snprintf(buf, len, "Mode : %s", MODES[order.mode]); break;
-    case ROW_SEND: snprintf(buf, len, "> Envoyer aux cigales"); break;
-    default: snprintf(buf, len, "> Rétablir leurs LEDs"); break;
+    case ROW_COLOR:
+        snprintf(buf, len, _("Couleur : %s"), preset < 0 ? _("personnalisée") : tr(PRESETS[preset].name));
+        break;
+    case ROW_R: snprintf(buf, len, _("Rouge (R) : %u"), order.r); break;
+    case ROW_G: snprintf(buf, len, _("Vert (G) : %u"), order.g); break;
+    case ROW_B: snprintf(buf, len, _("Bleu (B) : %u"), order.b); break;
+    case ROW_MODE: snprintf(buf, len, _("Mode : %s"), tr(MODES[order.mode])); break;
+    case ROW_SEND: snprintf(buf, len, N_("> Envoyer aux cigales")); break;
+    default: snprintf(buf, len, N_("> Rétablir leurs LEDs")); break;
     }
 }
 
@@ -260,11 +263,11 @@ static void ledcast_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[48];
     if (timing) {
-        ui_title(fb, order.mode == MODE_BLINK ? "Clignotement" : "Fondu");
-        const char *names[2][2] = {{"Allumé", "Éteint"}, {"Vers la couleur", "Vers le noir"}};
+        ui_title(fb, order.mode == MODE_BLINK ? N_("Clignotement") : N_("Fondu"));
+        const char *names[2][2] = {{N_("Allumé"), N_("Éteint")}, {N_("Vers la couleur"), N_("Vers le noir")}};
         int m = order.mode == MODE_BLINK ? 0 : 1;
         for (int i = 0; i < 2; ++i) {
-            snprintf(text, sizeof(text), "%s : %u ms", names[m][i], i ? order.t2 : order.t1);
+            snprintf(text, sizeof(text), _("%s : %u ms"), tr(names[m][i]), i ? order.t2 : order.t1);
             int y = UI_TITLE_H + 20 + i * 30;
             if (i == timing_row) {
                 gfx_fill_rect(fb, 4, y - 2, GFX_WIDTH - 8, 22, GFX_BLACK);
@@ -273,20 +276,21 @@ static void ledcast_render(uint8_t *fb, absolute_time_t now) {
                 gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
             }
         }
-        ui_lines(fb, UI_TITLE_H + 90, &gfx_font_small, "Flancs : choisir\nAiles : - / +  (maintenir : vite)");
-        ui_footer(fb, "Aile longue : retour");
+        ui_lines(fb, UI_TITLE_H + 90, &gfx_font_small, N_("Flancs : choisir\nAiles : - / +  (maintenir : vite)"));
+        ui_footer(fb, N_("Aile longue : retour"));
         return;
     }
-    ui_title(fb, "LEDs des cigales");
+    ui_title(fb, N_("LEDs des cigales"));
     ui_list(fb, N_ROWS, row, row_label);
-    const char *help = row == ROW_SEND || row == ROW_RESTORE ? "G : retour  D : valider"
-                       : row == ROW_MODE ? (order.mode == MODE_FIXED ? "Ailes : mode" : "Ailes : mode  D long : temps")
-                       : "Ailes : -  +";
+    const char *help = row == ROW_SEND || row == ROW_RESTORE ? N_("G : retour  D : valider")
+                       : row == ROW_MODE ? (order.mode == MODE_FIXED ? N_("Ailes : mode")
+                                                                     : N_("Ailes : mode  D long : temps"))
+                       : N_("Ailes : -  +");
     ui_footer(fb, status[0] && (row == ROW_SEND || row == ROW_RESTORE) ? status : help);
 }
 
 const app_t app_ledcast = {
-    .name = "LEDs des cigales",
+    .name = N_("LEDs des cigales"),
     .start = ledcast_start,
     .buttons = ledcast_buttons,
     .task = ledcast_task,

@@ -8,6 +8,7 @@
 
 #include "puzzles.h"
 #include "gfx.h"
+#include "i18n.h"
 
 #define PZ_TITLE_H 28
 #define PZ_FOOTER_Y 180
@@ -19,7 +20,8 @@ static bool pz_changed = false;  /* The screen must be redrawn */
 static bool pz_help = false;  /* The help page (rules, controls, record) is shown */
 static int pz_text_max = 0;  /* Widest footer or help line drawn, checked by the tests */
 
-static const char *PZ_NAMES[PUZZLE_COUNT] = {"Démineur", "2048", "Taquin", "Sokoban", "Mastermind", "Pendu"};
+static const char *PZ_NAMES[PUZZLE_COUNT] = {N_("Démineur"), "2048", N_("Taquin"), "Sokoban", "Mastermind",
+                                             N_("Pendu")};
 
 /* Directions: the flanks go left and right, the wings up (left wing) and down (right wing) */
 enum { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
@@ -27,12 +29,9 @@ static const int8_t DIR_DX[4] = {0, 1, 0, -1};
 static const int8_t DIR_DY[4] = {-1, 0, 1, 0};
 static const uint8_t DIR_BUTTONS[4] = {GAMES_BTN_A, GAMES_BTN_X, GAMES_BTN_B, GAMES_BTN_Y};
 
-/* Common lines of the help pages */
-#define HELP_MOVE "Flancs : gauche, droite\nAiles : haut (G), bas (D)\n"
-#define HELP_LONG "Long : G quitte, flanc D aide"
 /* Footers, the buttons in the order of the badge: left wing on the left */
-#define PZ_OVER_FOOTER "G : menu  D : rejouer"
-#define PZ_PLAY_FOOTER "Long : G menu, flanc D aide"
+#define PZ_OVER_FOOTER N_("G : menu  D : rejouer")
+#define PZ_PLAY_FOOTER N_("Long : G menu, flanc D aide")
 
 
 /* ------ Common ------ */
@@ -392,8 +391,9 @@ static void mines_draw_flag(uint8_t *fb, int x, int y, gfx_color_t color) {
 static void mines_render(uint8_t *fb) {
     char text[32];
     if (mines_state == MINES_WON)
-        snprintf(text, sizeof(text), "Gagné en %u s !", mines_seconds);
-    pz_draw_title(fb, mines_state == MINES_WON ? text : mines_state == MINES_LOST ? "Boum ! Perdu..." : "Démineur");
+        snprintf(text, sizeof(text), _("Gagné en %u s !"), mines_seconds);
+    pz_draw_title(fb, mines_state == MINES_WON ? text : mines_state == MINES_LOST ? N_("Boum ! Perdu...")
+                  : N_("Démineur"));
     /* The grid */
     for (int i = 0; i <= MINES_W; ++i)
         gfx_fill_rect(fb, MINES_X0 + i*MINES_CELL, MINES_Y0, 1, MINES_H*MINES_CELL + 1, GFX_BLACK);
@@ -432,16 +432,16 @@ static void mines_render(uint8_t *fb) {
     gfx_text(fb, px, 36, &gfx_font_small, "Mines", GFX_BLACK, GFX_ALIGN_CENTER);
     snprintf(text, sizeof(text), "%d", MINES_N - mines_flags);
     gfx_text(fb, px, 52, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, px, 84, &gfx_font_small, "Temps", GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, px, 84, &gfx_font_small, N_("Temps"), GFX_BLACK, GFX_ALIGN_CENTER);
     snprintf(text, sizeof(text), "%u", mines_seconds);
     gfx_text(fb, px, 100, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, px, 132, &gfx_font_small, mines_new_rec ? "Record !" : "Record", GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, px, 132, &gfx_font_small, mines_new_rec ? N_("Record !") : N_("Record"), GFX_BLACK, GFX_ALIGN_CENTER);
     if (pz_records[PUZZLE_MINES] == GAMES_NO_RECORD)
         snprintf(text, sizeof(text), "-");
     else
         snprintf(text, sizeof(text), "%u s", pz_records[PUZZLE_MINES]);
     gfx_text(fb, px, 148, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    pz_draw_footer(fb, over ? PZ_OVER_FOOTER : "Long : fl. G drapeau, D ouvre");
+    pz_draw_footer(fb, over ? PZ_OVER_FOOTER : N_("Long : fl. G drapeau, D ouvre"));
 }
 
 
@@ -580,7 +580,7 @@ static void t48_leave(void) {
 
 static void t48_render(uint8_t *fb) {
     char text[64];
-    snprintf(text, sizeof(text), "2048 : %lu", (unsigned long)t48_score);
+    snprintf(text, sizeof(text), _("2048 : %lu"), (unsigned long)t48_score);
     pz_draw_title(fb, text);
     for (int i = 0; i < 16; ++i) {
         int x = T48_X0 + (i % 4)*(T48_CELL + T48_GAP), y = T48_Y0 + (i / 4)*(T48_CELL + T48_GAP);
@@ -599,14 +599,15 @@ static void t48_render(uint8_t *fb) {
         }
     }
     if (t48_state == T48_WON) {
-        pz_draw_box(fb, "2048 !\nBravo !\nOn continue ?");
+        pz_draw_box(fb, _("2048 !\nBravo !\nOn continue ?"));
     } else if (t48_state == T48_OVER) {
         char rec[32];
         puzzles_record_text(PUZZLE_2048, rec, sizeof(rec));
-        snprintf(text, sizeof(text), "Bloqué !\nScore : %lu\n%s", (unsigned long)t48_score, t48_new_rec ? "Nouveau record !" : rec);
+        snprintf(text, sizeof(text), _("Bloqué !\nScore : %lu\n%s"), (unsigned long)t48_score,
+                 t48_new_rec ? _("Nouveau record !") : rec);
         pz_draw_box(fb, text);
     }
-    pz_draw_footer(fb, t48_state == T48_WON ? "Un bouton : continuer" : t48_state == T48_OVER ? PZ_OVER_FOOTER
+    pz_draw_footer(fb, t48_state == T48_WON ? N_("Un bouton : continuer") : t48_state == T48_OVER ? PZ_OVER_FOOTER
                    : PZ_PLAY_FOOTER);
 }
 
@@ -673,7 +674,7 @@ static void taq_buttons(uint8_t pressed) {
 
 static void taq_render(uint8_t *fb) {
     char text[64];
-    snprintf(text, sizeof(text), "Taquin : %u coup%s", taq_moves, taq_moves > 1 ? "s" : "");
+    snprintf(text, sizeof(text), _("Taquin : %u coup%s"), taq_moves, taq_moves > 1 ? "s" : "");
     pz_draw_title(fb, text);
     for (int i = 0; i < 16; ++i) {
         int x = T48_X0 + (i % 4)*(T48_CELL + T48_GAP), y = T48_Y0 + (i / 4)*(T48_CELL + T48_GAP);
@@ -690,7 +691,7 @@ static void taq_render(uint8_t *fb) {
     if (taq_solved) {
         char rec[32];
         puzzles_record_text(PUZZLE_TAQUIN, rec, sizeof(rec));
-        snprintf(text, sizeof(text), "Bravo !\n%u coups\n%s", taq_moves, taq_new_rec ? "Nouveau record !" : rec);
+        snprintf(text, sizeof(text), _("Bravo !\n%u coups\n%s"), taq_moves, taq_new_rec ? _("Nouveau record !") : rec);
         pz_draw_box(fb, text);
     }
     pz_draw_footer(fb, taq_solved ? PZ_OVER_FOOTER : PZ_PLAY_FOOTER);
@@ -893,7 +894,7 @@ static void soko_choose(int delta) {
 
 static void soko_render(uint8_t *fb) {
     char text[64];
-    snprintf(text, sizeof(text), "Sokoban %d/%d : %u", soko_level + 1, SOKO_LEVELS_N, soko_moves);
+    snprintf(text, sizeof(text), _("Sokoban %d/%d : %u"), soko_level + 1, SOKO_LEVELS_N, soko_moves);
     pz_draw_title(fb, text);
     int x0 = (GFX_WIDTH - soko_w*SOKO_CELL) / 2;
     int y0 = PZ_TITLE_H + (PZ_FOOTER_Y - 2 - PZ_TITLE_H - soko_h*SOKO_CELL) / 2;
@@ -933,12 +934,13 @@ static void soko_render(uint8_t *fb) {
             }
         }
     if (soko_solved) {
-        snprintf(text, sizeof(text), soko_level + 1 < SOKO_LEVELS_N ? "Niveau réussi !\n%u coups" : "Bravo !\n%u coups\nTous les niveaux !",
-                 soko_moves);
+        snprintf(text, sizeof(text), soko_level + 1 < SOKO_LEVELS_N ? _("Niveau réussi !\n%u coups")
+                 : _("Bravo !\n%u coups\nTous les niveaux !"), soko_moves);
         pz_draw_box(fb, text);
     }
-    pz_draw_footer(fb, soko_solved ? soko_level + 1 < SOKO_LEVELS_N ? "G : menu  D : niveau suivant" : PZ_OVER_FOOTER
-                   : "Long : fl. G annuler, D refaire");
+    pz_draw_footer(fb, soko_solved ? soko_level + 1 < SOKO_LEVELS_N ? N_("G : menu  D : niveau suivant")
+                                                                    : PZ_OVER_FOOTER
+                   : N_("Long : fl. G annuler, D refaire"));
 }
 
 
@@ -1045,10 +1047,10 @@ static void mm_symbol(uint8_t *fb, int x, int y, int s) {
 static void mm_render(uint8_t *fb) {
     char text[32];
     if (mm_state == MM_WON)
-        snprintf(text, sizeof(text), "Gagné en %d essai%s !", mm_try + 1, mm_try ? "s" : "");
+        snprintf(text, sizeof(text), _("Gagné en %d essai%s !"), mm_try + 1, mm_try ? "s" : "");
     else
         snprintf(text, sizeof(text), "Mastermind %d/%d", mm_try + 1, MM_TRIES);
-    pz_draw_title(fb, mm_state == MM_LOST ? "Perdu..." : text);
+    pz_draw_title(fb, mm_state == MM_LOST ? N_("Perdu...") : text);
     for (int t = 0; t <= mm_try; ++t) {
         int y = MM_Y0 + t*MM_ROW_H;
         snprintf(text, sizeof(text), "%d", t + 1);
@@ -1082,14 +1084,14 @@ static void mm_render(uint8_t *fb) {
     }
     if (mm_state != MM_PLAY) {
         if (mm_new_rec)
-            snprintf(text, sizeof(text), "Record !");
+            snprintf(text, sizeof(text), _("Record !"));
         else if (pz_records[PUZZLE_MASTERMIND] != GAMES_NO_RECORD)
             snprintf(text, sizeof(text), "Record %u", pz_records[PUZZLE_MASTERMIND]);
         else
             text[0] = 0;
         gfx_text(fb, GFX_WIDTH - 4, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    pz_draw_footer(fb, mm_state != MM_PLAY ? PZ_OVER_FOOTER : "Ailes : symbole  D long : ok");
+    pz_draw_footer(fb, mm_state != MM_PLAY ? PZ_OVER_FOOTER : N_("Ailes : symbole  D long : ok"));
 }
 
 
@@ -1213,23 +1215,23 @@ static void pendu_draw_gallows(uint8_t *fb, int errors) {
 static void pendu_render(uint8_t *fb) {
     char text[32];
     if (pendu_state == PENDU_WON)
-        snprintf(text, sizeof(text), "Trouvé ! Série : %u", pendu_streak);
+        snprintf(text, sizeof(text), _("Trouvé ! Série : %u"), pendu_streak);
     else if (pendu_state == PENDU_LOST)
-        snprintf(text, sizeof(text), "Pendu !");
+        snprintf(text, sizeof(text), _("Pendu !"));
     else
-        snprintf(text, sizeof(text), "Pendu  série : %u", pendu_streak);
+        snprintf(text, sizeof(text), _("Pendu  série : %u"), pendu_streak);
     pz_draw_title(fb, text);
     pendu_draw_gallows(fb, pendu_errors);
     /* Errors and record, at the right of the drawing */
     int px = 135;
-    gfx_text(fb, px, 36, &gfx_font_small, "Erreurs", GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, px, 36, &gfx_font_small, N_("Erreurs"), GFX_BLACK, GFX_ALIGN_CENTER);
     snprintf(text, sizeof(text), "%d / %d", pendu_errors, PENDU_ERRORS);
     gfx_text(fb, px, 52, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, px, 78, &gfx_font_small, pendu_new_rec ? "Record !" : "Record", GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, px, 78, &gfx_font_small, pendu_new_rec ? N_("Record !") : N_("Record"), GFX_BLACK, GFX_ALIGN_CENTER);
     if (pz_records[PUZZLE_PENDU] == GAMES_NO_RECORD)
         snprintf(text, sizeof(text), "-");
     else
-        snprintf(text, sizeof(text), "%u mot%s", pz_records[PUZZLE_PENDU], pz_records[PUZZLE_PENDU] > 1 ? "s" : "");
+        snprintf(text, sizeof(text), _("%u mot%s"), pz_records[PUZZLE_PENDU], pz_records[PUZZLE_PENDU] > 1 ? "s" : "");
     gfx_text(fb, px, 92, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     /* The word: the letters found, the others when lost (in a black box) */
     const char *word = PENDU_WORDS[pendu_word];
@@ -1260,38 +1262,45 @@ static void pendu_render(uint8_t *fb) {
         if (l == pendu_cursor && pendu_state == PENDU_PLAY)
             pz_frame(fb, x - 1, y - 1, PENDU_CELL_W + 1, PENDU_CELL_H + 1, 2, good ? GFX_INVERT : GFX_BLACK);
     }
-    pz_draw_footer(fb, pendu_state == PENDU_PLAY ? "D long : proposer la lettre" : "G : menu  D : mot suivant");
+    pz_draw_footer(fb, pendu_state == PENDU_PLAY ? N_("D long : proposer la lettre")
+                   : N_("G : menu  D : mot suivant"));
 }
 
 
 /* ------ Help pages ------ */
 
 static const char *const PZ_HELP[PUZZLE_COUNT] = {
-    "Ouvrez les cases sans mine.\nLe chiffre : mines autour.\n" HELP_MOVE
-        "Aile D longue : ouvrir\nFlanc G long : drapeau\n" HELP_LONG,
-    "Deux tuiles égales qui se\ntouchent fusionnent.\nAtteignez la tuile 2048 !\n" HELP_MOVE
-        "Tout glisse vers la touche.\n" HELP_LONG,
-    "Remettez les cases de 1 à 15\ndans l'ordre, trou à la fin.\nUne case voisine du trou\nglisse vers la touche :\n"
-        HELP_MOVE HELP_LONG,
-    "Poussez les caisses sur les\ncibles, une à la fois.\n" HELP_MOVE "Flanc G long : annuler\n"
-        "Aile D longue : recommencer\n" HELP_LONG,
-    "Trouvez le code secret :\n4 symboles parmi 6, 10 essais.\nPoint : bien placé,\nrond : mal placé.\n"
-        "Flancs : case, ailes : symbole\nAile D longue : valider\n" HELP_LONG,
-    "Trouvez le mot, lettre par\nlettre, avant d'être pendu\n(8 erreurs).\n"
-        "Flancs, ailes : choisir\nAile D longue : proposer\n" HELP_LONG,
+    /* The common lines ("Flancs : gauche...", "Long : G quitte...") are written in each text: the whole text is
+     * translated (tr() in pz_help_render()) */
+    N_("Ouvrez les cases sans mine.\nLe chiffre : mines autour.\n"
+       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\n"
+       "Aile D longue : ouvrir\nFlanc G long : drapeau\nLong : G quitte, flanc D aide"),
+    N_("Deux tuiles égales qui se\ntouchent fusionnent.\nAtteignez la tuile 2048 !\n"
+       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\n"
+       "Tout glisse vers la touche.\nLong : G quitte, flanc D aide"),
+    N_("Remettez les cases de 1 à 15\ndans l'ordre, trou à la fin.\n"
+       "Une case voisine du trou\nglisse vers la touche :\n"
+       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\nLong : G quitte, flanc D aide"),
+    N_("Poussez les caisses sur les\ncibles, une à la fois.\n"
+       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\nFlanc G long : annuler\n"
+       "Aile D longue : recommencer\nLong : G quitte, flanc D aide"),
+    N_("Trouvez le code secret :\n4 symboles parmi 6, 10 essais.\nPoint : bien placé,\nrond : mal placé.\n"
+       "Flancs : case, ailes : symbole\nAile D longue : valider\nLong : G quitte, flanc D aide"),
+    N_("Trouvez le mot, lettre par\nlettre, avant d'être pendu\n(8 erreurs).\n"
+       "Flancs, ailes : choisir\nAile D longue : proposer\nLong : G quitte, flanc D aide"),
 };
 
 static void pz_help_render(uint8_t *fb) {
     char text[48];
     pz_draw_title(fb, PZ_NAMES[pz_game]);
-    int y = pz_draw_lines(fb, 32, 15, &gfx_font_small, PZ_HELP[pz_game], GFX_BLACK);
+    int y = pz_draw_lines(fb, 32, 15, &gfx_font_small, tr(PZ_HELP[pz_game]), GFX_BLACK);
     if (pz_game == PUZZLE_SOKOBAN) {
-        snprintf(text, sizeof(text), "Niveau %d/%d (flancs : changer)", soko_level + 1, SOKO_LEVELS_N);
+        snprintf(text, sizeof(text), _("Niveau %d/%d (flancs : changer)"), soko_level + 1, SOKO_LEVELS_N);
         y = pz_draw_lines(fb, y, 15, &gfx_font_small, text, GFX_BLACK);
     }
     puzzles_record_text(pz_game, text, sizeof(text));
     pz_draw_lines(fb, y + 2, 15, &gfx_font_small, text, GFX_BLACK);
-    pz_draw_footer(fb, "G : menu  D : jouer");
+    pz_draw_footer(fb, N_("G : menu  D : jouer"));
 }
 
 
@@ -1315,19 +1324,19 @@ void puzzles_record_text(puzzle_t p, char *buf, int len) {
         return;
     unsigned r = pz_records[p];
     if (r == GAMES_NO_RECORD)
-        snprintf(buf, len, "Pas encore de record");
+        snprintf(buf, len, _("Pas encore de record"));
     else if (p == PUZZLE_MINES)
-        snprintf(buf, len, "Record : %u s", r);
+        snprintf(buf, len, _("Record : %u s"), r);
     else if (p == PUZZLE_TAQUIN)
-        snprintf(buf, len, "Record : %u coups", r);
+        snprintf(buf, len, _("Record : %u coups"), r);
     else if (p == PUZZLE_SOKOBAN)
-        snprintf(buf, len, "Niveaux réussis : %u / %d", r, SOKO_LEVELS_N);
+        snprintf(buf, len, _("Niveaux réussis : %u / %d"), r, SOKO_LEVELS_N);
     else if (p == PUZZLE_MASTERMIND)
-        snprintf(buf, len, "Record : %u essai%s", r, r > 1 ? "s" : "");
+        snprintf(buf, len, _("Record : %u essai%s"), r, r > 1 ? "s" : "");
     else if (p == PUZZLE_PENDU)
-        snprintf(buf, len, "Record : %u mot%s d'affilée", r, r > 1 ? "s" : "");
+        snprintf(buf, len, _("Record : %u mot%s d'affilée"), r, r > 1 ? "s" : "");
     else
-        snprintf(buf, len, "Record : %u", r);
+        snprintf(buf, len, _("Record : %u"), r);
 }
 
 /* The game is finished: the right wing starts another one */

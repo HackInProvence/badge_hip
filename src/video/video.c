@@ -12,6 +12,10 @@
 #include "sd.h"
 #include "video.h"
 
+#ifndef N_
+#define N_(text) (text)  /* A text shown: translated when drawn (src/menu/i18n.h, tools/i18n.py) */
+#endif
+
 
 #define FRAME_SIZE ((SCREEN_WIDTH*SCREEN_HEIGHT)/8)
 #define HEADER_SIZE 512
@@ -68,7 +72,7 @@ static bool open_video(const char *path) {
     int fr = sd_mount();
     if (fr != FR_OK) {
         printf("video: mount failed, FatFs error %d, card detect pin = %d\n", fr, sd_detect());
-        return fail(fr == FR_NO_FILESYSTEM ? "Carte SD non formatée (FAT/exFAT)" : "Pas de carte SD");
+        return fail(fr == FR_NO_FILESYSTEM ? N_("Carte SD non formatée (FAT/exFAT)") : N_("Pas de carte SD"));
     }
 
     /* Without path: VIDEO.EPV, or the first *.EPV of the root */
@@ -79,12 +83,12 @@ static bool open_video(const char *path) {
         snprintf(name, sizeof(name), "VIDEO.EPV");
     } else if (sd_list_files("", ".EPV", &name, 1) == 0) {
         sd_unmount();  /* The card may have been changed */
-        return fail("Pas de fichier .EPV sur la carte");
+        return fail(N_("Pas de fichier .EPV sur la carte"));
     }
 
     if (f_open(&file, name, FA_READ) != FR_OK) {
         sd_unmount();
-        return fail("Impossible d'ouvrir la vidéo");
+        return fail(N_("Impossible d'ouvrir la vidéo"));
     }
 
     uint8_t header[28];
@@ -93,7 +97,7 @@ static bool open_video(const char *path) {
     if (f_read(&file, header, sizeof(header), &n) != FR_OK || n != sizeof(header)
             || (memcmp(header, "EPVIDEO1", 8) && ! (v2 = ! memcmp(header, "EPVIDEO2", 8)))) {
         f_close(&file);
-        return fail("Fichier .EPV invalide");
+        return fail(N_("Fichier .EPV invalide"));
     }
     uint16_t width = header[8] | header[9] << 8;
     uint16_t height = header[10] | header[11] << 8;
@@ -104,7 +108,7 @@ static bool open_video(const char *path) {
     n_samples = v2 ? header[24] | header[25] << 8 | header[26] << 16 | (uint32_t)header[27] << 24 : 0;
     if (width != SCREEN_WIDTH || height != SCREEN_HEIGHT || bpp != 1 || fps == 0 || n_frames == 0) {
         f_close(&file);
-        return fail("Format de vidéo non supporté");
+        return fail(N_("Format de vidéo non supporté"));
     }
     f_lseek(&file, HEADER_SIZE);
 

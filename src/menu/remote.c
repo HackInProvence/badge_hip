@@ -9,6 +9,7 @@
 #include "pico/rand.h"
 
 #include "audio.h"
+#include "i18n.h"
 #include "net.h"
 #include "noise_gen.h"
 #include "ook_rx.h"
@@ -135,7 +136,7 @@ void remote_execute(uint8_t command, const char *from) {
     printf("remote: command 0x%02x from %s\n", command, from);
     last_command = command;
     last_command_at = get_absolute_time();
-    snprintf(event, sizeof(event), "Commande 0x%02X reçue", command);
+    snprintf(event, sizeof(event), _("Commande 0x%02X reçue"), command);
     switch (command) {
     case REMOTE_CIGALE:
         if (! is_muted()) {
@@ -143,22 +144,22 @@ void remote_execute(uint8_t command, const char *from) {
             cigale_on = true;
             cigale_end = delayed_by_ms(get_absolute_time(), CIGALE_MS);
         }
-        snprintf(event, sizeof(event), "La cigale chante !");
+        snprintf(event, sizeof(event), N_("La cigale chante !"));
         break;
     case REMOTE_MUTE:
         remote_set_muted(true);
-        snprintf(event, sizeof(event), "Mode muet (conférence)");
+        snprintf(event, sizeof(event), N_("Mode muet (conférence)"));
         break;
     case REMOTE_UNMUTE:
         remote_set_muted(false);
-        snprintf(event, sizeof(event), "Fin du mode muet");
+        snprintf(event, sizeof(event), N_("Fin du mode muet"));
         break;
     case REMOTE_SLEEP:
         if (strcmp(from, "this badge")) {
             sleep_requested = true;  /* main.c: not the talk badge */
-            snprintf(event, sizeof(event), "Mise en sommeil");
+            snprintf(event, sizeof(event), N_("Mise en sommeil"));
         } else {
-            snprintf(event, sizeof(event), "Ordre de sommeil envoyé");  /* The admin badge stays awake */
+            snprintf(event, sizeof(event), N_("Ordre de sommeil envoyé"));  /* The admin badge stays awake */
         }
         break;
     default:

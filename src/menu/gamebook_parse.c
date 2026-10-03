@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "gamebook_parse.h"
+#include "i18n.h"
 
 
 /* ------ Reading the file ------ */
@@ -615,7 +616,7 @@ bool gb_load(const gb_book_t *book, gb_src_t *src, uint16_t number, gb_section_t
                 sec->has_dice |= c->dice_min != 0;
                 gb_normalize(label, strlen(label), c->label, sizeof(c->label));
                 if (! c->label[0])
-                    strcpy(c->label, "Continuer");
+                    strcpy(c->label, N_("Continuer"));
             }
             continue;
         }

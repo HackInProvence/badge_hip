@@ -17,6 +17,7 @@
 #include "announce.h"
 #include "app.h"
 #include "display.h"
+#include "i18n.h"
 #include "net.h"
 #include "score_code.h"
 #include "store.h"
@@ -29,11 +30,12 @@
 #define ROUND_GAP_MS 600
 #define HISTORY 5
 
-static const char *const QR_NAMES[ANNOUNCE_QR_TYPES] = {"Aucun", "Lien (URL)", "Texte", "Téléphone", "SMS", "E-mail",
-                                                        "Wi-Fi", "Position GPS"};
-static const char *const QR_HELP[ANNOUNCE_QR_TYPES] = {"", "https://...", "Un texte", "+33612345678",
-                                                       "numéro:message", "adresse@mail.fr", "réseau;mot de passe",
-                                                       "43.17,5.60"};
+static const char *const QR_NAMES[ANNOUNCE_QR_TYPES] = {N_("Aucun"), N_("Lien (URL)"), N_("Texte"),
+                                                        N_("Téléphone"), "SMS", "E-mail", "Wi-Fi",
+                                                        N_("Position GPS")};
+static const char *const QR_HELP[ANNOUNCE_QR_TYPES] = {"", "https://...", N_("Un texte"), "+33612345678",
+                                                       N_("numéro:message"), "adresse@mail.fr",
+                                                       N_("réseau;mot de passe"), "43.17,5.60"};
 
 /* The announcements of the admin menu, when none was saved yet */
 static const store_announce_t DEFAULTS[STORE_ANNOUNCES] = {
@@ -84,7 +86,7 @@ void announce_qr_text(const store_announce_t *a, char *buf, int len) {
 /* The screen of an announcement: the time in a black band, the text, the QR code */
 void announce_draw(uint8_t *fb, const store_announce_t *a) {
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, 38, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, 3, &gfx_font_large, a->time[0] ? a->time : "Annonce", GFX_WHITE, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH/2, 3, &gfx_font_large, a->time[0] ? a->time : N_("Annonce"), GFX_WHITE, GFX_ALIGN_CENTER);
     char qr[96];
     announce_qr_text(a, qr, sizeof(qr));
     int y = ui_wrapped(fb, 44, &gfx_font_medium, a->text, qr[0] ? 3 : 6);
@@ -98,7 +100,7 @@ void announce_draw(uint8_t *fb, const store_announce_t *a) {
     if (scale >= 2)
         score_code_draw(fb, qr, y + (room - size * scale) / 2, scale);
     else
-        ui_lines(fb, y + 4, &gfx_font_small, "(QR code trop grand)");
+        ui_lines(fb, y + 4, &gfx_font_small, N_("(QR code trop grand)"));
 }
 
 /* ------ Radio ------ */
@@ -228,7 +230,7 @@ bool announce_new(char *buf, int len) {
     if (! fresh)
         return false;
     fresh = false;
-    snprintf(buf, len, "Annonce : %s", received[0].text);
+    snprintf(buf, len, _("Annonce : %s"), received[0].text);
     return true;
 }
 
@@ -279,18 +281,19 @@ static bool announces_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void announces_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Annonces");
+    ui_title(fb, N_("Annonces"));
     if (! n_received) {
-        ui_lines(fb, 60, &gfx_font_small, "Aucune annonce reçue.\nElles s'affichent toutes\nseules quand elles arrivent.");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, 60, &gfx_font_small,
+                 N_("Aucune annonce reçue.\nElles s'affichent toutes\nseules quand elles arrivent."));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     ui_list(fb, n_received, list_sel, received_label);
-    ui_footer(fb, "G : retour  D : afficher");
+    ui_footer(fb, N_("G : retour  D : afficher"));
 }
 
 const app_t app_announces = {
-    .name = "Annonces",
+    .name = N_("Annonces"),
     .start = announces_start,
     .buttons = announces_buttons,
     .render = announces_render,
@@ -313,12 +316,14 @@ static void admin_label(int i, char *buf, size_t len) {
 static void row_label(int i, char *buf, size_t len) {
     const store_announce_t *a = &announce_list()[sel];
     switch (i) {
-    case ROW_TIME: snprintf(buf, len, "Heure : %s", a->time); break;
-    case ROW_TEXT: snprintf(buf, len, "Texte : %s", a->text); break;
-    case ROW_QR_TYPE: snprintf(buf, len, "QR code : %s", QR_NAMES[a->qr_type < ANNOUNCE_QR_TYPES ? a->qr_type : 0]); break;
-    case ROW_QR: snprintf(buf, len, "Contenu : %s", a->qr[0] ? a->qr : "-"); break;
-    case ROW_PREVIEW: snprintf(buf, len, "> Aperçu"); break;
-    default: snprintf(buf, len, "> Envoyer à tous"); break;
+    case ROW_TIME: snprintf(buf, len, _("Heure : %s"), a->time); break;
+    case ROW_TEXT: snprintf(buf, len, _("Texte : %s"), a->text); break;
+    case ROW_QR_TYPE:
+        snprintf(buf, len, _("QR code : %s"), tr(QR_NAMES[a->qr_type < ANNOUNCE_QR_TYPES ? a->qr_type : 0]));
+        break;
+    case ROW_QR: snprintf(buf, len, _("Contenu : %s"), a->qr[0] ? a->qr : "-"); break;
+    case ROW_PREVIEW: snprintf(buf, len, N_("> Aperçu")); break;
+    default: snprintf(buf, len, N_("> Envoyer à tous")); break;
     }
 }
 
@@ -369,7 +374,7 @@ static bool admin_buttons(const app_buttons_t *b, absolute_time_t now) {
             case ROW_PREVIEW: view = V_PREVIEW; break;
             case ROW_SEND:
                 announce_send(a);
-                snprintf(status, sizeof(status), "Envoyée à toutes les cigales");
+                snprintf(status, sizeof(status), N_("Envoyée à toutes les cigales"));
                 break;
             }
         }
@@ -411,26 +416,26 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
     const store_announce_t *a = &announce_list()[sel];
     switch (view) {
     case V_LIST:
-        ui_title(fb, "Annonces");
+        ui_title(fb, N_("Annonces"));
         ui_list(fb, STORE_ANNOUNCES, sel, admin_label);
-        ui_footer(fb, "G : retour  D : modifier, envoyer");
+        ui_footer(fb, N_("G : retour  D : modifier, envoyer"));
         break;
     case V_EDIT: {
         char title[24];
-        snprintf(title, sizeof(title), "Annonce %d", sel + 1);
+        snprintf(title, sizeof(title), _("Annonce %d"), sel + 1);
         ui_title(fb, title);
         ui_list(fb, N_ROWS, row, row_label);
-        const char *help = row == ROW_QR_TYPE ? "Ailes : type de QR code" : row == ROW_PREVIEW || row == ROW_SEND
-                           ? "G : liste  D : valider" : "G : liste  D : modifier";
+        const char *help = row == ROW_QR_TYPE ? N_("Ailes : type de QR code") : row == ROW_PREVIEW || row == ROW_SEND
+                           ? N_("G : liste  D : valider") : N_("G : liste  D : modifier");
         ui_footer(fb, status[0] ? status : help);
         break;
     }
     case V_FIELD: {
-        const char *prompts[] = {"Heure (ex. 10:30)", "Texte de l'annonce", ""};
+        const char *prompts[] = {N_("Heure (ex. 10:30)"), N_("Texte de l'annonce"), ""};
         char prompt[64];
         if (row == ROW_QR)
-            snprintf(prompt, sizeof(prompt), "%s : %s", QR_NAMES[a->qr_type], QR_HELP[a->qr_type]);
-        ui_edit_render(fb, &edit, row == ROW_TIME ? "Heure" : row == ROW_TEXT ? "Texte" : "QR code",
+            snprintf(prompt, sizeof(prompt), _("%s : %s"), tr(QR_NAMES[a->qr_type]), tr(QR_HELP[a->qr_type]));
+        ui_edit_render(fb, &edit, row == ROW_TIME ? N_("Heure") : row == ROW_TEXT ? N_("Texte") : N_("QR code"),
                        row == ROW_QR ? prompt : prompts[row == ROW_TIME ? 0 : 1]);
         break;
     }
@@ -442,7 +447,7 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
 }
 
 const app_t app_announce_admin = {
-    .name = "Annonces (admin)",
+    .name = N_("Annonces (admin)"),
     .start = admin_start,
     .buttons = admin_buttons,
     .task = admin_task,

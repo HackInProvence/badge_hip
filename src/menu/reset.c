@@ -10,21 +10,23 @@
 #include <string.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "store.h"
 
 enum { R_SOCIAL, R_GAMES, R_CHALLENGES, R_CONTACTS, R_VIRUS, R_ACHV, R_CARGO, R_ALL, R_ANNOUNCES, N_RESETS };
-static const char *NAMES[N_RESETS] = {"Scores sociaux", "Records des jeux", "Défis CTF et crypto", "Contacts reçus",
-                                      "Virus", "Succès et niveau", "Contrebande", "Tout", "Annonces d'origine"};
+static const char *NAMES[N_RESETS] = {N_("Scores sociaux"), N_("Records des jeux"), N_("Défis CTF et crypto"),
+                                      N_("Contacts reçus"), N_("Virus"), N_("Succès et niveau"), N_("Contrebande"),
+                                      N_("Tout"), N_("Annonces d'origine")};
 static const char *DETAILS[N_RESETS] = {
-    "Le score et les rencontres\ndu réseau des cigales.",
-    "Les records des jeux et\ndes casse-têtes.",
-    "Les flags du CTF et les\ndéfis crypto résolus.",
-    "Les cartes de visite\nreçues (pas votre carte).",
-    "L'état du virus : en forme.",
-    "Les succès obtenus et\nleurs compteurs (le niveau\nrepart de 1).",
-    "La cale de la contrebande :\nles marchandises sont\ndistribuées à nouveau.",
-    "Tout cela à la fois (le nom,\nles réglages et votre carte\nsont gardés).",
-    "Les 6 annonces du menu admin\nreprennent leurs textes\nd'origine.",
+    N_("Le score et les rencontres\ndu réseau des cigales."),
+    N_("Les records des jeux et\ndes casse-têtes."),
+    N_("Les flags du CTF et les\ndéfis crypto résolus."),
+    N_("Les cartes de visite\nreçues (pas votre carte)."),
+    N_("L'état du virus : en forme."),
+    N_("Les succès obtenus et\nleurs compteurs (le niveau\nrepart de 1)."),
+    N_("La cale de la contrebande :\nles marchandises sont\ndistribuées à nouveau."),
+    N_("Tout cela à la fois (le nom,\nles réglages et votre carte\nsont gardés)."),
+    N_("Les 6 annonces du menu admin\nreprennent leurs textes\nd'origine."),
 };
 
 static int sel = 0;
@@ -67,7 +69,7 @@ static void reset(int what) {
         store_ext_changed();
     }
     printf("reset: %s\n", NAMES[what]);
-    snprintf(done, sizeof(done), "%s : remis à zéro", NAMES[what]);
+    snprintf(done, sizeof(done), _("%s : remis à zéro"), tr(NAMES[what]));
 }
 
 static void label(int i, char *buf, size_t len) {
@@ -109,20 +111,20 @@ static bool reset_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void reset_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Remise à zéro");
+    ui_title(fb, N_("Remise à zéro"));
     if (confirming) {
         ui_lines(fb, UI_TITLE_H + 10, &gfx_font_medium, NAMES[sel]);
         ui_lines(fb, UI_TITLE_H + 45, &gfx_font_small, DETAILS[sel]);
-        ui_lines(fb, UI_TITLE_H + 120, &gfx_font_small, "Remettre à zéro ?");
-        ui_footer(fb, "G : non  D long : oui");
+        ui_lines(fb, UI_TITLE_H + 120, &gfx_font_small, N_("Remettre à zéro ?"));
+        ui_footer(fb, N_("G : non  D long : oui"));
         return;
     }
     ui_list(fb, N_RESETS, sel, label);
-    ui_footer(fb, done[0] ? done : "G : retour  D : choisir");
+    ui_footer(fb, done[0] ? done : N_("G : retour  D : choisir"));
 }
 
 const app_t app_reset = {
-    .name = "Remise à zéro",
+    .name = N_("Remise à zéro"),
     .start = reset_start,
     .buttons = reset_buttons,
     .render = reset_render,

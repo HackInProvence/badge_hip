@@ -17,6 +17,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "social.h"
 
@@ -397,35 +398,35 @@ static void battle_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[48];
     if (state == S_LOBBY) {
-        ui_title(fb, "Bataille navale");
+        ui_title(fb, N_("Bataille navale"));
         if (invited) {
-            snprintf(text, sizeof(text), "%s vous défie !", inviter_name);
+            snprintf(text, sizeof(text), _("%s vous défie !"), inviter_name);
             ui_lines(fb, 60, &gfx_font_medium, text);
-            ui_footer(fb, "G : refuser  D : accepter");
+            ui_footer(fb, N_("G : refuser  D : accepter"));
         } else if (n_near) {
             ui_list(fb, n_near, sel, near_label);
-            ui_footer(fb, "G : retour  D : défier");
+            ui_footer(fb, N_("G : retour  D : défier"));
         } else {
-            ui_lines(fb, 60, &gfx_font_small, "Aucune cigale à portée.");
-            ui_footer(fb, "G : retour");
+            ui_lines(fb, 60, &gfx_font_small, N_("Aucune cigale à portée."));
+            ui_footer(fb, N_("G : retour"));
         }
         return;
     }
-    snprintf(text, sizeof(text), "Touchés %d - %d", count(hit_peer), count(hit_me & fleet));
+    snprintf(text, sizeof(text), _("Touchés %d - %d"), count(hit_peer), count(hit_me & fleet));
     ui_title(fb, text);
     /* The sea of the peer (where I shoot), and mine smaller */
     draw_sea(fb, 4, UI_TITLE_H + 6, 21, 0, shot_peer, hit_peer, state == S_AIM ? cursor : -1);
     draw_sea(fb, 136, UI_TITLE_H + 6, 10, fleet, hit_me, hit_me & fleet, -1);
-    ui_text(fb, 136, UI_TITLE_H + 72, &gfx_font_small, "Ma flotte");
-    const char *status = state == S_INVITING ? "Invitation..." : state == S_START ? "Préparation..." :
-                         state == S_AIM ? "A vous !" : state == S_SHOOTING ? "Tir..." :
-                         state == S_WAITING ? "Il vise..." : state == S_LOST ? "Adversaire parti" :
-                         count(hit_peer) == SHIP_CELLS ? "Victoire !" : "Défaite...";
+    ui_text(fb, 136, UI_TITLE_H + 72, &gfx_font_small, N_("Ma flotte"));
+    const char *status = state == S_INVITING ? N_("Invitation...") : state == S_START ? N_("Préparation...") :
+                         state == S_AIM ? N_("A vous !") : state == S_SHOOTING ? N_("Tir...") :
+                         state == S_WAITING ? N_("Il vise...") : state == S_LOST ? N_("Adversaire parti") :
+                         count(hit_peer) == SHIP_CELLS ? N_("Victoire !") : N_("Défaite...");
     ui_text(fb, 136, UI_TITLE_H + 92, &gfx_font_small, status);
     if (state == S_END && peer_revealed)
-        ui_text(fb, 136, UI_TITLE_H + 110, &gfx_font_small, cheat ? "TRICHE !" : "Flotte OK");
-    ui_footer(fb, state == S_AIM ? "Flancs : viser  D : tirer" : state >= S_END ? "G : quitter  D : rejouer" :
-              "G : abandonner");
+        ui_text(fb, 136, UI_TITLE_H + 110, &gfx_font_small, cheat ? N_("TRICHE !") : N_("Flotte OK"));
+    ui_footer(fb, state == S_AIM ? N_("Flancs : viser  D : tirer") : state >= S_END ? N_("G : quitter  D : rejouer")
+              : N_("G : abandonner"));
 }
 
 /* The invitation, for the notification */
@@ -434,12 +435,12 @@ bool battle_invited(char *buf, int len) {
     if (! invited || notified == invite_session)
         return false;
     notified = invite_session;
-    snprintf(buf, len, "%s : bataille navale ?", inviter_name);
+    snprintf(buf, len, _("%s : bataille navale ?"), inviter_name);
     return true;
 }
 
 const app_t app_battle = {
-    .name = "Bataille navale",
+    .name = N_("Bataille navale"),
     .start = battle_start,
     .buttons = battle_buttons,
     .task = battle_task,

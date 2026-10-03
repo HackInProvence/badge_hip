@@ -9,6 +9,7 @@
 
 #include "ff.h"
 #include "gfx.h"
+#include "i18n.h"
 #include "rsvp.h"
 #include "screen.h"
 #include "sd.h"
@@ -546,12 +547,12 @@ bool rsvp_start(const char *path) {
         return true;
     int fr = sd_mount();
     if (fr != FR_OK) {
-        snprintf(message, sizeof(message), "Pas de carte SD");
+        snprintf(message, sizeof(message), N_("Pas de carte SD"));
         return false;
     }
     if (f_open(&file, path, FA_READ) != FR_OK) {
         sd_unmount();
-        snprintf(message, sizeof(message), "Impossible d'ouvrir le texte");
+        snprintf(message, sizeof(message), N_("Impossible d'ouvrir le texte"));
         return false;
     }
     file_open = true;
@@ -570,7 +571,7 @@ bool rsvp_start(const char *path) {
     if (! have_word) {
         f_close(&file);
         file_open = false;
-        snprintf(message, sizeof(message), "Texte vide");
+        snprintf(message, sizeof(message), N_("Texte vide"));
         return false;
     }
     at_end = false;
@@ -579,7 +580,7 @@ bool rsvp_start(const char *path) {
     pending_seek = 0;
     overlay[0] = 0;
     if (resume)
-        set_overlay("Reprise");
+        set_overlay(N_("Reprise"));
     printf("rsvp: %s, %lu bytes, %s, %u wpm, from %lu\n", path, (unsigned long)file_size, latin1 ? "latin-1" : "utf-8",
            wpm, (unsigned long)resume);
     state = R_CLEAR;
@@ -607,7 +608,7 @@ void rsvp_speed(int steps) {
     int v = wpm + steps * RSVP_STEP_WPM;
     wpm = v < RSVP_MIN_WPM ? RSVP_MIN_WPM : v > RSVP_MAX_WPM ? RSVP_MAX_WPM : v;
     char msg[32];
-    snprintf(msg, sizeof(msg), "%u mots/min", wpm);
+    snprintf(msg, sizeof(msg), _("%u mots/min"), wpm);
     set_overlay(msg);
     pause_redraw = true;
 }
@@ -711,11 +712,12 @@ bool rsvp_task(absolute_time_t now) {
             in_multiframe = true;
             break;
         }
-        snprintf(text, sizeof(text), "%u mots/min, %u %%", wpm,
+        snprintf(text, sizeof(text), _("%u mots/min, %u %%"), wpm,
                  file_size ? (unsigned)((uint64_t)word.offset * 100 / file_size) : 0);
-        snprintf(text2, sizeof(text2), "Flancs : vitesse, long: -/+%ds", RSVP_SEEK_S);
-        draw_frame(at_end ? "Fin du texte" : "Pause", text, text2);
-        gfx_text(drawing, GFX_WIDTH / 2, 174, &gfx_font_small, at_end ? "D : relire  G : quitter" : "D : reprendre  G : quitter",
+        snprintf(text2, sizeof(text2), _("Flancs : vitesse, long: -/+%ds"), RSVP_SEEK_S);
+        draw_frame(at_end ? N_("Fin du texte") : N_("Pause"), text, text2);
+        gfx_text(drawing, GFX_WIDTH / 2, 174, &gfx_font_small,
+                 at_end ? N_("D : relire  G : quitter") : N_("D : reprendre  G : quitter"),
                  GFX_BLACK, GFX_ALIGN_CENTER);
         screen_push_ws(screen_ws_10fps);  /* Best contrast for the page */
         screen_push_rams(drawing, shown, GFX_FB_SIZE);

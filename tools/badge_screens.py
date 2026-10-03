@@ -10,11 +10,12 @@ All the screens of the badge (firmware badge_menu), captured through its USB ser
 and to check the texts:
 - it goes through every theme of the menu and every entry (the admin theme too), and the pages inside the
   applications (help, game, hint, editor...) listed in PAGES below;
-- it saves a PNG of each screen in docs/screens/ and writes docs/fr/ecrans.md and docs/en/screens.md;
+- it saves a PNG of each screen in docs/screens/ and writes docs/fr/ecrans.md (--lang en: in docs/screens/en/,
+  and docs/en/screens.md, the badge set to English during the capture, then back to its language);
 - with the check of the texts of the firmware (key U), it lists the texts cut ("..."), too wide or drawn under
   the footer: docs/screens/checks.txt, and at the end of the pages.
 
-Usage: python tools/badge_screens.py [--port COM9] [--only Jeux,Social]
+Usage: python tools/badge_screens.py [--port COM9] [--only Jeux,Social] [--lang en]
 The badge is restarted first. Nothing is sent by radio but the pages that do it by themselves (carrier, beacon of
 the hot / cold, contact exchange, radio tuning); the settings are left as they were (the toggles are not pressed).
 """
@@ -34,7 +35,7 @@ from badge_remote import Badge, find_port  # noqa: E402
 OUT = os.path.join(ROOT, 'docs', 'screens')
 
 # Entries of the menu that are not pages: toggles or actions (not pressed, the label is shown by the menu)
-NOT_PAGES = {('Médias', 6), ('Radio & IR', 0), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 1), ('Réglages', 2),
+NOT_PAGES = {('Médias', 6), ('Radio & IR', 0), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 2), ('Réglages', 3),
              ('Admin', 12), ('Admin', 14)}  # Démo écran (Badge, 5), Mode démo (Admin, 12): animations, not pages
 
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
@@ -161,16 +162,34 @@ class Crawler:
 def main():
     parser = argparse.ArgumentParser(description='Screenshots of every screen of the badge, and the check of the texts')
     parser.add_argument('--port', default=None)
-    parser.add_argument('--only', default=None, help='comma separated themes')
+    parser.add_argument('--only', default=None, help='comma separated themes (French names)')
+    parser.add_argument('--lang', default='fr', help='language of the badge during the capture (fr, en...)')
     args = parser.parse_args()
     port = args.port or find_port()
-    os.makedirs(OUT, exist_ok=True)
+    out = OUT if args.lang == 'fr' else os.path.join(OUT, args.lang)
+    os.makedirs(out, exist_ok=True)
     badge = Badge(port)
     badge.start()
     while not badge.connected():
         time.sleep(0.1)
-    t = st.Tester(badge, OUT, False)
+    t = st.Tester(badge, out, False)
     c = Crawler(t)
+
+    def set_lang(code):
+        """The language of the badge: 'N' (next language) until it is \\p code; returns the one it had"""
+        # The language at the start (logged by the badge when it starts: "i18n: language fr (Français), ...")
+        had = [l.split()[2] for l in t.lines if l.startswith('i18n: language ')]
+        if had and had[-1] == code:
+            return code
+        for _ in range(12):
+            t.mark()
+            t.keys('N')
+            m = t.expect(r'^i18n: language (\S+)', 3)
+            if not m:
+                sys.exit('the badge does not answer the key N: firmware without the translations?')
+            if m.group(1) == code:
+                return had[-1] if had else 'fr'
+        sys.exit(f'language {code} not in the firmware')
 
     def restart():
         """A restarted badge, on the main menu, with the check of the texts"""
@@ -198,6 +217,8 @@ def main():
         t.keys('x' * ti + 'b')
         return c.ui() == theme
 
+    restart()
+    before = set_lang(args.lang)
     restart()
     c.shot('Menu', 'Accueil', None, 'Le menu principal', len(t.lines))
     only = args.only.split(',') if args.only else None
@@ -242,32 +263,89 @@ def main():
             t.badge.send('\x01a')
             t.expect(r'^admin: off', 3)
     t.keys('U')
+    restore = before if before else 'fr'
+    if restore != args.lang:
+        set_lang(restore)  # The language the badge had
     badge.stop()
-    write_docs(c)
+    write_docs(c, args.lang, out)
 
 
-def write_docs(c):
+def english_names():
+    """French text -> English, from src/menu/lang/en.po (the titles of the pages in docs/en/screens.md)"""
+    import i18n
+    path = os.path.join(i18n.LANG_DIR, 'en.po')
+    if not os.path.exists(path):
+        return {}
+    _, entries = i18n.read_po(path)
+    return {e['id']: e['str'] for e in entries if e['str'] and not e['obsolete']}
+
+
+# The captions of PAGES and of the themes, in English (docs/en/screens.md)
+CAPTIONS_EN = {
+    'Le menu principal': 'The main menu', 'Une image de la carte SD': 'An image of the SD card',
+    'Lecture d\'une vidéo': 'Playing a video', 'Un dossier de musiques': 'A folder of music',
+    'Lecture d\'une musique': 'Playing a music', 'Un dossier de textes': 'A folder of texts',
+    'Lecture d\'un texte': 'Reading a text', 'La partie': 'The game', 'Saisie d\'un code': 'Typing a code',
+    'Un défi': 'A challenge', 'Son indice': 'Its hint', 'La saisie de la réponse': 'Typing the answer',
+    'Le flag final': 'The final flag', 'Choix du destinataire': 'Choosing the recipient',
+    'Choix du message': 'Choosing the message', 'Ma carte (champs cochés : envoyés)': 'My card (checked fields: sent)',
+    'Saisie d\'un champ': 'Typing a field', 'Echange des cartes': 'Exchanging the cards',
+    'Contacts reçus': 'Contacts received', 'Un talk (et son QR code)': 'A talk (and its QR code)',
+    'Plus fort': 'Brighter', 'Vert : tout va bien': 'Green: all is well', 'Orange : 5 min': 'Orange: 5 min',
+    'Rouge : fini': 'Red: time is up', 'Le mode': 'The mode', 'Les temps du clignotement': 'The blink times',
+    'Les temps du fondu': 'The fade times', 'Envoyer / rétablir': 'Send / restore',
+    'Une annonce : ses champs': 'An announcement: its fields', "Saisie de l'heure": 'Typing the time',
+    'Saisie du texte (lettres accentuées)': 'Typing the text (accented letters)',
+    "Aperçu (l'écran des cigales)": 'Preview (the screen of the cicadas)', 'La confirmation': 'The confirmation',
+    'Mes compétences': 'My skills', 'Qui les partage ?': 'Who shares them?',
+    'Comment obtenir un succès': 'How to get an achievement', 'Une sonnerie': 'A ringtone', 'Un livre': 'A book',
+    'La lecture': 'Reading', 'La cale': 'The hold', 'Mener une partie': 'Leading a game',
+    'Aide : une carte de rôle': 'Help: a role card', 'Aide : le détail du rôle': 'Help: the role in detail',
+    'Les réglages': 'The settings', 'Accueil': 'Home', 'Menu': 'Menu',
+    'Page 2': 'Page 2', 'Page 3': 'Page 3', 'Page 4': 'Page 4', 'Page 5': 'Page 5', 'Page 6': 'Page 6',
+    'Page 7': 'Page 7', 'Page 8': 'Page 8',
+}
+
+
+def write_docs(c, lang_run, out):
     # The rows of the lists cut with "..." are previews (the page of the row shows it all): listed apart
     problems = [ch for ch in c.checks if ': list row cut ' not in ch]
     rows = [ch for ch in c.checks if ': list row cut ' in ch]
-    with open(os.path.join(OUT, 'checks.txt'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(out, 'checks.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(problems + [''] + ['(list rows cut, previews)'] + rows) + '\n')
+    en = english_names() if lang_run == 'en' else {}
+
+    def name(text):
+        if lang_run != 'en':
+            return text
+        if text.startswith('Le thème '):
+            return 'The theme ' + en.get(text[len('Le thème '):], text[len('Le thème '):])
+        return CAPTIONS_EN.get(text) or en.get(text) or text
+
+    shots_dir = '../screens/' if lang_run == 'fr' else f'../screens/{lang_run}/'
     for lang, path, title, intro, t_problems, t_rows in (
             ('fr', os.path.join(ROOT, 'docs', 'fr', 'ecrans.md'), 'Badge SecSea — tous les écrans',
              'Généré par `tools/badge_screens.py` (captures du badge par le port série, mode utilisateur et admin).',
              'Textes à corriger', 'Lignes de listes raccourcies (aperçus : la page de la ligne montre tout)'),
             ('en', os.path.join(ROOT, 'docs', 'en', 'screens.md'), 'SecSea badge — every screen',
-             'Generated by `tools/badge_screens.py` (screenshots of the badge through its serial port, user and admin '
-             'modes). The texts of the badge are in French.', 'Texts to fix',
+             'Generated by `tools/badge_screens.py --lang en` (screenshots of the badge in English through its serial '
+             'port, user and admin modes). The language is chosen in Settings > Language '
+             '([translation](translation.md)).', 'Texts to fix',
              'Rows of lists shortened (previews: the page of the row shows it all)')):
+        if lang != lang_run:
+            continue
         lines = [f'# {title}', '', intro, '']
+        if lang == 'fr':
+            lines += ['*English version: [every screen](../en/screens.md).*', '']
+        else:
+            lines += ['*Version française : [tous les écrans](../fr/ecrans.md).*', '']
         current = None
         for theme, page, fname, caption, checks in c.shots:
             if theme != current:
-                lines += ['', f'## {theme}', '']
+                lines += ['', f'## {name(theme)}', '']
                 current = theme
-            label = page if not caption else f'{page} — {caption}'
-            lines += [f'### {label}', '', f'![{label}](../screens/{fname})', '']
+            label = name(page) if not caption else f'{name(page)} — {name(caption)}'
+            lines += [f'### {label}', '', f'![{label}]({shots_dir}{fname})', '']
             for ch in checks:
                 if not ch.startswith('list row cut'):
                     lines.append(f'- ⚠ {ch}')

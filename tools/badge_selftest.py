@@ -303,7 +303,7 @@ def test_settings(t):
     t.keys('yy')
     t.press('a', 'Réglages')
     # Infos, then the credits
-    t.check_ui('infos', 'xxxb', 'Infos')  # After the screensaver, the remote and the mute settings
+    t.check_ui('infos', 'xxxxb', 'Infos')  # After the screensaver, the language, the remote and the mute settings
     t.screenshot('infos')
     t.check_ui('credits', 'b', 'Crédits')
     t.mark()
@@ -313,7 +313,7 @@ def test_settings(t):
     t.result('credits: next page', m is not None, m.group(1) if m else '')
     t.check_ui('credits: back to infos', 'a', 'Infos')
     t.press('a', 'Réglages')
-    t.keys('yyy')
+    t.keys('yyyy')
     close_theme(t, 'Réglages')
 
 

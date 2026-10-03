@@ -10,11 +10,12 @@
 #include <string.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "skills.h"
 #include "social.h"
 #include "store.h"
 
-static const char *TYPES[] = {"PARTICIPANT", "ORATEUR", "STAFF"};
+static const char *TYPES[] = {N_("PARTICIPANT"), N_("ORATEUR"), N_("STAFF")};
 
 const char *nametag_type(void) {
     uint8_t t = store_get()->badge_type;
@@ -83,7 +84,7 @@ static void nametag_render(uint8_t *fb) {
 }
 
 const app_t app_nametag = {
-    .name = "Badge nominatif",
+    .name = N_("Badge nominatif"),
     .start = nametag_start,
     .buttons = nametag_buttons,
     .render = nametag_page,

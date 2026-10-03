@@ -12,6 +12,7 @@
 
 #include "achievements.h"
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "ook_rx.h"
 #include "remote.h"
@@ -58,7 +59,8 @@ static int signal_level(const signal_t *s) {
 }
 
 static const char *signal_word(int level) {
-    return level > 85 ? "BRÛLANT !" : level > 65 ? "Chaud" : level > 45 ? "Tiède" : level > 25 ? "Froid" : "Glacial";
+    return level > 85 ? N_("BRÛLANT !") : level > 65 ? N_("Chaud") : level > 45 ? N_("Tiède") :
+           level > 25 ? N_("Froid") : N_("Glacial");
 }
 
 /* LEDs from blue (cold) to red (hot), beeps faster when closer */
@@ -79,16 +81,16 @@ static void signal_render(uint8_t *fb, const signal_t *s, absolute_time_t now, c
     char text[40];
     if (signal_lost(s, now)) {
         gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_large, "???", GFX_BLACK, GFX_ALIGN_CENTER);
-        snprintf(text, sizeof(text), "%s hors de portée", what);
+        snprintf(text, sizeof(text), _("%s hors de portée"), what);
         ui_lines(fb, 90, &gfx_font_small, text);
         return;
     }
     int l = signal_level(s);
     gfx_text(fb, GFX_WIDTH/2, 40, &gfx_font_large, signal_word(l), GFX_BLACK, GFX_ALIGN_CENTER);
     ui_gauge(fb, 14, 80, GFX_WIDTH - 28, 22, l, 100);
-    snprintf(text, sizeof(text), "%s : %d dBm", what, s->rssi);
+    snprintf(text, sizeof(text), _("%s : %d dBm"), what, s->rssi);
     ui_lines(fb, 112, &gfx_font_small, text);
-    ui_lines(fb, 132, &gfx_font_small, "Bougez : suivez la chaleur !");
+    ui_lines(fb, 132, &gfx_font_small, N_("Bougez : suivez la chaleur !"));
 }
 
 
@@ -150,9 +152,9 @@ static bool hunt_task(absolute_time_t now) {
 }
 
 static void hunt_render(uint8_t *fb, absolute_time_t now) {
-    ui_title(fb, "Chaud - froid");
-    signal_render(fb, &hunt, now, "Balise");
-    ui_footer(fb, "G : quitter  D : autre balise");
+    ui_title(fb, N_("Chaud - froid"));
+    signal_render(fb, &hunt, now, _("Balise"));
+    ui_footer(fb, N_("G : quitter  D : autre balise"));
 }
 
 static void hunt_stop(void) {
@@ -164,7 +166,7 @@ static bool never_calm(void) {
 }
 
 const app_t app_hotcold = {
-    .name = "Chaud - froid",
+    .name = N_("Chaud - froid"),
     .start = hunt_start,
     .buttons = hunt_buttons,
     .task = hunt_task,
@@ -216,13 +218,15 @@ static bool master_task(absolute_time_t now) {
 
 static void master_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Balise chaud-froid");
-    gfx_text(fb, GFX_WIDTH/2, 40, &gfx_font_large, master ? "Emission" : "Arrêtée", GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_lines(fb, 82, &gfx_font_small, "Une balise par seconde\n(+10 dBm). Cachez ce badge :\nles autres le cherchent avec\nSocial > Chaud - froid.");
+    ui_title(fb, N_("Balise chaud-froid"));
+    gfx_text(fb, GFX_WIDTH/2, 40, &gfx_font_large, master ? N_("Emission") : N_("Arrêtée"), GFX_BLACK,
+             GFX_ALIGN_CENTER);
+    ui_lines(fb, 82, &gfx_font_small, N_("Une balise par seconde\n(+10 dBm). Cachez ce badge :\n"
+                                         "les autres le cherchent avec\nSocial > Chaud - froid."));
     char text[40];
-    snprintf(text, sizeof(text), "Brûlant dès %d dBm", (hot_dbm() * 100 - 15 * HOT_SPAN) / 100);
+    snprintf(text, sizeof(text), _("Brûlant dès %d dBm"), (hot_dbm() * 100 - 15 * HOT_SPAN) / 100);
     ui_lines(fb, 150, &gfx_font_small, text);
-    ui_footer(fb, master ? "G : quitter  D : arrêter" : "G : quitter  D : émettre");
+    ui_footer(fb, master ? N_("G : quitter  D : arrêter") : N_("G : quitter  D : émettre"));
 }
 
 static void master_stop(void) {
@@ -231,7 +235,7 @@ static void master_stop(void) {
 }
 
 const app_t app_hotcold_master = {
-    .name = "Balise chaud-froid",
+    .name = N_("Balise chaud-froid"),
     .start = master_start,
     .buttons = master_buttons,
     .task = master_task,
@@ -311,18 +315,19 @@ static bool radar_task(absolute_time_t now) {
 static void radar_render(uint8_t *fb, absolute_time_t now) {
     if (followed) {
         char title[24];
-        snprintf(title, sizeof(title), "Radar : %s", followed_name);
+        snprintf(title, sizeof(title), _("Radar : %s"), followed_name);
         ui_title(fb, title);
         signal_render(fb, &follow, now, followed_name);
-        ui_footer(fb, "G : retour à la liste");
+        ui_footer(fb, N_("G : retour à la liste"));
         return;
     }
-    ui_title(fb, "Radar des cigales");
+    ui_title(fb, N_("Radar des cigales"));
     if (! n_near)
-        ui_lines(fb, 60, &gfx_font_small, "Aucune cigale entendue.\nLes badges proches\napparaissent ici (balises\ntoutes les 2 s).");
+        ui_lines(fb, 60, &gfx_font_small, N_("Aucune cigale entendue.\nLes badges proches\n"
+                                             "apparaissent ici (balises\ntoutes les 2 s)."));
     else
         ui_list(fb, n_near, radar_sel, radar_label);
-    ui_footer(fb, "G : quitter  D : suivre");
+    ui_footer(fb, N_("G : quitter  D : suivre"));
 }
 
 static void radar_stop(void) {
@@ -334,7 +339,7 @@ static bool radar_calm(void) {
 }
 
 const app_t app_radar = {
-    .name = "Radar des cigales",
+    .name = N_("Radar des cigales"),
     .start = radar_start,
     .buttons = radar_buttons,
     .task = radar_task,
@@ -461,23 +466,24 @@ static void target_label(int i, char *buf, size_t len) {
 
 static void hunt433_render(uint8_t *fb, absolute_time_t now) {
     if (hunted >= 0) {
-        ui_title(fb, "Chasse 433 MHz");
+        ui_title(fb, N_("Chasse 433 MHz"));
         signal_render(fb, &target_signal, now, targets[hunted].text);
-        ui_footer(fb, "G : retour à la liste");
+        ui_footer(fb, N_("G : retour à la liste"));
         return;
     }
-    ui_title(fb, "Chasse 433 MHz");
+    ui_title(fb, N_("Chasse 433 MHz"));
     if (! n_targets) {
-        ui_lines(fb, 50, &gfx_font_small, "Écoute des émetteurs\n433 MHz (télécommandes,\ncapteurs, brouilleurs)...");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, 50, &gfx_font_small,
+                 N_("Écoute des émetteurs\n433 MHz (télécommandes,\ncapteurs, brouilleurs)..."));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     ui_list(fb, n_targets, target_sel, target_label);
-    ui_footer(fb, "G : retour  D : le chasser");
+    ui_footer(fb, N_("G : retour  D : le chasser"));
 }
 
 const app_t app_hunt433 = {
-    .name = "Chasse 433 MHz",
+    .name = N_("Chasse 433 MHz"),
     .start = hunt433_start,
     .buttons = hunt433_buttons,
     .task = hunt433_task,

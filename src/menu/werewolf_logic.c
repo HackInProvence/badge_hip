@@ -7,10 +7,11 @@
 
 #include <string.h>
 
+#include "i18n.h"
 #include "werewolf_logic.h"
 
-static const char *ROLE_NAMES[WW_ROLES] = {"Villageois", "Loup-garou", "Voyante", "Sorcière", "Chasseur", "Cupidon",
-                                           "Petite fille", "Voleur"};
+static const char *ROLE_NAMES[WW_ROLES] = {N_("Villageois"), N_("Loup-garou"), N_("Voyante"), N_("Sorcière"),
+                                           N_("Chasseur"), N_("Cupidon"), N_("Petite fille"), N_("Voleur")};
 
 int ww_wolves_for(int n) {
     return n >= 12 ? 3 : n >= 8 ? 2 : 1;  /* The rules from 8 players; 1 below (small games unlocked by the admin) */
@@ -252,10 +253,10 @@ const char *ww_role_name(int role) {
 
 const char *ww_win_text(ww_win_t win) {
     switch (win) {
-    case WW_WIN_VILLAGE: return "Le village gagne !";
-    case WW_WIN_WOLVES: return "Les loups gagnent !";
-    case WW_WIN_LOVERS: return "Les amoureux gagnent !";
-    case WW_WIN_DRAW: return "Personne ne gagne";
+    case WW_WIN_VILLAGE: return N_("Le village gagne !");
+    case WW_WIN_WOLVES: return N_("Les loups gagnent !");
+    case WW_WIN_LOVERS: return N_("Les amoureux gagnent !");
+    case WW_WIN_DRAW: return N_("Personne ne gagne");
     default: return "";
     }
 }

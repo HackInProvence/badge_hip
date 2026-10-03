@@ -24,6 +24,7 @@
 #include "audio.h"
 #include "display.h"
 #include "ff.h"
+#include "i18n.h"
 #include "rtttl_parse.h"
 #include "sd.h"
 
@@ -195,7 +196,7 @@ static void add_line(int f, uint32_t offset, uint16_t line_no, size_t len, bool 
         e = RTTTL_ERR_TOO_LONG;
         t.err_pos = LINE_MAX;
     }
-    snprintf(s->name, sizeof(s->name), "%s", t.name[0] ? t.name : "Sans nom");
+    snprintf(s->name, sizeof(s->name), "%s", t.name[0] ? t.name : _("Sans nom"));
     s->offset = offset;
     s->line = line_no;
     s->file = (uint8_t)f;
@@ -307,7 +308,7 @@ static void load_list(void) {
     status[0] = 0;
     if (sd_mount() != FR_OK) {
         sd_unmount();  /* Mount again next time, the card may be inserted */
-        snprintf(status, sizeof(status), "Pas de carte SD");
+        snprintf(status, sizeof(status), N_("Pas de carte SD"));
         dir[0] = 0;
     } else if (! dir[0]) {
         for (size_t i = 0; i < sizeof(ROOT_DIRS) / sizeof(ROOT_DIRS[0]); ++i) {
@@ -316,14 +317,14 @@ static void load_list(void) {
                 snprintf(dirs[n_dirs++], SD_NAME_MAX, "%s", ROOT_DIRS[i]);
         }
         if (! n_dirs)
-            snprintf(status, sizeof(status), "Ni SONNERIES ni RTTTL");
+            snprintf(status, sizeof(status), N_("Ni SONNERIES ni RTTTL"));
     } else {
         n_dirs = (int)sd_list_dirs(dir, dirs, MAX_DIRS);
         list_files();
         for (int f = 0; f < n_files; ++f)
             scan_file(f);
         if (! n_dirs && ! n_files)
-            snprintf(status, sizeof(status), "Dossier vide");
+            snprintf(status, sizeof(status), N_("Dossier vide"));
     }
     printf("rtttl: /%s: %d dir(s), %d file(s), %d tune(s)%s%s\n", dir, n_dirs, n_files, n_sd,
            page_prev ? ", previous page" : "", page_next ? ", next page" : "");
@@ -353,7 +354,7 @@ static void request_list(int select) {
 static void enter_dir(const char *name) {
     size_t len = strlen(dir);
     if (len + 1 + strlen(name) >= sizeof(dir)) {
-        snprintf(status, sizeof(status), "Chemin trop long");
+        snprintf(status, sizeof(status), N_("Chemin trop long"));
         return;
     }
     snprintf(dir + len, sizeof(dir) - len, "%s%s", len ? "/" : "", name);
@@ -543,7 +544,7 @@ static void start_playing(int i) {
     }
     app_tone(0, 0);  /* Stops a chime of the menu */
     if (! audio_open(RATE)) {
-        snprintf(status, sizeof(status), "Son indisponible");
+        snprintf(status, sizeof(status), N_("Son indisponible"));
         mode = M_LIST;
         return;
     }
@@ -727,12 +728,12 @@ static void row_label(int r, char *buf, size_t len) {
         return;
     }
     if (page_prev && r == n_dirs) {
-        snprintf(buf, len, "< Précédents");
+        snprintf(buf, len, N_("< Précédents"));
         return;
     }
     int i = r - first_tune_row();
     if (i >= n_tunes()) {
-        snprintf(buf, len, "Suivants >");
+        snprintf(buf, len, N_("Suivants >"));
         return;
     }
     if (i < n_builtin()) {
@@ -753,14 +754,14 @@ static void row_label(int r, char *buf, size_t len) {
 
 static void source_name(char *buf, size_t len) {
     if (cur < n_builtin())
-        snprintf(buf, len, "Sonnerie du badge");
+        snprintf(buf, len, N_("Sonnerie du badge"));
     else
         snprintf(buf, len, "%s/%s", dir, files[sd_tunes[cur - n_builtin()].file]);
 }
 
 static void render_play(uint8_t *fb) {
     char text[PATH_MAX_LEN + SD_NAME_MAX + 2], fitted[64];
-    snprintf(text, sizeof(text), "Sonnerie %d / %d", cur + 1, n_tunes());
+    snprintf(text, sizeof(text), _("Sonnerie %d / %d"), cur + 1, n_tunes());
     ui_title(fb, text);
     ui_wrapped(fb, UI_TITLE_H + 6, &gfx_font_medium, song.name, 2);
     source_name(text, sizeof(text));
@@ -777,25 +778,25 @@ static void render_play(uint8_t *fb) {
     snprintf(text, sizeof(text), "%lu:%02lu / %lu:%02lu", (unsigned long)(ms / 60000), (unsigned long)(ms / 1000 % 60),
              (unsigned long)(song_ms / 60000), (unsigned long)(song_ms / 1000 % 60));
     gfx_text(fb, GFX_WIDTH/2, 156, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_footer(fb, "G : stop  Flancs : préc./suiv.");
+    ui_footer(fb, N_("G : stop  Flancs : préc./suiv."));
 }
 
 static void render_error(uint8_t *fb) {
     char text[PATH_MAX_LEN + SD_NAME_MAX + 2], fitted[64];
-    ui_title(fb, "Sonnerie invalide");
+    ui_title(fb, N_("Sonnerie invalide"));
     int y = ui_wrapped(fb, UI_TITLE_H + 6, &gfx_font_medium, song.name, 2) + 4;
     source_name(text, sizeof(text));
     ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 8);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
     y += 26;
     if (cur >= n_builtin())
-        snprintf(text, sizeof(text), "Ligne %u, colonne %u :", sd_tunes[cur - n_builtin()].line,
+        snprintf(text, sizeof(text), _("Ligne %u, colonne %u :"), sd_tunes[cur - n_builtin()].line,
                  (unsigned)song.err_pos + 1);
     else
-        snprintf(text, sizeof(text), "Colonne %u :", (unsigned)song.err_pos + 1);
+        snprintf(text, sizeof(text), _("Colonne %u :"), (unsigned)song.err_pos + 1);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     ui_wrapped(fb, y + 18, &gfx_font_small, rtttl_error_text(song_err), 2);
-    ui_footer(fb, "G : retour");
+    ui_footer(fb, N_("G : retour"));
 }
 
 static void rtttl_render(uint8_t *fb, absolute_time_t now) {
@@ -806,9 +807,9 @@ static void rtttl_render(uint8_t *fb, absolute_time_t now) {
         render_error(fb);
     } else {
         const char *slash = strrchr(dir, '/');
-        ui_title(fb, ! dir[0] ? "Sonneries" : slash ? slash + 1 : dir);
+        ui_title(fb, ! dir[0] ? N_("Sonneries") : slash ? slash + 1 : dir);
         ui_list(fb, n_rows(), sel, row_label);
-        ui_footer(fb, list_pending ? "Lecture de la carte..." : status[0] ? status : "G : retour  D : choisir");
+        ui_footer(fb, list_pending ? N_("Lecture de la carte...") : status[0] ? status : N_("G : retour  D : choisir"));
     }
 }
 
@@ -817,7 +818,7 @@ static bool rtttl_calm(void) {
 }
 
 const app_t app_rtttl = {
-    .name = "Sonneries",
+    .name = N_("Sonneries"),
     .start = rtttl_start,
     .buttons = rtttl_buttons,
     .task = rtttl_task,

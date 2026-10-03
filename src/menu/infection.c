@@ -15,6 +15,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "store.h"
 
@@ -177,36 +178,38 @@ static bool infection_buttons(const app_buttons_t *b, absolute_time_t now) {
 static void infection_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     if (editing) {
-        ui_edit_render(fb, &edit, "Remède", RIDDLES[riddle].question);
+        ui_edit_render(fb, &edit, N_("Remède"), RIDDLES[riddle].question);
         return;
     }
-    ui_title(fb, "Virus des cigales");
+    ui_title(fb, N_("Virus des cigales"));
     switch (state()) {
     case INFECTED: {
         gfx_fill_rect(fb, 0, 36, GFX_WIDTH, 40, GFX_BLACK);
-        gfx_text(fb, GFX_WIDTH/2, 43, &gfx_font_large, "INFECTÉ", GFX_WHITE, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, 43, &gfx_font_large, N_("INFECTÉ"), GFX_WHITE, GFX_ALIGN_CENTER);
         char text[80];
-        snprintf(text, sizeof(text), "Génération %u. Vous toussez :\nles cigales proches peuvent\nêtre contaminées !", generation);
+        snprintf(text, sizeof(text), _("Génération %u. Vous toussez :\nles cigales proches peuvent\n"
+                                       "être contaminées !"), generation);
         ui_lines(fb, 84, &gfx_font_small, text);
-        ui_lines(fb, 142, &gfx_font_small, wrong ? "Mauvaise réponse..." : "Le remède : une énigme.");
-        ui_footer(fb, "G : retour  D : se soigner");
+        ui_lines(fb, 142, &gfx_font_small, wrong ? N_("Mauvaise réponse...") : N_("Le remède : une énigme."));
+        ui_footer(fb, N_("G : retour  D : se soigner"));
         break;
     }
     case IMMUNE:
-        gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, "Immunisé", GFX_BLACK, GFX_ALIGN_CENTER);
-        ui_lines(fb, 90, &gfx_font_small, "Vous avez trouvé le remède :\nce virus ne vous atteint plus.");
-        ui_footer(fb, "G : retour");
+        gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, N_("Immunisé"), GFX_BLACK, GFX_ALIGN_CENTER);
+        ui_lines(fb, 90, &gfx_font_small, N_("Vous avez trouvé le remède :\nce virus ne vous atteint plus."));
+        ui_footer(fb, N_("G : retour"));
         break;
     default:
-        gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, "En forme", GFX_BLACK, GFX_ALIGN_CENTER);
-        ui_lines(fb, 90, &gfx_font_small, "Un virus (inoffensif) circule\nde cigale en cigale...\nRestez trop près d'une cigale\ninfectée et vous l'attrapez !");
-        ui_footer(fb, "G : retour");
+        gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, N_("En forme"), GFX_BLACK, GFX_ALIGN_CENTER);
+        ui_lines(fb, 90, &gfx_font_small, N_("Un virus (inoffensif) circule\nde cigale en cigale...\n"
+                                              "Restez trop près d'une cigale\ninfectée et vous l'attrapez !"));
+        ui_footer(fb, N_("G : retour"));
         break;
     }
 }
 
 const app_t app_infection = {
-    .name = "Virus des cigales",
+    .name = N_("Virus des cigales"),
     .start = infection_start,
     .buttons = infection_buttons,
     .render = infection_render,
@@ -231,15 +234,16 @@ static bool zero_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void zero_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Virus : patient zéro");
-    ui_lines(fb, 40, &gfx_font_small, state() == INFECTED ? "Ce badge est infecté :\nil tousse toutes les 4 s." :
-             "Infectez ce badge pour\nlancer l'épidémie : les\nbadges qui restent près de\nlui l'attrapent (60 %).");
-    ui_lines(fb, 120, &gfx_font_small, "Flanc G : guérir ce badge");
-    ui_footer(fb, "G : retour  D : infecter");
+    ui_title(fb, N_("Virus : patient zéro"));
+    ui_lines(fb, 40, &gfx_font_small, state() == INFECTED ? N_("Ce badge est infecté :\nil tousse toutes les 4 s.") :
+             N_("Infectez ce badge pour\nlancer l'épidémie : les\nbadges qui restent près de\n"
+                "lui l'attrapent (60 %)."));
+    ui_lines(fb, 120, &gfx_font_small, N_("Flanc G : guérir ce badge"));
+    ui_footer(fb, N_("G : retour  D : infecter"));
 }
 
 const app_t app_infection_zero = {
-    .name = "Virus : patient zéro",
+    .name = N_("Virus : patient zéro"),
     .start = zero_start,
     .buttons = zero_buttons,
     .render = zero_render,

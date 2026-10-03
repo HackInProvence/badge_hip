@@ -40,6 +40,11 @@ def run(cmd, **kw):
 
 # ---- C tests ----
 
+# The translation of the texts (i18n.c), for the modules that call tr(): without the store of the badge (French)
+I18N = ['menu/i18n.c', 'menu/i18n_table.c']
+I18N_DEFINES = ['I18N_NO_STORE']
+
+
 def c_test(name, sources, includes, work, copy=(), defines=()):
     """Compiles then runs tests/host/<name>.c, returns (ok, output)."""
     for src, dst in copy:
@@ -67,13 +72,15 @@ def test_screen(work):
 
 
 def test_games(work):
-    return c_test('test_games', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'menu/score_code.c', 'qrcode/qrcodegen.c'],
-                  [STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work)
+    return c_test('test_games', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'menu/score_code.c', 'qrcode/qrcodegen.c'] + I18N,
+                  [STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work,
+                  defines=I18N_DEFINES)
 
 
 def test_puzzles(work):
-    return c_test('test_puzzles', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'menu/score_code.c', 'qrcode/qrcodegen.c'],
-                  [STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work)
+    return c_test('test_puzzles', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'menu/score_code.c', 'qrcode/qrcodegen.c'] + I18N,
+                  [STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), os.path.join(SRC, 'qrcode')], work,
+                  defines=I18N_DEFINES)
 
 
 def test_score(work):
@@ -178,8 +185,9 @@ def test_rsvp(work):
     # rsvp.c is copied next to the stand-ins of its dependencies, so that its "store.h", "screen.h"... are them
     for h in os.listdir(os.path.join(STUBS, 'rsvp')):
         shutil.copy(os.path.join(STUBS, 'rsvp', h), work)
-    return c_test('test_rsvp', ['gfx/gfx.c', 'gfx/gfx_fonts.c'], [work, STUBS, os.path.join(SRC, 'gfx')], work,
-                  copy=[('menu/rsvp.c', 'rsvp.c'), ('menu/rsvp.h', 'rsvp.h')])
+    return c_test('test_rsvp', ['gfx/gfx.c', 'gfx/gfx_fonts.c'] + I18N, [work, STUBS, os.path.join(SRC, 'gfx')], work,
+                  copy=[('menu/rsvp.c', 'rsvp.c'), ('menu/rsvp.h', 'rsvp.h'), ('menu/i18n.h', 'i18n.h')],
+                  defines=I18N_DEFINES)
 
 
 def test_party_games(work):

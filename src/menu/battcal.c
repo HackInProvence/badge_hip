@@ -11,6 +11,7 @@
 
 #include "app.h"
 #include "battery.h"
+#include "i18n.h"
 #include "store.h"
 
 #define MV_MIN 2500
@@ -75,17 +76,17 @@ static bool battcal_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (row == ROW_SAVE) {
         uint16_t raw = battery_raw();
         if (! raw)
-            snprintf(status, sizeof(status), "Pas encore de mesure");
+            snprintf(status, sizeof(status), _("Pas encore de mesure"));
         else if (battery_set_point(entered_mv, raw))
-            snprintf(status, sizeof(status), battery_calibrated() ? "Point enregistré" : "Il faut un 2e point");
+            snprintf(status, sizeof(status), battery_calibrated() ? _("Point enregistré") : _("Il faut un 2e point"));
         else
-            snprintf(status, sizeof(status), "Erreur d'écriture");
+            snprintf(status, sizeof(status), _("Erreur d'écriture"));
     } else if (! confirm) {
         confirm = true;
-        snprintf(status, sizeof(status), "D encore : effacer");
+        snprintf(status, sizeof(status), _("D encore : effacer"));
     } else {
         confirm = false;
-        snprintf(status, sizeof(status), battery_clear_points() ? "Calibration effacée" : "Erreur d'écriture");
+        snprintf(status, sizeof(status), battery_clear_points() ? _("Calibration effacée") : _("Erreur d'écriture"));
     }
     return true;
 }
@@ -106,25 +107,25 @@ static void battcal_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[48], v[16];
     const store_factory_t *f = store_factory_get();
-    ui_title(fb, "Batterie");
+    ui_title(fb, N_("Batterie"));
     int y = UI_TITLE_H + 3;
     snprintf(text, sizeof(text), "ADC : %u%s", shown_raw, battery_charging() ? " (USB)" : "");
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     y += 18;
     if (battery_mv()) {
         volts(v, sizeof(v), battery_mv());
-        snprintf(text, sizeof(text), "Mesure : %s  %d %%", v, battery_percent());
+        snprintf(text, sizeof(text), _("Mesure : %s  %d %%"), v, battery_percent());
     } else {
-        snprintf(text, sizeof(text), "Mesure : non calibrée");
+        snprintf(text, sizeof(text), _("Mesure : non calibrée"));
     }
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     for (int i = 0; i < 2; ++i) {
         y += 18;
         if (f->battery_mv[i]) {
             volts(v, sizeof(v), f->battery_mv[i]);
-            snprintf(text, sizeof(text), "Point %d : %s à %u", i + 1, v, f->battery_raw[i]);
+            snprintf(text, sizeof(text), _("Point %d : %s à %u"), i + 1, v, f->battery_raw[i]);
         } else {
-            snprintf(text, sizeof(text), "Point %d : -", i + 1);
+            snprintf(text, sizeof(text), _("Point %d : -"), i + 1);
         }
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     }
@@ -132,9 +133,9 @@ static void battcal_render(uint8_t *fb, absolute_time_t now) {
     for (int i = 0; i < N_ROWS; ++i, y += 22) {
         volts(v, sizeof(v), entered_mv);
         if (i == ROW_MV)
-            snprintf(text, sizeof(text), "Multimètre : %s", v);
+            snprintf(text, sizeof(text), _("Multimètre : %s"), v);
         else
-            snprintf(text, sizeof(text), i == ROW_SAVE ? "> Enregistrer le point" : "> Effacer");
+            snprintf(text, sizeof(text), i == ROW_SAVE ? _("> Enregistrer le point") : _("> Effacer"));
         if (i == row) {
             gfx_fill_rect(fb, 4, y - 2, GFX_WIDTH - 8, 21, GFX_BLACK);
             gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_CENTER);
@@ -142,11 +143,11 @@ static void battcal_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         }
     }
-    ui_footer(fb, status[0] ? status : row == ROW_MV ? "Ailes : -  +" : "G : retour  D : valider");
+    ui_footer(fb, status[0] ? status : row == ROW_MV ? N_("Ailes : -  +") : N_("G : retour  D : valider"));
 }
 
 const app_t app_battcal = {
-    .name = "Batterie (calibration)",
+    .name = N_("Batterie (calibration)"),
     .start = battcal_start,
     .buttons = battcal_buttons,
     .task = battcal_task,

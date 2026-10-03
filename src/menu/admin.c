@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "remote.h"
 #include "store.h"
 
@@ -19,15 +20,15 @@ typedef struct {
 } command_t;
 
 static const command_t COMMANDS[] = {
-    {"Muet (conférence)", REMOTE_MUTE},
-    {"Fin du mode muet", REMOTE_UNMUTE},
-    {"Cigale : chanter", REMOTE_CIGALE},
-    {"Talk : éteint", REMOTE_TALK + 0},
-    {"Talk : vert", REMOTE_TALK + 1},
-    {"Talk : orange (5 min)", REMOTE_TALK + 2},
-    {"Talk : rouge (fini)", REMOTE_TALK + 3},
-    {"Talk : rouge énervé", REMOTE_TALK + 4},
-    {"Mise en sommeil", REMOTE_SLEEP},
+    {N_("Muet (conférence)"), REMOTE_MUTE},
+    {N_("Fin du mode muet"), REMOTE_UNMUTE},
+    {N_("Cigale : chanter"), REMOTE_CIGALE},
+    {N_("Talk : éteint"), REMOTE_TALK + 0},
+    {N_("Talk : vert"), REMOTE_TALK + 1},
+    {N_("Talk : orange (5 min)"), REMOTE_TALK + 2},
+    {N_("Talk : rouge (fini)"), REMOTE_TALK + 3},
+    {N_("Talk : rouge énervé"), REMOTE_TALK + 4},
+    {N_("Mise en sommeil"), REMOTE_SLEEP},
 };
 #define N_COMMANDS ((int)(sizeof(COMMANDS) / sizeof(COMMANDS[0])))
 
@@ -58,13 +59,13 @@ static bool commands_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void commands_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Commandes radio");
+    ui_title(fb, N_("Commandes radio"));
     ui_list(fb, N_COMMANDS, cmd_selected, cmd_label);
-    ui_footer(fb, "G : retour  D : envoyer à tous");
+    ui_footer(fb, N_("G : retour  D : envoyer à tous"));
 }
 
 const app_t app_admin_commands = {
-    .name = "Commandes radio",
+    .name = N_("Commandes radio"),
     .start = commands_start,
     .buttons = commands_buttons,
     .render = commands_render,
@@ -73,12 +74,12 @@ const app_t app_admin_commands = {
 
 /* ------ Type of the badge (shown by the name tag) ------ */
 
-static const char *TYPES[] = {"Participant", "Orateur", "Staff"};
+static const char *TYPES[] = {N_("Participant"), N_("Orateur"), N_("Staff")};
 static int type_selected = 0;
 
 static void type_label(int i, char *buf, size_t len) {
     uint8_t t = store_get()->badge_type;
-    snprintf(buf, len, "%s%s", TYPES[i], i == (t < 3 ? t : 0) ? "  (actuel)" : "");
+    snprintf(buf, len, "%s%s", tr(TYPES[i]), i == (t < 3 ? t : 0) ? _("  (actuel)") : "");
 }
 
 static void type_start(absolute_time_t now) {
@@ -105,14 +106,14 @@ static bool type_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void type_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Type du badge");
+    ui_title(fb, N_("Type du badge"));
     ui_list(fb, 3, type_selected, type_label);
-    ui_lines(fb, 110, &gfx_font_small, "Affiché par le\nbadge nominatif.");
-    ui_footer(fb, "G : retour  D : choisir");
+    ui_lines(fb, 110, &gfx_font_small, N_("Affiché par le\nbadge nominatif."));
+    ui_footer(fb, N_("G : retour  D : choisir"));
 }
 
 const app_t app_admin_type = {
-    .name = "Type du badge",
+    .name = N_("Type du badge"),
     .start = type_start,
     .buttons = type_buttons,
     .render = type_render,

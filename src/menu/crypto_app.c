@@ -13,6 +13,7 @@
 #include "app.h"
 #include "audio.h"
 #include "crypto_ctf.h"
+#include "i18n.h"
 #include "store.h"
 
 #define DOT_MS 150
@@ -44,7 +45,7 @@ static int n_solved(void) {
 
 static void list_label(int i, char *buf, size_t len) {
     if (i == crypto_ctf_count()) {
-        snprintf(buf, len, "> Le flag final");
+        snprintf(buf, len, _("> Le flag final"));
         return;
     }
     snprintf(buf, len, "%s %d. %s", (solved() >> i) & 1 ? "[x]" : "[ ]", i + 1, crypto_ctf_title(i));
@@ -187,56 +188,58 @@ static void crypto_render(uint8_t *fb, absolute_time_t now) {
     char text[64];
     switch (view) {
     case V_LIST:
-        snprintf(text, sizeof(text), "Crypto : %d / %d", n_solved(), crypto_ctf_count());
+        snprintf(text, sizeof(text), _("Crypto : %d / %d"), n_solved(), crypto_ctf_count());
         ui_title(fb, text);
         ui_list(fb, crypto_ctf_count() + 1, sel, list_label);
-        ui_footer(fb, "G : retour  D : ouvrir");
+        ui_footer(fb, N_("G : retour  D : ouvrir"));
         break;
     case V_CHALLENGE:
         ui_title(fb, crypto_ctf_title(sel));
         ui_text(fb, 2, UI_TITLE_H + 4, &gfx_font_small, crypto_ctf_text(sel));  /* The lines are at most 196 px */
-        ui_footer(fb, crypto_ctf_morse(sel) ? "D : répondre  Flanc D : écouter" : "D : répondre  D long : indice");
+        ui_footer(fb, crypto_ctf_morse(sel) ? N_("D : répondre  Flanc D : écouter")
+                                            : N_("D : répondre  D long : indice"));
         break;
     case V_HINT:
-        ui_title(fb, "Indice");
-        ui_text(fb, 2, UI_TITLE_H + 8, &gfx_font_small, crypto_ctf_hint(sel)[0] ? crypto_ctf_hint(sel) : "Pas d'indice !");
-        ui_footer(fb, "G : retour");
+        ui_title(fb, N_("Indice"));
+        ui_text(fb, 2, UI_TITLE_H + 8, &gfx_font_small, crypto_ctf_hint(sel)[0] ? crypto_ctf_hint(sel)
+                                                                                : N_("Pas d'indice !"));
+        ui_footer(fb, N_("G : retour"));
         break;
     case V_ANSWER:
-        ui_edit_render(fb, &edit, "Réponse", crypto_ctf_title(sel));
+        ui_edit_render(fb, &edit, N_("Réponse"), crypto_ctf_title(sel));
         break;
     case V_RESULT: {
         ui_title(fb, crypto_ctf_title(sel));
         if (right) {
             char piece[16] = "";
             crypto_ctf_piece(sel, solved(), piece, sizeof(piece));
-            snprintf(text, sizeof(text), "Bravo !\nMorceau du flag :\n%s", piece);
+            snprintf(text, sizeof(text), _("Bravo !\nMorceau du flag :\n%s"), piece);
             ui_box(fb, text);
         } else {
-            ui_box(fb, "Ce n'est pas ça...");
+            ui_box(fb, N_("Ce n'est pas ça..."));
         }
-        ui_footer(fb, "D : continuer");
+        ui_footer(fb, N_("D : continuer"));
         break;
     }
     default: {
-        ui_title(fb, "Le flag final");
+        ui_title(fb, N_("Le flag final"));
         char flag[CRYPTO_CTF_FLAG_MAX];
         if (crypto_ctf_final_flag(solved(), flag, sizeof(flag))) {
-            ui_lines(fb, 50, &gfx_font_small, "Tous les défis sont résolus :");
+            ui_lines(fb, 50, &gfx_font_small, N_("Tous les défis sont résolus :"));
             ui_lines(fb, 80, &gfx_font_small, flag);
         } else {
-            snprintf(text, sizeof(text), "Encore %d défi%s à résoudre.", crypto_ctf_count() - n_solved(),
+            snprintf(text, sizeof(text), _("Encore %d défi%s à résoudre."), crypto_ctf_count() - n_solved(),
                      crypto_ctf_count() - n_solved() > 1 ? "s" : "");
             ui_lines(fb, 60, &gfx_font_small, text);
         }
-        ui_footer(fb, "G : retour");
+        ui_footer(fb, N_("G : retour"));
         break;
     }
     }
 }
 
 const app_t app_crypto = {
-    .name = "Défis crypto",
+    .name = N_("Défis crypto"),
     .start = crypto_start,
     .buttons = crypto_buttons,
     .task = crypto_task,

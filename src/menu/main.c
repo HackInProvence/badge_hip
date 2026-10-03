@@ -326,7 +326,8 @@ static uint8_t buttons_pressed(absolute_time_t now) {
 
 static bool sound_on = false;
 static unsigned led_mode = 0;
-static const char *LED_NAMES[] = {"éteintes", "arc-en-ciel", "respiration", "battement", "clignotement", "vert fixe"};
+static const char *LED_NAMES[] = {N_("éteintes"), N_("arc-en-ciel"), N_("respiration"), N_("battement"),
+                                   N_("clignotement"), N_("vert fixe")};
 #define N_LED_MODES (sizeof(LED_NAMES)/sizeof(LED_NAMES[0]))
 
 static void set_sound(bool on) {
@@ -511,10 +512,10 @@ static int file_selected = 0;
 /* What the file browser lists */
 typedef enum { B_VIDEO, B_MUSIC, B_TEXT, B_IMAGE } browse_kind_t;
 static browse_kind_t browsing = B_VIDEO;
-static const char *BROWSE_TITLES[] = {"Vidéos", "Musique", "Lecture rapide", "Images"};
+static const char *BROWSE_TITLES[] = {N_("Vidéos"), N_("Musique"), N_("Lecture rapide"), N_("Images")};
 static const char *BROWSE_EXTS[] = {".EPV", ".WAV", ".TXT", ".EPI"};
 static const char *BROWSE_DIRS[] = {VIDEO_DIR, MUSIC_DIR, TEXT_DIR, IMAGE_DIR};
-static const char *BROWSE_TOOLS[] = {"video2epaper.py", "audio2wav.py", "un fichier texte", "image2epi.py"};
+static const char *BROWSE_TOOLS[] = {"video2epaper.py", "audio2wav.py", N_("un fichier texte"), "image2epi.py"};
 static char browse_root[16] = "";  /* Can't go up from here */
 static char dir[PATH_MAX_LEN] = "";
 static char path[PATH_MAX_LEN] = "";
@@ -627,35 +628,35 @@ static void saver_delay_text(char *buf, size_t len);
 
 static void item_label(int item, char *buf, size_t len) {
     switch (item) {
-    case M_SOUND: snprintf(buf, len, "Cigale : %s", sound_on ? "activée" : "coupée"); break;
-    case M_LEDS: snprintf(buf, len, "LEDs : %s", LED_NAMES[led_mode]); break;
-    case M_SCREEN_DEMO: snprintf(buf, len, "Démo écran"); break;
-    case M_VIDEO: snprintf(buf, len, "Vidéos (carte SD)"); break;
-    case M_MUSIC: snprintf(buf, len, "Musique (carte SD)"); break;
-    case M_BLIND_TEST: snprintf(buf, len, "Blind test"); break;
-    case M_SOCIAL: snprintf(buf, len, "Réseau cigales : %lu pts", (unsigned long)social_score()); break;
-    case M_IR: snprintf(buf, len, "Infrarouge"); break;
-    case M_OLED: snprintf(buf, len, "Écran OLED"); break;
-    case M_CTF: snprintf(buf, len, "CTF : %d/%d flags", ctf_found_count(), CTF_N_FLAGS); break;
-    case M_RSVP: snprintf(buf, len, "Lecture rapide (PVSR)"); break;
+    case M_SOUND: snprintf(buf, len, _("Cigale : %s"), sound_on ? _("activée") : _("coupée")); break;
+    case M_LEDS: snprintf(buf, len, _("LEDs : %s"), tr(LED_NAMES[led_mode])); break;
+    case M_SCREEN_DEMO: snprintf(buf, len, N_("Démo écran")); break;
+    case M_VIDEO: snprintf(buf, len, N_("Vidéos (carte SD)")); break;
+    case M_MUSIC: snprintf(buf, len, N_("Musique (carte SD)")); break;
+    case M_BLIND_TEST: snprintf(buf, len, N_("Blind test")); break;
+    case M_SOCIAL: snprintf(buf, len, _("Réseau cigales : %lu pts"), (unsigned long)social_score()); break;
+    case M_IR: snprintf(buf, len, N_("Infrarouge")); break;
+    case M_OLED: snprintf(buf, len, N_("Écran OLED")); break;
+    case M_CTF: snprintf(buf, len, _("CTF : %d/%d flags"), ctf_found_count(), CTF_N_FLAGS); break;
+    case M_RSVP: snprintf(buf, len, N_("Lecture rapide (PVSR)")); break;
     case M_SETTINGS: {
         char delay[16];
         saver_delay_text(delay, sizeof(delay));
-        snprintf(buf, len, "Veille : %s", delay);  /* The delay of the screensaver, set on its page */
+        snprintf(buf, len, _("Veille : %s"), delay);  /* The delay of the screensaver, set on its page */
         break;
     }
-    case M_IMAGES: snprintf(buf, len, "Images"); break;
+    case M_IMAGES: snprintf(buf, len, N_("Images")); break;
     case M_TICTACTOE: case M_CONNECT4: case M_SIMON: case M_REFLEX: case M_SNAKE:
         snprintf(buf, len, "%s", games_name(item - M_TICTACTOE));
         break;
-    case M_VOLUME: snprintf(buf, len, "Volume : %u/%u", audio_get_volume(), AUDIO_VOLUME_MAX); break;
-    case M_RADIO_MSG: snprintf(buf, len, "Radio : message"); break;
-    case M_RADIO_CARRIER: snprintf(buf, len, "Radio : porteuse"); break;
-    case M_INFO: snprintf(buf, len, "Infos"); break;
-    case M_CREDITS: snprintf(buf, len, "Crédits"); break;
-    case M_REMOTE_TOGGLE: snprintf(buf, len, "Télécommande : %s", remote_enabled() ? "oui" : "non"); break;
-    case M_MUTE_TOGGLE: snprintf(buf, len, "Mode muet : %s", remote_muted() ? "oui" : "non"); break;
-    case M_ADMIN_OFF: snprintf(buf, len, "Quitter le mode admin"); break;
+    case M_VOLUME: snprintf(buf, len, _("Volume : %u/%u"), audio_get_volume(), AUDIO_VOLUME_MAX); break;
+    case M_RADIO_MSG: snprintf(buf, len, N_("Radio : message")); break;
+    case M_RADIO_CARRIER: snprintf(buf, len, N_("Radio : porteuse")); break;
+    case M_INFO: snprintf(buf, len, N_("Infos")); break;
+    case M_CREDITS: snprintf(buf, len, N_("Crédits")); break;
+    case M_REMOTE_TOGGLE: snprintf(buf, len, _("Télécommande : %s"), remote_enabled() ? _("oui") : _("non")); break;
+    case M_MUTE_TOGGLE: snprintf(buf, len, _("Mode muet : %s"), remote_muted() ? _("oui") : _("non")); break;
+    case M_ADMIN_OFF: snprintf(buf, len, N_("Quitter le mode admin")); break;
     default:
         if (item >= M_APP(0) && item < M_APP(APP_COUNT)) {
             const app_t *a = APPS[item - M_APP(0)];
@@ -676,7 +677,7 @@ static void file_label(int i, char *buf, size_t len) {
 
 static void bt_dir_label(int i, char *buf, size_t len) {
     if (i == 0)
-        snprintf(buf, len, "Tout");
+        snprintf(buf, len, N_("Tout"));
     else
         snprintf(buf, len, "> %s", bt_dirs[i-1]);
 }
@@ -698,21 +699,22 @@ typedef struct {
 } submenu_t;
 
 static const submenu_t SUBMENUS[] = {
-    {"Médias", 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
-    {"Jeux solo", 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
+    {N_("Médias"), 7, {M_IMAGES, M_VIDEO, M_MUSIC, M_APP(APP_RTTTL), M_RSVP, M_APP(APP_GAMEBOOK), M_VOLUME}},
+    {N_("Jeux solo"), 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                        M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST,
                        M_CTF, M_APP(APP_CRYPTO)}},
-    {"Jeux multi", 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN), M_APP(APP_TUG)}},
-    {"Social", 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
+    {N_("Jeux multi"), 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
+                           M_APP(APP_TUG)}},
+    {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
                     M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
-    {"Radio & IR", 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
+    {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
-    {"Badge", 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
+    {N_("Badge"), 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS)}},
-    {"Réglages", 7, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
+    {N_("Réglages"), 7, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE)}},
-    {"Admin", 15, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {N_("Admin"), 15, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_SMUGGLER_ADMIN),
                    M_APP(APP_WEREWOLF_ADMIN), M_APP(APP_RESET),
@@ -744,8 +746,9 @@ static bool admin_sequence(uint8_t flank, absolute_time_t now) {
     return ! strcmp(admin_keys, ADMIN_SEQUENCE);
 }
 /* Sequence of the flanks in the main menu that sets the language back to English, for a badge left in a language
- * that the user can't read (docs: G five times to come back to the main menu, then R four times, L four times) */
-#define LANG_SEQUENCE "RRRRLLLL"
+ * that the user can't read (docs: G five times to come back to the main menu, then the flanks left, right, left,
+ * right... 8 times). Alternating: never done by moving in the menu; a wing pressed starts it again. */
+#define LANG_SEQUENCE "LRLRLRLR"
 static char lang_keys[sizeof(LANG_SEQUENCE)] = "";
 static absolute_time_t lang_keys_ts = 0;
 
@@ -784,12 +787,12 @@ static void set_admin(bool on) {
         top_selected = 0;
     }
     printf("admin: %s\n", on ? "on" : "off");
-    set_status(on ? "Mode admin activé" : "Mode admin désactivé");
+    set_status(on ? N_("Mode admin activé") : N_("Mode admin désactivé"));
     redraw_menu = true;
 }
 
 static void top_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s  >", SUBMENUS[i].title);
+    snprintf(buf, len, "%s  >", tr(SUBMENUS[i].title));
 }
 
 static void sub_label(int i, char *buf, size_t len) {
@@ -830,7 +833,7 @@ static void render_menu(absolute_time_t now) {
     }
     draw_battery();
     bool show_status = status[0] && absolute_time_diff_us(status_ts, now) < STATUS_MS*1000ll;
-    draw_footer(show_status ? status : "Flancs : choix  D : OK  G : retour");
+    draw_footer(show_status ? status : N_("Flancs : choix  D : OK  G : retour"));
 }
 
 static void render_browser(void) {
@@ -838,26 +841,28 @@ static void render_browser(void) {
     /* The title is the current directory (or the kind of files at the top) */
     const char *sub = strrchr(dir, '/');
     char title[32];
-    fit_text_font(&gfx_font_medium, title, sizeof(title),
-                  strcmp(dir, browse_root) ? (sub ? sub + 1 : dir) : BROWSE_TITLES[browsing],
-                  GFX_WIDTH - 8);
-    draw_title(title);
+    if (strcmp(dir, browse_root)) {
+        fit_text_font(&gfx_font_medium, title, sizeof(title), sub ? sub + 1 : dir, GFX_WIDTH - 8);
+        draw_title(title);
+    } else {
+        draw_title(BROWSE_TITLES[browsing]);  /* Short; the "ui:" log stays in French (the tools read it) */
+    }
     draw_list(n_files, file_selected, file_label);
-    draw_footer("D : ouvrir  G : retour");
+    draw_footer(N_("D : ouvrir  G : retour"));
 }
 
 static void render_bt_folders(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Blind test");
+    draw_title(N_("Blind test"));
     draw_list(n_bt_dirs + 1, bt_dir_selected, bt_dir_label);
-    draw_footer("D : lancer  G : retour");
+    draw_footer(N_("D : lancer  G : retour"));
 }
 
 static void render_blind_test(void) {
     char text[48];
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Blind test");
-    snprintf(text, sizeof(text), "Morceau %u / %u", (unsigned)(bt_index + 1), (unsigned)n_playlist);
+    draw_title(N_("Blind test"));
+    snprintf(text, sizeof(text), _("Morceau %u / %u"), (unsigned)(bt_index + 1), (unsigned)n_playlist);
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 6, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
 
     if (bt_revealed) {
@@ -880,27 +885,28 @@ static void render_blind_test(void) {
         gfx_text(fb, GFX_WIDTH/2, 70, &gfx_font_large, "? ? ?", GFX_BLACK, GFX_ALIGN_CENTER);
     }
 
-    const char *state = bt_finished ? "Terminé" : (wav_is_paused() ? "Pause" : "Lecture...");
+    const char *state = bt_finished ? N_("Terminé") : (wav_is_paused() ? N_("Pause") : N_("Lecture..."));
     gfx_text(fb, GFX_WIDTH/2, 150, &gfx_font_small, state, GFX_BLACK, GFX_ALIGN_CENTER);
-    draw_footer("D : titre  Flanc D : suivant");
+    draw_footer(N_("D : titre  Flanc D : suivant"));
 }
 
 static void render_social(void) {
     char text[64], fitted[64];
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Réseau cigales");
-    snprintf(text, sizeof(text), "%s : %lu pts, %u rencontres", social_name(), (unsigned long)social_score(),
+    draw_title(N_("Réseau cigales"));
+    snprintf(text, sizeof(text), _("%s : %lu pts, %u rencontres"), social_name(), (unsigned long)social_score(),
              social_met_count());
     fit_text(fitted, sizeof(fitted), text, GFX_WIDTH - 12);
     gfx_text(fb, 6, TITLE_H + 4, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
-    gfx_text(fb, 6, TITLE_H + 24, &gfx_font_small, social_enabled() ? "Balises : actives" : "Balises : coupées",
-             GFX_BLACK, GFX_ALIGN_LEFT);
+    gfx_text(fb, 6, TITLE_H + 24, &gfx_font_small,
+             social_enabled() ? N_("Balises : actives") : N_("Balises : coupées"), GFX_BLACK, GFX_ALIGN_LEFT);
     gfx_fill_rect(fb, 0, TITLE_H + 45, GFX_WIDTH, 1, GFX_BLACK);
 
     social_neighbour_t nb[5];
     int n = social_neighbours(nb, 5);
     if (n == 0)
-        gfx_text(fb, GFX_WIDTH/2, TITLE_H + 70, &gfx_font_small, "Aucune cigale à portée", GFX_BLACK, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, TITLE_H + 70, &gfx_font_small, N_("Aucune cigale à portée"), GFX_BLACK,
+                 GFX_ALIGN_CENTER);
     for (int i = 0; i < n; ++i) {
         /* The RSSI helps to calibrate the meeting threshold (SOCIAL_RSSI_CLOSE) */
         snprintf(text, sizeof(text), "%s%s", nb[i].met ? "* " : "", nb[i].name);
@@ -909,12 +915,12 @@ static void render_social(void) {
         snprintf(text, sizeof(text), "%d dBm", nb[i].rssi);
         gfx_text(fb, GFX_WIDTH - 6, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    draw_footer("D : nom  Flanc D : balises");
+    draw_footer(N_("D : nom  Flanc D : balises"));
 }
 
 static void render_name_edit(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Nom de la cigale");
+    draw_title(N_("Nom de la cigale"));
     /* One cell per character, the current one inverted */
     const int cell = 23, x0 = (GFX_WIDTH - NAME_LEN * cell) / 2, y0 = TITLE_H + 10, h = gfx_font_large.height + 4;
     for (int i = 0; i < NAME_LEN; ++i) {
@@ -930,14 +936,14 @@ static void render_name_edit(void) {
     }
     /* Usage */
     static const char *help[] = {
-        "Flancs : changer la lettre",
-        "Aile D : case suivante",
-        "Aile G : case précédente",
-        "Aile D longue : enregistrer",
+        N_("Flancs : changer la lettre"),
+        N_("Aile D : case suivante"),
+        N_("Aile G : case précédente"),
+        N_("Aile D longue : enregistrer"),
     };
     for (int i = 0; i < 4; ++i)
         gfx_text(fb, 6, 88 + i * 21, &gfx_font_small, help[i], GFX_BLACK, GFX_ALIGN_LEFT);
-    draw_footer(name_cursor == 0 ? "Aile G ici : annuler" : "Espace = effacer une lettre");
+    draw_footer(name_cursor == 0 ? N_("Aile G ici : annuler") : N_("Espace = effacer une lettre"));
 }
 
 static void name_edit_start(void) {
@@ -1009,11 +1015,11 @@ static unsigned saver_minutes(void) {
 static void saver_delay_text(char *buf, size_t len) {
     unsigned m = saver_minutes();
     if (! m)
-        snprintf(buf, len, "désactivée");
+        snprintf(buf, len, _("désactivée"));
     else if (m % 60 == 0)
-        snprintf(buf, len, "%u h", m / 60);
+        snprintf(buf, len, _("%u h"), m / 60);
     else
-        snprintf(buf, len, "%u min", m);
+        snprintf(buf, len, _("%u min"), m);
 }
 
 /* The image of the screensaver ("" = the built-in SecSea image) */
@@ -1036,37 +1042,37 @@ static void settings_label(int i, char *buf, size_t len) {
     switch (i) {
     case 0:
         saver_delay_text(name, sizeof(name));
-        snprintf(buf, len, saver_minutes() ? "Veille après : %s" : "Veille : %s", name);
+        snprintf(buf, len, saver_minutes() ? _("Veille après : %s") : _("Veille : %s"), name);
         break;
     case 1:
         display_name(saver_image(), name, sizeof(name));
-        snprintf(buf, len, "Image : %s", saver_image()[0] ? name : "SecSea");
+        snprintf(buf, len, _("Image : %s"), saver_image()[0] ? name : "SecSea");
         break;
     default:
-        snprintf(buf, len, "Aperçu de la veille");
+        snprintf(buf, len, N_("Aperçu de la veille"));
         break;
     }
 }
 
 static void saver_image_label(int i, char *buf, size_t len) {
     if (i == 0)
-        snprintf(buf, len, "SecSea (intégrée)");
+        snprintf(buf, len, N_("SecSea (intégrée)"));
     else
         display_name(saver_files[i - 1], buf, len);
 }
 
 static void render_settings(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Veille de l'écran");  /* Not "Réglages": the name of its theme */
+    draw_title(N_("Veille de l'écran"));  /* Not "Réglages": the name of its theme */
     draw_list(3, settings_selected, settings_label);
-    draw_footer("D : changer  G : retour");
+    draw_footer(N_("D : changer  G : retour"));
 }
 
 static void render_saver_images(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Image de veille");
+    draw_title(N_("Image de veille"));
     draw_list(n_saver_files + 1, saver_selected, saver_image_label);
-    draw_footer("D : choisir  G : retour");
+    draw_footer(N_("D : choisir  G : retour"));
 }
 
 static void open_saver_images(void) {
@@ -1316,61 +1322,61 @@ static void name_edit_buttons(uint8_t pressed, absolute_time_t now) {
 
 static void ir_label(int i, char *buf, size_t len) {
     if (i == 0) {
-        snprintf(buf, len, "Enregistrer un signal");
+        snprintf(buf, len, N_("Enregistrer un signal"));
         return;
     }
     const ir_signal_t *s = &store_get()->ir[i - 1];
     uint16_t addr;
     uint8_t cmd;
     if (s->n == 0)
-        snprintf(buf, len, "%d : vide", i);
+        snprintf(buf, len, _("%d : vide"), i);
     else if (ir_decode_nec(s, &addr, &cmd))
-        snprintf(buf, len, "%d : NEC %04X / %02X", i, addr, cmd);
+        snprintf(buf, len, _("%d : NEC %04X / %02X"), i, addr, cmd);
     else
-        snprintf(buf, len, "%d : brut, %u impulsions", i, (s->n + 1) / 2);
+        snprintf(buf, len, _("%d : brut, %u impulsions"), i, (s->n + 1) / 2);
 }
 
 static void render_ir(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Infrarouge");
+    draw_title(N_("Infrarouge"));
     draw_list(1 + STORE_IR_SLOTS, ir_selected, ir_label);
-    draw_footer(ir_sending() ? "Emission..." : (status[0] ? status : "D : enregistrer/émettre"));
+    draw_footer(ir_sending() ? N_("Emission...") : (status[0] ? status : N_("D : enregistrer/émettre")));
 }
 
 static void oled_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s%s", i == oled_running ? "> " : "", oled_demo_name(i));
+    snprintf(buf, len, "%s%s", i == oled_running ? "> " : "", tr(oled_demo_name(i)));
 }
 
 static void render_oled(void) {
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Écran OLED");
+    draw_title(N_("Écran OLED"));
     draw_list(OLED_DEMO_COUNT, oled_selected, oled_label);
-    draw_footer("D : lancer  G : retour");
+    draw_footer(N_("D : lancer  G : retour"));
 }
 
 static void ctf_label(int i, char *buf, size_t len) {
     if (i == 0)
-        snprintf(buf, len, "Saisir un code");
+        snprintf(buf, len, N_("Saisir un code"));
     else
-        snprintf(buf, len, "Flags trouvés : %d/%d", ctf_found_count(), CTF_N_FLAGS);
+        snprintf(buf, len, _("Flags trouvés : %d/%d"), ctf_found_count(), CTF_N_FLAGS);
 }
 
 static void render_ctf(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title("CTF");
     draw_list(2, ctf_selected, ctf_label);
-    draw_footer("D : OK  G : retour");
+    draw_footer(N_("D : OK  G : retour"));
 }
 
 static void render_ctf_code(void) {
     char code[48];
     ctf_code_text(code, sizeof(code));
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Code secret");
-    gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_small, "Tapez le code avec", GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, GFX_WIDTH/2, 68, &gfx_font_small, "les 4 boutons.", GFX_BLACK, GFX_ALIGN_CENTER);
+    draw_title(N_("Code secret"));
+    gfx_text(fb, GFX_WIDTH/2, 50, &gfx_font_small, N_("Tapez le code avec"), GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH/2, 68, &gfx_font_small, N_("les 4 boutons."), GFX_BLACK, GFX_ALIGN_CENTER);
     gfx_text(fb, GFX_WIDTH/2, 105, &gfx_font_medium, code[0] ? code : "_", GFX_BLACK, GFX_ALIGN_CENTER);
-    draw_footer("Attendre 8 s : annuler");
+    draw_footer(N_("Attendre 8 s : annuler"));
 }
 
 /* A page with a title and some lines of text separated by \n */
@@ -1402,11 +1408,11 @@ static void render_info(void) {
     if (battery_mv())
         snprintf(bat, sizeof(bat), "%u,%02u V (%d %%)", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent());
     else
-        snprintf(bat, sizeof(bat), "non calibrée");
+        snprintf(bat, sizeof(bat), _("non calibrée"));
     /* 6 lines fit above the footer: the measured crystal and the default of the firmware are on the serial port ("!") */
     char xosc[24];
     if (radio_tools_measuring())
-        snprintf(xosc, sizeof(xosc), "mesure...");
+        snprintf(xosc, sizeof(xosc), _("mesure..."));
     else
         snprintf(xosc, sizeof(xosc), "%.4f MHz", radio_get_xosc() / 1e6);
     char build[32];
@@ -1415,12 +1421,12 @@ static void render_info(void) {
     if (date)
         *date++ = 0;
     snprintf(text, sizeof(text),
-             "Version " BADGE_VERSION " (%s)\nCompilée le %s\n"
-             "Radio : CC1101 v0x%02x\nQuartz : %s\nCarte SD : %s\n"
-             "Batterie : %s",
-             build, date ? date : "?", radio_tools_chip_version(), xosc,
-             sd_is_ready() ? "prête" : "absente", bat);
-    render_page("Infos", text, "D : crédits  G : retour");
+             _("Version %s (%s)\nCompilée le %s\n"
+               "Radio : CC1101 v0x%02x\nQuartz : %s\nCarte SD : %s\n"
+               "Batterie : %s"),
+             BADGE_VERSION, build, date ? date : "?", radio_tools_chip_version(), xosc,
+             sd_is_ready() ? _("prête") : _("absente"), bat);
+    render_page(N_("Infos"), text, N_("D : crédits  G : retour"));
 }
 
 static void render_music(void) {
@@ -1433,10 +1439,10 @@ static void render_music(void) {
     bar[AUDIO_VOLUME_MAX] = 0;
     char name[SD_NAME_MAX + 4];
     ui_fit_preview(&gfx_font_small, name, sizeof(name), playing_name, GFX_WIDTH - 12);  /* A file name of the SD */
-    snprintf(text, sizeof(text), "%s\n\n%s   %lu:%02lu / %lu:%02lu\n\nVolume : %s",
-             name, wav_is_paused() ? "Pause" : "Lecture",
+    snprintf(text, sizeof(text), _("%s\n\n%s   %lu:%02lu / %lu:%02lu\n\nVolume : %s"),
+             name, wav_is_paused() ? _("Pause") : _("Lecture"),
              (unsigned long)pos/60, (unsigned long)pos%60, (unsigned long)dur/60, (unsigned long)dur%60, bar);
-    render_page("Musique", text, "D : pause  G : stop  Flancs : - +");
+    render_page(N_("Musique"), text, N_("D : pause  G : stop  Flancs : - +"));
     /* Progress bar */
     int y = FOOTER_Y - 14;
     gfx_rect(fb, 6, y, GFX_WIDTH - 12, 8, GFX_BLACK);
@@ -1481,10 +1487,10 @@ static void open_browser(browse_kind_t kind) {
     if (n_files == 0) {
         snprintf(page_title, sizeof(page_title), "%s", BROWSE_TITLES[kind]);
         if (! sd_is_ready())
-            snprintf(page_text, sizeof(page_text), "Pas de carte SD.");
+            snprintf(page_text, sizeof(page_text), N_("Pas de carte SD."));
         else
-            snprintf(page_text, sizeof(page_text), "Aucun fichier %s dans\n/%s ni à la racine.\n\nVoir %s.", ext,
-                     BROWSE_DIRS[kind], BROWSE_TOOLS[kind]);
+            snprintf(page_text, sizeof(page_text), _("Aucun fichier %s dans\n/%s ni à la racine.\n\nVoir %s."), ext,
+                     BROWSE_DIRS[kind], tr(BROWSE_TOOLS[kind]));
         sd_unmount();  /* Mount again next time, the card may be changed */
         app = A_PAGE;
     } else {
@@ -1542,8 +1548,8 @@ static void play_selected(void) {
         music_refresh_ts = get_absolute_time();
         app = A_MUSIC;
     } else {
-        snprintf(page_title, sizeof(page_title), "Musique");
-        snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, wav_message());
+        snprintf(page_title, sizeof(page_title), N_("Musique"));
+        snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, tr(wav_message()));
         page_back = A_BROWSE;
         app = A_PAGE;
     }
@@ -1552,8 +1558,8 @@ static void play_selected(void) {
 /* Blind test: choice of the directory, "Tout" or a sub-directory of MUSIQUE */
 static void open_blind_test(void) {
     if (sd_mount() != 0) {
-        snprintf(page_title, sizeof(page_title), "Blind test");
-        snprintf(page_text, sizeof(page_text), "Pas de carte SD.");
+        snprintf(page_title, sizeof(page_title), N_("Blind test"));
+        snprintf(page_text, sizeof(page_text), N_("Pas de carte SD."));
         sd_unmount();
         app = A_PAGE;
         return;
@@ -1598,8 +1604,8 @@ static void start_blind_test(void) {
         add_tracks(d);
     }
     if (n_playlist == 0) {
-        snprintf(page_title, sizeof(page_title), "Blind test");
-        snprintf(page_text, sizeof(page_text), "Aucun fichier .WAV ici.\n\nVoir audio2wav.py.");
+        snprintf(page_title, sizeof(page_title), N_("Blind test"));
+        snprintf(page_text, sizeof(page_text), _("Aucun fichier .WAV ici.\n\nVoir audio2wav.py."));
         page_back = A_BT_FOLDERS;
         app = A_PAGE;
         return;
@@ -1623,8 +1629,8 @@ static void start_blind_test(void) {
 static void bt_next(void) {
     wav_stop();
     if (++bt_index >= n_playlist) {
-        snprintf(page_title, sizeof(page_title), "Blind test");
-        snprintf(page_text, sizeof(page_text), "Terminé !\n\n%u morceaux joués.", (unsigned)n_playlist);
+        snprintf(page_title, sizeof(page_title), N_("Blind test"));
+        snprintf(page_text, sizeof(page_text), _("Terminé !\n\n%u morceaux joués."), (unsigned)n_playlist);
         app = A_PAGE;
         return;
     }
@@ -1821,23 +1827,24 @@ static void radio_test_task(absolute_time_t now) {
 
 static void format_duration(char *buf, size_t len, uint32_t s) {
     if (s < 60)
-        snprintf(buf, len, "%lu s", (unsigned long)s);
+        snprintf(buf, len, _("%lu s"), (unsigned long)s);
     else if (s < 3600)
-        snprintf(buf, len, s % 60 ? "%lu min %02lu s" : "%lu min", (unsigned long)(s / 60), (unsigned long)(s % 60));
+        snprintf(buf, len, s % 60 ? _("%lu min %02lu s") : _("%lu min"), (unsigned long)(s / 60),
+                 (unsigned long)(s % 60));
     else
-        snprintf(buf, len, "%lu h %02lu min", (unsigned long)(s / 3600), (unsigned long)(s % 3600 / 60));
+        snprintf(buf, len, _("%lu h %02lu min"), (unsigned long)(s / 3600), (unsigned long)(s % 3600 / 60));
 }
 
 static void render_radio_test(absolute_time_t now) {
     char text[64], fitted[64];
     gfx_clear(fb, GFX_WHITE);
-    draw_title("Test radio");
-    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 6, &gfx_font_small, "Un message toutes les", GFX_BLACK, GFX_ALIGN_CENTER);
+    draw_title(N_("Test radio"));
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 6, &gfx_font_small, N_("Un message toutes les"), GFX_BLACK, GFX_ALIGN_CENTER);
     format_duration(text, sizeof(text), radio_test_s);
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 24, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 54, &gfx_font_small, "Flancs : - / +  (maintenir : vite)", GFX_BLACK,
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 54, &gfx_font_small, N_("Flancs : - / +  (maintenir : vite)"), GFX_BLACK,
              GFX_ALIGN_CENTER);
-    snprintf(text, sizeof(text), "Messages envoyés : %u", radio_test_sent);
+    snprintf(text, sizeof(text), _("Messages envoyés : %u"), radio_test_sent);
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 80, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     /* The last message on two lines: "SecSea <name>" and "coucou #<counter>" */
     const char *msg = radio_test_sent ? radio_tools_last_text() : "-";
@@ -1848,15 +1855,15 @@ static void render_radio_test(absolute_time_t now) {
     if (second)
         gfx_text(fb, GFX_WIDTH/2, TITLE_H + 112, &gfx_font_small, second + 1, GFX_BLACK, GFX_ALIGN_CENTER);
     if (radio_test_paused) {
-        snprintf(text, sizeof(text), "En pause");
+        snprintf(text, sizeof(text), N_("En pause"));
     } else {
         int64_t left = absolute_time_diff_us(now, radio_test_next) / 1000000;
         char d[24];
         format_duration(d, sizeof(d), left > 0 ? (uint32_t)left : 0);
-        snprintf(text, sizeof(text), "Prochain dans %s", d);
+        snprintf(text, sizeof(text), _("Prochain dans %s"), d);
     }
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 132, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    draw_footer(radio_test_paused ? "G : quitter  D : reprendre" : "G : quitter  D : pause");
+    draw_footer(radio_test_paused ? N_("G : quitter  D : reprendre") : N_("G : quitter  D : pause"));
 }
 
 /* Menu: right wing released = the usual action, held = another one (games: the record as a signed QR code,
@@ -1884,7 +1891,7 @@ static void long_item_ok(uint8_t pressed, absolute_time_t now) {
             ui_trace("Record");
             app = A_GAME;
         } else {
-            set_status("Pas encore de record");
+            set_status(N_("Pas encore de record"));
         }
         redraw = true;
     } else if (btn_released & BTN_OK) {
@@ -1945,9 +1952,10 @@ static void validate(void) {
         break;
     case M_OLED:
         if (! oled_present() && ! oled_init()) {
-            snprintf(page_title, sizeof(page_title), "Écran OLED");
+            snprintf(page_title, sizeof(page_title), N_("Écran OLED"));
             snprintf(page_text, sizeof(page_text),
-                     "Aucun écran détecté.\n\nSSD1306 128x64 I2C,\nport gauche (J3) :\nSDA broche 4, SCL broche 3,\n3,3 V broche 1, GND 11.");
+                     _("Aucun écran détecté.\n\nSSD1306 128x64 I2C,\nport gauche (J3) :\n"
+                       "SDA broche 4, SCL broche 3,\n3,3 V broche 1, GND 11."));
             app = A_PAGE;
         } else {
             app = A_OLED;
@@ -1996,7 +2004,7 @@ static void validate(void) {
         break;
     case M_RADIO_MSG:
         if (! radio_tools_send())
-            set_status("Radio occupée");
+            set_status(N_("Radio occupée"));
         break;
     case M_RADIO_CARRIER:
         radio_tools_carrier_start(CARRIER_MAX_MS);
@@ -2021,7 +2029,7 @@ static void cancel(void) {
         } else {
             set_sound(false);
             set_leds(0);
-            set_status("Son et LEDs coupés");
+            set_status(N_("Son et LEDs coupés"));
         }
         break;
     case A_START_IMAGE:
@@ -2228,7 +2236,7 @@ static void demo_task(absolute_time_t now, uint8_t pressed) {
         if (! demo_back()) {
             demo_leaving = false;
             set_leds(demo_saved_leds);
-            set_status("Mode démo arrêté");
+            set_status(N_("Mode démo arrêté"));
             printf("demo: off\n");
         }
         return;
@@ -2264,9 +2272,9 @@ static void demo_task(absolute_time_t now, uint8_t pressed) {
 static void sleep_render(uint8_t *fb) {
     gfx_clear(fb, GFX_WHITE);
     gfx_fill_rect(fb, 0, 24, GFX_WIDTH, 44, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, 30, &gfx_font_large, "SOMMEIL", GFX_WHITE, GFX_ALIGN_CENTER);
-    ui_wrapped(fb, 86, &gfx_font_small, "Le badge a été mis en sommeil par un admin. S'il reste coincé, "
-               "rapprochez-vous d'un organisateur.", 6);
+    gfx_text(fb, GFX_WIDTH/2, 30, &gfx_font_large, N_("SOMMEIL"), GFX_WHITE, GFX_ALIGN_CENTER);
+    ui_wrapped(fb, 86, &gfx_font_small, N_("Le badge a été mis en sommeil par un admin. S'il reste coincé, "
+                                           "rapprochez-vous d'un organisateur."), 6);
 }
 
 static void sleep_wait_screen(void) {
@@ -2384,6 +2392,8 @@ int main() {
         uint8_t pressed = buttons_pressed(now);
         if (pressed)
             printf("buttons pressed: 0x%02x\n", pressed);
+        if (pressed & (BTN_A | BTN_B))
+            lang_keys[0] = 0;  /* A wing between the flanks: not the sequence of the language */
         if (demo_on || demo_leaving) {
             demo_task(now, pressed);
             pressed = 0;  /* The press stops the demo, it is not for the page shown */
@@ -2469,11 +2479,12 @@ int main() {
                 bool right = ctf_code_check();
                 printf("ctf: code %s\n", right ? "right" : "wrong");
                 if (right && ctf_flag(0, flag, sizeof(flag))) {
-                    snprintf(page_text, sizeof(page_text), "Bravo, code Konami !\n\nFlag :\n%s", flag);
+                    snprintf(page_text, sizeof(page_text), _("Bravo, code Konami !\n\nFlag :\n%s"), flag);
                     set_leds(1);
                     play_chime();
                 } else {
-                    snprintf(page_text, sizeof(page_text), "Code incorrect.\n\nIndice : un code célèbre\ndes jeux vidéo...");
+                    snprintf(page_text, sizeof(page_text),
+                             _("Code incorrect.\n\nIndice : un code célèbre\ndes jeux vidéo..."));
                 }
                 page_back = A_CTF;
                 app = A_PAGE;
@@ -2527,8 +2538,9 @@ int main() {
                     app = A_CTF_CODE;
                 } else {
                     char flag[64];
-                    snprintf(page_title, sizeof(page_title), "Flags trouvés");
-                    snprintf(page_text, sizeof(page_text), "%s", ctf_flag(0, flag, sizeof(flag)) ? flag : "Aucun pour l'instant.");
+                    snprintf(page_title, sizeof(page_title), N_("Flags trouvés"));
+                    snprintf(page_text, sizeof(page_text), "%s",
+                             ctf_flag(0, flag, sizeof(flag)) ? flag : _("Aucun pour l'instant."));
                     page_back = A_CTF;
                     app = A_PAGE;
                 }
@@ -2652,7 +2664,7 @@ int main() {
             notify(APPS[APP_ANNOUNCES], notif);
         }
         if (vote_new())
-            notify(APPS[APP_VOTE], "Vote ouvert : Social > Vote");
+            notify(APPS[APP_VOTE], N_("Vote ouvert : Social > Vote"));
         if (app != A_APP && app != A_NAME_EDIT)
             ui_edit_typed_clear();  /* Typed on the PC keyboard, but no text editor on the screen */
         if (admin_request >= 0) {
@@ -2669,11 +2681,11 @@ int main() {
             redraw = true;
         }
         if (infection_coughed()) {
-            set_status("Kof kof ! (virus des cigales)");
+            set_status(N_("Kof kof ! (virus des cigales)"));
             printf("infection: cough\n");
         }
         if (infection_event())
-            notify(APPS[APP_INFECTION], "Vous êtes infecté !");
+            notify(APPS[APP_INFECTION], N_("Vous êtes infecté !"));
         if (duel_invited(notif, sizeof(notif)))
             notify(APPS[APP_DUEL], notif);
         if (smuggler_invited(notif, sizeof(notif)))
@@ -2791,8 +2803,9 @@ int main() {
                     image_asleep = false;
                     app = A_IMAGE;
                 } else {
-                    snprintf(page_title, sizeof(page_title), "Images");
-                    snprintf(page_text, sizeof(page_text), "%s\n\nImage .EPI invalide\n(voir image2epi.py).", files[image_index]);
+                    snprintf(page_title, sizeof(page_title), N_("Images"));
+                    snprintf(page_text, sizeof(page_text), _("%s\n\nImage .EPI invalide\n(voir image2epi.py)."),
+                             files[image_index]);
                     page_back = A_BROWSE;
                     app = A_PAGE;
                     redraw = true;
@@ -2827,8 +2840,8 @@ int main() {
                 if (video_start(path)) {
                     app = A_VIDEO;
                 } else {
-                    snprintf(page_title, sizeof(page_title), "Vidéo");
-                    snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, video_message());
+                    snprintf(page_title, sizeof(page_title), N_("Vidéo"));
+                    snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, tr(video_message()));
                     page_back = A_BROWSE;
                     app = A_PAGE;
                     redraw = true;
@@ -2841,8 +2854,8 @@ int main() {
                 if (rsvp_start(path)) {
                     app = A_RSVP;
                 } else {
-                    snprintf(page_title, sizeof(page_title), "Lecture rapide");
-                    snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, rsvp_message());
+                    snprintf(page_title, sizeof(page_title), N_("Lecture rapide"));
+                    snprintf(page_text, sizeof(page_text), "%s\n\n%s", playing_name, tr(rsvp_message()));
                     page_back = A_BROWSE;
                     app = A_PAGE;
                     redraw = true;
@@ -2940,8 +2953,10 @@ int main() {
                 else if (app == A_IR)
                     render_ir();
                 else if (app == A_IR_RECORD)
-                    render_page("Infrarouge", "Enregistrement...\n\nVisez le récepteur (port\ndroit) avec la télécommande\net appuyez sur une touche.",
-                                "G : annuler");
+                    render_page(N_("Infrarouge"),
+                            _("Enregistrement...\n\nVisez le récepteur (port\ndroit) avec la télécommande\n"
+                              "et appuyez sur une touche."),
+                            N_("G : annuler"));
                 else if (app == A_OLED)
                     render_oled();
                 else if (app == A_CTF)
@@ -2955,10 +2970,12 @@ int main() {
                 else if (app == A_INFO)
                     render_info();
                 else if (app == A_CARRIER)
-                    render_page("Porteuse", "433,92 MHz + 19 kHz\nen continu, +10 dBm\n\nVisible avec l'analyseur\nde fréquence du Flipper.\nArrêt auto après 30 s.",
-                                "G : arrêter");
+                    render_page(N_("Porteuse"),
+                            _("433,92 MHz + 19 kHz\nen continu, +10 dBm\n\nVisible avec l'analyseur\n"
+                              "de fréquence du Flipper.\nArrêt auto après 30 s."),
+                            N_("G : arrêter"));
                 else if (app == A_PAGE)
-                    render_page(page_title, page_text, "G ou D : retour");
+                    render_page(page_title, page_text, N_("G ou D : retour"));
                 else if (app == A_GAME)
                     games_render(fb);
                 else if (app == A_RADIO_TEST)

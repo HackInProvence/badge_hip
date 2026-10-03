@@ -9,6 +9,7 @@
 #include "pico/rand.h"
 
 #include "achievements.h"
+#include "i18n.h"
 #include "net.h"
 #include "skills.h"
 #include "social.h"
@@ -162,7 +163,7 @@ static void meet(neighbour_t *nb, absolute_time_t now) {
     s->score += points;
     store_changed();
     nb->pub.met = true;
-    snprintf(event, sizeof(event), "Rencontre : %s +%d", nb->pub.name, points);
+    snprintf(event, sizeof(event), _("Rencontre : %s +%d"), nb->pub.name, points);
     event_pending = true;
     printf("social: %s (score %lu)\n", event, (unsigned long)s->score);
 }
@@ -209,7 +210,7 @@ static void handle_beacon(const net_packet_t *packet) {
         int first = 0;
         while (! (common >> first & 1))
             ++first;
-        snprintf(event, sizeof(event), "%s aime aussi : %s", nb->pub.name, skills_name(first));
+        snprintf(event, sizeof(event), _("%s aime aussi : %s"), nb->pub.name, tr(skills_name(first)));
         event_pending = true;
         printf("social: %s\n", event);
         achv_unlock(ACHV_SKILL_MATCH);

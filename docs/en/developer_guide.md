@@ -1163,7 +1163,9 @@ The groups (`--only`):
 | `radio` | radio message, test mode, beacons of the cicada network |
 | `ir` | decoding and sending an NEC frame |
 | `images` | images of the SD card |
+| `ringtones` | Media > Ringtones: SONNERIES / RTTTL folders of the SD card, next page, playing a ringtone |
 | `apps` | name tag and lamp |
+| `battery` | battery measure; on a badge not calibrated, writes then erases the factory calibration sector (test of the writing) |
 | `admin` | secret sequence, mute / unmute commands, leaving the admin mode |
 | `radio433` | 433 MHz decoder and weather station pages, then the network beacons come back |
 | `social` | pages of the Social theme (contacts, radar, hot - cold...) and states of the talk badge |
@@ -1176,7 +1178,7 @@ badges are checked; screenshots in a dated folder. The badges are restarted firs
 
 ```bash
 python tools/test_party_games.py --ports COM9 COM11 [--only tug,assassin]   # tug of war, assassin
-python tools/test_werewolf.py --ports COM9 COM11 [--advanced]               # werewolf (narrator + robots)
+python tools/test_werewolf.py --ports COM9 COM11 [--without voyante,...]    # werewolf (narrator + robots)
 python tools/test_smuggler.py --ports COM9 COM11                            # smuggling
 ```
 
@@ -1202,7 +1204,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # sm
 | `tools/badge_remote.py` | window showing the badge screen enlarged (zoom 2–4), arrows / Enter = buttons, Shift = long press ("appui long" buttons on screen too), PNG capture; "Badge :" list to choose among several badges (or `--port`); "Mode clavier" check box: the text typed goes to the badge's editor (0x02 + character; Enter: done, Escape: cancel, Backspace: erase); "Mode admin" check box (0x01 + `A` / `a`), which follows the state of the badge (`admin: on/off` lines, and `!` sent on connection); the reading thread never dies (errors in the status line and the log); `--snapshot file.png` for a single capture |
 | `tools/badge_selftest.py` | automated badge test (§ 9.2) |
 | `tools/badge_screens.py` | goes through every theme, every entry (Admin included) and the pages of the applications, saves a PNG image of each screen in `docs/screens/` and writes [docs/fr/ecrans.md](../fr/ecrans.md) and [docs/en/screens.md](screens.md); with the check of the texts (`U`), lists the texts cut, too wide or under the footer (`docs/screens/checks.txt` and end of the pages); `--port`, `--only Jeux,Social`. The badge is restarted; the toggles of the menus are not pressed |
-| `tools/badge_media_test.py` | plays every video and music of the SD card (subfolders included) and checks that each one plays to its end (read error, stop before the end, frames per second of the videos); `--videos`, `--music` (both by default), `--max N` (N seconds of each file at most, 0 = whole file), `--port`; report printed and written to `media_report.txt` |
+| `tools/badge_media_test.py` | plays every video and music of the SD card (subfolders included) and checks that each one plays to its end (read error, stop before the end, frames per second of the videos); `--videos`, `--music` (both by default), `--max N` (N seconds of each video at most, 0 = whole file), `--music-max N` (N seconds of each music, 5 by default: the start; 0 = whole file), `--port`; report printed and written to `media_report.txt` |
 | `tools/score_check.py` | checks the score QR codes and ranks them (§ 6.11) |
 | `tools/contacts_export.py` | business cards received by the badge → `.vcf` (`--port`, `-o`) |
 | `tools/crypto_ctf_make.py` | generates the table of the crypto challenges (`--update`, `--answers`): solution file (§ 6.18) |

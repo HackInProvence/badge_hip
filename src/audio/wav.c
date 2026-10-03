@@ -11,6 +11,10 @@
 #include "sd.h"
 #include "wav.h"
 
+#ifndef N_
+#define N_(text) (text)  /* A text shown: translated when drawn (src/menu/i18n.h, tools/i18n.py) */
+#endif
+
 
 #define READ_CHUNK 1024  /* Bytes read from the card at once */
 
@@ -50,17 +54,17 @@ static bool parse_header(void) {
     uint8_t buf[40];
     UINT n;
     if (f_read(&file, buf, 12, &n) != FR_OK || n != 12 || memcmp(buf, "RIFF", 4) || memcmp(buf + 8, "WAVE", 4))
-        return fail("Fichier WAV invalide");
+        return fail(N_("Fichier WAV invalide"));
 
     bool fmt_found = false;
     while (true) {
         if (f_read(&file, buf, 8, &n) != FR_OK || n != 8)
-            return fail("Pas de données dans le WAV");
+            return fail(N_("Pas de données dans le WAV"));
         uint32_t size = le32(buf + 4);
         if (! memcmp(buf, "fmt ", 4)) {
             uint32_t len = size < sizeof(buf) ? size : sizeof(buf);
             if (size < 16 || f_read(&file, buf, len, &n) != FR_OK || n != len)
-                return fail("Fichier WAV invalide");
+                return fail(N_("Fichier WAV invalide"));
             uint16_t format = le16(buf);
             if (format == 0xFFFE && len >= 26)
                 format = le16(buf + 24);  /* WAVE_FORMAT_EXTENSIBLE: the first bytes of the sub-format GUID */
@@ -83,7 +87,7 @@ static bool parse_header(void) {
             fmt_found = true;
         } else if (! memcmp(buf, "data", 4)) {
             if (! fmt_found)
-                return fail("Fichier WAV invalide");
+                return fail(N_("Fichier WAV invalide"));
             data_size = data_left = size;
             data_offset = f_tell(&file);
             return true;
@@ -98,10 +102,10 @@ bool wav_start(const char *path) {
     wav_stop();
     int fr = sd_mount();
     if (fr != FR_OK)
-        return fail(fr == FR_NO_FILESYSTEM ? "Carte SD non formatée (FAT/exFAT)" : "Pas de carte SD");
+        return fail(fr == FR_NO_FILESYSTEM ? N_("Carte SD non formatée (FAT/exFAT)") : N_("Pas de carte SD"));
     if (f_open(&file, path, FA_READ) != FR_OK) {
         sd_unmount();
-        return fail("Impossible d'ouvrir le fichier");
+        return fail(N_("Impossible d'ouvrir le fichier"));
     }
     if (! parse_header()) {
         f_close(&file);
@@ -109,7 +113,7 @@ bool wav_start(const char *path) {
     }
     if (! audio_open(rate / step)) {
         f_close(&file);
-        return fail("Audio indisponible");
+        return fail(N_("Audio indisponible"));
     }
     playing = true;
     paused = false;

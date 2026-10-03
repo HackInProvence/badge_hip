@@ -13,6 +13,7 @@
 
 #include "app.h"
 #include "audio.h"
+#include "i18n.h"
 #include "noise_gen.h"
 #include "leds.h"
 #include "ook_rx.h"
@@ -21,9 +22,10 @@
 
 enum { TALK_OFF, TALK_GREEN, TALK_ORANGE, TALK_RED, TALK_ANGRY, TALK_STATES };
 
-static const char *NAMES[TALK_STATES] = {"Éteint", "OK", "5 min", "FINI", "STOP !"};
-static const char *DETAILS[TALK_STATES] = {"LEDs éteintes", "Vert : tout va bien", "Orange : il reste 5 min",
-                                           "Rouge : temps écoulé", "Rouge énervé : on conclut !"};
+static const char *NAMES[TALK_STATES] = {N_("Éteint"), N_("OK"), N_("5 min"), N_("FINI"), N_("STOP !")};
+static const char *DETAILS[TALK_STATES] = {N_("LEDs éteintes"), N_("Vert : tout va bien"),
+                                           N_("Orange : il reste 5 min"), N_("Rouge : temps écoulé"),
+                                           N_("Rouge énervé : on conclut !")};
 static int state = TALK_OFF;
 static bool active = false;
 static bool changed = false;
@@ -98,19 +100,19 @@ static bool talk_task(absolute_time_t now) {
 
 static void talk_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Badge de talk");
+    ui_title(fb, N_("Badge de talk"));
     /* The state in big, inverted when time is over */
     bool alert = state >= TALK_RED;
     if (alert)
         gfx_fill_rect(fb, 0, 40, GFX_WIDTH, 60, GFX_BLACK);
     gfx_text(fb, GFX_WIDTH/2, 57, &gfx_font_large, NAMES[state], alert ? GFX_WHITE : GFX_BLACK, GFX_ALIGN_CENTER);
     ui_lines(fb, 108, &gfx_font_small, DETAILS[state]);
-    ui_lines(fb, 130, &gfx_font_small, "Télécommande : Princeton\n0xC16A10 à 0xC16A14");
-    ui_footer(fb, "G : quitter  Flancs/D : état");
+    ui_lines(fb, 130, &gfx_font_small, N_("Télécommande : Princeton\n0xC16A10 à 0xC16A14"));
+    ui_footer(fb, N_("G : quitter  Flancs/D : état"));
 }
 
 const app_t app_talk = {
-    .name = "Badge de talk",
+    .name = N_("Badge de talk"),
     .start = talk_start,
     .buttons = talk_buttons,
     .task = talk_task,

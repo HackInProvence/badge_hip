@@ -66,7 +66,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
-| **Réglages** | Veille de l'écran, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
+| **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un septième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
 
@@ -490,6 +490,9 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
   c'est l'affichage le plus stable de l'écran, l'image reste nette pendant des heures sans courant.
 
   Pendant la veille, n'importe quel bouton réveille le badge.
+- **Langue** : français ou anglais (« Langue / Language », chaque langue écrite dans sa langue ; flancs puis aile
+  droite). Badge resté dans une langue illisible : aile gauche 5 fois (retour au menu principal), puis les flancs
+  en alternance gauche, droit × 4 : il repasse en anglais. Voir [traduction](traduction.md).
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.
@@ -621,8 +624,9 @@ prix du CTF...). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retou
 **Mise en sommeil** (dernière des Commandes radio) : les autres badges coupent tout (radio, LEDs, son, services)
 et affichent « SOMMEIL : le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un
 organisateur. » ; un redémarrage ne les réveille pas. Sauf un badge sur sa page de **badge de talk**, et le badge
-admin qui envoie l'ordre. L'ordre passe par le réseau des badges, pas en Princeton : un Flipper ne peut pas endormir la
-conférence. **Déblocage** (organisateurs) : 5 fois le flanc gauche, puis 5 fois le flanc droit (moins de 5 s entre
+admin qui envoie l'ordre. L'ordre passe par le réseau des badges, pas en Princeton : la télécommande Princeton d'un Flipper ne
+peut pas endormir la conférence (un fichier `.sub` du réseau fait par `tools/flipper_net_sub.py command 0x05` le peut :
+à garder pour les organisateurs). **Déblocage** (organisateurs) : 5 fois le flanc gauche, puis 5 fois le flanc droit (moins de 5 s entre
 deux appuis) ; le badge redémarre normalement.
 
 **Remise à zéro** : avant l'événement ou après des essais. Flancs : choisir ; aile droite, puis **appui long sur
@@ -677,8 +681,8 @@ python tools/badge_remote.py
 - **Badge :** la liste des badges branchés, pour choisir celui à piloter quand il y en a plusieurs.
 - **Mode clavier (saisie de texte)** : quand un éditeur de texte est ouvert sur le badge (carte de visite, réponse
   à un défi...), les caractères tapés sur l'ordinateur y sont insérés au curseur ; Entrée : valider ; Échap : annuler ;
-  Retour arrière : effacer. Les flèches restent les boutons. Seuls les caractères sans accent passent par le clavier :
-  les lettres accentuées se choisissent avec les flancs.
+  Retour arrière : effacer. Les flèches restent les boutons. Passent par le clavier : les caractères sans accent et
+  les lettres é è ê à â ç ô î ù û ë ï É È À Ç ; les autres se choisissent avec les flancs.
 - **Mode admin** : active ou désactive le mode admin du badge (voir [§ 4.8](#48-le-mode-admin-organisateurs)) ;
   la case suit l'état du badge.
 - Un problème de connexion (badge débranché, port occupé) s'affiche dans la ligne d'état et le journal ;
@@ -704,7 +708,7 @@ carte SD
 ├── VIDEOS/     vidéos .epv
 ├── MUSIQUE/    sons .wav (sous-dossiers possibles, pratiques pour le blind test)
 ├── TEXTES/     textes .txt pour la lecture rapide
-├── SONNERIES/  sonneries RTTTL .txt, .rtttl ou .rtx, sous-dossiers permis, fichiers en nombre quelconque
+├── SONNERIES/  sonneries RTTTL .txt, .rtttl, .rtx ou PICAXE .bas, sous-dossiers permis, fichiers en nombre quelconque
 ├── RTTTL/      idem (au choix)
 └── LIVRES/     livres-jeux .txt (16 au plus)
 ```
@@ -778,7 +782,7 @@ copier.
 | Le badge ne s'allume pas | Interrupteur sur ON ? Batterie chargée (brancher en USB) ? |
 | Le badge n'est pas vu par l'ordinateur | Câble USB de données (pas un câble de charge seule) ; interrupteur sur ON. |
 | « Carte SD absente » | Carte bien enfoncée ? Formatée en FAT32 ou exFAT ? |
-| Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`) et bon dossier ? Nom de moins de 64 caractères ? |
+| Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`, `.bas`) et bon dossier ? Nom de moins de 64 caractères ? |
 | Une sonnerie est marquée `(!)` | Une erreur dans la ligne : aile droite affiche la colonne et la raison (voir [sonneries.md](sonneries.md)). |
 | Pas de son | Volume à 0 ? (Médias > Volume). Le buzzer est discret : collez l'oreille. |
 | Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz doit être 26 ou 27 MHz. |

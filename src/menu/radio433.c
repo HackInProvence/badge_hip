@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "i18n.h"
 #include "ook_rx.h"
 
 #define HISTORY 8
@@ -101,10 +102,11 @@ static void age(char *buf, size_t len, absolute_time_t at, absolute_time_t now) 
 
 static void decoder_render(uint8_t *fb, absolute_time_t now) {
     char text[64], a[12];
-    ui_title(fb, "Décodeur 433 MHz");
+    ui_title(fb, N_("Décodeur 433 MHz"));
     if (! n_history) {
-        ui_lines(fb, 50, &gfx_font_small, "En écoute (réception seule)\ntélécommandes Princeton,\nCAME, Nice FLO, sondes\nmétéo...");
-        snprintf(text, sizeof(text), "Impulsions : %lu", (unsigned long)ook_rx_pulses());
+        ui_lines(fb, 50, &gfx_font_small,
+                 N_("En écoute (réception seule)\ntélécommandes Princeton,\nCAME, Nice FLO, sondes\nmétéo..."));
+        snprintf(text, sizeof(text), _("Impulsions : %lu"), (unsigned long)ook_rx_pulses());
         ui_lines(fb, 130, &gfx_font_small, text);
     }
     for (int i = 0; i < n_history; ++i) {
@@ -116,15 +118,16 @@ static void decoder_render(uint8_t *fb, absolute_time_t now) {
         gfx_text(fb, 3, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         gfx_text(fb, GFX_WIDTH - 3, y, &gfx_font_small, a, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    ui_footer(fb, "G : retour  D : effacer");
+    ui_footer(fb, N_("G : retour  D : effacer"));
 }
 
 static void weather_render(uint8_t *fb, absolute_time_t now) {
     char text[48], a[12];
-    ui_title(fb, "Station météo");
+    ui_title(fb, N_("Station météo"));
     if (! n_sensors) {
-        ui_lines(fb, 45, &gfx_font_small, "En attente d'une sonde\n433 MHz (Nexus, inFactory,\nThermoPRO, GT-WT02,\nLaCrosse, Acurite...)");
-        ui_lines(fb, 125, &gfx_font_small, "Les sondes émettent\ntoutes les 30 à 60 s.");
+        ui_lines(fb, 45, &gfx_font_small,
+                 N_("En attente d'une sonde\n433 MHz (Nexus, inFactory,\nThermoPRO, GT-WT02,\nLaCrosse, Acurite...)"));
+        ui_lines(fb, 125, &gfx_font_small, N_("Les sondes émettent\ntoutes les 30 à 60 s."));
     }
     /* The newest sensor in big, the others below */
     for (int i = 0; i < n_sensors; ++i) {
@@ -135,10 +138,11 @@ static void weather_render(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), "%s%d.%d°C", r->temp_c10 < 0 ? "-" : "", t / 10, t % 10);
             gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 6, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
             if (r->humidity != OOKDEC_NO_HUMIDITY) {
-                snprintf(text, sizeof(text), "Humidité %u %%", r->humidity);
+                snprintf(text, sizeof(text), _("Humidité %u %%"), r->humidity);
                 gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 36, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
             }
-            snprintf(text, sizeof(text), "%s ch%u  il y a %s%s", r->protocol, r->channel, a, r->battery_low ? "  pile !" : "");
+            snprintf(text, sizeof(text), _("%s ch%u  il y a %s%s"), r->protocol, r->channel, a,
+                     r->battery_low ? _("  pile !") : "");
             char fitted[48];
             ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 6);
             gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 60, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
@@ -150,11 +154,11 @@ static void weather_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, 3, UI_TITLE_H + 66 + i * 20, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
     }
-    ui_footer(fb, "G : retour  D : effacer");
+    ui_footer(fb, N_("G : retour  D : effacer"));
 }
 
 const app_t app_decoder = {
-    .name = "Décodeur 433 MHz",
+    .name = N_("Décodeur 433 MHz"),
     .start = rx_start,
     .buttons = rx_buttons,
     .task = rx_task,
@@ -164,7 +168,7 @@ const app_t app_decoder = {
 };
 
 const app_t app_weather = {
-    .name = "Station météo",
+    .name = N_("Station météo"),
     .start = rx_start,
     .buttons = rx_buttons,
     .task = rx_task,

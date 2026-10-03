@@ -44,6 +44,7 @@
 
 #include "achievements.h"
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 #include "party.h"
 #include "social.h"
@@ -101,32 +102,35 @@ typedef struct {
 } phase_t;
 
 static const phase_t PHASES[P_COUNT] = {
-    [P_NONE] = {"Début", "start", 0, false, "La partie commence..."},
-    [P_ROLES] = {"Rôles", "roles", 30, false, "Chacun lit sa carte en cachant son écran."},
-    [P_THIEF] = {"Voleur", "thief", 30, true, "La nuit tombe. Tous choisissent : seul le voleur compte."},
-    [P_CUPID] = {"Cupidon", "cupid", 30, true, "Tous choisissent 2 noms : seul Cupidon compte."},
-    [P_LOVERS] = {"Amoureux", "lovers", 15, true, "Les amoureux se reconnaissent ; tous valident."},
-    [P_SEER] = {"Voyante", "seer", 30, true, "Tous choisissent : seule la voyante découvre une carte."},
-    [P_WOLVES] = {"Loups", "wolves", 45, true,
-                  "Les loups choisissent leur victime ; la petite fille peut espionner."},
-    [P_WITCH] = {"Sorcière", "witch", 40, true, "Tous choisissent : seule la sorcière agit."},
-    [P_DAWN] = {"aube", "dawn", 15, false, "Le jour se lève : annoncez les morts de la nuit."},
-    [P_HUNTER] = {"Chasseur", "hunter", 30, false, "Le chasseur est mort : il emporte quelqu'un."},
-    [P_SHOT] = {"Chasseur", "shot", 10, false, "Annoncez la victime du chasseur."},
-    [P_SUCCESSOR] = {"Capitaine", "successor", 30, false, "Le capitaine est mort : il désigne son successeur."},
-    [P_ELECTION] = {"capitaine", "election", 60, false, "Le village élit son capitaine (sa voix compte double)."},
-    [P_DEBATE] = {"débat", "debate", 0, false, "Le village débat : qui sont les loups ?"},
-    [P_VOTE] = {"vote", "vote", 45, false, "Chacun vote sur son badge."},
-    [P_TIEBREAK] = {"égalité", "tiebreak", 30, false, "Égalité : le capitaine tranche."},
-    [P_VOTE2] = {"2e vote", "vote2", 45, false, "Égalité : second vote entre les ex aequo."},
-    [P_VERDICT] = {"verdict", "verdict", 12, false, "Annoncez l'éliminé et sa carte."},
-    [P_END] = {"Fin", "end", 0, false, ""},
+    [P_NONE] = {N_("Début"), "start", 0, false, N_("La partie commence...")},
+    [P_ROLES] = {N_("Rôles"), "roles", 30, false, N_("Chacun lit sa carte en cachant son écran.")},
+    [P_THIEF] = {N_("Voleur"), "thief", 30, true, N_("La nuit tombe. Tous choisissent : seul le voleur compte.")},
+    [P_CUPID] = {N_("Cupidon"), "cupid", 30, true, N_("Tous choisissent 2 noms : seul Cupidon compte.")},
+    [P_LOVERS] = {N_("Amoureux"), "lovers", 15, true, N_("Les amoureux se reconnaissent ; tous valident.")},
+    [P_SEER] = {N_("Voyante"), "seer", 30, true, N_("Tous choisissent : seule la voyante découvre une carte.")},
+    [P_WOLVES] = {N_("Loups"), "wolves", 45, true,
+                  N_("Les loups choisissent leur victime ; la petite fille peut espionner.")},
+    [P_WITCH] = {N_("Sorcière"), "witch", 40, true, N_("Tous choisissent : seule la sorcière agit.")},
+    [P_DAWN] = {N_("aube"), "dawn", 15, false, N_("Le jour se lève : annoncez les morts de la nuit.")},
+    [P_HUNTER] = {N_("Chasseur"), "hunter", 30, false, N_("Le chasseur est mort : il emporte quelqu'un.")},
+    [P_SHOT] = {N_("Chasseur"), "shot", 10, false, N_("Annoncez la victime du chasseur.")},
+    [P_SUCCESSOR] = {N_("Capitaine"), "successor", 30, false,
+                     N_("Le capitaine est mort : il désigne son successeur.")},
+    [P_ELECTION] = {N_("capitaine"), "election", 60, false,
+                    N_("Le village élit son capitaine (sa voix compte double).")},
+    [P_DEBATE] = {N_("débat"), "debate", 0, false, N_("Le village débat : qui sont les loups ?")},
+    [P_VOTE] = {N_("vote"), "vote", 45, false, N_("Chacun vote sur son badge.")},
+    [P_TIEBREAK] = {N_("égalité"), "tiebreak", 30, false, N_("Égalité : le capitaine tranche.")},
+    [P_VOTE2] = {N_("2e vote"), "vote2", 45, false, N_("Égalité : second vote entre les ex aequo.")},
+    [P_VERDICT] = {N_("verdict"), "verdict", 12, false, N_("Annoncez l'éliminé et sa carte.")},
+    [P_END] = {N_("Fin"), "end", 0, false, ""},
 };
 
 /* The options on the setup page, in this order */
 static const struct { uint8_t opt; const char *name; } OPTIONS[] = {
-    {WW_OPT_SEER, "Voyante"}, {WW_OPT_WITCH, "Sorcière"}, {WW_OPT_HUNTER, "Chasseur"}, {WW_OPT_CUPID, "Cupidon"},
-    {WW_OPT_GIRL, "Petite fille"}, {WW_OPT_CAPTAIN, "Capitaine"}, {WW_OPT_THIEF, "Voleur"},
+    {WW_OPT_SEER, N_("Voyante")}, {WW_OPT_WITCH, N_("Sorcière")}, {WW_OPT_HUNTER, N_("Chasseur")},
+    {WW_OPT_CUPID, N_("Cupidon")}, {WW_OPT_GIRL, N_("Petite fille")}, {WW_OPT_CAPTAIN, N_("Capitaine")},
+    {WW_OPT_THIEF, N_("Voleur")},
 };
 #define N_OPTIONS ((int)(sizeof(OPTIONS) / sizeof(OPTIONS[0])))
 
@@ -223,9 +227,9 @@ static void options_text(char *buf, size_t n, uint8_t opts) {
     buf[0] = 0;
     for (int i = 0; i < N_OPTIONS; ++i)
         if (opts & OPTIONS[i].opt)
-            snprintf(buf + strlen(buf), n - strlen(buf), "%s%s", buf[0] ? ", " : "", OPTIONS[i].name);
+            snprintf(buf + strlen(buf), n - strlen(buf), "%s%s", buf[0] ? ", " : "", tr(OPTIONS[i].name));
     if (! buf[0])
-        snprintf(buf, n, "loups et villageois seulement");
+        snprintf(buf, n, _("loups et villageois seulement"));
 }
 
 /* XOR with a hash of the key of the player and of a random nonce (sent in clear) */
@@ -239,19 +243,19 @@ static void mask(uint8_t *d, int len, uint32_t key, uint32_t nonce) {
 
 static void phase_title(char *buf, size_t len) {
     if (phase == P_END)
-        snprintf(buf, len, "Fin de partie");
+        snprintf(buf, len, _("Fin de partie"));
     else if (phase == P_HUNTER || phase == P_SHOT)
-        snprintf(buf, len, "Le chasseur");
+        snprintf(buf, len, _("Le chasseur"));
     else if (phase == P_SUCCESSOR)
-        snprintf(buf, len, "Le capitaine");
+        snprintf(buf, len, _("Le capitaine"));
     else if (PHASES[phase].night)
-        snprintf(buf, len, "Nuit %u : %s", day, PHASES[phase].title);
+        snprintf(buf, len, _("Nuit %u : %s"), day, tr(PHASES[phase].title));
     else if (phase >= P_DAWN)
-        snprintf(buf, len, "Jour %u : %s", day, PHASES[phase].title);
+        snprintf(buf, len, _("Jour %u : %s"), day, tr(PHASES[phase].title));
     else if (phase == P_ROLES)
-        snprintf(buf, len, "Ta carte");
+        snprintf(buf, len, _("Ta carte"));
     else
-        snprintf(buf, len, "Loup-garou");
+        snprintf(buf, len, _("Loup-garou"));
 }
 
 static int secs_left(absolute_time_t now) {
@@ -1219,7 +1223,7 @@ bool werewolf_event(char *buf, int len) {
     notified_step = step;
     char title[32];
     phase_title(title, sizeof(title));
-    snprintf(buf, len, "Loup-garou : %s", title);
+    snprintf(buf, len, _("Loup-garou : %s"), title);
     return true;
 }
 
@@ -1368,31 +1372,31 @@ static void choice_label(int r, char *buf, size_t len) {
     uint8_t v = rows[r];
     const char *mark = chosen_row(v) ? "> " : (phase == P_CUPID && v == pick1) ? "1 " : "";
     switch (v) {
-    case ROW_NOTHING: snprintf(buf, len, "%s%s", mark, phase == P_WITCH ? "Personne" : "Vote blanc"); return;
-    case ROW_HEAL: snprintf(buf, len, "%sSauver %s", mark, pname(info1)); return;
-    case ROW_NOHEAL: snprintf(buf, len, "%sNe pas sauver", mark); return;
-    case ROW_CONTINUE: snprintf(buf, len, "%sContinuer", mark); return;
-    case ROW_KEEP: snprintf(buf, len, "%sGarder ma carte", mark); return;
+    case ROW_NOTHING: snprintf(buf, len, "%s%s", mark, phase == P_WITCH ? _("Personne") : _("Vote blanc")); return;
+    case ROW_HEAL: snprintf(buf, len, _("%sSauver %s"), mark, pname(info1)); return;
+    case ROW_NOHEAL: snprintf(buf, len, _("%sNe pas sauver"), mark); return;
+    case ROW_CONTINUE: snprintf(buf, len, _("%sContinuer"), mark); return;
+    case ROW_KEEP: snprintf(buf, len, _("%sGarder ma carte"), mark); return;
     case ROW_CARD1: case ROW_CARD2:
-        snprintf(buf, len, "%sPrendre : %s", mark, ww_role_name(v == ROW_CARD1 ? info1 : info2));
+        snprintf(buf, len, _("%sPrendre : %s"), mark, tr(ww_role_name(v == ROW_CARD1 ? info1 : info2)));
         return;
-    case ROW_SLEEP: snprintf(buf, len, "%sDormir", mark); return;
-    case ROW_SPY: snprintf(buf, len, "%sEspionner les loups", mark); return;
+    case ROW_SLEEP: snprintf(buf, len, _("%sDormir"), mark); return;
+    case ROW_SPY: snprintf(buf, len, _("%sEspionner les loups"), mark); return;
     default: break;
     }
     if (v & ROW_POISON) {
-        snprintf(buf, len, "%sEmpoisonner %s", mark, pname(v & ~ROW_POISON));
+        snprintf(buf, len, _("%sEmpoisonner %s"), mark, pname(v & ~ROW_POISON));
         return;
     }
     char tag[32] = "";
     if (my_role == WW_WOLF && (my_wolves >> v & 1))
-        snprintf(tag, sizeof(tag), " (loup)");
+        snprintf(tag, sizeof(tag), _(" (loup)"));
     else if (seen[v] < WW_ROLES)
-        snprintf(tag, sizeof(tag), " (%s)", ww_role_name(seen[v]));
+        snprintf(tag, sizeof(tag), " (%s)", tr(ww_role_name(seen[v])));
     if (v == my_lover)
         snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " <3");
     if (v == captain)
-        snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " (cap.)");
+        snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), _(" (cap.)"));
     int votes = phase == P_WOLVES && my_role == WW_WOLF && priv_fresh() ? wolf_votes_for(v) : 0;
     if (votes)
         snprintf(tag + strlen(tag), sizeof(tag) - strlen(tag), " [%d]", votes);
@@ -1403,28 +1407,28 @@ static void choice_label(int r, char *buf, size_t len) {
 static void role_label(int i, char *buf, size_t len) {
     int role = mode == M_NARRATOR ? g.role[i] : revealed[i];
     bool lover = mode == M_NARRATOR ? ww_partner(&g, i) != WW_NONE : (lovers_end[0] == i || lovers_end[1] == i);
-    snprintf(buf, len, "%s%s : %s%s%s", is_alive(i) ? "" : "x ", pname(i), ww_role_name(role), lover ? " <3" : "",
-             i == captain ? " (cap.)" : "");
+    snprintf(buf, len, _("%s%s : %s%s%s"), is_alive(i) ? "" : "x ", pname(i), tr(ww_role_name(role)),
+             lover ? " <3" : "", i == captain ? _(" (cap.)") : "");
 }
 
 static void menu_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s", i == MENU_NARRATE ? "Mener une partie" : i == MENU_JOIN ? "Rejoindre une partie"
-             : "Aide : les rôles");
+    snprintf(buf, len, "%s", i == MENU_NARRATE ? N_("Mener une partie")
+             : i == MENU_JOIN ? N_("Rejoindre une partie") : N_("Aide : les rôles"));
 }
 
 static void setup_label(int i, char *buf, size_t len) {
     if (i == SETUP_PRESET) {
-        snprintf(buf, len, "Préréglage : %s", set_options == WW_OPT_ALL ? "classique"
-                 : set_options == WW_OPT_BEGINNER ? "débutant" : "à la carte");
+        snprintf(buf, len, _("Préréglage : %s"), set_options == WW_OPT_ALL ? _("classique")
+                 : set_options == WW_OPT_BEGINNER ? _("débutant") : _("à la carte"));
     } else if (i < SETUP_DEBATE) {
         const int k = i - SETUP_OPTIONS;
-        snprintf(buf, len, "[%c] %s", set_options & OPTIONS[k].opt ? 'x' : ' ', OPTIONS[k].name);
+        snprintf(buf, len, "[%c] %s", set_options & OPTIONS[k].opt ? 'x' : ' ', tr(OPTIONS[k].name));
     } else if (i == SETUP_DEBATE) {
-        snprintf(buf, len, "Débat : %u min", DEBATE_S[set_debate] / 60);
+        snprintf(buf, len, _("Débat : %u min"), DEBATE_S[set_debate] / 60);
     } else if (i == SETUP_WOLVES) {
-        snprintf(buf, len, "Loups : 2, ou 3 dès 12 j.");
+        snprintf(buf, len, N_("Loups : 2, ou 3 dès 12 j."));
     } else {
-        snprintf(buf, len, "> Ouvrir la partie");
+        snprintf(buf, len, N_("> Ouvrir la partie"));
     }
 }
 
@@ -1433,7 +1437,7 @@ static void lobby_label(int i, char *buf, size_t len) {
 }
 
 static void found_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s  %u joueur%s", found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
+    snprintf(buf, len, _("%s  %u joueur%s"), found[i].name, found[i].players, found[i].players > 1 ? "s" : "");
 }
 
 /* A list from \p y (ui_list() starts below the title) */
@@ -1508,24 +1512,25 @@ static void render_card(uint8_t *fb, const char *title, int card, const char *ex
     const ww_card_t *c = &WW_CARD[card];
     ui_title(fb, title);
     draw_icon(fb, 7, UI_TITLE_H + 7, c->icon);
-    int y = text_box(fb, 82, UI_TITLE_H + 10, GFX_WIDTH - 86, &gfx_font_medium, c->name, 2);
-    text_box(fb, 82, y + 4, GFX_WIDTH - 86, &gfx_font_small, c->camp, 2);
+    int y = text_box(fb, 82, UI_TITLE_H + 10, GFX_WIDTH - 86, &gfx_font_medium, tr(c->name), 2);
+    text_box(fb, 82, y + 4, GFX_WIDTH - 86, &gfx_font_small, tr(c->camp), 2);
     y = UI_TITLE_H + 2 * WW_ICON_SIZE + 12;
-    text_box(fb, 4, y, GFX_WIDTH - 8, &gfx_font_small, extra ? extra : c->power, 3);
+    text_box(fb, 4, y, GFX_WIDTH - 8, &gfx_font_small, extra ? extra : tr(c->power), 3);
 }
 
 static void render_help(uint8_t *fb) {
     const ww_card_t *c = &WW_CARD[help_card];
     if (help_details) {
         ui_title(fb, c->name);
-        text_box(fb, 4, UI_TITLE_H + 2, GFX_WIDTH - 8, &gfx_font_small, c->details, 7);
-        ui_footer(fb, "D : la carte  G : retour");
+        text_box(fb, 4, UI_TITLE_H + 2, GFX_WIDTH - 8, &gfx_font_small, tr(c->details), 7);
+        ui_footer(fb, N_("D : la carte  G : retour"));
         return;
     }
-    render_card(fb, help_back == PG_GAME && help_card == my_role ? "Ta carte" : "Les rôles", help_card, NULL);
+    render_card(fb, help_back == PG_GAME && help_card == my_role ? N_("Ta carte") : N_("Les rôles"), help_card,
+                NULL);
     char text[40];
-    snprintf(text, sizeof(text), "%d/%d  Flancs, D : détails", help_card + 1, WW_CARDS);
-    ui_footer(fb, help_back == PG_GAME ? "D : détails  G : la partie" : text);
+    snprintf(text, sizeof(text), _("%d/%d  Flancs, D : détails"), help_card + 1, WW_CARDS);
+    ui_footer(fb, help_back == PG_GAME ? N_("D : détails  G : la partie") : text);
 }
 
 static void timer_text(char *buf, size_t len, absolute_time_t now) {
@@ -1538,11 +1543,11 @@ static void timer_text(char *buf, size_t len, absolute_time_t now) {
 
 /* The deaths of the dawn, of the verdict or of the shot of the hunter, from \p y */
 static int render_deaths(uint8_t *fb, int y) {
-    const char *head = phase == P_DAWN ? "Cette nuit :" : phase == P_VERDICT ? "Le village a éliminé :"
-                       : "Le chasseur a emporté :";
+    const char *head = phase == P_DAWN ? N_("Cette nuit :") : phase == P_VERDICT ? N_("Le village a éliminé :")
+                       : N_("Le chasseur a emporté :");
     if (! n_deaths) {
-        const char *none = phase == P_DAWN ? "Personne n'est mort." : phase == P_VERDICT ? "Personne."
-                           : "Personne.";
+        const char *none = phase == P_DAWN ? N_("Personne n'est mort.") : phase == P_VERDICT ? N_("Personne.")
+                           : N_("Personne.");
         y = ui_lines(fb, y, &gfx_font_small, head);
         return ui_lines(fb, y + 2, &gfx_font_medium, none);
     }
@@ -1550,7 +1555,7 @@ static int render_deaths(uint8_t *fb, int y) {
     for (int i = 0; i < n_deaths && i < 4; ++i) {
         char line[40];
         int d = deaths[i];
-        snprintf(line, sizeof(line), "%s (%s)", pname(d), ww_role_name(d < WW_MAX ? revealed[d] : WW_NONE));
+        snprintf(line, sizeof(line), "%s (%s)", pname(d), tr(ww_role_name(d < WW_MAX ? revealed[d] : WW_NONE)));
         /* Medium when it fits (2 deaths at most: room below), small otherwise */
         bool medium = n_deaths <= 2 && gfx_text_width(&gfx_font_medium, line) <= GFX_WIDTH - 4;
         y = ui_lines(fb, y, medium ? &gfx_font_medium : &gfx_font_small, line);
@@ -1561,19 +1566,19 @@ static int render_deaths(uint8_t *fb, int y) {
 static void render_end(uint8_t *fb) {
     int y = ui_wrapped(fb, UI_TITLE_H + 10, &gfx_font_medium, ww_win_text(winner), 2);
     if (mode == M_PLAYER && my_idx < WW_MAX) {
-        y = ui_lines(fb, y + 8, &gfx_font_large, winners >> my_idx & 1 ? "Gagné !" : "Perdu...");
+        y = ui_lines(fb, y + 8, &gfx_font_large, winners >> my_idx & 1 ? N_("Gagné !") : N_("Perdu..."));
         char text[40];
-        snprintf(text, sizeof(text), "Tu étais : %s", ww_role_name(my_role));
+        snprintf(text, sizeof(text), _("Tu étais : %s"), tr(ww_role_name(my_role)));
         ui_lines(fb, y + 8, &gfx_font_small, text);
     }
-    ui_footer(fb, "D : les cartes  G long : fin");
+    ui_footer(fb, N_("D : les cartes  G long : fin"));
 }
 
 static void render_narrator(uint8_t *fb, absolute_time_t now) {
     char text[64];
     if (phase == P_NONE) {
-        ui_title(fb, "Loup-garou");
-        ui_lines(fb, 70, &gfx_font_medium, "Distribution\ndes cartes...");
+        ui_title(fb, N_("Loup-garou"));
+        ui_lines(fb, 70, &gfx_font_medium, N_("Distribution\ndes cartes..."));
         return;
     }
     phase_title(text, sizeof(text));
@@ -1586,73 +1591,74 @@ static void render_narrator(uint8_t *fb, absolute_time_t now) {
     char timer[12];
     timer_text(timer, sizeof(timer), now);
     if (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT) {
-        snprintf(text, sizeof(text), "%s   En vie : %d / %u", timer, ww_count_alive(&g), g.n);
+        snprintf(text, sizeof(text), _("%s   En vie : %d / %u"), timer, ww_count_alive(&g), g.n);
         y = ui_lines(fb, y, &gfx_font_small, text);
         render_deaths(fb, y + 4);
     } else {
         if (timer[0])
             y = ui_lines(fb, y, &gfx_font_large, timer);
         uint32_t e = expected();
-        int n = snprintf(text, sizeof(text), "En vie : %d / %u", ww_count_alive(&g), g.n);
+        int n = snprintf(text, sizeof(text), _("En vie : %d / %u"), ww_count_alive(&g), g.n);
         if (e)
-            snprintf(text + n, sizeof(text) - n, "   Choix : %d / %d", __builtin_popcount(acted & e),
+            snprintf(text + n, sizeof(text) - n, _("   Choix : %d / %d"), __builtin_popcount(acted & e),
                      __builtin_popcount(e));
         y = ui_lines(fb, y, &gfx_font_small, text);
         ui_wrapped(fb, y + 4, &gfx_font_small, PHASES[phase].hint, 3);
     }
-    ui_footer(fb, "D : suite  X : +30 s");
+    ui_footer(fb, N_("D : suite  X : +30 s"));
 }
 
 /* The prompt of a list of choices */
 static const char *prompt_text(char *text, size_t len) {
     bool real = false;  /* The role of this badge acts (the others pretend) */
-    const char *p = "Fais semblant de choisir";
+    const char *p = N_("Fais semblant de choisir");
     switch (phase) {
     case P_THIEF:
         if (my_role == WW_THIEF && priv_fresh() && info1 < WW_ROLES)
-            p = info1 == WW_WOLF && info2 == WW_WOLF ? "Deux loups : prends-en un !" : "Ta carte ou une autre ?";
+            p = info1 == WW_WOLF && info2 == WW_WOLF ? N_("Deux loups : prends-en un !")
+                : N_("Ta carte ou une autre ?");
         break;
     case P_CUPID:
         real = my_role == WW_CUPID;
-        p = real ? (pick1 == WW_NONE ? "1er amoureux ?" : "2e amoureux ?")
-            : pick1 == WW_NONE ? "Fais semblant : 1er nom" : "Fais semblant : 2e nom";
+        p = real ? (pick1 == WW_NONE ? N_("1er amoureux ?") : N_("2e amoureux ?"))
+            : pick1 == WW_NONE ? N_("Fais semblant : 1er nom") : N_("Fais semblant : 2e nom");
         break;
     case P_SEER:
         if (my_role == WW_SEER && priv_fresh() && info1 < WW_MAX && info2 < WW_ROLES) {
-            snprintf(text, len, "%s : %s", pname(info1), ww_role_name(info2));
+            snprintf(text, len, _("%s : %s"), pname(info1), tr(ww_role_name(info2)));
             return text;
         }
         if (my_role == WW_SEER)
-            p = "Qui sonder ?";
+            p = N_("Qui sonder ?");
         break;
     case P_WOLVES:
         if (my_role == WW_WOLF)
-            p = "Votre victime ?";
+            p = N_("Votre victime ?");
         if (my_role == WW_GIRL) {
             if (priv_fresh() && info1 < WW_MAX) {
-                snprintf(text, len, "Tu as vu %s (loup)", pname(info1));
+                snprintf(text, len, _("Tu as vu %s (loup)"), pname(info1));
                 return text;
             }
-            p = "Espionner ? (risqué)";
+            p = N_("Espionner ? (risqué)");
         }
         break;
     case P_WITCH:
         if (my_role != WW_WITCH)
-            p = second_step() ? "Fais semblant (2/2)" : "Fais semblant (1/2)";
+            p = second_step() ? N_("Fais semblant (2/2)") : N_("Fais semblant (1/2)");
         else if (second_step())
-            p = (potions & 2) ? "Empoisonner ?" : "Plus de poison";
+            p = (potions & 2) ? N_("Empoisonner ?") : N_("Plus de poison");
         else if (info1 < WW_MAX) {
-            snprintf(text, len, "Victime : %s", pname(info1));
+            snprintf(text, len, _("Victime : %s"), pname(info1));
             return text;
         } else
-            p = "Pas de victime";
+            p = N_("Pas de victime");
         break;
-    case P_ELECTION: p = "Qui sera capitaine ?"; break;
-    case P_VOTE: p = "Qui éliminer ?"; break;
-    case P_VOTE2: p = "2e vote : qui éliminer ?"; break;
-    case P_TIEBREAK: p = "Égalité : qui éliminer ?"; break;
-    case P_HUNTER: p = "Qui emporter ?"; break;
-    case P_SUCCESSOR: p = "Ton successeur ?"; break;
+    case P_ELECTION: p = N_("Qui sera capitaine ?"); break;
+    case P_VOTE: p = N_("Qui éliminer ?"); break;
+    case P_VOTE2: p = N_("2e vote : qui éliminer ?"); break;
+    case P_TIEBREAK: p = N_("Égalité : qui éliminer ?"); break;
+    case P_HUNTER: p = N_("Qui emporter ?"); break;
+    case P_SUCCESSOR: p = N_("Ton successeur ?"); break;
     default: break;
     }
     return p;
@@ -1670,55 +1676,55 @@ static const char *render_choices(uint8_t *fb, int y, const char *timer, const c
     if (lost_footer)
         return lost_footer;
     if (! my_seq)
-        return "Flancs : choix  D : valider";
+        return N_("Flancs : choix  D : valider");
     if (ack_seq < my_seq || ! priv_fresh())
-        return "Envoi...";
-    return phase == P_SEER && my_role == WW_SEER ? "Choix reçu" : "Choix reçu  D : changer";
+        return N_("Envoi...");
+    return phase == P_SEER && my_role == WW_SEER ? N_("Choix reçu") : N_("Choix reçu  D : changer");
 }
 
 /* A phase where only one player acts (the hunter, the captain): what the others see */
 static void render_waiting(uint8_t *fb, int y) {
     char text[64];
     if (phase == P_HUNTER)
-        snprintf(text, sizeof(text), "Le chasseur %s\nchoisit sa cible...", pname(actor));
+        snprintf(text, sizeof(text), _("Le chasseur %s\nchoisit sa cible..."), pname(actor));
     else if (phase == P_SUCCESSOR)
-        snprintf(text, sizeof(text), "Le capitaine %s\nchoisit son successeur...", pname(actor));
+        snprintf(text, sizeof(text), _("Le capitaine %s\nchoisit son successeur..."), pname(actor));
     else
-        snprintf(text, sizeof(text), "Égalité : le capitaine\n%s tranche...", pname(actor));
+        snprintf(text, sizeof(text), _("Égalité : le capitaine\n%s tranche..."), pname(actor));
     ui_lines(fb, y + 40, &gfx_font_small, text);
 }
 
 static void render_player(uint8_t *fb, absolute_time_t now) {
     char text[96];
     if (cancelled) {
-        ui_title(fb, "Loup-garou");
-        ui_box(fb, "Partie arrêtée\npar le meneur");
-        ui_footer(fb, "G long : quitter");
+        ui_title(fb, N_("Loup-garou"));
+        ui_box(fb, N_("Partie arrêtée\npar le meneur"));
+        ui_footer(fb, N_("G long : quitter"));
         return;
     }
     if (! have_state || phase == P_NONE) {
-        ui_title(fb, "Loup-garou");
-        ui_lines(fb, 70, &gfx_font_medium, "La partie\ncommence...");
-        ui_footer(fb, "G : menu");
+        ui_title(fb, N_("Loup-garou"));
+        ui_lines(fb, 70, &gfx_font_medium, N_("La partie\ncommence..."));
+        ui_footer(fb, N_("G : menu"));
         return;
     }
     if (phase == P_ROLES) {
         if (my_role >= WW_ROLES) {
-            ui_title(fb, "Ta carte");
-            ui_lines(fb, 80, &gfx_font_medium, "Carte en attente...");
-            ui_footer(fb, "G : menu");
+            ui_title(fb, N_("Ta carte"));
+            ui_lines(fb, 80, &gfx_font_medium, N_("Carte en attente..."));
+            ui_footer(fb, N_("G : menu"));
             return;
         }
         text[0] = 0;
         if (my_role == WW_WOLF && __builtin_popcount(my_wolves) > 1) {
-            snprintf(text, sizeof(text), "Avec toi :");
+            snprintf(text, sizeof(text), _("Avec toi :"));
             for (int i = 0; i < n_players; ++i)
                 if ((my_wolves >> i & 1) && i != my_idx)
                     snprintf(text + strlen(text), sizeof(text) - strlen(text), " %s", pname(i));
         }
-        render_card(fb, "Ta carte", my_role, text[0] ? text : NULL);
-        ui_footer(fb, my_seq ? (ack_seq >= my_seq && priv_fresh() ? "Compris, reçu" : "Envoi...")
-                  : "Cache l'écran !  D : compris");
+        render_card(fb, N_("Ta carte"), my_role, text[0] ? text : NULL);
+        ui_footer(fb, my_seq ? (ack_seq >= my_seq && priv_fresh() ? N_("Compris, reçu") : N_("Envoi..."))
+                  : N_("Cache l'écran !  D : compris"));
         return;
     }
     phase_title(text, sizeof(text));
@@ -1730,20 +1736,20 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
     char timer[12];
     timer_text(timer, sizeof(timer), now);
     bool lost = absolute_time_diff_us(last_state, now) > LOST_MS * 1000ll;
-    const char *footer = lost ? "Meneur hors de portée !" : "G : menu  D long : carte";
+    const char *footer = lost ? N_("Meneur hors de portée !") : N_("G : menu  D long : carte");
     int y = UI_TITLE_H + 2;
     if (my_idx < WW_MAX && ! me_alive() && ! must_act()) {
         if (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT) {
-            snprintf(text, sizeof(text), "Tu es mort(e)   %s", timer);
+            snprintf(text, sizeof(text), _("Tu es mort(e)   %s"), timer);
             y = ui_lines(fb, y, &gfx_font_small, text);
             render_deaths(fb, y + 4);
         } else {
-            y = ui_lines(fb, y + 16, &gfx_font_large, "Tu es mort(e)");
-            y = ui_lines(fb, y + 4, &gfx_font_small, "Chut ! Tu ne joues plus,\nmais tu suis la partie.");
+            y = ui_lines(fb, y + 16, &gfx_font_large, N_("Tu es mort(e)"));
+            y = ui_lines(fb, y + 4, &gfx_font_small, N_("Chut ! Tu ne joues plus,\nmais tu suis la partie."));
             if (timer[0])
                 ui_lines(fb, y + 4, &gfx_font_medium, timer);
         }
-        ui_footer(fb, lost ? footer : "G : menu");
+        ui_footer(fb, lost ? footer : N_("G : menu"));
         return;
     }
     switch (phase) {
@@ -1752,25 +1758,25 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
         render_deaths(fb, y + 4);
         break;
     case P_DEBATE:
-        y = ui_lines(fb, y + 4, &gfx_font_medium, "Débattez !");
+        y = ui_lines(fb, y + 4, &gfx_font_medium, N_("Débattez !"));
         y = ui_lines(fb, y + 2, &gfx_font_large, timer);
-        snprintf(text, sizeof(text), "%d joueurs en vie", __builtin_popcount(alive));
+        snprintf(text, sizeof(text), _("%d joueurs en vie"), __builtin_popcount(alive));
         y = ui_lines(fb, y + 4, &gfx_font_small, text);
         if (captain < WW_MAX) {
-            snprintf(text, sizeof(text), "Capitaine : %s", pname(captain));
+            snprintf(text, sizeof(text), _("Capitaine : %s"), pname(captain));
             y = ui_lines(fb, y, &gfx_font_small, text);
         }
-        ui_wrapped(fb, y + 2, &gfx_font_small, "Le vote suit.", 1);
+        ui_wrapped(fb, y + 2, &gfx_font_small, N_("Le vote suit."), 1);
         break;
     case P_LOVERS:
         if (my_lover < WW_MAX)
-            snprintf(text, sizeof(text), "Ton amoureux(se) :\n%s", pname(my_lover));
+            snprintf(text, sizeof(text), _("Ton amoureux(se) :\n%s"), pname(my_lover));
         else
-            snprintf(text, sizeof(text), "Les amoureux\nse reconnaissent...");
+            snprintf(text, sizeof(text), N_("Les amoureux\nse reconnaissent..."));
         ui_lines(fb, y, &gfx_font_small, timer);
         ui_box(fb, text);
         if (! lost)
-            footer = my_seq ? (ack_seq >= my_seq && priv_fresh() ? "Vu, reçu" : "Envoi...") : "D : vu";
+            footer = my_seq ? (ack_seq >= my_seq && priv_fresh() ? N_("Vu, reçu") : N_("Envoi...")) : N_("D : vu");
         break;
     default:
         if (! must_act()) {
@@ -1785,9 +1791,9 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
 }
 
 static void render_roles(uint8_t *fb) {
-    ui_title(fb, "Les cartes");
+    ui_title(fb, N_("Les cartes"));
     list_at(fb, UI_TITLE_H + 3, 7, n_players, list_sel, role_label);
-    ui_footer(fb, "G : retour");
+    ui_footer(fb, N_("G : retour"));
 }
 
 /* Another group game is in progress (party.c runs one at a time): its name, NULL when none */
@@ -1796,82 +1802,82 @@ static const char *other_game(void) {
     if (party_game() == PARTY_GAME_WEREWOLF || (s != PARTY_HOSTING && s != PARTY_JOINING && s != PARTY_JOINED
                                                && s != PARTY_STARTED))
         return NULL;
-    return party_game() == PARTY_GAME_TUG ? "tir à la corde" : party_game() == PARTY_GAME_ASSASSIN ? "Assassin"
-           : "un autre jeu";
+    return party_game() == PARTY_GAME_TUG ? N_("tir à la corde")
+           : party_game() == PARTY_GAME_ASSASSIN ? N_("Assassin") : N_("un autre jeu");
 }
 
 static void ww_render(uint8_t *fb, absolute_time_t now) {
     char text[128];
     switch (page) {
     case PG_MENU:
-        ui_title(fb, "Loup-garou");
+        ui_title(fb, N_("Loup-garou"));
         list_at(fb, UI_TITLE_H + 3, MENU_ROWS, MENU_ROWS, list_sel, menu_label);
         if (other_game())
-            snprintf(text, sizeof(text), "Une partie de %s est en cours : quitte-la d'abord.", other_game());
+            snprintf(text, sizeof(text), _("Une partie de %s est en cours : quitte-la d'abord."), tr(other_game()));
         else
-            snprintf(text, sizeof(text), "Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge.");
+            snprintf(text, sizeof(text), N_("Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge."));
         ui_wrapped(fb, UI_TITLE_H + 76, &gfx_font_small, text, 3);
-        ui_footer(fb, "G : retour  D : choisir");
+        ui_footer(fb, N_("G : retour  D : choisir"));
         break;
     case PG_SETUP:
-        ui_title(fb, "Mener une partie");
+        ui_title(fb, N_("Mener une partie"));
         list_at(fb, UI_TITLE_H + 3, 7, SETUP_ROWS, setup_row, setup_label);
-        ui_footer(fb, setup_row == SETUP_OPEN ? "G : retour  D : ouvrir"
-                  : setup_row == SETUP_WOLVES ? "Selon la règle du jeu" : "Flancs : ligne  D : changer");
+        ui_footer(fb, setup_row == SETUP_OPEN ? N_("G : retour  D : ouvrir")
+                  : setup_row == SETUP_WOLVES ? N_("Selon la règle du jeu") : N_("Flancs : ligne  D : changer"));
         break;
     case PG_LOBBY: {
-        ui_title(fb, "Partie ouverte");
+        ui_title(fb, N_("Partie ouverte"));
         int min = min_players();
-        snprintf(text, sizeof(text), "%d joueur%s (%d à %d), %d loups", n_lobby, n_lobby > 1 ? "s" : "", min,
+        snprintf(text, sizeof(text), _("%d joueur%s (%d à %d), %d loups"), n_lobby, n_lobby > 1 ? "s" : "", min,
                  WW_MAX_PLAYERS, ww_wolves_for(debug_mode() && n_lobby < WW_MIN_PLAYERS ? WW_MIN_PLAYERS
                                                : n_lobby < min_players() ? min_players() : n_lobby));
         int y = ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
         if (debug_mode())
-            y = ui_lines(fb, y, &gfx_font_small, "Test : des robots complètent");
+            y = ui_lines(fb, y, &gfx_font_small, N_("Test : des robots complètent"));
         if (n_lobby)
             list_at(fb, y + 2, (UI_FOOTER_Y - 4 - y) / UI_ROW_H, n_lobby, list_sel < n_lobby ? list_sel : 0,
                     lobby_label);
         else
-            ui_wrapped(fb, y + 20, &gfx_font_small, "Les joueurs : Jeux multi > Loup-garou > Rejoindre.", 3);
-        ui_footer(fb, n_lobby >= min ? "G long : annuler  D : lancer" : "G long : annuler");
+            ui_wrapped(fb, y + 20, &gfx_font_small, N_("Les joueurs : Jeux multi > Loup-garou > Rejoindre."), 3);
+        ui_footer(fb, n_lobby >= min ? N_("G long : annuler  D : lancer") : N_("G long : annuler"));
         break;
     }
     case PG_SCAN:
-        ui_title(fb, "Rejoindre");
+        ui_title(fb, N_("Rejoindre"));
         if (n_found) {
             list_at(fb, UI_TITLE_H + 3, 7, n_found, list_sel < n_found ? list_sel : 0, found_label);
-            ui_footer(fb, "G : retour  D : rejoindre");
+            ui_footer(fb, N_("G : retour  D : rejoindre"));
         } else {
-            ui_lines(fb, 60, &gfx_font_small, "Recherche des parties...\nLe meneur doit ouvrir\nla sienne.");
-            ui_footer(fb, "G : retour");
+            ui_lines(fb, 60, &gfx_font_small, N_("Recherche des parties...\nLe meneur doit ouvrir\nla sienne."));
+            ui_footer(fb, N_("G : retour"));
         }
         break;
     case PG_WAIT: {
-        ui_title(fb, "Loup-garou");
+        ui_title(fb, N_("Loup-garou"));
         if (cancelled || party_state() == PARTY_CANCELLED || party_state() == PARTY_IDLE) {
-            ui_box(fb, "Partie annulée");
-            ui_footer(fb, "G long : quitter");
+            ui_box(fb, N_("Partie annulée"));
+            ui_footer(fb, N_("G long : quitter"));
             break;
         }
         bool in = party_state() == PARTY_JOINED;
-        snprintf(text, sizeof(text), "%s  %d joueur%s", in ? "Inscrit(e) !" : "Inscription...", party_count(),
-                 party_count() > 1 ? "s" : "");
+        snprintf(text, sizeof(text), _("%s  %d joueur%s"), in ? _("Inscrit(e) !") : _("Inscription..."),
+                 party_count(), party_count() > 1 ? "s" : "");
         int y = ui_lines(fb, UI_TITLE_H + 6, &gfx_font_small, text);
         char roles[96];
         options_text(roles, sizeof(roles), options & WW_OPT_ALL);
-        snprintf(text, sizeof(text), "Rôles : %s.", roles);
+        snprintf(text, sizeof(text), _("Rôles : %s."), roles);
         y = ui_wrapped(fb, y + 4, &gfx_font_small, text, 4);
-        ui_wrapped(fb, y + 6, &gfx_font_small, "En attente du meneur...", 1);
-        ui_footer(fb, "G : menu  G long : quitter");
+        ui_wrapped(fb, y + 6, &gfx_font_small, N_("En attente du meneur..."), 1);
+        ui_footer(fb, N_("G : menu  G long : quitter"));
         break;
     }
     case PG_ROLES:
         render_roles(fb);
         break;
     case PG_QUIT:
-        ui_title(fb, "Loup-garou");
-        ui_box(fb, mode == M_NARRATOR ? "Arrêter la partie\npour tous ?" : "Quitter\nla partie ?");
-        ui_footer(fb, "G : non  D : oui");
+        ui_title(fb, N_("Loup-garou"));
+        ui_box(fb, mode == M_NARRATOR ? N_("Arrêter la partie\npour tous ?") : N_("Quitter\nla partie ?"));
+        ui_footer(fb, N_("G : non  D : oui"));
         break;
     case PG_HELP:
         render_help(fb);
@@ -2187,7 +2193,7 @@ static bool ww_calm(void) {
 }
 
 const app_t app_werewolf = {
-    .name = "Loup-garou",
+    .name = N_("Loup-garou"),
     .start = ww_start,
     .buttons = ww_buttons,
     .task = ww_task,
@@ -2199,16 +2205,17 @@ const app_t app_werewolf = {
 
 /* ------ Admin > Loup-garou (admin): below 8 players (the minimum of the rules), no game unless unlocked here ------ */
 
-static const char *UNLOCK_NAMES[WW_UNLOCKS] = {"8 joueurs minimum", "Petites parties (4+)", "Test : robots"};
+static const char *UNLOCK_NAMES[WW_UNLOCKS] = {N_("8 joueurs minimum"), N_("Petites parties (4+)"),
+                                               N_("Test : robots")};
 static const char *UNLOCK_HELP[WW_UNLOCKS] = {
-    "La règle du jeu :\nde 8 à 18 joueurs.",
-    "Dès 4 joueurs, avec\n1 loup-garou sous 8.",
-    "Dès 1 joueur : des robots\ncomplètent jusqu'à 8.",
+    N_("La règle du jeu :\nde 8 à 18 joueurs."),
+    N_("Dès 4 joueurs, avec\n1 loup-garou sous 8."),
+    N_("Dès 1 joueur : des robots\ncomplètent jusqu'à 8."),
 };
 static int unlock_sel = 0;
 
 static void unlock_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s %s", i == unlock_mode() ? "(o)" : "( )", UNLOCK_NAMES[i]);
+    snprintf(buf, len, "%s %s", i == unlock_mode() ? "(o)" : "( )", tr(UNLOCK_NAMES[i]));
 }
 
 static void unlock_start(absolute_time_t now) {
@@ -2235,14 +2242,14 @@ static bool unlock_buttons(const app_buttons_t *b, absolute_time_t now) {
 
 static void unlock_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Loup-garou (admin)");
+    ui_title(fb, N_("Loup-garou (admin)"));
     ui_list(fb, WW_UNLOCKS, unlock_sel, unlock_label);
     ui_lines(fb, UI_TITLE_H + 3 + WW_UNLOCKS * UI_ROW_H + 10, &gfx_font_small, UNLOCK_HELP[unlock_sel]);
-    ui_footer(fb, "Flancs : choisir  D : valider");
+    ui_footer(fb, N_("Flancs : choisir  D : valider"));
 }
 
 const app_t app_werewolf_admin = {
-    .name = "Loup-garou (admin)",
+    .name = N_("Loup-garou (admin)"),
     .start = unlock_start,
     .buttons = unlock_buttons,
     .render = unlock_render,

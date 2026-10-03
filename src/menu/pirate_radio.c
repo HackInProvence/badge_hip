@@ -39,6 +39,7 @@
 #include "app.h"
 #include "audio.h"
 #include "display.h"
+#include "i18n.h"
 #include "net.h"
 #include "ook_rx.h"
 #include "ook_tx.h"
@@ -182,7 +183,7 @@ static void timer_fraction(uint32_t rate, uint16_t *x, uint16_t *y) {
 /* ====================================== Transmitter ====================================== */
 
 enum { SRC_MELODY, SRC_TONE, SRC_SD, N_SOURCES };
-static const char *SOURCES[N_SOURCES] = {"Mélodie", "Tonalité 1 kHz", "Fichier SD"};
+static const char *SOURCES[N_SOURCES] = {N_("Mélodie"), N_("Tonalité 1 kHz"), N_("Fichier SD")};
 
 enum { ROW_SOURCE, ROW_FREQ, ROW_POWER, ROW_DEVIATION, ROW_GAIN, ROW_MONITOR, ROW_START, N_ROWS };
 
@@ -302,7 +303,7 @@ static void tx_stop(const char *reason) {
 static void tx_begin(absolute_time_t now) {
     if (! take_radio()) {
         page = T_SETUP;
-        snprintf(status, sizeof(status), "Radio occupée");
+        snprintf(status, sizeof(status), N_("Radio occupée"));
         printf("pirate: radio busy (OOK receiver or another radio feature)\n");
         return;
     }
@@ -319,7 +320,7 @@ static void tx_begin(absolute_time_t now) {
         synth_start();
         ok = audio_open(SYNTH_RATE);
         if (! ok)
-            snprintf(status, sizeof(status), "Audio indisponible");
+            snprintf(status, sizeof(status), N_("Audio indisponible"));
     }
     if (! ok) {
         audio_set_outputs(AUDIO_OUT_SPEAKER);
@@ -413,7 +414,7 @@ static void tx_start(absolute_time_t now) {
 
 static void tx_app_stop(void) {
     if (page == T_ON_AIR)
-        tx_stop("page quittée");
+        tx_stop(N_("page quittée"));
     page = T_SETUP;
 }
 
@@ -433,11 +434,11 @@ static bool tx_buttons(const app_buttons_t *b, absolute_time_t now) {
     switch (page) {
     case T_ON_AIR:
         if (b->long_pressed & UI_BTN_A) {
-            tx_stop("arrêt manuel");
+            tx_stop(N_("arrêt manuel"));
             return false;
         }
         if (b->pressed & (UI_BTN_A | UI_BTN_B))
-            tx_stop("arrêt manuel");
+            tx_stop(N_("arrêt manuel"));
         return true;
     case T_WAIT:
         if (b->pressed & UI_BTN_A)
@@ -505,15 +506,15 @@ static bool tx_task(absolute_time_t now) {
         return false;
     if (source == SRC_SD) {
         if (! wav_task()) {
-            tx_stop("fin du morceau");
+            tx_stop(N_("fin du morceau"));
             return true;
         }
     } else if (! synth_fill() && audio_queued() == 0) {
-        tx_stop(source == SRC_TONE ? "fin" : "fin de la mélodie");
+        tx_stop(source == SRC_TONE ? N_("fin") : N_("fin de la mélodie"));
         return true;
     }
     if (absolute_time_diff_us(on_air_ts, now) >= TX_MAX_MS * 1000ll) {
-        tx_stop("sécurité : 10 min max");
+        tx_stop(N_("sécurité : 10 min max"));
         return true;
     }
     if (absolute_time_diff_us(redraw_ts, now) >= 0) {
@@ -529,16 +530,16 @@ static bool tx_task(absolute_time_t now) {
 static void row_text(int i, char *buf, size_t len) {
     char f[24];
     switch (i) {
-    case ROW_SOURCE: snprintf(buf, len, "Source : %s", SOURCES[source]); break;
-    case ROW_FREQ: mhz(f, sizeof(f), FREQS[freq_i]); snprintf(buf, len, "Fréquence : %s", f); break;
-    case ROW_POWER: snprintf(buf, len, "Puissance : %d dBm", POWERS[power_i].dbm); break;
+    case ROW_SOURCE: snprintf(buf, len, _("Source : %s"), tr(SOURCES[source])); break;
+    case ROW_FREQ: mhz(f, sizeof(f), FREQS[freq_i]); snprintf(buf, len, _("Fréquence : %s"), f); break;
+    case ROW_POWER: snprintf(buf, len, _("Puissance : %d dBm"), POWERS[power_i].dbm); break;
     case ROW_DEVIATION:
-        snprintf(buf, len, "Excursion : %s kHz%s", DEVIATION_TEXTS[deviation_i],
+        snprintf(buf, len, _("Excursion : %s kHz%s"), DEVIATION_TEXTS[deviation_i],
                  DEVIATIONS[deviation_i] == 47600 ? " (Flipper)" : "");
         break;
-    case ROW_GAIN: snprintf(buf, len, "Gain du son : x%u", GAINS[gain_i]); break;
-    case ROW_MONITOR: snprintf(buf, len, "Haut-parleur : %s", monitor ? "oui" : "non"); break;
-    default: snprintf(buf, len, source == SRC_SD ? "> Choisir le fichier" : "> Émettre"); break;
+    case ROW_GAIN: snprintf(buf, len, _("Gain du son : x%u"), GAINS[gain_i]); break;
+    case ROW_MONITOR: snprintf(buf, len, _("Haut-parleur : %s"), monitor ? _("oui") : _("non")); break;
+    default: snprintf(buf, len, source == SRC_SD ? N_("> Choisir le fichier") : N_("> Émettre")); break;
     }
 }
 
@@ -553,29 +554,29 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
     if (page == T_FILES) {
         const char *sep = strrchr(dir, '/');
         char title[24];
-        ui_fit_preview(&gfx_font_medium, title, sizeof(title), dir[0] ? (sep ? sep + 1 : dir) : "Carte SD",
+        ui_fit_preview(&gfx_font_medium, title, sizeof(title), dir[0] ? (sep ? sep + 1 : dir) : N_("Carte SD"),
                        GFX_WIDTH - 8);  /* The folder shown */
         ui_title(fb, title);
         if (list_pending != LIST_NONE)
-            ui_wrapped(fb, 70, &gfx_font_small, "Lecture de la carte...", 3);
+            ui_wrapped(fb, 70, &gfx_font_small, N_("Lecture de la carte..."), 3);
         else if (n_files)
             ui_list(fb, n_files, file_sel, file_label);
         else
-            ui_wrapped(fb, 70, &gfx_font_small, "Ni dossier ni fichier .WAV ici", 3);
-        ui_footer(fb, ! n_files ? "G : retour" : file_is_dir[file_sel] ? "G : retour  D : ouvrir"
-                                                                        : "G : retour  D : émettre");
+            ui_wrapped(fb, 70, &gfx_font_small, N_("Ni dossier ni fichier .WAV ici"), 3);
+        ui_footer(fb, ! n_files ? N_("G : retour") : file_is_dir[file_sel] ? N_("G : retour  D : ouvrir")
+                                                                              : N_("G : retour  D : émettre"));
         return;
     }
     if (page == T_ON_AIR) {
-        ui_title(fb, "Radio pirate");
+        ui_title(fb, N_("Radio pirate"));
         gfx_fill_rect(fb, 6, UI_TITLE_H + 4, GFX_WIDTH - 12, 40, GFX_BLACK);
-        gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 8, &gfx_font_large, "ÉMISSION", GFX_WHITE, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 8, &gfx_font_large, N_("ÉMISSION"), GFX_WHITE, GFX_ALIGN_CENTER);
         int y = UI_TITLE_H + 50;
         mhz(f, sizeof(f), FREQS[freq_i]);
         snprintf(text, sizeof(text), "%s  NFM", f);
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 24;
-        snprintf(text, sizeof(text), "%d dBm, excursion %s kHz", POWERS[power_i].dbm, DEVIATION_TEXTS[deviation_i]);
+        snprintf(text, sizeof(text), _("%d dBm, excursion %s kHz"), POWERS[power_i].dbm, DEVIATION_TEXTS[deviation_i]);
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 18;
         ui_fit_preview(&gfx_font_small, text, sizeof(text), source == SRC_SD ? files[file_sel] : SOURCES[source],
@@ -589,10 +590,10 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         else
             snprintf(text, sizeof(text), "%lu:%02lu (10 min max)", (unsigned long)(s / 60), (unsigned long)(s % 60));
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-        ui_footer(fb, "G : arrêter");
+        ui_footer(fb, N_("G : arrêter"));
         return;
     }
-    ui_title(fb, "Radio pirate");
+    ui_title(fb, N_("Radio pirate"));
     int y = UI_TITLE_H + 2;
     for (int i = 0; i < N_ROWS; ++i, y += 18) {
         row_text(i, text, sizeof(text));
@@ -605,12 +606,12 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
     }
     y += 3;
     if (page == T_WAIT)
-        gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, "Attente du réseau...", GFX_BLACK, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, N_("Attente du réseau..."), GFX_BLACK, GFX_ALIGN_CENTER);
     else if (status[0])
         ui_wrapped(fb, y, &gfx_font_small, status, 2);
     else
-        ui_wrapped(fb, y, &gfx_font_small, "ISM 433 MHz : essais courts", 1);
-    ui_footer(fb, row == ROW_START ? "G : retour  D : valider" : "Ailes : -  +");
+        ui_wrapped(fb, y, &gfx_font_small, N_("ISM 433 MHz : essais courts"), 1);
+    ui_footer(fb, row == ROW_START ? N_("G : retour  D : valider") : N_("Ailes : -  +"));
 }
 
 static bool tx_calm(void) {
@@ -618,7 +619,7 @@ static bool tx_calm(void) {
 }
 
 const app_t app_pirate_radio = {
-    .name = "Radio pirate",
+    .name = N_("Radio pirate"),
     .start = tx_start,
     .buttons = tx_buttons,
     .task = tx_task,
@@ -933,10 +934,10 @@ static bool rx_task(absolute_time_t now) {
 static void rx_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[48], f[24];
-    ui_title(fb, "Écoute pirate");
+    ui_title(fb, N_("Écoute pirate"));
     if (! listening) {
-        ui_wrapped(fb, 70, &gfx_font_small, rx_waiting ? "Attente du réseau..." : "Radio occupée", 2);
-        ui_footer(fb, rx_waiting ? "G : retour" : "G : retour  D : réessayer");
+        ui_wrapped(fb, 70, &gfx_font_small, rx_waiting ? N_("Attente du réseau...") : N_("Radio occupée"), 2);
+        ui_footer(fb, rx_waiting ? N_("G : retour") : N_("G : retour  D : réessayer"));
         return;
     }
     int y = UI_TITLE_H + 4;
@@ -944,36 +945,36 @@ static void rx_render(uint8_t *fb, absolute_time_t now) {
     snprintf(text, sizeof(text), "%s  NFM", f);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_CENTER);
     y += 24;
-    snprintf(text, sizeof(text), "Signal : %d dBm", rssi);
+    snprintf(text, sizeof(text), _("Signal : %d dBm"), rssi);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     y += 17;
     ui_gauge(fb, 20, y, GFX_WIDTH - 40, 8, rssi < -110 ? 0 : rssi > -30 ? 80 : rssi + 110, 80);
     y += 14;
     bool carrier = rssi >= SQUELCH_DBM;
     if (! carrier) {
-        gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, "Pas d'émission", GFX_BLACK, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, N_("Pas d'émission"), GFX_BLACK, GFX_ALIGN_CENTER);
     } else {
         long afc_hz = (long)((int64_t)afc * radio_get_xosc() >> 16);
-        snprintf(text, sizeof(text), "Correction : %+ld Hz", afc_hz);
+        snprintf(text, sizeof(text), _("Correction : %+ld Hz"), afc_hz);
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 18;
         /* Only a measure of a real tone is shown (a clear peak, and a level above the noise) */
         if (shown.valid && shown.carrier && shown.purity_pct >= 50 && shown.level_pct >= 5)
-            snprintf(text, sizeof(text), "Tonalité : %lu Hz", (unsigned long)shown.tone_hz);
+            snprintf(text, sizeof(text), _("Tonalité : %lu Hz"), (unsigned long)shown.tone_hz);
         else
-            snprintf(text, sizeof(text), "Tonalité : -");
+            snprintf(text, sizeof(text), N_("Tonalité : -"));
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         y += 18;
         if (shown.valid && shown.carrier)
-            snprintf(text, sizeof(text), "Niveau %lu %%  Cycle %lu %%", (unsigned long)shown.level_pct,
+            snprintf(text, sizeof(text), _("Niveau %lu %%  Cycle %lu %%"), (unsigned long)shown.level_pct,
                      (unsigned long)shown.duty_pct);
         else
-            snprintf(text, sizeof(text), "Niveau : -");
+            snprintf(text, sizeof(text), N_("Niveau : -"));
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     }
-    gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 131, &gfx_font_small, squelch ? "Silencieux : oui" : "Silencieux : non",
-             GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_footer(fb, "Flancs : canal  D : silencieux");
+    gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 131, &gfx_font_small,
+             squelch ? N_("Silencieux : oui") : N_("Silencieux : non"), GFX_BLACK, GFX_ALIGN_CENTER);
+    ui_footer(fb, N_("Flancs : canal  D : silencieux"));
 }
 
 static bool rx_calm(void) {
@@ -981,7 +982,7 @@ static bool rx_calm(void) {
 }
 
 const app_t app_pirate_listen = {
-    .name = "Écouter la radio pirate",
+    .name = N_("Écouter la radio pirate"),
     .start = rx_start,
     .buttons = rx_buttons,
     .task = rx_task,

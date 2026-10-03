@@ -9,6 +9,7 @@
 
 #include "credits.h"
 #include "gfx.h"
+#include "i18n.h"
 
 #define TITLE_H 28
 #define FOOTER_Y 180
@@ -29,14 +30,19 @@ typedef struct {
 
 /* The contacts are the public pages that each one chose to show (GitHub account of the commits, association sites) */
 static const credit_t CREDITS[] = {
-    {hip_bw, 40, 148, 140, true, NULL, "Hack In Provence", "L'association qui soutient\nle projet et organise SecSea.", "hackinprovence.fr"},
-    {secsea_bw, 18, 172, 200, false, NULL, "SecSea 2026", "L'année de sortie du badge.", "x.com/SecSeaConf"},
-    {NULL, 0, 0, 0, false, "PB", "Miaou", "Pierre-Antoine Brameret.\nA posé toutes les bases\ndu projet : écran, radio, son.", "github.com/Miaou"},
-    {NULL, 0, 0, 0, false, "PG", "Paul Ganelon", "Instigateur du projet.", "linkedin.com/in/paulganelon"},
-    {NULL, 0, 0, 0, false, "CC", "Christophe Chaloin", "Première version\nhardware du badge.", "linkedin.com/in/christophe-chaloin-1433851"},
-    {NULL, 0, 0, 0, false, "CB", "Cédric Beranger", "A fait la version 1.1\nde la carte.", ""},
-    {NULL, 0, 0, 0, false, "T", "Tristus1er", "Le code des applications :\nmenus, médias, jeux,\nradio, extensions.", "github.com/Tristus1er"},
-    {NULL, 0, 0, 0, false, "+", "Et vous tous !", "Toutes les personnes qui\nont aidé et que l'on aurait\npu oublier. Merci !", "github.com/HackInProvence"},
+    {hip_bw, 40, 148, 140, true, NULL, "Hack In Provence",
+     N_("L'association qui soutient\nle projet et organise SecSea."), "hackinprovence.fr"},
+    {secsea_bw, 18, 172, 200, false, NULL, "SecSea 2026", N_("L'année de sortie du badge."), "x.com/SecSeaConf"},
+    {NULL, 0, 0, 0, false, "PB", "Miaou",
+     N_("Pierre-Antoine Brameret.\nA posé toutes les bases\ndu projet : écran, radio, son."), "github.com/Miaou"},
+    {NULL, 0, 0, 0, false, "PG", "Paul Ganelon", N_("Instigateur du projet."), "linkedin.com/in/paulganelon"},
+    {NULL, 0, 0, 0, false, "CC", "Christophe Chaloin",
+     N_("Première version\nhardware du badge."), "linkedin.com/in/christophe-chaloin-1433851"},
+    {NULL, 0, 0, 0, false, "CB", "Cédric Beranger", N_("A fait la version 1.1\nde la carte."), ""},
+    {NULL, 0, 0, 0, false, "T", "Tristus1er",
+     N_("Le code des applications :\nmenus, médias, jeux,\nradio, extensions."), "github.com/Tristus1er"},
+    {NULL, 0, 0, 0, false, "+", N_("Et vous tous !"),
+     N_("Toutes les personnes qui\nont aidé et que l'on aurait\npu oublier. Merci !"), "github.com/HackInProvence"},
 };
 #define N_CREDITS ((int)(sizeof(CREDITS) / sizeof(CREDITS[0])))
 
@@ -86,7 +92,7 @@ void credits_render(uint8_t *fb, int page) {
     char title[24];
     gfx_clear(fb, GFX_WHITE);
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
-    snprintf(title, sizeof(title), "Crédits %d/%d", page + 1, N_CREDITS);
+    snprintf(title, sizeof(title), _("Crédits %d/%d"), page + 1, N_CREDITS);
     gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
 
     /* The organizations have the logo of the cicada, the people their initials */
@@ -103,7 +109,7 @@ void credits_render(uint8_t *fb, int page) {
     y += font->height + 2;
 
     char line[48];
-    for (const char *t = c->role; *t; ) {
+    for (const char *t = tr(c->role); *t; ) {  /* Translated before it is cut in lines */
         const char *end = strchr(t, '\n');
         size_t n = end ? (size_t)(end - t) : strlen(t);
         if (n >= sizeof(line))
@@ -142,5 +148,6 @@ void credits_render(uint8_t *fb, int page) {
     }
 
     gfx_fill_rect(fb, 0, FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, "Flancs : défiler  G : retour", GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, N_("Flancs : défiler  G : retour"), GFX_BLACK,
+             GFX_ALIGN_CENTER);
 }

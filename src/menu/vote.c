@@ -15,6 +15,7 @@
 #include "pico/rand.h"
 
 #include "app.h"
+#include "i18n.h"
 #include "net.h"
 
 #define MAX_ANSWERS 5
@@ -30,12 +31,12 @@ typedef struct {
 } question_t;
 
 static const question_t QUESTIONS[] = {
-    {"Ce talk vous a plu ?", 4, {"Oui !", "Assez", "Bof", "Non"}},
-    {"Note du talk", 5, {"1", "2", "3", "4", "5"}},
-    {"Niveau technique ?", 3, {"Trop simple", "Parfait", "Trop dur"}},
-    {"Meilleur talk du jour ?", 4, {"Talk 1", "Talk 2", "Talk 3", "Talk 4"}},
-    {"Pause : café ou thé ?", 3, {"Café", "Thé", "Rien"}},
-    {"Revenir l'an prochain ?", 2, {"Oui !", "Non"}},
+    {N_("Ce talk vous a plu ?"), 4, {N_("Oui !"), N_("Assez"), N_("Bof"), N_("Non")}},
+    {N_("Note du talk"), 5, {"1", "2", "3", "4", "5"}},
+    {N_("Niveau technique ?"), 3, {N_("Trop simple"), N_("Parfait"), N_("Trop dur")}},
+    {N_("Meilleur talk du jour ?"), 4, {N_("Talk 1"), N_("Talk 2"), N_("Talk 3"), N_("Talk 4")}},
+    {N_("Pause : café ou thé ?"), 3, {N_("Café"), N_("Thé"), N_("Rien")}},
+    {N_("Revenir l'an prochain ?"), 2, {N_("Oui !"), N_("Non")}},
 };
 #define N_QUESTIONS ((int)(sizeof(QUESTIONS) / sizeof(QUESTIONS[0])))
 
@@ -180,16 +181,16 @@ static bool voter_task(absolute_time_t now) {
 }
 
 static void voter_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s%s", QUESTIONS[heard_question].answers[i], i == my_answer ? "   (mon vote)" : "");
+    snprintf(buf, len, "%s%s", tr(QUESTIONS[heard_question].answers[i]), i == my_answer ? _("   (mon vote)") : "");
 }
 
 static void voter_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
-    ui_title(fb, "Vote");
+    ui_title(fb, N_("Vote"));
     if (! vote_open()) {
-        ui_lines(fb, 60, &gfx_font_small, heard_session ? "Le vote est fermé.\nMerci !" :
-                 "Aucun vote en cours.\nLes questions des\norganisateurs arrivent ici.");
-        ui_footer(fb, "G : retour");
+        ui_lines(fb, 60, &gfx_font_small, heard_session ? N_("Le vote est fermé.\nMerci !") :
+                 N_("Aucun vote en cours.\nLes questions des\norganisateurs arrivent ici."));
+        ui_footer(fb, N_("G : retour"));
         return;
     }
     char fitted[48];
@@ -208,11 +209,11 @@ static void voter_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, 8, y + 1, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
         }
     }
-    ui_footer(fb, my_answer >= 0 ? "G : retour  D : changer mon vote" : "G : retour  D : voter");
+    ui_footer(fb, my_answer >= 0 ? N_("G : retour  D : changer mon vote") : N_("G : retour  D : voter"));
 }
 
 const app_t app_vote = {
-    .name = "Vote",
+    .name = N_("Vote"),
     .start = voter_start,
     .buttons = voter_buttons,
     .task = voter_task,
@@ -269,9 +270,9 @@ static bool admin_task(absolute_time_t now) {
 static void admin_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     if (! my_session) {
-        ui_title(fb, "Vote : questions");
+        ui_title(fb, N_("Vote : questions"));
         ui_list(fb, N_QUESTIONS, admin_sel, admin_label);
-        ui_footer(fb, "G : retour  D : ouvrir le vote");
+        ui_footer(fb, N_("G : retour  D : ouvrir le vote"));
         return;
     }
     /* Histogram */
@@ -283,7 +284,7 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
         if (counts[i] > max)
             max = counts[i];
     char text[48];
-    snprintf(text, sizeof(text), "Vote : %d votant%s", n_voters, n_voters > 1 ? "s" : "");
+    snprintf(text, sizeof(text), n_voters > 1 ? _("Vote : %d votants") : _("Vote : %d votant"), n_voters);
     ui_title(fb, text);
     ui_fit(&gfx_font_small, text, sizeof(text), q->text, GFX_WIDTH - 6);
     gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 3, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
@@ -298,11 +299,11 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
         snprintf(label, sizeof(label), "%d", counts[i]);
         gfx_text(fb, 62 + w + 3, y + (row - gfx_font_small.height) / 2, &gfx_font_small, label, GFX_BLACK, GFX_ALIGN_LEFT);
     }
-    ui_footer(fb, "G : retour  D : fermer le vote");
+    ui_footer(fb, N_("G : retour  D : fermer le vote"));
 }
 
 const app_t app_vote_admin = {
-    .name = "Vote (admin)",
+    .name = N_("Vote (admin)"),
     .start = admin_start,
     .buttons = admin_buttons,
     .task = admin_task,
