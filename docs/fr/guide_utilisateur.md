@@ -65,7 +65,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
-| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
+| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations et luminosité des LEDs, démo de l'écran, écran OLED, Succès |
 | **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
@@ -421,7 +421,11 @@ sonde, brouilleur qui répète son code).
   flanc gauche : état précédent ; flanc droit ou aile droite : état suivant. Cette page fonctionne même en mode muet,
   et écoute la télécommande en permanence tant qu'elle est ouverte.
 - **Cigale** : active ou coupe le chant de la cigale.
-- **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, éteintes).
+- **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, scintillement,
+  rouge et or, éteintes).
+- **Luminosité LEDs** : 10, 25, 50, 75 ou 100 % (chaque appui passe au palier suivant). S'applique à toutes les
+  animations, aux jeux et aux LEDs envoyées par les organisateurs ; retenue par le badge. La Lampe garde sa propre
+  luminosité.
 - **Démo écran** : montre les possibilités de l'écran (noir et blanc, 4 gris, animation rapide).
 - **Écran OLED** : démos sur un petit écran OLED branché sur le port gauche (étoiles, cube 3D, cigale, texte, vidéo).
 - **Succès** : les succès obtenus et le niveau de votre cigale (voir ci-dessous).

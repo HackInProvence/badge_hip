@@ -44,12 +44,15 @@ typedef enum {
     LED_BREATH,
     LED_BLINK,  /* period: time on, period2: time off */
     LED_FADE,  /* period: fade in (black -> color), period2: fade out (color -> black) */
+    LED_ALTERNATE,  /* color and color2 in turn, the eyes in opposition; period: a whole cycle */
+    LED_SPARKLE,  /* the color at a random brightness per eye, a new one every period (0: every frame) */
 } leds_anim_kind_t;
 
 typedef struct {
     leds_anim_kind_t kind;
     //uint8_t level;
     uint32_t color;  /* BRGW in big endian where white is unused */
+    uint32_t color2;  /* LED_ALTERNATE: the second color */
     absolute_time_t tref;
     uint64_t period;  /* in µs */
     uint64_t period2;  /* in µs, LED_BLINK and LED_FADE */
@@ -89,6 +92,17 @@ void leds_anim_blink(uint32_t color, uint64_t on_us, uint64_t off_us);
 
 /** \brief Fades: from black to the color in \p in_us, then back to black in \p out_us, again and again. */
 void leds_anim_fade(uint32_t color, uint64_t in_us, uint64_t out_us);
+
+/** \brief Alternates \p color and \p color2, one eye with each; \p period in µs is a whole cycle. */
+void leds_anim_alternate(uint32_t color, uint32_t color2, uint64_t period);
+
+/** \brief Sparkles: the color at a random brightness on each eye, changed every \p period µs (0: every frame). */
+void leds_anim_sparkle(uint32_t color, uint64_t period);
+
+/** \brief Brightness of all the LEDs, in percent (clamped to 100), applied to every color pushed: the animations
+ * keep their colors and get dimmer. 100 at boot. */
+void leds_set_brightness(uint8_t percent);
+uint8_t leds_get_brightness(void);
 
 /** \brief Cancels previous animations on the LEDs, optionally shuts them down */
 void leds_cancel_anim(bool leds_off);

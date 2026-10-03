@@ -9,6 +9,7 @@
 
 #include "app.h"
 #include "i18n.h"
+#include "leds.h"
 #include "remote.h"
 #include "store.h"
 
@@ -40,6 +41,7 @@ static void change(int delta) {
 static void lamp_start(absolute_time_t now) {
     (void)now;
     on = true;
+    leds_set_brightness(100);  /* The lamp has its own brightness, not the one of Badge > Luminosité LEDs */
     apply();
 }
 
@@ -79,6 +81,7 @@ static void lamp_render(uint8_t *fb, absolute_time_t now) {
 }
 
 static void lamp_stop(void) {
+    leds_set_brightness(led_brightness());
     app_leds(0, 0, 0);
 }
 

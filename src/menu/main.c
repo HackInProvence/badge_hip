@@ -327,8 +327,26 @@ static uint8_t buttons_pressed(absolute_time_t now) {
 static bool sound_on = false;
 static unsigned led_mode = 0;
 static const char *LED_NAMES[] = {N_("éteintes"), N_("arc-en-ciel"), N_("respiration"), N_("battement"),
-                                   N_("clignotement"), N_("vert fixe")};
+                                   N_("clignotement"), N_("vert fixe"), N_("scintillement"), N_("rouge et or")};
 #define N_LED_MODES (sizeof(LED_NAMES)/sizeof(LED_NAMES[0]))
+
+/* Brightness of all the LEDs (Badge > Luminosité LEDs), kept in the flash; the lamp sets its own (lamp.c) */
+static const uint8_t LED_BRIGHTNESS_STEPS[] = {10, 25, 50, 75, 100};
+
+unsigned led_brightness(void) {
+    uint8_t p = store_get()->leds_percent;
+    return p == 0 || p > 100 ? 100 : p;
+}
+
+/* The next step above the current brightness, back to the lowest after 100 % */
+static void next_led_brightness(void) {
+    size_t i = 0, n = sizeof(LED_BRIGHTNESS_STEPS);
+    while (i < n && LED_BRIGHTNESS_STEPS[i] <= led_brightness())
+        ++i;
+    store_get()->leds_percent = LED_BRIGHTNESS_STEPS[i % n];
+    store_changed();
+    leds_set_brightness(led_brightness());
+}
 
 static void set_sound(bool on) {
     sound_on = on;
@@ -351,6 +369,8 @@ static void set_leds(unsigned mode) {
     case 3: leds_anim_flashes(LED_RGB(255, 0, 0)); break;
     case 4: leds_anim_ook(LED_RGB(0, 64, 255), 500000); break;
     case 5: leds_anim_fixed(LED_RGB(0, 255, 0)); break;
+    case 6: leds_anim_sparkle(LED_RGB(255, 170, 50), 120000); break;  /* Amber, like the sun on the cicadas */
+    case 7: leds_anim_alternate(LED_RGB(255, 0, 0), LED_RGB(255, 170, 0), 600000); break;  /* Occitan colors */
     default: leds_cancel_anim(true); break;
     }
 }
@@ -385,6 +405,7 @@ typedef enum {
     M_REMOTE_TOGGLE,  /* Settings: obey the remote commands */
     M_MUTE_TOGGLE,  /* Settings: mute mode */
     M_ADMIN_OFF,  /* Admin menu: leave the admin mode */
+    M_LED_BRIGHTNESS,  /* Badge: brightness of the LEDs */
     N_ITEMS,
 } menu_item_t;
 #define M_APP(id) (64 + (id))  /* The applications (apps.h) in the menus */
@@ -630,6 +651,7 @@ static void item_label(int item, char *buf, size_t len) {
     switch (item) {
     case M_SOUND: snprintf(buf, len, _("Cigale : %s"), sound_on ? _("activée") : _("coupée")); break;
     case M_LEDS: snprintf(buf, len, _("LEDs : %s"), tr(LED_NAMES[led_mode])); break;
+    case M_LED_BRIGHTNESS: snprintf(buf, len, _("Luminosité LEDs : %u %%"), led_brightness()); break;
     case M_SCREEN_DEMO: snprintf(buf, len, N_("Démo écran")); break;
     case M_VIDEO: snprintf(buf, len, N_("Vidéos (carte SD)")); break;
     case M_MUSIC: snprintf(buf, len, N_("Musique (carte SD)")); break;
@@ -710,8 +732,8 @@ static const submenu_t SUBMENUS[] = {
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
     {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
-    {N_("Badge"), 8, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
-                  M_APP(APP_ACHIEVEMENTS)}},
+    {N_("Badge"), 9, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_LED_BRIGHTNESS,
+                  M_SCREEN_DEMO, M_OLED, M_APP(APP_ACHIEVEMENTS)}},
     {N_("Réglages"), 7, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE)}},
     {N_("Admin"), 15, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
@@ -1913,6 +1935,9 @@ static void validate(void) {
     case M_LEDS:
         set_leds(led_mode + 1);
         break;
+    case M_LED_BRIGHTNESS:
+        next_led_brightness();
+        break;
     case M_SCREEN_DEMO:
         app = A_START_SCREEN_DEMO;
         break;
@@ -2341,6 +2366,7 @@ int main() {
     display_init();
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
     i18n_init();  /* The language of the texts */
+    leds_set_brightness(led_brightness());
     if (store_get()->asleep == STORE_ASLEEP)
         sleep_mode();  /* Put to sleep by an admin: until the manual unlock (it reboots) */
     radio_tools_init();
