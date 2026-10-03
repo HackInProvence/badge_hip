@@ -46,6 +46,8 @@ static bool share_task(absolute_time_t now) {
 static void own_battery(char *buf, size_t len) {
     if (battery_calibrated() && battery_mv())
         snprintf(buf, len, "%u,%02u V  %d %%", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent());
+    else if (battery_percent() >= 0)
+        snprintf(buf, len, "ADC %u  ~%d %%", battery_raw(), battery_percent());  /* Automatic calibration */
     else
         snprintf(buf, len, _("ADC %u (non calibrée)"), battery_raw());
 }
@@ -124,6 +126,8 @@ static bool view_task(absolute_time_t now) {
 void battradio_text(const social_neighbour_t *c, char *buf, size_t len) {
     if (c->batt_mv)
         snprintf(buf, len, "%d %%%s", battery_percent_of_mv(c->batt_mv), c->batt_usb ? " USB" : "");
+    else if (c->batt_est >= 0)
+        snprintf(buf, len, "~%d %%%s", c->batt_est, c->batt_usb ? " USB" : "");
     else
         snprintf(buf, len, "ADC %u%s", c->batt_raw, c->batt_usb ? " USB" : "");
 }

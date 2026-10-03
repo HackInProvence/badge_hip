@@ -15,7 +15,7 @@ extern const app_t app_image_send, app_image_recv, app_crypto, app_battle, app_h
     app_announces, app_announce_admin, app_reset, app_battcal, app_pirate_listen, app_smuggler_admin, app_werewolf_admin;
 extern const app_t app_werewolf, app_assassin, app_tug, app_gamebook, app_rtttl,
     app_pirate_radio, app_demo, app_smuggler, app_skills, app_achievements, app_lang,
-    app_batt_share, app_batt_view;
+    app_batt_share, app_batt_view, app_battauto;
 
 const app_t *const APPS[APP_COUNT] = {
     [APP_LAMP] = &app_lamp,
@@ -71,4 +71,5 @@ const app_t *const APPS[APP_COUNT] = {
     [APP_LANG] = &app_lang,
     [APP_BATT_SHARE] = &app_batt_share,
     [APP_BATT_VIEW] = &app_batt_view,
+    [APP_BATT_AUTO] = &app_battauto,
 };

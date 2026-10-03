@@ -21,6 +21,7 @@
 #define BEACON_LEN2 16  /* ...then (newer firmwares) skills (4 bytes), level */
 #define BEACON_LEN3 21  /* ...then, when shared, the battery: raw ADC (2 bytes), mV (2 bytes, 0: not calibrated), flags */
 #define BATT_USB 0x01
+#define BATT_EST 0x02  /* No calibration in mV, an estimate of the automatic calibration: its % instead of the mV */
 #define BEACON_PERIOD_MS 2000
 #define BEACON_JITTER_MS 500
 #define NEIGHBOUR_TIMEOUT_MS 15000
@@ -236,9 +237,12 @@ static void handle_beacon(const net_packet_t *packet) {
         nb->pub.batt_raw = p[16] | p[17] << 8;
         nb->pub.batt_mv = p[18] | p[19] << 8;
         nb->pub.batt_usb = p[20] & BATT_USB;
+        nb->pub.batt_est = (p[20] & BATT_EST) && ! nb->pub.batt_mv && p[18] <= 100 ? p[18] : -1;
+        if (nb->pub.batt_est >= 0)
+            nb->pub.batt_mv = 0;
         /* For the PC (tools/battery_log.py): the battery of every cicada heard */
-        printf("battery: %08lX %s raw %u mv %u usb %u rssi %d\n", (unsigned long)id, nb->pub.name, nb->pub.batt_raw,
-               nb->pub.batt_mv, nb->pub.batt_usb, rssi);
+        printf("battery: %08lX %s raw %u mv %u usb %u rssi %d est %d\n", (unsigned long)id, nb->pub.name,
+               nb->pub.batt_raw, nb->pub.batt_mv, nb->pub.batt_usb, rssi, nb->pub.batt_est);
     }
     nb->last_seen = now;
     uint32_t common = nb->pub.skills & store_get()->skills;
@@ -281,6 +285,11 @@ static void send_beacon(void) {
         p[18] = mv;
         p[19] = mv >> 8;
         p[20] = battery_charging() ? BATT_USB : 0;
+        if (! mv && battery_percent() >= 0) {  /* The estimate of the automatic calibration, in place of the mV */
+            p[18] = battery_percent();
+            p[19] = 0;
+            p[20] |= BATT_EST;
+        }
         len = BEACON_LEN3;
     }
     if (net_send(NET_BEACON, p, len, NET_LOUD))  /* +10 dBm: at -10 dBm, ~-97 dBm at 1 m (edge of the sensitivity) */

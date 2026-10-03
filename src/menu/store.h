@@ -86,6 +86,12 @@ typedef struct {
     uint8_t batt_share;  /* STORE_BATT_SHARE: the battery level is in the beacons (Réglages > Batterie par radio) */
     uint8_t rtttl_leds;  /* Sonneries: brightness of the LEDs, index + 1 in rtttl.c LED_LEVELS (0, 0xFF: default) */
     uint8_t admin_ttl;  /* Admin: hops of the relay of its messages (relay.h), + 1 (0, 0xFF: default) */
+    /* Automatic calibration of the battery in progress (battery.c, Admin > Batterie (auto)): its step, the ADC at the
+     * end of the charge, the lowest ADC on battery since (saved as it goes down: the last one before the battery
+     * runs out is the empty end) */
+    uint8_t batt_auto_step;  /* BATTERY_AUTO_*, other values: none */
+    uint16_t batt_auto_full;
+    uint16_t batt_auto_min;
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1
@@ -142,6 +148,10 @@ typedef struct {
     /* Calibration of the battery measure (battery.c): 2 points (ADC raw value, millivolts), 0 = not set */
     uint16_t battery_raw[2];
     uint16_t battery_mv[2];
+    /* Automatic calibration (battery.c): the ADC at the end of the charge and when the battery ran out; 0 or 0xFFFF
+     * (a sector of an older firmware): not done */
+    uint16_t battery_auto_full;
+    uint16_t battery_auto_empty;
 } store_factory_t;
 
 /** \brief The factory settings (all 0 when never set). */

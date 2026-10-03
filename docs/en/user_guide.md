@@ -605,7 +605,8 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Pirate radio** (Radio pirate) | sends a melody, a 1 kHz tone or a WAV file of the SD card in FM on 433 MHz, to listen to with a Flipper Zero (Sub-GHz > Read RAW, FM476, sound on), a Portapack, an SDR or another cicada; settings: deviation (47.6 kHz "Flipper" by default, 5 kHz for an NFM receiver), sound gain x1 / x2 / x4 (see [pirate_radio.md](pirate_radio.md)); low power, short tests |
 | **Demo mode** (Mode démo) | for a stand: the badge shows its features in a loop (see below) |
 | **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown by the name tag |
-| **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged in a computer (a charger alone is not seen) |
+| **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged in a computer (a charger alone is not seen); "~72 %": the estimate of a badge calibrated automatically |
+| **Battery (auto)** (Batterie (auto)) | automatic calibration of the battery, without a multimeter: R: start; 1. charge on USB until full (measure steady for 10 min, the badge notes it), 2. unplug and let the badge **switch off by itself** (not with the switch, no reboot), 3. at the next start, both ends (full, empty) are kept in the factory settings; the level is then estimated ("~72 %", battery icon, Info) when there is no calibration with a multimeter. R during the steps: stop |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme again |
 
 **Cicada LEDs** (LEDs des cigales): a list of settings; sides: choose the row.

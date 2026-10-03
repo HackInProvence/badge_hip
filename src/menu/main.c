@@ -715,12 +715,13 @@ static const submenu_t SUBMENUS[] = {
                   M_APP(APP_ACHIEVEMENTS)}},
     {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
-    {N_("Admin"), 16, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {N_("Admin"), 17, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_SMUGGLER_ADMIN),
                    M_APP(APP_WEREWOLF_ADMIN), M_APP(APP_RESET),
                    M_APP(APP_BATTCAL),
                    M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE), M_APP(APP_BATT_VIEW),
+                   M_APP(APP_BATT_AUTO),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
@@ -786,7 +787,7 @@ static void sub_label(int i, char *buf, size_t len) {
 
 /* Battery in the title bar (white on black), 4 bars */
 static int battery_bars(void) {
-    return battery_mv() ? (battery_percent() + 12) / 25 : -1;
+    return battery_percent() >= 0 ? (battery_percent() + 12) / 25 : -1;
 }
 
 static void draw_battery(void) {
@@ -1392,6 +1393,8 @@ static void render_info(void) {
     char bat[32];
     if (battery_mv())
         snprintf(bat, sizeof(bat), "%u,%02u V (%d %%)", battery_mv() / 1000, battery_mv() % 1000 / 10, battery_percent());
+    else if (battery_percent() >= 0)
+        snprintf(bat, sizeof(bat), _("~%d %% (estimation)"), battery_percent());  /* Automatic calibration */
     else
         snprintf(bat, sizeof(bat), _("non calibrée"));
     /* 6 lines fit above the footer: the measured crystal and the default of the firmware are on the serial port ("!") */
@@ -2362,6 +2365,7 @@ int main() {
     games_init(&GAME_HOOKS, store_get()->game_records);
     puzzles_init(&GAME_HOOKS, store_get()->puzzle_records);
     battery_init();
+    battery_auto_boot();  /* A discharge of the automatic calibration that ended with the battery empty */
     ir_init();
     oled_init();
     printf("version: " BADGE_VERSION " (" BADGE_BUILD ")\n");

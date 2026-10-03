@@ -73,4 +73,46 @@ int battery_percent_of_mv(uint16_t mv);
 /** \brief Connected to a computer on USB (then charging, or charged). */
 bool battery_charging(void);
 
+/* ------ Automatic calibration: the ADC at the end of the charge and when the battery runs out ------
+ * Admin > Batterie (auto): started once, then 1. charged on USB until the measure stops rising (the full end),
+ * 2. unplugged, the badge runs until its battery is empty (the lowest measure is saved as it goes down), 3. at the
+ * next start that follows a real power off (not a reboot of the software) after a fall of at least
+ * BATTERY_AUTO_MIN_SPAN, the empty end is confirmed: both are saved in the factory settings. Then battery_percent()
+ * gives an estimate (the Li-ion curve stretched between the two ends) when there is no manual calibration. */
+
+#define BATTERY_AUTO_FULL_MS (10 * 60 * 1000)  /* On USB, the measure no longer rising for this long: full */
+#define BATTERY_AUTO_MIN_SPAN 400  /* ADC steps between full and empty (~0.5 V) to accept the empty end */
+#define BATTERY_AUTO_STEP 6  /* The lowest measure is saved each time it goes down by this much (~8 mV) */
+
+enum {
+    BATTERY_AUTO_NONE = 0,
+    BATTERY_AUTO_CHARGING = 0xA1,  /* Step 1: on USB until full */
+    BATTERY_AUTO_UNPLUG = 0xA2,  /* Full: waiting to be unplugged */
+    BATTERY_AUTO_DISCHARGING = 0xA3,  /* Step 2: on battery until it runs out */
+};
+
+/** \brief Call once at the start, after store_init(): concludes a discharge that ended with the battery empty. */
+void battery_auto_boot(void);
+
+/** \brief Starts (again) the automatic calibration. */
+void battery_auto_start(void);
+
+/** \brief Stops the automatic calibration in progress (the ends already saved are kept). */
+void battery_auto_cancel(void);
+
+/** \brief The step in progress (BATTERY_AUTO_*). */
+uint8_t battery_auto_step(void);
+
+/** \brief The ends saved (factory settings): true when both are known. */
+bool battery_auto_ends(uint16_t *full, uint16_t *empty);
+
+/** \brief The ADC at the end of the charge, the lowest on battery, of the calibration in progress (0: not yet). */
+void battery_auto_progress(uint16_t *full, uint16_t *min);
+
+/** \brief Forget the ends saved. \return true when saved */
+bool battery_auto_clear(void);
+
+/** \brief battery_percent() is an estimate of the automatic calibration (no manual calibration). */
+bool battery_percent_estimated(void);
+
 #endif /* _BATTERY_H */

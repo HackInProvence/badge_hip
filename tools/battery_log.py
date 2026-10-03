@@ -36,7 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from badge_remote import Badge, find_port  # noqa: E402
 
-LINE = re.compile(r'^battery: ([0-9A-F]{8}) (.*?) raw (\d+) mv (\d+) usb (\d) rssi (-?\d+)$')
+LINE = re.compile(r'^battery: ([0-9A-F]{8}) (.*?) raw (\d+) mv (\d+) usb (\d) rssi (-?\d+)(?: est (-?\d+))?$')
 
 
 def calibration(text):
@@ -73,7 +73,7 @@ def main():
     with open(out, 'a', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         if new:
-            w.writerow(['time', 'elapsed_min', 'id', 'name', 'raw', 'mv', 'mv_cal', 'usb', 'rssi'])
+            w.writerow(['time', 'elapsed_min', 'id', 'name', 'raw', 'mv', 'mv_cal', 'usb', 'rssi', 'percent_est'])
         print(f'listening on {port}, writing {out} (Ctrl+C to stop)')
         try:
             while True:
@@ -81,7 +81,8 @@ def main():
                     m = LINE.match(badge.logs.get())
                     if not m:
                         continue
-                    bid, name, raw, mv, usb, rssi = m.groups()
+                    bid, name, raw, mv, usb, rssi, est = m.groups()
+                    est = int(est) if est is not None else -1  # The estimate of its automatic calibration (%)
                     if args.name and not (name.startswith(args.name) or bid.startswith(args.name.upper())):
                         continue
                     now = time.time()
@@ -91,9 +92,10 @@ def main():
                     mv_cal = to_mv(int(raw)) if to_mv else ''
                     elapsed = (now - start) / 60
                     w.writerow([datetime.datetime.now().isoformat(timespec='seconds'), f'{elapsed:.1f}', bid, name,
-                                raw, mv, mv_cal, usb, rssi])
+                                raw, mv, mv_cal, usb, rssi, est if est >= 0 else ''])
                     f.flush()
-                    level = f'{mv} mV' if int(mv) else (f'~{mv_cal} mV (cal)' if mv_cal != '' else 'not calibrated')
+                    level = f'{mv} mV' if int(mv) else (f'~{mv_cal} mV (cal)' if mv_cal != '' else
+                                                        f'~{est} % (auto)' if est >= 0 else 'not calibrated')
                     print(f'{elapsed:7.1f} min  {name:<8} {bid}  ADC {raw:>4}  {level}  {"USB " if usb == "1" else ""}'
                           f'{rssi} dBm')
                 time.sleep(0.2)

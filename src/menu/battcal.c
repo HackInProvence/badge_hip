@@ -153,3 +153,72 @@ const app_t app_battcal = {
     .task = battcal_task,
     .render = battcal_render,
 };
+
+
+/* ------ Admin > Batterie (auto): the automatic calibration (battery.h), its steps ------ */
+
+static absolute_time_t auto_ts = 0;
+
+static void battauto_start(absolute_time_t now) {
+    auto_ts = now;
+}
+
+static bool battauto_buttons(const app_buttons_t *b, absolute_time_t now) {
+    (void)now;
+    if (b->pressed & UI_BTN_A)
+        return false;
+    if (b->pressed & UI_BTN_B) {
+        if (battery_auto_step() == BATTERY_AUTO_NONE)
+            battery_auto_start();
+        else
+            battery_auto_cancel();
+    }
+    return true;
+}
+
+static bool battauto_task(absolute_time_t now) {
+    if (absolute_time_diff_us(auto_ts, now) < 5000000)
+        return false;
+    auto_ts = now;  /* The measure and the step, again every 5 s */
+    return true;
+}
+
+static void battauto_render(uint8_t *fb, absolute_time_t now) {
+    (void)now;
+    char text[120];
+    uint16_t full, empty, min;
+    ui_title(fb, N_("Batterie (auto)"));
+    battery_auto_progress(&full, &min);
+    switch (battery_auto_step()) {
+    case BATTERY_AUTO_CHARGING:
+        snprintf(text, sizeof(text), _("1. Charger en USB\njusqu'au plein (mesure\nstable 10 min).\nADC : %u%s"),
+                 battery_raw(), battery_charging() ? "" : _(" (pas d'USB)"));
+        break;
+    case BATTERY_AUTO_UNPLUG:
+        snprintf(text, sizeof(text), _("Plein : ADC %u.\n2. Débrancher, puis\nlaisser le badge\ns'éteindre tout seul."),
+                 full);
+        break;
+    case BATTERY_AUTO_DISCHARGING:
+        snprintf(text, sizeof(text), _("2. Sur batterie : le\nlaisser s'éteindre seul\n(sans l'interrupteur).\n"
+                                       "Plein %u, plus bas %u"), full, min);
+        break;
+    default:
+        if (battery_auto_ends(&full, &empty))
+            snprintf(text, sizeof(text), _("Calibrée : plein ADC %u,\nvide ADC %u.\nEstimation : ~%d %%"), full,
+                     empty, battery_percent());
+        else
+            snprintf(text, sizeof(text), "%s", _("Pas encore calibrée.\nD : démarrer, puis\nsuivre les étapes."));
+        break;
+    }
+    ui_lines(fb, UI_TITLE_H + 10, &gfx_font_small, text);
+    ui_footer(fb, battery_auto_step() == BATTERY_AUTO_NONE ? N_("G : retour  D : démarrer")
+                                                          : N_("G : retour  D : arrêter"));
+}
+
+const app_t app_battauto = {
+    .name = N_("Batterie (auto)"),
+    .start = battauto_start,
+    .buttons = battauto_buttons,
+    .task = battauto_task,
+    .render = battauto_render,
+};

@@ -350,6 +350,12 @@ Les compétences des cartes reçues partent dans la ligne `CATEGORIES`.
 
 #### `tools/battery_log.py` — test d'autonomie de la batterie
 
+Un badge calibré automatiquement (Admin > Batterie (auto)) envoie aussi son estimation : colonne `percent_est` du CSV,
+« ~72 % (auto) » à l'écran. Le calibrage automatique enregistre l'ADC au plein (sur USB, mesure stable 10 min) et le
+plus bas atteint sur batterie, gardé au fil de la décharge dans la mémoire du badge ; il est validé au démarrage qui
+suit une vraie coupure (pas un redémarrage logiciel) après une baisse d'au moins 400 pas d'ADC (~0,5 V). Éteindre le
+badge à l'interrupteur pendant la décharge fausserait le bout « vide ».
+
 Le badge testé tourne sur sa batterie, loin de l'USB, avec Réglages > Batterie par radio : oui (ses balises portent sa
 batterie toutes les 2 s). Un autre badge branché au PC les entend et écrit `battery: <id> <nom> raw <ADC> mv <mV>
 usb <0|1> rssi <dBm>` ; le script garde un relevé par badge toutes les `--interval` secondes dans un CSV (heure,

@@ -67,6 +67,7 @@ typedef enum {
     APP_LANG,
     APP_BATT_SHARE,
     APP_BATT_VIEW,
+    APP_BATT_AUTO,
     APP_COUNT,
 } app_id_t;
 

@@ -46,6 +46,7 @@ typedef struct {
     uint16_t batt_raw;  /* ADC of its battery (0..4095), valid even when it is not calibrated */
     uint16_t batt_mv;  /* Its battery in mV, 0 when not calibrated (then only the raw value means something) */
     bool batt_usb;  /* Plugged in USB (charging) */
+    int8_t batt_est;  /* The estimate of its automatic calibration (%), -1: none */
 } social_neighbour_t;
 
 #define SOCIAL_MEETING_POINTS_MAX 200

@@ -352,6 +352,12 @@ The skills of the received cards go in the `CATEGORIES` line.
 
 #### `tools/battery_log.py` — battery life test
 
+A badge calibrated automatically (Admin > Battery (auto)) also sends its estimate: column `percent_est` of the CSV,
+"~72 % (auto)" on the screen. The automatic calibration records the ADC when full (on USB, measure steady for
+10 min) and the lowest one reached on battery, kept as the battery runs down in the memory of the badge; it is
+confirmed at the start that follows a real power cut (not a software reboot) after a fall of at least 400 ADC steps
+(~0.5 V). Switching the badge off with its switch during the discharge would give a wrong "empty" end.
+
 The badge under test runs on its battery, away from the USB, with Settings > Battery by radio: yes (its beacons carry
 its battery every 2 s). Another badge plugged in the PC hears them and writes `battery: <id> <name> raw <ADC> mv <mV>
 usb <0|1> rssi <dBm>`; the script keeps one sample per badge every `--interval` seconds in a CSV (time, elapsed
