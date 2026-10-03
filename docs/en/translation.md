@@ -12,8 +12,8 @@ with. The system is modular: adding a language means adding a file, without touc
   The choice is kept (even after a firmware update).
 - **Back to English** (a badge left in a language you can't read):
   1. press the **left wing (L) 5 times**: you come back to the main menu, whatever the page;
-  2. then the sides in turn, **left, right, left, right, left, right, left, right** (8 presses within 8 seconds,
-     without touching the wings).
+  2. then **hold the left wing for 5 seconds** (in the main menu: nothing else holds a wing there, and no presses
+     there can be mistaken for the admin mode sequence).
   The badge switches to English and shows "Language: English".
 - **From the serial port** (USB): the key `E` sets the badge to English, `N` goes to the next language.
 - The texts received from other badges (preset messages, announcements...) are shown in the language of each badge

@@ -856,7 +856,7 @@ are in [translation](translation.md).
 | Action | How |
 |---|---|
 | Choose the language | Settings > Language ("Langue / Language"): sides to choose, R to confirm |
-| Back to English from any language | left wing (L) **5 times** (back to the main menu), then the sides in turn **left, right** × 4 (8 presses within 8 s) |
+| Back to English from any language | left wing (L) **5 times** (back to the main menu), then the left wing **held 5 s** |
 | From the serial port | `E`: English; `N`: next language (log `i18n: language en (English)`) |
 | Screenshots of a language | `python tools/badge_screens.py --lang en`: `docs/screens/en/` and `docs/en/screens.md`, then the badge goes back to its language |
 | Add / fix a translation | `python tools/i18n.py update`, translate `src/menu/lang/<code>.po`, `python tools/i18n.py gen`, build |

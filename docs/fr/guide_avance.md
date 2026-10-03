@@ -859,7 +859,7 @@ dans [traduction](traduction.md).
 | Action | Comment |
 |---|---|
 | Choisir la langue | Réglages > Langue (« Langue / Language ») : flancs pour choisir, D pour valider |
-| Revenir à l'anglais depuis n'importe quelle langue | aile gauche (G) **5 fois** (retour au menu principal), puis les flancs en alternance **gauche, droit** × 4 (8 appuis en moins de 8 s) |
+| Revenir à l'anglais depuis n'importe quelle langue | aile gauche (G) **5 fois** (retour au menu principal), puis aile gauche **maintenue 5 s** |
 | Par le port série | `E` : anglais ; `N` : langue suivante (trace `i18n: language en (English)`) |
 | Captures d'écran d'une langue | `python tools/badge_screens.py --lang en` : `docs/screens/en/` et `docs/en/screens.md`, puis le badge revient à sa langue |
 | Ajouter / corriger une traduction | `python tools/i18n.py update`, traduire `src/menu/lang/<code>.po`, `python tools/i18n.py gen`, compiler |

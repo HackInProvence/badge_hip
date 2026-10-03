@@ -503,8 +503,8 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
 
   While asleep, any button wakes the badge up.
 - **Language** (Langue): French or English ("Langue / Language", each language written in itself; sides then right
-  wing). A badge left in a language you can't read: left wing 5 times (back to the main menu), then the sides
-  in turn left, right × 4: it switches to English. See [translation](translation.md).
+  wing). A badge left in a language you can't read: left wing 5 times (back to the main menu), then the left
+  wing held for 5 seconds: it switches to English. See [translation](translation.md).
 - **Remote: yes / no** (Télécommande : oui / non): the badge obeys (or not) the radio commands of the
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mute mode: yes / no** (Mode muet : oui / non): turns off the sound and the LEDs. The organizers can switch it on

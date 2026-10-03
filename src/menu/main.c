@@ -745,27 +745,11 @@ static bool admin_sequence(uint8_t flank, absolute_time_t now) {
     admin_keys[n + 1] = 0;
     return ! strcmp(admin_keys, ADMIN_SEQUENCE);
 }
-/* Sequence of the flanks in the main menu that sets the language back to English, for a badge left in a language
- * that the user can't read (docs: G five times to come back to the main menu, then the flanks left, right, left,
- * right... 8 times). Alternating: never done by moving in the menu; a wing pressed starts it again. */
-#define LANG_SEQUENCE "LRLRLRLR"
-static char lang_keys[sizeof(LANG_SEQUENCE)] = "";
-static absolute_time_t lang_keys_ts = 0;
-
-static bool lang_sequence(uint8_t flank, absolute_time_t now) {
-    size_t n = strlen(lang_keys);
-    if (n && absolute_time_diff_us(lang_keys_ts, now) > ADMIN_SEQUENCE_MS * 1000ll)
-        n = 0;  /* Too slow: start again */
-    if (n == sizeof(lang_keys) - 1) {
-        memmove(lang_keys, lang_keys + 1, n);
-        --n;
-    }
-    if (! n)
-        lang_keys_ts = now;
-    lang_keys[n] = flank == BTN_Y ? 'L' : 'R';
-    lang_keys[n + 1] = 0;
-    return ! strcmp(lang_keys, LANG_SEQUENCE);
-}
+/* The left wing held LANG_HOLD_MS in the main menu sets the language back to English, for a badge left in a language
+ * that the user can't read (docs: the left wing five times to come back to the main menu, then held 5 s). Nothing
+ * else holds a wing there, and no sequence of the flanks (the admin one) can start it. */
+#define LANG_HOLD_MS 5000
+static bool lang_hold_done = false;  /* Once per press */
 
 static int menu_level = 0;  /* 0: the themes, 1: the features of the theme */
 static int top_selected = 0;
@@ -2392,8 +2376,14 @@ int main() {
         uint8_t pressed = buttons_pressed(now);
         if (pressed)
             printf("buttons pressed: 0x%02x\n", pressed);
-        if (pressed & (BTN_A | BTN_B))
-            lang_keys[0] = 0;  /* A wing between the flanks: not the sequence of the language */
+        if (! (btn_stable & BTN_A)) {
+            lang_hold_done = false;
+        } else if (app == A_MENU && menu_level == 0 && ! lang_hold_done && btn_held_ms(BTN_A, now) >= LANG_HOLD_MS) {
+            lang_hold_done = true;
+            i18n_set(i18n_find("en"), true);  /* Back to English */
+            set_status(N_("Langue : English"));
+            redraw = true;
+        }
         if (demo_on || demo_leaving) {
             demo_task(now, pressed);
             pressed = 0;  /* The press stops the demo, it is not for the page shown */
@@ -2562,13 +2552,8 @@ int main() {
         } else if (pressed & (BTN_UP | BTN_DOWN)) {
             int delta = (pressed & BTN_UP) ? -1 : 1;
             if (app == A_MENU) {
-                bool lang_reset = menu_level == 0 && lang_sequence(pressed & (BTN_UP | BTN_DOWN), now);
                 if (menu_level == 0 && admin_sequence(pressed & (BTN_UP | BTN_DOWN), now)) {
                     set_admin(true);
-                } else if (lang_reset) {
-                    i18n_set(i18n_find("en"), true);  /* Back to English */
-                    top_selected = 0;
-                    set_status(N_("Langue : English"));
                 } else if (menu_level == 0)
                     top_selected = (top_selected + delta + N_SUBMENUS) % N_SUBMENUS;
                 else

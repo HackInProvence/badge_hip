@@ -12,8 +12,8 @@ commencer. Le système est modulaire : ajouter une langue, c'est ajouter un fich
   Le choix est gardé (même après une mise à jour du firmware).
 - **Retour à l'anglais** (badge resté dans une langue illisible) :
   1. appuyer **5 fois sur l'aile gauche (G)** : on revient au menu principal, quelle que soit la page ;
-  2. puis les flancs en alternance, **gauche, droit, gauche, droit, gauche, droit, gauche, droit** (8 appuis en
-     moins de 8 secondes, sans toucher aux ailes).
+  2. puis **maintenir l'aile gauche 5 secondes** (dans le menu principal ; rien d'autre n'y maintient une aile, et
+     aucune suite d'appuis ne s'y confond avec la séquence du mode admin).
   Le badge passe en anglais et affiche « Language: English ».
 - **Par le port série** (USB) : la touche `E` met le badge en anglais, `N` passe à la langue suivante.
 - Les textes reçus d'autres badges (messages prédéfinis, annonces...) sont affichés dans la langue de chaque badge

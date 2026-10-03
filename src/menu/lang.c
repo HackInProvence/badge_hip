@@ -5,7 +5,8 @@
 
 /* Réglages > Langue: the choice of the language of the texts (i18n.c, docs/fr/traduction.md). Each language is
  * written in itself ("English", "Français"), the title in all of them: a badge left in an unknown language can be
- * set back by anyone (and by the sequence of keys of main.c, or the key 'E' of the serial port: English). */
+ * set back by anyone (and to English by the left wing held 5 s in the main menu, main.c, or the key 'E' of the
+ * serial port). */
 
 #include <stdio.h>
 

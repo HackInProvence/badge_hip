@@ -491,8 +491,8 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 
   Pendant la veille, n'importe quel bouton réveille le badge.
 - **Langue** : français ou anglais (« Langue / Language », chaque langue écrite dans sa langue ; flancs puis aile
-  droite). Badge resté dans une langue illisible : aile gauche 5 fois (retour au menu principal), puis les flancs
-  en alternance gauche, droit × 4 : il repasse en anglais. Voir [traduction](traduction.md).
+  droite). Badge resté dans une langue illisible : aile gauche 5 fois (retour au menu principal), puis aile
+  gauche maintenue 5 secondes : il repasse en anglais. Voir [traduction](traduction.md).
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.
