@@ -73,16 +73,21 @@ int battery_percent_of_mv(uint16_t mv);
 /** \brief Connected to a computer on USB (then charging, or charged). */
 bool battery_charging(void);
 
-/* ------ Automatic calibration: the ADC at the end of the charge and when the battery runs out ------
- * Admin > Batterie (auto): started once, then 1. charged on USB until the measure stops rising (the full end),
- * 2. unplugged, the badge runs until its battery is empty (the lowest measure is saved as it goes down), 3. at the
- * next start that follows a real power off (not a reboot of the software) after a fall of at least
- * BATTERY_AUTO_MIN_SPAN, the empty end is confirmed: both are saved in the factory settings. Then battery_percent()
- * gives an estimate (the Li-ion curve stretched between the two ends) when there is no manual calibration. */
+/* ------ Automatic calibration: the battery life ------
+ * The ADC stays almost flat for most of the discharge: the charge left is estimated from the time on battery since
+ * the last full charge, against the battery life. Admin > Batterie (auto) measures it: started once, then
+ * 1. charged on USB until the measure stops rising, 2. unplugged, the badge runs until its battery is empty (the
+ * minutes on battery are saved every BATTERY_SAVE_MINUTES), 3. at the next start that follows a real power off (not
+ * a reboot of the software) after BATTERY_AUTO_MIN_LIFE minutes at least, the battery life is saved in the factory
+ * settings. Then battery_percent() gives an estimate (no manual calibration): 100 % after a full charge (the measure
+ * on USB stable BATTERY_AUTO_FULL_MS), minus the time on battery; unknown after a partial charge; at most
+ * BATTERY_LOW_PERCENT when the ADC fell BATTERY_FALL_RAW below its level when unplugged (the end is near). */
 
 #define BATTERY_AUTO_FULL_MS (10 * 60 * 1000)  /* On USB, the measure no longer rising for this long: full */
-#define BATTERY_AUTO_MIN_SPAN 400  /* ADC steps between full and empty (~0.5 V) to accept the empty end */
-#define BATTERY_AUTO_STEP 6  /* The lowest measure is saved each time it goes down by this much (~8 mV) */
+#define BATTERY_AUTO_MIN_LIFE 60  /* Minutes on battery at least to accept a battery life */
+#define BATTERY_SAVE_MINUTES 10  /* The minutes on battery are saved this often (flash writes) */
+#define BATTERY_FALL_RAW 100  /* ADC steps below the level when unplugged: the final fall */
+#define BATTERY_LOW_PERCENT 10
 
 enum {
     BATTERY_AUTO_NONE = 0,
@@ -103,13 +108,13 @@ void battery_auto_cancel(void);
 /** \brief The step in progress (BATTERY_AUTO_*). */
 uint8_t battery_auto_step(void);
 
-/** \brief The ends saved (factory settings): true when both are known. */
-bool battery_auto_ends(uint16_t *full, uint16_t *empty);
+/** \brief The battery life measured (factory settings), in minutes: true when known. */
+bool battery_auto_life(uint16_t *minutes);
 
-/** \brief The ADC at the end of the charge, the lowest on battery, of the calibration in progress (0: not yet). */
-void battery_auto_progress(uint16_t *full, uint16_t *min);
+/** \brief The minutes on battery of the calibration in progress (step 2). */
+uint16_t battery_auto_minutes(void);
 
-/** \brief Forget the ends saved. \return true when saved */
+/** \brief Forget the battery life measured. \return true when saved */
 bool battery_auto_clear(void);
 
 /** \brief battery_percent() is an estimate of the automatic calibration (no manual calibration). */

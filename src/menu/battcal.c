@@ -186,26 +186,27 @@ static bool battauto_task(absolute_time_t now) {
 static void battauto_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     char text[120];
-    uint16_t full, empty, min;
+    uint16_t life, m = battery_auto_minutes();
     ui_title(fb, N_("Batterie (auto)"));
-    battery_auto_progress(&full, &min);
     switch (battery_auto_step()) {
     case BATTERY_AUTO_CHARGING:
         snprintf(text, sizeof(text), _("1. Charger en USB\njusqu'au plein (mesure\nstable 10 min).\nADC : %u%s"),
                  battery_raw(), battery_charging() ? "" : _(" (pas d'USB)"));
         break;
     case BATTERY_AUTO_UNPLUG:
-        snprintf(text, sizeof(text), _("Plein : ADC %u.\n2. Débrancher, puis\nlaisser le badge\ns'éteindre tout seul."),
-                 full);
+        snprintf(text, sizeof(text), "%s", _("Plein.\n2. Débrancher, puis\nlaisser le badge\ns'éteindre tout seul."));
         break;
     case BATTERY_AUTO_DISCHARGING:
         snprintf(text, sizeof(text), _("2. Sur batterie : le\nlaisser s'éteindre seul\n(sans l'interrupteur).\n"
-                                       "Plein %u, plus bas %u"), full, min);
+                                       "Depuis %u h %02u"), m / 60, m % 60);
         break;
     default:
-        if (battery_auto_ends(&full, &empty))
-            snprintf(text, sizeof(text), _("Calibrée : plein ADC %u,\nvide ADC %u.\nEstimation : ~%d %%"), full,
-                     empty, battery_percent());
+        if (battery_auto_life(&life) && battery_percent() >= 0)
+            snprintf(text, sizeof(text), _("Autonomie : %u h %02u\nRestant : ~%d %%"), life / 60, life % 60,
+                     battery_percent());
+        else if (battery_auto_life(&life))
+            snprintf(text, sizeof(text), _("Autonomie : %u h %02u\nRestant : inconnu (après\nune charge complète)"),
+                     life / 60, life % 60);
         else
             snprintf(text, sizeof(text), "%s", _("Pas encore calibrée.\nD : démarrer, puis\nsuivre les étapes."));
         break;

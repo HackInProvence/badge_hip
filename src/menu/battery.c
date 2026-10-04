@@ -110,20 +110,20 @@ uint16_t battery_raw(void) {
 }
 
 
-/* ------ Automatic calibration ------ */
+/* ------ Automatic calibration and the time on battery ------
+ * The ADC of the badges stays almost flat for most of the discharge (a battery life test: 2530 for 13 h, then the
+ * fall of the last 3 h): it cannot tell the charge left. The estimate is the time on battery since the last full
+ * charge, against the battery life measured by the automatic calibration; the ADC only tells the final fall. */
 
 static bool valid(uint16_t v) {
     return v && v != 0xFFFF;
 }
 
-bool battery_auto_ends(uint16_t *full, uint16_t *empty) {
+bool battery_auto_life(uint16_t *minutes) {
     const store_factory_t *f = store_factory_get();
-    bool ok = valid(f->battery_auto_full) && valid(f->battery_auto_empty)
-              && f->battery_auto_full > f->battery_auto_empty + BATTERY_AUTO_MIN_SPAN;
-    if (full)
-        *full = ok ? f->battery_auto_full : 0;
-    if (empty)
-        *empty = ok ? f->battery_auto_empty : 0;
+    bool ok = valid(f->battery_auto_life) && f->battery_auto_life >= BATTERY_AUTO_MIN_LIFE;
+    if (minutes)
+        *minutes = ok ? f->battery_auto_life : 0;
     return ok;
 }
 
@@ -133,10 +133,9 @@ uint8_t battery_auto_step(void) {
                                                                                                   : BATTERY_AUTO_NONE;
 }
 
-void battery_auto_progress(uint16_t *full, uint16_t *min) {
-    store_t *s = store_get();
-    *full = battery_auto_step() >= BATTERY_AUTO_UNPLUG && valid(s->batt_auto_full) ? s->batt_auto_full : 0;
-    *min = battery_auto_step() == BATTERY_AUTO_DISCHARGING && valid(s->batt_auto_min) ? s->batt_auto_min : 0;
+uint16_t battery_auto_minutes(void) {
+    uint16_t m = store_get()->batt_auto_minutes;
+    return battery_auto_step() == BATTERY_AUTO_DISCHARGING && m != 0xFFFF ? m : 0;
 }
 
 static void set_step(uint8_t step) {
@@ -148,8 +147,7 @@ void battery_auto_start(void) {
     store_t *s = store_get();
     s->batt_auto_full = 0;
     s->batt_auto_min = 0xFFFF;
-    auto_max = 0;
-    auto_max_ts = get_absolute_time();
+    s->batt_auto_minutes = 0;
     set_step(BATTERY_AUTO_CHARGING);
     printf("battery: automatic calibration started (charge on USB until full)\n");
 }
@@ -161,7 +159,7 @@ void battery_auto_cancel(void) {
 
 bool battery_auto_clear(void) {
     store_factory_t *f = store_factory_get();
-    f->battery_auto_full = f->battery_auto_empty = 0;
+    f->battery_auto_full = f->battery_auto_empty = f->battery_auto_life = 0;
     printf("battery: automatic calibration cleared\n");
     return store_factory_save();
 }
@@ -175,64 +173,88 @@ void battery_auto_boot(void) {
         printf("battery: automatic calibration: discharging goes on (software reboot)\n");
         return;
     }
-    if (! valid(s->batt_auto_full) || ! valid(s->batt_auto_min) || s->batt_auto_full < s->batt_auto_min
-        || s->batt_auto_full - s->batt_auto_min < BATTERY_AUTO_MIN_SPAN) {
-        printf("battery: automatic calibration: discharge too short (%u -> %u), goes on\n", s->batt_auto_full,
-               s->batt_auto_min);
+    if (s->batt_auto_minutes == 0xFFFF || s->batt_auto_minutes < BATTERY_AUTO_MIN_LIFE) {
+        printf("battery: automatic calibration: %u min on battery only, goes on\n", s->batt_auto_minutes);
         return;  /* Switched off too early: the discharge goes on */
     }
     store_factory_t *f = store_factory_get();
     f->battery_auto_full = s->batt_auto_full;
     f->battery_auto_empty = s->batt_auto_min;
+    /* The minutes are saved every BATTERY_SAVE_MINUTES: on average half of it was not */
+    f->battery_auto_life = s->batt_auto_minutes + BATTERY_SAVE_MINUTES / 2;
     bool saved = store_factory_save();
-    printf("battery: automatic calibration done, full ADC %u, empty ADC %u (%s)\n", f->battery_auto_full,
-           f->battery_auto_empty, saved ? "saved" : "NOT saved");
+    printf("battery: automatic calibration done, battery life %u min (ADC full %u, empty %u) (%s)\n",
+           f->battery_auto_life, f->battery_auto_full, f->battery_auto_empty, saved ? "saved" : "NOT saved");
     set_step(BATTERY_AUTO_NONE);
 }
 
-/* The steps, at each measure */
+/* At each measure: the full charge (the measure on USB stable for BATTERY_AUTO_FULL_MS), the minutes on battery since
+ * (saved every BATTERY_SAVE_MINUTES), the steps of the automatic calibration */
 static void auto_task(absolute_time_t now) {
+    static bool was_usb = false, full_seen = false;
+    static uint64_t battery_ms = 0;
+    static absolute_time_t last_ts = 0;
+    static int unsaved = 0;
     store_t *s = store_get();
-    switch (battery_auto_step()) {
-    case BATTERY_AUTO_CHARGING:
-        if (! battery_charging()) {
-            auto_max = 0;  /* Unplugged before the end of the charge: waits for the USB again */
-            break;
+    bool usb = battery_charging();
+    uint64_t dt = last_ts ? absolute_time_diff_us(last_ts, now) / 1000 : 0;
+    last_ts = now;
+    if (usb) {
+        if (! was_usb) {
+            auto_max = 0;
+            full_seen = false;
+            s->batt_elapsed = 0xFFFF;  /* A charge: unknown until it is full (a partial charge is not counted) */
+            store_changed();
         }
         if (filtered_raw > auto_max + 1 || ! auto_max) {
             auto_max = filtered_raw;
             auto_max_ts = now;
-        } else if (absolute_time_diff_us(auto_max_ts, now) >= BATTERY_AUTO_FULL_MS * 1000ll) {
-            s->batt_auto_full = auto_max;
-            printf("battery: automatic calibration: full, ADC %u (unplug the badge now)\n", auto_max);
-            set_step(BATTERY_AUTO_UNPLUG);
+        } else if (! full_seen && absolute_time_diff_us(auto_max_ts, now) >= BATTERY_AUTO_FULL_MS * 1000ll) {
+            full_seen = true;
+            s->batt_elapsed = 0;  /* Full: the time on battery starts from 0 */
+            printf("battery: full (ADC %u)\n", auto_max);
+            if (battery_auto_step() == BATTERY_AUTO_CHARGING) {
+                s->batt_auto_full = auto_max;
+                printf("battery: automatic calibration: full, unplug the badge now\n");
+                s->batt_auto_step = BATTERY_AUTO_UNPLUG;
+            }
+            store_changed();
         }
-        break;
-    case BATTERY_AUTO_UNPLUG:
-        if (! battery_charging()) {
-            s->batt_auto_min = filtered_raw;
-            printf("battery: automatic calibration: on battery, ADC %u (let it run out)\n", filtered_raw);
-            set_step(BATTERY_AUTO_DISCHARGING);
-        }
-        break;
-    case BATTERY_AUTO_DISCHARGING:
-        if (battery_charging()) {
-            /* Plugged in before the battery ran out: the discharge is lost, back to the charge */
+        if (battery_auto_step() == BATTERY_AUTO_DISCHARGING) {
             printf("battery: automatic calibration: plugged in before empty, back to the charge\n");
-            auto_max = 0;
-            set_step(BATTERY_AUTO_CHARGING);
-        } else if (filtered_raw + BATTERY_AUTO_STEP <= s->batt_auto_min) {
-            s->batt_auto_min = filtered_raw;
-            store_changed();  /* Saved as it goes down: the last one before the end is the empty end */
+            set_step(BATTERY_AUTO_CHARGING);  /* The discharge is lost */
         }
-        break;
-    default:
-        break;
+    } else {
+        if (was_usb || ! valid(s->batt_unplug_raw)) {
+            s->batt_unplug_raw = filtered_raw;  /* The level on battery: the final fall is below it */
+            if (battery_auto_step() == BATTERY_AUTO_UNPLUG) {
+                s->batt_auto_minutes = 0;
+                s->batt_auto_min = filtered_raw;
+                s->batt_auto_step = BATTERY_AUTO_DISCHARGING;
+                printf("battery: automatic calibration: on battery, let it run out\n");
+            }
+            store_changed();
+        }
+        if (battery_auto_step() == BATTERY_AUTO_DISCHARGING && filtered_raw < s->batt_auto_min)
+            s->batt_auto_min = filtered_raw;
+        battery_ms += dt;
+        while (battery_ms >= 60000) {  /* One more minute on battery */
+            battery_ms -= 60000;
+            if (s->batt_elapsed < 0xFFFE)
+                ++s->batt_elapsed;
+            if (battery_auto_step() == BATTERY_AUTO_DISCHARGING && s->batt_auto_minutes < 0xFFFE)
+                ++s->batt_auto_minutes;
+            if (++unsaved >= BATTERY_SAVE_MINUTES) {
+                unsaved = 0;
+                store_changed();  /* The last save before the battery runs out gives the battery life */
+            }
+        }
     }
+    was_usb = usb;
 }
 
 bool battery_percent_estimated(void) {
-    return ! battery_calibrated() && battery_auto_ends(NULL, NULL);
+    return ! battery_calibrated() && battery_percent() >= 0;
 }
 
 uint16_t battery_mv(void) {
@@ -248,11 +270,16 @@ int battery_percent(void) {
     uint16_t mv = battery_mv();
     if (mv)
         return battery_percent_of_mv(mv);
-    uint16_t full, empty;
-    if (! filtered_raw || ! battery_auto_ends(&full, &empty))
-        return -1;  /* Not calibrated: no value rather than a wrong one */
-    /* Automatic calibration: the curve stretched between its empty end (CURVE 0 %) and its full end (100 %) */
-    int32_t lo = CURVE[0][0], hi = CURVE[CURVE_N - 1][0];
-    int32_t v = lo + ((int32_t)filtered_raw - empty) * (hi - lo) / (full - empty);
-    return battery_percent_of_mv(v < lo ? lo : v > hi ? hi : v);
+    /* Automatic calibration: the time on battery since the last full charge, against the battery life measured */
+    const store_t *s = store_get();
+    uint16_t life;
+    if (! filtered_raw || ! battery_auto_life(&life) || s->batt_elapsed == 0xFFFF || battery_charging())
+        return -1;  /* Not calibrated, or a partial charge: no value rather than a wrong one */
+    int p = 100 - (int)((uint32_t)s->batt_elapsed * 100 / life);
+    if (p < 0)
+        p = 0;
+    /* The final fall of the ADC (the last hours): at most BATTERY_LOW_PERCENT, whatever the time says */
+    if (valid(s->batt_unplug_raw) && filtered_raw + BATTERY_FALL_RAW < s->batt_unplug_raw && p > BATTERY_LOW_PERCENT)
+        p = BATTERY_LOW_PERCENT;
+    return p;
 }

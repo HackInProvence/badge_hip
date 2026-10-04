@@ -92,6 +92,9 @@ typedef struct {
     uint8_t batt_auto_step;  /* BATTERY_AUTO_*, other values: none */
     uint16_t batt_auto_full;
     uint16_t batt_auto_min;
+    uint16_t batt_auto_minutes;  /* Minutes on battery of the calibration in progress */
+    uint16_t batt_elapsed;  /* Minutes on battery since the last full charge, 0xFFFF: unknown (a partial charge) */
+    uint16_t batt_unplug_raw;  /* ADC when unplugged (the level on battery: the final fall goes below it) */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1
@@ -152,6 +155,7 @@ typedef struct {
      * (a sector of an older firmware): not done */
     uint16_t battery_auto_full;
     uint16_t battery_auto_empty;
+    uint16_t battery_auto_life;  /* Minutes on battery from full to empty (the estimate of the charge left) */
 } store_factory_t;
 
 /** \brief The factory settings (all 0 when never set). */

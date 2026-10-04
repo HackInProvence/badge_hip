@@ -697,7 +697,7 @@ msgstr "Testo dell'avviso"
 #: src/menu/announce.c:456
 #: src/menu/contacts.c:376
 #: src/menu/messages.c:118
-#: src/menu/werewolf.c:1629
+#: src/menu/werewolf.c:1630
 msgid "%s : %s"
 msgstr "%s: %s"
 
@@ -728,13 +728,13 @@ msgstr "Ucciso da %s"
 
 #: src/menu/assassin.c:597
 #: src/menu/tug.c:305
-#: src/menu/werewolf.c:1440
+#: src/menu/werewolf.c:1441
 msgid "%s  %u joueurs"
 msgstr "%s  %u gioc."
 
 #: src/menu/assassin.c:598
 #: src/menu/tug.c:306
-#: src/menu/werewolf.c:1441
+#: src/menu/werewolf.c:1442
 msgid "%s  %u joueur"
 msgstr "%s  %u gioc."
 
@@ -745,7 +745,7 @@ msgstr "Crea una partita"
 
 #: src/menu/assassin.c:602
 #: src/menu/tug.c:310
-#: src/menu/werewolf.c:1416
+#: src/menu/werewolf.c:1417
 msgid "Rejoindre une partie"
 msgstr "Entra in una partita"
 
@@ -761,9 +761,9 @@ msgstr "Tiro alla fune"
 #: src/menu/assassin.c:610
 #: src/menu/tug.c:332
 #: src/menu/werewolf.c:258
-#: src/menu/werewolf.c:1581
-#: src/menu/werewolf.c:1701
-#: src/menu/werewolf.c:1707
+#: src/menu/werewolf.c:1582
+#: src/menu/werewolf.c:1702
+#: src/menu/werewolf.c:1708
 msgid "Loup-garou"
 msgstr "Lupo mannaro"
 
@@ -804,7 +804,7 @@ msgstr "S: annulla  D: avvia"
 #: src/menu/assassin.c:951
 #: src/menu/tug.c:488
 #: src/menu/tug.c:642
-#: src/menu/werewolf.c:1848
+#: src/menu/werewolf.c:1849
 msgid "Rejoindre"
 msgstr "Entra"
 
@@ -1028,7 +1028,7 @@ msgstr "Ognuno ha un bersaglio segreto: avvicinati molto per eliminarlo. Min. %d
 
 #: src/menu/assassin.c:954
 #: src/menu/tug.c:645
-#: src/menu/werewolf.c:1851
+#: src/menu/werewolf.c:1852
 msgid "G : retour  D : rejoindre"
 msgstr "S: indietro  D: entra"
 
@@ -1114,11 +1114,11 @@ msgid "Batterie (calibration)"
 msgstr "Batteria (taratura)"
 
 #: src/menu/battcal.c:190
-#: src/menu/battcal.c:219
+#: src/menu/battcal.c:220
 msgid "Batterie (auto)"
 msgstr "Batteria (auto)"
 
-#: src/menu/battcal.c:194
+#: src/menu/battcal.c:193
 msgid ""
 "1. Charger en USB\n"
 "jusqu'au plein (mesure\n"
@@ -1130,45 +1130,53 @@ msgstr ""
 "stabile per 10 min).\n"
 "ADC: %u%s"
 
-#: src/menu/battcal.c:195
+#: src/menu/battcal.c:194
 msgid " (pas d'USB)"
 msgstr " (no USB)"
 
-#: src/menu/battcal.c:198
+#: src/menu/battcal.c:197
 msgid ""
-"Plein : ADC %u.\n"
+"Plein.\n"
 "2. Débrancher, puis\n"
 "laisser le badge\n"
 "s'éteindre tout seul."
 msgstr ""
-"Pieno: ADC %u.\n"
+"Pieno.\n"
 "2. Scollega, poi\n"
 "lascia che il badge\n"
 "si spenga da solo."
 
-#: src/menu/battcal.c:202
+#: src/menu/battcal.c:200
 msgid ""
 "2. Sur batterie : le\n"
 "laisser s'éteindre seul\n"
 "(sans l'interrupteur).\n"
-"Plein %u, plus bas %u"
+"Depuis %u h %02u"
 msgstr ""
 "2. A batteria: lascia\n"
 "che si spenga da solo\n"
 "(non con l'interruttore).\n"
-"Pieno %u, minimo %u"
+"Da %u h %02u"
 
-#: src/menu/battcal.c:207
+#: src/menu/battcal.c:205
 msgid ""
-"Calibrée : plein ADC %u,\n"
-"vide ADC %u.\n"
-"Estimation : ~%d %%"
+"Autonomie : %u h %02u\n"
+"Restant : ~%d %%"
 msgstr ""
-"Calibrata: pieno ADC %u,\n"
-"vuoto ADC %u.\n"
-"Stima: ~%d %%"
+"Autonomia: %u h %02u\n"
+"Rimasto: ~%d %%"
 
-#: src/menu/battcal.c:210
+#: src/menu/battcal.c:208
+msgid ""
+"Autonomie : %u h %02u\n"
+"Restant : inconnu (après\n"
+"une charge complète)"
+msgstr ""
+"Autonomia: %u h %02u\n"
+"Rimasto: ignoto (dopo\n"
+"una carica completa)"
+
+#: src/menu/battcal.c:211
 msgid ""
 "Pas encore calibrée.\n"
 "D : démarrer, puis\n"
@@ -1178,11 +1186,11 @@ msgstr ""
 "D: avvia, poi\n"
 "segui i passi."
 
-#: src/menu/battcal.c:214
+#: src/menu/battcal.c:215
 msgid "G : retour  D : démarrer"
 msgstr "S: indietro  D: avvia"
 
-#: src/menu/battcal.c:215
+#: src/menu/battcal.c:216
 #: src/menu/chorus.c:410
 msgid "G : retour  D : arrêter"
 msgstr "S: indietro  D: ferma"
@@ -1488,7 +1496,7 @@ msgstr "Contatti"
 #: src/menu/contacts.c:330
 #: src/menu/crypto_app.c:194
 #: src/menu/pirate_radio.c:566
-#: src/menu/werewolf.c:1826
+#: src/menu/werewolf.c:1827
 msgid "G : retour  D : ouvrir"
 msgstr "S: indietro  D: apri"
 
@@ -1786,14 +1794,14 @@ msgstr "Pareggio"
 
 #: src/menu/duel.c:376
 #: src/menu/games.c:146
-#: src/menu/werewolf.c:1570
+#: src/menu/werewolf.c:1571
 msgid "Gagné !"
 msgstr "Vinto!"
 
 #: src/menu/duel.c:376
 #: src/menu/games.c:146
 #: src/menu/puzzles.c:1053
-#: src/menu/werewolf.c:1570
+#: src/menu/werewolf.c:1571
 msgid "Perdu..."
 msgstr "Perso..."
 
@@ -1907,9 +1915,9 @@ msgid "Flancs, D : suite  G : menu"
 msgstr "Lati, D: avanti  S: menu"
 
 #: src/menu/gamebook.c:693
-#: src/menu/werewolf.c:1709
-#: src/menu/werewolf.c:1716
-#: src/menu/werewolf.c:1753
+#: src/menu/werewolf.c:1710
+#: src/menu/werewolf.c:1717
+#: src/menu/werewolf.c:1754
 msgid "G : menu"
 msgstr "S: menu"
 
@@ -3401,11 +3409,11 @@ msgstr "Stelle"
 msgid "Vidéo (carte SD)"
 msgstr "Video (SD)"
 
-#: src/menu/oled_demo.c:192
+#: src/menu/oled_demo.c:198
 msgid "Pas de vidéo"
 msgstr "Nessun video"
 
-#: src/menu/oled_demo.c:193
+#: src/menu/oled_demo.c:199
 msgid "sur la carte SD"
 msgstr "sulla scheda SD"
 
@@ -5704,152 +5712,152 @@ msgid "Jour %u : %s"
 msgstr "Giorno %u: %s"
 
 #: src/menu/werewolf.c:256
-#: src/menu/werewolf.c:1530
-#: src/menu/werewolf.c:1714
-#: src/menu/werewolf.c:1726
+#: src/menu/werewolf.c:1531
+#: src/menu/werewolf.c:1715
+#: src/menu/werewolf.c:1727
 msgid "Ta carte"
 msgstr "La tua carta"
 
-#: src/menu/werewolf.c:1226
+#: src/menu/werewolf.c:1227
 msgid "Loup-garou : %s"
 msgstr "Lupo mannaro: %s"
 
-#: src/menu/werewolf.c:1375
+#: src/menu/werewolf.c:1376
 msgid "Personne"
 msgstr "Nessuno"
 
-#: src/menu/werewolf.c:1375
+#: src/menu/werewolf.c:1376
 msgid "Vote blanc"
 msgstr "Scheda bianca"
 
-#: src/menu/werewolf.c:1376
+#: src/menu/werewolf.c:1377
 msgid "%sSauver %s"
 msgstr "%sSalva %s"
 
-#: src/menu/werewolf.c:1377
+#: src/menu/werewolf.c:1378
 msgid "%sNe pas sauver"
 msgstr "%sNon salvare"
 
-#: src/menu/werewolf.c:1378
+#: src/menu/werewolf.c:1379
 msgid "%sContinuer"
 msgstr "%sContinua"
 
-#: src/menu/werewolf.c:1379
+#: src/menu/werewolf.c:1380
 msgid "%sGarder ma carte"
 msgstr "%sTieni la carta"
 
-#: src/menu/werewolf.c:1381
+#: src/menu/werewolf.c:1382
 msgid "%sPrendre : %s"
 msgstr "%sPrendi: %s"
 
-#: src/menu/werewolf.c:1383
+#: src/menu/werewolf.c:1384
 msgid "%sDormir"
 msgstr "%sDormi"
 
-#: src/menu/werewolf.c:1384
+#: src/menu/werewolf.c:1385
 msgid "%sEspionner les loups"
 msgstr "%sSpia i lupi"
 
-#: src/menu/werewolf.c:1388
+#: src/menu/werewolf.c:1389
 msgid "%sEmpoisonner %s"
 msgstr "%sAvvelena %s"
 
-#: src/menu/werewolf.c:1393
+#: src/menu/werewolf.c:1394
 msgid " (loup)"
 msgstr " (lupo)"
 
-#: src/menu/werewolf.c:1399
-#: src/menu/werewolf.c:1411
+#: src/menu/werewolf.c:1400
+#: src/menu/werewolf.c:1412
 msgid " (cap.)"
 msgstr " (cap.)"
 
-#: src/menu/werewolf.c:1410
+#: src/menu/werewolf.c:1411
 msgid "%s%s : %s%s%s"
 msgstr "%s%s: %s%s%s"
 
-#: src/menu/werewolf.c:1415
-#: src/menu/werewolf.c:1824
+#: src/menu/werewolf.c:1416
+#: src/menu/werewolf.c:1825
 msgid "Mener une partie"
 msgstr "Fai il narratore"
 
-#: src/menu/werewolf.c:1416
+#: src/menu/werewolf.c:1417
 msgid "Aide : les rôles"
 msgstr "Aiuto: i ruoli"
 
-#: src/menu/werewolf.c:1421
+#: src/menu/werewolf.c:1422
 msgid "Préréglage : %s"
 msgstr "Modalità: %s"
 
-#: src/menu/werewolf.c:1421
+#: src/menu/werewolf.c:1422
 msgid "classique"
 msgstr "classica"
 
-#: src/menu/werewolf.c:1422
+#: src/menu/werewolf.c:1423
 msgid "débutant"
 msgstr "facile"
 
-#: src/menu/werewolf.c:1422
+#: src/menu/werewolf.c:1423
 msgid "à la carte"
 msgstr "su misura"
 
-#: src/menu/werewolf.c:1427
+#: src/menu/werewolf.c:1428
 msgid "Débat : %u min"
 msgstr "Dibattito: %u min"
 
-#: src/menu/werewolf.c:1429
+#: src/menu/werewolf.c:1430
 msgid "Loups : 2, ou 3 dès 12 j."
 msgstr "Lupi: 2, o 3 da 12 g."
 
-#: src/menu/werewolf.c:1431
+#: src/menu/werewolf.c:1432
 msgid "> Ouvrir la partie"
 msgstr "> Apri la partita"
 
-#: src/menu/werewolf.c:1527
+#: src/menu/werewolf.c:1528
 msgid "D : la carte  G : retour"
 msgstr "D: la carta  S: indietro"
 
-#: src/menu/werewolf.c:1530
+#: src/menu/werewolf.c:1531
 msgid "Les rôles"
 msgstr "I ruoli"
 
-#: src/menu/werewolf.c:1533
+#: src/menu/werewolf.c:1534
 msgid "%d/%d  Flancs, D : détails"
 msgstr "%d/%d  Lati, D: dettagli"
 
-#: src/menu/werewolf.c:1534
+#: src/menu/werewolf.c:1535
 msgid "D : détails  G : la partie"
 msgstr "D: dettagli  S: la partita"
 
-#: src/menu/werewolf.c:1547
+#: src/menu/werewolf.c:1548
 msgid "Cette nuit :"
 msgstr "Stanotte:"
 
-#: src/menu/werewolf.c:1547
+#: src/menu/werewolf.c:1548
 msgid "Le village a éliminé :"
 msgstr "Il villaggio elimina:"
 
-#: src/menu/werewolf.c:1548
+#: src/menu/werewolf.c:1549
 msgid "Le chasseur a emporté :"
 msgstr "Il cacciatore ha preso:"
 
-#: src/menu/werewolf.c:1550
+#: src/menu/werewolf.c:1551
 msgid "Personne n'est mort."
 msgstr "Nessun morto."
 
-#: src/menu/werewolf.c:1550
 #: src/menu/werewolf.c:1551
+#: src/menu/werewolf.c:1552
 msgid "Personne."
 msgstr "Nessuno."
 
-#: src/menu/werewolf.c:1572
+#: src/menu/werewolf.c:1573
 msgid "Tu étais : %s"
 msgstr "Eri: %s"
 
-#: src/menu/werewolf.c:1575
+#: src/menu/werewolf.c:1576
 msgid "D : les cartes  G long : fin"
 msgstr "D: le carte  S lungo: fine"
 
-#: src/menu/werewolf.c:1582
+#: src/menu/werewolf.c:1583
 msgid ""
 "Distribution\n"
 "des cartes..."
@@ -5857,133 +5865,133 @@ msgstr ""
 "Distribuisco\n"
 "le carte..."
 
-#: src/menu/werewolf.c:1595
+#: src/menu/werewolf.c:1596
 msgid "%s   En vie : %d / %u"
 msgstr "%s   In vita: %d / %u"
 
-#: src/menu/werewolf.c:1602
+#: src/menu/werewolf.c:1603
 msgid "En vie : %d / %u"
 msgstr "In vita: %d / %u"
 
-#: src/menu/werewolf.c:1604
+#: src/menu/werewolf.c:1605
 msgid "   Choix : %d / %d"
 msgstr "   Scelte: %d / %d"
 
-#: src/menu/werewolf.c:1609
+#: src/menu/werewolf.c:1610
 msgid "D : suite  X : +30 s"
 msgstr "D: avanti  X: +30 s"
 
-#: src/menu/werewolf.c:1615
+#: src/menu/werewolf.c:1616
 msgid "Fais semblant de choisir"
 msgstr "Fai finta di scegliere"
 
-#: src/menu/werewolf.c:1619
+#: src/menu/werewolf.c:1620
 msgid "Deux loups : prends-en un !"
 msgstr "Due lupi: prendine uno!"
 
-#: src/menu/werewolf.c:1620
+#: src/menu/werewolf.c:1621
 msgid "Ta carte ou une autre ?"
 msgstr "La tua o un'altra?"
 
-#: src/menu/werewolf.c:1624
+#: src/menu/werewolf.c:1625
 msgid "1er amoureux ?"
 msgstr "1° innamorato?"
 
-#: src/menu/werewolf.c:1624
+#: src/menu/werewolf.c:1625
 msgid "2e amoureux ?"
 msgstr "2° innamorato?"
 
-#: src/menu/werewolf.c:1625
+#: src/menu/werewolf.c:1626
 msgid "Fais semblant : 1er nom"
 msgstr "Fai finta: 1° nome"
 
-#: src/menu/werewolf.c:1625
+#: src/menu/werewolf.c:1626
 msgid "Fais semblant : 2e nom"
 msgstr "Fai finta: 2° nome"
 
-#: src/menu/werewolf.c:1633
+#: src/menu/werewolf.c:1634
 msgid "Qui sonder ?"
 msgstr "Chi scruti?"
 
-#: src/menu/werewolf.c:1637
+#: src/menu/werewolf.c:1638
 msgid "Votre victime ?"
 msgstr "Vostra vittima?"
 
-#: src/menu/werewolf.c:1640
+#: src/menu/werewolf.c:1641
 msgid "Tu as vu %s (loup)"
 msgstr "Hai visto %s (lupo)"
 
-#: src/menu/werewolf.c:1643
+#: src/menu/werewolf.c:1644
 msgid "Espionner ? (risqué)"
 msgstr "Spii? (rischioso)"
 
-#: src/menu/werewolf.c:1648
+#: src/menu/werewolf.c:1649
 msgid "Fais semblant (1/2)"
 msgstr "Fai finta (1/2)"
 
-#: src/menu/werewolf.c:1648
+#: src/menu/werewolf.c:1649
 msgid "Fais semblant (2/2)"
 msgstr "Fai finta (2/2)"
 
-#: src/menu/werewolf.c:1650
+#: src/menu/werewolf.c:1651
 msgid "Empoisonner ?"
 msgstr "Avveleni?"
 
-#: src/menu/werewolf.c:1650
+#: src/menu/werewolf.c:1651
 msgid "Plus de poison"
 msgstr "Veleno finito"
 
-#: src/menu/werewolf.c:1652
+#: src/menu/werewolf.c:1653
 msgid "Victime : %s"
 msgstr "Vittima: %s"
 
-#: src/menu/werewolf.c:1655
+#: src/menu/werewolf.c:1656
 msgid "Pas de victime"
 msgstr "Niente vittime"
 
-#: src/menu/werewolf.c:1657
+#: src/menu/werewolf.c:1658
 msgid "Qui sera capitaine ?"
 msgstr "Chi sarà capitano?"
 
-#: src/menu/werewolf.c:1658
+#: src/menu/werewolf.c:1659
 msgid "Qui éliminer ?"
 msgstr "Chi eliminare?"
 
-#: src/menu/werewolf.c:1659
+#: src/menu/werewolf.c:1660
 msgid "2e vote : qui éliminer ?"
 msgstr "2° voto: chi eliminare?"
 
-#: src/menu/werewolf.c:1660
+#: src/menu/werewolf.c:1661
 msgid "Égalité : qui éliminer ?"
 msgstr "Parità: chi eliminare?"
 
-#: src/menu/werewolf.c:1661
+#: src/menu/werewolf.c:1662
 msgid "Qui emporter ?"
 msgstr "Chi abbatti?"
 
-#: src/menu/werewolf.c:1662
+#: src/menu/werewolf.c:1663
 msgid "Ton successeur ?"
 msgstr "Il tuo successore?"
 
-#: src/menu/werewolf.c:1680
+#: src/menu/werewolf.c:1681
 msgid "Flancs : choix  D : valider"
 msgstr "Lati: scelta  D: OK"
 
-#: src/menu/werewolf.c:1682
-#: src/menu/werewolf.c:1727
-#: src/menu/werewolf.c:1780
+#: src/menu/werewolf.c:1683
+#: src/menu/werewolf.c:1728
+#: src/menu/werewolf.c:1781
 msgid "Envoi..."
 msgstr "Invio..."
 
-#: src/menu/werewolf.c:1683
+#: src/menu/werewolf.c:1684
 msgid "Choix reçu"
 msgstr "Ricevuta"
 
-#: src/menu/werewolf.c:1683
+#: src/menu/werewolf.c:1684
 msgid "Choix reçu  D : changer"
 msgstr "Ricevuta  D: cambia"
 
-#: src/menu/werewolf.c:1690
+#: src/menu/werewolf.c:1691
 msgid ""
 "Le chasseur %s\n"
 "choisit sa cible..."
@@ -5991,7 +5999,7 @@ msgstr ""
 "Il cacciatore %s\n"
 "prende la mira..."
 
-#: src/menu/werewolf.c:1692
+#: src/menu/werewolf.c:1693
 msgid ""
 "Le capitaine %s\n"
 "choisit son successeur..."
@@ -5999,7 +6007,7 @@ msgstr ""
 "Il capitano %s\n"
 "sceglie il successore..."
 
-#: src/menu/werewolf.c:1694
+#: src/menu/werewolf.c:1695
 msgid ""
 "Égalité : le capitaine\n"
 "%s tranche..."
@@ -6007,7 +6015,7 @@ msgstr ""
 "Parità: il capitano\n"
 "%s decide..."
 
-#: src/menu/werewolf.c:1702
+#: src/menu/werewolf.c:1703
 msgid ""
 "Partie arrêtée\n"
 "par le meneur"
@@ -6015,12 +6023,12 @@ msgstr ""
 "Partita chiusa\n"
 "dal narratore"
 
-#: src/menu/werewolf.c:1703
-#: src/menu/werewolf.c:1861
+#: src/menu/werewolf.c:1704
+#: src/menu/werewolf.c:1862
 msgid "G long : quitter"
 msgstr "S lungo: esci"
 
-#: src/menu/werewolf.c:1708
+#: src/menu/werewolf.c:1709
 msgid ""
 "La partie\n"
 "commence..."
@@ -6028,39 +6036,39 @@ msgstr ""
 "La partita\n"
 "inizia..."
 
-#: src/menu/werewolf.c:1715
+#: src/menu/werewolf.c:1716
 msgid "Carte en attente..."
 msgstr "Carta in arrivo..."
 
-#: src/menu/werewolf.c:1721
+#: src/menu/werewolf.c:1722
 msgid "Avec toi :"
 msgstr "Con te:"
 
-#: src/menu/werewolf.c:1727
+#: src/menu/werewolf.c:1728
 msgid "Compris, reçu"
 msgstr "Ok, ricevuto"
 
-#: src/menu/werewolf.c:1728
+#: src/menu/werewolf.c:1729
 msgid "Cache l'écran !  D : compris"
 msgstr "Copri lo schermo!  D: capito"
 
-#: src/menu/werewolf.c:1740
+#: src/menu/werewolf.c:1741
 msgid "G : menu  D long : carte"
 msgstr "S: menu  D lungo: carta"
 
-#: src/menu/werewolf.c:1740
+#: src/menu/werewolf.c:1741
 msgid "Meneur hors de portée !"
 msgstr "Narratore lontano!"
 
-#: src/menu/werewolf.c:1744
+#: src/menu/werewolf.c:1745
 msgid "Tu es mort(e)   %s"
 msgstr "Sei morto/a   %s"
 
-#: src/menu/werewolf.c:1748
+#: src/menu/werewolf.c:1749
 msgid "Tu es mort(e)"
 msgstr "Sei morto/a"
 
-#: src/menu/werewolf.c:1749
+#: src/menu/werewolf.c:1750
 msgid ""
 "Chut ! Tu ne joues plus,\n"
 "mais tu suis la partie."
@@ -6068,23 +6076,23 @@ msgstr ""
 "Ssst! Non giochi più,\n"
 "ma segui la partita."
 
-#: src/menu/werewolf.c:1762
+#: src/menu/werewolf.c:1763
 msgid "Débattez !"
 msgstr "Discutete!"
 
-#: src/menu/werewolf.c:1764
+#: src/menu/werewolf.c:1765
 msgid "%d joueurs en vie"
 msgstr "%d giocatori vivi"
 
-#: src/menu/werewolf.c:1767
+#: src/menu/werewolf.c:1768
 msgid "Capitaine : %s"
 msgstr "Capitano: %s"
 
-#: src/menu/werewolf.c:1770
+#: src/menu/werewolf.c:1771
 msgid "Le vote suit."
 msgstr "Poi si vota."
 
-#: src/menu/werewolf.c:1774
+#: src/menu/werewolf.c:1775
 msgid ""
 "Ton amoureux(se) :\n"
 "%s"
@@ -6092,7 +6100,7 @@ msgstr ""
 "Il tuo amore:\n"
 "%s"
 
-#: src/menu/werewolf.c:1776
+#: src/menu/werewolf.c:1777
 msgid ""
 "Les amoureux\n"
 "se reconnaissent..."
@@ -6100,71 +6108,71 @@ msgstr ""
 "Gli innamorati\n"
 "si riconoscono..."
 
-#: src/menu/werewolf.c:1780
+#: src/menu/werewolf.c:1781
 msgid "D : vu"
 msgstr "D: ok"
 
-#: src/menu/werewolf.c:1780
+#: src/menu/werewolf.c:1781
 msgid "Vu, reçu"
 msgstr "Visto"
 
-#: src/menu/werewolf.c:1795
+#: src/menu/werewolf.c:1796
 msgid "Les cartes"
 msgstr "Le carte"
 
-#: src/menu/werewolf.c:1806
+#: src/menu/werewolf.c:1807
 msgid "tir à la corde"
 msgstr "tiro alla fune"
 
-#: src/menu/werewolf.c:1807
+#: src/menu/werewolf.c:1808
 msgid "un autre jeu"
 msgstr "un altro gioco"
 
-#: src/menu/werewolf.c:1817
+#: src/menu/werewolf.c:1818
 msgid "Une partie de %s est en cours : quitte-la d'abord."
 msgstr "Una partita di %s è in corso: prima lasciala."
 
-#: src/menu/werewolf.c:1819
+#: src/menu/werewolf.c:1820
 msgid "Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge."
 msgstr "Un narratore (non gioca) e 8-18 giocatori, ognuno col suo badge."
 
-#: src/menu/werewolf.c:1827
+#: src/menu/werewolf.c:1828
 msgid "Flancs : ligne  D : changer"
 msgstr "Lati: riga  D: cambia"
 
-#: src/menu/werewolf.c:1827
+#: src/menu/werewolf.c:1828
 msgid "Selon la règle du jeu"
 msgstr "Come da regolamento"
 
-#: src/menu/werewolf.c:1830
+#: src/menu/werewolf.c:1831
 msgid "Partie ouverte"
 msgstr "Partita aperta"
 
-#: src/menu/werewolf.c:1832
+#: src/menu/werewolf.c:1833
 msgid "%d joueurs (%d à %d), %d loups"
 msgstr "%d gioc. (%d-%d), %d lupi"
 
-#: src/menu/werewolf.c:1833
+#: src/menu/werewolf.c:1834
 msgid "%d joueur (%d à %d), %d loups"
 msgstr "%d gioc. (%d-%d), %d lupi"
 
-#: src/menu/werewolf.c:1838
+#: src/menu/werewolf.c:1839
 msgid "Test : des robots complètent"
 msgstr "Test: robot aggiunti"
 
-#: src/menu/werewolf.c:1843
+#: src/menu/werewolf.c:1844
 msgid "Les joueurs : Jeux multi > Loup-garou > Rejoindre."
 msgstr "Giocatori: Giochi multi > Lupo mannaro > Entra."
 
-#: src/menu/werewolf.c:1844
+#: src/menu/werewolf.c:1845
 msgid "G long : annuler"
 msgstr "S lungo: annulla"
 
-#: src/menu/werewolf.c:1844
+#: src/menu/werewolf.c:1845
 msgid "G long : annuler  D : lancer"
 msgstr "S lungo: annulla  D: avvia"
 
-#: src/menu/werewolf.c:1853
+#: src/menu/werewolf.c:1854
 msgid ""
 "Recherche des parties...\n"
 "Le meneur doit ouvrir\n"
@@ -6174,39 +6182,39 @@ msgstr ""
 "Il narratore deve aprire\n"
 "la sua."
 
-#: src/menu/werewolf.c:1860
+#: src/menu/werewolf.c:1861
 msgid "Partie annulée"
 msgstr "Partita annullata"
 
-#: src/menu/werewolf.c:1865
+#: src/menu/werewolf.c:1866
 msgid "%s  %d joueurs"
 msgstr "%s  %d gioc."
 
-#: src/menu/werewolf.c:1866
+#: src/menu/werewolf.c:1867
 msgid "%s  %d joueur"
 msgstr "%s  %d gioc."
 
-#: src/menu/werewolf.c:1866
+#: src/menu/werewolf.c:1867
 msgid "Inscription..."
 msgstr "Iscrizione..."
 
-#: src/menu/werewolf.c:1866
+#: src/menu/werewolf.c:1867
 msgid "Inscrit(e) !"
 msgstr "Iscritto/a!"
 
-#: src/menu/werewolf.c:1871
+#: src/menu/werewolf.c:1872
 msgid "Rôles : %s."
 msgstr "Ruoli: %s."
 
-#: src/menu/werewolf.c:1873
+#: src/menu/werewolf.c:1874
 msgid "En attente du meneur..."
 msgstr "Attesa del narratore..."
 
-#: src/menu/werewolf.c:1874
+#: src/menu/werewolf.c:1875
 msgid "G : menu  G long : quitter"
 msgstr "S: menu  S lungo: esci"
 
-#: src/menu/werewolf.c:1882
+#: src/menu/werewolf.c:1883
 msgid ""
 "Arrêter la partie\n"
 "pour tous ?"
@@ -6214,7 +6222,7 @@ msgstr ""
 "Fermare la partita\n"
 "per tutti?"
 
-#: src/menu/werewolf.c:1882
+#: src/menu/werewolf.c:1883
 msgid ""
 "Quitter\n"
 "la partie ?"
@@ -6222,23 +6230,23 @@ msgstr ""
 "Lasci\n"
 "la partita?"
 
-#: src/menu/werewolf.c:1883
+#: src/menu/werewolf.c:1884
 msgid "G : non  D : oui"
 msgstr "S: no  D: sì"
 
-#: src/menu/werewolf.c:2211
+#: src/menu/werewolf.c:2212
 msgid "8 joueurs minimum"
 msgstr "8 giocatori min."
 
-#: src/menu/werewolf.c:2211
+#: src/menu/werewolf.c:2212
 msgid "Petites parties (4+)"
 msgstr "Partite piccole (4+)"
 
-#: src/menu/werewolf.c:2212
+#: src/menu/werewolf.c:2213
 msgid "Test : robots"
 msgstr "Test: robot"
 
-#: src/menu/werewolf.c:2214
+#: src/menu/werewolf.c:2215
 msgid ""
 "La règle du jeu :\n"
 "de 8 à 18 joueurs."
@@ -6246,7 +6254,7 @@ msgstr ""
 "Il regolamento:\n"
 "da 8 a 18 giocatori."
 
-#: src/menu/werewolf.c:2215
+#: src/menu/werewolf.c:2216
 msgid ""
 "Dès 4 joueurs, avec\n"
 "1 loup-garou sous 8."
@@ -6254,7 +6262,7 @@ msgstr ""
 "Da 4 giocatori, con\n"
 "1 lupo sotto gli 8."
 
-#: src/menu/werewolf.c:2216
+#: src/menu/werewolf.c:2217
 msgid ""
 "Dès 1 joueur : des robots\n"
 "complètent jusqu'à 8."
@@ -6262,12 +6270,12 @@ msgstr ""
 "Da 1 giocatore: i robot\n"
 "completano fino a 8."
 
-#: src/menu/werewolf.c:2248
-#: src/menu/werewolf.c:2255
+#: src/menu/werewolf.c:2249
+#: src/menu/werewolf.c:2256
 msgid "Loup-garou (admin)"
 msgstr "Lupo mannaro (adm)"
 
-#: src/menu/werewolf.c:2251
+#: src/menu/werewolf.c:2252
 msgid "Flancs : choisir  D : valider"
 msgstr "Lati: scegli  D: OK"
 
@@ -6412,3 +6420,34 @@ msgstr "File .EPV non valido"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Formato video non supportato"
+
+#~ msgid ""
+#~ "Plein : ADC %u.\n"
+#~ "2. Débrancher, puis\n"
+#~ "laisser le badge\n"
+#~ "s'éteindre tout seul."
+#~ msgstr ""
+#~ "Pieno: ADC %u.\n"
+#~ "2. Scollega, poi\n"
+#~ "lascia che il badge\n"
+#~ "si spenga da solo."
+
+#~ msgid ""
+#~ "2. Sur batterie : le\n"
+#~ "laisser s'éteindre seul\n"
+#~ "(sans l'interrupteur).\n"
+#~ "Plein %u, plus bas %u"
+#~ msgstr ""
+#~ "2. A batteria: lascia\n"
+#~ "che si spenga da solo\n"
+#~ "(non con l'interruttore).\n"
+#~ "Pieno %u, minimo %u"
+
+#~ msgid ""
+#~ "Calibrée : plein ADC %u,\n"
+#~ "vide ADC %u.\n"
+#~ "Estimation : ~%d %%"
+#~ msgstr ""
+#~ "Calibrata: pieno ADC %u,\n"
+#~ "vuoto ADC %u.\n"
+#~ "Stima: ~%d %%"
