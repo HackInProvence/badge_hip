@@ -693,10 +693,10 @@ start during the demo; **any button stops it** ("Demo mode off"), and the LEDs g
 - **Calibrating** (Admin > Battery (calibration)), once per badge:
   1. with the badge on USB (charging), measure the battery voltage with a multimeter;
   2. on the "Multimeter" line (Multimètre), set this voltage with the wings (- / +, hold: fast);
-  3. side: "> Save the point" (> Enregistrer le point), right wing;
-  4. do it again on battery, unplugged for a few minutes (the voltage must have dropped by at least 0.2 V):
-     the level is shown from this 2nd point on.
-  A new point replaces the nearest one. "> Clear" (> Effacer, right wing twice) forgets the calibration.
+  3. side: "> Save point 1" (> Enregistrer le point 1), right wing;
+  4. do it again on battery, unplugged for a few minutes (the voltage must have dropped by at least 0.2 V), with
+     "> Save point 2": the level is shown from this 2nd point on.
+  Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer, right wing twice) forgets the calibration.
   The calibration is a "factory" setting: kept by the Reset (even "All") and by the firmware updates.
 
 

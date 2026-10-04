@@ -681,10 +681,10 @@ pas pendant la démo ; **n'importe quel bouton l'arrête** (« Mode démo arrêt
 - **Calibrer** (Admin > Batterie (calibration)), une fois par badge :
   1. badge branché en USB (en charge), mesurez la tension de la batterie au multimètre ;
   2. sur la ligne « Multimètre », réglez cette tension avec les ailes (- / +, maintenir : vite) ;
-  3. flanc : « Enregistrer le point », aile droite ;
+  3. flanc : « Enregistrer le point 1 », aile droite ;
   4. recommencez sur batterie, débranché depuis quelques minutes (la tension doit avoir baissé d'au moins
-     0,2 V) : le niveau s'affiche dès ce 2e point.
-  Un nouveau point remplace le plus proche. « Effacer » (aile droite deux fois) oublie la calibration.
+     0,2 V), avec « Enregistrer le point 2 » : le niveau s'affiche dès ce 2e point.
+  Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « Effacer » (aile droite deux fois) oublie la calibration.
   La calibration est un réglage « usine » : gardée par la Remise à zéro (même « Tout ») et par les mises à jour
   du firmware.
 

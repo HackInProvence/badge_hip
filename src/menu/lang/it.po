@@ -1040,85 +1040,89 @@ msgstr ""
 "Ricerca partite\n"
 "di Assassin..."
 
-#: src/menu/battcal.c:79
+#: src/menu/battcal.c:81
 msgid "Pas encore de mesure"
 msgstr "Nessuna misura"
 
-#: src/menu/battcal.c:81
-msgid "Il faut un 2e point"
-msgstr "Serve un 2° punto"
-
-#: src/menu/battcal.c:81
-msgid "Point enregistré"
-msgstr "Punto salvato"
-
 #: src/menu/battcal.c:83
-#: src/menu/battcal.c:89
+#: src/menu/battcal.c:95
 msgid "Erreur d'écriture"
 msgstr "Errore scrittura"
 
-#: src/menu/battcal.c:86
+#: src/menu/battcal.c:85
+msgid "Point %d enregistré"
+msgstr "Punto %d salvato"
+
+#: src/menu/battcal.c:87
+msgid "Il faut un 2e point"
+msgstr "Serve un 2° punto"
+
+#: src/menu/battcal.c:89
+msgid "ADC trop proche du point %d"
+msgstr "ADC troppo vicino al punto %d"
+
+#: src/menu/battcal.c:92
 msgid "D encore : effacer"
 msgstr "D ancora: azzera"
 
-#: src/menu/battcal.c:89
+#: src/menu/battcal.c:95
 msgid "Calibration effacée"
 msgstr "Taratura azzerata"
 
-#: src/menu/battcal.c:110
+#: src/menu/battcal.c:116
 msgid "Batterie"
 msgstr "Batteria"
 
-#: src/menu/battcal.c:117
+#: src/menu/battcal.c:123
 msgid "Mesure : %s  %d %%"
 msgstr "Misura: %s  %d %%"
 
-#: src/menu/battcal.c:119
+#: src/menu/battcal.c:125
 msgid "Mesure : non calibrée"
 msgstr "Misura: non tarata"
 
-#: src/menu/battcal.c:126
+#: src/menu/battcal.c:132
 msgid "Point %d : %s à %u"
 msgstr "Punto %d: %s a %u"
 
-#: src/menu/battcal.c:128
+#: src/menu/battcal.c:134
 msgid "Point %d : -"
 msgstr "Punto %d: -"
 
-#: src/menu/battcal.c:136
+#: src/menu/battcal.c:142
 msgid "Multimètre : %s"
 msgstr "Multimetro: %s"
 
-#: src/menu/battcal.c:138
+#: src/menu/battcal.c:144
 msgid "> Effacer"
 msgstr "> Azzera"
 
-#: src/menu/battcal.c:138
-msgid "> Enregistrer le point"
-msgstr "> Salva il punto"
-
 #: src/menu/battcal.c:146
+msgid "> Enregistrer le point %d"
+msgstr "> Salva il punto %d"
+
+#: src/menu/battcal.c:154
 #: src/menu/ledcast.c:327
 #: src/menu/pirate_radio.c:614
 msgid "Ailes : -  +"
 msgstr "Ali: -  +"
 
-#: src/menu/battcal.c:146
+#: src/menu/battcal.c:154
 #: src/menu/ledcast.c:324
 #: src/menu/pirate_radio.c:614
 msgid "G : retour  D : valider"
 msgstr "S: indietro  D: OK"
 
-#: src/menu/battcal.c:150
+#: src/menu/battcal.c:158
 msgid "Batterie (calibration)"
 msgstr "Batteria (taratura)"
 
-#: src/menu/battcal.c:190
-#: src/menu/battcal.c:220
+#: src/menu/battcal.c:198
+#: src/menu/battcal.c:228
 msgid "Batterie (auto)"
 msgstr "Batteria (auto)"
 
-#: src/menu/battcal.c:193
+#: src/menu/battcal.c:201
 msgid ""
 "1. Charger en USB\n"
 "jusqu'au plein (mesure\n"
@@ -1130,11 +1134,11 @@ msgstr ""
 "stabile per 10 min).\n"
 "ADC: %u%s"
 
-#: src/menu/battcal.c:194
+#: src/menu/battcal.c:202
 msgid " (pas d'USB)"
 msgstr " (no USB)"
 
-#: src/menu/battcal.c:197
+#: src/menu/battcal.c:205
 msgid ""
 "Plein.\n"
 "2. Débrancher, puis\n"
@@ -1146,7 +1150,7 @@ msgstr ""
 "lascia che il badge\n"
 "si spenga da solo."
 
-#: src/menu/battcal.c:200
+#: src/menu/battcal.c:208
 msgid ""
 "2. Sur batterie : le\n"
 "laisser s'éteindre seul\n"
@@ -1158,7 +1162,7 @@ msgstr ""
 "(non con l'interruttore).\n"
 "Da %u h %02u"
 
-#: src/menu/battcal.c:205
+#: src/menu/battcal.c:213
 msgid ""
 "Autonomie : %u h %02u\n"
 "Restant : ~%d %%"
@@ -1166,7 +1170,7 @@ msgstr ""
 "Autonomia: %u h %02u\n"
 "Rimasto: ~%d %%"
 
-#: src/menu/battcal.c:208
+#: src/menu/battcal.c:216
 msgid ""
 "Autonomie : %u h %02u\n"
 "Restant : inconnu (après\n"
@@ -1176,7 +1180,7 @@ msgstr ""
 "Rimasto: ignoto (dopo\n"
 "una carica completa)"
 
-#: src/menu/battcal.c:211
+#: src/menu/battcal.c:219
 msgid ""
 "Pas encore calibrée.\n"
 "D : démarrer, puis\n"
@@ -1186,11 +1190,11 @@ msgstr ""
 "D: avvia, poi\n"
 "segui i passi."
 
-#: src/menu/battcal.c:215
+#: src/menu/battcal.c:223
 msgid "G : retour  D : démarrer"
 msgstr "S: indietro  D: avvia"
 
-#: src/menu/battcal.c:216
+#: src/menu/battcal.c:224
 #: src/menu/chorus.c:410
 msgid "G : retour  D : arrêter"
 msgstr "S: indietro  D: ferma"
@@ -6491,6 +6495,12 @@ msgstr "File .EPV non valido"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Formato video non supportato"
+
+#~ msgid "Point enregistré"
+#~ msgstr "Punto salvato"
+
+#~ msgid "> Enregistrer le point"
+#~ msgstr "> Salva il punto"
 
 #~ msgid "Batterie faible : mode économie"
 #~ msgstr "Batteria scarica: risparmio"

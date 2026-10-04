@@ -720,11 +720,12 @@ fausse. Une fois par badge, avec un multimètre :
    les 2 s), la mesure, et les points 1 et 2.
 2. Mesurez la tension aux bornes de la batterie. Sur la ligne « Multimètre », réglez cette tension avec les ailes
    (G : −, D : +, par 10 mV ; maintenues : de plus en plus vite ; de 2,50 à 4,50 V).
-3. Flanc droit jusqu'à « > Enregistrer le point », aile droite : « Il faut un 2e point ».
+3. Flanc droit jusqu'à « > Enregistrer le point 1 », aile droite : « Il faut un 2e point ».
 4. Débranchez, laissez la tension baisser quelques minutes (au moins 0,2 V d'écart, 150 pas d'ADC), mesurez,
-   réglez et enregistrez : « Point enregistré », le niveau s'affiche.
+   réglez, puis « > Enregistrer le point 2 » : « Point 2 enregistré », le niveau s'affiche. « ADC trop proche du
+   point 1 » : l'ADC n'a pas assez bougé, le niveau reste caché ; recommencez plus tard.
 
-Un nouveau point remplace le plus proche. « > Effacer » demande une confirmation (D encore). Sur la ligne
+Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « > Effacer » demande une confirmation (D encore). Sur la ligne
 « Multimètre », l'aile gauche sert à régler : quittez par un appui long sur l'aile gauche, ou depuis une autre ligne.
 Les points sont des **réglages usine** : gardés par la Remise à zéro (même « Tout ») et par les mises à jour.
 Vérification par la console : `!` affiche `battery: factory points ...`.

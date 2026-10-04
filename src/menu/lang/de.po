@@ -1040,85 +1040,89 @@ msgstr ""
 "Suche nach\n"
 "Assassin-Spielen..."
 
-#: src/menu/battcal.c:79
+#: src/menu/battcal.c:81
 msgid "Pas encore de mesure"
 msgstr "Noch keine Messung"
 
-#: src/menu/battcal.c:81
-msgid "Il faut un 2e point"
-msgstr "2. Punkt nötig"
-
-#: src/menu/battcal.c:81
-msgid "Point enregistré"
-msgstr "Punkt gesichert"
-
 #: src/menu/battcal.c:83
-#: src/menu/battcal.c:89
+#: src/menu/battcal.c:95
 msgid "Erreur d'écriture"
 msgstr "Schreibfehler"
 
-#: src/menu/battcal.c:86
+#: src/menu/battcal.c:85
+msgid "Point %d enregistré"
+msgstr "Punkt %d gespeichert"
+
+#: src/menu/battcal.c:87
+msgid "Il faut un 2e point"
+msgstr "2. Punkt nötig"
+
+#: src/menu/battcal.c:89
+msgid "ADC trop proche du point %d"
+msgstr "ADC zu nah an Punkt %d"
+
+#: src/menu/battcal.c:92
 msgid "D encore : effacer"
 msgstr "R nochmal: löschen"
 
-#: src/menu/battcal.c:89
+#: src/menu/battcal.c:95
 msgid "Calibration effacée"
 msgstr "Kalibr. gelöscht"
 
-#: src/menu/battcal.c:110
+#: src/menu/battcal.c:116
 msgid "Batterie"
 msgstr "Akku"
 
-#: src/menu/battcal.c:117
+#: src/menu/battcal.c:123
 msgid "Mesure : %s  %d %%"
 msgstr "Messung: %s  %d %%"
 
-#: src/menu/battcal.c:119
+#: src/menu/battcal.c:125
 msgid "Mesure : non calibrée"
 msgstr "Messung: unkalibriert"
 
-#: src/menu/battcal.c:126
+#: src/menu/battcal.c:132
 msgid "Point %d : %s à %u"
 msgstr "Pkt. %d: %s bei %u"
 
-#: src/menu/battcal.c:128
+#: src/menu/battcal.c:134
 msgid "Point %d : -"
 msgstr "Punkt %d: -"
 
-#: src/menu/battcal.c:136
+#: src/menu/battcal.c:142
 msgid "Multimètre : %s"
 msgstr "Multimeter: %s"
 
-#: src/menu/battcal.c:138
+#: src/menu/battcal.c:144
 msgid "> Effacer"
 msgstr "> Löschen"
 
-#: src/menu/battcal.c:138
-msgid "> Enregistrer le point"
-msgstr "> Punkt speichern"
-
 #: src/menu/battcal.c:146
+msgid "> Enregistrer le point %d"
+msgstr "> Punkt %d speichern"
+
+#: src/menu/battcal.c:154
 #: src/menu/ledcast.c:327
 #: src/menu/pirate_radio.c:614
 msgid "Ailes : -  +"
 msgstr "Flügel: -  +"
 
-#: src/menu/battcal.c:146
+#: src/menu/battcal.c:154
 #: src/menu/ledcast.c:324
 #: src/menu/pirate_radio.c:614
 msgid "G : retour  D : valider"
 msgstr "L: zurück  R: OK"
 
-#: src/menu/battcal.c:150
+#: src/menu/battcal.c:158
 msgid "Batterie (calibration)"
 msgstr "Akku (Kalibrierung)"
 
-#: src/menu/battcal.c:190
-#: src/menu/battcal.c:220
+#: src/menu/battcal.c:198
+#: src/menu/battcal.c:228
 msgid "Batterie (auto)"
 msgstr "Akku (auto)"
 
-#: src/menu/battcal.c:193
+#: src/menu/battcal.c:201
 msgid ""
 "1. Charger en USB\n"
 "jusqu'au plein (mesure\n"
@@ -1130,11 +1134,11 @@ msgstr ""
 "10 min stabil).\n"
 "ADC: %u%s"
 
-#: src/menu/battcal.c:194
+#: src/menu/battcal.c:202
 msgid " (pas d'USB)"
 msgstr " (kein USB)"
 
-#: src/menu/battcal.c:197
+#: src/menu/battcal.c:205
 msgid ""
 "Plein.\n"
 "2. Débrancher, puis\n"
@@ -1146,7 +1150,7 @@ msgstr ""
 "das Badge von selbst\n"
 "ausgehen lassen."
 
-#: src/menu/battcal.c:200
+#: src/menu/battcal.c:208
 msgid ""
 "2. Sur batterie : le\n"
 "laisser s'éteindre seul\n"
@@ -1158,7 +1162,7 @@ msgstr ""
 "(nicht mit dem Schalter).\n"
 "Seit %u h %02u"
 
-#: src/menu/battcal.c:205
+#: src/menu/battcal.c:213
 msgid ""
 "Autonomie : %u h %02u\n"
 "Restant : ~%d %%"
@@ -1166,7 +1170,7 @@ msgstr ""
 "Laufzeit: %u h %02u\n"
 "Rest: ~%d %%"
 
-#: src/menu/battcal.c:208
+#: src/menu/battcal.c:216
 msgid ""
 "Autonomie : %u h %02u\n"
 "Restant : inconnu (après\n"
@@ -1176,7 +1180,7 @@ msgstr ""
 "Rest: unbekannt (nach\n"
 "voller Ladung)"
 
-#: src/menu/battcal.c:211
+#: src/menu/battcal.c:219
 msgid ""
 "Pas encore calibrée.\n"
 "D : démarrer, puis\n"
@@ -1186,11 +1190,11 @@ msgstr ""
 "R: starten, dann\n"
 "den Schritten folgen."
 
-#: src/menu/battcal.c:215
+#: src/menu/battcal.c:223
 msgid "G : retour  D : démarrer"
 msgstr "L: zurück  R: starten"
 
-#: src/menu/battcal.c:216
+#: src/menu/battcal.c:224
 #: src/menu/chorus.c:410
 msgid "G : retour  D : arrêter"
 msgstr "L: zurück  R: stoppen"
@@ -6492,6 +6496,12 @@ msgstr "Ungültige .EPV-Datei"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Format nicht unterstützt"
+
+#~ msgid "Point enregistré"
+#~ msgstr "Punkt gesichert"
+
+#~ msgid "> Enregistrer le point"
+#~ msgstr "> Punkt speichern"
 
 #~ msgid "Batterie faible : mode économie"
 #~ msgstr "Akku schwach: Sparmodus"

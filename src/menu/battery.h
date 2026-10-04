@@ -50,10 +50,10 @@ void battery_task(absolute_time_t now);
 /** \brief Whether the measure is calibrated: otherwise the level must not be shown. */
 bool battery_calibrated(void);
 
-/** \brief Calibration: the battery measures \p mv millivolts while the ADC reads \p raw. Sets the first point, the
- * second one, or replaces the nearest one (the same within BATTERY_CAL_MIN_RAW), and saves it in the factory
- * settings. \return true when saved */
-bool battery_set_point(uint16_t mv, uint16_t raw);
+/** \brief Calibration: the battery measures \p mv millivolts while the ADC reads \p raw: sets the point \p i (0 or
+ * 1, chosen by the user) and saves it in the factory settings. The measure is calibrated only when the 2 points are
+ * BATTERY_CAL_MIN_RAW apart (battery_calibrated()). \return true when saved */
+bool battery_set_point(int i, uint16_t mv, uint16_t raw);
 
 /** \brief Forget the calibration of this badge. \return true when saved */
 bool battery_clear_points(void);

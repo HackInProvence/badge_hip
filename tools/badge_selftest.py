@@ -680,14 +680,14 @@ def test_battery(t):
         return
     t.screenshot('battery_calibration')
     t.mark()
-    t.keys('xb')  # Enregistrer le point (the voltage proposed: 4.20 V on USB)
+    t.keys('xb')  # Enregistrer le point 1 (the voltage proposed: 4.20 V on USB)
     p1 = t.expect(r'^battery: point 1 set, ADC raw (\d+) = (\d+) mV', 3)
     t.expect(r'^store: factory settings saved \(ok\)', 3)
-    t.keys('y' + 'a' * 50 + 'xb')  # 0.50 V less, but the same ADC value...
-    p2 = t.expect(r'^battery: point 1 set', 3)  # ...replaces point 1: 2 points need 2 different charges
+    t.keys('y' + 'a' * 50 + 'xxb')  # Enregistrer le point 2: 0.50 V less, but the same ADC value...
+    p2 = t.expect(r'^battery: point 2 set', 3)  # ...saved where the user chose (it replaced point 1 before)
     t.mark()
     t.keys('!')
-    still = t.expect(r'^battery: not calibrated', 5)  # One point (the same ADC value twice): never a wrong value
+    still = t.expect(r'^battery: not calibrated', 5)  # 2 points with the same ADC value: never a wrong value
     t.keys('xb')  # Effacer: asks a confirmation...
     t.pump(0.5)
     t.mark()

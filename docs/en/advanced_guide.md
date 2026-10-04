@@ -720,11 +720,12 @@ badge, with a multimeter:
    2 s), the measure, and points 1 and 2.
 2. Measure the voltage on the battery terminals. On the "Multimeter" row (Multimètre), set this voltage with the wings
    (L: −, R: +, by 10 mV; held: faster and faster; from 2.50 to 4.50 V).
-3. Right side to "> Save the point" (> Enregistrer le point), right wing: "Need a 2nd point".
-4. Unplug, let the voltage drop for a few minutes (at least 0.2 V apart, 150 ADC steps), measure, set and save:
-   "Point saved", the level is shown.
+3. Right side to "> Save point 1" (> Enregistrer le point 1), right wing: "Need a 2nd point".
+4. Unplug, let the voltage drop for a few minutes (at least 0.2 V apart, 150 ADC steps), measure, set, then
+   "> Save point 2": "Point 2 saved", the level is shown. "ADC too close to point 1": the ADC did not move enough,
+   the level stays hidden; try again later.
 
-A new point replaces the closest one. "> Clear" (> Effacer) asks for a confirmation ("R again: clear"). On the "Multimeter"
+Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer) asks for a confirmation ("R again: clear"). On the "Multimeter"
 row, the left wing is used to set the value: leave with a long press on the left wing, or from another row.
 The points are **factory settings**: kept by the reset (even "All") and by the updates.
 Check from the console: `!` prints `battery: factory points ...`.

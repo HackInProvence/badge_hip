@@ -63,15 +63,11 @@ bool battery_calibrated(void) {
     return abs(raw[1] - raw[0]) >= BATTERY_CAL_MIN_RAW && mv[0] && mv[1];
 }
 
-bool battery_set_point(uint16_t mv, uint16_t raw) {
+bool battery_set_point(int i, uint16_t mv, uint16_t raw) {
     store_factory_t *f = store_factory_get();
-    int i;
-    if (! f->battery_mv[0] || abs(raw - f->battery_raw[0]) < BATTERY_CAL_MIN_RAW)
-        i = 0;  /* First point, or the same one measured again */
-    else if (! f->battery_mv[1] || abs(raw - f->battery_raw[1]) < BATTERY_CAL_MIN_RAW)
-        i = 1;
-    else
-        i = abs(raw - f->battery_raw[0]) < abs(raw - f->battery_raw[1]) ? 0 : 1;  /* Replace the nearest one */
+    /* The point chosen by the user: it used to be chosen here (the same one again when the ADC was within
+     * BATTERY_CAL_MIN_RAW of point 1), so with an ADC almost flat the point 2 could never be saved */
+    i = i ? 1 : 0;
     f->battery_raw[i] = raw;
     f->battery_mv[i] = mv;
     printf("battery: point %d set, ADC raw %u = %u mV\n", i + 1, raw, mv);

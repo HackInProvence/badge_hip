@@ -18,7 +18,7 @@
 #define MV_MAX 4500
 #define MV_STEP 10
 
-enum { ROW_MV, ROW_SAVE, ROW_CLEAR, N_ROWS };
+enum { ROW_MV, ROW_SAVE_1, ROW_SAVE_2, ROW_CLEAR, N_ROWS };
 
 static int row = 0;
 static uint16_t entered_mv = 0;
@@ -73,14 +73,20 @@ static bool battcal_buttons(const app_buttons_t *b, absolute_time_t now) {
         return false;
     if (! (b->pressed & UI_BTN_B))
         return true;
-    if (row == ROW_SAVE) {
+    if (row == ROW_SAVE_1 || row == ROW_SAVE_2) {
+        const store_factory_t *f = store_factory_get();
+        int i = row - ROW_SAVE_1;
         uint16_t raw = battery_raw();
         if (! raw)
             snprintf(status, sizeof(status), _("Pas encore de mesure"));
-        else if (battery_set_point(entered_mv, raw))
-            snprintf(status, sizeof(status), battery_calibrated() ? _("Point enregistré") : _("Il faut un 2e point"));
-        else
+        else if (! battery_set_point(i, entered_mv, raw))
             snprintf(status, sizeof(status), _("Erreur d'écriture"));
+        else if (battery_calibrated())
+            snprintf(status, sizeof(status), _("Point %d enregistré"), i + 1);
+        else if (! f->battery_mv[1 - i])
+            snprintf(status, sizeof(status), _("Il faut un 2e point"));
+        else
+            snprintf(status, sizeof(status), _("ADC trop proche du point %d"), 2 - i);  /* Not calibrated */
     } else if (! confirm) {
         confirm = true;
         snprintf(status, sizeof(status), _("D encore : effacer"));
@@ -129,15 +135,17 @@ static void battcal_render(uint8_t *fb, absolute_time_t now) {
         }
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     }
-    y += 24;
-    for (int i = 0; i < N_ROWS; ++i, y += 22) {
+    y += 20;
+    for (int i = 0; i < N_ROWS; ++i, y += 18) {  /* 4 rows above the footer */
         volts(v, sizeof(v), entered_mv);
         if (i == ROW_MV)
             snprintf(text, sizeof(text), _("Multimètre : %s"), v);
+        else if (i == ROW_CLEAR)
+            snprintf(text, sizeof(text), "%s", _("> Effacer"));
         else
-            snprintf(text, sizeof(text), i == ROW_SAVE ? _("> Enregistrer le point") : _("> Effacer"));
+            snprintf(text, sizeof(text), _("> Enregistrer le point %d"), i - ROW_SAVE_1 + 1);
         if (i == row) {
-            gfx_fill_rect(fb, 4, y - 2, GFX_WIDTH - 8, 21, GFX_BLACK);
+            gfx_fill_rect(fb, 4, y - 1, GFX_WIDTH - 8, 18, GFX_BLACK);
             gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_CENTER);
         } else {
             gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
