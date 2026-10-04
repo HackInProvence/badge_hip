@@ -85,9 +85,10 @@ bool battery_clear_points(void) {
 }
 
 bool battery_charging(void) {
-    /* Enumerated by a computer (a terminal open or not: stdio_usb_connected() was only the terminal); the board
-     * has no VBUS sense: a charger alone is not seen */
-    return tud_mounted();
+    /* Enumerated by a computer (a terminal open or not: stdio_usb_connected() was only the terminal) and the bus
+     * active: the board has no VBUS sense, so an unplugged badge stays "mounted" with its bus idle (suspended) - it
+     * said USB for 13 h on its battery during a battery life test; a charger alone is not seen either */
+    return tud_mounted() && ! tud_suspended();
 }
 
 void battery_task(absolute_time_t now) {
