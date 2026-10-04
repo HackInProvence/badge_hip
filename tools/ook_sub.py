@@ -18,7 +18,8 @@ badge (src/radio/ookdec.c), to test its receiver with a Flipper: copy the files 
     python tools/ook_sub.py check file.sub...                       checks the format of files
     python tools/ook_sub.py selftest                                generates everything in a temporary folder and checks it
 
-Options of all the generators: -o / --output (file, or folder for "weather"), --repeats (frames per file).
+Options of all the generators: -o / --output (file, or folder for "weather"), --repeats (frames per file),
+--player (the format of the simpler RAW players: see below).
 
 The Flipper can also send Princeton itself, without file: Sub-GHz > Add Manually > Princeton_433 (random 20 bits key,
 button 0x4, te = 400µs, 24 bits), then edit the "Key:" line of the saved file to choose the code.
@@ -26,6 +27,10 @@ button 0x4, te = 400µs, 24 bits), then edit the "Key:" line of the saved file t
 Format (flipperzero-firmware documentation/file_formats/SubGhzFileFormats.md, "RAW Files"): header lines, then
 "RAW_Data:" lines of up to 512 non-zero durations in µs, alternating positive (carrier on) and negative (carrier off),
 the first one positive.
+With --player, the format of the simpler RAW players (that do not read the signed durations of the Flipper): no
+comment line, a blank line after "Protocol: RAW", unsigned durations (carrier on, off, on... the first one on) and
+RAW_Data lines of PLAYER_PER_LINE values (an even count: each line starts with a carrier on). Not for the Flipper
+(it needs the signs): keep the default format for it.
 
 The timings and bit layouts are those of src/radio/ookdec.c (references: rtl_433 src/devices, Flipper Zero
 lib/subghz/protocols and the Weather Station app), and the same as the encoders of src/tests/host/test_ookdec.c:
@@ -40,6 +45,8 @@ import tempfile
 FREQUENCY = 433920000
 PRESET = 'FuriHalSubGhzPresetOok650Async'
 MAX_PER_LINE = 512
+PLAYER_PER_LINE = 16
+PLAYER = False  # --player: the format of the simpler RAW players
 FINAL_SILENCE = 30000  # µs of silence at the end of the file
 
 
@@ -272,13 +279,16 @@ WEATHER = {
 
 # ---- Files ----
 
-def sub_text(durations, comment=None):
+def sub_text(durations, comment=None, player=False):
     lines = ['Filetype: Flipper SubGhz RAW File', 'Version: 1']
-    if comment:
+    if comment and not player:
         lines.append('# ' + comment)
     lines += ['Frequency: %d' % FREQUENCY, 'Preset: ' + PRESET, 'Protocol: RAW']
-    for i in range(0, len(durations), MAX_PER_LINE):
-        lines.append('RAW_Data: ' + ' '.join(str(d) for d in durations[i:i + MAX_PER_LINE]))
+    if player:
+        lines.append('')
+    n = PLAYER_PER_LINE if player else MAX_PER_LINE
+    for i in range(0, len(durations), n):
+        lines.append('RAW_Data: ' + ' '.join(str(abs(d) if player else d) for d in durations[i:i + n]))
     return '\n'.join(lines) + '\n'
 
 
@@ -312,6 +322,8 @@ def check_file(path):
         raise ValueError('%s: the file must start with Filetype and Version' % path)
     if not durations or durations[0] <= 0:
         raise ValueError('%s: the first duration must be positive' % path)
+    if all(d > 0 for d in durations):  # The format of the simpler players (--player): unsigned, alternating
+        durations = [d if i % 2 == 0 else -d for i, d in enumerate(durations)]
     for i, d in enumerate(durations):
         if d == 0:
             raise ValueError('%s: zero duration at %d' % (path, i))
@@ -322,7 +334,7 @@ def check_file(path):
 
 def write(path, durations, comment):
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(sub_text(durations, comment))
+        f.write(sub_text(durations, comment, PLAYER))
     d = check_file(path)
     assert d == durations
     print('%s: %d durations, %.0f ms' % (path, len(d), sum(abs(x) for x in d) / 1000))
@@ -359,6 +371,11 @@ def selftest_in(folder):
     write(os.path.join(folder, 'princeton.sub'), princeton(0x123454), 'Princeton 0x123454')
     write(os.path.join(folder, 'came.sub'), came(0x5A1), 'CAME 0x5A1')
     write(os.path.join(folder, 'nice.sub'), nice_flo(0x3F1, 24), 'Nice FLO 0x3F1')
+    path = os.path.join(folder, 'princeton_player.sub')
+    with open(path, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(sub_text(princeton(0x123454), 'not written', player=True))
+    assert check_file(path) == princeton(0x123454)
+    assert '#' not in open(path).read() and '-' not in open(path).read()
     # Shapes: number of durations of one frame, merged with the neighbours
     assert len(princeton(0x123454, repeats=1)) == 50
     assert len(nexus(213, 45, 2, 0x5A, False, repeats=1)) == 2 + 74
@@ -378,6 +395,7 @@ def main():
         q.add_argument('code', type=lambda x: int(x, 0))
         q.add_argument('-o', '--output')
         q.add_argument('--repeats', type=int)
+        q.add_argument('--player', action='store_true', help='the format of the simpler RAW players')
         if name == 'princeton':
             q.add_argument('--te', type=int, default=400, help='elementary duration in µs (default 400, as the Flipper)')
         else:
@@ -390,11 +408,14 @@ def main():
     q.add_argument('--battery-low', action='store_true')
     q.add_argument('--protocol', choices=['all'] + list(WEATHER), default='all')
     q.add_argument('--repeats', type=int)
+    q.add_argument('--player', action='store_true', help='the format of the simpler RAW players')
     q.add_argument('-o', '--output', default='.', help='folder')
     q = sub.add_parser('check')
     q.add_argument('files', nargs='+')
     sub.add_parser('selftest')
     args = p.parse_args()
+    global PLAYER
+    PLAYER = getattr(args, 'player', False)
 
     try:
         if args.cmd == 'princeton':

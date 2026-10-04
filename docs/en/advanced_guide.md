@@ -456,6 +456,11 @@ a cicada does not react, send it again (its receiver alternates between OOK and 
 
 Made by `python tools/ook_sub.py princeton 0xC16A02 -o SecSea_raw_muet.sub` (`--repeats N` for a longer signal).
 
+For a **simpler RAW player** than the Flipper, that does not recognise these files: `tools/flipper/player/`, the
+same commands (`SecSea_player_muet.sub`...) in the format of these players (no comment line, a blank line after
+`Protocol: RAW`, unsigned durations: carrier on, off, on..., 16 per line). Not for the Flipper, which needs the
+signs. Option `--player` of `ook_sub.py`.
+
 Four RAW files (GFSK packets of the network of the badges, `NET_LEDS`, made by `flipper_net_sub.py leds`) drive the
 LEDs of the cicadas in range, without relay (TTL 0): for **range tests**. Same folder, Sub-GHz > Saved > the file >
 Send:

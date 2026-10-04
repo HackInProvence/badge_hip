@@ -455,6 +455,11 @@ Send ; si une cigale ne réagit pas, renvoyez-le (son récepteur alterne entre l
 Régénérés par `python tools/ook_sub.py princeton 0xC16A02 -o SecSea_raw_muet.sub` (`--repeats N` pour un signal
 plus long).
 
+Pour un **lecteur RAW plus simple** que le Flipper, qui ne reconnaît pas ces fichiers : `tools/flipper/player/`, les
+mêmes commandes (`SecSea_player_muet.sub`...) au format de ces lecteurs (sans ligne de commentaire, une ligne vide
+après `Protocol: RAW`, des durées sans signe : porteuse allumée, éteinte, allumée..., 16 par ligne). Pas pour le
+Flipper, qui a besoin des signes. Option `--player` de `ook_sub.py`.
+
 Quatre fichiers RAW (paquets GFSK du réseau des badges, `NET_LEDS`, générés par `flipper_net_sub.py leds`) pilotent
 les LEDs des cigales à portée, sans relais (TTL 0) : pour les **essais de portée**. Même dossier, Sub-GHz > Saved >
 le fichier > Send (Envoyer) :
