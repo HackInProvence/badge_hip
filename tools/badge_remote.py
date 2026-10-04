@@ -20,6 +20,7 @@ Keyboard (the window must have the focus):
     Right / Enter / b   right wing (OK)                   Shift: long press
     F5              ask the screen again
     F12             screenshot (PNG)
+    F1 / "?" button the help and the table of all the commands of the serial port (SERIAL_COMMANDS)
 Keyboard mode (check box): the characters typed go to the text editor of the badge (name, contact card, answers),
     Enter = done, Escape = cancel, Backspace = erase; the arrows are still the buttons.
 Several badges plugged in: choose one in the "Badge" list (or --port).
@@ -51,6 +52,54 @@ except ImportError:
 
 WIDTH = HEIGHT = 200
 PICO_VID = 0x2E8A
+
+# Every command of the USB serial port of the firmware (src/menu/main.c, buttons_pressed()): the key sent, what it
+# does. Shown by the "?" button. Keep it up to date when a command is added: the host test "remote_help"
+# (src/tests/host/run_tests.py) fails when a command of main.c is missing here.
+SERIAL_COMMANDS = [
+    ('a', 'Aile gauche (retour, annuler)'),
+    ('A', 'Aile gauche, appui long'),
+    ('b', 'Aile droite (OK, choisir)'),
+    ('B', 'Aile droite, appui long'),
+    ('x', 'Flanc droit (descendre)'),
+    ('X', 'Flanc droit, appui long'),
+    ('y', 'Flanc gauche (monter)'),
+    ('Y', 'Flanc gauche, appui long'),
+    ('!', 'Diagnostic : extensions, réseau, cigales voisines, CTF, télécommande, batterie, version'),
+    ('?', 'Diagnostic : état de l\'audio'),
+    ('i', 'Test infrarouge : construit, décode et émet une trame NEC'),
+    ('o', 'Diagnostic : état du récepteur OOK (télécommandes 433 MHz)'),
+    ('O', 'Diagnostic : traces des essais de décodage OOK (marche / arrêt)'),
+    ('p', 'Diagnostic : dernières impulsions OOK reçues'),
+    ('k', 'Export des contacts reçus (tools/contacts_export.py)'),
+    ('V', 'Réseau : traces des paquets reçus et envoyés (marche / arrêt)'),
+    ('P', 'Réseau : envoie un ping (les badges qui l\'entendent l\'écrivent)'),
+    ('L', 'Réseau : boucle locale, les paquets reviennent comme d\'un badge jumeau (marche / arrêt)'),
+    ('M', 'Radio : envoie le message radio (profil chat du Flipper)'),
+    ('r', 'Radio : registres du CC1101 et sa PATABLE'),
+    ('W', 'Test : batterie faible simulée, mode économie (marche / arrêt)'),
+    ('E', 'Langue : retour à l\'anglais'),
+    ('N', 'Langue : langue suivante'),
+    ('U', 'Contrôle des textes coupés ou sous le pied de page (traces "uicheck:", marche / arrêt)'),
+    ('R', 'Redémarre le badge'),
+    ('[', 'Écran : envoyé à chaque changement (cette application)'),
+    (']', 'Écran : plus envoyé'),
+    ('s', 'Écran : envoyé une fois (F5)'),
+    ('0x01 A / a', 'Mode admin : activé / désactivé (case "Mode admin")'),
+    ('0x02 + caractère', 'Mode clavier : tape le caractère dans l\'éditeur de texte du badge'),
+]
+
+HELP_TEXT = '''Télécommande du badge SecSea par son port série USB.
+
+Clavier (la fenêtre doit avoir le focus) :
+  Haut / y : flanc gauche (monter)       Bas / x : flanc droit (descendre)
+  Gauche / a : aile gauche (retour)      Droite / Entrée / b : aile droite (OK)
+  Maj + touche : appui long              F5 : redemander l'écran
+  F12 : capture d'écran (PNG)            F1 : cette aide
+Mode clavier (case) : les caractères tapés vont dans l'éditeur de texte du badge
+  (Entrée : valider, Échap : annuler, Retour arrière : effacer).
+
+Les commandes du port série (double-clic : envoyer au badge) :'''
 # Colors of the 4 gray levels, 0 = black to 3 = white, with a paper tone like the e-Paper
 GRAYS = [(0x20, 0x20, 0x20), (0x6E, 0x6E, 0x6A), (0xB4, 0xB4, 0xAE), (0xEC, 0xEC, 0xE4)]
 
@@ -323,6 +372,33 @@ def run_window(port, zoom, on_ready=None):
     ttk.Button(tools, text='Capture (F12)', command=screenshot).pack(side='left')
     ttk.Button(tools, text='Rafraîchir (F5)', command=lambda: badge.send('s')).pack(side='left', padx=4)
     ttk.Button(tools, text='Diagnostic', command=lambda: badge.send('!')).pack(side='left')
+
+    def show_help(_event=None):
+        win = tk.Toplevel(root)
+        win.title('Badge SecSea - aide et commandes')
+        win.configure(padx=10, pady=10)
+        tk.Label(win, text=HELP_TEXT, justify='left', anchor='w', font=('Consolas', 9)).pack(fill='x')
+        table = ttk.Treeview(win, columns=('key', 'what'), show='headings', height=len(SERIAL_COMMANDS))
+        table.heading('key', text='Commande')
+        table.heading('what', text='Effet')
+        table.column('key', width=120, anchor='w')
+        table.column('what', width=620, anchor='w')
+        for key, what in SERIAL_COMMANDS:
+            table.insert('', 'end', values=(key, what))
+        table.pack(fill='both', expand=True, pady=(6, 0))
+
+        def send_selected(_event):
+            item = table.focus()
+            if not item:
+                return
+            key = table.item(item, 'values')[0]
+            if len(key) == 1:  # The commands with an argument (0x01, 0x02) are in the main window
+                badge.send(key)
+                badge.logs.put(f'--- sent: {key}')
+        table.bind('<Double-1>', send_selected)
+        ttk.Button(win, text='Fermer', command=win.destroy).pack(pady=(6, 0))
+    ttk.Button(tools, text='?', width=3, command=show_help).pack(side='left', padx=4)
+    root.bind('<F1>', show_help)
     ttk.Checkbutton(tools, text='Journal', variable=log_visible,
                     command=lambda: log.grid() if log_visible.get() else log.grid_remove()).pack(side='right')
     ttk.Checkbutton(tools, text='Mode clavier (saisie de texte)', variable=keyboard,

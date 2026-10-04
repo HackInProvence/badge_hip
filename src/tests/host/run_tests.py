@@ -20,6 +20,7 @@ Exit code 0 when all the tests pass.
 
 import argparse
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -111,6 +112,22 @@ def test_i18n(work):
     ok, out = c_test('test_i18n', ['menu/i18n.c', 'menu/i18n_table.c'], [os.path.join(SRC, 'menu')], work,
                      defines=['I18N_NO_STORE'])
     return ok, r.stdout + out
+
+
+def test_remote_help(work):
+    # The help of tools/badge_remote.py ("?" button) lists every command of the serial port of main.c
+    src = open(os.path.join(SRC, 'menu', 'main.c'), encoding='utf-8').read()
+    body = src[src.index('static uint8_t buttons_pressed('):]
+    body = body[:body.index('\n}\n')]
+    keys = set(re.findall(r"case '(.)'", body)) | {f'0x{int(v, 16):02x}' for v in re.findall(r'case 0x([0-9A-Fa-f]+)', body)}
+    sys.path.insert(0, os.path.join(SRC, '..', 'tools'))
+    import badge_remote
+    listed = {k.split()[0].lower() if k.startswith('0x') else k for k, _ in badge_remote.SERIAL_COMMANDS}
+    missing = sorted(keys - listed)
+    extra = sorted(k for k in listed - keys)
+    ok = not missing and not extra
+    return ok, f'{len(keys)} commands' + (f', missing in SERIAL_COMMANDS: {missing}' if missing else '') + \
+        (f', not in main.c: {extra}' if extra else '')
 
 
 def test_rtttl(work):
@@ -289,7 +306,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
