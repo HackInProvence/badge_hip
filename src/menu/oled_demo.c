@@ -72,6 +72,12 @@ static bool open_video(void) {
         f_close(&video);
         return false;
     }
+    uint16_t width = header[8] | header[9] << 8, height = header[10] | header[11] << 8;
+    uint16_t bpp = header[14] | header[15] << 8;
+    if (width * height / 8 != EPV_FRAME_SIZE || width != 200 || bpp != 1) {
+        f_close(&video);  /* Not the frames of 200 x 200 x 1 bit read below */
+        return false;
+    }
     video_fps = header[12] | header[13] << 8;
     video_frames = header[16] | header[17] << 8 | header[18] << 16 | (uint32_t)header[19] << 24;
     if (! video_fps)

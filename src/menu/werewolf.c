@@ -299,7 +299,8 @@ static void new_phase(uint8_t prev) {
 
 static void log_deaths(void) {
     for (int i = 0; i < n_deaths; ++i)
-        printf("werewolf: death %s (%s)\n", pname(deaths[i]), ww_role_name(revealed[deaths[i]]));
+        printf("werewolf: death %s (%s)\n", pname(deaths[i]),
+               ww_role_name(deaths[i] < WW_MAX ? revealed[deaths[i]] : WW_NONE));  /* A byte of the radio */
     if (! n_deaths && (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT))
         printf("werewolf: no death\n");
 }

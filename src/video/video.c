@@ -150,6 +150,8 @@ static void feed_audio(void) {
         size_t n = audio_free();
         if (n > AUDIO_CHUNK)
             n = AUDIO_CHUNK;
+        if (audio_read >= n_samples)
+            return;  /* All read (or a bogus header): never n_samples - audio_read below 0 */
         if (n > n_samples - audio_read)
             n = n_samples - audio_read;
         if (n < 256 && audio_read < n_samples)  /* Not worth a read yet */

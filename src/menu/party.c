@@ -292,6 +292,8 @@ static void handle(const net_packet_t *p) {
                 n_roster = x[2] > PARTY_MAX ? PARTY_MAX : x[2];
                 memset(roster, 0, sizeof(roster));
             }
+            if (x[0] >= pages_total)
+                return;  /* A page number out of the roster (a byte of the radio): the shift would be undefined */
             pages_got |= 1ull << x[0];
             for (int k = 0; k < PER_PAGE && 3 + (k + 1) * 12 <= n; ++k) {
                 int i = x[0] * PER_PAGE + k;
