@@ -439,6 +439,28 @@ command:
 
 Hold the button for a second. The commands: [§ 5](#5-remote-control-mute-mode-sleep-and-demo-mode).
 
+Four RAW files (GFSK packets of the network of the badges, `NET_LEDS`, made by `flipper_net_sub.py leds`) drive the
+LEDs of the cicadas in range, without relay (TTL 0): for **range tests**. Same folder, Sub-GHz > Saved > the file >
+Send:
+
+| File | Effect |
+|---|---|
+| `SecSea_leds_vert.sub` | green LEDs (50 %) |
+| `SecSea_leds_rouge.sub` | red LEDs (50 %) |
+| `SecSea_leds_retablir.sub` | back to the usual animation of the badge |
+| `SecSea_leds_vert_rouge_boucle.sub` | **green, red, green... every second, for 2 min 30** (150 orders) |
+
+Range test with the loop: start it, walk away with the Flipper; while a cicada alternates green / red every second,
+it receives; when it skips colors, it is at the edge of the range. Send the file again to go on, then
+`SecSea_leds_retablir.sub`. For another length, period or color:
+
+```bash
+python tools/flipper_net_sub.py leds green red --period 1 --count 600 --ttl 0 -o loop_10min.sub
+python tools/flipper_net_sub.py leds blue --level 100 --ttl 0 --send    # sent right away over USB
+```
+
+A cicada in saving mode (low battery) keeps its LEDs off.
+
 #### `tools/ook_sub.py` — OOK `.sub` files (remotes, weather sensors)
 
 Writes Sub-GHz RAW files (preset `FuriHalSubGhzPresetOok650Async`) with the timings the badge decodes: to drive the
@@ -470,13 +492,17 @@ prints the "SecSea" preset that lets the Flipper record the packets of a badge. 
 |---|---|
 | `command CMD` | a remote command (`NET_COMMAND`), e.g. `0x02` |
 | `ping` | a ping (the badges print it on their serial port) |
+| `leds COLOR...` | the **LEDs of the cicadas** (`NET_LEDS`, like Admin > Cicada LEDs): one color (`green`, `red`, `orange`, `yellow`, `cyan`, `blue`, `purple`, `pink`, `white`, or `RRGGBB`; the French names work too), or several in a loop, one every `--period` s; `off`: back to the animation of the badge |
 | `pirates [N]` | a **network of N cicadas nearby** (6 by default, 16 at most) with pirate names (Rackham, Barbossa, AnneBony, Surcouf, La Buse...), each with a random score, skills and level, sending their beacons (`NET_BEACON`) `--repeats` times: to test the reception and the decoding of the beacons (Social > Radar, or `!` on the console of the badge) |
 | `raw TYPE BYTES...` | any packet: the type, then the data bytes in hex |
 | `preset` | prints the lines to add to the file `subghz/assets/setting_user` of the SD card of the Flipper |
 | `--id N` | id of the sender, 4 bytes (default `0x5EC5EA26`) |
 | `--repeats N` | packets in the file (default 8) |
 | `--gap MS` | milliseconds between two packets (default 250) |
-| `--ttl N` | `command`: hops of the relay by the cicadas, 0 to 4 (default 2, 0: no relay) |
+| `--ttl N` | `command`, `leds`: hops of the relay by the cicadas, 0 to 4 (default 2, 0: no relay, for range tests) |
+| `--period S` | `leds`: seconds between two colors (default 1) |
+| `--count N` | `leds`: orders in the file (default 1; 150 = 2 min 30 at 1 s) |
+| `--level N` | `leds`: brightness, 1 to 100 % (default 50) |
 | `-o`, `--output` | output file (default `secsea_<kind>.sub`) |
 | `--power DBM` | power of the Flipper: 10 (default, like the badges), 7, 5, 0, -10, -15, -20, -30 |
 | `--send` | copies the file to the Flipper plugged in USB and sends it (its serial console, like `flipper_weather.py`) |
@@ -486,6 +512,7 @@ prints the "SecSea" preset that lets the Flipper record the packets of a badge. 
 python tools/flipper_net_sub.py command 0x02 -o mute_gfsk.sub
 python tools/flipper_net_sub.py preset
 python tools/flipper_net_sub.py pirates 8 --repeats 6 --power -10 --send
+python tools/flipper_net_sub.py leds green red --period 1 --count 150 --ttl 0 -o leds_loop.sub
 ```
 
 Precautions:
@@ -582,6 +609,7 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 | `M` | sends the "Radio: message" (readable with `subghz chat 433920000 0` on a Flipper) |
 | `P` | ping at +10 dBm: the badges that hear it print `net: ping #n from <id>, rssi ...` |
 | `L` | *loopback* mode (the packets sent come back as from a twin badge, to test alone): on / off |
+| `W` | simulated low battery (saving mode: mute, remote control off, warning, icon): on / off |
 | `R` | immediate reboot of the badge |
 | `[` / `]` | sending the screen on every change: on / off (`@FB ...` lines) |
 | `s` | sends the screen once |

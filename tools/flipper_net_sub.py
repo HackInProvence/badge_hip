@@ -14,6 +14,8 @@ Flipper Zero and the network of the cicadas (GFSK 9.99 kbps, sync word 0xC16A, s
        python tools/flipper_net_sub.py ping -o ping.sub
        python tools/flipper_net_sub.py raw 0x0F 01 -o any.sub           (type, then the data bytes in hex)
        python tools/flipper_net_sub.py pirates 8 --send                 (8 cicadas with pirate names, see below)
+       python tools/flipper_net_sub.py leds vert rouge --period 1 --count 150 --ttl 0 -o leds.sub
+                         (the LEDs of the cicadas: one color, or a loop of colors, one every --period seconds)
    Copy them to the SD card of the Flipper (subghz/), then Sub-GHz > Saved > the file > Send; or --send: copied and
    sent by the Flipper plugged in USB (its serial console, like flipper_weather.py).
    "pirates N": a crowd of N cicadas nearby (N <= 16), each with a pirate name, a score, skills and a level, sending
@@ -38,7 +40,14 @@ BAUD = 9992.6  # MDMCFG4 = 0xC8, MDMCFG3 = 0x93 with the 26 MHz crystal of the F
 FREQUENCY = 433920000
 SYNC = (0xC1, 0x6A)
 MAGIC = 0xC1
-TYPES = {'beacon': 0x01, 'command': 0x02, 'message': 0x03, 'ping': 0x0F}
+TYPES = {'beacon': 0x01, 'command': 0x02, 'message': 0x03, 'leds': 0x0C, 'ping': 0x0F}
+
+# The colors of the LEDs of the cicadas (src/menu/ledcast.c), French and English names, or RRGGBB in hex
+COLORS = {'rouge': (255, 0, 0), 'red': (255, 0, 0), 'orange': (255, 80, 0), 'jaune': (255, 200, 0),
+          'yellow': (255, 200, 0), 'vert': (0, 255, 0), 'green': (0, 255, 0), 'cyan': (0, 255, 255),
+          'bleu': (0, 0, 255), 'blue': (0, 0, 255), 'violet': (160, 0, 255), 'purple': (160, 0, 255),
+          'rose': (255, 0, 120), 'pink': (255, 0, 120), 'blanc': (255, 255, 255), 'white': (255, 255, 255),
+          'eteint': None, 'off': None}
 
 # The pirate cicadas: names of 8 bytes at most (the name in a beacon, social.c)
 PIRATES = ['Rackham', 'Barbossa', 'AnneBony', 'MaryRead', 'Surcouf', 'La Buse', 'Flint', 'Silver', 'Kidd',
@@ -128,7 +137,7 @@ def write_sub(path, durations, comment):
 
 def main():
     parser = argparse.ArgumentParser(description='Flipper Zero .sub files for the network of the cicadas')
-    parser.add_argument('kind', choices=['command', 'ping', 'raw', 'pirates', 'preset'])
+    parser.add_argument('kind', choices=['command', 'ping', 'raw', 'pirates', 'leds', 'preset'])
     parser.add_argument('args', nargs='*', help='command: the command (0x02...); raw: the type then data bytes (hex); '
                         'pirates: how many cicadas (default 6)')
     parser.add_argument('--id', type=lambda v: int(v, 0), default=0x5EC5EA26, help='id of the sender (4 bytes)')
@@ -139,7 +148,10 @@ def main():
     parser.add_argument('--power', type=int, default=10, choices=sorted(POWERS),
                         help='power of the Flipper in dBm (default +10, like the badges)')
     parser.add_argument('--ttl', type=int, default=2, choices=range(0, 5),
-                        help='command: hops of the relay by the cicadas (default 2, 0: no relay)')
+                        help='command, leds: hops of the relay by the cicadas (default 2, 0: no relay: range tests)')
+    parser.add_argument('--period', type=float, default=1.0, help='leds: seconds between two colors (1)')
+    parser.add_argument('--count', type=int, default=1, help='leds: orders in the file (1; e.g. 150 = 2.5 min at 1 s)')
+    parser.add_argument('--level', type=int, default=50, help='leds: brightness, 1 to 100 %% (50)')
     parser.add_argument('--send', action='store_true', help='copy the file to the Flipper plugged in USB and send it')
     parser.add_argument('--port', default=None, help='with --send: serial port of the Flipper (found by itself)')
     args = parser.parse_args()
@@ -153,6 +165,15 @@ def main():
         return
     header = [MAGIC]
     sender = [(args.id >> (8 * i)) & 0xFF for i in range(4)]
+    if args.kind == 'leds':
+        durations, comment = leds(args.args or ['vert'], args.period, args.count, args.level, args.ttl, sender)
+        out = args.output or 'secsea_leds.sub'
+        write_sub(out, durations, comment)
+        seconds = sum(abs(d) for chunk in durations for d in chunk) / 1e6
+        print(f'{out}: {comment}, {seconds:.0f} s on the air')
+        if args.send:
+            send(out, args.port)
+        return
     if args.kind == 'pirates':
         durations, comment = pirates(int(args.args[0]) if args.args else 6, args.repeats)
         out = args.output or 'secsea_pirates.sub'
@@ -179,6 +200,33 @@ def main():
     print(f'{out}: {len(packet)} bytes, {sum(len(d) for d in durations)} durations')
     if args.send:
         send(out, args.port)
+
+
+def leds(colors, period, count, level, ttl, sender):
+    """The LED orders of an admin badge (NET_LEDS, ledcast.c), fixed colors, one every \\p period seconds, in a loop
+    over \\p colors, \\p count orders in all. Each order has its own nonce (a cicada applies each new one).
+    Returns (durations per packet, comment)."""
+    rgb = []
+    for c in colors:
+        c = c.lower()
+        if c in COLORS:
+            rgb.append(COLORS[c])
+        elif len(c) == 6:
+            rgb.append(tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)))
+        else:
+            sys.exit(f'unknown color {c}: ' + ', '.join(COLORS) + ' or RRGGBB')
+    level = max(1, min(100, level))
+    durations = []
+    for k in range(count):
+        color = rgb[k % len(rgb)]
+        nonce = random.randrange(65536)
+        mode = 0 if color is None else 1  # Off: back to the animation of the badge ("Rétablir")
+        r, g, b = color or (0, 0, 0)
+        data = [nonce & 0xFF, nonce >> 8, mode, r, g, b, 0xF4, 0x01, 0xF4, 0x01, level, ttl] + sender
+        packet = [MAGIC, TYPES['leds']] + sender + data
+        durations.append(raw_durations(packet_bits(packet), 1, round(period * 1e6)))
+    names = '/'.join(colors)
+    return durations, f'SecSea LEDs {names}: {count} orders, every {period:g} s, {level} %, TTL {ttl}'
 
 
 def pirates(n, rounds):

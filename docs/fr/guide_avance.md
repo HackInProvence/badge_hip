@@ -437,6 +437,28 @@ envoie une commande :
 
 Maintenez le bouton une seconde. Les commandes : [§ 5](#5-télécommande-mode-muet-sommeil-et-mode-démo).
 
+Quatre fichiers RAW (paquets GFSK du réseau des badges, `NET_LEDS`, générés par `flipper_net_sub.py leds`) pilotent
+les LEDs des cigales à portée, sans relais (TTL 0) : pour les **essais de portée**. Même dossier, Sub-GHz > Saved >
+le fichier > Send (Envoyer) :
+
+| Fichier | Effet |
+|---|---|
+| `SecSea_leds_vert.sub` | LEDs vertes (50 %) |
+| `SecSea_leds_rouge.sub` | LEDs rouges (50 %) |
+| `SecSea_leds_retablir.sub` | retour à l'animation habituelle du badge |
+| `SecSea_leds_vert_rouge_boucle.sub` | **vert, rouge, vert... toutes les secondes, pendant 2 min 30** (150 ordres) |
+
+Essai de portée avec la boucle : lancez-la, éloignez-vous avec le Flipper ; tant qu'une cigale alterne vert / rouge
+chaque seconde, elle reçoit ; si elle saute des couleurs, elle est en limite de portée. Rejouez le fichier pour
+continuer, puis `SecSea_leds_retablir.sub`. Pour une autre durée, période ou couleur :
+
+```bash
+python tools/flipper_net_sub.py leds vert rouge --period 1 --count 600 --ttl 0 -o boucle_10min.sub
+python tools/flipper_net_sub.py leds bleu --level 100 --ttl 0 --send    # envoyé tout de suite par l'USB
+```
+
+Une cigale en mode économie (batterie faible) garde ses LEDs éteintes.
+
 #### `tools/ook_sub.py` — fichiers `.sub` OOK (télécommandes, sondes météo)
 
 Écrit des fichiers Sub-GHz RAW (préréglage `FuriHalSubGhzPresetOok650Async`) avec les chronogrammes que décode le
@@ -470,12 +492,16 @@ Bibliothèque standard.
 | `command CMD` | une commande à distance (`NET_COMMAND`), par exemple `0x02` |
 | `ping` | un ping (les badges l'écrivent sur leur port série) |
 | `raw TYPE OCTETS...` | un paquet quelconque : le type, puis les octets de données en hexadécimal |
+| `leds COULEUR...` | les **LEDs des cigales** (`NET_LEDS`, comme Admin > LEDs des cigales) : une couleur (`vert`, `rouge`, `orange`, `jaune`, `cyan`, `bleu`, `violet`, `rose`, `blanc`, ou `RRGGBB`), ou plusieurs en boucle, une toutes les `--period` s ; `eteint` : rétablir l'animation du badge |
 | `pirates [N]` | un **réseau de N cigales proches** (6 par défaut, 16 au plus) aux noms de pirates (Rackham, Barbossa, AnneBony, Surcouf, La Buse...), chacune avec un score, des compétences et un niveau tirés au hasard, qui envoient leurs balises (`NET_BEACON`) `--repeats` fois : pour tester la réception et le décodage des balises (Social > Radar, ou `!` sur la console du badge) |
 | `preset` | affiche les lignes à ajouter au fichier `subghz/assets/setting_user` de la carte SD du Flipper |
 | `--id N` | identifiant de l'émetteur, 4 octets (défaut `0x5EC5EA26`) |
 | `--repeats N` | paquets dans le fichier (défaut 8) |
 | `--gap MS` | millisecondes entre deux paquets (défaut 250) |
-| `--ttl N` | `command` : sauts du relais par les cigales, 0 à 4 (défaut 2, 0 : pas de relais) |
+| `--ttl N` | `command`, `leds` : sauts du relais par les cigales, 0 à 4 (défaut 2, 0 : pas de relais, pour les essais de portée) |
+| `--period S` | `leds` : secondes entre deux couleurs (défaut 1) |
+| `--count N` | `leds` : ordres dans le fichier (défaut 1 ; 150 = 2 min 30 à 1 s) |
+| `--level N` | `leds` : luminosité, 1 à 100 % (défaut 50) |
 | `-o`, `--output` | fichier de sortie (défaut `secsea_<type>.sub`) |
 | `--power DBM` | puissance du Flipper : 10 (défaut, comme les badges), 7, 5, 0, -10, -15, -20, -30 |
 | `--send` | copie le fichier sur le Flipper branché en USB et l'envoie (sa console série, comme `flipper_weather.py`) |
@@ -485,6 +511,7 @@ Bibliothèque standard.
 python tools/flipper_net_sub.py command 0x02 -o muet_gfsk.sub
 python tools/flipper_net_sub.py pirates 8 --repeats 6 --power -10 --send
 python tools/flipper_net_sub.py preset
+python tools/flipper_net_sub.py leds vert rouge --period 1 --count 150 --ttl 0 -o leds_boucle.sub
 ```
 
 Précautions :
@@ -581,6 +608,7 @@ PuTTY (Windows, type « Serial ») convient aussi. Chaque caractère est une com
 | `M` | envoie le « Radio : message » (lisible par `subghz chat 433920000 0` sur un Flipper) |
 | `P` | ping à +10 dBm : les badges qui l'entendent écrivent `net: ping #n from <id>, rssi ...` |
 | `L` | mode *loopback* (les paquets émis reviennent comme d'un badge jumeau, pour tester seul) : marche / arrêt |
+| `W` | batterie faible simulée (mode économie : muet, télécommande coupée, alerte, icône) : marche / arrêt |
 | `R` | redémarrage immédiat du badge |
 | `[` / `]` | envoi de l'écran à chaque changement : marche / arrêt (lignes `@FB ...`) |
 | `s` | envoi de l'écran une fois |
