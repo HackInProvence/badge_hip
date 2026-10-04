@@ -120,4 +120,17 @@ bool battery_auto_clear(void);
 /** \brief battery_percent() is an estimate of the automatic calibration (no manual calibration). */
 bool battery_percent_estimated(void);
 
+/* ------ Low battery: the degraded mode (main.c: mute, no remote control, a warning, an icon) ------
+ * On battery, when the estimate is BATTERY_LOW_PERCENT or less, or the ADC fell BATTERY_FALL_RAW below its level
+ * when unplugged (works without any calibration), for BATTERY_LOW_MEASURES measures in a row; then kept until the USB
+ * is connected again. */
+
+#define BATTERY_LOW_MEASURES 5
+
+/** \brief The battery is low. */
+bool battery_low(void);
+
+/** \brief Test: a low battery simulated (key 'W' of the serial port), whatever the measure and the USB. */
+void battery_simulate_low(bool on);
+
 #endif /* _BATTERY_H */

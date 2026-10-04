@@ -36,7 +36,7 @@ OUT = os.path.join(ROOT, 'docs', 'screens')
 
 # Entries of the menu that are not pages: toggles or actions (not pressed, the label is shown by the menu)
 NOT_PAGES = {('Médias', 6), ('Radio & IR', 0), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 2), ('Réglages', 3),
-             ('Admin', 12), ('Admin', 16)}  # Démo écran (Badge, 5), Mode démo (Admin, 12): animations, not pages
+             ('Admin', 12), ('Admin', 17), ('Admin', 18)}  # Démo écran (Badge, 5), Mode démo (Admin, 12): animations, not pages
 
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
 # screen to capture, with its caption. "back" at the end of a step goes back where the page was.

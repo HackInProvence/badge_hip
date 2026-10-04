@@ -77,8 +77,22 @@ static uint8_t last_command = 0;  /* Received by the network and in OOK: execute
 static absolute_time_t last_command_at = 0;
 
 
+static bool low_battery = false;  /* The degraded mode of a low battery: mute and no remote control, the settings kept */
+
 static bool is_muted(void) {
-    return store_get()->muted == 1;
+    return store_get()->muted == 1 || low_battery;
+}
+
+void remote_set_low_battery(bool low) {
+    if (low == low_battery)
+        return;
+    low_battery = low;
+    audio_set_mute(is_muted());
+    if (low && cigale_on) {
+        noise_gen_set_enabled(false);
+        cigale_on = false;
+    }
+    printf("remote: low battery mode %s\n", low ? "on (mute, no remote control)" : "off");
 }
 
 
@@ -100,7 +114,7 @@ void remote_set_muted(bool m) {
 
 
 bool remote_enabled(void) {
-    return store_get()->remote_off != 1;
+    return store_get()->remote_off != 1 && ! low_battery;
 }
 
 

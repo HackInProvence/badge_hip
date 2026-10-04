@@ -263,6 +263,10 @@ static uint8_t buttons_pressed(absolute_time_t now) {
     case 'P':
         net_ping();
         break;
+    case 'W':
+        /* Test: a low battery simulated (the degraded mode, its warning and its icon) */
+        battery_simulate_low(! battery_low());
+        break;
     case 'L':
         /* Debug: the packets sent come back as sent by a twin badge (test the radio features alone) */
         net_set_loopback(! net_loopback());
@@ -715,13 +719,13 @@ static const submenu_t SUBMENUS[] = {
                   M_APP(APP_ACHIEVEMENTS)}},
     {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
-    {N_("Admin"), 17, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
+    {N_("Admin"), 18, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
                    M_APP(APP_HOTCOLD_MASTER), M_APP(APP_INFECTION_ZERO), M_APP(APP_SMUGGLER_ADMIN),
                    M_APP(APP_WEREWOLF_ADMIN), M_APP(APP_RESET),
                    M_APP(APP_BATTCAL),
                    M_APP(APP_PIRATE_RADIO), M_APP(APP_DEMO), M_APP(APP_ADMIN_TYPE), M_APP(APP_BATT_VIEW),
-                   M_APP(APP_BATT_AUTO),
+                   M_APP(APP_BATT_AUTO), M_APP(APP_BATTERY_DRAIN),
                    M_ADMIN_OFF}},  /* Last: hidden unless admin */
 };
 /* The admin menu is only shown in admin mode */
@@ -790,7 +794,19 @@ static int battery_bars(void) {
     return battery_percent() >= 0 ? (battery_percent() + 12) / 25 : -1;
 }
 
+/* The low battery: an empty battery with "!" (white on the title bar, or black on a page) */
+static void draw_low_battery(uint8_t *buf, int x, int y, gfx_color_t color) {
+    gfx_rect(buf, x, y, 22, 12, color);
+    gfx_fill_rect(buf, x + 22, y + 3, 2, 6, color);
+    gfx_fill_rect(buf, x + 10, y + 2, 2, 5, color);  /* ! */
+    gfx_fill_rect(buf, x + 10, y + 8, 2, 2, color);
+}
+
 static void draw_battery(void) {
+    if (battery_low()) {
+        draw_low_battery(fb, GFX_WIDTH - 27, 8, GFX_WHITE);
+        return;
+    }
     int bars = battery_bars();
     if (bars < 0)
         return;
@@ -1176,6 +1192,10 @@ static void show_saver(void) {
      * unstable, a ghost comes back a few seconds after the image (tried: also with EOPT 0x22); the OTP one holds */
     if (bpp == 2)
         dither_4g(saver_planes[0], saver_planes[1]);
+    if (battery_low()) {  /* A small icon in the bottom right corner, on a white patch */
+        gfx_fill_rect(saver_planes[0], GFX_WIDTH - 30, GFX_HEIGHT - 18, 30, 18, GFX_WHITE);
+        draw_low_battery(saver_planes[0], GFX_WIDTH - 27, GFX_HEIGHT - 15, GFX_BLACK);
+    }
     screen_show_image_bw_otp(saver_planes[0]);
     printf("saver: on (%s)\n", p[0] ? p : "SecSea");
 }
@@ -2624,6 +2644,16 @@ int main() {
         ook_rx_task(now);
         if (ledcast_changed() && ! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
             set_leds(led_mode);  /* An admin badge set the LEDs */
+        static bool was_low = false;
+        if (battery_low() != was_low) {
+            was_low = battery_low();
+            remote_set_low_battery(was_low);  /* Mute (LEDs, buzzer) and no remote control, the settings kept */
+            if (was_low)
+                notify(APPS[APP_LOW_BATTERY], N_("Batterie faible : économie"));
+            else
+                set_status(N_("Batterie : mode normal"));
+            redraw = true;
+        }
         static bool was_muted = false;
         if (remote_muted() != was_muted) {
             was_muted = remote_muted();

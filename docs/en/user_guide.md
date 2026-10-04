@@ -607,7 +607,13 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown by the name tag |
 | **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged in a computer (a charger alone is not seen); "~72 %": the estimate of a badge calibrated automatically |
 | **Battery (auto)** (Batterie (auto)) | measures the battery life, without a multimeter: R: start; 1. charge on USB until full (measure steady for 10 min), 2. unplug and let the badge **switch off by itself** (not with the switch, no reboot), 3. at the next start, the battery life is kept in the factory settings. Then, without a calibration with a multimeter, the charge left is estimated from the time on battery since the last **full charge** ("~72 %", icon, Info); unknown after a partial charge; 10 % at most when the measure falls (the end is near). The voltage of the battery stays almost flat until the last hours: it does not tell the charge left. R during the steps: stop |
+| **Battery drain** (Vider la batterie) | to test the low battery warning: white LEDs, radio pings every 500 ms, screen and processor busy, until the battery is low (the saving mode then takes over); shows the time, the ADC and the pings; R: on / off, L: back. Start it unplugged from USB (otherwise the battery does not drain) |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme again |
+
+**Low battery** (Batterie faible): when the measure stays under the threshold (5 measures in a row), the badge
+enters the **saving mode**: mute (no LEDs, no buzzer), remote control off, a "Low battery!" warning page, then a
+small empty battery icon on the battery icon and, discreet, at the bottom right of the screensaver. It leaves it
+when plugged in USB ("Battery: normal mode").
 
 **Cicada LEDs** (LEDs des cigales): a list of settings; sides: choose the row.
 - "Color" (Couleur): wings: previous / next colour (red, orange, yellow, green, cyan, blue, purple, pink, white);

@@ -596,7 +596,13 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Batteries des cigales** | la batterie des cigales qui la diffusent (Réglages > Batterie par radio) : « 81 % », ou « ADC 2533 » pour un badge non calibré, « USB » s'il est branché à un ordinateur (un simple chargeur ne se voit pas) ; « ~72 % » : l'estimation d'un badge calibré automatiquement |
 | **Batterie (auto)** | mesure l'autonomie de la batterie, sans multimètre : D : démarrer ; 1. charger en USB jusqu'au plein (mesure stable 10 min), 2. débrancher et laisser le badge **s'éteindre tout seul** (sans l'interrupteur ni le redémarrer), 3. au redémarrage, l'autonomie est gardée dans les réglages d'usine. Ensuite, sans calibration au multimètre, le reste est estimé d'après le temps passé sur batterie depuis la dernière **charge complète** (« ~72 % », icône, Infos) ; inconnu après une charge partielle ; 10 % au plus quand la mesure chute (la fin approche). La tension de la batterie reste presque plate jusqu'aux dernières heures : elle ne dit pas le reste. D pendant les étapes : arrêter |
+| **Vider la batterie** | pour tester l'alerte de batterie faible : LEDs blanches, pings radio toutes les 500 ms, écran et processeur occupés, jusqu'à la batterie faible (le mode économie prend alors le relais) ; affiche la durée, l'ADC et les pings ; D : marche / arrêt, G : retour. À lancer débranché de l'USB (sinon la batterie ne se vide pas) |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
+
+**Batterie faible** : quand la mesure reste sous le seuil (5 mesures de suite), le badge passe en **mode
+économie** : muet (ni LEDs ni buzzer), télécommande coupée, une page d'alerte « Batterie faible ! », puis une
+petite icône de pile vide sur l'icône de batterie et, discrète, en bas à droite de l'écran de veille. Il en sort
+quand on le branche en USB (« Batterie : mode normal »).
 
 **LEDs des cigales** : une liste de réglages ; flancs : choisir la ligne.
 - « Couleur » : ailes : couleur précédente / suivante (rouge, orange, jaune, vert, cyan, bleu, violet, rose, blanc) ;

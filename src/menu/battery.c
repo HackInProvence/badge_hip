@@ -21,6 +21,8 @@
 static uint16_t filtered_raw = 0;
 static absolute_time_t next_ts = 0;
 static void auto_task(absolute_time_t now);
+static bool low = false, low_simulated = false;
+static int low_measures = 0;
 static uint16_t auto_max = 0;  /* Automatic calibration, on USB: the highest measure, and since when */
 static absolute_time_t auto_max_ts = 0;
 
@@ -251,6 +253,32 @@ static void auto_task(absolute_time_t now) {
         }
     }
     was_usb = usb;
+
+    /* Low battery: confirmed over several measures, kept until the USB */
+    if (usb) {
+        if (low)
+            printf("battery: low battery over (USB)\n");
+        low = false;
+        low_measures = 0;
+    } else if (! low) {
+        int p = battery_percent();
+        bool fall = valid(s->batt_unplug_raw) && filtered_raw + BATTERY_FALL_RAW < s->batt_unplug_raw;
+        low_measures = (p >= 0 && p <= BATTERY_LOW_PERCENT) || fall ? low_measures + 1 : 0;
+        if (low_measures >= BATTERY_LOW_MEASURES) {
+            low = true;
+            printf("battery: low battery (ADC %u, level when unplugged %u, estimate %d %%)\n", filtered_raw,
+                   s->batt_unplug_raw, p);
+        }
+    }
+}
+
+bool battery_low(void) {
+    return low || low_simulated;
+}
+
+void battery_simulate_low(bool on) {
+    low_simulated = on;
+    printf("battery: low battery %s (simulated)\n", on ? "on" : "off");
 }
 
 bool battery_percent_estimated(void) {

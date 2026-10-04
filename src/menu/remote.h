@@ -58,6 +58,10 @@ bool remote_sleep_requested(void);
 /** \brief Sends a command to all the badges around (admin menu): loud, 5 times over 2 s. */
 void remote_send(uint8_t command);
 
+/** \brief The degraded mode of a low battery (main.c): muted and the remote commands ignored, without changing the
+ * settings (they come back with the USB). */
+void remote_set_low_battery(bool low);
+
 /** \brief The remote commands are obeyed (settings). */
 bool remote_enabled(void);
 void remote_set_enabled(bool enabled);

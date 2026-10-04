@@ -68,6 +68,8 @@ typedef enum {
     APP_BATT_SHARE,
     APP_BATT_VIEW,
     APP_BATT_AUTO,
+    APP_LOW_BATTERY,
+    APP_BATTERY_DRAIN,
     APP_COUNT,
 } app_id_t;
 
