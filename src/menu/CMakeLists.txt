@@ -23,6 +23,7 @@ target_sources(badge_menu PRIVATE
     infection.c
     messages.c
     nametag.c
+    rank.c
     program.c
     vote.c
     talk.c

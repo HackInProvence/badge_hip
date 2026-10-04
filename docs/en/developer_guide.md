@@ -902,7 +902,9 @@ what they receive (no image is sent).
   The mask goes in the beacon (§ 6.6) and in the vCard (`CATEGORIES`, § 6.20). Log: `skills: <name> on/off`.
 - **Achievements** ([achievements.c](../../src/menu/achievements.c)): 32 achievements (`ACHV[]`: name, how, XP), XP =
   sum of the achievements obtained + 2 per cicada met (`XP_PER_MEETING`, `store_t.n_met`); 10 levels (`LEVEL_XP`:
-  0, 20, 50, 100, 170, 260, 380, 530, 720, 1000; `LEVEL_NAMES`: Oeuf ... Cigale d'or). `achievements_init()` gives
+  0, 20, 50, 100, 170, 260, 380, 530, 720, 1000; `LEVEL_NAMES`: the pirate ranks, Moussaillon ... Barbe-Noire;
+  their 64 x 64 portraits in [rank.c](../../src/menu/rank.c), Badge > Mon grade, drawn by `tools/pirate_ranks.py`:
+  edit it then run it again, `--png` for the contact sheet, `--check` in the host tests). `achievements_init()` gives
   "Premiers pas"; `achv_task()` (every second) gives the achievements of the encounters and "Expert"; `achv_event()`
   returns the text of the announcement once, which the loop writes at the bottom of the screen with a chime (unless a
   sound is playing). Platine is given as soon as all the achievements before `ACHV_ALL` are obtained. The level goes

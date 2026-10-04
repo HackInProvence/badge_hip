@@ -6,8 +6,9 @@
 /** \file achievements.h
  *
  * \brief The achievements ("Succès") and the level of the cicada, like the level of the dolphin of the Flipper Zero:
- * each achievement gives experience points (XP), the meetings too; the level goes from 1 (Oeuf) to 10
- * (Cigale d'or). Shown in Badge > Succès and sent in the beacon (the radar shows the level of the others: "N3").
+ * each achievement gives experience points (XP), the meetings too; the level is a pirate rank, from 1 (Moussaillon)
+ * to 10 (Barbe-Noire), earned and never chosen. Shown in Badge > Succès and Badge > Mon grade (its portrait, rank.c),
+ * and sent in the beacon (the radar shows the level of the others: "N3").
  *
  * The features call achv_unlock() when the achievement is reached; achv_add() counts (games played and won,
  * trades...: statistics saved for later achievements). A new achievement is announced in the footer, with a chime.
@@ -78,7 +79,12 @@ uint16_t achv_add(achv_counter_t counter, uint16_t n);
 uint32_t achv_xp(void);
 uint8_t achv_level(void);
 const char *achv_level_name(uint8_t level);
+/** \brief XP needed for the level \p level (1..ACHV_LEVELS). */
+uint32_t achv_level_xp(uint8_t level);
 #define ACHV_LEVELS 10
+
+/** \brief Draws the portrait of the rank \p level (64 x 64 pixels, times \p zoom) at (x, y) (rank.c). */
+void rank_draw_portrait(uint8_t *fb, int x, int y, uint8_t level, int zoom);
 
 /** \brief The last achievement unlocked, once (e.g. "Succès : Sociable"). */
 bool achv_event(char *msg, int len);

@@ -363,60 +363,60 @@ msgstr ""
 msgid "Platine"
 msgstr "Platino"
 
-#: src/menu/achievements.c:62
-msgid "Larve"
-msgstr "Larva"
-
-#: src/menu/achievements.c:62
-msgid "Mue"
-msgstr "Muta"
-
-#: src/menu/achievements.c:62
-msgid "Nymphe"
-msgstr "Ninfa"
-
-#: src/menu/achievements.c:62
-msgid "Oeuf"
-msgstr "Uovo"
+#: src/menu/achievements.c:63
+#: src/menu/smuggler.c:642
+msgid "Matelot"
+msgstr "Marinaio"
 
 #: src/menu/achievements.c:63
-msgid "Chanteuse"
-msgstr "Cantante"
+msgid "Moussaillon"
+msgstr "Mozzo"
 
 #: src/menu/achievements.c:63
-#: src/menu/oled_demo.c:26
-msgid "Cigale"
-msgstr "Cicala"
-
-#: src/menu/achievements.c:63
-msgid "Jeune cigale"
-msgstr "Cicalina"
+msgid "Pirate d'eau douce"
+msgstr "Pirata d'acqua dolce"
 
 #: src/menu/achievements.c:64
-msgid "Cigale d'or"
-msgstr "Cicala d'oro"
+msgid "Boucanier"
+msgstr "Bucaniere"
 
 #: src/menu/achievements.c:64
-msgid "Maestro"
-msgstr "Maestro"
+msgid "Canonnier"
+msgstr "Cannoniere"
 
 #: src/menu/achievements.c:64
-msgid "Virtuose"
-msgstr "Virtuoso"
+msgid "Corsaire"
+msgstr "Corsaro"
 
-#: src/menu/achievements.c:83
+#: src/menu/achievements.c:64
+msgid "Flibustier"
+msgstr "Filibustiere"
+
+#: src/menu/achievements.c:65
+msgid "Barbe-Bleue"
+msgstr "Barbablù"
+
+#: src/menu/achievements.c:65
+msgid "Barbe-Noire"
+msgstr "Barbanera"
+
+#: src/menu/achievements.c:65
+msgid "Capitaine Fracasse"
+msgstr "Capitan Fracassa"
+
+#: src/menu/achievements.c:84
 msgid "Niveau %u : %s !"
 msgstr "Livello %u: %s!"
 
-#: src/menu/achievements.c:85
+#: src/menu/achievements.c:86
 msgid "Succès : %s"
 msgstr "Trofeo: %s"
 
-#: src/menu/achievements.c:185
+#: src/menu/achievements.c:190
 msgid "Rencontres"
 msgstr "Incontri"
 
-#: src/menu/achievements.c:187
+#: src/menu/achievements.c:192
 msgid ""
 "Chaque cigale rencontrée\n"
 "(rester près d'elle)\n"
@@ -426,16 +426,16 @@ msgstr ""
 "(restale vicino)\n"
 "vale 2 XP."
 
-#: src/menu/achievements.c:188
+#: src/menu/achievements.c:193
 msgid "%u rencontres : %u XP"
 msgstr "%u incontri: %u XP"
 
-#: src/menu/achievements.c:189
+#: src/menu/achievements.c:194
 msgid "%u rencontre : %u XP"
 msgstr "%u incontro: %u XP"
 
-#: src/menu/achievements.c:192
-#: src/menu/achievements.c:202
+#: src/menu/achievements.c:197
+#: src/menu/achievements.c:207
 #: src/menu/announce.c:307
 #: src/menu/assassin.c:860
 #: src/menu/assassin.c:901
@@ -443,35 +443,31 @@ msgstr "%u incontro: %u XP"
 msgid "G : retour"
 msgstr "S: indietro"
 
-#: src/menu/achievements.c:201
+#: src/menu/achievements.c:206
 msgid "Obtenu !"
 msgstr "Ottenuto!"
 
-#: src/menu/achievements.c:201
+#: src/menu/achievements.c:206
 msgid "Pas encore obtenu"
 msgstr "Da ottenere"
 
-#: src/menu/achievements.c:207
-msgid "Niv. %u : %s"
-msgstr "Liv. %u: %s"
+#: src/menu/achievements.c:219
+msgid "Niv. %u   %lu / %lu XP   %d/%d"
+msgstr "Liv. %u   %lu / %lu XP   %d/%d"
 
-#: src/menu/achievements.c:215
-msgid "%lu / %lu XP   %d/%d succès"
-msgstr "%lu / %lu XP   %d/%d trofei"
+#: src/menu/achievements.c:222
+msgid "Niv. %u   %lu XP   %d/%d"
+msgstr "Liv. %u   %lu XP   %d/%d"
 
-#: src/menu/achievements.c:218
-msgid "%lu XP   %d/%d succès"
-msgstr "%lu XP   %d/%d trofei"
-
-#: src/menu/achievements.c:238
+#: src/menu/achievements.c:242
 msgid "Rencontres : %u x 2 = %u XP"
 msgstr "Incontri: %u x 2 = %u XP"
 
-#: src/menu/achievements.c:256
+#: src/menu/achievements.c:260
 msgid "D : comment  G : retour"
 msgstr "D: come  S: indietro"
 
-#: src/menu/achievements.c:260
+#: src/menu/achievements.c:264
 msgid "Succès"
 msgstr "Trofei"
 
@@ -3469,6 +3465,10 @@ msgid "Badge nominatif"
 msgstr "Cartellino"
 
 #: src/menu/oled_demo.c:26
+msgid "Cigale"
+msgstr "Cicala"
+
+#: src/menu/oled_demo.c:26
 msgid "Cube 3D"
 msgstr "Cubo 3D"
 
@@ -4201,6 +4201,22 @@ msgstr ": ok"
 msgid "Restez près d'autres cigales."
 msgstr "Resta vicino ad altre cicale."
 
+#: src/menu/rank.c:695
+msgid "Grade %u / %u   %lu XP"
+msgstr "Grado %u / %u   %lu XP"
+
+#: src/menu/rank.c:707
+msgid "Grade suivant : %lu XP"
+msgstr "Grado seguente: %lu XP"
+
+#: src/menu/rank.c:709
+msgid "Grade le plus haut !"
+msgstr "Grado più alto!"
+
+#: src/menu/rank.c:731
+msgid "Mon grade"
+msgstr "Il mio grado"
+
 #: src/menu/remote.c:156
 msgid "Commande 0x%02X reçue"
 msgstr "Ricevuto cmd 0x%02X"
@@ -4740,10 +4756,6 @@ msgstr "Collezione: %d / %d"
 #: src/menu/smuggler.c:633
 msgid "Fortune : %lu doublons"
 msgstr "Ricchezza: %lu dobloni"
-
-#: src/menu/smuggler.c:642
-msgid "Matelot"
-msgstr "Marinaio"
 
 #: src/menu/smuggler.c:642
 msgid "Mousse"
@@ -6495,6 +6507,42 @@ msgstr "File .EPV non valido"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Formato video non supportato"
+
+#~ msgid "Larve"
+#~ msgstr "Larva"
+
+#~ msgid "Mue"
+#~ msgstr "Muta"
+
+#~ msgid "Nymphe"
+#~ msgstr "Ninfa"
+
+#~ msgid "Oeuf"
+#~ msgstr "Uovo"
+
+#~ msgid "Chanteuse"
+#~ msgstr "Cantante"
+
+#~ msgid "Jeune cigale"
+#~ msgstr "Cicalina"
+
+#~ msgid "Cigale d'or"
+#~ msgstr "Cicala d'oro"
+
+#~ msgid "Maestro"
+#~ msgstr "Maestro"
+
+#~ msgid "Virtuose"
+#~ msgstr "Virtuoso"
+
+#~ msgid "Niv. %u : %s"
+#~ msgstr "Liv. %u: %s"
+
+#~ msgid "%lu / %lu XP   %d/%d succès"
+#~ msgstr "%lu / %lu XP   %d/%d trofei"
+
+#~ msgid "%lu XP   %d/%d succès"
+#~ msgstr "%lu XP   %d/%d trofei"
 
 #~ msgid "Point enregistré"
 #~ msgstr "Punto salvato"

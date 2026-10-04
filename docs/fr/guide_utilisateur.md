@@ -425,24 +425,29 @@ sonde, brouilleur qui répète son code).
 - **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, éteintes).
 - **Démo écran** : montre les possibilités de l'écran (noir et blanc, 4 gris, animation rapide).
 - **Écran OLED** : démos sur un petit écran OLED branché sur le port gauche (étoiles, cube 3D, cigale, texte, vidéo).
-- **Succès** : les succès obtenus et le niveau de votre cigale (voir ci-dessous).
+- **Succès** : les succès obtenus et le grade de votre cigale (voir ci-dessous).
+- **Mon grade** : le portrait de votre grade de pirate en grand, son nom et les XP du grade suivant ; comme le badge
+  nominatif, la page reste affichée (même sans alimentation), un bouton la quitte.
 
-**Succès et niveau** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès
-donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau va de 1 à 10 :
+**Succès et grade** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès
+donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau, de 1 à 10, est un **grade de pirate** ; il se gagne
+avec les XP, il ne se choisit pas :
 
-| Niveau | Nom | XP | Niveau | Nom | XP |
+| Niveau | Grade | XP | Niveau | Grade | XP |
 |---|---|---|---|---|---|
-| 1 | Oeuf | 0 | 6 | Cigale | 260 |
-| 2 | Larve | 20 | 7 | Chanteuse | 380 |
-| 3 | Nymphe | 50 | 8 | Virtuose | 530 |
-| 4 | Mue | 100 | 9 | Maestro | 720 |
-| 5 | Jeune cigale | 170 | 10 | Cigale d'or | 1000 |
+| 1 | Moussaillon | 0 | 6 | Boucanier | 260 |
+| 2 | Pirate d'eau douce | 20 | 7 | Corsaire | 380 |
+| 3 | Matelot | 50 | 8 | Capitaine Fracasse | 530 |
+| 4 | Canonnier | 100 | 9 | Barbe-Bleue | 720 |
+| 5 | Flibustier | 170 | 10 | Barbe-Noire | 1000 |
 
-La page montre le niveau, les XP (sur ceux du niveau suivant) avec une jauge, le nombre de succès obtenus, puis la
+![Les portraits des 10 grades](../images/pirate_ranks.png)
+
+La page Succès a pour titre le grade, puis montre le niveau, les XP (sur ceux du niveau suivant) avec une jauge, le nombre de succès obtenus, puis la
 liste : d'abord les rencontres (« Rencontres : 16 x 2 = 32 XP » : chaque cigale rencontrée rapporte 2 XP), puis la valeur
 de chaque succès (« Contrebandier (+20 XP) », case pleine : obtenu). Flancs : choisir ; aile
 droite : comment l'obtenir ; aile gauche : retour.
-Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou le nouveau niveau (« Niveau 3 : Nymphe ! »).
+Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou le nouveau niveau (« Niveau 3 : Matelot ! »).
 
 | Succès | Comment l'obtenir | XP |
 |---|---|---|

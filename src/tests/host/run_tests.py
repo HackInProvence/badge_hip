@@ -162,6 +162,10 @@ def test_werewolf(work):
     r = run([sys.executable, os.path.join(SRC, '..', 'tools', 'werewolf_icons.py'), '--check'])
     if r.returncode:
         return False, r.stdout + r.stderr
+    # The portraits of the pirate ranks in rank.c are the ones of tools/pirate_ranks.py
+    r = run([sys.executable, os.path.join(SRC, '..', 'tools', 'pirate_ranks.py'), '--check'])
+    if r.returncode:
+        return False, r.stdout + r.stderr
     os.makedirs(os.path.join(work, 'pico'), exist_ok=True)
     with open(os.path.join(work, 'pico', 'rand.h'), 'w') as f:
         f.write('#include <stdint.h>\nuint32_t get_rand_32(void);\n')

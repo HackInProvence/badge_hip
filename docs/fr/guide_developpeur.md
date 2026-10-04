@@ -908,7 +908,9 @@ durées de 50 ms à 5 s par pas de 50 ms.
   `skills: <nom> on/off`.
 - **Succès** ([achievements.c](../../src/menu/achievements.c)) : 32 succès (`ACHV[]` : nom, comment, XP), XP = somme
   des succès obtenus + 2 par cigale rencontrée (`XP_PER_MEETING`, `store_t.n_met`) ; 10 niveaux (`LEVEL_XP` : 0, 20,
-  50, 100, 170, 260, 380, 530, 720, 1000 ; `LEVEL_NAMES` : Oeuf ... Cigale d'or). `achievements_init()` donne
+  50, 100, 170, 260, 380, 530, 720, 1000 ; `LEVEL_NAMES` : les grades de pirate, Moussaillon ... Barbe-Noire ; leurs portraits 64 x 64 dans
+  [rank.c](../../src/menu/rank.c), Badge > Mon grade, dessinés par `tools/pirate_ranks.py` : le modifier puis le
+  relancer, `--png` pour la planche, `--check` dans les tests du PC). `achievements_init()` donne
   « Premiers pas » ; `achv_task()` (chaque seconde) donne les succès des rencontres et « Expert » ; `achv_event()`
   rend une fois le texte de l'annonce, que la boucle écrit en bas de l'écran avec un carillon (sauf si un son joue).
   Platine est donné dès que tous les succès d'avant `ACHV_ALL` sont obtenus. Le niveau part dans la balise.

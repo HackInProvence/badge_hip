@@ -436,25 +436,30 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Screen demo** (Démo écran): shows what the screen can do (black and white, 4 greys, fast animation).
 - **OLED screen** (Écran OLED): demos on a small OLED screen plugged into the left port (Stars, 3D cube, Cicada,
   Scrolling text, Video (SD card)).
-- **Achievements** (Succès): the achievements obtained and the level of your cicada (see below).
+- **Achievements** (Succès): the achievements obtained and the rank of your cicada (see below).
+- **My rank** (Mon grade): the portrait of your pirate rank in large, its name and the XP of the next rank; like the
+  name tag, the page stays on the screen (even without power), a button leaves it.
 
-**Achievements and level**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
-achievement gives XP, and each cicada met **2 XP**. The level goes from 1 to 10:
+**Achievements and rank**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
+achievement gives XP, and each cicada met **2 XP**. The level, from 1 to 10, is a **pirate rank**; it is earned with
+the XP, it cannot be chosen:
 
-| Level | Name | XP | Level | Name | XP |
+| Level | Rank | XP | Level | Rank | XP |
 |---|---|---|---|---|---|
-| 1 | Egg (Oeuf) | 0 | 6 | Cicada (Cigale) | 260 |
-| 2 | Larva (Larve) | 20 | 7 | Singer (Chanteuse) | 380 |
-| 3 | Nymph (Nymphe) | 50 | 8 | Virtuoso (Virtuose) | 530 |
-| 4 | Molt (Mue) | 100 | 9 | Maestro | 720 |
-| 5 | Young cicada (Jeune cigale) | 170 | 10 | Gold cicada (Cigale d'or) | 1000 |
+| 1 | Cabin boy (Moussaillon) | 0 | 6 | Buccaneer (Boucanier) | 260 |
+| 2 | Landlubber (Pirate d'eau douce) | 20 | 7 | Privateer (Corsaire) | 380 |
+| 3 | Sailor (Matelot) | 50 | 8 | Captain Fracasse (Capitaine Fracasse) | 530 |
+| 4 | Gunner (Canonnier) | 100 | 9 | Bluebeard (Barbe-Bleue) | 720 |
+| 5 | Freebooter (Flibustier) | 170 | 10 | Blackbeard (Barbe-Noire) | 1000 |
 
-The page shows the level, the XP (out of those of the next level) with a gauge, the number of achievements obtained,
+![The portraits of the 10 ranks](../images/pirate_ranks.png)
+
+The Achievements page has the rank as its title, then shows the level, the XP (out of those of the next level) with a gauge, the number of achievements obtained,
 then the list: first the meetings ("Meetings: 16 x 2 = 32 XP": each cicada met brings 2 XP), then the value of each
 achievement ("Smuggler (+20 XP)", filled box: obtained). Sides: choose;
 right wing: how to get it; left wing: back.
 A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"), or the new level
-("Level 3: Nymph!").
+("Level 3: Sailor!").
 
 | Achievement | How to get it | XP |
 |---|---|---|

@@ -59,9 +59,10 @@ static const achv_t ACHV[ACHV_COUNT] = {
 
 /* XP needed for each level (level n: LEVEL_XP[n - 1]) */
 static const uint16_t LEVEL_XP[ACHV_LEVELS] = {0, 20, 50, 100, 170, 260, 380, 530, 720, 1000};
-static const char *LEVEL_NAMES[ACHV_LEVELS] = {N_("Oeuf"), N_("Larve"), N_("Nymphe"), N_("Mue"),
-                                               N_("Jeune cigale"), N_("Cigale"), N_("Chanteuse"),
-                                               N_("Virtuose"), N_("Maestro"), N_("Cigale d'or")};
+/* The pirate ranks (their portraits: rank.c, tools/pirate_ranks.py, same order) */
+static const char *LEVEL_NAMES[ACHV_LEVELS] = {N_("Moussaillon"), N_("Pirate d'eau douce"), N_("Matelot"),
+                                               N_("Canonnier"), N_("Flibustier"), N_("Boucanier"), N_("Corsaire"),
+                                               N_("Capitaine Fracasse"), N_("Barbe-Bleue"), N_("Barbe-Noire")};
 
 static char event[48];
 static bool event_pending = false;
@@ -116,6 +117,10 @@ uint8_t achv_level(void) {
     while (level < ACHV_LEVELS && xp >= LEVEL_XP[level])
         ++level;
     return level;
+}
+
+uint32_t achv_level_xp(uint8_t level) {
+    return LEVEL_XP[level < 1 ? 0 : level > ACHV_LEVELS ? ACHV_LEVELS - 1 : level - 1];
 }
 
 const char *achv_level_name(uint8_t level) {
@@ -204,18 +209,17 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
     }
     uint8_t level = achv_level();
     uint32_t xp = achv_xp();
-    snprintf(text, sizeof(text), _("Niv. %u : %s"), level, tr(LEVEL_NAMES[level - 1]));
-    ui_title(fb, text);
+    ui_title(fb, LEVEL_NAMES[level - 1]);  /* The rank (Badge > Mon grade: its portrait) */
     /* Progress to the next level */
     uint32_t lo = LEVEL_XP[level - 1], hi = level < ACHV_LEVELS ? LEVEL_XP[level] : lo;
     int done = 0;
     for (int i = 0; i < ACHV_COUNT; ++i)
         done += achv_unlocked(i);
     if (level < ACHV_LEVELS)
-        snprintf(text, sizeof(text), _("%lu / %lu XP   %d/%d succès"), (unsigned long)xp, (unsigned long)hi, done,
-                 ACHV_COUNT);
+        snprintf(text, sizeof(text), _("Niv. %u   %lu / %lu XP   %d/%d"), level, (unsigned long)xp,
+                 (unsigned long)hi, done, ACHV_COUNT);
     else
-        snprintf(text, sizeof(text), _("%lu XP   %d/%d succès"), (unsigned long)xp, done, ACHV_COUNT);
+        snprintf(text, sizeof(text), _("Niv. %u   %lu XP   %d/%d"), level, (unsigned long)xp, done, ACHV_COUNT);
     gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 2, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     ui_gauge(fb, 6, UI_TITLE_H + 21, GFX_WIDTH - 12, 6, hi > lo ? xp - lo : 1, hi > lo ? hi - lo : 1);
     /* The list: 6 rows */
