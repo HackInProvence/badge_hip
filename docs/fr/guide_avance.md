@@ -437,6 +437,24 @@ envoie une commande :
 
 Maintenez le bouton une seconde. Les commandes : [§ 5](#5-télécommande-mode-muet-sommeil-et-mode-démo).
 
+Les mêmes commandes en **RAW** (`tools/flipper/raw/`, un fichier par commande, 10 trames Princeton, 0,5 s) : pour un
+Flipper qui n'a pas le protocole Princeton, ou pour rejouer exactement le même signal. Sub-GHz > Saved > le fichier >
+Send ; si une cigale ne réagit pas, renvoyez-le (son récepteur alterne entre l'OOK et le réseau).
+
+| Fichier | Code | Effet |
+|---|---|---|
+| `SecSea_raw_chante.sub` | `C1 6A 01` | la cigale chante |
+| `SecSea_raw_muet.sub` | `C1 6A 02` | mode muet |
+| `SecSea_raw_fin_muet.sub` | `C1 6A 04` | fin du mode muet |
+| `SecSea_raw_talk_vert.sub` | `C1 6A 11` | talk : vert |
+| `SecSea_raw_talk_orange.sub` | `C1 6A 12` | talk : orange, 5 min |
+| `SecSea_raw_talk_rouge_enerve.sub` | `C1 6A 14` | talk : rouge énervé |
+| `SecSea_raw_talk_rouge_fini.sub` | `C1 6A 1F` | talk : rouge, fini |
+| `SecSea_raw_talk_eteint.sub` | `C1 6A 18` | talk : éteint |
+
+Régénérés par `python tools/ook_sub.py princeton 0xC16A02 -o SecSea_raw_muet.sub` (`--repeats N` pour un signal
+plus long).
+
 Quatre fichiers RAW (paquets GFSK du réseau des badges, `NET_LEDS`, générés par `flipper_net_sub.py leds`) pilotent
 les LEDs des cigales à portée, sans relais (TTL 0) : pour les **essais de portée**. Même dossier, Sub-GHz > Saved >
 le fichier > Send (Envoyer) :

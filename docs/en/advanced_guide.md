@@ -439,6 +439,23 @@ command:
 
 Hold the button for a second. The commands: [§ 5](#5-remote-control-mute-mode-sleep-and-demo-mode).
 
+The same commands in **RAW** (`tools/flipper/raw/`, one file per command, 10 Princeton frames, 0.5 s): for a
+Flipper without the Princeton protocol, or to replay exactly the same signal. Sub-GHz > Saved > the file > Send; if
+a cicada does not react, send it again (its receiver alternates between OOK and the network).
+
+| File | Code | Effect |
+|---|---|---|
+| `SecSea_raw_chante.sub` | `C1 6A 01` | the cicada sings |
+| `SecSea_raw_muet.sub` | `C1 6A 02` | mute mode |
+| `SecSea_raw_fin_muet.sub` | `C1 6A 04` | end of mute mode |
+| `SecSea_raw_talk_vert.sub` | `C1 6A 11` | talk: green |
+| `SecSea_raw_talk_orange.sub` | `C1 6A 12` | talk: orange, 5 min |
+| `SecSea_raw_talk_rouge_enerve.sub` | `C1 6A 14` | talk: angry red |
+| `SecSea_raw_talk_rouge_fini.sub` | `C1 6A 1F` | talk: red, finished |
+| `SecSea_raw_talk_eteint.sub` | `C1 6A 18` | talk: off |
+
+Made by `python tools/ook_sub.py princeton 0xC16A02 -o SecSea_raw_muet.sub` (`--repeats N` for a longer signal).
+
 Four RAW files (GFSK packets of the network of the badges, `NET_LEDS`, made by `flipper_net_sub.py leds`) drive the
 LEDs of the cicadas in range, without relay (TTL 0): for **range tests**. Same folder, Sub-GHz > Saved > the file >
 Send:
