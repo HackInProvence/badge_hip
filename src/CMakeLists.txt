@@ -5,6 +5,7 @@ target_sources(badge INTERFACE ${CMAKE_CURRENT_LIST_DIR}/badge_defs.h)
 
 # Add libraries projects
 add_subdirectory(btns)
+add_subdirectory(flash_write)
 add_subdirectory(leds)
 add_subdirectory(log)
 add_subdirectory(music)

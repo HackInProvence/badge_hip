@@ -211,6 +211,26 @@ pico_enable_stdio_usb(test_proto_badge 1)
 pico_enable_stdio_uart(test_proto_badge 0)
 
 
+# Test flash_write
+
+add_executable(test_flash_write)
+target_sources(test_flash_write PRIVATE flash_write.c)
+pico_add_extra_outputs(test_flash_write)
+
+target_link_libraries(test_flash_write PRIVATE
+    badge_tests
+    pico_stdlib
+    pico_time
+    #badge_tests
+    log
+    flash_write
+)
+
+# enable usb output, disable uart output
+pico_enable_stdio_usb(test_flash_write 1)
+pico_enable_stdio_uart(test_flash_write 0)
+
+
 ## Test template
 #
 #add_executable(test_template)
@@ -220,6 +240,8 @@ pico_enable_stdio_uart(test_proto_badge 0)
 #target_link_libraries(test_template PRIVATE
 #    badge
 #    pico_stdlib
+#    #badge_tests
+#    log
 #    template
 #)
 #
