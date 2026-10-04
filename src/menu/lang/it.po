@@ -2611,37 +2611,35 @@ msgstr "Ali: modo"
 msgid "Ailes : mode  D long : temps"
 msgstr "Ali: modo  D lungo: tempi"
 
-#: src/menu/lowbatt.c:31
-#: src/menu/lowbatt.c:39
+#: src/menu/lowbatt.c:35
+#: src/menu/lowbatt.c:43
 msgid "Batterie faible"
 msgstr "Batteria scarica"
 
-#: src/menu/lowbatt.c:32
+#: src/menu/lowbatt.c:36
 msgid "Batterie faible !"
 msgstr "Batteria scarica!"
 
-#: src/menu/lowbatt.c:34
+#: src/menu/lowbatt.c:38
 msgid ""
 "Mode économie : muet,\n"
 "LEDs éteintes,\n"
 "télécommande coupée.\n"
-"\n"
 "Recharger le badge\n"
 "(USB) pour en sortir."
 msgstr ""
 "Risparmio: muto,\n"
 "LED spenti,\n"
 "telecomando spento.\n"
-"\n"
 "Ricarica il badge\n"
 "(USB) per uscire."
 
-#: src/menu/lowbatt.c:102
-#: src/menu/lowbatt.c:125
+#: src/menu/lowbatt.c:107
+#: src/menu/lowbatt.c:130
 msgid "Vider la batterie"
 msgstr "Scarica batteria"
 
-#: src/menu/lowbatt.c:105
+#: src/menu/lowbatt.c:110
 msgid ""
 "LEDs blanches, radio,\n"
 "écran, processeur.\n"
@@ -2653,7 +2651,7 @@ msgstr ""
 "Da %lu min %02lu s\n"
 "ADC %u, %lu ping"
 
-#: src/menu/lowbatt.c:109
+#: src/menu/lowbatt.c:114
 msgid ""
 "Batterie faible :\n"
 "arrêté, le mode\n"
@@ -2664,7 +2662,7 @@ msgstr ""
 "fermato, la modalità\n"
 "risparmio è attiva."
 
-#: src/menu/lowbatt.c:111
+#: src/menu/lowbatt.c:116
 msgid ""
 "Arrêté.\n"
 "D : relancer."
@@ -2672,7 +2670,7 @@ msgstr ""
 "Fermato.\n"
 "D: riavvia."
 
-#: src/menu/lowbatt.c:117
+#: src/menu/lowbatt.c:122
 msgid "G : retour  D : marche / arrêt"
 msgstr "S: indietro  D: avvia / ferma"
 

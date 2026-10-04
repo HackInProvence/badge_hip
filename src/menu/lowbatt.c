@@ -21,6 +21,10 @@
 
 /* ------ The warning ------ */
 
+static void warning_start(absolute_time_t now) {
+    (void)now;  /* Nothing to set up, but main.c always calls start() */
+}
+
 static bool warning_buttons(const app_buttons_t *b, absolute_time_t now) {
     (void)now;
     return ! (b->pressed & (UI_BTN_A | UI_BTN_B));
@@ -31,12 +35,13 @@ static void warning_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Batterie faible"));
     ui_lines(fb, UI_TITLE_H + 12, &gfx_font_medium, N_("Batterie faible !"));
     ui_lines(fb, UI_TITLE_H + 44, &gfx_font_small,
-             N_("Mode économie : muet,\nLEDs éteintes,\ntélécommande coupée.\n\nRecharger le badge\n(USB) pour en sortir."));
+             N_("Mode économie : muet,\nLEDs éteintes,\ntélécommande coupée.\nRecharger le badge\n(USB) pour en sortir."));
     ui_footer(fb, N_("G : retour"));
 }
 
 const app_t app_low_battery = {
     .name = N_("Batterie faible"),
+    .start = warning_start,
     .buttons = warning_buttons,
     .render = warning_render,
 };
