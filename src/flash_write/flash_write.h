@@ -10,7 +10,8 @@
  * The goal of the lib is trifold:
  * - always reserve a sector at the end of the flash for persistent data,
  * - give a library to read/write a persistent structure from running code,
- * - give means to flash a default configuration (e.g. with a test program).
+ * - give means to flash a default configuration (e.g. with a test program)
+ *   using target_compile_definitions(flash_write INTERFACE FLASH_INITILIZE_PERSISTENCE).
  *
  * See reset.h to set initial value for this sector.
  * */
@@ -26,22 +27,28 @@ typedef struct {
     char magic[4];  /**< Expected to be Miao (all 1s when flash is erased) */
     uint32_t flags_configured;  /**< Flags to specify which values are non-default */
     uint32_t radio_crystal_frequency;  /**< Calibration for the crystal that drives the radio (in Hz) */
-    // /!\ do update reset.h when changing fields of this struct
+    // /!\ do update flash_write.c when changing fields of this struct
 } Persistence;
 
-/* The global pointer to the Persistence structure, use other functions for this library to modify it */
-extern const uint8_t __reserved_sector_start[];  /* Available at link time, must be an array */
-extern const Persistence *g_persistence;  /**< Friendly name to use in programs, points to the first byte of the reserved sector(s) */
 
-
-///** Not needed to access \p g_persistence, but needed for other functions of this lib */
-//void flash_write_init(void);
-
-/** \brief Get a copy of the flashed persistence configuration to be able to modify it.
+/** \brief Returns a pointer to a valid Persistence (read only access).
  *
- * Implemented with a single RAM copy so this always returns the same pointer.
+ * If the Persistence has not been flashed yet (or magic is not the expected value),
+ *  returns a pointer to the default initializer of this struct (probably from flash),
+ * But if the Persistence structure has the correct magic, returns the pointer to the flash were it is stored.
+ *
+ * You cannot change this and hence must call flash_write_get_rw_copy() followed by flash_write_commit()
+ *  to commit changes. */
+const Persistence *flash_write_get_ro_ptr(void);
+
+/** \brief Get a copy of the flashed persistence configuration to be able to modify and flash_write_commit() it.
+ *
  * Copy the content of the flash on each call.
- * The copy is not committed automatically, so modifications are not persisted until flash_write_commit() is called. */
+ * Implemented with a single RAM copy so this always returns the same pointer and reset the content of previous call.
+ * The copy is not committed automatically, so modifications are not persisted until flash_write_commit() is called.
+ *
+ * If the content of the flash does not contain what seems like a legit configuration (invalid magic),
+ *  the local copy is first initialized with default values. */
 Persistence *flash_write_get_rw_copy(void);
 
 /** \brief Update flash with the content of the updated flash_write_get_rw_copy().

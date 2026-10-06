@@ -225,6 +225,8 @@ target_link_libraries(test_flash_write PRIVATE
     log
     flash_write
 )
+# Initialize with default configuration while pushing the binary
+#target_compile_definitions(flash_write INTERFACE FLASH_INITILIZE_PERSISTENCE)
 
 # enable usb output, disable uart output
 pico_enable_stdio_usb(test_flash_write 1)

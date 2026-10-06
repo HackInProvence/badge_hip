@@ -10,6 +10,9 @@ target_link_libraries(badge INTERFACE flash_write)
 target_link_options(flash_write INTERFACE "LINKER:--script=${CMAKE_CURRENT_LIST_DIR}/reserved_sector.ld")
 set_property(TARGET flash_write APPEND PROPERTY INTERFACE_LINK_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/reserved_sector.ld)
 
+# Initialize with default configuration while pushing the binary
+#target_compile_definitions(flash_write INTERFACE FLASH_INITILIZE_PERSISTENCE)
+
 target_link_libraries(flash_write INTERFACE
     #badge
     pico_flash

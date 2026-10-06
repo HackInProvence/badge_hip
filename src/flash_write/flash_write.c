@@ -14,29 +14,55 @@
 #include "flash_write.h"
 
 
-const Persistence *g_persistence = (const Persistence *)__reserved_sector_start;
+/* Available at link time, must be an array when casting in a global const defined here */
+extern const uint8_t __reserved_sector_start[];
+
+
+#ifdef FLASH_INITILIZE_PERSISTENCE
+#define _DEFAULT_ATTRIBS __attribute__((section(".reserved_sector"), used))
+#else
+#define _DEFAULT_ATTRIBS
+#endif
+
+/* The default configuration, used when the flashed configuration is invalid,
+ *  or used to initialize the configuration when flashing the program. */
+_DEFAULT_ATTRIBS const Persistence _default_persistence = {
+    .magic = "Miao",
+    .flags_configured = 0,
+    .radio_crystal_frequency = CC1101_fXOSC,  /* Initial default value */
+};
 
 static bool initialized = false;
 /* Reserve the whole zone in RAM to be sure that we are able to copy it before erasing and reprogramming the zone */
 static uint8_t local_copy[FLASH_RESERVED_SIZE] = {};
 
 
-//void flash_write_init(void) {
-//    // Copy the structure to the local_copy in case 
-//    memcpy(&local_copy, g_persistence, sizeof(Persistence));
-//    initialized = true;
-//}
+const Persistence *flash_write_get_ro_ptr(void) {
+    const Persistence *pers = (const Persistence *)__reserved_sector_start;
+
+    /* When invalid magic, consider it garbage, and return a ptr to the default initializer instead (also somewhere in flash...) */
+    if (memcmp(pers->magic, _default_persistence.magic, sizeof(((Persistence *)NULL)->magic)) != 0)
+        return &_default_persistence;
+
+    return pers;
+}
 
 
 Persistence *flash_write_get_rw_copy(void) {
     memcpy(local_copy, __reserved_sector_start, FLASH_RESERVED_SIZE);
+
+    /* When invalid magic, first set the local copy to defaults */
+    Persistence *lc = (Persistence *)local_copy;
+    if (memcmp(lc->magic, _default_persistence.magic, 4) != 0)
+        memcpy(lc, &_default_persistence, sizeof(Persistence));
+
     initialized = true;
-    return (Persistence *)local_copy;
+    return lc;
 }
 
 
-/** The call back for flash_safe_execute */
-void do_commit(void *param) {
+/* The callback for flash_safe_execute, does the erase and program of the flash */
+static void do_commit(void *param) {
     /* Here, we are in an interrupt-free zone, so we can't log, and we should be fast
      *  but we can read the flash because it's flash_range_ functions that disable XIP
      *  (they are in RAM, but this function is in flash)
