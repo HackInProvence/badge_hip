@@ -177,6 +177,27 @@ Précautions :
   script est interrompu, vérifiez ces réglages à la main ;
 - `test_smuggler.py` **modifie la cale** des deux badges : à faire sur des badges de test.
 
+#### `test_network.py` — le réseau radio entre 2 badges ou plus
+
+Sans toucher aux menus ni aux réglages (mode muet, admin, scores inchangés) : l'identité de chaque badge (version,
+nom, version du CC1101), puis chaque badge envoie `--rounds` pings (touche `P`) que les autres doivent entendre :
+une matrice émetteur × récepteur du pourcentage reçu et du RSSI moyen ; enfin chaque badge doit voir les autres
+parmi ses voisines (balises) et n'avoir perdu aucun paquet à l'émission. Un lien passe à `--min-percent` % (80).
+
+```bash
+python tools/test_network.py --ports COM9 COM11 COM13 --rounds 20
+```
+
+```
+  sender \ receiver               COM9           COM11           COM13
+  COM9 (Tristan)                     -      95% -85dBm      95% -71dBm
+  COM11 (Cig 8B58)          85% -83dBm               -      95% -87dBm
+  COM13 (Cig E4DF)          90% -66dBm      95% -86dBm               -
+```
+
+Un lien qui chute d'un coup de 15 à 20 dB (badge déplacé, main sur l'antenne) peut échouer : relancez avant de
+conclure.
+
 #### `src/tests/host/run_tests.py` — tests sur PC, sans badge
 
 Compile les modules C du firmware avec le compilateur du PC et vérifie leurs règles (jeux, décodeurs radio, vCard,
