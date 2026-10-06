@@ -323,8 +323,10 @@ Aile droite : chercher une autre balise.
   Une cigale guérie est immunisée.
 
 **Choeur** : quand un chef de choeur (un organisateur ou une télécommande) lance un morceau, les cigales autour le
-chantent ensemble, chacune sa voix, avec un départ synchronisé par radio. Deux morceaux : « Frère Jacques » en canon
-à 4 voix et « L'Ode à la joie » à 3 voix.
+chantent ensemble, chacune sa voix, avec un départ synchronisé par radio. Huit morceaux du domaine public :
+« Frère Jacques » (canon à 4 voix), « L'Ode à la joie » (3 voix), « Tetris (Korobeiniki) » (3 voix), « Canon de
+Pachelbel » (4 voix), « Roi de la montagne » (Grieg, 3 voix), « Row your boat » (canon à 4 voix), « Vive le vent »
+(3 voix) et « Menuet en sol » (2 voix).
 Votre badge participe par défaut ; aile droite : participer / ne plus chanter. En mode muet, le choeur est silencieux.
 
 **Annonces** : les annonces des organisateurs (pause café, prochain talk...). Une annonce est un écran construit

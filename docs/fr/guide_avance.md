@@ -720,7 +720,7 @@ Dans l'ordre du menu :
 | **LEDs des cigales** | couleur (9 couleurs ou R, G, B de 0 à 255) et mode (Fixe, Clignotant, Fondu, durées de 50 ms à 5 s) imposés aux LEDs des cigales autour, jusqu'à « Rétablir leurs LEDs » ou leur redémarrage | voir le [guide utilisateur § 4.8](guide_utilisateur.md#48-le-mode-admin-organisateurs) |
 | **Annonces (admin)** | 6 annonces (heure, texte de 56 caractères, QR code : lien, texte, téléphone, SMS, e-mail, Wi-Fi, position GPS), gardées en flash ; aperçu ; envoi 3 fois à toutes les cigales | flancs : choisir ; D : ouvrir / modifier ; G : retour |
 | **Vote (admin)** | ouvre une question prédéfinie, compte les votes (un par badge, le dernier compte) et affiche l'histogramme | D : ouvrir le vote, puis D : fermer |
-| **Choeur : lancer** | lance « Frère Jacques » (4 voix) ou « L'Ode à la joie » (3 voix) ; ce badge chante la première voix | D : lancer / arrêter |
+| **Choeur : lancer** | lance un des 8 morceaux (Frère Jacques, Ode à la joie, Tetris, Canon de Pachelbel, Roi de la montagne, Row your boat, Vive le vent, Menuet en sol) ; ce badge chante la première voix | D : lancer / arrêter |
 | **Balise chaud-froid** | ce badge émet une balise par seconde à +10 dBm ; les autres le cherchent avec Social > Chaud - froid. L'échelle (« Brûlant dès -74 dBm » par défaut, réglable par pas de 5 dB) est gardée et envoyée avec la balise | D : émettre / arrêter ; flancs : échelle ; G : quitter |
 | **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie | D : infecter ; flanc gauche : guérir ce badge |
 | **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge ([contrebande.md](contrebande.md)) | flancs : choisir ; D : ajouter |
@@ -801,7 +801,7 @@ de l'écran et écrit `remote: command 0x.. from ...`.
 | `0x02` | mode muet |
 | `0x03` | fin du mode muet |
 | `0x10` à `0x14` | lumières du badge de talk, si sa page est ouverte : éteint, vert, orange (5 min), rouge (fini), rouge énervé |
-| `0x30` + n | lance le morceau n du choeur (`0x30` Frère Jacques, `0x31` L'Ode à la joie) |
+| `0x30` + n | lance le morceau n du choeur (`0x30` Frère Jacques, `0x31` L'Ode à la joie, `0x32` Tetris, `0x33` Canon de Pachelbel, `0x34` Roi de la montagne, `0x35` Row your boat, `0x36` Vive le vent, `0x37` Menuet en sol) |
 | `0x04`, `0x18`, `0x1F` (Princeton seulement) | boutons du Flipper : `0x03`, `0x10`, `0x13` (voir § 2.5) |
 
 Le badge n'obéit pas si Réglages > Télécommande est à « non ». Autres commandes depuis un Flipper : un fichier

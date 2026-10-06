@@ -1191,7 +1191,7 @@ msgid "G : retour  D : démarrer"
 msgstr "S: indietro  D: avvia"
 
 #: src/menu/battcal.c:224
-#: src/menu/chorus.c:410
+#: src/menu/chorus.c:550
 msgid "G : retour  D : arrêter"
 msgstr "S: indietro  D: ferma"
 
@@ -1351,23 +1351,47 @@ msgstr ""
 "Opzioni > Batteria\n"
 "via radio: sì."
 
-#: src/menu/chorus.c:82
+#: src/menu/chorus.c:210
 msgid "Frère Jacques"
 msgstr "Fra Martino"
 
-#: src/menu/chorus.c:84
+#: src/menu/chorus.c:212
 msgid "Ode à la joie"
 msgstr "Inno alla gioia"
 
-#: src/menu/chorus.c:321
+#: src/menu/chorus.c:214
+msgid "Tetris (Korobeiniki)"
+msgstr "Tetris (Korobeiniki)"
+
+#: src/menu/chorus.c:216
+msgid "Canon de Pachelbel"
+msgstr "Canone di Pachelbel"
+
+#: src/menu/chorus.c:218
+msgid "Roi de la montagne"
+msgstr "Re della montagna"
+
+#: src/menu/chorus.c:220
+msgid "Row your boat"
+msgstr "Row your boat"
+
+#: src/menu/chorus.c:222
+msgid "Vive le vent"
+msgstr "Jingle Bells"
+
+#: src/menu/chorus.c:224
+msgid "Menuet en sol"
+msgstr "Minuetto in sol"
+
+#: src/menu/chorus.c:461
 msgid "%s (%d voix)"
 msgstr "%s (%d voci)"
 
-#: src/menu/chorus.c:350
+#: src/menu/chorus.c:490
 msgid "Choeur des cigales"
 msgstr "Coro delle cicale"
 
-#: src/menu/chorus.c:353
+#: src/menu/chorus.c:493
 msgid ""
 "En attente d'un chef de\n"
 "choeur : quand il lance un\n"
@@ -1379,7 +1403,7 @@ msgstr ""
 "un brano, ogni cicala\n"
 "canta la sua voce."
 
-#: src/menu/chorus.c:355
+#: src/menu/chorus.c:495
 msgid ""
 "Vous ne participez pas\n"
 "aux choeurs."
@@ -1387,36 +1411,36 @@ msgstr ""
 "Non partecipi\n"
 "ai cori."
 
-#: src/menu/chorus.c:358
+#: src/menu/chorus.c:498
 msgid "Voix %d / %d%s"
 msgstr "Voce %d / %d%s"
 
-#: src/menu/chorus.c:359
+#: src/menu/chorus.c:499
 msgid "  (chef)"
 msgstr "  (capo)"
 
-#: src/menu/chorus.c:363
+#: src/menu/chorus.c:503
 msgid "Départ dans %lld s"
 msgstr "Inizio tra %lld s"
 
-#: src/menu/chorus.c:370
+#: src/menu/chorus.c:510
 msgid "G : retour  D : ne plus chanter"
 msgstr "S: indietro  D: non cantare"
 
-#: src/menu/chorus.c:370
+#: src/menu/chorus.c:510
 msgid "G : retour  D : participer"
 msgstr "S: indietro  D: partecipa"
 
-#: src/menu/chorus.c:374
+#: src/menu/chorus.c:514
 msgid "Choeur"
 msgstr "Coro"
 
-#: src/menu/chorus.c:406
-#: src/menu/chorus.c:414
+#: src/menu/chorus.c:546
+#: src/menu/chorus.c:554
 msgid "Choeur : lancer"
 msgstr "Coro: avvia"
 
-#: src/menu/chorus.c:409
+#: src/menu/chorus.c:549
 msgid ""
 "Les cigales autour chantent\n"
 "chacune une voix (départ\n"
@@ -1426,7 +1450,7 @@ msgstr ""
 "ognuna una voce (avvio\n"
 "sincronizzato via radio)."
 
-#: src/menu/chorus.c:410
+#: src/menu/chorus.c:550
 msgid "G : retour  D : lancer"
 msgstr "S: indietro  D: avvia"
 

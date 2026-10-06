@@ -332,8 +332,10 @@ Right wing: look for another beacon.
   A cured cicada is immune.
 
 **Chorus** (Choeur): when a choir leader (an organizer or a remote control) starts a song, the cicadas around sing it
-together, each one its own voice, with a start synchronized over the radio. Two songs: "Frère Jacques" as a 4-voice
-canon and the "Ode to Joy" in 3 voices.
+together, each one its own voice, with a start synchronized over the radio. Eight public domain songs: "Frère
+Jacques" (4-voice canon), "Ode to Joy" (3 voices), "Tetris (Korobeiniki)" (3 voices), "Pachelbel's Canon" (4 voices),
+"Mountain King" (Grieg, 3 voices), "Row your boat" (4-voice round), "Jingle Bells" (3 voices) and "Minuet in G"
+(2 voices).
 Your badge takes part by default; right wing: take part / stop singing. In mute mode, the choir is silent.
 
 **Announcements** (Annonces): the announcements of the organizers (coffee break, next talk...). An announcement is a
