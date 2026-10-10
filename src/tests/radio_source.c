@@ -33,6 +33,7 @@
 #include "pico/stdlib.h"
 #include "pico/sync.h"
 
+#include "flash_write.h"
 #include "log.h"
 #include "leds.h"
 #include "radio.h"
@@ -396,6 +397,8 @@ int main() {
     leds_anim_t led = {
         .tref = get_absolute_time(),
     };
+    /* Find the crystal frequency once and for all (don't expect it to change) */
+    uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
     while(true) {
         int ch;
         absolute_time_t now = get_absolute_time();
@@ -517,7 +520,7 @@ int main() {
                 int8_t eoff = ccread_status_reg(CC1101_FREQEST);
                 uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
                 printf("new packet, RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz, len % 4d, in % 7.02f ms,\ncontent: ",
-                        rssi, lqi, ((int64_t)(eoff)*CC1101_fXOSC)>>14, i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
+                        rssi, lqi, ((int64_t)(eoff)*fXOSC)>>14, i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
                 for (size_t i=0; i<i_rx; ++i)
                     printf("%02x ", buffer_rx[i]);
                 printf("\n");

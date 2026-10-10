@@ -10,6 +10,9 @@
  * Typical usage: \ref radio_init followed by \ref radio_boot, then \ref radio_set_frequency.
  * Then push your packet-mode configuration (TODO), then your data (TODO), then \ref radio_wait_state(TX or RX, true).
  *
+ * The radio crystal may need some calibration.
+ * The calibrated value is retrieved from the persistent configuration in flash (see flash_write.h).
+ *
  * TODO:
  * - decide whether print_cc_ function worth linking printf (it should except no log),
  * - accessors to push configuration and data to send, access to received bytes and quality indicators,
@@ -20,17 +23,6 @@
 #define _RADIO_H
 
 #include "pinouts.h"
-
-
-#ifndef CC1101_fXOSC
-/** \brief Define the CC1101 cristal frequency, which we can calibrate with radio_calibrate.c and .py (see also badge_secsea.h) */
-#define CC1101_fXOSC 26000000
-#endif
-
-/* Verify that configuration worked... */
-//#define XSTR(x) STR(x)
-//#define STR(x) #x
-//#pragma message "CC1101 frequency set to " XSTR(CC1101_fXOSC)
 
 
 /** \brief Initialize the radio library for write operations. */

@@ -10,6 +10,7 @@
 #include "hardware/spi.h"
 #include "pico/binary_info.h"
 
+#include "flash_write.h"
 #include "log.h"
 #include "radio.h"
 
@@ -148,9 +149,10 @@ void print_cc_configuration(void) {
 
 void radio_set_frequency(uint32_t freq_hz) {
     /* setting = freq_hz * 2**16/fXOSC */
+    uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
     uint64_t setting = freq_hz;
     setting <<= 16;
-    setting /= CC1101_fXOSC;
+    setting /= fXOSC;
     setting &= 0x003FFFFF;  /* Can only write the upper 22 bits, which gives 1.664GHz max */
 
     uint8_t cmd[4] = {
@@ -159,7 +161,7 @@ void radio_set_frequency(uint32_t freq_hz) {
         (setting >> 8) & 0xFF,  /* FREQ1 */
          setting & 0xFF,        /* FREQ0 */
     };
-    log_info("radio: closest frequency = %lldHz", (setting*CC1101_fXOSC)>>16);
+    log_info("radio: closest frequency = %lldHz", (setting*fXOSC)>>16);
     ccsend(cmd, NULL, 4);
 }
 
@@ -176,14 +178,15 @@ void radio_set_baud_rate(uint32_t rate_bauds) {
      * Rdata*2^28/fXOSC = (256+mantissa)*2^exp */
     uint64_t conf = rate_bauds;
     conf <<= 28;
-    conf /= CC1101_fXOSC;
+    uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
+    conf /= fXOSC;
     size_t mag = 63-__builtin_clzll(conf);
     //log_info("conf=%llu, 0x%016llx, mag=%d\n", conf, conf, mag);
     pad[1] |= (mag-8) & 0x0F;
     conf >>= mag-8;
     pad[2] = conf-256;
     //log_info("mantissa=%d, exp=%d\n", mantissa, exp);
-    log_info("radio: closest baud rate = %lld bps", ((uint64_t)((256+pad[2])*(1<<(pad[1]&0x0F)))*CC1101_fXOSC)>>28);
+    log_info("radio: closest baud rate = %lld bps", ((uint64_t)((256+pad[2])*(1<<(pad[1]&0x0F)))*fXOSC)>>28);
     ccsend(pad, NULL, 3);
 }
 
@@ -252,11 +255,7 @@ const uint8_t radio_preset_gfsk[] = {
     //CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
     CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
     CC1101_MDMCFG1, 0x22, /* 4 preamble bytes by default */
-#if CC1101_fXOSC < 26500000
-    CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz */
-#else
-    CC1101_DEVIATN, 0x34, /* Deviation; 0x34 gives 19.78kHz; but 0x33 gives 18.13 which is worse? */
-#endif
+    CC1101_DEVIATN, 0x34, /* Deviation = 19.04kHz for 26.000000MHz */
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
     CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */

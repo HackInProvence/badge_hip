@@ -4,7 +4,7 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 // -----------------------------------------------------
-// Configures MY PROTOTYPE which is not completely pin-compatible with the final badge.
+// Configures a PROTOTYPE BOARD (RPi pico + eInk) which is not completely pin-compatible with the final badge.
 // Should not be included manually but using -DPICO_BOARD=badge_proto while configuring cmake
 // Inspired from pico-sdk/src/boards/include/boards/pico_w.h
 // -----------------------------------------------------
@@ -28,9 +28,12 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #include "pinouts.h"
 
 // --- Radio ---
-// Radio may need calibration, which you can provide with -DCC1101_fXOSC at cmake time (see src/tests/radio_calibrate.py)
+// Radio may need calibration, which you can provide and persist in flash (search for radio_crystal_frequency)
 #ifndef CC1101_fXOSC
-#define CC1101_fXOSC 25997640
+// This default value is just used to flash the default configuration
+// You can read the current value with pico in boot mode and picotool save -r 10fff000 10fff100 tmp.bin -t bin && xxd tmp.bin
+//  -> see flash_write.h for the struct but it should be the third uint32 (little endian)
+#define CC1101_fXOSC 26000000
 #endif
 
 // --- UART ---

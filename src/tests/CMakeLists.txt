@@ -124,6 +124,7 @@ target_link_libraries(radio_source PRIVATE
     pico_stdlib
     pico_sync
     pico_time
+    flash_write
     leds
     radio
 )

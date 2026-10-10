@@ -15,6 +15,7 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+#include "flash_write.h"
 #include "log.h"
 #include "radio.h"
 
@@ -233,7 +234,8 @@ void rx_fsk_printf(void) {
         lqi = lqi & 0x7f;
         int8_t eoff;
         ccread_burst(CC1101_FREQEST, &eoff, 1);
-        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz: ", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
+        uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
+        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz: ", rssi, lqi, crc_ok, ((int64_t)(eoff)*fXOSC)>>14);
         for (size_t i=0; i<n-2; ++i)
             printf("%02x ", recv[i]);
         printf("\n");
@@ -350,7 +352,8 @@ void rx_fsk_raw_printf(void) {
         lqi &= 0x7f;
         int16_t rssi = ccread_status_reg(CC1101_RSSI);
         rssi -= 74;  /* According to CC1101 datasheet */
-        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz\n", rssi, lqi, crc_ok, ((int64_t)(eoff)*CC1101_fXOSC)>>14);
+        uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
+        printf("with RSSI=%+04d dBm, LQI=%03d, CRC=%d, est. freq. %+ 7lli Hz\n", rssi, lqi, crc_ok, ((int64_t)(eoff)*fXOSC)>>14);
 
         /* Add data to our current buffer, but don't overflow */
         ccread_burst(CC1101_RXFIFO, recv, n);
