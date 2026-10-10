@@ -13,39 +13,29 @@ Requires pyserial.
 Manual:
 - flash the radio_calibrate.uf2 image on the pico/badge,
 - reboot it but while connected in USB (ground 3V3_EN on the pico),
-- wait for a reasonably long time (10s, 100s),
 - start this script, which should connect to the pico with UART over USB,
-- Ctrl-C as soon as the first status line appears
-- "In 0.60050011s (0.60000200s on pico), rate is 25.996640818 MHz (25.997476167 on pico)"
--                                                                  ^^^^^^^^^^^^--- best estimate (by the pico)
-- either change it with -DCC1101_fXOSC= (frequency in Hz) in the cmake command and rebuild and recompile,
-- or use the test_radio.dis image to locate radio_set_frequency:
-  - the constant @<radio_set_frequency+0x30> is the CC1101_fXOSC,
-  - this gives you the offset of the constant (26MHz == 0x018cba80, or 25.997640 == 0x018cb148) -> 0x10006824 for instance,
-  - subtract 0x10000000 and you have the index in the .bin file, but not in the UF2 file,
-  - using your favorite hexeditor, search for it in the uf2 file, it should be 4-bytes aligned and in little endian,
-    and the function around it should be the same as in the .bin or in the .dis.
-  - xxd src/tests/test_radio.uf2 | sed 's/80ba 8c01/48b1 8c01/' | xxd -r - src/tests/test_radio.uf2
-                                                    ^^^^^^^^^---new value
-                                          ^^^^^^^^^-------------old value
+- "In  1312.811018s ( 1312.804376s on pico), rate is  9.999867 kHz (9.999917 on pico), xosc is 25.999653 MHz ([25.999785, 25.999787] on pico)"
+                                                                                                               ^^^^^^^^^--^^^^^^^^^ bounds using pico's clock
+                                                                                               ^^^^^^^^^--------------------------- value using python's clock
+                                                      ^^^^^^^^------^^^^^^^^------------------------------------------------------- diff btw pico and host clks
+- wait long enough so that bounds converge
 
 Conclusions:
-- the pico time is accurate (at least it does not deviate from my laptop clock),
-- when connecting to the serial to read the frequency, it slows down;
+- the RP2040's crystal is not necessarily more accurate than the CC1101's,
+
+Notes on previous method to calibrate:
+- when connecting to the serial to read the frequency, it slowed down, meaning that some interrupts were missed
   this may be caused by the UART that may have a higher priority interrupt than our GPIO counter
   -> we should use core 1 to count! -> THIS WORKS BETTER, but it still drifts low when we connect with UART...
   -> this may also be caused by USB CDC handler which sets up a task according to pico_stdio_usb...
-- without multi-core, we can read the most precise value by flashing the radio_calibrate.uf2, rebooting the pico,
-  waiting (> 10s ?), then connecting with UART (once connected, even if disconnected, the value drifts) -> 29_997_640 Hz
+  -> even with interrupt in RAM, we missed counts
+  -> interrupt less is a better approach, so use PWM.
 - the python value oscillates because it depends on the serial module,
   but it is a mean over the whole time the script runs, so it should stabilize -> 29_997_100 Hz
 
 New elements:
 - this is still not a very good calibration, needs more work,
 - the actual frequency is even higher than the one given by the pico,
-- beware when calibrating with something like an HackRF,
-  the higher the fXOSC, the lower the final frequency,
-  because of how the frequency register works, so don't overshoot.
 """
 
 import time
@@ -76,17 +66,26 @@ if __name__ == '__main__':
                 if not l:
                     print('nothing received, ended?')
                     break
-                if b'GDO0' in l or b'started' in l:
+                # Skip logs
+                l = l.strip()
+                if not l or b'[INFO]' in l:
                     continue
                 ts = time.time()  # Our ts
                 data.append([ts]+list(map(int,l.decode().split(','))))
                 if len(data)>1:
                     first,*_,last = data
-                    dt = last[0]-first[0]  # Out ts
-                    dtp = (last[1]-first[1])/1e6  # Pico's ts
-                    rate = (last[2]-first[2])/dt  *96  # 96 because we measured fXOSC/96
-                    ratep = sum(d[3] for d in data)/len(data)
-                    print(f'\x1b[2K\rIn {dt:.8f}s ({dtp:.8f}s on pico), rate is {rate/1e6:.9f} MHz ({ratep/1e6:.9f} on pico)', end='', flush=True)
+                    dt = last[0]-first[0]  # Using our ts
+                    dtp = (last[1]-first[1])/1e6  # Using Pico's ts
+                    rate = (last[2]-first[2])/dt  # IRQ rate, with our ts
+                    #ratep = sum(d[3] for d in data)/len(data)  # Pico's mean rate
+                    ratep = (last[2]-first[2])/dtp  # Pico's mean rate
+                    xosc = 2600 * rate  # With current config, the clock is 26k * the IRQ on the pico
+                    #xoscp = sum(d[4] for d in data)/len(data)  # Pico's mean xosc
+                    xoscp = 2600 * ratep  # Pico's mean xosc
+                    xoscp_ = 2600 * (last[2]-first[2]+1)/dtp  # Pico's mean xosc upper bound
+                    print(f'\x1b[2K\rIn {dt:12.6f}s ({dtp:12.6f}s on pico), rate is {rate/1e3:9.6f} kHz ({ratep/1e3:.6f} on pico), ' +
+                          f'xosc is {xosc/1e6:.6f} MHz ([{xoscp/1e6:.6f}, {xoscp_/1e6:.6f}] on pico)',
+                          end='', flush=True)
     except serial.SerialException:
         print('\nconnection lost')
     except KeyboardInterrupt:
