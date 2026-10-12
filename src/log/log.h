@@ -13,8 +13,11 @@
 #ifndef _LOG_H
 #define _LOG_H
 
+#include <stdbool.h>
+
+/* Use -DBADGE_DISABLE_LOGS=yes on your cmake . command to disable them */
 #ifdef BADGE_DISABLE_LOGS
-#pragma message "Log API disabled by configuration, no panic message on stdout."
+#pragma message "Log API disabled by configuration, no messages on stdout."
 #endif /* BADGE_DISABLE_LOGS */
 
 
@@ -33,11 +36,14 @@ typedef enum {
  * \param lev   Display messages of this level and above (LOG_LEVEL_NONE to disable at runtime). */
 void log_set_level(log_level lev);
 
-#define log_info(fmt, ...) log_printf(LOG_LEVEL_INFO, fmt, ##__VA_ARGS__)
+/** Log with INFO level and adds a newline */
+#define log_info(fmt, ...) log_printf(LOG_LEVEL_INFO, true, fmt, ##__VA_ARGS__)
 
-#define log_warning(fmt, ...) log_printf(LOG_LEVEL_WARNING, fmt, ##__VA_ARGS__)
+/** Log with WARNING level and adds a newline */
+#define log_warning(fmt, ...) log_printf(LOG_LEVEL_WARNING, true, fmt, ##__VA_ARGS__)
 
-void log_printf(log_level lev, const char *fmt, ...);
+/** If you don't want the automatic newline inserted by log_info and log_warning, call this one */
+void log_printf(log_level lev, bool add_newline, const char *fmt, ...);
 
 
 #endif /* _LOG_H */

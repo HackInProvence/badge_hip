@@ -13,7 +13,8 @@ void log_set_level(log_level lev) {
     (void)lev;
 }
 
-void log_printf(log_level lev, const char *fmt, ...) {
+void log_printf(log_level lev, bool add_newline, const char *fmt, ...) {
     (void)lev;
+    (void)add_newline;
     (void)fmt;
 }

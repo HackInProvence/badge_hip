@@ -25,7 +25,7 @@ void log_set_level(log_level lev) {
     level = clamp_lev(lev);
 }
 
-void log_printf(log_level lev, const char *fmt, ...) {
+void log_printf(log_level lev, bool add_newline, const char *fmt, ...) {
     if (lev < level)
         return;
 
@@ -49,5 +49,6 @@ void log_printf(log_level lev, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
-    puts(NULL);
+    if (add_newline)
+        puts(NULL);
 }
