@@ -104,12 +104,7 @@ pico_add_extra_outputs(radio_calibrate)
 target_link_libraries(radio_calibrate PRIVATE
     badge
     hardware_clocks
-    hardware_gpio
-    hardware_irq
-    hardware_pwm
-    pico_multicore
     pico_stdlib
-    pico_time
     log
     radio
 )

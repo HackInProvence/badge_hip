@@ -4,15 +4,28 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIu64
+#include <sys/types.h>
+#include <inttypes.h>
 #include <stdio.h>  /* This uses printf because of the print_cc_ function */
 
 #include "hardware/gpio.h"
+#include "hardware/irq.h"
+#include "hardware/pwm.h"
 #include "hardware/spi.h"
 #include "pico/binary_info.h"
+#include "pico/time.h"
 
 #include "flash_write.h"
 #include "log.h"
 #include "radio.h"
+
+
+/* Used for calibration */
+static uint64_t rises = 0;
+static absolute_time_t t0 = 0;
+static uint slice = 0;
 
 
 /** \brief SPI read/write pulling CSn down for the whole transaction, \p response can be NULL
@@ -237,6 +250,108 @@ void radio_wait_state(radio_state_t target_state, bool do_change) {
             old_status = status;
         }
     } while (status_state(status) != target_state);
+}
+
+
+/* The counter callback is not in flash to avoid the XIP cache and reduce its footprint */
+void __not_in_flash_func(counter)(void) {
+    pwm_clear_irq(slice);
+    ++rises;
+}
+
+/* Global strategy: use the RP2040 crystal to calibrate the CC1101 crystal.
+ * It's hard to conclude with great precision, because one crystal is not supposed to be better than the other.
+ * TODO: implement a mini-NTP equivalent to calibrate "both"...
+ *  (FREQEST would be less accurate because it is somewhat coarse I don't have a calibrated SDR for reference)
+ *
+ * Use the PWM edge-sensitivity to count GDO2 rising edges and interrupt on wraps.
+ * Target around 10kHz interrupts to be sure to not miss an interrupt because of UART (seems to fail at 100kHz).
+ * Accuracy (relative to the RP2040 crystal) is 2600/(length_ms/1000) in Hz = 100000/length_ms in ppm,
+ *  and we only need less than 1000 ppm to not skip channels, hence 10 to 100 seconds should be ok.
+ *
+ * There would be (at least) another way to measure a delay and stop the count by hardware using another slice to count time,
+ *  and make it DMA on wrap to stop the counting slice.
+ * The time measurement would be more accurate (because here we use get_absolute_time which is a call),
+ *  but we would have more work to make it count times longer than 268ms
+ *  ((65536*256*2)/125MHz, *256 with clock divider, *2 with phase correct) */
+void radio_calibrate(uint32_t length_ms){
+    /* Use the PWM edge counter on B port of slice 6 to count the rising edges of the CC1101 clock
+     *  (GDO0 is on port A and cannot count edges) */
+    if (pwm_gpio_to_channel(BADGE_RADIO_GDO2) != PWM_CHAN_B) {
+        log_warning("can't use pin %u, not on PWM channel B", BADGE_RADIO_GDO2);
+        return;
+    }
+    slice = pwm_gpio_to_slice_num(BADGE_RADIO_GDO2);
+
+    /* With PWM slice IRQ, we can count XOSC/1 (PWM can count up to sys_clk/2),
+     *  but only one of GDOx should output the clock at a time */
+    ccsend((uint8_t[]){CC1101_BURST(CC1101_IOCFG2), 0x30, 0x2E, 0x29}, NULL, 4);
+
+    pwm_config cfg = pwm_get_default_config();
+    pwm_config_set_clkdiv_mode(&cfg, PWM_DIV_B_RISING);
+
+    /* Use a 2.6k wrap so the interrupt is called at ~ 10kHz, which is slow enough to not be glitched by the UART activity */
+    pwm_config_set_wrap(&cfg, 2599);
+    pwm_config_set_clkdiv_int(&cfg, 1);  /* 0 means 256, so only counts 1 for 256 rising edges -> in fact, we don't need that */
+    pwm_init(slice, &cfg, /*start=*/false);
+
+    gpio_set_function(BADGE_RADIO_GDO2, GPIO_FUNC_PWM);
+    pwm_set_counter(slice, 0);
+    pwm_clear_irq(slice);
+    irq_set_exclusive_handler(PWM_IRQ_WRAP, counter);
+    irq_set_enabled(PWM_IRQ_WRAP, true);
+    pwm_set_irq_enabled(slice, true);
+
+    /* Get time before enabling because we will get time before disabling */
+    t0 = get_absolute_time();
+    pwm_set_enabled(slice, true);
+
+    /* Wait for length_ms */
+    absolute_time_t until = delayed_by_ms(t0, length_ms);
+    absolute_time_t log_until = delayed_by_ms(t0, length_ms > 100 ? length_ms-100 : 0);
+    absolute_time_t now = t0;
+    absolute_time_t last_log = t0;
+    while (absolute_time_diff_us(log_until, now) < 0) {
+        uint64_t dt_log = absolute_time_diff_us(last_log, now);
+        if (dt_log > 250000) {
+            last_log = now;
+            uint64_t diff_us = absolute_time_diff_us(t0, now);
+            uint64_t xosc_l = 2600*rises*1000000/diff_us;  /* lower bound, in Hz */
+            uint64_t xosc_u = 2600*(rises+1)*1000000/diff_us;  /* upper bound, in Hz */
+
+            log_printf(LOG_LEVEL_INFO, /*add_newline=*/false, "\x1b[2K\r");
+            log_printf(LOG_LEVEL_INFO, /*add_newline=*/false,
+                 "rises=% 9" PRIu64 ", %5d.%03d <= xosc <= %5d.%03d kHz (%3d.%03d/%3d.%03d s)", rises,
+                 (uint32_t)(xosc_l/1000), (uint32_t)(xosc_l%1000),
+                 (uint32_t)(xosc_u/1000), (uint32_t)(xosc_u%1000),
+                 (uint32_t)(diff_us/1000000), (uint32_t)((diff_us/1000)%1000),
+                 length_ms/1000, length_ms%1000
+            );
+        }
+        now = get_absolute_time();
+    }
+    while (absolute_time_diff_us(until, now) < 0)
+        now = get_absolute_time();
+    pwm_set_enabled(slice, false);
+
+    /* TODO: we can have a more reliable measurement having counter recording the time, but this requires:
+     * - disabling other interrupts,
+     * - getting time in the interrupt. */
+    /* "now" is the closest time that is before disabling the PWM */
+    uint64_t diff_us = absolute_time_diff_us(t0, now);
+    //uint64_t xosc_l = 2600*rises*1000000/diff_us;  /* lower bound, in Hz */
+    /* A closer upper bound is reached with pwm_get_counter */
+    uint64_t xosc = (2600*rises+pwm_get_counter(slice))*1000000/diff_us;  /* upper bound, in Hz */
+
+    /* Take a point in between and save it */
+    //uint64_t xosc = (xosc_l+xosc_u)/2ull;
+    Persistence *pers = flash_write_get_rw_copy();
+    pers->radio_crystal_frequency = xosc;
+    pers->flags_configured |= FLASH_CONFIGURED_CC1101;
+    flash_write_commit();
+
+    printf("\n");  /* Leave that like that because we don't have means to prefix a \n in a log_ */
+    log_info("CC1101 calibrated to fXOSC = %u Hz", pers->radio_crystal_frequency);
 }
 
 

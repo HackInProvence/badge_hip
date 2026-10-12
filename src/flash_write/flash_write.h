@@ -30,6 +30,9 @@ typedef struct {
     // /!\ do update flash_write.c when changing fields of this struct
 } Persistence;
 
+/* Masks for flags_configured */
+#define FLASH_CONFIGURED_CC1101 1
+
 
 /** \brief Returns a pointer to a valid Persistence (read only access).
  *

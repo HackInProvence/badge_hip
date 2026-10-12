@@ -5,6 +5,8 @@ target_include_directories(radio SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(radio INTERFACE
     badge_tests
     hardware_gpio
+    hardware_irq
+    hardware_pwm
     hardware_spi
     pico_time
     log

@@ -68,6 +68,22 @@ radio_state_t radio_state(void);
  * Can only \param do_change when \param target_state is IDLE, RX, TX, or FSTXON. */
 void radio_wait_state(radio_state_t target_state, bool do_change);
 
+/** \brief Do a calibration of the radio (long and blocking)
+ *
+ * The radio cannot be used while calibrating.
+ * This uses the GDO2 pin of the CC1101 and the PWM slice for BADGE_RADIO_GDO2.
+ * And saves the result to the flash.
+ * Prints stats using at the INFO level.
+ *
+ * The calibration is done with the pico's crystal, so by no means it is perfect.
+ * The calibration was mostly required for the version with the 27MHz crystal,
+ *  because it was not good enough.
+ *
+ * The configuration of the radio is not restored after the calibration.
+ *
+ * (see .c for more details) */
+void radio_calibrate(uint32_t length_ms);
+
 
 /** \brief Default configuration for the flipper chat app.
  *

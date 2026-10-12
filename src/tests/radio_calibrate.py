@@ -10,6 +10,8 @@ Try to calibrate the CC1101 crystal using the serial port.
 The radio_calibrate program must be flashed on the device.
 Requires pyserial.
 
+--!!!> this program is NOT USED anymore, only use radio_calibrate <!!!--
+
 Manual:
 - flash the radio_calibrate.uf2 image on the pico/badge,
 - reboot it but while connected in USB (ground 3V3_EN on the pico),
@@ -56,6 +58,7 @@ def wait_open():
 
 
 if __name__ == '__main__':
+    b  # TODO: don't use this script for now (voluntarily broken)
     # We could only keep the first and last data point, but this could be used to plot the evolution...
     data = []  # [[ts_host, ts_pico, ticks, rate_pico], ...]
     try:
