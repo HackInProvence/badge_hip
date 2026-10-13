@@ -63,7 +63,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Médias** | Images, Vidéos, Musique, Sonneries, Lecture rapide, Livres-jeux, Volume |
 | **Jeux solo** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto |
 | **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
-| **Social** | Réseau des cigales, Messages, Contacts, Compétences, Programme, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
+| **Social** | Réseau des cigales, Messages, Contacts, Compétences, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
 | **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
@@ -299,7 +299,8 @@ Lockpicking, Défense.
   en bas de l'écran, avec un carillon : « Marius aime aussi : Radio / SDR » (une fois par visite).
 - Les badges d'un firmware plus ancien n'envoient pas leurs compétences.
 
-**Programme** : le programme de la conférence, sans carte SD. Aile droite : le détail d'un talk, avec le QR code
+**Programme** (retiré du menu : le programme peut changer après le flashage des badges ; voir le thème Social dans
+`src/menu/main.c` pour le remettre) : le programme de la conférence, sans carte SD. Aile droite : le détail d'un talk, avec le QR code
 de son lien ; flancs : talk précédent / suivant.
 Le programme de SecSea 2026 n'est pas encore publié : les talks affichés sont provisoires.
 

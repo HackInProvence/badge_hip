@@ -68,6 +68,10 @@ void contacts_export(void);  /* contacts.c: the cards received as vCards on USB 
 
 
 /* Buttons flags from btns_get_state() */
+/* Social > Programme (program.c): hidden, the program of the conference can change after the badges are flashed
+ * (the page and its code stay in the firmware). 1: back in the demo mode; the menu: see the Social theme below */
+#define MENU_PROGRAM 0
+
 #define BTN_A 0x01  /* left wing */
 #define BTN_B 0x02  /* right wing */
 #define BTN_X 0x04  /* right flank */
@@ -710,7 +714,9 @@ static const submenu_t SUBMENUS[] = {
                        M_CTF, M_APP(APP_CRYPTO)}},
     {N_("Jeux multi"), 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
                            M_APP(APP_TUG)}},
-    {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS), M_APP(APP_PROGRAM),
+    /* Programme (program.c) is not in the menu: the program of the conference can change after the badges are
+     * flashed. To put it back: M_APP(APP_PROGRAM) after APP_SKILLS, 12 entries, and MENU_PROGRAM 1 (the demo mode) */
+    {N_("Social"), 11, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS),
                     M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
     {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
@@ -2204,7 +2210,12 @@ static void demo_start_step(absolute_time_t now) {
     case D_NAMETAG: app_open(APPS[APP_NAMETAG]); break;
     case D_ACHIEVEMENTS: app_open(APPS[APP_ACHIEVEMENTS]); break;
     case D_SKILLS: app_open(APPS[APP_SKILLS]); break;
-    case D_PROGRAM: app_open(APPS[APP_PROGRAM]); break;
+    case D_PROGRAM:
+        if (MENU_PROGRAM)
+            app_open(APPS[APP_PROGRAM]);
+        else
+            shown = false;  /* Not in the menus: not in the demo either */
+        break;
     case D_RADAR: app_open(APPS[APP_RADAR]); break;
     case D_GAMEBOOK: app_open(APPS[APP_GAMEBOOK]); break;
     case D_IMAGES: shown = demo_media(B_IMAGE); break;

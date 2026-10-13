@@ -395,7 +395,8 @@ def test_social(t):
     close_theme(t, 'Badge')
 
 
-SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Programme', 'Vote', 'Radar des cigales',
+# 'Programme' is hidden (not in the Social theme of main.c): add it back after 'Compétences' with it
+SOCIAL = ['Réseau cigales', 'Messages', 'Contacts', 'Compétences', 'Vote', 'Radar des cigales',
           'Chaud - froid', 'Virus des cigales', 'Choeur', 'Annonces', 'Contrebande']
 ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Vote (admin)',
          'Choeur : lancer', 'Balise chaud-froid', 'Virus : patient zéro', 'Contrebande (admin)',
@@ -493,13 +494,15 @@ def test_net(t):
     t.result('net: message', ok and sent is not None)
     social_back(t, 'Messages')
     close_theme(t, 'Social')
-    # Program page and infection page
+    # Infection page (and the program page when it is in the menu)
     open_theme(t, 'Social')
-    ok = social_app(t, 'Programme')
-    t.keys('xxb')
-    t.screenshot('program_details', 1.0)
-    t.keys('a')
-    social_back(t, 'Programme')
+    ok = True
+    if 'Programme' in SOCIAL:
+        ok = social_app(t, 'Programme')
+        t.keys('xxb')
+        t.screenshot('program_details', 1.0)
+        t.keys('a')
+        social_back(t, 'Programme')
     ok = ok and social_app(t, 'Virus des cigales')
     t.screenshot('infection')
     social_back(t, 'Virus des cigales')

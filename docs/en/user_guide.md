@@ -66,7 +66,7 @@ The main menu groups the features by theme:
 | **Media** (Médias) | Images, Videos (SD card), Music (SD card), Ringtones, Speed reading (RSVP), Gamebooks, Volume |
 | **Solo games** (Jeux solo) | Tic-tac-toe, Connect 4, Simon, Reflexes, Snake, Minesweeper, 2048, 15 puzzle, Sokoban, Mastermind, Hangman, Blind test, CTF, Crypto CTF |
 | **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war |
-| **Social** | Cicada network, Messages, Contacts, Skills, Program, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
+| **Social** | Cicada network, Messages, Contacts, Skills, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
 | **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements |
 | **Settings** (Réglages) | Screensaver, Language, Remote, Mute mode, Info, Credits, Radio tuning |
@@ -308,7 +308,8 @@ Development, CTF, Lockpicking, Defense.
   screen, with a chime: "Marius likes Radio / SDR too" (once per visit).
 - The badges of an older firmware do not send their skills.
 
-**Program** (Programme): the conference program, no SD card needed. Right wing: the details of a talk, with the
+**Program** (Programme; removed from the menu: the program can change after the badges are flashed; see the Social theme
+in `src/menu/main.c` to bring it back): the conference program, no SD card needed. Right wing: the details of a talk, with the
 QR code of its link; sides: previous / next talk.
 The SecSea 2026 program is not published yet: the talks shown are placeholders.
 
