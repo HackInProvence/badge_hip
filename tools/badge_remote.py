@@ -431,6 +431,7 @@ def run_window(port, zoom, on_ready=None):
     rate_box.pack(side='right')
     tk.Label(tools, text='Débit radio :').pack(side='right', padx=(8, 2))
     was_connected = [False]
+    diag_port = [None]  # The port of the badge whose diagnostic was asked last
 
     # Several badges plugged in: choose the one to drive
     ports_bar = tk.Frame(root)
@@ -461,6 +462,7 @@ def run_window(port, zoom, on_ready=None):
         device = port_labels.get(port_choice.get())
         if device and device != badge.port_name:
             badge.switch(device)
+            rate.set('')  # Until the diagnostic of the new badge
         root.focus_set()
     port_box.bind('<<ComboboxSelected>>', on_port)
     refresh_ports()
@@ -510,8 +512,11 @@ def run_window(port, zoom, on_ready=None):
             rows = badge.frames.get_nowait()
         if rows:
             show(rows)
-        if badge.connected() and not was_connected[0]:
-            badge.send('!')  # The state of the badge, the admin mode among others
+        if badge.connected() and (not was_connected[0] or badge.port_name != diag_port[0]):
+            # Connected, or another badge chosen in the list: its diagnostic ("!") updates the settings shown (admin
+            # mode, bit rate of the radio...)
+            badge.send('!')
+            diag_port[0] = badge.port_name
         was_connected[0] = badge.connected()
         while not badge.logs.empty():
             line = badge.logs.get_nowait()
