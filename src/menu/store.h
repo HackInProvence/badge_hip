@@ -95,6 +95,7 @@ typedef struct {
     uint16_t batt_auto_minutes;  /* Minutes on battery of the calibration in progress */
     uint16_t batt_elapsed;  /* Minutes on battery since the last full charge, 0xFFFF: unknown (a partial charge) */
     uint16_t batt_unplug_raw;  /* ADC when unplugged (the level on battery: the final fall goes below it) */
+    uint8_t net_rate;  /* Bit rate of the network: index + 1 in radio_tools.c RATES (0, 0xFF: default, 100 kbit/s) */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1

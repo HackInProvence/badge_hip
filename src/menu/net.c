@@ -227,8 +227,10 @@ void net_debug(void) {
     radio_read_registers(CC1101_SYNC1, &sync1, 1);
     radio_read_registers(CC1101_FREND0, &frend0, 1);
     radio_read_registers(CC1101_IOCFG0, &iocfg0, 1);
-    printf("net channel: occupancy %u %%, noise %d dBm, busy %lu, forced %lu, %u kbit/s\n", occupancy,
-           noise_x16 / 16, (unsigned long)n_busy, (unsigned long)n_forced, (unsigned)(RADIO_TOOLS_SOCIAL_BAUDS / 1000));
+    uint32_t bauds = radio_tools_social_bauds() + 50;
+    printf("net channel: occupancy %u %%, noise %d dBm, busy %lu, forced %lu, %lu.%lu kbit/s\n", occupancy,
+           noise_x16 / 16, (unsigned long)n_busy, (unsigned long)n_forced, (unsigned long)(bauds / 1000),
+           (unsigned long)(bauds % 1000 / 100));
     printf("net state: %s%s%s%s, queue %d, repairs %lu, radio_tools %s, marcstate 0x%02x, pktctrl0 0x%02x, mdmcfg2 0x%02x, "
            "sync1 0x%02x, frend0 0x%02x, iocfg0 0x%02x, gdo0 %d (%s)\n", paused ? "paused" : "running",
            owner ? ", owner" : "", tx_pending ? ", tx pending" : "", chat ? ", chat" : "", queue_count,

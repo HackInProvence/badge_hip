@@ -74,7 +74,13 @@ int8_t radio_tools_freq_offset(void);
 
 /** \brief Configure the radio for the network of the cicadas (sync word, TX power), in IDLE. */
 void radio_tools_profile_social(uint8_t patable);
-#define RADIO_TOOLS_SOCIAL_BAUDS 100000  /* The network of the cicadas (the chat of the Flipper: 10 kbit/s) */
+/* The bit rate of the network of the cicadas (the chat of the Flipper stays at 10 kbit/s): 10, 38.4, 50 or 100 kbit/s,
+ * for the range tests (serial "K" / 0x04 n, badge_remote.py); saved. All the badges must use the same one. */
+#define RADIO_TOOLS_SOCIAL_RATES 4
+#define RADIO_TOOLS_SOCIAL_RATE_DEFAULT 3  /* 100 kbit/s */
+void radio_tools_set_social_rate(int index);
+int radio_tools_social_rate(void);
+uint32_t radio_tools_social_bauds(void);
 /** \brief The profile of the chat of the Flipper Zero (sync word 0x464C). */
 void radio_tools_profile_chat(uint8_t patable);
 

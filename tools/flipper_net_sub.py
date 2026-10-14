@@ -36,7 +36,15 @@ import argparse
 import random
 import sys
 
-BAUD = 99975.6  # MDMCFG4 = 0x5B, MDMCFG3 = 0xF8 with the 26 MHz crystal of the Flipper (radio_tools.c: 100 kbps)
+# The bit rates of the network of the badges (radio_tools.c RATES, serial "K" / 0x04 n): the modem registers of the
+# Flipper for each one: MDMCFG4 (filter + rate exponent), MDMCFG3, DEVIATN, FSCTRL1, FOCCFG, BSCFG, AGCCTRL2/1/0, FREND1
+RATES = {
+    '10': (9992.6, [0xC8, 0x93, 0x34, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56]),
+    '38.4': (38383.5, [0x9A, 0x83, 0x35, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56]),
+    '50': (49987.8, [0x8A, 0xF8, 0x40, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56]),
+    '100': (99975.6, [0x5B, 0xF8, 0x47, 0x08, 0x1D, 0x1C, 0xC7, 0x00, 0xB2, 0xB6]),
+}
+BAUD = RATES['100'][0]  # --kbps
 FREQUENCY = 433920000
 SYNC = (0xC1, 0x6A)
 MAGIC = 0xC1
@@ -61,23 +69,33 @@ PRESET = [
     (0x02, 0x0D),  # IOCFG0: GDO0 serial data (asynchronous)
     (0x03, 0x47),  # FIFOTHR
     (0x08, 0x32),  # PKTCTRL0: asynchronous serial mode, infinite length
-    (0x0B, 0x08),  # FSCTRL1: IF
-    (0x10, 0x5B),  # MDMCFG4: channel bandwidth 325 kHz, data rate exponent
-    (0x11, 0xF8),  # MDMCFG3: data rate 100 kbps (the Gaussian filter of the GFSK)
+    (0x0B, None),  # FSCTRL1: IF (RATES)
+    (0x10, None),  # MDMCFG4: channel bandwidth, data rate exponent (RATES)
+    (0x11, None),  # MDMCFG3: data rate (the Gaussian filter of the GFSK)
     (0x12, 0x10),  # MDMCFG2: GFSK, no sync word (the bits of the file contain it)
-    (0x15, 0x47),  # DEVIATN: 47.6 kHz
+    (0x15, None),  # DEVIATN
     (0x18, 0x18),  # MCSM0: calibration
-    (0x19, 0x1D),  # FOCCFG
-    (0x1A, 0x1C),  # BSCFG
-    (0x1B, 0xC7), (0x1C, 0x00), (0x1D, 0xB2),  # AGCCTRL2/1/0
+    (0x19, None),  # FOCCFG
+    (0x1A, None),  # BSCFG
+    (0x1B, None), (0x1C, None), (0x1D, None),  # AGCCTRL2/1/0
     (0x20, 0xFB),  # WORCTRL
-    (0x21, 0xB6),  # FREND1
+    (0x21, None),  # FREND1
 ]
+PRESET_FROM_RATE = {0x10: 0, 0x11: 1, 0x15: 2, 0x0B: 3, 0x19: 4, 0x1A: 5, 0x1B: 6, 0x1C: 7, 0x1D: 8, 0x21: 9}
+KBPS = '100'
+
+
+def set_rate(kbps):
+    global BAUD, KBPS
+    KBPS = kbps
+    BAUD = RATES[kbps][0]
 PATABLE = [0xC0, 0, 0, 0, 0, 0, 0, 0]
 
 
 def preset_data():
-    values = [b for pair in PRESET for b in pair] + [0, 0] + PATABLE  # PATABLE[0]: the power (--power)
+    regs = RATES[KBPS][1]
+    pairs = [(r, regs[PRESET_FROM_RATE[r]] if v is None else v) for r, v in PRESET]
+    values = [b for pair in pairs for b in pair] + [0, 0] + PATABLE  # PATABLE[0]: the power (--power)
     return ' '.join(f'{v:02X}' for v in values)
 
 
@@ -156,8 +174,11 @@ def main():
     parser.add_argument('--level', type=int, default=50, help='leds: brightness, 1 to 100 %% (50)')
     parser.add_argument('--send', action='store_true', help='copy the file to the Flipper plugged in USB and send it')
     parser.add_argument('--port', default=None, help='with --send: serial port of the Flipper (found by itself)')
+    parser.add_argument('--kbps', default='100', choices=list(RATES),
+                        help='bit rate of the network of the badges (100; serial "K" of the badges, badge_remote.py)')
     args = parser.parse_args()
     PATABLE[0] = POWERS[args.power]
+    set_rate(args.kbps)
 
     if args.kind == 'preset':
         print('Add to the SD card of the Flipper, file subghz/assets/setting_user:\n')

@@ -10,6 +10,7 @@
 #include "hardware/irq.h"
 
 #include "i18n.h"
+#include "net.h"
 #include "ook_rx.h"
 #include "ook_tx.h"
 #include "pinouts.h"
@@ -46,6 +47,7 @@ static char message[64] = "";
 
 
 static int8_t freq_offset = 0;  /* FSCTRL0: steps of fXOSC / 2^14 */
+static int social_rate = RADIO_TOOLS_SOCIAL_RATE_DEFAULT;  /* Index in RATES (radio_tools_profile_social()) */
 
 static void configure(void) {
     radio_wait_state(CC1101_STATE_IDLE, true);
@@ -86,6 +88,9 @@ void radio_tools_init(void) {
     radio_read_registers(CC1101_VERSION, &chip_version, 1);
     if (store_get()->radio_tuned == STORE_RADIO_TUNED)
         freq_offset = store_get()->radio_freq_offset;  /* The tuning (radio_tune.c) */
+    uint8_t rate = store_get()->net_rate;
+    if (rate >= 1 && rate <= RADIO_TOOLS_SOCIAL_RATES)
+        social_rate = rate - 1;  /* The bit rate chosen for the range tests */
     configure();
     printf("radio: CC1101 version 0x%02x, frequency offset %d\n", chip_version, freq_offset);
     /* Measure the crystal (~1s, in the background) and reconfigure the radio with it */
@@ -160,17 +165,48 @@ void radio_tools_profile_chat(uint8_t patable) {
 }
 
 
+/* The modem of the network for each bit rate (GFSK): the channel filter (MDMCFG4 high nibble: fXOSC / (8 (4 + M) 2^E)),
+ * the deviation, the IF, the frequency and bit synchronisation loops, the AGC, the RX front end. 10 kbit/s: the
+ * preset of the Flipper (the chat); 100 kbit/s: the CC1101 recommendations for 100 kBaud; between them, filters
+ * wide enough for the offsets of the crystals (+-20 ppm each) */
+typedef struct {
+    uint32_t bauds;
+    uint8_t chanbw, deviatn, fsctrl1, foccfg, bscfg, agc2, agc1, agc0, frend1;
+} social_rate_t;
+static const social_rate_t RATES[RADIO_TOOLS_SOCIAL_RATES] = {
+    {9995, 0xC0, 0x34, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56},  /* 102 kHz filter, deviation 19 kHz (~30 ms/beacon) */
+    {38383, 0x90, 0x35, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56},  /* 163 kHz, 20.6 kHz (~8 ms) */
+    {49988, 0x80, 0x40, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56},  /* 203 kHz, 25.4 kHz (~6 ms) */
+    {99975, 0x50, 0x47, 0x08, 0x1D, 0x1C, 0xC7, 0x00, 0xB2, 0xB6},  /* 325 kHz, 47.6 kHz (~3.7 ms) */
+};
+
 void radio_tools_profile_social(uint8_t patable) {
     set_profile(RADIO_TOOLS_SOCIAL_SYNC1, RADIO_TOOLS_SOCIAL_SYNC0, patable);
-    /* The network of the cicadas at 100 kbit/s GFSK (10 times shorter packets than the 10 kbit/s of the chat of the
-     * Flipper: ~3.7 ms for a beacon): deviation 47.6 kHz, channel filter 325 kHz, IF 203 kHz, the frequency and bit
-     * synchronisation loops and the AGC of the CC1101 recommendations for 100 kBaud. MCSM1: no channel check by the
-     * radio (net.c checks it before sending), RX -> IDLE and TX -> IDLE at the end of a packet */
-    radio_write_registers((const uint8_t[]){CC1101_MDMCFG4, 0x50, CC1101_DEVIATN, 0x47, CC1101_FSCTRL1, 0x08,
-                                            CC1101_FOCCFG, 0x1D, CC1101_BSCFG, 0x1C, CC1101_AGCCTRL2, 0xC7,
-                                            CC1101_AGCCTRL1, 0x00, CC1101_AGCCTRL0, 0xB2, CC1101_FREND1, 0xB6,
-                                            CC1101_MCSM1, 0x00}, 20);
-    radio_set_baud_rate(RADIO_TOOLS_SOCIAL_BAUDS);  /* Keeps the channel filter of MDMCFG4 */
+    /* MCSM1: no channel check by the radio (net.c checks it before sending), RX -> IDLE and TX -> IDLE at the end of a
+     * packet */
+    const social_rate_t *r = &RATES[social_rate];
+    radio_write_registers((const uint8_t[]){CC1101_MDMCFG4, r->chanbw, CC1101_DEVIATN, r->deviatn,
+                                            CC1101_FSCTRL1, r->fsctrl1, CC1101_FOCCFG, r->foccfg, CC1101_BSCFG, r->bscfg,
+                                            CC1101_AGCCTRL2, r->agc2, CC1101_AGCCTRL1, r->agc1,
+                                            CC1101_AGCCTRL0, r->agc0, CC1101_FREND1, r->frend1, CC1101_MCSM1, 0x00}, 20);
+    radio_set_baud_rate(r->bauds);  /* Keeps the channel filter of MDMCFG4 */
+}
+
+uint32_t radio_tools_social_bauds(void) {
+    return RATES[social_rate].bauds;
+}
+
+int radio_tools_social_rate(void) {
+    return social_rate;
+}
+
+void radio_tools_set_social_rate(int index) {
+    social_rate = index >= 0 && index < RADIO_TOOLS_SOCIAL_RATES ? index : RADIO_TOOLS_SOCIAL_RATE_DEFAULT;
+    store_get()->net_rate = social_rate + 1;
+    store_save_now();  /* At once: a test of range may switch the badge off soon */
+    uint32_t b = radio_tools_social_bauds();
+    printf("net: rate %lu.%lu kbit/s\n", (unsigned long)((b + 50) / 1000), (unsigned long)((b + 50) % 1000 / 100));
+    net_reconfigure();  /* The network takes the new profile at its next turn */
 }
 
 

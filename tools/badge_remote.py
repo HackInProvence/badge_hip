@@ -78,6 +78,7 @@ SERIAL_COMMANDS = [
     ('M', 'Radio : envoie le message radio (profil chat du Flipper)'),
     ('r', 'Radio : registres du CC1101 et sa PATABLE'),
     ('W', 'Test : batterie faible simulée, mode économie (marche / arrêt)'),
+    ('K', 'Réseau : débit radio suivant (10, 38,4, 50, 100 kbit/s), gardé ; tous les badges doivent avoir le même'),
     ('E', 'Langue : retour à l\'anglais'),
     ('N', 'Langue : langue suivante'),
     ('U', 'Contrôle des textes coupés ou sous le pied de page (traces "uicheck:", marche / arrêt)'),
@@ -87,7 +88,12 @@ SERIAL_COMMANDS = [
     ('s', 'Écran : envoyé une fois (F5)'),
     ('0x01 A / a', 'Mode admin : activé / désactivé (case "Mode admin")'),
     ('0x02 + caractère', 'Mode clavier : tape le caractère dans l\'éditeur de texte du badge'),
+    ('0x04 + chiffre', 'Réseau : débit radio 0 = 10, 1 = 38,4, 2 = 50, 3 = 100 kbit/s (liste "Débit radio")'),
 ]
+
+# The bit rates of the network (0x04 + index), and the value printed by the badge -> the label
+RATES = ['10 kbit/s', '38,4 kbit/s', '50 kbit/s', '100 kbit/s']
+RATE_LABELS = {'10.0': RATES[0], '38.4': RATES[1], '50.0': RATES[2], '100.0': RATES[3]}
 
 HELP_TEXT = '''Télécommande du badge SecSea par son port série USB.
 
@@ -96,6 +102,7 @@ Clavier (la fenêtre doit avoir le focus) :
   Gauche / a : aile gauche (retour)      Droite / Entrée / b : aile droite (OK)
   Maj + touche : appui long              F5 : redemander l'écran
   F12 : capture d'écran (PNG)            F1 : cette aide
+Débit radio (liste) : le débit du réseau des cigales, pour les essais de portée (tous les badges le même).
 Mode clavier (case) : les caractères tapés vont dans l'éditeur de texte du badge
   (Entrée : valider, Échap : annuler, Retour arrière : effacer).
 
@@ -411,6 +418,18 @@ def run_window(port, zoom, on_ready=None):
         badge.send('\x01' + ('A' if admin.get() else 'a'))
         root.focus_set()
     ttk.Checkbutton(tools, text='Mode admin', variable=admin, command=admin_clicked).pack(side='right', padx=8)
+    # The bit rate of the network (range tests): 0x04 + index; the list follows the badge ("net: rate", "!")
+    rate = tk.StringVar(value='')
+
+    def rate_chosen(_event=None):
+        if rate.get() in RATES:
+            badge.send('\x04' + str(RATES.index(rate.get())))
+            badge.logs.put(f'--- débit radio : {rate.get()} (tous les badges doivent avoir le même)')
+        root.focus_set()
+    rate_box = ttk.Combobox(tools, textvariable=rate, values=RATES, state='readonly', width=11)
+    rate_box.bind('<<ComboboxSelected>>', rate_chosen)
+    rate_box.pack(side='right')
+    tk.Label(tools, text='Débit radio :').pack(side='right', padx=(8, 2))
     was_connected = [False]
 
     # Several badges plugged in: choose the one to drive
@@ -499,6 +518,11 @@ def run_window(port, zoom, on_ready=None):
             m = re.search(r'(?:^admin: |, admin )(on|off)\b', line)
             if m:
                 admin.set(m.group(1) == 'on')
+            m = re.search(r'^net(?: channel)?: .*?(\d+(?:\.\d)?) kbit/s', line)
+            if m:
+                label = RATE_LABELS.get(m.group(1))
+                if label:
+                    rate.set(label)
             log.insert('end', line + '\n')
             if int(log.index('end-1c').split('.')[0]) > 500:
                 log.delete('1.0', '100.0')

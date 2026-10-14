@@ -168,6 +168,17 @@ static uint8_t buttons_pressed(absolute_time_t now) {
             admin_request = c == 'A' ? 1 : 0;
         break;
     }
+    case 0x04: {
+        /* Bit rate of the network (range tests, badge_remote.py): 0x04 then '0'..'3' (10, 38.4, 50, 100 kbit/s) */
+        int c = getchar_timeout_us(50000);
+        if (c >= '0' && c < '0' + RADIO_TOOLS_SOCIAL_RATES)
+            radio_tools_set_social_rate(c - '0');
+        break;
+    }
+    case 'K':
+        /* Bit rate of the network: the next one (10, 38.4, 50, 100 kbit/s), saved */
+        radio_tools_set_social_rate((radio_tools_social_rate() + 1) % RADIO_TOOLS_SOCIAL_RATES);
+        break;
     case 0x02: {
         /* Keyboard mode of badge_remote.py: 0x02 then a character typed on the PC, for the text editors */
         int c = getchar_timeout_us(50000);

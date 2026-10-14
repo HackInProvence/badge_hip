@@ -548,6 +548,7 @@ Bibliothèque standard.
 | `--level N` | `leds` : luminosité, 1 à 100 % (défaut 50) |
 | `-o`, `--output` | fichier de sortie (défaut `secsea_<type>.sub`) |
 | `--power DBM` | puissance du Flipper : 10 (défaut, comme les badges), 7, 5, 0, -10, -15, -20, -30 |
+| `--kbps N` | débit des badges : 10, 38.4, 50 ou 100 (défaut), le même que leur réglage (`K` ; aussi pour `flipper_weather.py`) |
 | `--send` | copie le fichier sur le Flipper branché en USB et l'envoie (sa console série, comme `flipper_weather.py`) |
 | `--port COMx` | avec `--send` : le port du Flipper (trouvé tout seul) |
 
@@ -653,6 +654,8 @@ PuTTY (Windows, type « Serial ») convient aussi. Chaque caractère est une com
 | `P` | ping à +10 dBm : les badges qui l'entendent écrivent `net: ping #n from <id>, rssi ...` |
 | `L` | mode *loopback* (les paquets émis reviennent comme d'un badge jumeau, pour tester seul) : marche / arrêt |
 | `W` | batterie faible simulée (mode économie : muet, télécommande coupée, alerte, icône) : marche / arrêt |
+| `K` | débit radio du réseau suivant : 10, 38,4, 50, 100 kbit/s (défaut 100), gardé ; **tous les badges doivent avoir le même** (essais de portée) |
+| `0x04` + `0`..`3` | débit radio du réseau : 10, 38,4, 50 ou 100 kbit/s (la liste « Débit radio » de `badge_remote.py`) |
 | `R` | redémarrage immédiat du badge |
 | `[` / `]` | envoi de l'écran à chaque changement : marche / arrêt (lignes `@FB ...`) |
 | `s` | envoi de l'écran une fois |

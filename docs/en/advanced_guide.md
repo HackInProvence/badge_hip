@@ -548,6 +548,7 @@ prints the "SecSea" preset that lets the Flipper record the packets of a badge. 
 | `--level N` | `leds`: brightness, 1 to 100 % (default 50) |
 | `-o`, `--output` | output file (default `secsea_<kind>.sub`) |
 | `--power DBM` | power of the Flipper: 10 (default, like the badges), 7, 5, 0, -10, -15, -20, -30 |
+| `--kbps N` | bit rate of the badges: 10, 38.4, 50 or 100 (default), the same as their setting (`K`; also for `flipper_weather.py`) |
 | `--send` | copies the file to the Flipper plugged in USB and sends it (its serial console, like `flipper_weather.py`) |
 | `--port COMx` | with `--send`: the port of the Flipper (found by itself) |
 
@@ -653,6 +654,8 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 | `P` | ping at +10 dBm: the badges that hear it print `net: ping #n from <id>, rssi ...` |
 | `L` | *loopback* mode (the packets sent come back as from a twin badge, to test alone): on / off |
 | `W` | simulated low battery (saving mode: mute, remote control off, warning, icon): on / off |
+| `K` | next bit rate of the network: 10, 38.4, 50, 100 kbit/s (default 100), saved; **all the badges must use the same** (range tests) |
+| `0x04` + `0`..`3` | bit rate of the network: 10, 38.4, 50 or 100 kbit/s (the "Débit radio" list of `badge_remote.py`) |
 | `R` | immediate reboot of the badge |
 | `[` / `]` | sending the screen on every change: on / off (`@FB ...` lines) |
 | `s` | sends the screen once |
