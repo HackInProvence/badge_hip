@@ -718,7 +718,7 @@ Dans l'ordre du menu :
 |---|---|---|
 | **Commandes radio** | envoie une commande à tous les badges autour : Muet (conférence), Fin du mode muet, Cigale : chanter, Talk : éteint / vert / orange (5 min) / rouge (fini) / rouge énervé, Mise en sommeil. Ce badge l'exécute aussi (sauf le sommeil) | flancs : choisir ; D : envoyer ; G : retour |
 | **LEDs des cigales** | couleur (9 couleurs ou R, G, B de 0 à 255) et mode (Fixe, Clignotant, Fondu, durées de 50 ms à 5 s) imposés aux LEDs des cigales autour, jusqu'à « Rétablir leurs LEDs » ou leur redémarrage | voir le [guide utilisateur § 4.8](guide_utilisateur.md#48-le-mode-admin-organisateurs) |
-| **Annonces (admin)** | 6 annonces (heure, texte de 56 caractères, QR code : lien, texte, téléphone, SMS, e-mail, Wi-Fi, position GPS), gardées en flash ; aperçu ; envoi 3 fois à toutes les cigales | flancs : choisir ; D : ouvrir / modifier ; G : retour |
+| **Annonces (admin)** | 20 annonces (heure, texte de 56 caractères, QR code : lien, texte, téléphone, SMS, e-mail, Wi-Fi, position GPS), gardées en flash ; aperçu ; envoi 3 fois à toutes les cigales | flancs : choisir ; D : ouvrir / modifier ; G : retour |
 | **Vote (admin)** | ouvre une question prédéfinie, compte les votes (un par badge, le dernier compte) et affiche l'histogramme | D : ouvrir le vote, puis D : fermer |
 | **Choeur : lancer** | lance un des 8 morceaux (Frère Jacques, Ode à la joie, Tetris, Canon de Pachelbel, Roi de la montagne, Row your boat, Vive le vent, Menuet en sol) ; ce badge chante la première voix | D : lancer / arrêter |
 | **Balise chaud-froid** | ce badge émet une balise par seconde à +10 dBm ; les autres le cherchent avec Social > Chaud - froid. L'échelle (« Brûlant dès -74 dBm » par défaut, réglable par pas de 5 dB) est gardée et envoyée avec la balise | D : émettre / arrêter ; flancs : échelle ; G : quitter |
@@ -766,7 +766,7 @@ Vérification par la console : `!` affiche `battery: factory points ...`.
 | Succès et niveau | succès et leurs compteurs |
 | Contrebande | la cale (nouvelles marchandises à la prochaine ouverture) |
 | Tout | tout ce qui précède, plus la progression du livre-jeu |
-| Annonces d'origine | les 6 annonces admin reprennent leurs textes d'origine (pas compris dans « Tout ») |
+| Annonces d'origine | les 20 annonces admin reprennent leurs textes d'origine (pas compris dans « Tout ») |
 
 Ne sont jamais effacés : le nom, la carte de visite, les réglages (veille, volume, télécommande, mode muet, mode
 admin, type du badge, réglage radio) et la calibration de la batterie.

@@ -627,8 +627,8 @@ quand on le branche en USB (« Batterie : mode normal »).
 Pendant le réglage, les LEDs de ce badge montrent la couleur et le mode choisis. Aile gauche longue (ou aile gauche
 sur les deux dernières lignes) : quitter.
 
-**Annonces (admin)** : 6 annonces, gardées après extinction ; au départ, des exemples (accueil, pauses, remise des
-prix du CTF...). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retour. Une annonce a 6 lignes
+**Annonces (admin)** : 20 annonces, gardées après extinction ; au départ, le programme de SecSea 2026 (les talks des
+deux jours, 3 emplacements libres « (vide) »). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retour. Une annonce a 6 lignes
 (flancs : choisir ; aile gauche : retour à la liste) :
 - « Heure » (par exemple 10:30) et « Texte » (56 caractères au plus, lettres accentuées comprises) : aile droite :
   modifier, avec l'éditeur à 4 boutons (ou le clavier de l'ordinateur) ;
@@ -671,7 +671,7 @@ l'aile droite** pour confirmer (aile gauche : non) :
 - « Contrebande » : la cale de la contrebande (les marchandises sont distribuées à nouveau à la prochaine ouverture) ;
 - « Tout » : tout cela à la fois, plus la progression du livre-jeu. Le nom, les réglages et votre carte de visite
   sont gardés ;
-- « Annonces d'origine » : les 6 annonces du menu admin reprennent leurs textes d'origine (pas compris dans « Tout »).
+- « Annonces d'origine » : les 20 annonces du menu admin reprennent leurs textes d'origine (pas compris dans « Tout »).
 
 **Mode démo** : aile droite : lancer. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif (8 s),
 succès (6 s), images de la carte SD (18 s, une nouvelle toutes les 6 s), la première vidéo (20 s), compétences (5 s),

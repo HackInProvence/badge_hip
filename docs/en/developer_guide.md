@@ -454,20 +454,23 @@ How it works:
   they read as 0xFF, which their users check for (or, for a group of fields, a magic byte like `v2_magic`);
 - a `_Static_assert` guarantees that the structure fits in the sector.
 
-The business cards do not fit in that sector: they live in a second store, `store_ext_t`, of 8 KB (two sectors)
-right before the first one (`STORE_OFFSET - 8192`), with its own header (magic `"CONT"`, version):
+The business cards do not fit in that sector: they live in a second store, `store_ext_t`, of 12 KB (three sectors,
+8 KB before version 3), **below** the factory settings (`STORE_FACTORY_OFFSET - 12288`; the 8 KB between the factory
+settings and the first sector are no longer used), with its own header (magic `"CONT"`, version):
 the mask of the fields sent, my card and the 12 cards received (`STORE_CONTACTS`), 512 bytes each with fixed fields
 (`CONTACT_BYTES`). It is reset when the header does not match: the move to 512-byte cards (`STORE_EXT_VERSION` 2)
-therefore erases, on update, the cards received **and** my card (the mask goes back to first name + name).
+therefore erases, on update, the cards received **and** my card (the mask goes back to first name + name); so does
+version 3 (20 announcements instead of 6). The writes go straight from the structure in RAM, the last page padded
+with 0xFF (no buffer of a sector: the RAM is short).
 `store_ext_changed()` writes it the same way, 5 s later.
 The admin announcements (§ 6.23) were added later at the end of `store_ext_t`, without changing the version:
-`announce_magic` then 6 `store_announce_t` (`STORE_ANNOUNCES`: time 6 bytes, text 112, type of the QR code,
+`announce_magic` then 20 `store_announce_t` (`STORE_ANNOUNCES`: time 6 bytes, text 112, type of the QR code,
 content 64), valid when `announce_magic` is `STORE_ANNOUNCE_MAGIC` (`"ANNO"`); otherwise `announce_list()` puts the
 default announcements there. Then `contact_skills[12]`: the skills of each card received (§ 6.20), moved along with
 the cards.
 
-The third store, the **factory settings** (`store_factory_t`, magic `"FACT"`), has its own sector just before
-`store_ext_t`: never erased by the Remise à zéro, a version change or a new firmware; it keeps the calibration of the
+The third store, the **factory settings** (`store_factory_t`, magic `"FACT"`), has its own sector, never moved
+(`STORE_OFFSET - 8192 - 4096`, just above `store_ext_t` since version 3): never erased by the Remise à zéro, a version change or a new firmware; it keeps the calibration of the
 battery (§ 6.9) and is written at once (`store_factory_save()`).
 
 ### 6.9 Battery
@@ -899,7 +902,7 @@ what they receive (no image is sent).
   the main loop the text of the notification ("Annonce : ..."); `announce_open_newest()` makes the next opening of the
   page show the newest one with `app_show_still()`, like the screensaver. `notify()` opens the page right away when
   the badge is on the menus or the screensaver; otherwise, it shows at the next opening of Social > Annonces.
-- **Admin** (Admin > Annonces (admin), `app_announce_admin`): 6 editable announcements (`STORE_ANNOUNCES`), kept in
+- **Admin** (Admin > Annonces (admin), `app_announce_admin`): 20 editable announcements (`STORE_ANNOUNCES`), kept in
   `store_ext_t` (§ 6.8), examples at first (`DEFAULTS`). Rows: Heure (editor `UI_CHARSET_TEXT`, 5 characters), Texte
   and Contenu (`UI_CHARSET_LONG`, 56 characters), type of the QR code (wings), Aperçu (`announce_draw()` with the fast
   refresh), Envoyer (`announce_send()`, in the background).

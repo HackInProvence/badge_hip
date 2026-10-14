@@ -453,20 +453,23 @@ Principe :
   `v2_magic`) ;
 - `_Static_assert` garantit que la structure tient dans le secteur.
 
-Les cartes de visite ne tiennent pas dans ce secteur : elles sont dans un second stockage, `store_ext_t`, de 8 Ko
-(deux secteurs) juste avant le premier (`STORE_OFFSET - 8192`), avec son propre en-tête (magique `"CONT"`, version) :
+Les cartes de visite ne tiennent pas dans ce secteur : elles sont dans un second stockage, `store_ext_t`, de 12 Ko
+(trois secteurs, 8 Ko avant la version 3), **sous** les réglages d'usine (`STORE_FACTORY_OFFSET - 12288`, les 8 Ko
+entre les réglages d'usine et le premier secteur ne servent plus), avec son propre en-tête (magique `"CONT"`,
+version) :
 le masque des champs envoyés, ma carte et les 12 cartes reçues (`STORE_CONTACTS`), chacune de 512 octets à champs fixes
 (`CONTACT_BYTES`). Il est réinitialisé si l'en-tête ne correspond pas : le passage aux cartes de 512 octets
 (`STORE_EXT_VERSION` 2) efface donc, à la mise à jour, les cartes reçues **et** ma carte (le masque revient à
-prénom + nom). `store_ext_changed()` l'écrit de la même façon, 5 s plus tard.
+prénom + nom) ; la version 3 (20 annonces au lieu de 6) aussi. Les écritures partent directement de la structure en
+RAM, la dernière page complétée par 0xFF (pas de tampon d'un secteur : la RAM manque). `store_ext_changed()` l'écrit de la même façon, 5 s plus tard.
 Les annonces de l'admin (§ 6.23) ont été ajoutées ensuite à la fin de `store_ext_t`, sans changer la version :
-`announce_magic` puis 6 `store_announce_t` (`STORE_ANNOUNCES` : heure 6 octets, texte 112, type du QR code, contenu
+`announce_magic` puis 20 `store_announce_t` (`STORE_ANNOUNCES` : heure 6 octets, texte 112, type du QR code, contenu
 64), valides quand `announce_magic` vaut `STORE_ANNOUNCE_MAGIC` (`"ANNO"`) ; sinon `announce_list()` y met les
 annonces par défaut. Puis `contact_skills[12]` : les compétences de chaque carte reçue (§ 6.20), déplacées avec les
 cartes.
 
-Le troisième stockage, les **réglages usine** (`store_factory_t`, magique `"FACT"`), a son propre secteur juste avant
-`store_ext_t` : jamais effacé par la Remise à zéro, un changement de version ou un nouveau firmware ; il garde la
+Le troisième stockage, les **réglages usine** (`store_factory_t`, magique `"FACT"`), a son propre secteur, jamais déplacé
+(`STORE_OFFSET - 8192 - 4096`, juste au-dessus de `store_ext_t` depuis la version 3) : jamais effacé par la Remise à zéro, un changement de version ou un nouveau firmware ; il garde la
 calibration de la batterie (§ 6.9) et s'écrit tout de suite (`store_factory_save()`).
 
 ### 6.9 Batterie
@@ -904,7 +907,7 @@ durées de 50 ms à 5 s par pas de 50 ms.
   `announce_open_newest()` fait que la prochaine ouverture de la page affiche la plus récente avec `app_show_still()`,
   comme la veille. `notify()` ouvre la page tout de suite si le badge est sur les menus ou la veille ; sinon, elle
   s'affichera à la prochaine ouverture de Social > Annonces.
-- **Admin** (Admin > Annonces (admin), `app_announce_admin`) : 6 annonces modifiables (`STORE_ANNOUNCES`), gardées
+- **Admin** (Admin > Annonces (admin), `app_announce_admin`) : 20 annonces modifiables (`STORE_ANNOUNCES`), gardées
   dans `store_ext_t` (§ 6.8), des exemples au départ (`DEFAULTS`). Lignes : Heure (éditeur `UI_CHARSET_TEXT`,
   5 caractères), Texte et Contenu (`UI_CHARSET_LONG`, 56 caractères), type du QR code (ailes), Aperçu
   (`announce_draw()` en rafraîchissement rapide), Envoyer (`announce_send()`, en tâche de fond).

@@ -638,8 +638,8 @@ when plugged in USB ("Battery: normal mode").
 While setting, the LEDs of this badge show the colour and the mode chosen. Long left wing (or left wing on the last
 two rows): quit.
 
-**Notices (admin)** (Annonces (admin)): 6 announcements, kept after the badge is switched off; at first, examples
-(welcome, breaks, CTF awards...). Sides: choose; right wing: open it; left wing: back. An announcement has 6 rows
+**Notices (admin)** (Annonces (admin)): 20 announcements, kept after the badge is switched off; at first, the program of
+SecSea 2026 (the talks of both days, 3 free slots "(empty)"). Sides: choose; right wing: open it; left wing: back. An announcement has 6 rows
 (sides: choose; left wing: back to the list):
 - "Time" (Heure, for example 10:30) and "Text" (Texte, at most 56 characters, accented letters included): right wing:
   edit, with the 4-button editor (or the keyboard of the computer);
@@ -682,7 +682,7 @@ right wing** to confirm (left wing: no):
 - "Smuggling" (Contrebande): the hold of the smuggling game (the goods are given again at the next opening);
 - "All" (Tout): all of this at once, plus the progress of the gamebook. The name, the settings and your business card
   are kept;
-- "Announcements" (Annonces d'origine): the 6 announcements of the admin menu get their original texts back
+- "Announcements" (Annonces d'origine): the 20 announcements of the admin menu get their original texts back
   (not part of "All").
 
 **Demo mode** (Mode démo): right wing: start. The badge goes through, in a loop, with rainbow LEDs: name tag (8 s),
