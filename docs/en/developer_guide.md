@@ -518,9 +518,12 @@ battery (§ 6.9) and is written at once (`store_factory_save()`).
 ### 6.12 The badge radio network (`net.c`)
 
 All the features that talk to other badges share the CC1101 through [net.h](../../src/menu/net.h):
-- **Profile**: GFSK **100 kbit/s** (`radio_tools_profile_social()`: deviation 47.6 kHz, filter 325 kHz), 433.92 MHz,
-  sync word 0xC16A, CC1101 CRC; a beacon lasts ~3.7 ms. The "Radio: message" (chat of the Flipper) keeps the
-  9.99 kbit/s preset of the Flipper.
+- **Profile**: GFSK **10 kbit/s** by default (`radio_tools_profile_social()`, table `RATES`: 38.4, 50 or 100 kbit/s
+  for tests, key `K` / `0x04` + n, kept in `store_t.net_rate`), 433.92 MHz, sync word 0xC16A, CC1101 CRC; a beacon
+  lasts ~30 ms at 10 kbit/s, ~3.7 ms at 100. Range measured between two 1.2 badges: 7 m at 10 kbit/s, 5 m at 38.4,
+  4.5 m at 50, 4 m at 100: the default favours the range, listen before talk and the adaptive period hold the load
+  (simulation: ~96 % of the beacons received with 100 badges, one every 8 s). The "Radio: message" (chat of the
+  Flipper) keeps the 9.99 kbit/s preset of the Flipper.
 - **Listen before talk**: a packet goes when nothing is received (GDO0) and the RSSI is under the noise floor
   + 10 dB (the noise is tracked all the time, never under -112 dBm), straight from RX (no calibration); otherwise a
   random backoff (2 to 64 ms, doubled at each try), and after 8 tries it goes anyway. The **occupancy** of the channel

@@ -6,7 +6,7 @@
 # visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 """
-Flipper Zero and the network of the cicadas (GFSK 100 kbps, sync word 0xC16A, see src/menu/net.h):
+Flipper Zero and the network of the cicadas (GFSK 10 kbps by default, --kbps, sync word 0xC16A, see src/menu/net.h):
 
 1. Writes .sub files (RAW, custom GFSK preset) that make a Flipper send packets of the badges:
        python tools/flipper_net_sub.py command 0x02 -o mute.sub        (remote command: 0x02 mute, 0x03 unmute...;
@@ -44,7 +44,7 @@ RATES = {
     '50': (49987.8, [0x8A, 0xF8, 0x40, 0x06, 0x16, 0x6C, 0x43, 0x40, 0x91, 0x56]),
     '100': (99975.6, [0x5B, 0xF8, 0x47, 0x08, 0x1D, 0x1C, 0xC7, 0x00, 0xB2, 0xB6]),
 }
-BAUD = RATES['100'][0]  # --kbps
+BAUD = RATES['10'][0]  # --kbps
 FREQUENCY = 433920000
 SYNC = (0xC1, 0x6A)
 MAGIC = 0xC1
@@ -82,7 +82,7 @@ PRESET = [
     (0x21, None),  # FREND1
 ]
 PRESET_FROM_RATE = {0x10: 0, 0x11: 1, 0x15: 2, 0x0B: 3, 0x19: 4, 0x1A: 5, 0x1B: 6, 0x1C: 7, 0x1D: 8, 0x21: 9}
-KBPS = '100'
+KBPS = '10'
 
 
 def set_rate(kbps):
@@ -174,8 +174,8 @@ def main():
     parser.add_argument('--level', type=int, default=50, help='leds: brightness, 1 to 100 %% (50)')
     parser.add_argument('--send', action='store_true', help='copy the file to the Flipper plugged in USB and send it')
     parser.add_argument('--port', default=None, help='with --send: serial port of the Flipper (found by itself)')
-    parser.add_argument('--kbps', default='100', choices=list(RATES),
-                        help='bit rate of the network of the badges (100; serial "K" of the badges, badge_remote.py)')
+    parser.add_argument('--kbps', default='10', choices=list(RATES),
+                        help='bit rate of the network of the badges (10; serial "K" of the badges, badge_remote.py)')
     args = parser.parse_args()
     PATABLE[0] = POWERS[args.power]
     set_rate(args.kbps)

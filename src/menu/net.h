@@ -7,8 +7,9 @@
  *
  * \brief Radio network of the cicadas: every feature that talks to other badges shares the CC1101 through this layer.
  *
- * All the packets use the same radio profile (GFSK 100 kbps, sync word 0xC16A, CRC; radio_tools_profile_social()):
- * [0xC1][type][id of the sender, 4 bytes little endian][data...], at most 61 bytes (~3.7 ms for a beacon).
+ * All the packets use the same radio profile (GFSK 10 kbps by default, 38.4, 50 or 100 for tests, sync word 0xC16A,
+ * CRC; radio_tools_profile_social()): [0xC1][type][id of the sender, 4 bytes little endian][data...], at most
+ * 61 bytes (~30 ms for a beacon at 10 kbps).
  * The badge listens all the time; the packets to send are queued and sent when the channel is free (listen before
  * talk: no packet received and the RSSI under the noise floor + 10 dB, otherwise a random backoff); the share of the
  * time the channel is busy (net_occupancy()) slows down the beacons (social.c). Power:
@@ -88,7 +89,7 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags);
 bool net_idle(void);
 
 /* ------ Chat mode: the profile of the chat of the Flipper Zero ("subghz chat"), plain text packets ------
- * The 10 kbps GFSK preset of the Flipper (not the 100 kbps of the network), sync word 0x464C, no header: any CC1101 (Flipper, ESP32 with
+ * The 10 kbps GFSK preset of the Flipper (whatever the bit rate of the network), sync word 0x464C, no header: any CC1101 (Flipper, ESP32 with
  * RadioLib...) reads and writes it. While it is on, the network is deaf and net_send() refuses. */
 
 typedef void (*net_chat_handler_t)(const char *text, int len, int rssi);

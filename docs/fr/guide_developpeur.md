@@ -517,9 +517,12 @@ calibration de la batterie (§ 6.9) et s'écrit tout de suite (`store_factory_sa
 ### 6.12 Le réseau radio des badges (`net.c`)
 
 Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.h](../../src/menu/net.h) :
-- **Profil** : GFSK **100 kbit/s** (`radio_tools_profile_social()` : déviation 47,6 kHz, filtre 325 kHz), 433,92 MHz,
-  mot de synchronisation 0xC16A, CRC du CC1101 ; une balise dure ~3,7 ms. Le « Radio : message » (chat du Flipper)
-  garde le préréglage 9,99 kbit/s du Flipper.
+- **Profil** : GFSK **10 kbit/s** par défaut (`radio_tools_profile_social()`, table `RATES` : 38,4, 50 ou 100 kbit/s
+  pour les essais, touche `K` / `0x04` + n, gardé dans `store_t.net_rate`), 433,92 MHz, mot de synchronisation 0xC16A,
+  CRC du CC1101 ; une balise dure ~30 ms à 10 kbit/s, ~3,7 ms à 100. Portée mesurée entre deux badges 1.2 : 7 m à
+  10 kbit/s, 5 m à 38,4, 4,5 m à 50, 4 m à 100 : le défaut privilégie la portée, l'écoute avant d'émettre et la
+  période adaptative tiennent la charge (simulation : ~96 % des balises reçues à 100 badges, une toutes les 8 s). Le
+  « Radio : message » (chat du Flipper) garde le préréglage 9,99 kbit/s du Flipper.
 - **Écoute avant d'émettre** : un paquet part quand rien n'est reçu (GDO0) et que le RSSI est sous le bruit de fond
   + 10 dB (le bruit est suivi en continu, jamais sous -112 dBm), directement depuis la réception (pas de
   calibration) ; sinon un délai aléatoire (2 à 64 ms, doublé à chaque essai), et après 8 essais il part quand même.

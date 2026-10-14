@@ -235,8 +235,8 @@ def main():
     parser.add_argument('-o', '--output', default=None, help='also writes the .sub file here')
     parser.add_argument('--no-send', action='store_true', help='only write the .sub file (-o)')
     parser.add_argument('--dry-run', action='store_true', help='only show the forecast and the text')
-    parser.add_argument('--kbps', default='100', choices=list(fns.RATES),
-                        help='bit rate of the network of the badges (100; serial "K" of the badges, badge_remote.py)')
+    parser.add_argument('--kbps', default='10', choices=list(fns.RATES),
+                        help='bit rate of the network of the badges (10; serial "K" of the badges, badge_remote.py)')
     args = parser.parse_args()
     fns.set_rate(args.kbps)
 
