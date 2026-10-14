@@ -32,7 +32,8 @@
 #define SOCIAL_CLOSE_BEACONS 3
 #define SOCIAL_CLOSE_WINDOW_MS 10000
 #define SOCIAL_PATABLE 0x0E  /* -20dBm @433MHz */
-#define SOCIAL_MAX_NEIGHBOURS 8
+#define SOCIAL_MAX_NEIGHBOURS 32  /* Full: the oldest one makes room only for a stronger one (social.c) */
+#define SOCIAL_LIST_MAX 16  /* The lists of the pages (radar, duel...): the closest ones */
 
 typedef struct {
     uint32_t id;
@@ -85,5 +86,15 @@ bool social_event(char *msg, int len);
 
 /** \brief Number of beacons sent and received since boot (for the tests). */
 void social_stats(uint32_t *sent, uint32_t *received);
+
+/** rief The period of the beacons now (ms): 2 s, longer when the channel is busy (net_occupancy()). */
+uint32_t social_beacon_period_ms(void);
+
+/** rief Beacons of new badges ignored because the table of the neighbours was full of stronger ones. */
+uint32_t social_ignored(void);
+
+/** \brief A buffer for a copy of all the neighbours, shared (the RAM): only inside a function, never kept from one
+ * call to the next (another feature uses it in between). */
+extern social_neighbour_t social_tmp[SOCIAL_MAX_NEIGHBOURS];
 
 #endif /* _SOCIAL_H */

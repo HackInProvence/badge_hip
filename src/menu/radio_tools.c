@@ -53,6 +53,9 @@ static void configure(void) {
     /* The registers that the OOK receiver (ook_rx.c) changes and that the preset keeps at their reset values:
      * with FREND0 = 0x11, the packets would be sent with PATABLE[1] (nothing) */
     radio_write_registers((const uint8_t[]){CC1101_FREND0, 0x10, CC1101_FREND1, 0x56, CC1101_MDMCFG0, 0xF8}, 6);
+    /* Changed by the network profile (radio_tools_profile_social()): their values for the 10 kbit/s profile (chat of
+     * the Flipper, measures), MCSM1 at its reset value */
+    radio_write_registers((const uint8_t[]){CC1101_BSCFG, 0x6C, CC1101_MCSM1, 0x30}, 4);
     /* The longest packet: 61 bytes (the RX FIFO minus the length and the 2 status bytes). With the default (255),
      * a sync word found in the noise followed by a big "length" made the radio wait for the end of a packet that
      * never came (GDO0 stuck high: the network neither sent nor received, see check_radio() in net.c) */
@@ -159,6 +162,15 @@ void radio_tools_profile_chat(uint8_t patable) {
 
 void radio_tools_profile_social(uint8_t patable) {
     set_profile(RADIO_TOOLS_SOCIAL_SYNC1, RADIO_TOOLS_SOCIAL_SYNC0, patable);
+    /* The network of the cicadas at 100 kbit/s GFSK (10 times shorter packets than the 10 kbit/s of the chat of the
+     * Flipper: ~3.7 ms for a beacon): deviation 47.6 kHz, channel filter 325 kHz, IF 203 kHz, the frequency and bit
+     * synchronisation loops and the AGC of the CC1101 recommendations for 100 kBaud. MCSM1: no channel check by the
+     * radio (net.c checks it before sending), RX -> IDLE and TX -> IDLE at the end of a packet */
+    radio_write_registers((const uint8_t[]){CC1101_MDMCFG4, 0x50, CC1101_DEVIATN, 0x47, CC1101_FSCTRL1, 0x08,
+                                            CC1101_FOCCFG, 0x1D, CC1101_BSCFG, 0x1C, CC1101_AGCCTRL2, 0xC7,
+                                            CC1101_AGCCTRL1, 0x00, CC1101_AGCCTRL0, 0xB2, CC1101_FREND1, 0xB6,
+                                            CC1101_MCSM1, 0x00}, 20);
+    radio_set_baud_rate(RADIO_TOOLS_SOCIAL_BAUDS);  /* Keeps the channel filter of MDMCFG4 */
 }
 
 

@@ -74,6 +74,7 @@ int8_t radio_tools_freq_offset(void);
 
 /** \brief Configure the radio for the network of the cicadas (sync word, TX power), in IDLE. */
 void radio_tools_profile_social(uint8_t patable);
+#define RADIO_TOOLS_SOCIAL_BAUDS 100000  /* The network of the cicadas (the chat of the Flipper: 10 kbit/s) */
 /** \brief The profile of the chat of the Flipper Zero (sync word 0x464C). */
 void radio_tools_profile_chat(uint8_t patable);
 

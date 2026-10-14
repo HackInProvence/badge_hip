@@ -17,12 +17,29 @@
 
 #define QUEUE_LEN 8
 #define POLL_US 2000
-#define TX_END_MIN_US 3000  /* The radio leaves IDLE (calibration) before sending */
+#define TX_END_MIN_US 1000  /* The radio goes from RX to TX at once (no calibration) */
 #define TX_TIMEOUT_US 200000
+
+/* Listen before talk: the channel is busy while a packet is received (GDO0) or the RSSI is CCA_ABOVE_NOISE above the
+ * noise floor; then the packet waits a random backoff, doubled at each try; after CCA_TRIES it is sent anyway */
+#define CCA_ABOVE_NOISE 10
+#define CCA_TRIES 8
+#define BACKOFF_MIN_MS 2
+#define BACKOFF_MAX_MS 64
+/* The noise floor: follows the quiet measures (down quickly, up slowly), from NOISE_START_DBM, never below
+ * NOISE_MIN_DBM (the thermal noise in the 325 kHz filter, ~-112 dBm); no measure in the first RSSI_SETTLE_US of RX
+ * (the RSSI is not valid yet: it read ~-125 dBm) */
+#define NOISE_START_DBM (-100)
+#define NOISE_MIN_DBM (-112)
+#define RSSI_SETTLE_US 1000
+/* The occupancy of the channel: the share of the measures (one per POLL_US, while listening) busy, per
+ * OCCUPANCY_BUCKET_MS, averaged (1/4 of each new bucket) */
+#define OCCUPANCY_BUCKET_MS 1000
 
 typedef struct {
     uint8_t len;
     uint8_t flags;
+    uint8_t tries;  /* Channel found busy */
     absolute_time_t not_before;
     uint8_t bytes[NET_HEADER + NET_MAX_DATA];
 } tx_packet_t;
@@ -37,6 +54,12 @@ static bool tx_pending = false;
 static absolute_time_t tx_ts = 0;
 static absolute_time_t next_poll = 0;
 static uint32_t n_sent = 0, n_received = 0, n_dropped = 0;
+static uint32_t n_busy = 0, n_forced = 0;  /* Channel busy when a packet was due, packets sent after CCA_TRIES */
+static int noise_x16 = NOISE_START_DBM * 16;  /* The noise floor, in 1/16 dB */
+static uint16_t bucket_busy = 0, bucket_total = 0;
+static absolute_time_t bucket_ts = 0;
+static uint8_t occupancy = 0;  /* % */
+static absolute_time_t rx_ts = 0;  /* Start of the RX */
 static bool loopback = false;
 static bool verbose = false;
 static uint8_t loop_bytes[NET_HEADER + NET_MAX_DATA];
@@ -100,6 +123,7 @@ bool net_send(uint8_t type, const void *data, uint8_t len, uint8_t flags) {
     memcpy(t->bytes + NET_HEADER, data, len);
     t->len = NET_HEADER + len;
     t->flags = flags;
+    t->tries = 0;
     uint32_t delay_ms = flags & NET_JITTER ? get_rand_32() % NET_JITTER_MS : 0;
     t->not_before = delayed_by_ms(get_absolute_time(), delay_ms);
     return true;
@@ -203,12 +227,24 @@ void net_debug(void) {
     radio_read_registers(CC1101_SYNC1, &sync1, 1);
     radio_read_registers(CC1101_FREND0, &frend0, 1);
     radio_read_registers(CC1101_IOCFG0, &iocfg0, 1);
+    printf("net channel: occupancy %u %%, noise %d dBm, busy %lu, forced %lu, %u kbit/s\n", occupancy,
+           noise_x16 / 16, (unsigned long)n_busy, (unsigned long)n_forced, (unsigned)(RADIO_TOOLS_SOCIAL_BAUDS / 1000));
     printf("net state: %s%s%s%s, queue %d, repairs %lu, radio_tools %s, marcstate 0x%02x, pktctrl0 0x%02x, mdmcfg2 0x%02x, "
            "sync1 0x%02x, frend0 0x%02x, iocfg0 0x%02x, gdo0 %d (%s)\n", paused ? "paused" : "running",
            owner ? ", owner" : "", tx_pending ? ", tx pending" : "", chat ? ", chat" : "", queue_count,
            (unsigned long)n_repairs, radio_tools_idle() ? "idle" : "busy",
            marc & 0x1F, pktctrl0, mdmcfg2, sync1, frend0, iocfg0, gpio_get(BADGE_RADIO_GDO0),
            gpio_get_dir(BADGE_RADIO_GDO0) ? "output" : "input");
+}
+
+
+uint8_t net_occupancy(void) {
+    return occupancy;
+}
+
+
+int net_noise_dbm(void) {
+    return noise_x16 / 16;
 }
 
 
@@ -221,6 +257,7 @@ void net_stats(uint32_t *sent, uint32_t *received, uint32_t *dropped) {
 
 static void start_rx(void) {
     radio_write_registers((const uint8_t[]){CC1101_SRX}, 1);
+    rx_ts = get_absolute_time();
 }
 
 
@@ -297,14 +334,49 @@ static void poll_rx(absolute_time_t now) {
 }
 
 
+/* The RSSI now (dBm), the radio listening */
+static int rssi_now(void) {
+    uint8_t v = 0;
+    radio_read_registers(CC1101_RSSI, &v, 1);
+    return (int8_t)v / 2 - 74;
+}
+
+
+/* One measure of the channel while listening: the noise floor and the occupancy. \return busy */
+static bool measure_channel(absolute_time_t now) {
+    int rssi = rssi_now();
+    bool receiving = gpio_get(BADGE_RADIO_GDO0);
+    bool busy = receiving || rssi * 16 >= noise_x16 + CCA_ABOVE_NOISE * 16;
+    if (! receiving) {
+        if (rssi * 16 < noise_x16)
+            noise_x16 -= (noise_x16 - rssi * 16) / 8 + 1;  /* Down quickly */
+        else if (! busy)
+            noise_x16 += (rssi * 16 - noise_x16) / 64 + 1;  /* Up slowly (the quiet measures only) */
+        if (noise_x16 < NOISE_MIN_DBM * 16)
+            noise_x16 = NOISE_MIN_DBM * 16;
+    }
+    ++bucket_total;
+    bucket_busy += busy;
+    if (absolute_time_diff_us(bucket_ts, now) >= OCCUPANCY_BUCKET_MS * 1000) {
+        int pct = bucket_total ? bucket_busy * 100 / bucket_total : 0;
+        occupancy = (occupancy * 3 + pct + 2) / 4;
+        bucket_busy = bucket_total = 0;
+        bucket_ts = now;
+    }
+    return busy;
+}
+
+
 static void send_next(void) {
     tx_packet_t *t = &queue[queue_head];
-    radio_wait_state(CC1101_STATE_IDLE, true);
     radio_set_power(t->flags & NET_LOUD ? NET_PATABLE_LOUD : t->flags & NET_MEDIUM ? NET_PATABLE_MEDIUM : NET_PATABLE_QUIET);
     if (verbose)
-        printf("net: tx %s %u, %u bytes, flags 0x%02x\n", chat ? "chat" : "type", chat ? 0 : t->bytes[1],
-               t->len, t->flags);
-    if (radio_tx_packet(t->bytes, t->len)) {
+        printf("net: tx %s %u, %u bytes, flags 0x%02x, tries %u\n", chat ? "chat" : "type", chat ? 0 : t->bytes[1],
+               t->len, t->flags, t->tries);
+    /* The network: from RX at once (the channel was just found free); the chat: the old way, from IDLE */
+    bool sent = chat ? (radio_wait_state(CC1101_STATE_IDLE, true), radio_tx_packet(t->bytes, t->len))
+                     : radio_tx_packet_from_rx(t->bytes, t->len);
+    if (sent) {
         tx_pending = true;
         tx_ts = get_absolute_time();
         ++n_sent;
@@ -430,10 +502,27 @@ void net_task(absolute_time_t now) {
         return;
     }
 
-    /* Send when the channel is free: not while receiving a packet (GDO0 high) */
-    if (queue_count && absolute_time_diff_us(queue[queue_head].not_before, now) >= 0 && ! gpio_get(BADGE_RADIO_GDO0)) {
-        send_next();
-        return;
+    /* Listening: measure the channel (noise floor, occupancy) */
+    bool listening = radio_state() == CC1101_STATE_RX && absolute_time_diff_us(rx_ts, now) >= RSSI_SETTLE_US;
+    bool busy = listening ? measure_channel(now) : true;
+
+    /* Send when the channel is free (listen before talk), otherwise a random backoff, doubled at each try */
+    if (queue_count && absolute_time_diff_us(queue[queue_head].not_before, now) >= 0) {
+        tx_packet_t *t = &queue[queue_head];
+        if (chat ? ! gpio_get(BADGE_RADIO_GDO0) : listening && ! busy) {
+            send_next();
+            return;
+        }
+        if (listening && ++t->tries >= CCA_TRIES) {
+            ++n_forced;  /* A channel busy for long (an interferer): send anyway */
+            send_next();
+            return;
+        }
+        ++n_busy;
+        uint32_t max_ms = BACKOFF_MIN_MS << (t->tries < 6 ? t->tries : 6);
+        if (max_ms > BACKOFF_MAX_MS)
+            max_ms = BACKOFF_MAX_MS;
+        t->not_before = delayed_by_ms(now, BACKOFF_MIN_MS + get_rand_32() % max_ms);
     }
     poll_rx(now);
 }

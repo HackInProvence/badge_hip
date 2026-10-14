@@ -566,7 +566,7 @@ void assassin_service(absolute_time_t now) {
     /* The hot / cold gauge: the beacons of the target (social.c), or its packets of the game */
     if (st == S_ALIVE && target != ASSASSIN_NONE && absolute_time_diff_us(hunt_ts, now) > 1000000) {
         hunt_ts = now;
-        social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+        social_neighbour_t *near = social_tmp;  /* All of them (shared buffer) */
         int count = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
         bool heard = false;
         int16_t rssi = 0;

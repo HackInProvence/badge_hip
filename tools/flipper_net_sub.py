@@ -6,7 +6,7 @@
 # visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 """
-Flipper Zero and the network of the cicadas (GFSK 9.99 kbps, sync word 0xC16A, see src/menu/net.h):
+Flipper Zero and the network of the cicadas (GFSK 100 kbps, sync word 0xC16A, see src/menu/net.h):
 
 1. Writes .sub files (RAW, custom GFSK preset) that make a Flipper send packets of the badges:
        python tools/flipper_net_sub.py command 0x02 -o mute.sub        (remote command: 0x02 mute, 0x03 unmute...;
@@ -36,7 +36,7 @@ import argparse
 import random
 import sys
 
-BAUD = 9992.6  # MDMCFG4 = 0xC8, MDMCFG3 = 0x93 with the 26 MHz crystal of the Flipper
+BAUD = 99975.6  # MDMCFG4 = 0x5B, MDMCFG3 = 0xF8 with the 26 MHz crystal of the Flipper (radio_tools.c: 100 kbps)
 FREQUENCY = 433920000
 SYNC = (0xC1, 0x6A)
 MAGIC = 0xC1
@@ -61,15 +61,17 @@ PRESET = [
     (0x02, 0x0D),  # IOCFG0: GDO0 serial data (asynchronous)
     (0x03, 0x47),  # FIFOTHR
     (0x08, 0x32),  # PKTCTRL0: asynchronous serial mode, infinite length
-    (0x0B, 0x06),  # FSCTRL1: IF
-    (0x10, 0xC8),  # MDMCFG4: channel bandwidth 101 kHz, data rate exponent
-    (0x11, 0x93),  # MDMCFG3: data rate 9.99 kbps
+    (0x0B, 0x08),  # FSCTRL1: IF
+    (0x10, 0x5B),  # MDMCFG4: channel bandwidth 325 kHz, data rate exponent
+    (0x11, 0xF8),  # MDMCFG3: data rate 100 kbps (the Gaussian filter of the GFSK)
     (0x12, 0x10),  # MDMCFG2: GFSK, no sync word (the bits of the file contain it)
-    (0x15, 0x34),  # DEVIATN: 19 kHz
+    (0x15, 0x47),  # DEVIATN: 47.6 kHz
     (0x18, 0x18),  # MCSM0: calibration
-    (0x19, 0x16),  # FOCCFG
-    (0x1B, 0x43), (0x1C, 0x40), (0x1D, 0x91),  # AGCCTRL2/1/0
+    (0x19, 0x1D),  # FOCCFG
+    (0x1A, 0x1C),  # BSCFG
+    (0x1B, 0xC7), (0x1C, 0x00), (0x1D, 0xB2),  # AGCCTRL2/1/0
     (0x20, 0xFB),  # WORCTRL
+    (0x21, 0xB6),  # FREND1
 ]
 PATABLE = [0xC0, 0, 0, 0, 0, 0, 0, 0]
 

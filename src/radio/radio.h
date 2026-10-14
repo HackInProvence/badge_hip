@@ -112,6 +112,10 @@ void radio_read_registers(uint8_t reg, uint8_t *values, size_t len);
  * \return false when the packet is too long */
 bool radio_tx_packet(const uint8_t *payload, size_t len);
 
+/** \brief Same, but straight from RX (the channel was just checked free by the caller): the TX FIFO must be empty,
+ * MCSM1.CCA_MODE 0 (the radio does not check the channel again). No calibration between RX and TX (~10 us). */
+bool radio_tx_packet_from_rx(const uint8_t *payload, size_t len);
+
 
 /** \brief Default configuration for the flipper chat app.
  *

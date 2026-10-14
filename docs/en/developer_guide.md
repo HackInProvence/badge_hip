@@ -515,7 +515,20 @@ battery (§ 6.9) and is written at once (`store_factory_save()`).
 ### 6.12 The badge radio network (`net.c`)
 
 All the features that talk to other badges share the CC1101 through [net.h](../../src/menu/net.h):
-- **Profile**: GFSK 9.99 kbit/s (the Flipper preset), 433.92 MHz, sync word 0xC16A, CC1101 CRC.
+- **Profile**: GFSK **100 kbit/s** (`radio_tools_profile_social()`: deviation 47.6 kHz, filter 325 kHz), 433.92 MHz,
+  sync word 0xC16A, CC1101 CRC; a beacon lasts ~3.7 ms. The "Radio: message" (chat of the Flipper) keeps the
+  9.99 kbit/s preset of the Flipper.
+- **Listen before talk**: a packet goes when nothing is received (GDO0) and the RSSI is under the noise floor
+  + 10 dB (the noise is tracked all the time, never under -112 dBm), straight from RX (no calibration); otherwise a
+  random backoff (2 to 64 ms, doubled at each try), and after 8 tries it goes anyway. The **occupancy** of the channel
+  (`net_occupancy()`, share of the time busy, averaged over a few seconds) sets the period of the beacons: 2 s up to
+  25 %, proportional above, 8 s at most (`social_beacon_period_ms()`). The meeting window and the forgetting of a
+  neighbour grow with the interval measured between its beacons (40 s at most). `!` prints
+  `net channel: occupancy, noise, busy, forced` and `social: beacon period`.
+- **Neighbours**: 32 at most (`SOCIAL_MAX_NEIGHBOURS`); the table full, the oldest one is replaced only when the new
+  cicada is received stronger than it was at its last beacon (otherwise the beacon is ignored, counter in `!`). The
+  lists of the pages keep the 16 closest ones (`SOCIAL_LIST_MAX`); `social_tmp` is the shared buffer of the full
+  copies (the RAM).
 - **Packet**: `[0xC1][type][sender id, 4 bytes little endian][data, at most 55 bytes]`,
   61 bytes at most (the RX FIFO minus the length byte and the two status bytes).
   The id is `net_id()`, an FNV-1a hash of the unique id of the flash.
@@ -536,7 +549,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 - **Sharing the radio**: the other features (message to the Flipper, carrier, OOK receiver) take the radio;
   the network pauses (`net_pause()`, `radio_tools_idle()`) and reconfigures the radio afterwards.
 - **Chat mode**: `net_set_chat(handler)` switches the radio to the profile of the Flipper Zero's "SubGHz chat"
-  (`radio_tools_profile_chat()`: same GFSK 9.99 kbps modem, sync word 0x464C); `net_set_chat(NULL)` goes back to the
+  (`radio_tools_profile_chat()`: the 9.99 kbps GFSK modem of the Flipper, sync word 0x464C); `net_set_chat(NULL)` goes back to the
   network. The packets are plain text, without header (at most 61 bytes): a Flipper (`subghz chat`) or any CC1101
   reads and writes them. `net_send_text()` sends them at +10 dBm; the handler gets each text with its RSSI.
   In this mode the network hears nothing, `net_send()` refuses the packets and the queue is emptied when the mode

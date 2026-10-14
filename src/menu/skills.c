@@ -107,17 +107,17 @@ uint32_t skills_from_text(const char *text) {
 enum { V_MAIN, V_MINE, V_NEAR };
 static int view = V_MAIN;
 static int sel = 0;
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0;
 static absolute_time_t refresh_ts = 0;
 
 static void find_near(void) {
-    social_neighbour_t all[SOCIAL_MAX_NEIGHBOURS];
+    social_neighbour_t *all = social_tmp;  /* All of them (shared buffer) */
     int n = social_neighbours(all, SOCIAL_MAX_NEIGHBOURS);
     uint32_t mine = store_get()->skills;
     n_near = 0;
     for (int i = 0; i < n; ++i)
-        if (all[i].skills & mine)
+        if ((all[i].skills & mine) && n_near < SOCIAL_LIST_MAX)
             near[n_near++] = all[i];
 }
 

@@ -514,7 +514,20 @@ calibration de la batterie (§ 6.9) et s'écrit tout de suite (`store_factory_sa
 ### 6.12 Le réseau radio des badges (`net.c`)
 
 Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.h](../../src/menu/net.h) :
-- **Profil** : GFSK 9,99 kbit/s (le préréglage du Flipper), 433,92 MHz, mot de synchronisation 0xC16A, CRC du CC1101.
+- **Profil** : GFSK **100 kbit/s** (`radio_tools_profile_social()` : déviation 47,6 kHz, filtre 325 kHz), 433,92 MHz,
+  mot de synchronisation 0xC16A, CRC du CC1101 ; une balise dure ~3,7 ms. Le « Radio : message » (chat du Flipper)
+  garde le préréglage 9,99 kbit/s du Flipper.
+- **Écoute avant d'émettre** : un paquet part quand rien n'est reçu (GDO0) et que le RSSI est sous le bruit de fond
+  + 10 dB (le bruit est suivi en continu, jamais sous -112 dBm), directement depuis la réception (pas de
+  calibration) ; sinon un délai aléatoire (2 à 64 ms, doublé à chaque essai), et après 8 essais il part quand même.
+  L'**occupation** du canal (`net_occupancy()`, part du temps occupé, moyennée sur quelques secondes) règle la
+  période des balises : 2 s jusqu'à 25 %, proportionnelle au-delà, 8 s au plus (`social_beacon_period_ms()`). La
+  fenêtre des rencontres et l'oubli d'une voisine s'allongent avec l'intervalle mesuré entre ses balises (40 s au
+  plus). `!` affiche `net channel: occupancy, noise, busy, forced` et `social: beacon period`.
+- **Voisines** : 32 au plus (`SOCIAL_MAX_NEIGHBOURS`) ; la table pleine, la plus ancienne n'est remplacée que si la
+  nouvelle cigale est reçue plus fort qu'elle à sa dernière balise (sinon la balise est ignorée, compteur dans `!`).
+  Les listes des pages gardent les 16 plus proches (`SOCIAL_LIST_MAX`) ; `social_tmp` est le tampon partagé des
+  copies complètes (la RAM).
 - **Paquet** : `[0xC1][type][identifiant de l'émetteur, 4 octets little endian][données, 55 octets au plus]`,
   61 octets au plus (la FIFO de réception moins l'octet de longueur et les deux octets d'état).
   L'identifiant est `net_id()`, un hash FNV-1a de l'identifiant unique de la flash.
@@ -535,7 +548,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 - **Partage de la radio** : les autres fonctions (message au Flipper, porteuse, récepteur OOK) prennent la radio ;
   le réseau se met en pause (`net_pause()`, `radio_tools_idle()`) et reconfigure la radio ensuite.
 - **Mode chat** : `net_set_chat(gestionnaire)` passe la radio sur le profil du « SubGHz chat » du Flipper Zero
-  (`radio_tools_profile_chat()` : même modem GFSK 9,99 kbit/s, mot de synchronisation 0x464C) ; `net_set_chat(NULL)`
+  (`radio_tools_profile_chat()` : le modem GFSK 9,99 kbit/s du Flipper, mot de synchronisation 0x464C) ; `net_set_chat(NULL)`
   revient au réseau. Les paquets sont du texte brut, sans en-tête (61 octets au plus) : un Flipper (`subghz chat`)
   ou tout CC1101 les lit et les écrit. `net_send_text()` les envoie à +10 dBm ; le gestionnaire reçoit chaque texte
   avec son RSSI. Dans ce mode, le réseau n'entend rien, `net_send()` refuse les paquets et la file est vidée au

@@ -22,9 +22,13 @@
 #define BEACON_LEN3 21  /* ...then, when shared, the battery: raw ADC (2 bytes), mV (2 bytes, 0: not calibrated), flags */
 #define BATT_USB 0x01
 #define BATT_EST 0x02  /* No calibration in mV, an estimate of the automatic calibration: its % instead of the mV */
-#define BEACON_PERIOD_MS 2000
-#define BEACON_JITTER_MS 500
+#define BEACON_PERIOD_MS 2000  /* While the channel is quiet */
+#define BEACON_PERIOD_MAX_MS 8000
+#define OCCUPANCY_TARGET 25  /* % of the channel (net_occupancy()): above, the beacons slow down proportionally */
+/* The meeting window (SOCIAL_CLOSE_WINDOW_MS) and the forgetting of a neighbour (NEIGHBOUR_TIMEOUT_MS) are for
+ * beacons every 2 s: they grow with the interval of the beacons of the neighbour (measured) or of this badge */
 #define NEIGHBOUR_TIMEOUT_MS 15000
+#define WINDOW_MAX_MS 40000
 #define AGAIN_MINUTES 60  /* A cicada met again: counted (no points) at most once per hour */
 
 typedef struct {
@@ -34,6 +38,7 @@ typedef struct {
     uint8_t close_count;
     bool met_now;  /* Meeting counted during this visit */
     bool skills_told;  /* The shared skills were announced during this visit */
+    uint16_t interval_ms;  /* Between its beacons (averaged; the beacons lost make it longer) */
 } neighbour_t;
 
 static bool enabled = true;
@@ -43,11 +48,33 @@ static neighbour_t neighbours[SOCIAL_MAX_NEIGHBOURS];
 static char event[48];
 static bool event_pending = false;
 static uint32_t n_sent = 0, n_received = 0;
+static uint32_t n_ignored = 0;  /* Beacons of new badges ignored: the table full of stronger ones */
 
+
+/* The period of the beacons: 2 s, longer when the channel is busy (the load stays about the same with more badges) */
+uint32_t social_ignored(void) {
+    return n_ignored;
+}
+
+uint32_t social_beacon_period_ms(void) {
+    uint32_t occ = net_occupancy(), period = BEACON_PERIOD_MS;
+    if (occ > OCCUPANCY_TARGET)
+        period = BEACON_PERIOD_MS * occ / OCCUPANCY_TARGET;
+    return period > BEACON_PERIOD_MAX_MS ? BEACON_PERIOD_MAX_MS : period;
+}
 
 static void schedule_beacon(absolute_time_t now) {
-    uint32_t jitter = get_rand_32() % (2 * BEACON_JITTER_MS);
-    next_beacon = delayed_by_ms(now, BEACON_PERIOD_MS - BEACON_JITTER_MS + jitter);
+    uint32_t period = social_beacon_period_ms(), jitter = period / 4;  /* +- 25 %: two badges don't stay in step */
+    next_beacon = delayed_by_ms(now, period - jitter + get_rand_32() % (2 * jitter));
+}
+
+/* A window of 2 s beacons (\p base_ms) for the beacons of \p nb: scaled to the longest interval */
+static int64_t scaled_us(const neighbour_t *nb, uint32_t base_ms) {
+    uint32_t interval = social_beacon_period_ms();
+    if (nb->interval_ms > interval)
+        interval = nb->interval_ms;
+    uint32_t ms = interval > BEACON_PERIOD_MS ? base_ms * interval / BEACON_PERIOD_MS : base_ms;
+    return (ms > WINDOW_MAX_MS ? WINDOW_MAX_MS : ms) * 1000ll;
 }
 
 
@@ -117,23 +144,23 @@ bool social_event(char *msg, int len) {
 }
 
 
+social_neighbour_t social_tmp[SOCIAL_MAX_NEIGHBOURS];
+
 int social_neighbours(social_neighbour_t *out, int max) {
-    /* Insertion sort by RSSI (closest first) of all the neighbours, then keep the first ones */
-    social_neighbour_t all[SOCIAL_MAX_NEIGHBOURS];
+    /* Insertion sort by RSSI (closest first), straight into \p out, keeping the \p max first ones */
     int n = 0;
-    for (int i = 0; i < SOCIAL_MAX_NEIGHBOURS; ++i) {
+    for (int i = 0; i < SOCIAL_MAX_NEIGHBOURS && max > 0; ++i) {
         if (! neighbours[i].pub.id)
             continue;
-        int j = n++;
-        while (j > 0 && all[j-1].rssi < neighbours[i].pub.rssi) {
-            all[j] = all[j-1];
+        if (n == max && out[n-1].rssi >= neighbours[i].pub.rssi)
+            continue;  /* Weaker than all the ones kept */
+        int j = n < max ? n++ : n - 1;
+        while (j > 0 && out[j-1].rssi < neighbours[i].pub.rssi) {
+            out[j] = out[j-1];
             --j;
         }
-        all[j] = neighbours[i].pub;
+        out[j] = neighbours[i].pub;
     }
-    if (n > max)
-        n = max;
-    memcpy(out, all, n * sizeof(all[0]));
     return n;
 }
 
@@ -209,16 +236,28 @@ static void handle_beacon(const net_packet_t *packet) {
     absolute_time_t now = packet->at;
     ++n_received;
 
-    /* Find the neighbour, or take a free (or the oldest) slot */
-    neighbour_t *nb = NULL, *oldest = &neighbours[0];
+    /* Find the neighbour, or take a free slot. The table full: the oldest one makes room only when the new badge is
+     * received stronger than the oldest one was at its last beacon (a crowd must not push out the badge at hand,
+     * whose meeting needs several beacons) */
+    neighbour_t *nb = NULL, *oldest = NULL, *free_slot = NULL;
     for (int i = 0; i < SOCIAL_MAX_NEIGHBOURS && ! nb; ++i) {
         if (neighbours[i].pub.id == id)
             nb = &neighbours[i];
-        else if (absolute_time_diff_us(neighbours[i].last_seen, oldest->last_seen) > 0 || ! neighbours[i].pub.id)
+        else if (! neighbours[i].pub.id)
+            free_slot = free_slot ? free_slot : &neighbours[i];
+        else if (! oldest || absolute_time_diff_us(neighbours[i].last_seen, oldest->last_seen) > 0)
             oldest = &neighbours[i];
     }
-    if (! nb) {
-        nb = oldest;
+    if (nb) {
+        uint32_t ms = absolute_time_diff_us(nb->last_seen, now) / 1000;
+        if (ms > 0)
+            nb->interval_ms = nb->interval_ms ? (nb->interval_ms * 3 + (ms > 30000 ? 30000 : ms)) / 4 : ms;
+    } else {
+        if (! free_slot && rssi <= oldest->pub.rssi) {
+            ++n_ignored;
+            return;
+        }
+        nb = free_slot ? free_slot : oldest;
         memset(nb, 0, sizeof(*nb));
         nb->pub.id = id;
         store_t *s = store_get();
@@ -259,7 +298,7 @@ static void handle_beacon(const net_packet_t *packet) {
 
     /* Close enough, long enough: meeting */
     if (rssi >= SOCIAL_RSSI_CLOSE && ! nb->met_now) {
-        if (! nb->close_count || absolute_time_diff_us(nb->close_start, now) > SOCIAL_CLOSE_WINDOW_MS * 1000ll) {
+        if (! nb->close_count || absolute_time_diff_us(nb->close_start, now) > scaled_us(nb, SOCIAL_CLOSE_WINDOW_MS)) {
             nb->close_count = 0;
             nb->close_start = now;
         }
@@ -300,7 +339,8 @@ static void send_beacon(void) {
 void social_task(absolute_time_t now) {
     /* Forget the badges that went away */
     for (int i = 0; i < SOCIAL_MAX_NEIGHBOURS; ++i)
-        if (neighbours[i].pub.id && absolute_time_diff_us(neighbours[i].last_seen, now) > NEIGHBOUR_TIMEOUT_MS * 1000ll)
+        if (neighbours[i].pub.id
+                && absolute_time_diff_us(neighbours[i].last_seen, now) > scaled_us(&neighbours[i], NEIGHBOUR_TIMEOUT_MS))
             memset(&neighbours[i], 0, sizeof(neighbours[i]));
 
     if (enabled && absolute_time_diff_us(now, next_beacon) <= 0) {

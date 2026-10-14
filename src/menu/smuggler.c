@@ -182,7 +182,7 @@ static int page = P_HOME;
 static int home_sel = 0, grid_sel = 0;
 static int detail_good = 0, detail_back = P_HOME;
 static uint8_t near_mode = TRADE_EXCHANGE, gift_good = SMUGGLER_NO_GOOD;
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0, n_far = 0, near_sel = 0;
 static absolute_time_t near_ts = 0;
 
@@ -194,13 +194,13 @@ static void set_page(int p) {
 }
 
 static void refresh_near(void) {
-    social_neighbour_t all[SOCIAL_MAX_NEIGHBOURS];
+    social_neighbour_t *all = social_tmp;  /* All of them (shared buffer) */
     int n = social_neighbours(all, SOCIAL_MAX_NEIGHBOURS);
     uint32_t selected = near_sel < n_near ? near[near_sel].id : 0;
     int before = n_near;
     n_near = n_far = 0;
     for (int i = 0; i < n; ++i) {
-        if (all[i].rssi >= SMUGGLER_TRADE_RSSI)
+        if (all[i].rssi >= SMUGGLER_TRADE_RSSI && n_near < SOCIAL_LIST_MAX)
             near[n_near++] = all[i];
         else
             ++n_far;

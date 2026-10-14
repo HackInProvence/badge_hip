@@ -247,7 +247,7 @@ const app_t app_hotcold_master = {
 
 /* ------ Radar of the cicadas: the neighbours by signal strength, and follow one ------ */
 
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0, radar_sel = 0;
 static uint32_t followed = 0;
 static char followed_name[9];
@@ -270,7 +270,7 @@ static void radar_start(absolute_time_t now) {
     (void)now;
     followed = 0;
     radar_sel = 0;
-    n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    n_near = social_neighbours(near, SOCIAL_LIST_MAX);
     printf("radar: %d cicada(s)%s%s\n", n_near, n_near ? ", the first " : "", n_near ? near[0].name : "");
 }
 
@@ -303,7 +303,7 @@ static bool radar_task(absolute_time_t now) {
         return false;
     radar_ts = now;
     int before = n_near;
-    n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    n_near = social_neighbours(near, SOCIAL_LIST_MAX);
     if (n_near != before)
         printf("radar: %d cicada(s)%s%s\n", n_near, n_near ? ", the first " : "", n_near ? near[0].name : "");
     if (radar_sel >= n_near)

@@ -338,6 +338,20 @@ bool radio_tx_packet(const uint8_t *payload, size_t len) {
 }
 
 
+bool radio_tx_packet_from_rx(const uint8_t *payload, size_t len) {
+    if (len > 61)
+        return false;
+    uint8_t tx[2+61+1];
+    tx[0] = CC1101_BURST(CC1101_TXFIFO);
+    tx[1] = len;
+    memcpy(tx+2, payload, len);
+    tx[2+len] = CC1101_STX;
+    ccsend(tx, NULL, len+2);
+    ccsend(tx+2+len, NULL, 1);
+    return true;
+}
+
+
 const uint8_t radio_preset_gfsk[] = {
     CC1101_IOCFG0, 0x06, /* GDO0 = packet being transmitted or received */
     CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */

@@ -82,15 +82,15 @@ const app_t app_batt_share = {
 
 /* ------ Admin > Batteries des cigales ------ */
 
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0, sel = 0;
 static absolute_time_t view_ts = 0;
 
 static int with_battery(void) {
-    social_neighbour_t all[SOCIAL_MAX_NEIGHBOURS];
+    social_neighbour_t *all = social_tmp;  /* All of them (shared buffer) */
     int n = social_neighbours(all, SOCIAL_MAX_NEIGHBOURS), k = 0;
     for (int i = 0; i < n; ++i)
-        if (all[i].batt)
+        if (all[i].batt && k < SOCIAL_LIST_MAX)
             near[k++] = all[i];
     return k;
 }

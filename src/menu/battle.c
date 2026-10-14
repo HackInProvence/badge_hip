@@ -52,7 +52,7 @@ static bool last_hit_in = false;
 static bool revealed = false, peer_revealed = false, cheat = false;
 static absolute_time_t resend_ts = 0, peer_seen = 0, alive_ts = 0, end_ts = 0;
 static bool changed = false;
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0, sel = 0;
 static bool invited = false;
 static uint32_t inviter = 0;
@@ -258,7 +258,7 @@ static void battle_start(absolute_time_t now) {
     if (state != S_LOBBY && state != S_END && state != S_LOST)
         return;
     state = S_LOBBY;
-    n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    n_near = social_neighbours(near, SOCIAL_LIST_MAX);
     sel = 0;
 }
 
@@ -316,7 +316,7 @@ static bool battle_task(absolute_time_t now) {
         static absolute_time_t list_ts = 0;
         if (absolute_time_diff_us(list_ts, now) > 2000000) {
             list_ts = now;
-            n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+            n_near = social_neighbours(near, SOCIAL_LIST_MAX);
             changed = true;
         }
     } else if (state != S_END && state != S_LOST && absolute_time_diff_us(peer_seen, now) > LOST_MS * 1000ll) {

@@ -46,7 +46,7 @@ static int peer_choice = -1;  /* Revealed (and checked) this round */
 static absolute_time_t resend_ts = 0, peer_seen = 0, result_ts = 0;
 static bool changed = false;
 /* Lobby */
-static social_neighbour_t near[SOCIAL_MAX_NEIGHBOURS];
+static social_neighbour_t near[SOCIAL_LIST_MAX];
 static int n_near = 0, sel = 0;
 /* An invitation received while not playing */
 static bool invited = false;
@@ -195,7 +195,7 @@ static void duel_start(absolute_time_t now) {
         return;  /* A game in progress goes on */
     state = S_LOBBY;
     sel = 0;
-    n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+    n_near = social_neighbours(near, SOCIAL_LIST_MAX);
 }
 
 static void start_game(uint32_t with, const char *name, uint16_t sess, absolute_time_t now) {
@@ -265,7 +265,7 @@ static bool duel_task(absolute_time_t now) {
         static absolute_time_t list_ts = 0;
         if (absolute_time_diff_us(list_ts, now) > 2000000) {
             list_ts = now;
-            n_near = social_neighbours(near, SOCIAL_MAX_NEIGHBOURS);
+            n_near = social_neighbours(near, SOCIAL_LIST_MAX);
             changed = true;
         }
     }

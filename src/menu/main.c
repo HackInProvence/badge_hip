@@ -187,7 +187,7 @@ static uint8_t buttons_pressed(absolute_time_t now) {
         /* Debug: state of the extensions, the network and the CTF */
         uint32_t sent, received;
         social_stats(&sent, &received);
-        social_neighbour_t nb[SOCIAL_MAX_NEIGHBOURS];
+        social_neighbour_t *nb = social_tmp;  /* All of them (shared buffer) */
         int n = social_neighbours(nb, SOCIAL_MAX_NEIGHBOURS);
         printf("oled: %s, IR RX pin = %d, IR recording %d sending %d\n", oled_present() ? "present" : "absent",
                gpio_get(BADGE_IR_RX), ir_recording(), ir_sending());
@@ -196,6 +196,8 @@ static uint8_t buttons_pressed(absolute_time_t now) {
                (unsigned long)sent, (unsigned long)received, n);
         for (int i = 0; i < n; ++i)
             printf("  %s %d dBm%s\n", nb[i].name, nb[i].rssi, nb[i].met ? " (met)" : "");
+        printf("social: beacon period %lu ms, new badges ignored (table full) %lu\n",
+               (unsigned long)social_beacon_period_ms(), (unsigned long)social_ignored());
         printf("ctf: %d/%d flags\n", ctf_found_count(), CTF_N_FLAGS);
         uint32_t ns, nr, nd;
         net_stats(&ns, &nr, &nd);
