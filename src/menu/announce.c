@@ -43,14 +43,26 @@ static const char *const QR_HELP[ANNOUNCE_QR_TYPES] = {"", "https://...", N_("Un
                                                        N_("numéro:message"), "adresse@mail.fr",
                                                        N_("réseau;mot de passe"), "43.17,5.60"};
 
-/* The announcements of the admin menu, when none was saved yet */
+/* The announcements of the admin menu, when none was saved yet (the program of SecSea 2026: day 1, then day 2;
+ * the slots after them are empty, to fill in the admin menu) */
 static const store_announce_t DEFAULTS[STORE_ANNOUNCES] = {
-    {"09:00", "Bienvenue à SecSea 2026 ! Accueil et café", ANNOUNCE_QR_URL, "https://www.hackinprovence.fr/"},
-    {"10:30", "Pause café : rendez-vous au bar", ANNOUNCE_QR_NONE, ""},
-    {"12:30", "Pause déjeuner : bon appétit !", ANNOUNCE_QR_NONE, ""},
-    {"14:00", "Reprise des conférences", ANNOUNCE_QR_NONE, ""},
-    {"17:30", "Remise des prix du CTF", ANNOUNCE_QR_URL, "https://www.hackinprovence.fr/"},
+    {"13:37", "@root : Opening", ANNOUNCE_QR_NONE, ""},
+    {"14:00", "@Miaou : 1 an de hack", ANNOUNCE_QR_NONE, ""},
+    {"14:45", "@Maurice : On est tous dans l'annuaire", ANNOUNCE_QR_NONE, ""},
+    {"15:30", "SYSTEM_IDLE : Pause", ANNOUNCE_QR_NONE, ""},
+    {"16:00", "@Alain : Wifi Sensing", ANNOUNCE_QR_NONE, ""},
+    {"16:45", "@Skilo : How I dumped Bob s Firmware", ANNOUNCE_QR_NONE, ""},
+    {"17:30", "Ilyes Azouni : Biométrie : usurper un visage", ANNOUNCE_QR_NONE, ""},
+    {"18:15", "RUMPS", ANNOUNCE_QR_NONE, ""},
+    {"19:00", "Tournoi Mario Kart / Pizzas / Mini CTF", ANNOUNCE_QR_NONE, ""},
+    {"14:00", "@Trystan : Derrière les plateformes MaaS", ANNOUNCE_QR_NONE, ""},
+    {"14:45", "@T0t0r0 : ERP Pwned !", ANNOUNCE_QR_NONE, ""},
+    {"15:30", "@Mh4ck : Pwn the Brick", ANNOUNCE_QR_NONE, ""},
+    {"16:15", "SYSTEM_IDLE : Pause", ANNOUNCE_QR_NONE, ""},
+    {"16:45", "@Roro : Claude : Audit my repo, make no mistake", ANNOUNCE_QR_NONE, ""},
+    {"17:30", "@p1lot : An Explanation of Temporal memory state for evasion", ANNOUNCE_QR_NONE, ""},
     {"18:30", "Apéro de clôture : merci à tous !", ANNOUNCE_QR_NONE, ""},
+    {"23:00", "Fermeture des portes", ANNOUNCE_QR_NONE, ""},
 };
 
 store_announce_t *announce_list(void) {
@@ -329,7 +341,10 @@ static char status[40] = "";
 
 static void admin_label(int i, char *buf, size_t len) {
     const store_announce_t *a = &announce_list()[i];
-    snprintf(buf, len, "%s %s", a->time, a->text);
+    if (! a->time[0] && ! a->text[0])
+        snprintf(buf, len, "%s", _("(vide)"));  /* A free slot: D to write an announcement */
+    else
+        snprintf(buf, len, "%s %s", a->time, a->text);
 }
 
 static void row_label(int i, char *buf, size_t len) {

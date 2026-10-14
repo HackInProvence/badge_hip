@@ -13,7 +13,7 @@ const i18n_lang_t I18N_LANGS[] = {
     {"it", "Italiano"},
 };
 
-const int I18N_N_TEXTS = 1321;
+const int I18N_N_TEXTS = 1322;
 
 /* The French texts, by FNV-1a hash */
 const i18n_text_t I18N_TEXTS[] = {
@@ -1200,6 +1200,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0xE4C4B006u, "Écoute pirate"},
     {0xE4FE97FCu, "Veille : %s"},
     {0xE52B4CC0u, "%u rencontres : %u XP"},
+    {0xE5452378u, "(vide)"},
     {0xE57D9A2Du, "%s (%d voix)"},
     {0xE580EC40u, "Dossier vide"},
     {0xE5952DC3u, "Équipe des %s"},
@@ -2525,6 +2526,7 @@ static const char *const TEXTS_DE[] = {
     "Piratenempfang",
     "Schoner: %s",
     "%u Treffen: %u XP",
+    "(leer)",
     "%s (%d St.)",
     "Ordner leer",
     "Team der %s",
@@ -3850,6 +3852,7 @@ static const char *const TEXTS_EN[] = {
     "Pirate RX",
     "Screensaver: %s",
     "%u meetings: %u XP",
+    "(empty)",
     "%s (%d parts)",
     "Empty folder",
     "Team %s",
@@ -5175,6 +5178,7 @@ static const char *const TEXTS_ES[] = {
     "Escucha pirata",
     "Salvapantallas: %s",
     "%u encuentros: %u XP",
+    "(vacío)",
     "%s (%d voces)",
     "Carpeta vacía",
     "Equipo %s",
@@ -6500,6 +6504,7 @@ static const char *const TEXTS_IT[] = {
     "RX pirata",
     "Screensaver: %s",
     "%u incontri: %u XP",
+    "(vuoto)",
     "%s (%d voci)",
     "Cartella vuota",
     "Squadra %s",

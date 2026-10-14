@@ -17,17 +17,20 @@
 #define STORE_OFFSET (PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE)
 #define SAVE_DELAY_US 5000000
 #define STORE_EXT_MAGIC 0x544E4F43  /* "CONT" */
-#define STORE_EXT_VERSION 2  /* 2: cards of 512 bytes (longer URLs) */
-#define STORE_EXT_OFFSET (STORE_OFFSET - STORE_EXT_SIZE)
+#define STORE_EXT_VERSION 3  /* 2: cards of 512 bytes (longer URLs); 3: 20 announcements (the contacts are erased) */
+/* The flash, from its end: the store (1 sector), 8 KB (the contacts of the older firmwares, unused since version 3),
+ * the factory settings (1 sector, never moved: they survive the new firmwares), the contacts and the announcements
+ * (12 KB, below the factory settings since version 3) */
 #define STORE_FACTORY_VERSION 1
-#define STORE_FACTORY_OFFSET (STORE_EXT_OFFSET - FLASH_SECTOR_SIZE)
+#define STORE_FACTORY_OFFSET (STORE_OFFSET - 8192 - FLASH_SECTOR_SIZE)
+#define STORE_EXT_OFFSET (STORE_FACTORY_OFFSET - STORE_EXT_SIZE)
 
 _Static_assert(sizeof(store_t) <= FLASH_SECTOR_SIZE, "the store must fit in a flash sector");
 
 static store_t store;
 static bool dirty = false;
 static absolute_time_t dirty_ts = 0;
-static uint8_t sector[FLASH_SECTOR_SIZE] __attribute__((aligned(4)));
+static uint8_t last_page[FLASH_PAGE_SIZE] __attribute__((aligned(4)));  /* The end of a structure, padded with 0xFF */
 static store_ext_t ext __attribute__((aligned(4)));
 static store_factory_t factory;
 static bool ext_dirty = false;
@@ -91,20 +94,28 @@ store_factory_t *store_factory_get(void) {
 }
 
 
+/* Writes \p len bytes of \p data (RAM) at \p offset, erased before: the whole pages straight from \p data, the last
+ * one padded with 0xFF (no copy of a whole sector: the RAM is short). Runs with the interrupts disabled */
+static void program(uint32_t offset, const void *data, size_t len) {
+    size_t whole = len / FLASH_PAGE_SIZE * FLASH_PAGE_SIZE;
+    if (whole)
+        flash_range_program(offset, data, whole);
+    if (len > whole) {
+        memset(last_page, 0xFF, sizeof(last_page));
+        memcpy(last_page, (const uint8_t *)data + whole, len - whole);
+        flash_range_program(offset + whole, last_page, FLASH_PAGE_SIZE);
+    }
+}
+
+
 static void save_factory(void *param) {
     (void)param;
     flash_range_erase(STORE_FACTORY_OFFSET, FLASH_SECTOR_SIZE);
-    flash_range_program(STORE_FACTORY_OFFSET, sector, FLASH_SECTOR_SIZE);
+    program(STORE_FACTORY_OFFSET, &factory, sizeof(factory));
 }
 
 
 bool store_factory_save(void) {
-    if (dirty) {  /* The sector buffer is shared: write the pending store first */
-        dirty_ts = 0;
-        store_task(get_absolute_time());
-    }
-    memset(sector, 0xFF, sizeof(sector));
-    memcpy(sector, &factory, sizeof(factory));
     int r = flash_safe_execute(save_factory, NULL, 100);
     printf("store: factory settings saved (%s)\n", r == PICO_OK ? "ok" : "error");
     return r == PICO_OK;
@@ -141,7 +152,7 @@ void store_save_now(void) {
 static void save(void *param) {
     (void)param;
     flash_range_erase(STORE_OFFSET, FLASH_SECTOR_SIZE);
-    flash_range_program(STORE_OFFSET, sector, FLASH_SECTOR_SIZE);
+    program(STORE_OFFSET, &store, sizeof(store));
 }
 
 
@@ -154,8 +165,6 @@ void store_task(absolute_time_t now) {
     if (! dirty || absolute_time_diff_us(dirty_ts, now) < SAVE_DELAY_US)
         return;
     dirty = false;
-    memset(sector, 0xFF, sizeof(sector));
-    memcpy(sector, &store, sizeof(store));
     int r = flash_safe_execute(save, NULL, 100);
     printf("store: saved (%s)\n", r == PICO_OK ? "ok" : "error");
 }

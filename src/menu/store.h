@@ -109,14 +109,14 @@ typedef struct {
 /* Second store (2 sectors before the first one): the contact cards (contacts.c) */
 #define CONTACT_BYTES 512  /* All the fields of a card (contacts.c, sizes of FIELDS) */
 #define STORE_CONTACTS 12
-#define STORE_EXT_SIZE 8192
+#define STORE_EXT_SIZE 12288  /* 12 KB since the 20 announcements (8 KB before) */
 
 typedef struct {
     char bytes[CONTACT_BYTES];  /* The fields at fixed offsets, each one a C string */
 } contact_card_t;
 
 /* An announcement of the admin menu (announce.c): UTF-8 strings */
-#define STORE_ANNOUNCES 6
+#define STORE_ANNOUNCES 20
 typedef struct {
     char time[6];  /* "10:30" */
     char text[112];  /* Up to 56 characters (2 bytes for an accented letter) */
