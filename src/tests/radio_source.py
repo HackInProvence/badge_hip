@@ -99,6 +99,26 @@ PRESETS = {
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
+    # gfsk for the badge, 100kHz datarate
+    'gfskbadge': bytes([
+        0x04, 0xC1,  # CC1101_SYNC1: Sync word MSB -> princeton inspired
+        0x05, 0x6A,  # CC1101_SYNC0: Sync work LSB
+        #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
+        0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (adds a length byte after sync word)
+        0x09, 0x00,  # CC1101_ADDR: no packet filtration
+        0x0B, 0x06,  # CC1101_FSCTRL1: IF frequency
+        0x10, 0x6B,  # CC1101_MDMCFG4: Channel bandwidth: 271kHz
+        0x11, 0xF8,  # CC1101_MDMCFG3: Data rate: 99.98kbps
+        0x12, 0x12,  # CC1101_MDMCFG2: Modulation: GSK, no manchester, 16/16 sync word bits
+        0x13, 0x22,  # CC1101_MDMCFG1: 4 preamble bytes by default
+        0x15, 0x50,  # CC1101_DEVIATN: Deviation = 50.78kHz
+        0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
+        0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
+        0x1B, 0x43,  # CC1101_AGCCTRL2
+        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1D, 0x91,  # CC1101_AGCCTRL0
+        0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
+    ])
 }
 
 

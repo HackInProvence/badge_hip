@@ -365,7 +365,7 @@ const uint8_t radio_preset_gfsk_flip[] = {
     CC1101_PKTCTRL0, 0x05, /* no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word) */
     CC1101_ADDR, 0x00, /* no packet filtration */
     CC1101_FSCTRL1, 0x06, /* IF frequency */
-    CC1101_MDMCFG4, 0xC0, /* Channel bandwidth: 203kHz */
+    CC1101_MDMCFG4, 0xC0, /* Channel bandwidth: ~~203kHz~~ 101k */
     //CC1101_MDMCFG4, 0xC8, /* Channel bandwidth: 203kHz */
     //CC1101_MDMCFG3, 0x93, /* Data rate: 9.992kbps */
     CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
@@ -380,3 +380,29 @@ const uint8_t radio_preset_gfsk_flip[] = {
     /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
 };
 const size_t radio_preset_gfsk_flip_len = sizeof(radio_preset_gfsk_flip);
+
+
+const uint8_t radio_preset_gfsk_badge[] = {
+    //CC1101_IOCFG0, 0x06, /* GDO0 = packet being transmitted or received */
+    CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */
+    CC1101_SYNC1, 0xC1, /* Sync word MSB */
+    CC1101_SYNC0, 0x6A, /* Sync work LSB */
+    //CC1101_PKTLEN, 0x00, /* The doc says that the value must be different from 0... */
+    /*CC1101_PKTCTRL1 -> default value **includes** the 2 status bytes... so the max received FIFO size is 62 */
+    CC1101_PKTCTRL0, 0x05, /* no whitening, use FIFOs, with CRC, variable packet length (first byte after sync word) */
+    CC1101_ADDR, 0x00, /* no packet filtration */
+    CC1101_FSCTRL1, 0x06, /* IF frequency */
+    CC1101_MDMCFG4, 0x6B, /* Channel bandwidth: 271kHz */
+    CC1101_MDMCFG3, 0xF8, /* Data rate: 99.98kbps */
+    CC1101_MDMCFG2, 0x12, /* Modulation: GSK, no manchester, 16/16 sync word bits */
+    CC1101_MDMCFG1, 0x22, /* 4 preamble bytes by default */
+    CC1101_DEVIATN, 0x50, /* Deviation = 50.78kHz for 26.000000MHz */
+    CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
+    CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
+    CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */
+    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense to 33 dB (??) */
+    CC1101_AGCCTRL0, 0x91,
+    CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
+    /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
+};
+const size_t radio_preset_gfsk_badge_len = sizeof(radio_preset_gfsk_badge);

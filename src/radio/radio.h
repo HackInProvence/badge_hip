@@ -98,6 +98,14 @@ extern const uint8_t radio_preset_gfsk_flip[];
 extern const size_t radio_preset_gfsk_flip_len;
 
 
+/** \brief Configuration for live badges
+ *
+ * GFSK @100kHz (deviation 50k, channel bandwidth 271k), 32 bits preamble, princeton synch words
+ * This uses the packet mode of the CC1101 */
+extern const uint8_t radio_preset_gfsk_badge[];
+extern const size_t radio_preset_gfsk_badge_len;
+
+
 /* Register access type: default is write single byte, but these sets byte to change the access
  * CC1101_READ to read a byte instead of write,
  * CC1101_BURST to read/write multiple bytes (until CSn comes high again) */
