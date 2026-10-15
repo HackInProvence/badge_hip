@@ -32,6 +32,7 @@ STATIC int16_t rssi = INT16_MIN;
 /* Config requirements when receiving: IOCFG2 is carrier sense, IOCFG1 is MISO, IOCFG0 is RX FIFO over threshold, FIFOTHR is 32 */
 STATIC const uint8_t config_rx[] = {CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00, 0x07};
 STATIC const size_t config_rx_len = sizeof(config_rx);
+STATIC absolute_time_t led_until = 0;  /* This is just for RaSo in fact... */
 
 /* TX side */
 STATIC uint8_t buffer_tx[BUFFER_TX_LENGTH+2];  /* First 2 bytes are the length of remainder (len(payload)+1), third byte is the command, then the payload */
@@ -286,6 +287,7 @@ void dispatcher_step() {
             i_rx = 0;
             st_rx = WAITING;
             rssi = INT16_MIN;
+            led_until = make_timeout_time_ms(200);
 
             //ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);  /* We emptied the RX FIFO beforehand */
             radio_wait_state(CC1101_STATE_RX, true);

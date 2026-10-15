@@ -58,6 +58,7 @@ extern const size_t config_rx_len;
 extern int16_t rssi;
 extern uint8_t send_mode;
 extern uint8_t buffer_tx[];
+extern absolute_time_t led_until;
 
 
 /* Assumes that it is called with the radio in the control state */
@@ -320,8 +321,9 @@ int main() {
         } else if (st_tx == WAITING && absolute_time_diff_us(st_tx_ts, now) < 50000) {
             led.kind = LED_WHEEL;
             led.period = 80000;
-        /* Otherwise waiting for USB/air: breathing blue */
-        } else {
+        /* Otherwise waiting for USB/air: breathing blue
+         *  but wait a little to keep the previous color visible */
+        } else if (absolute_time_diff_us(now, led_until) < 0) {
             led.kind = LED_BREATH;
             led.color = BLUE;
             led.period = 3000000;
