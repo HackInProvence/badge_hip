@@ -355,7 +355,7 @@ void radio_calibrate(uint32_t length_ms){
 }
 
 
-const uint8_t radio_preset_gfsk[] = {
+const uint8_t radio_preset_gfsk_flip[] = {
     CC1101_IOCFG0, 0x06, /* GDO0 = packet being transmitted or received */
     CC1101_FIFOTHR, 0x47, /* ADC retention, no RX attenuation, 33/32 TX/RX FIFO thresholds */
     CC1101_SYNC1, 0x46, /* Sync word MSB */
@@ -379,4 +379,4 @@ const uint8_t radio_preset_gfsk[] = {
     CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
     /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
 };
-const size_t radio_preset_gfsk_len = sizeof(radio_preset_gfsk);
+const size_t radio_preset_gfsk_flip_len = sizeof(radio_preset_gfsk_flip);

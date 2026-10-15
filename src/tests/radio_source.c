@@ -170,7 +170,7 @@ int main() {
 
     /* Push sensible defaults for when there is no USB to push new commands (test nomad)
      * (this pushes IOCFG and FIFTHR but they will overridden by config_rx) */
-    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
+    ccsend(radio_preset_gfsk_flip, NULL, radio_preset_gfsk_flip_len);
 
     /* Initialize radio to receive */
     ccsend(config_rx, NULL, sizeof(config_rx));

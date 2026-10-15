@@ -94,8 +94,8 @@ void radio_calibrate(uint32_t length_ms);
  * This uses the packet mode of the CC1101
  *
  * 999 = 9.99kbps */
-extern const uint8_t radio_preset_gfsk[];
-extern const size_t radio_preset_gfsk_len;
+extern const uint8_t radio_preset_gfsk_flip[];
+extern const size_t radio_preset_gfsk_flip_len;
 
 
 /* Register access type: default is write single byte, but these sets byte to change the access

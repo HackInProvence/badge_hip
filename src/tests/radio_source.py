@@ -23,8 +23,9 @@ PRESETS = {
     # NOTE: DON'T PUSH 0x00 to 0x03 (IOCFGx and FIFO_THRESH)
     # NOTE: use either VARIABLE or INFINITE packet length (see CC1101_PKTCTRL0.LENGTH_CONFIG)
     # NOTE: MDMCFG2.SYNC_MODE should be *at least* carrier sense (bit 2 set)
+    # Use FL synch word, for compat' with flipper chat app
     'gfsk': bytes([
-        0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
+        0x04, 0x46,  # CC1101_SYNC1: Sync word MSB -> These are "FL" from the subghz chat app TODO change this profile's name
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
         #0x06, 0x00,  # CC1101_PKTLEN: The doc says that the value must be different from 0...
         0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (adds a length byte after sync word)
@@ -43,8 +44,9 @@ PRESETS = {
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
+    # Use FL synch word, for compat' with flipper chat app
     'fsk': bytes([
-        0x04, 0x46,  # CC1101_SYNC1: Sync word MSB
+        0x04, 0x46,  # CC1101_SYNC1: Sync word MSB -> These are "FL" from the subghz chat app TODO change this profile's name
         0x05, 0x4C,  # CC1101_SYNC0: Sync work LSB
         0x08, 0x05,  # CC1101_PKTCTRL0: no whitening, use FIFOs, with CRC, variable packet length (adds a length byte after sync word)
         0x09, 0x00,  # CC1101_ADDR: no packet filtration

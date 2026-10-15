@@ -142,7 +142,7 @@ void tx_chat_flipper(const uint8_t *msg) {
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
 
     /* 800µs per byte (without preamble) */
-    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
+    ccsend(radio_preset_gfsk_flip, NULL, radio_preset_gfsk_flip_len);
     radio_set_frequency(433920000);
     radio_set_baud_rate(9995);  /* Closest is 9991 or 9992 */
     print_cc_configuration();
@@ -180,10 +180,10 @@ void tx_chat_flipper(const uint8_t *msg) {
 }
 
 
-/* Receive FSK-transmitted data, max 64 bytes (preset radio_preset_gfsk used by radio_source) */
+/* Receive FSK-transmitted data, max 64 bytes (preset radio_preset_gfsk_flip used by radio_source) */
 void rx_fsk_printf(void) {
     gpio_set_dir(BADGE_RADIO_GDO0, GPIO_IN);
-    ccsend(radio_preset_gfsk, NULL, radio_preset_gfsk_len);
+    ccsend(radio_preset_gfsk_flip, NULL, radio_preset_gfsk_flip_len);
     radio_set_frequency(433920000);
     radio_set_baud_rate(9995);
     print_cc_configuration();
