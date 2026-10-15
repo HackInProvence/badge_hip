@@ -40,7 +40,8 @@ PRESETS = {
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
         0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
         0x1B, 0x43,  # CC1101_AGCCTRL2
-        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        #0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1C, 0x78,  # CC1101_AGCCTRL1: Relative carrier sense +14db, but absolute carrier sense disabled
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
@@ -58,7 +59,8 @@ PRESETS = {
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
         0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
         0x1B, 0x43,  # CC1101_AGCCTRL2
-        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        #0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1C, 0x78,  # CC1101_AGCCTRL1: Relative carrier sense +14db, but absolute carrier sense disabled
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ]),
@@ -115,7 +117,7 @@ PRESETS = {
         0x18, 0x18,  # CC1101_MCSM0: Autocalibration on RX or TX, 64 ripples, no pin radio control
         0x19, 0x16,  # CC1101_FOCCFG: FOC: 3K, K/2 after sync word, limited to BW_chan/4
         0x1B, 0x43,  # CC1101_AGCCTRL2
-        0x1C, 0x40,  # CC1101_AGCCTRL1: Relative carrier sense disabled, but absolute carrier sense
+        0x1C, 0x78,  # CC1101_AGCCTRL1: Relative carrier sense +14db, but absolute carrier sense disabled
         0x1D, 0x91,  # CC1101_AGCCTRL0
         0x20, 0xFB,  # CC1101_WORCTRL: WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h
     ])

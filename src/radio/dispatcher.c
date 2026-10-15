@@ -221,12 +221,15 @@ void dispatcher_init(void) {
     /* Configure the radio */
     ccsend(radio_preset_gfsk_badge, NULL, radio_preset_gfsk_badge_len);
 
+    uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
+    log_info("calibrated frequency: %d MHz", fXOSC);
+
     /* Initialize radio to receive */
     ccsend(config_rx, NULL, sizeof(config_rx));
     radio_set_frequency(433920000);  /* Recompute with calibration results */
     /* FIXME: this can only be changed if the rest of the configuration follows,
      *  so this is just to recompute with current calibration */
-    radio_set_baud_rate(99999);
+    radio_set_baud_rate(100000);
 
     /* Setup an IRQ to watch carrier sense.
      * It's hard to receive packets of unknown lengths with the CC1101,

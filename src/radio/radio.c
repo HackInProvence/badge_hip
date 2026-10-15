@@ -374,7 +374,8 @@ const uint8_t radio_preset_gfsk_flip[] = {
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
     CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */
-    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense to 33 dB (??) */
+    //CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense to 33 dB (??) */
+    CC1101_AGCCTRL1, 0x78, /* Relative carrier sense +14dB, but absolute carrier sense disabled */
     CC1101_AGCCTRL0, 0x91,
     CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
     /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
@@ -400,7 +401,7 @@ const uint8_t radio_preset_gfsk_badge[] = {
     CC1101_MCSM0, 0x18, /* Autocalibration on RX or TX, 64 ripples, no pin radio control */
     CC1101_FOCCFG, 0x16, /* FOC: 3K, K/2 after sync word, limited to BW_chan/4 */
     CC1101_AGCCTRL2, 0x43, /* Reduce DVGA gain, maximum LNA gain, target averaged amplitude to 33 dB */
-    CC1101_AGCCTRL1, 0x40, /* Relative carrier sense disabled, but absolute carrier sense to 33 dB (??) */
+    CC1101_AGCCTRL1, 0x78, /* Relative carrier sense +14dB, but absolute carrier sense disabled */
     CC1101_AGCCTRL0, 0x91,
     CC1101_WORCTRL, 0xFB, /* WakeOnRadio: power down RC, 48 cycles for Event 1 (43ms), calibrate RC, maximum Event 0 timeout: 17h */
     /* Note: as MCSM2.RX_TIME is kept to its default value (7), RX will never timeout and WOR should have its auto-sleep disabled */
