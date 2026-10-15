@@ -117,6 +117,64 @@ void test_zones44(const uint8_t *ws0, const uint8_t *ws1, const uint8_t *ws2) {
 }
 
 
+// Waveform settings, showing grays, slowly
+// drive with long pauses between drives, we see the darkening
+const uint8_t ws_ardu_0[159] = \
+    "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* black */ \
+    "\x40\x48\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* darker */ \
+    "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* lighter */ \
+    "\x40\x48\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* white */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+    "\x0A\x00\x00\x00\x00\x00\x00" \
+    "\x08\x01\x00\x08\x01\x00\x02" \
+    "\x01\x40\x00\x00\x00\x00\x0E" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x22"  /* EOPT, 0x22 = normal */         \
+    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
+    "\x41"  /* VSH1, 0x41 == 15V */           \
+    /* This LUT never uses VSH2 */            \
+    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\x32"  /*  VSL, 0x32 == -15V */          \
+    "\x20"; /* VCOM, 0x20 == -0.8V */
+
+// Waveform settings, showing grays, taken from arduino projects
+const uint8_t ws_ardu_1[159] = \
+    "\xA8\x48\x54\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* black */ \
+    "\xA0\x48\x50\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* darker */ \
+    "\x80\x48\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* lighter */ \
+    "\x54\x48\xA8\x00\x00\x00\x00\x00\x00\x00\x00\x00" /* white */ \
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+    "\x01\x02\x00\x09\x00\x00\x00" \
+    "\x08\x01\x00\x08\x01\x00\x02" \
+    "\x01\x02\x00\x09\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x00\x00\x00\x00\x00\x00\x00" \
+    "\x22\x22\x22\x22\x22\x22" "\x00\x00\x00" \
+    "\x22"  /* EOPT, 0x22 = normal */         \
+    "\x17"  /*  VGH, 0x17 == 0x00 == 20V */   \
+    "\x41"  /* VSH1, 0x41 == 15V */           \
+    /* This LUT never uses VSH2 */            \
+    "\x00"  /* VSH2, 0x00 == ???, POR is 5V */\
+    "\x32"  /*  VSL, 0x32 == -15V */          \
+    "\x20"; /* VCOM, 0x20 == -0.8V */
+
+
 /* Have some working configurations to play with */
 uint8_t working_ws0[159] = {};
 uint8_t working_ws1[159] = {};
@@ -487,6 +545,9 @@ void search_4g(void) {
 }
 
 
+#include "grad_4g.h"
+#include "text_bw.h"
+#include "squares_bw.h"
 int main() {
     stdio_usb_init();
     log_set_level(LOG_LEVEL_INFO);
@@ -498,6 +559,7 @@ int main() {
     /* Bench test some WS to improve animations */
     //test_zones44(NULL, NULL, NULL);
     //test_zones44(ws_30fps, ws_20fps, NULL);
+    //test_zones44(screen_ws_1681_bw, ws_ardu_0, ws_ardu_1);
 
     //ws_dump(screen_ws_1681_4grays);
 
@@ -508,8 +570,15 @@ int main() {
 
     //search_quick_white();
     //search_quick_black();
-    search_maintain();
+    //search_maintain();
     //search_4g();
+
+    screen_clear_image_position();
+    //screen_push_ws(ws_ardu_1);
+    screen_push_ws(screen_ws_1681_4grays);
+    screen_push_rams(grad_4g_lsb, grad_4g_msb, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+    //screen_push_rams(text_bw, squares_bw, (SCREEN_WIDTH*SCREEN_HEIGHT)/8);
+    screen_show_rams();
 
     /* It's important to deep sleep because it sometimes have side effects on color stabilisation */
     screen_deep_sleep();
