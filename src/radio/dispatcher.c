@@ -3,59 +3,41 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/** \file
- *
- * \brief Abstracts the radio RX/TX side and notifies on RX.
- *
- * Set up callbacks for message types and be called back on receiving these.
- * Queue messages to send. */
+
+#include <stdio.h>
+
+#include "hardware/gpio.h"
+#include "pico/sync.h"
 
 #include "log.h"
 #include "dispatcher.h"
+#include "flash_write.h"
+#include "radio.h"
 
 /* Compromise to not use too much RAM while having space to receive a little more than one screen */
-#define BUFFER_TX_LENGTH 128
+//#define BUFFER_TX_LENGTH 128 -> moved to .h for now FIXME
 #define BUFFER_RX_LENGTH 8192
 
 
-/** Buffer states: follow whether we are receiving or full */
-typedef enum {
-    WAITING,  /* No operation has started, everything is setup */
-    FILLING,  /* Receiving bytes, but buffer is not complete */
-    PART_READY,  /* Need to flush received bytes to the buffer before overflow */
-    READY,  /* A packet has been fully received and is ready to be processed */
-} buffer_state_t;
-
-/** RaSo states: differentiate main states of the process */
-typedef enum {
-    BOOT,
-    RADIO_WAIT,  /* Radio is in RX mode, but no packet is received yet */
-    RADIO_RECEIVING,  /* Radio is in carrier sense mode, receiving something, we should not interrupt that */
-    RADIO_CONTROL,  /* Radio is being configured or sending a packet */
-} raso_state_t;
-
-
 /* Global state management */
-static raso_state_t st_raso = BOOT;
-static critical_section_t cs_update_st_raso;  /* Protect changes of st_raso in main from interrupts */
-
-/* TX side TODO: we need less, because this is an RX of the USB side */
-static buffer_state_t st_tx = WAITING;
-static absolute_time_t st_tx_ts = 0;
-static uint8_t buffer_tx[BUFFER_TX_LENGTH+2];  /* First 2 bytes are the length of remainder (len(payload)+1), third byte is the command, then the payload */
-static size_t i_tx = 0;  /* Index to write to buffer_tx when receiving data from USB */
-static uint8_t send_mode = 1;  /* Mirrors PKTCTRL0.LENGTH_CONFIG */
-/* Config requirements when sending: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
-static const uint8_t config_tx[] = {CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07};
+STATIC raso_state_t st_raso = BOOT;
+STATIC critical_section_t cs_update_st_raso;  /* Protect changes of st_raso in main from interrupts */
 
 /* RX side */
 static buffer_state_t st_rx = WAITING;
 static uint8_t buffer_rx[BUFFER_RX_LENGTH+64]; /* +64 to be able to flush the RX FIFO in cases of overflow TODO: drop with SFRX instead */
-static size_t i_rx = 0;
+STATIC size_t i_rx = 0;
 static absolute_time_t t_rise = 0, t_fall = 0;  /* Measure reception time */
-static int16_t rssi = INT16_MIN;
+STATIC int16_t rssi = INT16_MIN;
 /* Config requirements when receiving: IOCFG2 is carrier sense, IOCFG1 is MISO, IOCFG0 is RX FIFO over threshold, FIFOTHR is 32 */
-static const uint8_t config_rx[] = {CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00, 0x07};
+STATIC const uint8_t config_rx[] = {CC1101_BURST(CC1101_IOCFG2), 0x0E, 0x2E, 0x00, 0x07};
+STATIC const size_t config_rx_len = sizeof(config_rx);
+
+/* TX side */
+STATIC uint8_t buffer_tx[BUFFER_TX_LENGTH+2];  /* First 2 bytes are the length of remainder (len(payload)+1), third byte is the command, then the payload */
+/* Config requirements when sending: IOCFG2 is TX FIFO under threshold, IOCFG1 is MISO, IOCFG0 is sending ongoing, FIFOTHR is 33 */
+STATIC uint8_t send_mode = 1;  /* Mirrors PKTCTRL0.LENGTH_CONFIG */
+static const uint8_t config_tx[] = {CC1101_BURST(CC1101_IOCFG2), 0x02, 0x2E, 0x06, 0x07};
 
 
 /** We should not read the last byte available in the FIFO because there is a bug that would duplicate reinsert it in the FIFO,
@@ -224,4 +206,92 @@ void emit_buffer(void) {
         log_warning("remaining %d bytes in TXFIFO", len);
 
     /* We should be IDLE here, because either variable packet or fixed packet length made the radio disable itself */
+}
+
+
+void dispatcher_init(void) {
+    /* Set up the local state */
+    critical_section_init(&cs_update_st_raso);
+    st_raso = RADIO_WAIT;  /* Can't be interrupted: no IRQ yet */
+
+    /* The radio should already be in the IDLE state, but a pico reset does not reset its state */
+    radio_wait_state(CC1101_STATE_IDLE, true);
+    ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
+
+    /* Configure the radio */
+    ccsend(radio_preset_gfsk_badge, NULL, radio_preset_gfsk_badge_len);
+
+    /* Initialize radio to receive */
+    ccsend(config_rx, NULL, sizeof(config_rx));
+    radio_set_frequency(433920000);  /* Recompute with calibration results */
+    /* FIXME: this can only be changed if the rest of the configuration follows,
+     *  so this is just to recompute with current calibration */
+    radio_set_baud_rate(99999);
+
+    /* Setup an IRQ to watch carrier sense.
+     * It's hard to receive packets of unknown lengths with the CC1101,
+     *  as the reception correctly starts with CS being high, but it does not end with CS being low again...
+     * We need to go back to IDLE when reception is done */
+    gpio_set_irq_callback(radio_events);  /* There is a single callback for all GPIO events */
+    gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE                     , true);
+    gpio_set_irq_enabled(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+    irq_set_enabled(IO_IRQ_BANK0, true);
+    radio_wait_state(CC1101_STATE_RX, true);
+
+    /* Set up receive hook */
+    /* Set up alarm to send pings */
+    /* Put the radio in receive mode */
+}
+
+
+void dispatcher_step() {
+    /* Note: if you want fail-safes and debug code, see tests/radio.c on the parent commit of this one */
+    if(st_raso == RADIO_WAIT || st_raso == RADIO_RECEIVING) {
+        switch(st_rx) {
+        case WAITING:
+            /* Probably here with RADIO_WAIT, in which case it's ok */
+            break;
+        case FILLING:
+            break;
+        case PART_READY:
+            /* FIFO threshold reached, do fetch incoming data */
+            read_rx_fifo(false);
+            break;
+        case READY:
+            /* Carrier sense went down, we finished receiving a packet */
+            /* When using CS, the reception of bytes continues after CS is cleared...
+             * To avoid that, we reset to IDLE then RX */
+            /* We may be too slow, as the next transmission may have started while we are pushing our payload on USB
+             *  and recalibrating the radio */
+            radio_wait_state(CC1101_STATE_IDLE, true);
+            /* RX termination based on CS seems to only works when nothing was received yet... */
+            //ccsend((uint8_t[]){CC1101_SFRX, CC1101_MCSM2, 0x07}, NULL, 3);
+
+            /* There may be still data for us in the RX FIFO */
+            read_rx_fifo(true);
+
+            int8_t eoff = ccread_status_reg(CC1101_FREQEST);
+            uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
+            uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
+            printf("new packet, RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz, len % 4d, in % 7.02f ms,\ncontent: ",
+                    rssi, lqi, ((int64_t)(eoff)*fXOSC)>>14, i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
+            for (size_t i=0; i<i_rx; ++i)
+                printf("%02x ", buffer_rx[i]);
+            printf("\n");
+
+            /* Reset buffer state */
+            i_rx = 0;
+            st_rx = WAITING;
+            rssi = INT16_MIN;
+
+            //ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);  /* We emptied the RX FIFO beforehand */
+            radio_wait_state(CC1101_STATE_RX, true);
+            /* Indicate to the IRQ that we are now ready to re-receive */
+            critical_section_enter_blocking(&cs_update_st_raso);
+            st_raso = RADIO_WAIT;
+            critical_section_exit(&cs_update_st_raso);
+            break;
+        }
+
+    }
 }

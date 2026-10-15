@@ -1,5 +1,8 @@
 add_library(radio INTERFACE)
-target_sources(radio INTERFACE ${CMAKE_CURRENT_LIST_DIR}/radio.c)
+target_sources(radio INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/radio.c
+    ${CMAKE_CURRENT_LIST_DIR}/dispatcher.c
+)
 target_include_directories(radio SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(radio INTERFACE
@@ -8,6 +11,7 @@ target_link_libraries(radio INTERFACE
     hardware_irq
     hardware_pwm
     hardware_spi
+    pico_sync
     pico_time
     log
     flash_write

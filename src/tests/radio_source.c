@@ -33,8 +33,8 @@
 #include "pico/stdlib.h"
 #include "pico/sync.h"
 
-#include "flash_write.h"
 #include "log.h"
+#include "dispatcher.h"
 #include "leds.h"
 #include "radio.h"
 
@@ -44,8 +44,20 @@
 #define RED LED_RGB(32, 0, 0)
 #define WHITE LED_RGB(64, 64, 64)
 
-/* When changing BUFFER_TX_LENGTH, for now radio_source.py has no mean to know that and its assert on size might be wrong */
-#define BUFFER_TX_LENGTH 65535
+/* TX side TODO: we need less, because this is an RX of the USB side */
+static buffer_state_t st_tx = WAITING;
+static absolute_time_t st_tx_ts = 0;
+static size_t i_tx = 0;  /* Index to write to buffer_tx when receiving data from USB */
+
+/* Shared with dispatcher.c, for now FIXME */
+extern raso_state_t st_raso;
+extern critical_section_t cs_update_st_raso;
+extern size_t i_rx;
+extern const uint8_t config_rx[];
+extern const size_t config_rx_len;
+extern int16_t rssi;
+extern uint8_t send_mode;
+extern uint8_t buffer_tx[];
 
 
 /* Assumes that it is called with the radio in the control state */
@@ -161,34 +173,13 @@ int main() {
     radio_init();
     radio_boot();
     leds_init(NULL);
-    critical_section_init(&cs_update_st_raso);
 
-    /* The radio should already be in the IDLE state,
-     *  but pushing the reset button does not reset its state */
-    radio_wait_state(CC1101_STATE_IDLE, true);
-    ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);
+    dispatcher_init();
+    st_tx_ts = get_absolute_time();
 
     /* Push sensible defaults for when there is no USB to push new commands (test nomad)
      * (this pushes IOCFG and FIFTHR but they will overridden by config_rx) */
-    ccsend(radio_preset_gfsk_flip, NULL, radio_preset_gfsk_flip_len);
-
-    /* Initialize radio to receive */
-    ccsend(config_rx, NULL, sizeof(config_rx));
-    radio_set_frequency(433920000);
-    radio_set_baud_rate(9999);
-
-    st_raso = RADIO_WAIT;  /* Can't be interrupted: no IRQ yet */
-    st_tx_ts = get_absolute_time();
-
-    /* Setup an IRQ to watch carrier sense.
-     * It's hard to receive packets of unknown lengths with the CC1101,
-     *  as the reception correctly starts with CS being high, but it does not end with CS being low again...
-     * We need to go back to IDLE when reception is done */
-    gpio_set_irq_callback(radio_events);  /* There is a single callback for all GPIO events */
-    gpio_set_irq_enabled(BADGE_RADIO_GDO0, GPIO_IRQ_EDGE_RISE                     , true);
-    gpio_set_irq_enabled(BADGE_RADIO_GDO2, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
-    irq_set_enabled(IO_IRQ_BANK0, true);
-    radio_wait_state(CC1101_STATE_RX, true);
+    //ccsend(radio_preset_gfsk_flip, NULL, radio_preset_gfsk_flip_len);
 
     log_info("booted, waiting for packets on USB or on air");
 
@@ -197,8 +188,6 @@ int main() {
     leds_anim_t led = {
         .tref = get_absolute_time(),
     };
-    /* Find the crystal frequency once and for all (don't expect it to change) */
-    uint32_t fXOSC = flash_write_get_ro_ptr()->radio_crystal_frequency;
     while(true) {
         int ch;
         absolute_time_t now = get_absolute_time();
@@ -228,7 +217,7 @@ int main() {
                     if (i_tx >= 2) {
                         /* TODO: see if clarifications in SWIM serial2swim work and report them here */
                         uint16_t *payload_len = (uint16_t *)buffer_tx;
-                        if (*payload_len+2 > sizeof(buffer_tx)) {
+                        if (*payload_len+2 > BUFFER_TX_LENGTH+2) {
                             log_warning("announced USB packet too large, dropping and wait for end of stream");
                             /* We just wait that the current stream stops */
                             st_raso = WAITING;  /* FIXME: st_tx??? */
@@ -257,6 +246,7 @@ int main() {
                 log_warning("unexpected st_tx state: PART_READY");  /* This may flood your console */
                 break;
             case READY:
+                /* TODO: move to a dispatcher_push_config */
                 /* Acquire the critical section to prevent IRQs from changing st_raso, if not done yet */
                 critical_section_enter_blocking(&cs_update_st_raso);
                 /* If the radio is available (not receiving), reserve it */
@@ -282,7 +272,7 @@ int main() {
                     i_tx = 0;
                     buffer_tx[0] = buffer_tx[1] = 0;
                     /* And set the radio back to waiting */
-                    ccsend(config_rx, NULL, sizeof(config_rx));
+                    ccsend(config_rx, NULL, config_rx_len);
                     st_raso = RADIO_WAIT;
                     rssi = INT16_MIN;
                     radio_wait_state(CC1101_STATE_RX, true);
@@ -292,54 +282,7 @@ int main() {
         }
 
         /* Handle RX to USB direction */
-        /* Note: if you want fail-safes and debug code, see tests/radio.c on the parent commit of this one */
-        if(st_raso == RADIO_WAIT || st_raso == RADIO_RECEIVING) {
-            switch(st_rx) {
-            case WAITING:
-                /* Probably here with RADIO_WAIT, in which case it's ok */
-                break;
-            case FILLING:
-                break;
-            case PART_READY:
-                /* FIFO threshold reached, do fetch incoming data */
-                read_rx_fifo(false);
-                break;
-            case READY:
-                /* Carrier sense went down, we finished receiving a packet */
-                /* When using CS, the reception of bytes continues after CS is cleared...
-                 * To avoid that, we reset to IDLE then RX */
-                /* We may be too slow, as the next transmission may have started while we are pushing our payload on USB
-                 *  and recalibrating the radio */
-                radio_wait_state(CC1101_STATE_IDLE, true);
-                /* RX termination based on CS seems to only works when nothing was received yet... */
-                //ccsend((uint8_t[]){CC1101_SFRX, CC1101_MCSM2, 0x07}, NULL, 3);
-
-                /* There may be still data for us in the RX FIFO */
-                read_rx_fifo(true);
-
-                int8_t eoff = ccread_status_reg(CC1101_FREQEST);
-                uint8_t lqi = ccread_status_reg(CC1101_LQI) & 0x7F;  /* Discard CRC OK */
-                printf("new packet, RSSI %+ 3ddBm, LQI % 3d, est. freq. % 7lli Hz, len % 4d, in % 7.02f ms,\ncontent: ",
-                        rssi, lqi, ((int64_t)(eoff)*fXOSC)>>14, i_rx, absolute_time_diff_us(t_rise, t_fall)/1000.f);
-                for (size_t i=0; i<i_rx; ++i)
-                    printf("%02x ", buffer_rx[i]);
-                printf("\n");
-
-                /* Reset buffer state */
-                i_rx = 0;
-                st_rx = WAITING;
-                rssi = INT16_MIN;
-
-                //ccsend((uint8_t[]){CC1101_SFRX}, NULL, 1);  /* We emptied the RX FIFO beforehand */
-                radio_wait_state(CC1101_STATE_RX, true);
-                /* Indicate to the IRQ that we are now ready to re-receive */
-                critical_section_enter_blocking(&cs_update_st_raso);
-                st_raso = RADIO_WAIT;
-                critical_section_exit(&cs_update_st_raso);
-                break;
-            }
-
-        }
+        dispatcher_step();
 
         /* Compute color, we have priorities: radio first, then USB, then waiting (keep alive) */
         if (st_raso == RADIO_RECEIVING) {  /* FIXME: inverse all tests to avoid lhs wrongly set */
