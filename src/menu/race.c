@@ -36,6 +36,7 @@
 #define SEND_BASE_MS 200  /* Period of the states: more cars, slower */
 #define SEND_PER_CAR_MS 60
 #define HELD_TIMEOUT_MS 120  /* The buttons callback comes at every turn of the loop while a button is held */
+#define GIVE_UP_MS 1500  /* Both wings held this long during the race: the player gives up */
 #define K_STATE PARTY_KIND_GAME
 
 /* The physics, in pixels and seconds */
@@ -468,6 +469,12 @@ static void back_home(void) {
 
 static bool race_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (page == P_GAME && (phase == PH_RACE || phase == PH_COUNTDOWN) && ! cancelled) {
+        if ((b->held & (UI_BTN_A | UI_BTN_B)) == (UI_BTN_A | UI_BTN_B) && app_held_ms(b, UI_BTN_A) >= GIVE_UP_MS
+                && app_held_ms(b, UI_BTN_B) >= GIVE_UP_MS) {
+            printf("race: gave up\n");  /* The others go on without this car */
+            back_home();
+            return true;
+        }
         held = b->held;  /* The race: the buttons drive (a long press on G does not leave) */
         held_ts = now;
         return true;
@@ -663,7 +670,7 @@ static void render_race(uint8_t *fb) {
     gfx_text(fb, GFX_WIDTH - 4, 0, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_RIGHT);
     if (phase == PH_GRID) {  /* The controls, before the start */
         gfx_fill_rect(fb, 0, UI_FOOTER_Y - 3, GFX_WIDTH, GFX_HEIGHT - UI_FOOTER_Y + 3, GFX_WHITE);
-        ui_footer(fb, N_("Flanc D : gaz  G / D : tourner"));
+        ui_footer(fb, N_("Flanc D : gaz  G / D : tourner"));  /* (G + D held: give up) */
     }
 }
 

@@ -232,7 +232,7 @@ drawn at random; with an odd number of players, one of them is the **Referee** (
 of a track bigger than the screen (the screen follows your car, black; the others are hollow).
 - 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race.
 - **Right side**: accelerate; **left side**: brake then back up; **wings**: steer (held). The grass slows you down a
-  lot. The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
+  lot. Both wings held 1.5 s: give up (the others go on). The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
   skipping one does not count the lap.
 - At the top: the lap ("Lap 2/3") and your place ("1/3"). The screen is drawn about 4 times per second.
 - The race ends when everybody has finished, or 30 s after the first one; the ranking gives the times, then the lap

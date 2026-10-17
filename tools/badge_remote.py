@@ -321,24 +321,42 @@ def run_window(port, zoom, on_ready=None):
 
     root = tk.Tk()
     root.title('Badge SecSea - télécommande')
-    if not zoom:
-        # As big as possible: the window must also fit the buttons and the log
-        zoom = max(2, min(4, (root.winfo_screenheight() - 380) // HEIGHT))
     root.configure(padx=10, pady=10)
+    # The screen of the badge is the only row that grows or shrinks with the window: the buttons, the log and the list
+    # of the badges stay visible; its zoom is a whole number (sharp pixels), the biggest that fits (--zoom: fixed)
+    fixed_zoom = zoom
+    zoom_now = [zoom or 2]
 
-    size = WIDTH * zoom
     image = tk.PhotoImage(width=WIDTH, height=HEIGHT)
     image.put('#%02x%02x%02x' % GRAYS[3], to=(0, 0, WIDTH, HEIGHT))
-    zoomed = [image.zoom(zoom)]
-    canvas = tk.Canvas(root, width=size, height=size, highlightthickness=4, highlightbackground='#333333')
-    canvas.grid(row=0, column=0, columnspan=4)
+    zoomed = [image.zoom(zoom_now[0])]
+    canvas = tk.Canvas(root, width=WIDTH * zoom_now[0], height=HEIGHT * zoom_now[0], highlightthickness=4,
+                       highlightbackground='#333333')
+    canvas.grid(row=0, column=0, columnspan=4, sticky='nsew')
+    root.rowconfigure(0, weight=1)
+    for col in range(4):
+        root.columnconfigure(col, weight=1)
     canvas_image = canvas.create_image(0, 0, anchor='nw', image=zoomed[0])
     last = {'rows': None, 'count': 0, 't0': time.time()}
+
+    def place_image():
+        w, h = canvas.winfo_width(), canvas.winfo_height()
+        canvas.coords(canvas_image, max(0, (w - WIDTH * zoom_now[0]) // 2), max(0, (h - HEIGHT * zoom_now[0]) // 2))
+
+    def on_canvas_size(event):
+        if not fixed_zoom:
+            z = max(1, min(event.width - 8, event.height - 8) // WIDTH)
+            if z != zoom_now[0]:
+                zoom_now[0] = z
+                zoomed[0] = image.zoom(z)
+                canvas.itemconfigure(canvas_image, image=zoomed[0])
+        place_image()
+    canvas.bind('<Configure>', on_canvas_size)
 
     def show(rows):
         colors = ['#%02x%02x%02x' % g for g in GRAYS]
         image.put(' '.join('{' + ' '.join(colors[v] for v in row) + '}' for row in rows))
-        zoomed[0] = image.zoom(zoom)
+        zoomed[0] = image.zoom(zoom_now[0])
         canvas.itemconfigure(canvas_image, image=zoomed[0])
         last['rows'] = rows
         last['count'] += 1
@@ -371,7 +389,7 @@ def run_window(port, zoom, on_ready=None):
         if not last['rows']:
             return
         name = datetime.datetime.now().strftime('badge_%Y%m%d_%H%M%S.png')
-        save_png(name, last['rows'], zoom)
+        save_png(name, last['rows'], zoom_now[0])
         badge.logs.put(f'--- screenshot saved: {os.path.abspath(name)}')
 
     log_visible = tk.BooleanVar(value=True)
@@ -467,8 +485,20 @@ def run_window(port, zoom, on_ready=None):
     port_box.bind('<<ComboboxSelected>>', on_port)
     refresh_ports()
 
-    log = tk.Text(root, height=10, width=80, font=('Consolas', 9), bg='#111111', fg='#dddddd')
+    log = tk.Text(root, height=8, width=80, font=('Consolas', 9), bg='#111111', fg='#dddddd')
     log.grid(row=4, column=0, columnspan=4, sticky='we', pady=(6, 0))
+
+    # The first size: the biggest whole zoom with which the whole window fits on the screen (the task bar too)
+    root.update_idletasks()
+    if not fixed_zoom:
+        others = root.winfo_reqheight() - canvas.winfo_reqheight()
+        free_h = root.winfo_screenheight() - others - 120
+        free_w = root.winfo_screenwidth() - 60
+        zoom_now[0] = max(1, min(4, free_h // HEIGHT, free_w // WIDTH))
+        zoomed[0] = image.zoom(zoom_now[0])
+        canvas.itemconfigure(canvas_image, image=zoomed[0])
+        canvas.configure(width=WIDTH * zoom_now[0], height=HEIGHT * zoom_now[0])
+    root.minsize(root.winfo_reqwidth() // 2, others + HEIGHT + 30 if not fixed_zoom else 0)
 
     # Keyboard
     keys = {'Up': ('y', 'Y'), 'Down': ('x', 'X'), 'Left': ('a', 'A'), 'Right': ('b', 'B'), 'Return': ('b', 'B'),
