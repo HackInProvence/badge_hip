@@ -26,7 +26,7 @@
 #define FSK_SYNC_LEN 28
 /* The longest frame: the sync word, 8 symbols of length, the coded bits of 32 bytes + CRC (544 bits) */
 #define FSK_MAX_SYMS (FSK_SYNC_LEN + 8 + 272)
-#define FSK_SYMBOL_MS 20
+#define FSK_SYMBOL_MS 2  /* As set in the page (its strip: Symbole 2 ms): a frame of ~150 symbols lasts ~0.3 s */
 #define FSK_REPEATS 3  /* The receiver combines the copies */
 #define FSK_GAP_MS 300  /* Silence between the copies */
 

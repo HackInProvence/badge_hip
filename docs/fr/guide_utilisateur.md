@@ -447,8 +447,8 @@ sonde, brouilleur qui répète son code).
 - **Mon grade** : le portrait de votre grade de pirate en grand, son nom et les XP du grade suivant ; comme le badge
   nominatif, la page reste affichée (même sans alimentation), un bouton la quitte.
 - **Identifiant sonore** : le badge joue son identifiant (« Nom#1234 ») au buzzer, en sons très aigus (16 à 17,5 kHz,
-  à peine audibles), 3 fois (~10 s) ; un téléphone ou un PC le décode avec la page `docs/fsk-buzzer-link.html`
-  (Chrome, les tons réglés à 16000, 16500, 17000, 17500 Hz et 20 ms dans son bandeau, bouton « Écouter », micro
+  à peine audibles), 3 fois (~2 s) ; un téléphone ou un PC le décode avec la page `docs/fsk-buzzer-link.html`
+  (Chrome, les tons réglés à 16000, 16500, 17000, 17500 Hz et 2 ms dans son bandeau, bouton « Écouter », micro
   autorisé), près du badge. Aile droite : émettre ; aile gauche : arrêter / retour. Rien en mode muet.
 
 **Succès et grade** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès

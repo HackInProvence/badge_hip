@@ -7,7 +7,7 @@
  * buzzer in 4-FSK, FSK_REPEATS times; a phone or a PC decodes it with the page docs/fsk-buzzer-link.html (Écouter).
  * The frame: fsk_link.c. The tones: the PWM of the buzzer at the frequency of the tone (duty cycle 50 %), its period
  * changed at the end of a period (the registers of the RP2040 are double-buffered: the phase stays continuous); a
- * hardware repeating timer gives the 20 ms of each symbol (the receiver only syncs at the start of the frame). */
+ * hardware repeating timer gives the FSK_SYMBOL_MS of each symbol (the receiver only syncs at the start of the frame). */
 
 #include <stdio.h>
 #include <string.h>
