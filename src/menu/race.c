@@ -138,16 +138,25 @@ static bool on_page(void) {
 #define LEDS_MIDDLE 11
 #define LEDS_LAST 12
 static int leds_car = -1;
-static void car_leds(int car) {
+
+/* Sets the LEDs to \p car (see above), now */
+static void apply_leds(int car) {
     static const uint8_t RANKS[3][3] = {{0, 255, 0}, {255, 90, 0}, {255, 0, 0}};
-    if (car == leds_car || ! on_page())
-        return;
-    leds_car = car;
     const uint8_t *c = car >= LEDS_FIRST ? RANKS[car - LEDS_FIRST] : car >= 0 ? COLORS[car] : NULL;
     if (c)
         app_leds(c[0] / 2, c[1] / 2, c[2] / 2);
     else
         app_leds(0, 0, 0);
+}
+
+/* The LEDs become \p car (when this page is shown): set when they change, the rank traced */
+static void car_leds(int car) {
+    if (car == leds_car || ! on_page())
+        return;
+    if (car >= LEDS_FIRST)
+        printf("race: leds %s\n", car == LEDS_FIRST ? "green" : car == LEDS_LAST ? "red" : "orange");
+    leds_car = car;
+    apply_leds(car);
 }
 
 static absolute_time_t race_start(void) {
@@ -430,6 +439,11 @@ void race_service(absolute_time_t now) {
             if (ph == PH_RACE) {  /* The LEDs: green first, red last, orange between */
                 int r = my_rank();
                 car_leds(r == 1 ? LEDS_FIRST : r == n ? LEDS_LAST : LEDS_MIDDLE);
+                static absolute_time_t leds_ts = 0;
+                if (on_page() && absolute_time_diff_us(leds_ts, now) >= 1000000) {
+                    leds_ts = now;
+                    apply_leds(leds_car);  /* Again every second: something else may have changed the LEDs */
+                }
             }
         }
     }
@@ -896,4 +910,5 @@ const app_t app_race = {
     .calm = race_calm,
     .stop = race_stop,
     .no_saver = true,
+    .owns_leds = true,  /* The color of the car, then the rank: the animation of the badge does not change them */
 };
