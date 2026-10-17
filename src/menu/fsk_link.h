@@ -8,7 +8,8 @@
  * \brief The acoustic link of docs/fsk-buzzer-link.html (the receiver, a web page: it is the reference): a text
  * sent by the buzzer in 4-FSK, decoded by the microphone of a phone or a PC.
  *
- * 4 tones (FSK_TONES_HZ), FSK_SYMBOL_MS per symbol, 2 bits per symbol in Gray code (tone 0 = 00, 1 = 01, 2 = 11,
+ * 4 tones (FSK_TONES_HZ: 16000 / 16500 / 17000 / 17500 Hz, to set the same in the strip of the page), FSK_SYMBOL_MS
+ * per symbol, 2 bits per symbol in Gray code (tone 0 = 00, 1 = 01, 2 = 11,
  * 3 = 10). The frame: the sync word (28 symbols), the length in two Hamming(8,4) words (high nibble first), then
  * [data..., CRC-8] in a convolutional code K = 7, rate 1/2, polynomials 171 / 133 octal, 6 tail bits, interleaved in
  * blocks of 8 rows (padded to a multiple of 16 bits), 2 bits per symbol, MSB first. CRC-8: polynomial 0x07, init 0,

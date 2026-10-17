@@ -43,7 +43,7 @@ static void tone(uint16_t hz) {
         pwm_set_gpio_level(BADGE_BUZZER, 0);
         return;
     }
-    uint32_t wrap = clk_hz / hz - 1;  /* clkdiv 1: 125 MHz / 6000 Hz = 20833, within 16 bits */
+    uint32_t wrap = clk_hz / hz - 1;  /* clkdiv 1: 125 MHz / 16000 Hz = 7812, within 16 bits */
     pwm_set_wrap(slice, wrap);
     pwm_set_gpio_level(BADGE_BUZZER, (wrap + 1) / 2);
 }

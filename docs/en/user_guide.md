@@ -457,9 +457,10 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Achievements** (Succès): the achievements obtained and the rank of your cicada (see below).
 - **My rank** (Mon grade): the portrait of your pirate rank in large, its name and the XP of the next rank; like the
   name tag, the page stays on the screen (even without power), a button leaves it.
-- **Sound ID** (Identifiant sonore): the badge plays its identifier ("Name#1234") on the buzzer, in high tones (6 to
-  7.5 kHz), 3 times (~10 s); a phone or a PC decodes it with the page `docs/fsk-buzzer-link.html` (Chrome, button
-  "Écouter", microphone allowed), near the badge. Right wing: send; left wing: stop / back. Nothing in mute mode.
+- **Sound ID** (Identifiant sonore): the badge plays its identifier ("Name#1234") on the buzzer, in very high tones (16 to
+  17.5 kHz, hardly audible), 3 times (~10 s); a phone or a PC decodes it with the page `docs/fsk-buzzer-link.html`
+  (Chrome, the tones set to 16000, 16500, 17000, 17500 Hz and 20 ms in its strip, button "Écouter", microphone
+  allowed), near the badge. Right wing: send; left wing: stop / back. Nothing in mute mode.
 
 **Achievements and rank**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
 achievement gives XP, and each cicada met **2 XP**. The level, from 1 to 10, is a **pirate rank**; it is earned with
