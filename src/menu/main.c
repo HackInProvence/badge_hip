@@ -630,8 +630,9 @@ static void draw_list(int count, int sel, void (*label)(int, char *, size_t)) {
         label(i, text, sizeof(text));
         ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);  /* File names: cut expected */
         if (i == sel) {
+            /* The selected row: whole, scrolling if needed */
             gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, ROW_H-1, GFX_BLACK);
-            gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_LEFT);
+            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_LEFT);
         } else {
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
@@ -2977,8 +2978,13 @@ int main() {
                 redraw = true;
             }
 
+            /* A text scrolls on the page: drawn again for its next step */
+            if (app != A_SAVER && app != A_START_SAVER && ui_scroll_due(time_us_64()))
+                redraw = true;
+
             if (redraw) {
                 redraw = false;
+                ui_scroll_frame();
                 if (app == A_MENU)
                     render_menu(now);
                 else if (app == A_BROWSE)

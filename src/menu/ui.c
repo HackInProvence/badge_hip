@@ -21,51 +21,138 @@ const char UI_CHARSET_LONG[] = " abcdefghijklmnopqrstuvwxyz\x80\x81\x82\x83\x84\
                                "0123456789.,;:!?'\"-_+=/@#&%()*~$<>";
 
 
+/* ------ The slow scroll ------
+ * Each text that scrolls has a slot (its place on the page: x, y): when its text changes, it starts again from its
+ * beginning. Horizontal: the text from its k-th character, k growing by one every UI_SCROLL_STEP_MS after a pause,
+ * until its end shows, a pause, then again. Vertical (ui_wrapped()): the same with the lines. */
+#define SCROLL_SLOTS 8
+
+typedef struct {
+    int16_t x, y;
+    uint32_t hash;
+    uint64_t start_us;
+} scroll_slot_t;
+
+static scroll_slot_t slots[SCROLL_SLOTS];
+static int slot_next = 0;
+static bool scrolled = false;  /* Something scrolls on the page drawn */
+static uint64_t frame_us = 0;
+static uint64_t redraw_us = 0;  /* The next step */
+
+static uint32_t text_hash(const char *s) {
+    uint32_t h = 2166136261u;
+    while (*s)
+        h = (h ^ (uint8_t)*s++) * 16777619u;
+    return h;
+}
+
+/* The time since the text of the place (x, y) became \p text (ms) */
+static uint32_t scroll_age_ms(int x, int y, const char *text) {
+    uint32_t h = text_hash(text);
+    scroll_slot_t *s = NULL;
+    for (int i = 0; i < SCROLL_SLOTS && ! s; ++i)
+        if (slots[i].x == x && slots[i].y == y)
+            s = &slots[i];
+    if (! s) {
+        s = &slots[slot_next];
+        slot_next = (slot_next + 1) % SCROLL_SLOTS;
+        s->x = x;
+        s->y = y;
+        s->hash = h + 1;
+    }
+    if (s->hash != h) {
+        s->hash = h;
+        s->start_us = frame_us;
+    }
+    scrolled = true;
+    return (uint32_t)((frame_us - s->start_us) / 1000);
+}
+
+/* The step of a scroll of \p steps steps (characters or lines) after \p age_ms: 0 during the first pause, then one
+ * more every \p step_ms, \p steps during the last pause, and again */
+static int scroll_step(uint32_t age_ms, int steps, uint32_t step_ms) {
+    uint32_t cycle = 2 * UI_SCROLL_PAUSE_MS + steps * step_ms;
+    uint32_t t = age_ms % cycle;
+    if (t < UI_SCROLL_PAUSE_MS)
+        return 0;
+    int k = (t - UI_SCROLL_PAUSE_MS) / step_ms;
+    return k > steps ? steps : k;
+}
+
+void ui_scroll_frame(void) {
+    scrolled = false;
+    frame_us = time_us_64();
+}
+
+bool ui_scroll_due(uint64_t now_us) {
+    if (! scrolled)
+        return false;
+    if (! redraw_us)
+        redraw_us = now_us + UI_SCROLL_STEP_MS * 1000ull;
+    if (now_us < redraw_us)
+        return false;
+    redraw_us = 0;
+    return true;
+}
+
+static size_t utf8_next(const char *s, size_t i) {
+    if (! s[i])
+        return i;
+    ++i;
+    while ((s[i] & 0xC0) == 0x80)
+        ++i;
+    return i;
+}
+
+void ui_scroll_text(uint8_t *fb, int x, int y, int width, const gfx_font_t *font, const char *text, gfx_color_t color,
+                    gfx_align_t align) {
+    text = tr(text);
+    if (gfx_text_width(font, text) <= width) {
+        gfx_text(fb, x, y, font, text, color, align);
+        return;
+    }
+    /* The characters to skip so that the end shows: the scroll goes from 0 to there */
+    size_t len = strlen(text), last = 0;
+    int steps = 0;
+    while (last < len && gfx_text_width(font, text + last) > width) {
+        last = utf8_next(text, last);
+        ++steps;
+    }
+    int k = scroll_step(scroll_age_ms(x, y, text), steps, UI_SCROLL_STEP_MS);
+    size_t from = 0;
+    for (int i = 0; i < k; ++i)
+        from = utf8_next(text, from);
+    /* From there, as much as fits */
+    char shown[128];
+    size_t n = 0;
+    while (text[from + n] && n < sizeof(shown) - 4) {
+        size_t next = utf8_next(text + from, n);
+        memcpy(shown, text + from, next);
+        shown[next] = 0;
+        if (gfx_text_width(font, shown) > width)
+            break;
+        n = next;
+    }
+    memcpy(shown, text + from, n);
+    shown[n] = 0;
+    int left = align == GFX_ALIGN_CENTER ? x - width / 2 : x;
+    gfx_text(fb, left, y, font, shown, color, GFX_ALIGN_LEFT);
+}
+
+
 void ui_title(uint8_t *fb, const char *title) {
     ui_check_width(&gfx_font_medium, title, GFX_WIDTH - 2, "title");
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, UI_TITLE_H, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, (UI_TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
+    ui_scroll_text(fb, GFX_WIDTH/2, (UI_TITLE_H - gfx_font_medium.height)/2, GFX_WIDTH - 6, &gfx_font_medium, title,
+                   GFX_WHITE, GFX_ALIGN_CENTER);
 }
 
 
 void ui_footer(uint8_t *fb, const char *text) {
     ui_check_width(&gfx_font_small, text, GFX_WIDTH - 2, "footer");
-    text = tr(text);
-    if (gfx_text_width(&gfx_font_small, text) <= GFX_WIDTH - 2) {
-        gfx_fill_rect(fb, 0, UI_FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
-        gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-        return;
-    }
-    /* Too long for one line (a notification: a message, an announcement...): two lines, over the bottom of the page,
-     * cut at a space; the end of the second one with "..." if it is still too long */
-    const int h = gfx_font_small.height + 2, y0 = UI_FOOTER_Y - h;
-    char first[64], rest[100];
-    size_t cut = 0;
-    for (size_t i = 0; text[i] && i < sizeof(first) - 1; ++i) {
-        if (text[i] != ' ')
-            continue;
-        memcpy(first, text, i);
-        first[i] = 0;
-        if (gfx_text_width(&gfx_font_small, first) > GFX_WIDTH - 2)
-            break;
-        cut = i;
-    }
-    if (! cut) {  /* No space early enough: cut anywhere */
-        while (text[cut] && cut < sizeof(first) - 1) {
-            memcpy(first, text, cut + 1);
-            first[cut + 1] = 0;
-            if (gfx_text_width(&gfx_font_small, first) > GFX_WIDTH - 2)
-                break;
-            ++cut;
-        }
-    }
-    memcpy(first, text, cut);
-    first[cut] = 0;
-    ui_fit(&gfx_font_small, rest, sizeof(rest), text + cut + (text[cut] == ' '), GFX_WIDTH - 2);
-    gfx_fill_rect(fb, 0, y0 - 2, GFX_WIDTH, GFX_HEIGHT - y0 + 2, GFX_WHITE);
-    gfx_fill_rect(fb, 0, y0 - 2, GFX_WIDTH, 1, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, y0, &gfx_font_small, first, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, rest, GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_fill_rect(fb, 0, UI_FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
+    /* A long one (a notification: a message, an announcement...) scrolls */
+    ui_scroll_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, GFX_WIDTH - 4, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
 }
 
 
@@ -127,8 +214,9 @@ int ui_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *text) {
     text = tr(text);  /* Translated before it is split */
     while (*text) {
         text = next_line(text, line, sizeof(line));
-        ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
-        gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+        if (ui_check && gfx_text_width(font, line) > GFX_WIDTH - 4)
+            printf("uicheck: scrolls \"%s\"\n", line);
+        ui_scroll_text(fb, GFX_WIDTH/2, y, GFX_WIDTH - 4, font, line, GFX_BLACK, GFX_ALIGN_CENTER);
         ui_check_bottom(y + font->height, line);
         y += font->height + 3;
     }
@@ -162,8 +250,9 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
         label(i, text, sizeof(text));
         ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);
         if (i == sel) {
+            /* The selected row: whole, scrolling if needed (the others: a preview with "...") */
             gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, UI_ROW_H-1, GFX_BLACK);
-            gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_WHITE, GFX_ALIGN_LEFT);
+            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_LEFT);
         } else {
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
@@ -177,51 +266,55 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
 }
 
 
+/* The next line of a text cut at the spaces to fit the width (a word longer than the line is cut): into \p line,
+ * returns the rest of the text */
+static const char *wrap_line(const gfx_font_t *font, const char *text, char *line, size_t len) {
+    while (*text == ' ')
+        ++text;
+    size_t n = 0, fit = 0;
+    while (text[n] && text[n] != '\n' && n < len - 1) {
+        size_t end = n;
+        while (text[end] && text[end] != ' ' && text[end] != '\n' && end < len - 1)
+            ++end;
+        memcpy(line, text, end);
+        line[end] = 0;
+        if (gfx_text_width(font, line) > GFX_WIDTH - 6 && fit)
+            break;
+        fit = end;
+        n = end;
+        while (text[n] == ' ')
+            ++n;
+    }
+    if (! fit)
+        fit = n ? n : 1;
+    memcpy(line, text, fit);
+    line[fit] = 0;
+    text += fit;
+    return *text == '\n' ? text + 1 : text;
+}
+
 int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int max_lines) {
     char line[96];
-    int lines = 0;
     text = tr(text);
-    while (*text && lines < max_lines) {
-        while (*text == ' ')
-            ++text;
-        /* As many words as fit in the width (a word longer than the line is cut) */
-        size_t n = 0, fit = 0;
-        while (text[n] && text[n] != '\n' && n < sizeof(line) - 1) {
-            size_t end = n;
-            while (text[end] && text[end] != ' ' && text[end] != '\n' && end < sizeof(line) - 1)
-                ++end;
-            memcpy(line, text, end);
-            line[end] = 0;
-            if (gfx_text_width(font, line) > GFX_WIDTH - 6 && fit)
-                break;
-            fit = end;
-            n = end;
-            while (text[n] == ' ')
-                ++n;
-        }
-        if (! fit)
-            fit = n ? n : 1;
-        memcpy(line, text, fit);
-        line[fit] = 0;
-        bool more = lines == max_lines - 1 && text[fit] && strspn(text + fit, " \n") != strlen(text + fit);
-        if (more && ui_check)
-            printf("uicheck: cut (more than %d lines): \"%s\"\n", max_lines, text);
-        char fitted[100];
-        if (more) {
-            /* The last line allowed and some text left: the rest from here, ended by "..." (never cut silently) */
-            snprintf(line, sizeof(line), "%s", text);
-            for (char *c = line; *c; ++c)
-                if (*c == '\n')
-                    *c = ' ';
-        }
-        ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
-        gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+    /* More lines than the place: the window of max_lines lines scrolls a line at a time (the lines are cut twice:
+     * counted, then drawn; no table of lines, the RAM is short) */
+    int n_lines = 0;
+    for (const char *t = text; *t; ++n_lines)
+        t = wrap_line(font, t, line, sizeof(line));
+    int first = 0;
+    if (n_lines > max_lines) {
+        if (ui_check)
+            printf("uicheck: scrolls (more than %d lines): \"%s\"\n", max_lines, text);
+        first = scroll_step(scroll_age_ms(-1, y, text), n_lines - max_lines, UI_SCROLL_LINE_MS);
+    }
+    const char *t = text;
+    for (int i = 0; *t && i < first + max_lines; ++i) {
+        t = wrap_line(font, t, line, sizeof(line));
+        if (i < first)
+            continue;
+        ui_scroll_text(fb, GFX_WIDTH/2, y, GFX_WIDTH - 4, font, line, GFX_BLACK, GFX_ALIGN_CENTER);
         ui_check_bottom(y + font->height, line);
         y += font->height + 3;
-        ++lines;
-        text += fit;
-        if (*text == '\n')
-            ++text;
     }
     return y;
 }

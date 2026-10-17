@@ -32,6 +32,22 @@
 void ui_title(uint8_t *fb, const char *title);
 void ui_footer(uint8_t *fb, const char *text);
 
+/* ------ Slow scroll: a text wider than its place is never cut, it scrolls (a character every UI_SCROLL_STEP_MS,
+ * a pause at both ends); a paragraph longer than its lines scrolls a line at a time. The main loop draws the page
+ * again while something scrolls (ui_scroll_frame(), ui_scroll_due()). */
+#define UI_SCROLL_STEP_MS 400
+#define UI_SCROLL_PAUSE_MS 1500
+#define UI_SCROLL_LINE_MS 2000
+
+/** \brief Draws \p text at (x, y) like gfx_text(), in \p width pixels at most (centered on \p x with
+ * GFX_ALIGN_CENTER, from \p x with GFX_ALIGN_LEFT); wider, it scrolls slowly. */
+void ui_scroll_text(uint8_t *fb, int x, int y, int width, const gfx_font_t *font, const char *text, gfx_color_t color,
+                    gfx_align_t align);
+/** \brief Before drawing a page: forget whether something scrolls. */
+void ui_scroll_frame(void);
+/** \brief After drawing it, in the main loop: the page must be drawn again for the next step of a scroll. */
+bool ui_scroll_due(uint64_t now_us);
+
 /** \brief Text truncated with "..." to fit in \p width pixels. */
 void ui_fit(const gfx_font_t *font, char *dst, size_t len, const char *src, int width);
 /** \brief ui_fit() for a preview (a row of a list, a file name of the SD card): its cut is expected. */
