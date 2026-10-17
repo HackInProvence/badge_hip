@@ -13,7 +13,7 @@ const i18n_lang_t I18N_LANGS[] = {
     {"it", "Italiano"},
 };
 
-const int I18N_N_TEXTS = 1322;
+const int I18N_N_TEXTS = 1324;
 
 /* The French texts, by FNV-1a hash */
 const i18n_text_t I18N_TEXTS[] = {
@@ -151,6 +151,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x1AE61469u, "Pas de fichier .EPV sur la carte"},
     {0x1AECCA52u, "Roi de la contrebande"},
     {0x1B70F0ECu, "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %d joueurs min."},
+    {0x1C03C671u, "Message privé"},
     {0x1C6BFC1Du, "LEDs blanches, radio,\nécran, processeur.\nDepuis %lu min %02lu s\nADC %u, %lu pings"},
     {0x1CA1AD55u, "Lien (URL)"},
     {0x1D548532u, "Croiser une cigale qui\npartage une compétence."},
@@ -824,6 +825,7 @@ const i18n_text_t I18N_TEXTS[] = {
     {0x9C12311Cu, "Bleu (B) : %u"},
     {0x9C32857Cu, "Lavande"},
     {0x9C57B83Au, "aube"},
+    {0x9C9A9F27u, "G : retour  D : lire"},
     {0x9CC22C09u, "respiration"},
     {0x9CC722F5u, "prête"},
     {0x9D140ECAu, "La partie commence..."},
@@ -1477,6 +1479,7 @@ static const char *const TEXTS_DE[] = {
     "Keine .EPV-Datei auf der Karte",
     "Schmugglerkönig",
     "Jeder hat ein geheimes Ziel: geh ganz nah ran, um es zu erledigen. Min. %d Spieler.",
+    "Private Nachricht",
     "Weiße LEDs, Funk,\nBildschirm, Prozessor.\nSeit %lu min %02lu s\nADC %u, %lu Pings",
     "Link (URL)",
     "Zikade mit gleichem\nSkill treffen.",
@@ -2150,6 +2153,7 @@ static const char *const TEXTS_DE[] = {
     "Blau (B): %u",
     "Lavendel",
     "Morgen",
+    "L: zurück  R: lesen",
     "Atmen",
     "OK",
     "Das Spiel beginnt...",
@@ -2803,6 +2807,7 @@ static const char *const TEXTS_EN[] = {
     "No .EPV file on the card",
     "Smuggling king",
     "Everyone has a secret target: get very close to kill it. %d players min.",
+    "Private message",
     "White LEDs, radio,\nscreen, processor.\nFor %lu min %02lu s\nADC %u, %lu pings",
     "Link (URL)",
     "Meet a cicada that\nshares a skill.",
@@ -3476,6 +3481,7 @@ static const char *const TEXTS_EN[] = {
     "Blue (B): %u",
     "Lavender",
     "dawn",
+    "L: back  R: read",
     "breathing",
     "ready",
     "The game starts...",
@@ -4129,6 +4135,7 @@ static const char *const TEXTS_ES[] = {
     "No hay .EPV en la tarjeta",
     "Rey del contrabando",
     "Cada uno tiene un objetivo secreto: acércate mucho para abatirlo. Mín. %d jugadores.",
+    "Mensaje privado",
     "LED blancos, radio,\npantalla, procesador.\nDesde hace %lu min %02lu s\nADC %u, %lu pings",
     "Web (URL)",
     "Halla una cigarra que\ncomparta una habilidad.",
@@ -4802,6 +4809,7 @@ static const char *const TEXTS_ES[] = {
     "Azul (B): %u",
     "Lavanda",
     "alba",
+    "I: volver  D: leer",
     "respiración",
     "lista",
     "La partida empieza...",
@@ -5455,6 +5463,7 @@ static const char *const TEXTS_IT[] = {
     "Nessun file .EPV sulla scheda",
     "Re del contrabbando",
     "Ognuno ha un bersaglio segreto: avvicinati molto per eliminarlo. Min. %d giocatori.",
+    "Messaggio privato",
     "LED bianchi, radio,\nschermo, processore.\nDa %lu min %02lu s\nADC %u, %lu ping",
     "Link (URL)",
     "Incontra una cicala con\nuna competenza comune.",
@@ -6128,6 +6137,7 @@ static const char *const TEXTS_IT[] = {
     "Blu (B): %u",
     "Lavanda",
     "alba",
+    "S: indietro  D: leggi",
     "respiro",
     "pronta",
     "La partita inizia...",

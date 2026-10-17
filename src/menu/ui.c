@@ -30,8 +30,42 @@ void ui_title(uint8_t *fb, const char *title) {
 
 void ui_footer(uint8_t *fb, const char *text) {
     ui_check_width(&gfx_font_small, text, GFX_WIDTH - 2, "footer");
-    gfx_fill_rect(fb, 0, UI_FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    text = tr(text);
+    if (gfx_text_width(&gfx_font_small, text) <= GFX_WIDTH - 2) {
+        gfx_fill_rect(fb, 0, UI_FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
+        gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+        return;
+    }
+    /* Too long for one line (a notification: a message, an announcement...): two lines, over the bottom of the page,
+     * cut at a space; the end of the second one with "..." if it is still too long */
+    const int h = gfx_font_small.height + 2, y0 = UI_FOOTER_Y - h;
+    char first[64], rest[100];
+    size_t cut = 0;
+    for (size_t i = 0; text[i] && i < sizeof(first) - 1; ++i) {
+        if (text[i] != ' ')
+            continue;
+        memcpy(first, text, i);
+        first[i] = 0;
+        if (gfx_text_width(&gfx_font_small, first) > GFX_WIDTH - 2)
+            break;
+        cut = i;
+    }
+    if (! cut) {  /* No space early enough: cut anywhere */
+        while (text[cut] && cut < sizeof(first) - 1) {
+            memcpy(first, text, cut + 1);
+            first[cut + 1] = 0;
+            if (gfx_text_width(&gfx_font_small, first) > GFX_WIDTH - 2)
+                break;
+            ++cut;
+        }
+    }
+    memcpy(first, text, cut);
+    first[cut] = 0;
+    ui_fit(&gfx_font_small, rest, sizeof(rest), text + cut + (text[cut] == ' '), GFX_WIDTH - 2);
+    gfx_fill_rect(fb, 0, y0 - 2, GFX_WIDTH, GFX_HEIGHT - y0 + 2, GFX_WHITE);
+    gfx_fill_rect(fb, 0, y0 - 2, GFX_WIDTH, 1, GFX_BLACK);
+    gfx_text(fb, GFX_WIDTH/2, y0, &gfx_font_small, first, GFX_BLACK, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH/2, UI_FOOTER_Y, &gfx_font_small, rest, GFX_BLACK, GFX_ALIGN_CENTER);
 }
 
 
@@ -169,10 +203,17 @@ int ui_wrapped(uint8_t *fb, int y, const gfx_font_t *font, const char *text, int
             fit = n ? n : 1;
         memcpy(line, text, fit);
         line[fit] = 0;
-        if (lines == max_lines - 1 && text[fit] && text[fit] != '\n' && strspn(text + fit, " ") != strlen(text + fit))
-            if (ui_check)
-                printf("uicheck: cut (more than %d lines): \"%s\"\n", max_lines, text);
+        bool more = lines == max_lines - 1 && text[fit] && strspn(text + fit, " \n") != strlen(text + fit);
+        if (more && ui_check)
+            printf("uicheck: cut (more than %d lines): \"%s\"\n", max_lines, text);
         char fitted[100];
+        if (more) {
+            /* The last line allowed and some text left: the rest from here, ended by "..." (never cut silently) */
+            snprintf(line, sizeof(line), "%s", text);
+            for (char *c = line; *c; ++c)
+                if (*c == '\n')
+                    *c = ' ';
+        }
         ui_fit(font, fitted, sizeof(fitted), line, GFX_WIDTH - 4);
         gfx_text(fb, GFX_WIDTH/2, y, font, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
         ui_check_bottom(y + font->height, line);

@@ -605,9 +605,7 @@ static void draw_title(const char *title) {
 }
 
 static void draw_footer(const char *text) {
-    ui_check_width(&gfx_font_small, text, GFX_WIDTH - 2, "footer");
-    gfx_fill_rect(fb, 0, FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
+    ui_footer(fb, text);  /* A status too long (a notification) on two lines */
 }
 
 /* Text truncated with "..." to fit in the width */
@@ -2702,7 +2700,7 @@ int main() {
             notify(APPS[APP_WEREWOLF], notif);  /* "Loup-garou : Nuit 2 : Loups" */
         messages_task(now);
         if (messages_new(notif, sizeof(notif)))
-            notify(NULL, notif);
+            notify(APPS[APP_MESSAGES], notif);  /* The page shows the whole message (messages.c) */
         announce_task(now);
         if (announce_new(notif, sizeof(notif))) {
             announce_open_newest();  /* The page shows it right away */

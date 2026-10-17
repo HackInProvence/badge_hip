@@ -53,6 +53,7 @@ static int n_inbox = 0;
 static seen_t seen[SEEN];
 static int seen_next = 0;
 static bool new_message = false;
+static bool open_newest = false;  /* The next opening of the page shows the newest message (the notification) */
 static uint32_t n_relayed = 0;
 
 static bool already_seen(uint32_t origin, uint16_t uid) {
@@ -115,6 +116,7 @@ bool messages_new(char *buf, int len) {
     if (! new_message)
         return false;
     new_message = false;
+    open_newest = true;
     snprintf(buf, len, _("%s : %s"), inbox[0].name, tr(MESSAGES[inbox[0].message]));
     return true;
 }
@@ -142,7 +144,7 @@ static void send_message(uint32_t recipient, int message) {
 
 /* ------ The page: inbox, then write (choose the recipient and the message) ------ */
 
-enum { V_INBOX, V_RECIPIENT, V_MESSAGE, V_SENT };
+enum { V_INBOX, V_RECIPIENT, V_MESSAGE, V_SENT, V_READ };
 
 typedef struct {
     uint32_t id;
@@ -198,8 +200,9 @@ static void message_label(int i, char *buf, size_t len) {
 
 static void msg_start(absolute_time_t now) {
     (void)now;
-    view = V_INBOX;
-    sel = 0;
+    view = open_newest && n_inbox ? V_READ : V_INBOX;  /* From the notification: the message at once, whole */
+    sel = view == V_READ ? 1 : 0;
+    open_newest = false;
     new_message = false;
 }
 
@@ -212,8 +215,25 @@ static bool msg_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_A) {
         if (view == V_INBOX)
             return false;
+        int read = view == V_READ ? sel : 0;
         view = view == V_MESSAGE ? V_RECIPIENT : V_INBOX;
-        sel = 0;
+        sel = read;  /* Back from a message: the same row of the inbox */
+        return true;
+    }
+    if (view == V_READ) {
+        /* A message, whole: right wing: answer its sender; the flanks: the previous / next one */
+        if ((b->pressed & UI_BTN_Y) && sel > 1)
+            --sel;
+        if ((b->pressed & UI_BTN_X) && sel < n_inbox)
+            ++sel;
+        if (b->pressed & UI_BTN_B) {
+            list_recipients();
+            for (int i = 0; i < n_recipients; ++i)
+                if (recipients[i].id == inbox[sel - 1].from)
+                    recipient = i;
+            view = V_MESSAGE;
+            sel = 0;
+        }
         return true;
     }
     int n = count();
@@ -224,16 +244,12 @@ static bool msg_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_B) {
         switch (view) {
         case V_INBOX:
-            list_recipients();
             if (sel > 0) {
-                /* Answer the sender of this message */
-                for (int i = 0; i < n_recipients; ++i)
-                    if (recipients[i].id == inbox[sel - 1].from)
-                        recipient = i;
-                view = V_MESSAGE;
-            } else {
-                view = V_RECIPIENT;
+                view = V_READ;  /* The message, whole (the row of the list is cut) */
+                return true;
             }
+            list_recipients();
+            view = V_RECIPIENT;
             sel = 0;
             break;
         case V_RECIPIENT:
@@ -271,8 +287,19 @@ static void msg_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), _("Messages (%d)"), n_inbox);
         ui_title(fb, text);
         ui_list(fb, n_inbox + 1, sel, inbox_label);
-        ui_footer(fb, sel ? N_("G : retour  D : répondre") : N_("G : retour  D : écrire"));
+        ui_footer(fb, sel ? N_("G : retour  D : lire") : N_("G : retour  D : écrire"));
         break;
+    case V_READ: {
+        const inbox_t *m = &inbox[sel - 1];
+        snprintf(text, sizeof(text), "%s#%04X", m->name, (unsigned)(m->from & 0xFFFF));
+        ui_title(fb, text);
+        int y = UI_TITLE_H + 6;
+        if (m->to_me)
+            y = ui_lines(fb, y, &gfx_font_small, N_("Message privé")) + 2;
+        ui_wrapped(fb, y + 4, &gfx_font_medium, MESSAGES[m->message], 5);
+        ui_footer(fb, N_("G : retour  D : répondre"));
+        break;
+    }
     case V_RECIPIENT:
         ui_title(fb, N_("A qui ?"));
         ui_list(fb, n_recipients, sel, recipient_label);
