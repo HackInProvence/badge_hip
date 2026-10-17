@@ -221,8 +221,8 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
 **Mini-bolides** (2 à 4 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
 d'un circuit plus grand que l'écran (l'écran suit votre voiture, noire ; les autres sont creuses).
 - 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course.
-- **Flanc droit** : accélérer ; **flanc gauche** : freiner puis reculer ; **ailes** : tourner (maintenues). L'herbe
-  ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage (côté droit, haut de l'épingle, côté gauche) comptent dans l'ordre :
+- **Aile droite** : accélérer ; **aile gauche** : freiner puis reculer ; **flancs** : tourner (maintenus ; le flanc
+  gauche à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage (côté droit, haut de l'épingle, côté gauche) comptent dans l'ordre :
   couper par l'herbe en sautant l'un d'eux ne compte pas le tour.
 - En haut : le tour (« Tour 2/3 ») et votre place (« 1/3 »). L'écran se redessine environ 4 fois par seconde.
 - La course finit quand tout le monde est arrivé, ou 30 s après le premier ; le classement donne les temps, puis

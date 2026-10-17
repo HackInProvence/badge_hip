@@ -231,8 +231,8 @@ drawn at random; with an odd number of players, one of them is the **Referee** (
 **Micro racers** (Mini-bolides, 2 to 4 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
 of a track bigger than the screen (the screen follows your car, black; the others are hollow).
 - 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race.
-- **Right side**: accelerate; **left side**: brake then back up; **wings**: steer (held). The grass slows you down a
-  lot. Both wings held 1.5 s: give up (the others go on). The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
+- **Right wing**: accelerate; **left wing**: brake then back up; **sides**: steer (held; the left side to the
+  left). Off the road (the grass), the car slows down a lot. Both wings held 1.5 s: give up (the others go on). The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
   skipping one does not count the lap.
 - At the top: the lap ("Lap 2/3") and your place ("1/3"). The screen is drawn about 4 times per second.
 - The race ends when everybody has finished, or 30 s after the first one; the ranking gives the times, then the lap

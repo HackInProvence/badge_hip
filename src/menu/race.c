@@ -6,7 +6,8 @@
 /* Mini-bolides: a race of small cars seen from above, like Micro Machines, for 2 to 4 cicadas, in the lobby of
  * party.c. Every badge drives its car on the same track (TRACK, 384 x 288 pixels: more than the screen, which follows
  * the car); LAPS laps, the checkpoints 1, 2, 3 in order (a shortcut through the grass does not count).
- * The right flank accelerates, the left one brakes then backs up, the wings turn; the grass slows the car down.
+ * The right wing accelerates, the left one brakes then backs up, the flanks turn (left flank: left); off the road
+ * (the grass) the car slows down.
  * Each badge sends the state of its car now and then (K_STATE, to everybody) and draws the other cars from the last
  * state received, moved on with their speed (the screen shows ~4 images per second, the physics runs at 30 Hz).
  * The start is the same on every badge (the start time of party.c), the result too: the finish times travel in
@@ -203,7 +204,7 @@ static void checkpoint(car_t *c, int line, absolute_time_t now) {
 /* The physics of this badge's car, one tick */
 static void drive(car_t *c, float dt, absolute_time_t now) {
     bool racing = phase == PH_RACE && ! c->finish;
-    bool gas = racing && (held & UI_BTN_X), brake = racing && (held & UI_BTN_Y);
+    bool gas = racing && (held & UI_BTN_B), brake = racing && (held & UI_BTN_A);
     float vmax = tile_at(c->x, c->y) == '#' ? V_GRASS : V_ROAD;
     if (gas)
         c->speed += ACCEL * dt;
@@ -217,11 +218,11 @@ static void drive(car_t *c, float dt, absolute_time_t now) {
         c->speed = c->speed - BRAKE * dt > vmax ? c->speed - BRAKE * dt : vmax;  /* Into the grass: slowed down */
     if (c->speed < V_BACK)
         c->speed = V_BACK;
-    /* The wings turn while held, when the car moves or the gas / brake is held (stopped against an edge, it must
-     * be able to turn away); backing up: the other way, like a car */
-    if ((held & (UI_BTN_A | UI_BTN_B)) && (c->speed > 4 || c->speed < -4 || gas || brake)
+    /* The flanks turn while held (the left one to the left), when the car moves or the gas / brake is held (stopped
+     * against an edge, it must be able to turn away); backing up: the other way, like a car */
+    if ((held & (UI_BTN_X | UI_BTN_Y)) && (c->speed > 4 || c->speed < -4 || gas || brake)
             && absolute_time_diff_us(turn_ts, now) >= TURN_MS * 1000) {
-        int d = (held & UI_BTN_B ? 1 : -1) * (c->speed < 0 ? -1 : 1);
+        int d = (held & UI_BTN_X ? 1 : -1) * (c->speed < 0 ? -1 : 1);
         c->angle = (c->angle + d + DIRS) % DIRS;
         turn_ts = now;
     }
@@ -670,7 +671,7 @@ static void render_race(uint8_t *fb) {
     gfx_text(fb, GFX_WIDTH - 4, 0, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_RIGHT);
     if (phase == PH_GRID) {  /* The controls, before the start */
         gfx_fill_rect(fb, 0, UI_FOOTER_Y - 3, GFX_WIDTH, GFX_HEIGHT - UI_FOOTER_Y + 3, GFX_WHITE);
-        ui_footer(fb, N_("Flanc D : gaz  G / D : tourner"));  /* (G + D held: give up) */
+        ui_footer(fb, N_("D : gaz  G : frein  flancs : tourner"));  /* (G + D held: give up) */
     }
 }
 
@@ -742,8 +743,8 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
         } else {
             ui_list(fb, 2, sel, home_label);
             ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 12, &gfx_font_small, N_("Course de petites voitures, 2 à 4 "
-                       "pilotes, 3 tours. Flanc droit : gaz, flanc gauche : frein, ailes : tourner. L'herbe "
-                       "ralentit !"), 5);
+                       "pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la "
+                       "piste, la voiture ralentit !"), 5);
             ui_footer(fb, N_("G : retour  D : choisir"));
         }
         break;
