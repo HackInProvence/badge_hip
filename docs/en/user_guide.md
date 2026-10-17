@@ -65,7 +65,7 @@ The main menu groups the features by theme:
 |---|---|
 | **Media** (Médias) | Images, Videos (SD card), Music (SD card), Ringtones, Speed reading (RSVP), Gamebooks, Volume |
 | **Solo games** (Jeux solo) | Tic-tac-toe, Connect 4, Simon, Reflexes, Snake, Minesweeper, 2048, 15 puzzle, Sokoban, Mastermind, Hangman, Blind test, CTF, Crypto CTF |
-| **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war |
+| **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war, Micro racers |
 | **Social** | Cicada network, Messages, Contacts, Skills, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
 | **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements |
@@ -210,7 +210,7 @@ The texts are in French.
   "Fleet OK" (Flotte OK) or "CHEAT!" (TRICHE !).
 - At the end of a game: right wing: play again; left wing: quit.
 
-**Group games**: **Tug of war** (Tir à la corde), **Assassin** and **Werewolf** (Loup-garou) are played by several
+**Group games**: **Tug of war** (Tir à la corde), **Micro racers** (Mini-bolides), **Assassin** and **Werewolf** (Loup-garou) are played by several
 badges, over the radio, with the same lobby:
 - "Create a game" (Créer une partie; "Host a game", Mener une partie, at the werewolf): your badge hosts the game and
   lists the players who join it. Right wing: start (when there are enough players); left wing: cancel.
@@ -227,6 +227,16 @@ drawn at random; with an odd number of players, one of them is the **Referee** (
   team reaches its mark and wins at once; otherwise, the strongest at the end of the 20 s wins.
 - The result: the winning team, the score "Cicadas - Ants", your pulls and the best puller; green LEDs for the
   winners, red for the losers. Right wing: back to the choice Create / Join; left wing: back.
+
+**Micro racers** (Mini-bolides, 2 to 4 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
+of a track bigger than the screen (the screen follows your car, black; the others are hollow).
+- 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race.
+- **Right side**: accelerate; **left side**: brake then back up; **wings**: steer (held). The grass slows you down a
+  lot. The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
+  skipping one does not count the lap.
+- At the top: the lap ("Lap 2/3") and your place ("1/3"). The screen is drawn about 4 times per second.
+- The race ends when everybody has finished, or 30 s after the first one; the ranking gives the times, then the lap
+  reached by those who did not finish. Right wing: play again; left wing: back.
 
 **Assassin** (3 players at least; 2 when the host is in admin mode): a game that lasts the whole conference.
 - At the start, the host draws a secret ring: each player gets a **target**, and is himself the target of another one.

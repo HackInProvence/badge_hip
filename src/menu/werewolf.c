@@ -1805,7 +1805,8 @@ static const char *other_game(void) {
                                                && s != PARTY_STARTED))
         return NULL;
     return party_game() == PARTY_GAME_TUG ? N_("tir à la corde")
-           : party_game() == PARTY_GAME_ASSASSIN ? N_("Assassin") : N_("un autre jeu");
+           : party_game() == PARTY_GAME_ASSASSIN ? N_("Assassin")
+           : party_game() == PARTY_GAME_RACE ? N_("Mini-bolides") : N_("un autre jeu");
 }
 
 static void ww_render(uint8_t *fb, absolute_time_t now) {

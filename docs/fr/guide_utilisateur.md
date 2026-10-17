@@ -62,7 +62,7 @@ Le menu principal regroupe les fonctions par thème :
 |---|---|
 | **Médias** | Images, Vidéos, Musique, Sonneries, Lecture rapide, Livres-jeux, Volume |
 | **Jeux solo** | Morpion, Puissance 4, Simon, Réflexes, Snake, Démineur, 2048, Taquin, Sokoban, Mastermind, Pendu, Blind test, CTF, Défis crypto |
-| **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde |
+| **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde, Mini-bolides |
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
@@ -217,6 +217,16 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
   fin des 20 s gagne.
 - Le résultat : l'équipe gagnante, le score « Cigales - Fourmis », vos tractions et le meilleur tireur ; LEDs vertes
   pour les gagnants, rouges pour les perdants. Aile droite : revenir au choix Créer / Rejoindre ; aile gauche : retour.
+
+**Mini-bolides** (2 à 4 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
+d'un circuit plus grand que l'écran (l'écran suit votre voiture, noire ; les autres sont creuses).
+- 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course.
+- **Flanc droit** : accélérer ; **flanc gauche** : freiner puis reculer ; **ailes** : tourner (maintenues). L'herbe
+  ralentit beaucoup. Les points de passage (côté droit, haut de l'épingle, côté gauche) comptent dans l'ordre :
+  couper par l'herbe en sautant l'un d'eux ne compte pas le tour.
+- En haut : le tour (« Tour 2/3 ») et votre place (« 1/3 »). L'écran se redessine environ 4 fois par seconde.
+- La course finit quand tout le monde est arrivé, ou 30 s après le premier ; le classement donne les temps, puis
+  le tour atteint par ceux qui ne sont pas arrivés. Aile droite : rejouer ; aile gauche : retour.
 
 **Assassin** (3 joueurs au moins ; 2 quand l'hôte est en mode admin) : un jeu qui dure toute la conférence.
 - Au lancement, l'hôte tire un cercle secret : chaque joueur reçoit une **cible**, et lui-même est la cible

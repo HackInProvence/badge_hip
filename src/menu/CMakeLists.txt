@@ -47,6 +47,7 @@ target_sources(badge_menu PRIVATE
     werewolf_cards.c
     assassin.c
     tug.c
+    race.c
     tug_logic.c
     assassin_logic.c
     gamebook.c

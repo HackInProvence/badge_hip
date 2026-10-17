@@ -608,6 +608,7 @@ static const char *busy_game(void) {
         return NULL;
     return party_game() == PARTY_GAME_TUG ? N_("Tir à la corde")
            : party_game() == PARTY_GAME_WEREWOLF ? N_("Loup-garou")
+           : party_game() == PARTY_GAME_RACE ? N_("Mini-bolides")
            : "?";
 }
 

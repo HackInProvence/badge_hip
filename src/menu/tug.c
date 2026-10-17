@@ -330,7 +330,7 @@ static const char *busy_game(void) {
     if (party_state() != PARTY_STARTED || party_game() == PARTY_GAME_TUG)
         return NULL;
     return party_game() == PARTY_GAME_ASSASSIN ? N_("Assassin") : party_game() == PARTY_GAME_WEREWOLF ? N_("Loup-garou")
-           : "?";
+           : party_game() == PARTY_GAME_RACE ? N_("Mini-bolides") : "?";
 }
 
 static void back_home(void) {

@@ -37,7 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from badge_remote import Badge  # noqa: E402
 from badge_selftest import Tester, open_theme, TOP  # noqa: E402
 
-JEUX = ['Duel', 'Bataille navale', 'Loup-garou', 'Assassin', 'Tir à la corde']
+JEUX = ['Duel', 'Bataille navale', 'Loup-garou', 'Assassin', 'Tir à la corde', 'Mini-bolides']
 TUG = JEUX.index('Tir à la corde')  # Order of the "Jeux multi" theme in src/menu/main.c (SUBMENUS)
 ASSASSIN = JEUX.index('Assassin')
 

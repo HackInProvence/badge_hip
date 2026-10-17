@@ -479,6 +479,7 @@ static bool notify(const app_t *a, const char *msg) {
 
 /* The group games run when their page is not shown (tug.c, assassin.c) */
 void tug_service(absolute_time_t now);
+void race_service(absolute_time_t now);
 void assassin_service(absolute_time_t now);
 bool assassin_event(char *buf, int len);
 void werewolf_service(absolute_time_t now);
@@ -724,8 +725,8 @@ static const submenu_t SUBMENUS[] = {
     {N_("Jeux solo"), 14, {M_TICTACTOE, M_CONNECT4, M_SIMON, M_REFLEX, M_SNAKE, M_APP(APP_MINES), M_APP(APP_2048),
                        M_APP(APP_TAQUIN), M_APP(APP_SOKOBAN), M_APP(APP_MASTERMIND), M_APP(APP_PENDU), M_BLIND_TEST,
                        M_CTF, M_APP(APP_CRYPTO)}},
-    {N_("Jeux multi"), 5, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
-                           M_APP(APP_TUG)}},
+    {N_("Jeux multi"), 6, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
+                           M_APP(APP_TUG), M_APP(APP_RACE)}},
     /* Programme (program.c) is not in the menu: the program of the conference can change after the badges are
      * flashed. To put it back: M_APP(APP_PROGRAM) after APP_SKILLS, 12 entries, and MENU_PROGRAM 1 (the demo mode) */
     {N_("Social"), 11, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS),
@@ -2740,6 +2741,7 @@ int main() {
         party_task(now);
         smuggler_task(now);
         tug_service(now);
+        race_service(now);
         assassin_service(now);
         werewolf_service(now);
         battery_task(now);

@@ -42,6 +42,7 @@ typedef enum {
     PARTY_GAME_TUG = 1,  /* Tir à la corde (tug.c) */
     PARTY_GAME_ASSASSIN,  /* Assassin (assassin.c) */
     PARTY_GAME_WEREWOLF,  /* Loup-garou (werewolf.c) */
+    PARTY_GAME_RACE,  /* Mini-bolides (race.c) */
 } party_game_t;
 
 typedef enum {
