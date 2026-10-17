@@ -228,8 +228,12 @@ drawn at random; with an odd number of players, one of them is the **Referee** (
 - The result: the winning team, the score "Cicadas - Ants", your pulls and the best puller; green LEDs for the
   winners, red for the losers. Right wing: back to the choice Create / Join; left wing: back.
 
-**Micro racers** (Mini-bolides, 2 to 4 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
-of a track bigger than the screen (the screen follows your car, black; the others are hollow).
+**Micro racers** (Mini-bolides, 2 to 8 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
+of a track bigger than the screen (the screen follows your car, framed).
+- Each car has a **color** (red, blue, green, yellow, purple, orange, cyan, pink: the LEDs of its badge, in the
+  waiting room and during the race) and a **pattern** on the screen (solid, hollow, checkered, stripes...). The
+  waiting room shows the pattern, the name and the color of each driver, "(you)" for yours; your pattern is also in
+  the bar of the race.
 - 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race.
 - **Right wing**: accelerate; **left wing**: brake then back up; **sides**: steer (held; the left side to the
   left). Off the road (the grass), the car slows down a lot. Both wings held 1.5 s: give up (the others go on). The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and

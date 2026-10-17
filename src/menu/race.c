@@ -3,7 +3,7 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/* Mini-bolides: a race of small cars seen from above, like Micro Machines, for 2 to 4 cicadas, in the lobby of
+/* Mini-bolides: a race of small cars seen from above, like Micro Machines, for 2 to 8 cicadas, in the lobby of
  * party.c. Every badge drives its car on the same track (TRACK, 384 x 288 pixels: more than the screen, which follows
  * the car); LAPS laps, the checkpoints 1, 2, 3 in order (a shortcut through the grass does not count).
  * The right wing accelerates, the left one brakes then backs up, the flanks turn (left flank: left); off the road
@@ -24,7 +24,7 @@
 #include "net.h"
 #include "party.h"
 
-#define MAX_CARS 4
+#define MAX_CARS 8
 #define MIN_PLAYERS 2
 #define LAPS 3
 #define START_DELAY_MS 2500
@@ -85,7 +85,15 @@ static const int16_t LINES[4][4] = {
 #define WORLD_W (TRACK_W * TILE)
 #define WORLD_H (TRACK_H * TILE)
 /* The grid, behind the start line (x of the line: 7 * 16), heading east */
-static const int16_t GRID[MAX_CARS][2] = {{98, 26}, {98, 54}, {74, 40}, {50, 26}};
+static const int16_t GRID[MAX_CARS][2] = {{98, 26}, {98, 54}, {80, 40}, {62, 26}, {62, 54}, {44, 40}, {36, 26},
+                                           {36, 54}};
+
+/* The car of each place of the roster: its color (the LEDs of its badge, its name in the lobby) and its pattern on
+ * the black and white screen (draw_square()) */
+static const char *const COLOR_NAMES[MAX_CARS] = {N_("Rouge"), N_("Bleu"), N_("Vert"), N_("Jaune"), N_("Violet"),
+                                                  N_("Orange"), N_("Cyan"), N_("Rose")};
+static const uint8_t COLORS[MAX_CARS][3] = {{255, 0, 0}, {0, 0, 255}, {0, 255, 0}, {255, 180, 0}, {150, 0, 255},
+                                            {255, 70, 0}, {0, 220, 220}, {255, 0, 110}};
 
 enum { P_HOME, P_SCAN, P_LOBBY, P_GAME };
 enum { PH_WAIT, PH_GRID, PH_COUNTDOWN, PH_RACE, PH_RESULT };
@@ -122,6 +130,18 @@ static int order[MAX_CARS];  /* The ranking, index in cars */
 
 static bool on_page(void) {
     return app_current() == &app_race;
+}
+
+/* The LEDs of this badge in the color of its car (the place \p car in the roster), half bright */
+static int leds_car = -1;
+static void car_leds(int car) {
+    if (car == leds_car || ! on_page())
+        return;
+    leds_car = car;
+    if (car < 0)
+        app_leds(0, 0, 0);
+    else
+        app_leds(COLORS[car][0] / 2, COLORS[car][1] / 2, COLORS[car][2] / 2);
 }
 
 static absolute_time_t race_start(void) {
@@ -332,6 +352,7 @@ static void result(void) {
     if (on_page()) {
         app_tone(won ? 1319 : 440, 400);
         app_leds(won ? 0 : 255, won ? 255 : 80, 0);
+        leds_car = -2;
     }
 }
 
@@ -367,10 +388,10 @@ void race_service(absolute_time_t now) {
         changed = true;
         if (ph == PH_RACE) {
             printf("race: go!\n");
-            if (on_page()) {
+            if (on_page())
                 app_tone(1760, 300);
-                app_leds(0, 255, 0);
-            }
+            leds_car = -2;
+            car_leds(me);  /* The race: the color of the car */
         }
     }
     if (ph == PH_COUNTDOWN) {
@@ -381,6 +402,7 @@ void race_service(absolute_time_t now) {
             if (on_page()) {
                 app_tone(880, 120);
                 app_leds(255, left > 1 ? 0 : 160, 0);
+                leds_car = -2;  /* The countdown: red, then yellow */
             }
         }
     }
@@ -567,6 +589,11 @@ static bool race_task(absolute_time_t now) {
             list_ts = now;
             n_lobby = party_players(lobby, MAX_CARS);
             changed = true;
+            int mine = -1;
+            for (int i = 0; i < n_lobby; ++i)
+                if (lobby[i].id == net_id())
+                    mine = i;
+            car_leds(mine);  /* The lobby: the LEDs in the color of this badge's car */
         }
     }
     if (! changed || absolute_time_diff_us(frame_ts, now) < FRAME_MS * 1000ll)
@@ -617,29 +644,48 @@ static void draw_track(uint8_t *fb, int cx, int cy) {
         }
 }
 
-/* A car: a capsule of 3 squares along its direction, the front marked; this badge's car black, the others hollow */
-static void draw_car(uint8_t *fb, const car_t *c, int cx, int cy, bool mine) {
+/* A square of 7 x 7 pixels centered on (x, y) with the pattern of the car \p car (its place in the roster): 0 black,
+ * 1 hollow, 2 checkered, 3 horizontal stripes, 4 vertical stripes, 5 a dot inside, 6 diagonal, 7 a cross; \p zoom:
+ * 2 for the lobby */
+static void draw_square(uint8_t *fb, int x, int y, int car, int zoom, int min_y, gfx_color_t color) {
+    for (int j = 0; j < 7; ++j)
+        for (int i = 0; i < 7; ++i) {
+            bool edge = i == 0 || j == 0 || i == 6 || j == 6, ink;
+            switch (car % MAX_CARS) {
+            case 0: ink = true; break;
+            case 1: ink = edge; break;
+            case 2: ink = edge || (i + j) % 2 == 0; break;
+            case 3: ink = edge || j % 2 == 0; break;
+            case 4: ink = edge || i % 2 == 0; break;
+            case 5: ink = edge || (i >= 2 && i <= 4 && j >= 2 && j <= 4); break;
+            case 6: ink = edge || (i + j) % 3 == 0; break;
+            default: ink = edge || i == 3 || j == 3; break;
+            }
+            if (ink && y + (j - 3) * zoom >= min_y)
+                gfx_fill_rect(fb, x + (i - 3) * zoom, y + (j - 3) * zoom, zoom, zoom, color);
+        }
+}
+
+/* A car: a capsule of 3 squares along its direction with its pattern, the front marked; this badge's car framed */
+static void draw_car(uint8_t *fb, const car_t *c, int car, int cx, int cy, bool mine) {
     float dx = dir_cos(c->angle), dy = dir_sin(c->angle);
     int x0 = (int)c->x - cx, y0 = (int)c->y - cy;
-    if (x0 < -10 || x0 > GFX_WIDTH + 10 || y0 < BAR_H - 10 || y0 > GFX_HEIGHT + 10)
+    if (x0 < -12 || x0 > GFX_WIDTH + 12 || y0 < BAR_H - 12 || y0 > GFX_HEIGHT + 12)
         return;
+    for (int k = -1; k <= 1; ++k) {  /* White under it: the car shows over the grass */
+        int x = x0 + (int)lroundf(dx * 4 * k), y = y0 + (int)lroundf(dy * 4 * k);
+        if (y - 4 >= BAR_H)
+            gfx_fill_rect(fb, x - 4, y - 4, 9, 9, GFX_WHITE);
+    }
     for (int k = -1; k <= 1; ++k) {
         int x = x0 + (int)lroundf(dx * 4 * k), y = y0 + (int)lroundf(dy * 4 * k);
-        if (y - 3 >= BAR_H) {
-            gfx_fill_rect(fb, x - 3, y - 3, 7, 7, GFX_BLACK);
-            if (! mine)
-                gfx_fill_rect(fb, x - 2, y - 2, 5, 5, GFX_WHITE);
-        }
+        draw_square(fb, x, y, car, 1, BAR_H, GFX_BLACK);
     }
-    if (! mine)
-        for (int k = -1; k <= 1; ++k) {  /* The outline again over the inside of the next square */
-            int x = x0 + (int)lroundf(dx * 4 * k), y = y0 + (int)lroundf(dy * 4 * k);
-            if (y - 2 >= BAR_H)
-                gfx_fill_rect(fb, x - 1, y - 1, 3, 3, GFX_WHITE);
-        }
     int fx = x0 + (int)lroundf(dx * 7), fy = y0 + (int)lroundf(dy * 7);  /* The front */
     if (fy - 1 >= BAR_H)
-        gfx_fill_rect(fb, fx - 1, fy - 1, 3, 3, mine ? GFX_WHITE : GFX_BLACK);
+        gfx_fill_rect(fb, fx - 1, fy - 1, 3, 3, GFX_BLACK);
+    if (mine && y0 - 9 >= BAR_H)  /* This badge's car: a frame around it */
+        gfx_rect(fb, x0 - 9, y0 - 9, 19, 19, GFX_BLACK);
 }
 
 static void render_race(uint8_t *fb) {
@@ -652,8 +698,8 @@ static void render_race(uint8_t *fb) {
     draw_track(fb, cx, cy);
     for (int i = 0; i < n; ++i)
         if (i != me)
-            draw_car(fb, &cars[i], cx, cy, false);
-    draw_car(fb, m, cx, cy, true);
+            draw_car(fb, &cars[i], i, cx, cy, false);
+    draw_car(fb, m, me, cx, cy, true);
     /* The bar: the lap, the rank, the countdown */
     char text[40];
     gfx_fill_rect(fb, 0, 0, GFX_WIDTH, BAR_H - 2, GFX_BLACK);
@@ -668,7 +714,11 @@ static void render_race(uint8_t *fb) {
         snprintf(text, sizeof(text), _("Tour %d/%d"), lap, LAPS);
     gfx_text(fb, 4, 0, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_LEFT);
     snprintf(text, sizeof(text), "%d/%d", my_rank(), n);
-    gfx_text(fb, GFX_WIDTH - 4, 0, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_RIGHT);
+    int w = gfx_text(fb, GFX_WIDTH - 4, 0, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_RIGHT);
+    (void)w;
+    /* This badge's pattern in the bar */
+    int px = GFX_WIDTH - 16 - gfx_text_width(&gfx_font_small, text);
+    draw_square(fb, px, 8, me, 2, 0, GFX_WHITE);  /* In white on the black bar, twice as big */
     if (phase == PH_GRID) {  /* The controls, before the start */
         gfx_fill_rect(fb, 0, UI_FOOTER_Y - 3, GFX_WIDTH, GFX_HEIGHT - UI_FOOTER_Y + 3, GFX_WHITE);
         ui_footer(fb, N_("D : gaz  G : frein  flancs : tourner"));  /* (G + D held: give up) */
@@ -679,19 +729,23 @@ static void render_result(uint8_t *fb) {
     char text[48];
     ui_title(fb, N_("Arrivée"));
     int y = UI_TITLE_H + 4;
+    const gfx_font_t *font = n > 5 ? &gfx_font_small : &gfx_font_medium;
+    int row = n > 5 ? 18 : 24;
     for (int i = 0; i < n; ++i) {
         const car_t *c = &cars[order[i]];
         if (c->finish)
             snprintf(text, sizeof(text), "%d. %s  %u.%02u s", i + 1, c->name, c->finish / 100, c->finish % 100);
         else
             snprintf(text, sizeof(text), _("%d. %s  (tour %d)"), i + 1, c->name, c->laps < 0 ? 1 : c->laps + 1);
+        gfx_fill_rect(fb, 6, y + row / 2 - 6, 13, 13, GFX_WHITE);
+        draw_square(fb, 12, y + row / 2 - 1, order[i], 1, 0, GFX_BLACK);  /* The pattern of the car */
         if (order[i] == me) {
-            gfx_fill_rect(fb, 2, y - 1, GFX_WIDTH - 4, 20, GFX_BLACK);
-            gfx_text(fb, 8, y, &gfx_font_medium, text, GFX_WHITE, GFX_ALIGN_LEFT);
+            gfx_fill_rect(fb, 22, y - 1, GFX_WIDTH - 24, row - 2, GFX_BLACK);
+            ui_scroll_text(fb, 26, y, GFX_WIDTH - 30, font, text, GFX_WHITE, GFX_ALIGN_LEFT);
         } else {
-            gfx_text(fb, 8, y, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_LEFT);
+            ui_scroll_text(fb, 26, y, GFX_WIDTH - 30, font, text, GFX_BLACK, GFX_ALIGN_LEFT);
         }
-        y += 24;
+        y += row;
     }
     ui_footer(fb, N_("G : retour  D : rejouer"));
 }
@@ -702,7 +756,7 @@ static void render_lobby(uint8_t *fb) {
     case PARTY_HOSTING:
         ui_title(fb, N_("Ta partie"));
         snprintf(text, sizeof(text), _("%d / %d pilotes"), n_lobby, MAX_CARS);
-        ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text : N_("Il faut 2 joueurs au moins."));
+        ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text : N_("Il faut 2 joueurs au moins."));
         break;
     case PARTY_JOINING:
         ui_title(fb, N_("Rejoindre"));
@@ -712,7 +766,7 @@ static void render_lobby(uint8_t *fb) {
     case PARTY_JOINED:
         ui_title(fb, N_("Salle d'attente"));
         snprintf(text, sizeof(text), _("Partie de %s"), party_name(party_host_id()));
-        ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, text);
+        ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
         break;
     default:
         ui_title(fb, N_("Mini-bolides"));
@@ -720,9 +774,15 @@ static void render_lobby(uint8_t *fb) {
         ui_footer(fb, N_("D : OK"));
         return;
     }
-    for (int i = 0; i < n_lobby; ++i) {
-        snprintf(text, sizeof(text), "%d. %s", i + 1, lobby[i].id ? lobby[i].name : "...");
-        gfx_text(fb, 20, UI_TITLE_H + 28 + i * 22, &gfx_font_medium, text, GFX_BLACK, GFX_ALIGN_LEFT);
+    /* The cars: 2 columns of 4, the pattern (as on the track), the name, the color (the LEDs of that badge) */
+    for (int i = 0; i < n_lobby && i < MAX_CARS; ++i) {
+        int x = i % 2 ? GFX_WIDTH / 2 + 2 : 4, y = UI_TITLE_H + 24 + i / 2 * 32;
+        draw_square(fb, x + 8, y + 14, i, 2, 0, GFX_BLACK);
+        bool mine = lobby[i].id == net_id();
+        snprintf(text, sizeof(text), "%s", lobby[i].id ? lobby[i].name : "...");
+        ui_scroll_text(fb, x + 20, y, GFX_WIDTH / 2 - 24, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
+        snprintf(text, sizeof(text), mine ? _("%s (toi)") : "%s", tr(COLOR_NAMES[i]));
+        ui_scroll_text(fb, x + 20, y + 15, GFX_WIDTH / 2 - 24, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
     }
     ui_footer(fb, party_state() == PARTY_JOINED ? N_("G : quitter")
               : n_lobby >= MIN_PLAYERS ? N_("G : annuler  D : lancer") : N_("G : annuler"));
@@ -742,7 +802,7 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
             ui_footer(fb, N_("G : retour"));
         } else {
             ui_list(fb, 2, sel, home_label);
-            ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 12, &gfx_font_small, N_("Course de petites voitures, 2 à 4 "
+            ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 12, &gfx_font_small, N_("Course de petites voitures, 2 à 8 "
                        "pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la "
                        "piste, la voiture ralentit !"), 5);
             ui_footer(fb, N_("G : retour  D : choisir"));
@@ -786,6 +846,7 @@ static bool race_calm(void) {
 
 static void race_stop(void) {
     app_leds(0, 0, 0);
+    leds_car = -1;
 }
 
 const app_t app_race = {

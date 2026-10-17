@@ -563,7 +563,7 @@ msgstr ""
 #: src/menu/assassin.c:947
 #: src/menu/lang.c:47
 #: src/menu/messages.c:306
-#: src/menu/race.c:748
+#: src/menu/race.c:809
 #: src/menu/reset.c:123
 msgid "G : retour  D : choisir"
 msgstr "S: indietro  D: scegli"
@@ -727,34 +727,34 @@ msgid "Éliminé par %s"
 msgstr "Ucciso da %s"
 
 #: src/menu/assassin.c:597
-#: src/menu/race.c:433
+#: src/menu/race.c:455
 #: src/menu/tug.c:305
 #: src/menu/werewolf.c:1441
 msgid "%s  %u joueurs"
 msgstr "%s  %u gioc."
 
 #: src/menu/assassin.c:598
-#: src/menu/race.c:433
+#: src/menu/race.c:455
 #: src/menu/tug.c:306
 #: src/menu/werewolf.c:1442
 msgid "%s  %u joueur"
 msgstr "%s  %u gioc."
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:438
+#: src/menu/race.c:460
 #: src/menu/tug.c:310
 msgid "Créer une partie"
 msgstr "Crea una partita"
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:438
+#: src/menu/race.c:460
 #: src/menu/tug.c:310
 #: src/menu/werewolf.c:1417
 msgid "Rejoindre une partie"
 msgstr "Entra in una partita"
 
 #: src/menu/assassin.c:609
-#: src/menu/race.c:458
+#: src/menu/race.c:480
 #: src/menu/tug.c:501
 #: src/menu/tug.c:536
 #: src/menu/tug.c:542
@@ -763,7 +763,7 @@ msgid "Tir à la corde"
 msgstr "Tiro alla fune"
 
 #: src/menu/assassin.c:610
-#: src/menu/race.c:459
+#: src/menu/race.c:481
 #: src/menu/tug.c:332
 #: src/menu/werewolf.c:258
 #: src/menu/werewolf.c:1582
@@ -772,11 +772,11 @@ msgid "Loup-garou"
 msgstr "Lupo mannaro"
 
 #: src/menu/assassin.c:611
-#: src/menu/race.c:718
-#: src/menu/race.c:736
-#: src/menu/race.c:767
-#: src/menu/race.c:771
-#: src/menu/race.c:792
+#: src/menu/race.c:773
+#: src/menu/race.c:797
+#: src/menu/race.c:828
+#: src/menu/race.c:832
+#: src/menu/race.c:854
 msgid "Mini-bolides"
 msgstr "Mini bolidi"
 
@@ -786,7 +786,7 @@ msgid "+%d autres"
 msgstr "+%d altri"
 
 #: src/menu/assassin.c:811
-#: src/menu/race.c:703
+#: src/menu/race.c:758
 #: src/menu/tug.c:480
 msgid "Ta partie"
 msgstr "Partita"
@@ -803,41 +803,41 @@ msgstr "Servono almeno %d giocatori."
 #: src/menu/assassin.c:818
 #: src/menu/assassin.c:823
 #: src/menu/main.c:3010
-#: src/menu/race.c:710
-#: src/menu/race.c:728
+#: src/menu/race.c:765
+#: src/menu/race.c:789
 #: src/menu/smuggler.c:536
 msgid "G : annuler"
 msgstr "S: annulla"
 
 #: src/menu/assassin.c:818
-#: src/menu/race.c:728
+#: src/menu/race.c:789
 #: src/menu/tug.c:485
 msgid "G : annuler  D : lancer"
 msgstr "S: annulla  D: avvia"
 
 #: src/menu/assassin.c:821
 #: src/menu/assassin.c:952
-#: src/menu/race.c:708
-#: src/menu/race.c:753
+#: src/menu/race.c:763
+#: src/menu/race.c:814
 #: src/menu/tug.c:488
 #: src/menu/tug.c:642
 msgid "Rejoindre"
 msgstr "Entra"
 
 #: src/menu/assassin.c:822
-#: src/menu/race.c:709
+#: src/menu/race.c:764
 #: src/menu/tug.c:489
 msgid "Connexion..."
 msgstr "Accesso..."
 
 #: src/menu/assassin.c:826
-#: src/menu/race.c:713
+#: src/menu/race.c:768
 #: src/menu/tug.c:493
 msgid "Salle d'attente"
 msgstr "Sala d'attesa"
 
 #: src/menu/assassin.c:827
-#: src/menu/race.c:714
+#: src/menu/race.c:769
 #: src/menu/tug.c:494
 msgid "Partie de %s"
 msgstr "Partita di %s"
@@ -849,7 +849,7 @@ msgstr "In attesa dell'avvio..."
 
 #: src/menu/assassin.c:831
 #: src/menu/games.c:873
-#: src/menu/race.c:727
+#: src/menu/race.c:788
 #: src/menu/tug.c:498
 msgid "G : quitter"
 msgstr "S: esci"
@@ -864,7 +864,7 @@ msgid "Assassin"
 msgstr "Assassin"
 
 #: src/menu/assassin.c:835
-#: src/menu/race.c:719
+#: src/menu/race.c:774
 #: src/menu/tug.c:502
 msgid ""
 "Partie annulée par l'hôte\n"
@@ -874,7 +874,7 @@ msgstr ""
 "(o avviata senza di te)."
 
 #: src/menu/assassin.c:836
-#: src/menu/race.c:720
+#: src/menu/race.c:775
 #: src/menu/tug.c:503
 msgid "D : OK"
 msgstr "D: OK"
@@ -920,7 +920,7 @@ msgid "Distribution des cibles..."
 msgstr "Assegnazione bersagli..."
 
 #: src/menu/assassin.c:859
-#: src/menu/race.c:772
+#: src/menu/race.c:833
 #: src/menu/tug.c:543
 msgid ""
 "Réception de la liste\n"
@@ -1050,7 +1050,7 @@ msgid "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %
 msgstr "Ognuno ha un bersaglio segreto: avvicinati molto per eliminarlo. Min. %d giocatori."
 
 #: src/menu/assassin.c:955
-#: src/menu/race.c:756
+#: src/menu/race.c:817
 #: src/menu/tug.c:645
 #: src/menu/werewolf.c:1853
 msgid "G : retour  D : rejoindre"
@@ -2534,34 +2534,42 @@ msgid "Rétablir"
 msgstr "Ripristina"
 
 #: src/menu/ledcast.c:124
+#: src/menu/race.c:93
 msgid "Jaune"
 msgstr "Giallo"
 
 #: src/menu/ledcast.c:124
+#: src/menu/race.c:94
 msgid "Orange"
 msgstr "Arancio"
 
 #: src/menu/ledcast.c:124
+#: src/menu/race.c:93
 msgid "Rouge"
 msgstr "Rosso"
 
 #: src/menu/ledcast.c:124
+#: src/menu/race.c:93
 msgid "Vert"
 msgstr "Verde"
 
 #: src/menu/ledcast.c:125
+#: src/menu/race.c:93
 msgid "Bleu"
 msgstr "Blu"
 
 #: src/menu/ledcast.c:125
+#: src/menu/race.c:94
 msgid "Cyan"
 msgstr "Ciano"
 
 #: src/menu/ledcast.c:125
+#: src/menu/race.c:94
 msgid "Rose"
 msgstr "Rosa"
 
 #: src/menu/ledcast.c:125
+#: src/menu/race.c:93
 msgid "Violet"
 msgstr "Viola"
 
@@ -4117,68 +4125,72 @@ msgstr "Record: %u parola di fila"
 msgid "Record : %u mots d'affilée"
 msgstr "Record: %u parole di fila"
 
-#: src/menu/race.c:664
+#: src/menu/race.c:710
 msgid "Sur la grille"
 msgstr "In griglia"
 
-#: src/menu/race.c:666
+#: src/menu/race.c:712
 msgid "Arrivé %u.%02u s"
 msgstr "Arrivato %u.%02u s"
 
-#: src/menu/race.c:668
+#: src/menu/race.c:714
 msgid "Tour %d/%d"
 msgstr "Giro %d/%d"
 
-#: src/menu/race.c:674
+#: src/menu/race.c:725
 msgid "D : gaz  G : frein  flancs : tourner"
 msgstr "D: gas  S: freno  lati: sterza"
 
-#: src/menu/race.c:680
+#: src/menu/race.c:731
 msgid "Arrivée"
 msgstr "Arrivo"
 
-#: src/menu/race.c:687
+#: src/menu/race.c:740
 msgid "%d. %s  (tour %d)"
 msgstr "%d. %s  (giro %d)"
 
-#: src/menu/race.c:696
+#: src/menu/race.c:751
 #: src/menu/tug.c:617
 msgid "G : retour  D : rejouer"
 msgstr "S: indietro  D: rigioca"
 
-#: src/menu/race.c:704
+#: src/menu/race.c:759
 msgid "%d / %d pilotes"
 msgstr "%d / %d piloti"
 
-#: src/menu/race.c:705
+#: src/menu/race.c:760
 #: src/menu/tug.c:483
 msgid "Il faut 2 joueurs au moins."
 msgstr "Servono almeno 2 giocatori."
 
-#: src/menu/race.c:739
+#: src/menu/race.c:785
+msgid "%s (toi)"
+msgstr "%s (tu)"
+
+#: src/menu/race.c:800
 #: src/menu/tug.c:629
 msgid "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la d'abord."
 msgstr "Una partita di %s è in corso sul tuo badge: finiscila o lasciala prima."
 
-#: src/menu/race.c:745
-msgid "Course de petites voitures, 2 à 4 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
-msgstr "Corsa di macchinine, da 2 a 4 piloti, 3 giri. Ala destra: gas, ala sinistra: freno, lati: sterzare. Fuori pista l'auto rallenta!"
+#: src/menu/race.c:806
+msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
+msgstr "Corsa di macchinine, da 2 a 8 piloti, 3 giri. Ala destra: gas, ala sinistra: freno, lati: sterzare. Fuori pista l'auto rallenta!"
 
-#: src/menu/race.c:758
+#: src/menu/race.c:819
 msgid "Recherche des courses..."
 msgstr "Ricerca delle corse..."
 
-#: src/menu/race.c:768
+#: src/menu/race.c:829
 #: src/menu/tug.c:537
 msgid "Partie annulée par l'hôte."
 msgstr "Annullata dall'host."
 
-#: src/menu/race.c:769
+#: src/menu/race.c:830
 #: src/menu/tug.c:538
 msgid "G : retour  D : OK"
 msgstr "S: indietro  D: OK"
 
-#: src/menu/race.c:773
+#: src/menu/race.c:834
 #: src/menu/tug.c:544
 msgid "G long : quitter la page"
 msgstr "S lungo: esci"
@@ -6609,6 +6621,9 @@ msgstr "File .EPV non valido"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Formato video non supportato"
+
+#~ msgid "Course de petites voitures, 2 à 4 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
+#~ msgstr "Corsa di macchinine, da 2 a 4 piloti, 3 giri. Ala destra: gas, ala sinistra: freno, lati: sterzare. Fuori pista l'auto rallenta!"
 
 #~ msgid "Flanc D : gaz  G / D : tourner"
 #~ msgstr "Lato D: gas  S / D: sterza"

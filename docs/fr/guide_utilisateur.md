@@ -218,8 +218,12 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
 - Le résultat : l'équipe gagnante, le score « Cigales - Fourmis », vos tractions et le meilleur tireur ; LEDs vertes
   pour les gagnants, rouges pour les perdants. Aile droite : revenir au choix Créer / Rejoindre ; aile gauche : retour.
 
-**Mini-bolides** (2 à 4 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
-d'un circuit plus grand que l'écran (l'écran suit votre voiture, noire ; les autres sont creuses).
+**Mini-bolides** (2 à 8 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
+d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
+- Chaque voiture a une **couleur** (rouge, bleu, vert, jaune, violet, orange, cyan, rose : les LEDs de son badge,
+  dans la salle d'attente et pendant la course) et un **motif** à l'écran (pleine, creuse, damier, rayures...). La
+  salle d'attente montre le motif, le nom et la couleur de chaque pilote, « (toi) » pour la vôtre ; votre motif est
+  aussi dans la barre de la course.
 - 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course.
 - **Aile droite** : accélérer ; **aile gauche** : freiner puis reculer ; **flancs** : tourner (maintenus ; le flanc
   gauche à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage (côté droit, haut de l'épingle, côté gauche) comptent dans l'ordre :
