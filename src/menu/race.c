@@ -132,16 +132,22 @@ static bool on_page(void) {
     return app_current() == &app_race;
 }
 
-/* The LEDs of this badge in the color of its car (the place \p car in the roster), half bright */
+/* The LEDs of this badge, half bright: the color of its car (\p car: its place in the roster, in the lobby and on
+ * the grid), or during the race its rank (LEDS_FIRST green, LEDS_MIDDLE orange, LEDS_LAST red); -1: off */
+#define LEDS_FIRST 10
+#define LEDS_MIDDLE 11
+#define LEDS_LAST 12
 static int leds_car = -1;
 static void car_leds(int car) {
+    static const uint8_t RANKS[3][3] = {{0, 255, 0}, {255, 90, 0}, {255, 0, 0}};
     if (car == leds_car || ! on_page())
         return;
     leds_car = car;
-    if (car < 0)
-        app_leds(0, 0, 0);
+    const uint8_t *c = car >= LEDS_FIRST ? RANKS[car - LEDS_FIRST] : car >= 0 ? COLORS[car] : NULL;
+    if (c)
+        app_leds(c[0] / 2, c[1] / 2, c[2] / 2);
     else
-        app_leds(COLORS[car][0] / 2, COLORS[car][1] / 2, COLORS[car][2] / 2);
+        app_leds(0, 0, 0);
 }
 
 static absolute_time_t race_start(void) {
@@ -390,8 +396,7 @@ void race_service(absolute_time_t now) {
             printf("race: go!\n");
             if (on_page())
                 app_tone(1760, 300);
-            leds_car = -2;
-            car_leds(me);  /* The race: the color of the car */
+            leds_car = -2;  /* The race: the LEDs follow the rank (below) */
         }
     }
     if (ph == PH_COUNTDOWN) {
@@ -422,6 +427,10 @@ void race_service(absolute_time_t now) {
                     coast(&cars[i], dt, now);
             rank();
             changed = true;
+            if (ph == PH_RACE) {  /* The LEDs: green first, red last, orange between */
+                int r = my_rank();
+                car_leds(r == 1 ? LEDS_FIRST : r == n ? LEDS_LAST : LEDS_MIDDLE);
+            }
         }
     }
     /* This badge's car for the others (on the grid too: they see it before the start) */
@@ -606,6 +615,34 @@ static bool race_task(absolute_time_t now) {
 /* The track seen from (cx, cy), the top left corner of the screen in the world, below the bar of the race */
 #define BAR_H 18
 
+/* The start line and the checkpoints: a dashed line across the band (bold: the next one to pass), its number */
+static void draw_lines(uint8_t *fb, int cx, int cy, int next) {
+    for (int k = 1; k < 4; ++k) {
+        int x0 = LINES[k][0] - cx, y0 = LINES[k][1] - cy, x1 = LINES[k][2] - cx, y1 = LINES[k][3] - cy;
+        bool across_x = x1 - x0 > y1 - y0;  /* A horizontal band: the line goes along x */
+        int w = k == next ? 3 : 1;
+        int mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+        if (across_x) {
+            for (int x = x0; x <= x1; x += 6)
+                if (my - w / 2 >= BAR_H)
+                    gfx_fill_rect(fb, x, my - w / 2, 4, w, GFX_BLACK);
+        } else {
+            for (int y = y0; y <= y1; y += 6)
+                if (y >= BAR_H)
+                    gfx_fill_rect(fb, mx - w / 2, y, w, 4, GFX_BLACK);
+        }
+        /* The number in a box, on the road: the middle of the part of the band over the road */
+        int lx = across_x ? (k == 1 ? LINES[k][0] + 24 : LINES[k][2] - 24) - cx : mx;
+        int ly = across_x ? my : LINES[k][3] - 24 - cy;
+        if (ly - 7 >= BAR_H && lx > -8 && lx < GFX_WIDTH + 8 && ly < GFX_HEIGHT + 8) {
+            char t[2] = {(char)('0' + k), 0};
+            gfx_fill_rect(fb, lx - 6, ly - 8, 12, 16, k == next ? GFX_BLACK : GFX_WHITE);
+            gfx_rect(fb, lx - 6, ly - 8, 12, 16, GFX_BLACK);
+            gfx_text(fb, lx, ly - 8, &gfx_font_small, t, k == next ? GFX_WHITE : GFX_BLACK, GFX_ALIGN_CENTER);
+        }
+    }
+}
+
 static void draw_track(uint8_t *fb, int cx, int cy) {
     for (int sy = BAR_H; sy < GFX_HEIGHT; ++sy) {
         int wy = cy + sy;
@@ -696,6 +733,7 @@ static void render_race(uint8_t *fb) {
     if (cx > WORLD_W - GFX_WIDTH) cx = WORLD_W - GFX_WIDTH;
     if (cy > WORLD_H - GFX_HEIGHT) cy = WORLD_H - GFX_HEIGHT;
     draw_track(fb, cx, cy);
+    draw_lines(fb, cx, cy, m->finish ? -1 : m->cp == 3 ? 0 : m->cp + 1);  /* 0: the start line next (drawn checkered) */
     for (int i = 0; i < n; ++i)
         if (i != me)
             draw_car(fb, &cars[i], i, cx, cy, false);

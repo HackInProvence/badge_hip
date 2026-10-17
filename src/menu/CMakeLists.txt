@@ -48,6 +48,8 @@ target_sources(badge_menu PRIVATE
     assassin.c
     tug.c
     race.c
+    fsk_link.c
+    fsk_id.c
     tug_logic.c
     assassin_logic.c
     gamebook.c

@@ -1,0 +1,346 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta charset="utf-8">
+<title>FSK Buzzer Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: two instrument panels (TX / RX) side by side, stacking on phone; a shared parameter strip on top. */
+:root{
+  --bg:#f3f4f2; --panel:#ffffff; --fg:#1d2120; --muted:#6b7370; --line:#d6dad7;
+  --accent:#0b7a6e; --accent-ink:#ffffff;
+  --t0:#c75b1a; --t1:#b8860b; --t2:#0b7a6e; --t3:#3a5bb8;
+  --ok:#1f8a4c; --bad:#b83232; --meter:#e4e7e5;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141817; --panel:#1d2220; --fg:#e7eae8; --muted:#97a09c; --line:#303835;
+  --accent:#3fc1b0; --accent-ink:#0f1413;
+  --t0:#f08a4a; --t1:#e3b84a; --t2:#3fc1b0; --t3:#7d9cf0;
+  --ok:#4fc27a; --bad:#ef6a6a; --meter:#262c2a; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#141817; --panel:#1d2220; --fg:#e7eae8; --muted:#97a09c; --line:#303835;
+  --accent:#3fc1b0; --accent-ink:#0f1413;
+  --t0:#f08a4a; --t1:#e3b84a; --t2:#3fc1b0; --t3:#7d9cf0;
+  --ok:#4fc27a; --bad:#ef6a6a; --meter:#262c2a; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:16px}
+header h1{font-size:1.35rem;font-weight:600;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:65ch}
+.strip{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.strip label{display:grid;gap:3px;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.strip input{font:500 .95rem var(--mono);width:6.5em;padding:5px 7px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg)}
+.strip .hint{font-size:.8rem;color:var(--muted);flex-basis:100%;margin:0;max-width:none}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.panels{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:12px;align-content:start;min-width:0}
+.panel h2{margin:0;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.panel h2 .st{font-family:var(--mono);text-transform:none;letter-spacing:0;font-size:.78rem;padding:2px 8px;border-radius:999px;background:var(--meter)}
+.st.on{background:var(--accent);color:var(--accent-ink)}
+textarea{width:100%;font:1rem var(--mono);padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg);resize:vertical;min-height:2.6em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:500 .9rem var(--sans);padding:8px 14px;border-radius:4px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+.syms{font:.8rem/1.7 var(--mono);word-break:break-all;color:var(--muted)}
+.s0{color:var(--t0)}.s1{color:var(--t1)}.s2{color:var(--t2)}.s3{color:var(--t3)}
+canvas{width:100%;height:120px;display:block;background:var(--meter);border-radius:4px;max-width:100%}
+.meter{display:grid;grid-template-columns:5.5em 1fr 4.5em;gap:8px;align-items:center;font:.8rem var(--mono)}
+.meter .bar{height:8px;background:var(--meter);border-radius:4px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:var(--accent)}
+.meter.t0 .bar i{background:var(--t0)}.meter.t1 .bar i{background:var(--t1)}.meter.t2 .bar i{background:var(--t2)}.meter.t3 .bar i{background:var(--t3)}
+.log{font:.85rem/1.5 var(--mono);display:grid;gap:4px;max-height:260px;overflow:auto}
+.log div{padding:6px 8px;border-left:3px solid var(--line);background:var(--bg);border-radius:0 4px 4px 0;word-break:break-word}
+.log .ok{border-color:var(--ok)}.log .bad{border-color:var(--bad)}
+.log small{color:var(--muted)}
+details{font-size:.85rem;color:var(--muted)}
+details pre{font:.78rem/1.5 var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px;overflow-x:auto;color:var(--fg);margin:8px 0 0}
+.err{color:var(--bad);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>FSK Buzzer Link</h1>
+  <p>Liaison acoustique 4‑FSK entre deux machines : l'une émet au haut‑parleur, l'autre décode au micro. Mêmes réglages sur les deux PC. Un seul PC suffit pour un premier essai (haut‑parleur → micro).</p>
+</header>
+
+<div class="strip">
+  <label>Ton 0 (Hz)<input id="t0" type="number" value="6000" step="50" min="400" max="12000"></label>
+  <label>Ton 1 (Hz)<input id="t1" type="number" value="6500" step="50" min="400" max="12000"></label>
+  <label>Ton 2 (Hz)<input id="t2" type="number" value="7000" step="50" min="400" max="12000"></label>
+  <label>Ton 3 (Hz)<input id="t3" type="number" value="7500" step="50" min="400" max="12000"></label>
+  <label>Symbole (ms)<input id="sym" type="number" value="20" step="5" min="10" max="200"></label>
+  <label>Volume<input id="vol" type="number" value="0.8" step="0.1" min="0.05" max="1"></label>
+  <p class="hint">4 tons, codage Gray (00·01·11·10), 2 bits par symbole. Trame : mot de synchro 28 symboles · longueur en Hamming(8,4) · [données + CRC‑8] en code convolutif K=7 r=½, entrelacés. Réception : Goertzel fenêtré sur un symbole entier par pas de ¼, bruit estimé sur les bins de garde entre les tons, Viterbi à décision douce, combinaison des répétitions.</p>
+</div>
+
+<div class="panels">
+  <section class="panel">
+    <h2>Émetteur <span class="st" id="txst">prêt</span></h2>
+    <textarea id="txmsg" rows="2" maxlength="32">BADGE-0042</textarea>
+    <div class="row">
+      <button class="primary" id="send">Émettre</button>
+      <button id="rep">Émettre ×3</button>
+      <span id="txinfo" style="font:.8rem var(--mono);color:var(--muted)"></span>
+    </div>
+    <div class="syms" id="txsyms"></div>
+    <details><summary>Séquence pour le firmware du badge</summary><pre id="fw"></pre></details>
+  </section>
+
+  <section class="panel">
+    <h2>Récepteur <span class="st" id="rxst">arrêté</span></h2>
+    <div class="row">
+      <button class="primary" id="listen">Écouter</button>
+      <button id="stop" disabled>Arrêter</button>
+      <button id="clear">Effacer</button>
+    </div>
+    <p class="err" id="rxerr" hidden></p>
+    <canvas id="scope" width="600" height="120"></canvas>
+    <div class="meter t0"><span id="l0"></span><div class="bar"><i id="m0"></i></div><span id="v0">–</span></div>
+    <div class="meter t1"><span id="l1"></span><div class="bar"><i id="m1"></i></div><span id="v1">–</span></div>
+    <div class="meter t2"><span id="l2"></span><div class="bar"><i id="m2"></i></div><span id="v2">–</span></div>
+    <div class="meter t3"><span id="l3"></span><div class="bar"><i id="m3"></i></div><span id="v3">–</span></div>
+    <div class="meter"><span>sync</span><div class="bar"><i id="ms"></i></div><span id="vs">–</span></div>
+    <div class="log" id="log"></div>
+  </section>
+</div>
+</div>
+
+<script>
+// Modem 4-FSK Gray : code convolutif K=7 r=1/2 + Viterbi à décision douce, entrelacement,
+// combinaison des répétitions, Goertzel pleine fenêtre avec bins de garde pour le bruit.
+// Fichier partagé entre la page web et le banc de test node.
+(function(root){
+const HOPS=4;                                   // pas d'analyse par symbole
+// mot de synchro : 28 symboles, autocorrélation hors pic < 0,05 (recherche numérique)
+const PATTERN=[1,0,1,0,2,2,1,1,0,2,1,3,1,3,0,1,2,3,3,2,3,3,2,0,3,0,1,1];
+const PRE=PATTERN,SYNC=PATTERN;
+const MAXLEN=32, ROWS=8, TAIL=6;
+const GRAY=[[0,0],[0,1],[1,1],[1,0]];           // ton -> (b1,b0)
+const GRAYINV={ '00':0,'01':1,'11':2,'10':3 };
+
+function crc8(bytes){let c=0;for(const b of bytes){c^=b;for(let i=0;i<8;i++)c=(c&0x80)?((c<<1)^0x07)&0xFF:(c<<1)&0xFF}return c}
+function byteToBits(b){const o=[];for(let i=7;i>=0;i--)o.push((b>>i)&1);return o}
+
+// ---- Hamming(8,4) pour l'octet de longueur ----
+function hammingEnc(n){const d=[(n>>3)&1,(n>>2)&1,(n>>1)&1,n&1];
+  const c=[d[0]^d[1]^d[3],d[0]^d[2]^d[3],d[0],d[1]^d[2]^d[3],d[1],d[2],d[3]];
+  return [...c,c.reduce((a,b)=>a^b,0)]}
+function hammingDec(bits){const c=bits.slice(0,7);const s=(c[0]^c[2]^c[4]^c[6])|((c[1]^c[2]^c[5]^c[6])<<1)|((c[3]^c[4]^c[5]^c[6])<<2);
+  const par=bits.reduce((a,b)=>a^b,0);let fail=false;if(s){if(par)c[s-1]^=1;else fail=true}
+  return {nibble:(c[2]<<3)|(c[4]<<2)|(c[5]<<1)|c[6],fail}}
+
+// ---- Code convolutif K=7, polynômes 171/133 (octal) ----
+const G1=0o171,G2=0o133;
+const parity=x=>{x^=x>>16;x^=x>>8;x^=x>>4;x^=x>>2;x^=x>>1;return x&1};
+function convEnc(bits){const out=[];let sr=0;for(const b of [...bits,...Array(TAIL).fill(0)]){sr=((sr<<1)|b)&0x7F;out.push(parity(sr&G1),parity(sr&G2))}return out}
+// Viterbi : soft = valeurs dans [-1,1], +1 = bit 1
+function viterbi(soft){
+  const n=soft.length/2,NS=64;let pm=new Float64Array(NS).fill(-1e9);pm[0]=0;
+  const hist=new Array(n);
+  for(let t=0;t<n;t++){const s0=soft[2*t],s1=soft[2*t+1];const npm=new Float64Array(NS).fill(-1e9),prev=new Uint8Array(NS);
+    for(let s=0;s<NS;s++){if(pm[s]<-1e8)continue;
+      for(let b=0;b<2;b++){const sr=((s<<1)|b)&0x7F,ns=sr&0x3F;
+        const m=pm[s]+(parity(sr&G1)?s0:-s0)+(parity(sr&G2)?s1:-s1);
+        if(m>npm[ns]){npm[ns]=m;prev[ns]=s}}}
+    pm=npm;hist[t]=prev}
+  let s=0;const bits=new Array(n);  // état final 0 grâce aux bits de queue
+  for(let t=n-1;t>=0;t--){bits[t]=s&1;s=hist[t][s]}
+  return bits.slice(0,n-TAIL);
+}
+// ---- Entrelacement bloc (ROWS lignes) ----
+function padLen(n){return Math.ceil(n/(2*ROWS))*2*ROWS}
+function interleave(bits){const N=padLen(bits.length),cols=N/ROWS,x=[...bits,...Array(N-bits.length).fill(0)],o=new Array(N);
+  for(let i=0;i<N;i++)o[(i%ROWS)*cols+Math.floor(i/ROWS)]=x[i];return o}
+function deinterleave(v){const N=v.length,cols=N/ROWS,o=new Array(N);for(let i=0;i<N;i++)o[i]=v[(i%ROWS)*cols+Math.floor(i/ROWS)];return o}
+
+// ---- Trame ----
+function codedBits(len){return padLen((8*(len+1)+TAIL)*2)}
+function buildFrame(text){
+  const data=Array.from(new TextEncoder().encode(text)).slice(0,MAXLEN);
+  const len=data.length,crc=crc8([len,...data]);
+  const lenBits=[...hammingEnc(len>>4),...hammingEnc(len&15)];
+  const coded=interleave(convEnc([...data,crc].flatMap(byteToBits)));
+  const bits=[...lenBits,...coded];const syms=[];
+  for(let i=0;i<bits.length;i+=2)syms.push(GRAYINV[''+bits[i]+bits[i+1]]);
+  return {symbols:[...PATTERN,...syms],payload:[len,...data,crc],len,crc,nSyms:PATTERN.length+syms.length};
+}
+
+// ---- Analyse spectrale : Goertzel fenêtré sur une pleine fenêtre symbole ----
+function goertzel(buf,win,f,fs){const N=buf.length,k=Math.round(N*f/fs),w=2*Math.PI*k/N,coef=2*Math.cos(w);
+  let s0=0,s1=0,s2=0;for(let i=0;i<N;i++){s0=buf[i]*win[i]+coef*s1-s2;s2=s1;s1=s0}return (s1*s1+s2*s2-coef*s1*s2)/N}
+
+function Decoder(P,fs,onFrame,onStatus){
+  const tones=P.tones.slice();const symLen=Math.round(fs*P.sym/1000),hopLen=Math.round(symLen/HOPS);
+  const ring=new Float32Array(symLen);let rpos=0,filled=0;
+  const win=Float32Array.from({length:symLen},(_,i)=>0.5-0.5*Math.cos(2*Math.PI*i/symLen));
+  const sorted=tones.slice().sort((a,b)=>a-b),gap=sorted[1]-sorted[0];
+  const guards=[sorted[0]-gap/2,...sorted.slice(0,-1).map((f,i)=>(f+sorted[i+1])/2),sorted[sorted.length-1]+gap/2];
+  const self={state:'search',score:[],hop:0,syms:[],soft:[],expect:0,peak:-1,peakAt:0,last:null,hopLen,symLen};
+  const lin=new Float32Array(symLen);
+  self.push=function(buf){
+    for(let i=0;i<buf.length;i++){ring[rpos]=buf[i];rpos=(rpos+1)%symLen}
+    filled=Math.min(symLen,filled+buf.length);if(filled<symLen)return null;
+    for(let i=0;i<symLen;i++)lin[i]=ring[(rpos+i)%symLen];
+    const E=tones.map(f=>goertzel(lin,win,f,fs));
+    const Gd=guards.map(f=>goertzel(lin,win,f,fs));
+    const noise=Gd.slice().sort((a,b)=>a-b)[Math.floor(Gd.length/2)]+1e-12;   // médiane des bins de garde
+    const S=E.map(e=>Math.max(0,e-noise));                                   // soustraction spectrale
+    const tot=S.reduce((a,b)=>a+b,0)+1e-12;
+    const sc=S.map(e=>(e-(tot-e)/3)/tot);                                    // score par ton, dans [-1/3,1]
+    const snr=10*Math.log10(Math.max(...E)/noise);
+    self.score.push(sc);if(self.score.length>6000)self.score.shift();
+    const b1=(Math.max(S[2],S[3])-Math.max(S[0],S[1]))/tot, b0=(Math.max(S[1],S[2])-Math.max(S[0],S[3]))/tot;
+    let q=0;
+    if(self.state==='search'){
+      const L=PATTERN.length,n=self.score.length;
+      if(n>=L*HOPS){let c=0;for(let k=0;k<L;k++)c+=self.score[n-1-(L-1-k)*HOPS][PATTERN[k]];q=c/L;
+        if(q>0.5&&q>self.peak){self.peak=q;self.peakAt=0}
+        else if(self.peak>0){self.peakAt++;
+          if(self.peakAt>=2){ // le pic est 2 pas derrière : on se cale dessus
+            self.state='rx';self.hop=HOPS-self.peakAt;self.syms=[];self.soft=[];self.expect=0;self.peak=-1;onStatus&&onStatus('rx')}}}
+    }else{
+      self.hop++;
+      if(self.hop%HOPS===0){
+        let best=0;for(let k=1;k<4;k++)if(S[k]>S[best])best=k;
+        self.syms.push(best);self.soft.push(b1,b0);
+        if(self.syms.length===8){const bits=self.syms.flatMap(s=>GRAY[s]);
+          const h=hammingDec(bits.slice(0,8)),l=hammingDec(bits.slice(8));const len=(h.nibble<<4)|l.nibble;
+          if(h.fail||l.fail||len>MAXLEN){finish('longueur illisible');return {E,snr,q}}
+          self.len=len;self.expect=8+codedBits(len)/2}
+        if(self.expect&&self.syms.length>=self.expect)finish();
+      }
+    }
+    return {E,noise,snr,q,b1,b0};
+  };
+  function tryDecode(soft,len){
+    const bits=viterbi(deinterleave(soft).slice(0,(8*(len+1)+TAIL)*2));
+    const by=[];for(let i=0;i+8<=bits.length;i+=8)by.push(bits.slice(i,i+8).reduce((a,b)=>(a<<1)|b,0));
+    const data=by.slice(0,len),crc=by[len];
+    return {ok:crc8([len,...data])===crc,data,crc};
+  }
+  function finish(err){
+    self.state='search';self.peak=-1;
+    if(err){onFrame({ok:false,error:err});return}
+    const len=self.len,soft=self.soft.slice(16);
+    let r=tryDecode(soft,len),combined=false;
+    if(!r.ok&&self.last&&self.last.len===len&&Date.now()-self.last.t<8000){
+      const sum=soft.map((v,i)=>v+self.last.soft[i]);r=tryDecode(sum,len);combined=true;
+      self.last={len,soft:sum,t:Date.now()}}
+    else if(!r.ok)self.last={len,soft,t:Date.now()};
+    if(r.ok)self.last=null;
+    let text='';try{text=new TextDecoder().decode(new Uint8Array(r.data))}catch(e){}
+    onFrame({ok:r.ok,text,len,crc:r.crc,combined,error:r.ok?null:'CRC faux'});
+  }
+  return self;
+}
+root.FSK={HOPS,PATTERN,PRE,SYNC,MAXLEN,GRAY,crc8,hammingEnc,hammingDec,convEnc,viterbi,interleave,deinterleave,buildFrame,goertzel,Decoder};
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+const $=id=>document.getElementById(id);
+const P={tones:[6000,6500,7000,7500],sym:20,vol:0.8};
+const KEYS=['t0','t1','t2','t3','sym','vol'];
+function readParams(){P.tones=[0,1,2,3].map(i=>+$('t'+i).value);P.sym=+$('sym').value;P.vol=+$('vol').value;
+  P.tones.forEach((f,i)=>$('l'+i).textContent=f+' Hz');
+  try{localStorage.setItem('fsk-params-v4',JSON.stringify(P))}catch(e){}
+  renderTx();if(running){stopListen();listen()}}
+try{const s=JSON.parse(localStorage.getItem('fsk-params-v4'));if(s&&s.tones){s.tones.forEach((f,i)=>$('t'+i).value=f);$('sym').value=s.sym;$('vol').value=s.vol}}catch(e){}
+KEYS.forEach(k=>$(k).addEventListener('change',readParams));
+
+function renderTx(){
+  const {symbols,payload,nSyms}=FSK.buildFrame($('txmsg').value);
+  $('txsyms').innerHTML=symbols.map((s,i)=>`<span class="s${s}">${s}</span>`+((i+1)%8?'':' ')).join('');
+  $('txinfo').textContent=`${nSyms} symboles · ${nSyms*P.sym} ms · ${(2000/P.sym).toFixed(0)} bit/s`;
+  const hx=a=>a.map(b=>'0x'+b.toString(16).padStart(2,'0').toUpperCase()).join(', ');
+  $('fw').textContent=
+`// Le badge joue simplement cette suite de tons, ${P.sym} ms chacun, phase continue si possible.
+// Codage (convolutif + entrelacement) déjà appliqué : rien à calculer côté firmware pour un ID fixe.
+static const uint16_t tone_hz[4] = { ${P.tones.join(', ')} };
+static const uint8_t  frame_syms[${nSyms}] = {
+  ${symbols.map((s,i)=>s+(i<nSyms-1?',':'')+(((i+1)%28)?'':'\n  ')).join('')}
+};
+// pour info, charge utile en clair : len, data..., crc8(0x07) = { ${hx(payload)} }`;
+}
+$('txmsg').addEventListener('input',renderTx);
+
+// ---------- Émetteur ----------
+let actx=null;
+function ctx(){if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx}
+let sending=false;
+async function transmit(times){
+  if(sending)return;sending=true;$('send').disabled=$('rep').disabled=true;$('txst').textContent='émission';$('txst').classList.add('on');
+  const c=ctx();const {symbols}=FSK.buildFrame($('txmsg').value);const T=P.sym/1000;
+  const osc=c.createOscillator();osc.type='square';const g=c.createGain();
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.max(...P.tones)*1.5;
+  osc.connect(lp);lp.connect(g);g.connect(c.destination);
+  let t=c.currentTime+0.15;const t0=t;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(P.vol*0.5,t+0.01);
+  for(let r=0;r<times;r++){
+    for(const s of symbols){osc.frequency.setValueAtTime(P.tones[s],t);t+=T}
+    if(r<times-1){g.gain.setValueAtTime(0,t);g.gain.setValueAtTime(P.vol*0.5,t+0.3);t+=0.3}
+  }
+  g.gain.setValueAtTime(P.vol*0.5,t);g.gain.linearRampToValueAtTime(0,t+0.01);
+  osc.start(t0);osc.stop(t+0.02);
+  await new Promise(res=>osc.onended=res);
+  sending=false;$('send').disabled=$('rep').disabled=false;$('txst').textContent='prêt';$('txst').classList.remove('on');
+}
+$('send').onclick=()=>transmit(1);$('rep').onclick=()=>transmit(3);
+
+// ---------- Récepteur ----------
+let stream=null,proc=null,src=null,running=false,dec=null;
+const hist=[];   // historique des scores par ton pour l'oscillo
+function onFrame(r){
+  if(r.ok)addLog('ok',`✓ ${JSON.stringify(r.text)}`,`${r.len} octets${r.combined?' · décodé en combinant 2 répétitions':''}`);
+  else addLog('bad',`✗ ${r.error}`,r.len!=null?`len ${r.len} · lu ${JSON.stringify(r.text)}${r.combined?' (combiné)':''}`:'');
+  $('rxst').textContent='écoute';
+}
+function addLog(cls,main,sub){const d=document.createElement('div');d.className=cls;
+  d.innerHTML=`${esc(main)} <small>${new Date().toLocaleTimeString()}${sub?' · '+esc(sub):''}</small>`;$('log').prepend(d);
+  while($('log').children.length>40)$('log').lastChild.remove();}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function drawScope(){
+  if(!running)return;
+  const cv=$('scope'),g=cv.getContext('2d');const W=cv.width,H=cv.height;g.clearRect(0,0,W,H);
+  const css=getComputedStyle(document.documentElement);
+  g.lineWidth=1;g.strokeStyle=css.getPropertyValue('--line');g.beginPath();g.moveTo(0,H-8);g.lineTo(W,H-8);g.stroke();
+  for(let k=0;k<4;k++){g.lineWidth=1.5;g.strokeStyle=css.getPropertyValue('--t'+k);g.beginPath();
+    hist.forEach((v,i)=>{const x=i/600*W,y=H-8-Math.max(0,v[k])*(H-16);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
+  requestAnimationFrame(drawScope);
+}
+async function listen(){
+  $('rxerr').hidden=true;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+  catch(e){$('rxerr').textContent='Micro inaccessible : '+e.message+'. Ouvre le fichier directement dans Chrome/Firefox (ou via http://localhost) et autorise le micro.';$('rxerr').hidden=false;return}
+  const c=ctx();
+  dec=FSK.Decoder(P,c.sampleRate,onFrame,s=>{if(s==='rx')$('rxst').textContent='trame…'});
+  let acc=new Float32Array(dec.hopLen),accN=0;
+  src=c.createMediaStreamSource(stream);
+  // passe-bande autour des tons avant analyse
+  const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=(Math.min(...P.tones)+Math.max(...P.tones))/2;bp.Q.value=bp.frequency.value/(Math.max(...P.tones)-Math.min(...P.tones)+1000);
+  proc=c.createScriptProcessor(1024,1,1);
+  const db=v=>10*Math.log10(v+1e-12);
+  proc.onaudioprocess=ev=>{const inp=ev.inputBuffer.getChannelData(0);
+    for(let i=0;i<inp.length;i++){acc[accN++]=inp[i];if(accN===dec.hopLen){
+      const m=dec.push(acc);accN=0;if(!m)continue;
+      const sc=dec.score[dec.score.length-1];hist.push(sc);if(hist.length>600)hist.shift();
+      const nd=db(m.noise);
+      m.E.forEach((e,k)=>{const d=db(e)-nd;$('m'+k).style.width=Math.max(0,Math.min(100,d*2.5))+'%';$('v'+k).textContent=d.toFixed(0)+' dB'});
+      if(dec.state==='search'){$('ms').style.width=Math.max(0,m.q*100)+'%';$('vs').textContent=m.q.toFixed(2)}
+    }}};
+  src.connect(bp);bp.connect(proc);proc.connect(c.destination);
+  running=true;hist.length=0;
+  $('listen').disabled=true;$('stop').disabled=false;$('rxst').textContent='écoute';$('rxst').classList.add('on');drawScope();
+}
+function stopListen(){running=false;try{proc.disconnect();src.disconnect();stream.getTracks().forEach(t=>t.stop())}catch(e){}
+  $('listen').disabled=false;$('stop').disabled=true;$('rxst').textContent='arrêté';$('rxst').classList.remove('on')}
+$('listen').onclick=listen;$('stop').onclick=stopListen;$('clear').onclick=()=>$('log').innerHTML='';
+readParams();
+</script>
+
+</body></html>

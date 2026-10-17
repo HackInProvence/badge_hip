@@ -65,7 +65,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde, Mini-bolides |
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
-| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès |
+| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès, Mon grade, Identifiant sonore |
 | **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
@@ -224,9 +224,10 @@ d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
   dans la salle d'attente et pendant la course) et un **motif** à l'écran (pleine, creuse, damier, rayures...). La
   salle d'attente montre le motif, le nom et la couleur de chaque pilote, « (toi) » pour la vôtre ; votre motif est
   aussi dans la barre de la course.
-- 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course.
+- 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course. Pendant la course, les
+  LEDs donnent votre place : vertes en tête, rouges en dernier, orange entre les deux.
 - **Aile droite** : accélérer ; **aile gauche** : freiner puis reculer ; **flancs** : tourner (maintenus ; le flanc
-  gauche à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage (côté droit, haut de l'épingle, côté gauche) comptent dans l'ordre :
+  gauche à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage 1 (côté droit), 2 (haut de l'épingle), 3 (côté gauche), en pointillés sur la piste avec leur numéro (le prochain en gras), comptent dans l'ordre :
   couper par l'herbe en sautant l'un d'eux ne compte pas le tour.
 - En haut : le tour (« Tour 2/3 ») et votre place (« 1/3 »). L'écran se redessine environ 4 fois par seconde.
 - La course finit quand tout le monde est arrivé, ou 30 s après le premier ; le classement donne les temps, puis
@@ -445,6 +446,9 @@ sonde, brouilleur qui répète son code).
 - **Succès** : les succès obtenus et le grade de votre cigale (voir ci-dessous).
 - **Mon grade** : le portrait de votre grade de pirate en grand, son nom et les XP du grade suivant ; comme le badge
   nominatif, la page reste affichée (même sans alimentation), un bouton la quitte.
+- **Identifiant sonore** : le badge joue son identifiant (« Nom#1234 ») au buzzer, en sons aigus (6 à 7,5 kHz), 3 fois
+  (~10 s) ; un téléphone ou un PC le décode avec la page `docs/fsk-buzzer-link.html` (Chrome, bouton « Écouter »,
+  micro autorisé), près du badge. Aile droite : émettre ; aile gauche : arrêter / retour. Rien en mode muet.
 
 **Succès et grade** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès
 donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau, de 1 à 10, est un **grade de pirate** ; il se gagne

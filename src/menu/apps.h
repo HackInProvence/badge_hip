@@ -72,6 +72,7 @@ typedef enum {
     APP_BATTERY_DRAIN,
     APP_RANK,
     APP_RACE,
+    APP_FSK_ID,
     APP_COUNT,
 } app_id_t;
 

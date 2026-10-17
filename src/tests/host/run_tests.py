@@ -19,6 +19,7 @@ Exit code 0 when all the tests pass.
 """
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -128,6 +129,32 @@ def test_remote_help(work):
     ok = not missing and not extra
     return ok, f'{len(keys)} commands' + (f', missing in SERIAL_COMMANDS: {missing}' if missing else '') + \
         (f', not in main.c: {extra}' if extra else '')
+
+
+def test_fsk(work):
+    # The encoder of the acoustic link (fsk_link.c) gives the same symbols as buildFrame() of the receiver,
+    # docs/fsk-buzzer-link.html (its JavaScript run by node)
+    node = shutil.which('node')
+    if not node:
+        return None, 'node not in the PATH'
+    texts = ['BADGE-0042', '', 'A', 'Tristan#5331', 'x' * 31, '0123456789abcdefghijklmnopqrstuv', 'Cigalou#404C']
+    ok, out = c_test('test_fsk', ['menu/fsk_link.c'], [os.path.join(SRC, 'menu')], work)
+    exe = os.path.join(work, 'test_fsk' + ('.exe' if os.name == 'nt' else ''))
+    if not ok:
+        return False, out
+    # One run per text: an empty text is an argument too
+    c_out = [run([exe, t]).stdout.strip() for t in texts]
+    html = open(os.path.join(SRC, '..', 'docs', 'fsk-buzzer-link.html'), encoding='utf-8').read()
+    script = re.search(r'<script>(.*?)</script>', html, re.S).group(1)
+    js = os.path.join(work, 'fsk.js')
+    with open(js, 'w', encoding='utf-8') as f:
+        f.write(script + '\nconst texts = JSON.parse(process.argv[2]);\n'
+                'for (const t of texts) console.log(FSK.buildFrame(t).symbols.join(""));\n')
+    js_out = run([node, js, json.dumps(texts)]).stdout.split()
+    bad = [t for t, c, j in zip(texts, c_out, js_out) if c != j]
+    if len(js_out) != len(texts):
+        return False, 'node: ' + ' '.join(js_out)[:200]
+    return not bad, f'{len(texts)} texts, the same symbols as the page' if not bad else f'different: {bad}'
 
 
 def test_rtttl(work):
@@ -310,7 +337,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 

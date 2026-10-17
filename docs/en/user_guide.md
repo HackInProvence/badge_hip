@@ -68,7 +68,7 @@ The main menu groups the features by theme:
 | **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war, Micro racers |
 | **Social** | Cicada network, Messages, Contacts, Skills, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
-| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements |
+| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements, My rank, Sound ID |
 | **Settings** (Réglages) | Screensaver, Language, Remote, Mute mode, Info, Credits, Radio tuning |
 
 Some entries show their value in the menu: "Volume: 4/8", "Cicada network: 12 pts", "CTF: 0/1 flags",
@@ -234,9 +234,10 @@ of a track bigger than the screen (the screen follows your car, framed).
   waiting room and during the race) and a **pattern** on the screen (solid, hollow, checkered, stripes...). The
   waiting room shows the pattern, the name and the color of each driver, "(you)" for yours; your pattern is also in
   the bar of the race.
-- 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race.
+- 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race. During the race, the LEDs give your
+  place: green in the lead, red last, orange in between.
 - **Right wing**: accelerate; **left wing**: brake then back up; **sides**: steer (held; the left side to the
-  left). Off the road (the grass), the car slows down a lot. Both wings held 1.5 s: give up (the others go on). The checkpoints (right side, top of the hairpin, left side) count in order: cutting through the grass and
+  left). Off the road (the grass), the car slows down a lot. Both wings held 1.5 s: give up (the others go on). The checkpoints 1 (right side), 2 (top of the hairpin), 3 (left side), dashed on the track with their number (the next one bold), count in order: cutting through the grass and
   skipping one does not count the lap.
 - At the top: the lap ("Lap 2/3") and your place ("1/3"). The screen is drawn about 4 times per second.
 - The race ends when everybody has finished, or 30 s after the first one; the ranking gives the times, then the lap
@@ -456,6 +457,9 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Achievements** (Succès): the achievements obtained and the rank of your cicada (see below).
 - **My rank** (Mon grade): the portrait of your pirate rank in large, its name and the XP of the next rank; like the
   name tag, the page stays on the screen (even without power), a button leaves it.
+- **Sound ID** (Identifiant sonore): the badge plays its identifier ("Name#1234") on the buzzer, in high tones (6 to
+  7.5 kHz), 3 times (~10 s); a phone or a PC decodes it with the page `docs/fsk-buzzer-link.html` (Chrome, button
+  "Écouter", microphone allowed), near the badge. Right wing: send; left wing: stop / back. Nothing in mute mode.
 
 **Achievements and rank**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
 achievement gives XP, and each cicada met **2 XP**. The level, from 1 to 10, is a **pirate rank**; it is earned with

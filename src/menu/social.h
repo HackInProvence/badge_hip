@@ -87,10 +87,10 @@ bool social_event(char *msg, int len);
 /** \brief Number of beacons sent and received since boot (for the tests). */
 void social_stats(uint32_t *sent, uint32_t *received);
 
-/** rief The period of the beacons now (ms): 2 s, longer when the channel is busy (net_occupancy()). */
+/** \brief The period of the beacons now (ms): 2 s, longer when the channel is busy (net_occupancy()). */
 uint32_t social_beacon_period_ms(void);
 
-/** rief Beacons of new badges ignored because the table of the neighbours was full of stronger ones. */
+/** \brief Beacons of new badges ignored because the table of the neighbours was full of stronger ones. */
 uint32_t social_ignored(void);
 
 /** \brief A buffer for a copy of all the neighbours, shared (the RAM): only inside a function, never kept from one

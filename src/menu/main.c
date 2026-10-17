@@ -734,8 +734,8 @@ static const submenu_t SUBMENUS[] = {
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
     {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
-    {N_("Badge"), 9, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
-                  M_APP(APP_ACHIEVEMENTS), M_APP(APP_RANK)}},
+    {N_("Badge"), 10, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
+                  M_APP(APP_ACHIEVEMENTS), M_APP(APP_RANK), M_APP(APP_FSK_ID)}},
     {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
     {N_("Admin"), 18, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
@@ -1687,8 +1687,10 @@ static void play_chime(void) {
 }
 
 /* Sound of the games: a square wave, like the chime */
+static bool buzzer_claimed = false;  /* An application drives the buzzer (app_buzzer_claim()) */
+
 static void game_tone(uint16_t hz, uint16_t ms) {
-    if (wav_is_paused())
+    if (wav_is_paused() || buzzer_claimed)
         return;
     if (chime_playing || audio_is_open()) {
         audio_close();
@@ -1750,6 +1752,15 @@ static void game_leds(uint8_t r, uint8_t g, uint8_t b) {
 /* For the applications (app.h) */
 void app_tone(uint16_t hz, uint16_t ms) {
     game_tone(hz, ms);  /* Silent in mute mode (audio_set_mute()) */
+}
+
+void app_buzzer_claim(bool busy) {
+    if (busy) {
+        audio_close();
+        chime_playing = false;
+        set_sound(false);  /* The cicada uses the buzzer too */
+    }
+    buzzer_claimed = busy;
 }
 
 void app_cough(void) {

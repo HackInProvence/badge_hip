@@ -360,10 +360,10 @@ typedef enum {
     SCREEN_SHOT_BLACK,
 } screen_shot_kind_t;
 
-/** rief Incremented each time the screen draws something (to know when screen_shot() changed). */
+/** \brief Incremented each time the screen draws something (to know when screen_shot() changed). */
 uint32_t screen_shot_counter(void);
 
-/** rief What the screen shows: a copy of its RAM (as written by screen_push_rams(), in image coordinates)
+/** \brief What the screen shows: a copy of its RAM (as written by screen_push_rams(), in image coordinates)
  * and how it was drawn. The planes are SCREEN_WIDTH*SCREEN_HEIGHT/8 bytes, same format as the images of image2epaper.py. */
 screen_shot_kind_t screen_shot(const uint8_t **lsb, const uint8_t **msb);
 

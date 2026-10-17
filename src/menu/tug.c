@@ -470,8 +470,11 @@ static void draw_names(uint8_t *fb, int y, const char (*list)[9], int count) {
     }
 }
 
+/* The names drawn by a page (the lobby, the team mates): one buffer, never two at a time (the RAM is short) */
+static char names_buf[PARTY_MAX][9];
+
 static void render_lobby(uint8_t *fb) {
-    static char list[PARTY_MAX][9];
+    char (*list)[9] = names_buf;
     char text[48];
     for (int i = 0; i < n_lobby; ++i)
         snprintf(list[i], sizeof(list[i]), "%s", lobby[i].id ? lobby[i].name : "...");
@@ -556,7 +559,7 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
         } else {
             ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, N_("Tu es dans l'équipe des"));
             ui_lines(fb, UI_TITLE_H + 22, &gfx_font_medium, TEAMS[team[me]]);
-            static char mates[PARTY_MAX][9];
+            char (*mates)[9] = names_buf;
             int k = 0;
             for (int i = 0; i < n; ++i)
                 if (team[i] == team[me] && i != me)

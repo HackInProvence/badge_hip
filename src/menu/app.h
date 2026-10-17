@@ -65,6 +65,9 @@ const app_t *app_current(void);
 
 /* Sound and LEDs for the applications, implemented in main.c: they respect the mute mode (remote.h) */
 void app_tone(uint16_t hz, uint16_t ms);
+/** \brief An application drives the buzzer itself (fsk_id.c): the sounds and the cicada stop, and no other sound
+ * starts while \p busy (true when taken, false when given back). */
+void app_buzzer_claim(bool busy);
 void app_cough(void);  /* The cough of the virus (infection.c) */
 void app_leds(uint8_t r, uint8_t g, uint8_t b);  /* All black: back to the LED animation of the badge */
 
