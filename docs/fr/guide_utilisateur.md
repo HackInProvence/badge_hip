@@ -199,7 +199,7 @@ ultrason).
   qu'il a répondu honnêtement : « Flotte OK » ou « TRICHE ! ».
 - À la fin d'une partie : aile droite : rejouer ; aile gauche : quitter.
 
-**Jeux de groupe** : **Tir à la corde**, **Assassin** et **Loup-garou** se jouent à plusieurs badges, par radio,
+**Jeux de groupe** : **Tir à la corde**, **Mini-bolides**, **Assassin** et **Loup-garou** se jouent à plusieurs badges, par radio,
 avec le même salon :
 - « Créer une partie » (« Mener une partie » au loup-garou) : votre badge héberge la partie et liste les joueurs
   qui la rejoignent. Aile droite : lancer (quand il y a assez de joueurs) ; aile gauche : annuler.
