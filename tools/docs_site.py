@@ -3,8 +3,9 @@
 Every .md of docs/fr, docs/en and docs/ (the design notes) is converted to HTML, with a menu of the pages, a link to
 the same page in the other language (the line "*English version: [...](../en/x.md).*" of each page), and the images
 they show. The resources go in the ressources/ sub-folder, with their own page in each language: the firmware
-(.uf2, when built), the content of the SD card (docs/sd, also as a .zip), the PC tools (tools/), the Flipper Zero
-files, the hardware (schematic, pictures, KiCad project as a .zip), the pictures. Links to other files of the
+(.uf2, when built), the content of the SD card (docs/sd, also as a .zip), the PC tools useful to a user
+(USER_TOOLS: remote control, SD files, contacts, media conversions...; not the ones of the development), the
+Flipper Zero files, the hardware (schematic, pictures, KiCad project as a .zip), the pictures. Links to other files of the
 repository (source code) point to the repository on the web. docs/analyses (local notes) is never published.
 
     python tools/docs_site.py                    (writes build/docs_site/)
@@ -48,8 +49,14 @@ LANGS = {
 }
 NOTES = 'notes'  # The output folder of docs/*.md (French)
 # Published as files (same path under ressources/); docs/analyses never
-PUBLISHED = ('docs/screens/', 'docs/images/', 'docs/color_reveal/', 'docs/sd/', 'imgs/', 'tools/', 'hardware/')
-NOT_PUBLISHED = ('docs/analyses/', 'tools/__pycache__/', 'hardware/kicad/')
+PUBLISHED = ('docs/screens/', 'docs/images/', 'docs/color_reveal/', 'docs/sd/', 'imgs/', 'tools/flipper/',
+             'hardware/')
+NOT_PUBLISHED = ('docs/analyses/', 'hardware/kicad/')
+# The scripts useful to a user of the badge (not the ones of the development: tests, files of the firmware...), and
+# the modules they need; published at their path, and together (flat) in outils.zip
+USER_TOOLS = ('tools/badge_remote.py', 'tools/sd_files.py', 'tools/contacts_export.py', 'src/images/image2epi.py',
+              'src/video/video2epaper.py', 'src/audio/audio2wav.py', 'tools/rtttl_sort.py', 'tools/gamebook_check.py')
+USER_TOOL_MODULES = ('tools/rtttl_lib.py',)
 IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp')
 LINK = re.compile(r'(!?)\[([^\]]*)\]\(([^)\s]+)(\s+"[^"]*")?\)')
 OTHER_VERSION = re.compile(r'^\*(English version|Version française)\s*:.*\*\s*$', re.M)
@@ -123,7 +130,8 @@ def size_text(n):
 
 
 def published(rel):
-    return rel.startswith(PUBLISHED) and not rel.startswith(NOT_PUBLISHED) or \
+    return rel in USER_TOOLS or rel in USER_TOOL_MODULES or \
+        rel.startswith(PUBLISHED) and not rel.startswith(NOT_PUBLISHED) or \
         (rel.startswith('docs/') and rel.count('/') == 1 and rel.endswith('.html'))
 
 
@@ -173,6 +181,7 @@ class Site:
         for name in os.listdir(os.path.join(ROOT, 'docs')):
             if published('docs/' + name):
                 self.files.add('docs/' + name)
+        self.files.update(r for r in USER_TOOLS + USER_TOOL_MODULES if os.path.exists(os.path.join(ROOT, r)))
 
     # ------ The pages
 
@@ -211,7 +220,7 @@ class Site:
             return 'sd'
         if rel.startswith('tools/flipper'):
             return 'flipper'
-        if rel.startswith('tools'):
+        if rel in USER_TOOLS or rel in USER_TOOL_MODULES:
             return 'tools'
         if rel.startswith('hardware'):
             return 'hardware'
@@ -329,7 +338,7 @@ class Site:
                          f'<p>The example content of the SD card: unzip <a href="../{RES}/carte_sd.zip">'
                          f'carte_sd.zip</a> at the root of the card (FAT32).</p>'))
         body.append(table(sd))
-        tools = [r for r in self.files if r.startswith('tools/') and r.endswith('.py')]
+        tools = [r for r in USER_TOOLS if r in self.files]
         body.append(f'<h2 id="tools">{head("Outils du PC", "PC tools")}</h2>')
         body.append(head(f'<p>Scripts Python 3 (le détail de chacun : <code>--help</code> et le guide avancé). '
                          f'Tous ensemble : <a href="../{RES}/outils.zip">outils.zip</a>.</p>',
@@ -432,7 +441,10 @@ conference, and are a teaching tool for radio and infrared.</p>
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.copyfile(os.path.join(ROOT, rel), dst)
         self.zip_dir(os.path.join(ROOT, 'docs', 'sd'), os.path.join(res, 'carte_sd.zip'))
-        self.zip_dir(os.path.join(ROOT, 'tools'), os.path.join(res, 'outils.zip'))
+        with zipfile.ZipFile(os.path.join(res, 'outils.zip'), 'w', zipfile.ZIP_DEFLATED) as z:
+            for rel in USER_TOOLS + USER_TOOL_MODULES:
+                if rel in self.files:
+                    z.write(os.path.join(ROOT, rel), posixpath.basename(rel))  # Flat: the modules beside
         kicad = os.path.join(ROOT, 'hardware', 'kicad')
         if os.path.isdir(kicad):
             os.makedirs(os.path.join(res, 'hardware'), exist_ok=True)
