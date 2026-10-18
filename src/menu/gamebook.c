@@ -720,14 +720,12 @@ static void render_read(uint8_t *fb) {
 }
 
 static void render_menu(uint8_t *fb) {
-    char text[64], fitted[64];
-    ui_fit_preview(&gfx_font_medium, fitted, sizeof(fitted), book.title, GFX_WIDTH - 4);
-    ui_title(fb, fitted);
+    char text[64];
+    ui_title(fb, book.title);  /* Long: it scrolls (never cut) */
     int y = UI_TITLE_H + 4;
     if (book.author[0]) {
         snprintf(text, sizeof(text), _("par %s"), book.author);
-        ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 4);
-        gfx_text(fb, GFX_WIDTH / 2, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
+        ui_scroll_text(fb, GFX_WIDTH / 2, y, GFX_WIDTH - 4, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     }
     y += 20;
     if (has_progress())
@@ -799,6 +797,6 @@ const app_t app_gamebook = {
     .start = gamebook_start,
     .buttons = gamebook_buttons,
     .render = gamebook_render,
-    .stop = gamebook_stop,
+    .stop = gamebook_stop,
     .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

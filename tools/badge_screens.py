@@ -146,7 +146,7 @@ PAGES = {
     'Recevoir une image': [],
     'Infrarouge': [],
     'Chasse 433 MHz': [],
-    'Lampe': [('yy', 'moins', 'Moins fort', None)],
+    'Lampe': [('b', 'eteinte', 'La lampe éteinte (B)', 'b')],  # Not -/+: the level is kept, it may be at an end
     'Badge de talk': [('x', 'vert', 'Vert : tout va bien', None), ('x', 'orange', 'Orange : 5 min', None),
                       ('x', 'rouge', 'Rouge : fini', None), ('x', None, None, None), ('x', None, None, None)],
     'Crédits': [('x', 'p2', 'Page 2', None), ('x', 'p3', 'Page 3', None), ('x', 'p4', 'Page 4', None),
@@ -232,7 +232,24 @@ class Crawler:
         return False
 
 
-def vote_screens(c, admin_ports, voter_ports):
+def badge_lang(t, code):
+    """The language of a badge: 'N' (next language) until it is \\p code; returns the one it had (None: unknown)"""
+    had = [l.split()[2] for l in t.lines if l.startswith('i18n: language ')]
+    if had and had[-1] == code:
+        return code
+    for _ in range(12):
+        t.mark()
+        t.keys('N')
+        m = t.expect(r'^i18n: language (\S+)', 3)
+        if not m:
+            return None
+        if m.group(1) == code:
+            t.expect(r'^store: saved', 15)
+            return had[-1] if had else 'fr'
+    return None
+
+
+def vote_screens(c, admin_ports, voter_ports, lang='fr'):
     """Social > Vote with two other badges (their ports): the admin badge (the one of the capture) opens a question,
     each voter answers another answer: the screen of a voter, then the histogram of the admin badge"""
     t = c.t
@@ -249,6 +266,7 @@ def vote_screens(c, admin_ports, voter_ports):
         while not b.connected():
             time.sleep(0.2)
         vt.pump(8)
+        vt.lang_before = badge_lang(vt, lang)  # The voters in the language of the capture, given back at the end
         vt.keys('[')
         vt.keys('x' * st.THEMES.index('Social') + 'b' + 'x' * 4 + 'b', 0.4)  # Social > Vote
         voters.append(vt)
@@ -273,6 +291,8 @@ def vote_screens(c, admin_ports, voter_ports):
     t.keys('b', 0.5)  # Closes the question
     for vt in voters:
         vt.keys('a', 0.5)
+        if vt.lang_before and vt.lang_before != lang:
+            badge_lang(vt, vt.lang_before)
         vt.badge.stop()
     del vstart
 
@@ -426,7 +446,7 @@ def main():
         print('Vote')
         restart()
         n = len(c.shots)
-        vote_screens(c, None, args.voters.split(','))
+        vote_screens(c, None, args.voters.split(','), args.lang)
         # Each new screen after the other screens of its page (the docs are grouped by page)
         for shot in c.shots[n:]:
             c.shots.remove(shot)
@@ -491,7 +511,7 @@ CAPTIONS_EN = {
     'Le score en QR code (signé)': 'The score as a QR code (signed)',
     'La partie : attendre le signal': 'The game: wait for the signal', 'Le signal : appuyer !': 'The signal: press!',
     'Le temps de réaction': 'The reaction time',
-    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer',
+    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer', 'La lampe éteinte (B)': 'The lamp off (B)',
     'Un morceau : deviner le titre': 'A track: guess the title', 'La réponse': 'The answer',
     "Une cigale qui vote (l'autre a choisi une autre réponse)": 'A cicada voting (the other one chose another answer)',
     'Le résultat des deux cigales qui votent': 'The result of the two cicadas voting', "L'aide pendant la partie": 'The help during the game',
