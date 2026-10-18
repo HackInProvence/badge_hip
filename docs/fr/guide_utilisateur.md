@@ -222,6 +222,10 @@ avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la co
 
 **Mini-bolides** (2 à 8 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
 d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
+- **Le circuit** : le créateur de la partie le choisit dans la salle d'attente avec Y / X, parmi 4 niveaux :
+  **Ovale (facile)**, **Épingle (moyen)**, **Serpent (difficile** : un S sur la droite**)** et **Zigzag (expert** :
+  une route étroite et deux zigzags**)**. Les autres pilotes le voient dans la liste des parties et dans la salle
+  d'attente. Couper par l'herbe fait manquer un point de passage : le tour ne compte pas.
 - Chaque voiture a une **couleur** (rouge, bleu, vert, jaune, violet, orange, cyan, rose : les LEDs de son badge,
   dans la salle d'attente et pendant la course) et un **motif** à l'écran (pleine, creuse, damier, rayures...). La
   salle d'attente montre le motif, le nom et la couleur de chaque pilote, « (toi) » pour la vôtre ; votre motif est

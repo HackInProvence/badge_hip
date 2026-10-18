@@ -730,34 +730,34 @@ msgid "Éliminé par %s"
 msgstr "Killed by %s"
 
 #: src/menu/assassin.c:597
-#: src/menu/race.c:478
+#: src/menu/race.c:553
 #: src/menu/tug.c:305
 #: src/menu/werewolf.c:1441
 msgid "%s  %u joueurs"
 msgstr "%s  %u players"
 
 #: src/menu/assassin.c:598
-#: src/menu/race.c:478
+#: src/menu/race.c:553
 #: src/menu/tug.c:306
 #: src/menu/werewolf.c:1442
 msgid "%s  %u joueur"
 msgstr "%s  %u player"
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:483
+#: src/menu/race.c:562
 #: src/menu/tug.c:310
 msgid "Créer une partie"
 msgstr "Create a game"
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:483
+#: src/menu/race.c:562
 #: src/menu/tug.c:310
 #: src/menu/werewolf.c:1417
 msgid "Rejoindre une partie"
 msgstr "Join a game"
 
 #: src/menu/assassin.c:609
-#: src/menu/race.c:503
+#: src/menu/race.c:582
 #: src/menu/tug.c:504
 #: src/menu/tug.c:539
 #: src/menu/tug.c:545
@@ -766,7 +766,7 @@ msgid "Tir à la corde"
 msgstr "Tug of war"
 
 #: src/menu/assassin.c:610
-#: src/menu/race.c:504
+#: src/menu/race.c:583
 #: src/menu/tug.c:332
 #: src/menu/werewolf.c:258
 #: src/menu/werewolf.c:1582
@@ -775,11 +775,11 @@ msgid "Loup-garou"
 msgstr "Werewolf"
 
 #: src/menu/assassin.c:611
-#: src/menu/race.c:824
-#: src/menu/race.c:848
-#: src/menu/race.c:878
-#: src/menu/race.c:882
-#: src/menu/race.c:904
+#: src/menu/race.c:908
+#: src/menu/race.c:937
+#: src/menu/race.c:967
+#: src/menu/race.c:971
+#: src/menu/race.c:993
 msgid "Mini-bolides"
 msgstr "Micro racers"
 
@@ -789,7 +789,7 @@ msgid "+%d autres"
 msgstr "+%d more"
 
 #: src/menu/assassin.c:811
-#: src/menu/race.c:809
+#: src/menu/race.c:893
 #: src/menu/tug.c:483
 msgid "Ta partie"
 msgstr "Your game"
@@ -806,41 +806,40 @@ msgstr "At least %d players needed."
 #: src/menu/assassin.c:818
 #: src/menu/assassin.c:823
 #: src/menu/main.c:3157
-#: src/menu/race.c:816
-#: src/menu/race.c:840
+#: src/menu/race.c:900
 #: src/menu/smuggler.c:536
+#: src/menu/smuggler.c:553
 msgid "A : annuler"
 msgstr "A: cancel"
 
 #: src/menu/assassin.c:818
-#: src/menu/race.c:840
 #: src/menu/tug.c:488
 msgid "A : annuler  B : lancer"
 msgstr "A: cancel  B: start"
 
 #: src/menu/assassin.c:821
 #: src/menu/assassin.c:952
-#: src/menu/race.c:814
-#: src/menu/race.c:864
+#: src/menu/race.c:898
+#: src/menu/race.c:953
 #: src/menu/tug.c:491
 #: src/menu/tug.c:644
 msgid "Rejoindre"
 msgstr "Join"
 
 #: src/menu/assassin.c:822
-#: src/menu/race.c:815
+#: src/menu/race.c:899
 #: src/menu/tug.c:492
 msgid "Connexion..."
 msgstr "Joining..."
 
 #: src/menu/assassin.c:826
-#: src/menu/race.c:819
+#: src/menu/race.c:903
 #: src/menu/tug.c:496
 msgid "Salle d'attente"
 msgstr "Waiting room"
 
 #: src/menu/assassin.c:827
-#: src/menu/race.c:820
+#: src/menu/race.c:904
 #: src/menu/tug.c:497
 msgid "Partie de %s"
 msgstr "%s's game"
@@ -852,7 +851,7 @@ msgstr "Waiting for the start..."
 
 #: src/menu/assassin.c:831
 #: src/menu/games.c:873
-#: src/menu/race.c:839
+#: src/menu/race.c:928
 #: src/menu/tug.c:501
 msgid "A : quitter"
 msgstr "A: quit"
@@ -867,7 +866,7 @@ msgid "Assassin"
 msgstr "Assassin"
 
 #: src/menu/assassin.c:835
-#: src/menu/race.c:825
+#: src/menu/race.c:909
 #: src/menu/tug.c:505
 msgid ""
 "Partie annulée par l'hôte\n"
@@ -877,7 +876,7 @@ msgstr ""
 "(or started without you)."
 
 #: src/menu/assassin.c:836
-#: src/menu/race.c:826
+#: src/menu/race.c:910
 #: src/menu/tug.c:506
 msgid "B : OK"
 msgstr "B: OK"
@@ -923,7 +922,7 @@ msgid "Distribution des cibles..."
 msgstr "Dealing the targets..."
 
 #: src/menu/assassin.c:859
-#: src/menu/race.c:883
+#: src/menu/race.c:972
 #: src/menu/tug.c:546
 msgid ""
 "Réception de la liste\n"
@@ -1053,7 +1052,7 @@ msgid "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %
 msgstr "Everyone has a secret target: get very close to kill it. %d players min."
 
 #: src/menu/assassin.c:955
-#: src/menu/race.c:867
+#: src/menu/race.c:956
 #: src/menu/tug.c:647
 #: src/menu/werewolf.c:1853
 msgid "A : retour  B : rejoindre"
@@ -2666,42 +2665,42 @@ msgid "Rétablir"
 msgstr "Restore"
 
 #: src/menu/ledcast.c:124
-#: src/menu/race.c:93
+#: src/menu/race.c:167
 msgid "Jaune"
 msgstr "Yellow"
 
 #: src/menu/ledcast.c:124
-#: src/menu/race.c:94
+#: src/menu/race.c:168
 msgid "Orange"
 msgstr "Orange"
 
 #: src/menu/ledcast.c:124
-#: src/menu/race.c:93
+#: src/menu/race.c:167
 msgid "Rouge"
 msgstr "Red"
 
 #: src/menu/ledcast.c:124
-#: src/menu/race.c:93
+#: src/menu/race.c:167
 msgid "Vert"
 msgstr "Green"
 
 #: src/menu/ledcast.c:125
-#: src/menu/race.c:93
+#: src/menu/race.c:167
 msgid "Bleu"
 msgstr "Blue"
 
 #: src/menu/ledcast.c:125
-#: src/menu/race.c:94
+#: src/menu/race.c:168
 msgid "Cyan"
 msgstr "Cyan"
 
 #: src/menu/ledcast.c:125
-#: src/menu/race.c:94
+#: src/menu/race.c:168
 msgid "Rose"
 msgstr "Pink"
 
 #: src/menu/ledcast.c:125
-#: src/menu/race.c:93
+#: src/menu/race.c:167
 msgid "Violet"
 msgstr "Purple"
 
@@ -3198,7 +3197,7 @@ msgid "Flags trouvés : %d/%d"
 msgstr "Flags found: %d/%d"
 
 #: src/menu/main.c:1419
-#: src/menu/race.c:880
+#: src/menu/race.c:969
 #: src/menu/tug.c:541
 msgid "A : retour  B : OK"
 msgstr "A: back  B: OK"
@@ -4245,67 +4244,95 @@ msgstr "Record: %u word in a row"
 msgid "Record : %u mots d'affilée"
 msgstr "Record: %u words in a row"
 
-#: src/menu/race.c:762
+#: src/menu/race.c:66
+msgid "Ovale (facile)"
+msgstr "Oval (easy)"
+
+#: src/menu/race.c:88
+msgid "Épingle (moyen)"
+msgstr "Hairpin (medium)"
+
+#: src/menu/race.c:110
+msgid "Serpent (difficile)"
+msgstr "Snake (hard)"
+
+#: src/menu/race.c:132
+msgid "Zigzag (expert)"
+msgstr "Zigzag (expert)"
+
+#: src/menu/race.c:846
 msgid "Sur la grille"
 msgstr "On the grid"
 
-#: src/menu/race.c:764
+#: src/menu/race.c:848
 msgid "Arrivé %u.%02u s"
 msgstr "Finished %u.%02u s"
 
-#: src/menu/race.c:766
+#: src/menu/race.c:850
 msgid "Tour %d/%d"
 msgstr "Lap %d/%d"
 
-#: src/menu/race.c:776
+#: src/menu/race.c:860
 msgid "Y X : tourner  A : frein  B : gaz"
 msgstr "Y X: steer  A: brake  B: gas"
 
-#: src/menu/race.c:782
+#: src/menu/race.c:866
 msgid "Arrivée"
 msgstr "Finish"
 
-#: src/menu/race.c:791
+#: src/menu/race.c:875
 msgid "%d. %s  (tour %d)"
 msgstr "%d. %s  (lap %d)"
 
-#: src/menu/race.c:802
+#: src/menu/race.c:886
 #: src/menu/tug.c:620
 msgid "A : retour  B : rejouer"
 msgstr "A: back  B: play again"
 
-#: src/menu/race.c:810
+#: src/menu/race.c:894
 msgid "%d / %d pilotes"
 msgstr "%d / %d drivers"
 
-#: src/menu/race.c:811
+#: src/menu/race.c:895
 #: src/menu/tug.c:486
 msgid "Il faut 2 joueurs au moins."
 msgstr "At least 2 players needed."
 
-#: src/menu/race.c:836
+#: src/menu/race.c:915
+msgid "Circuit : %s"
+msgstr "Track: %s"
+
+#: src/menu/race.c:925
 msgid "%s (toi)"
 msgstr "%s (you)"
 
-#: src/menu/race.c:851
+#: src/menu/race.c:929
+msgid "Y X : circuit  A : annuler"
+msgstr "Y X: track  A: cancel"
+
+#: src/menu/race.c:929
+msgid "Y X : circuit  A : annuler  B : lancer"
+msgstr "Y X: track  A: cancel  B: start"
+
+#: src/menu/race.c:940
 #: src/menu/tug.c:632
 msgid "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la d'abord."
 msgstr "A game of %s is running on your badge: finish or leave it first."
 
-#: src/menu/race.c:857
-msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"
-msgstr "A race of small cars, 2 to 8 drivers, 3 laps. Y X: steer, A: brake, B: gas. Off the track, the car slows down!"
+#: src/menu/race.c:946
+msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours, 4 circuits. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"
+msgstr "A race of small cars, 2 to 8 drivers, 3 laps, 4 tracks. Y X: steer, A: brake, B: gas. Off the track, the car slows down!"
 
-#: src/menu/race.c:869
+#: src/menu/race.c:958
 msgid "Recherche des courses..."
 msgstr "Looking for races..."
 
-#: src/menu/race.c:879
+#: src/menu/race.c:968
 #: src/menu/tug.c:540
 msgid "Partie annulée par l'hôte."
 msgstr "Cancelled by the host."
 
-#: src/menu/race.c:884
+#: src/menu/race.c:973
 #: src/menu/tug.c:547
 msgid "A long : quitter la page"
 msgstr "Hold A: leave the page"
@@ -6758,6 +6785,9 @@ msgstr "Invalid .EPV file"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Video format not supported"
+
+#~ msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"
+#~ msgstr "A race of small cars, 2 to 8 drivers, 3 laps. Y X: steer, A: brake, B: gas. Off the track, the car slows down!"
 
 #~ msgid "Course de petites voitures, 2 à 4 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
 #~ msgstr "A race of small cars, 2 to 4 drivers, 3 laps. Right wing: gas, left wing: brake, sides: steer. Off the track, the car slows down!"

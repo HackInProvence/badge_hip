@@ -229,6 +229,10 @@ drawn at random; with an odd number of players, one of them is the **Referee** (
 
 **Micro racers** (Mini-bolides, 2 to 8 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
 of a track bigger than the screen (the screen follows your car, framed).
+- **The track**: the creator of the party chooses it in the waiting room with Y / X, among 4 levels: **Oval
+  (easy)**, **Hairpin (medium)**, **Snake (hard**: an S on the right**)** and **Zigzag (expert**: a narrow road and
+  two zigzags**)**. The other drivers see it in the list of the parties and in the waiting room. Cutting over the
+  grass misses a checkpoint: the lap does not count.
 - Each car has a **color** (red, blue, green, yellow, purple, orange, cyan, pink: the LEDs of its badge, in the
   waiting room and during the race) and a **pattern** on the screen (solid, hollow, checkered, stripes...). The
   waiting room shows the pattern, the name and the color of each driver, "(you)" for yours; your pattern is also in

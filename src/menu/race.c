@@ -50,38 +50,112 @@
 #define TURN_MS 110  /* A step of the 32 directions while A or B is held */
 #define DIRS 32
 
-/* The track: '#' grass, '.' road, 'S' the start line */
+/* The tracks, chosen by the host in the lobby (the flags of the party), from the easiest: '#' grass, '.' road,
+ * 'S' the start line, always on the top straight (the same grid). The start line and the checkpoints 1, 2, 3: bands
+ * across the road and the grass beside it (cutting a turn over the grass still passes them; skipping one makes the
+ * lap not count): x0, y0, x1, y1 in pixels */
 #define TILE 16
 #define TRACK_W 24
 #define TRACK_H 18
-static const char TRACK[TRACK_H][TRACK_W + 1] = {
-    "########################",
-    "##.....S..............##",
-    "#......S...............#",
-    "#......S...............#",
-    "#...################...#",
-    "#...################...#",
-    "#...#####......#####...#",
-    "#...#####......#####...#",
-    "#...#####..##..#####...#",
-    "#...#####..##..#####...#",
-    "#...#####..##..#####...#",
-    "#...#####..##..#####...#",
-    "#...#####..##..#####...#",
-    "#...#####..##..#####...#",
-    "#..........##..........#",
-    "#..........##..........#",
-    "##.........##.........##",
-    "########################",
+typedef struct {
+    const char *name;
+    char tiles[TRACK_H][TRACK_W + 1];
+    int16_t lines[4][4];
+} track_t;
+static const track_t TRACKS[] = {
+    {N_("Ovale (facile)"),  /* a ring: the right side, the bottom straight, the left side */
+     {
+        "########################",
+        "##.....S...............#",
+        "#......S...............#",
+        "#......S...............#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#...################...#",
+        "#......................#",
+        "#......................#",
+        "#......................#",
+        "########################",
+     },
+     {{112, 0, 127, 63}, {320, 128, 383, 143}, {176, 224, 191, 287}, {0, 128, 63, 143}}},
+    {N_("Épingle (moyen)"),  /* a hairpin in the middle: the right side, its top, the left side */
+     {
+        "########################",
+        "##.....S..............##",
+        "#......S...............#",
+        "#......S...............#",
+        "#...################...#",
+        "#...################...#",
+        "#...#####......#####...#",
+        "#...#####......#####...#",
+        "#...#####..##..#####...#",
+        "#...#####..##..#####...#",
+        "#...#####..##..#####...#",
+        "#...#####..##..#####...#",
+        "#...#####..##..#####...#",
+        "#...#####..##..#####...#",
+        "#..........##..........#",
+        "#..........##..........#",
+        "##.........##.........##",
+        "########################",
+     },
+     {{112, 0, 127, 63}, {320, 128, 383, 143}, {176, 64, 191, 143}, {0, 128, 63, 143}}},
+    {N_("Serpent (difficile)"),  /* an S on the right: its bend (cutting it over the grass misses it), the bottom straight, the left side */
+     {
+        "########################",
+        "##.....S...............#",
+        "#......S...............#",
+        "#......S...............#",
+        "#...################...#",
+        "#...####...............#",
+        "#...####...............#",
+        "#...####...............#",
+        "#...####...#############",
+        "#...####...#############",
+        "#...####...............#",
+        "#...####...............#",
+        "#...####...............#",
+        "#...################...#",
+        "#......................#",
+        "#......................#",
+        "#......................#",
+        "########################",
+     },
+     {{112, 0, 127, 63}, {128, 128, 175, 143}, {176, 224, 191, 287}, {0, 128, 63, 143}}},
+    {N_("Zigzag (expert)"),  /* a narrow road, two zigzags: their bends, the bottom straight */
+     {
+        "########################",
+        "##.....S...............#",
+        "#......S...............#",
+        "#......S...............#",
+        "#..##################..#",
+        "#..##########..........#",
+        "#..##########..........#",
+        "#..##########..#########",
+        "#......######..#########",
+        "#......######..#########",
+        "#####..######..........#",
+        "#####..######..........#",
+        "#####..##############..#",
+        "#####..##############..#",
+        "#####..##############..#",
+        "#####..................#",
+        "#####..................#",
+        "########################",
+     },
+     {{112, 0, 127, 63}, {208, 112, 239, 127}, {176, 224, 191, 287}, {80, 192, 111, 207}}},
 };
-/* The start line and the checkpoints 1, 2, 3: bands across the road and the grass beside it (cutting a turn over
- * the grass still passes them; skipping one makes the lap not count): x0, y0, x1, y1 in pixels */
-static const int16_t LINES[4][4] = {
-    {112, 0, 127, 63},  /* The start line, on the top straight */
-    {320, 128, 383, 143},  /* 1: the right side */
-    {176, 64, 191, 143},  /* 2: the top of the hairpin, and the grass above it */
-    {0, 128, 63, 143},  /* 3: the left side */
-};
+#define N_TRACKS ((int)(sizeof(TRACKS) / sizeof(TRACKS[0])))
+static int track_i = 0;  /* The track of the race (the host: its choice) */
+#define TRACK (TRACKS[track_i].tiles)
+#define LINES (TRACKS[track_i].lines)
 #define WORLD_W (TRACK_W * TILE)
 #define WORLD_H (TRACK_H * TILE)
 /* The grid, behind the start line (x of the line: 7 * 16), heading east */
@@ -336,6 +410,7 @@ static void take_roster(void) {
     me = party_index(net_id());
     if (me < 0 || me >= MAX_CARS)
         return;
+    track_i = party_flags() < N_TRACKS ? party_flags() : 0;  /* The track chosen by the host */
     for (int i = 0; i < n; ++i) {
         car_t *c = &cars[i];
         memset(c, 0, sizeof(*c));
@@ -349,7 +424,7 @@ static void take_roster(void) {
     ready = true;
     changed = true;
     rank();
-    printf("race: %d cars, I am car %d\n", n, me + 1);
+    printf("race: %d cars, I am car %d, track %d\n", n, me + 1, track_i + 1);
 }
 
 static void result(void) {
@@ -477,6 +552,10 @@ void race_service(absolute_time_t now) {
 static void found_label(int i, char *buf, size_t len) {
     snprintf(buf, len, found[i].players > 1 ? _("%s  %u joueurs") : _("%s  %u joueur"), found[i].name,
              found[i].players);
+    if (found[i].flags < N_TRACKS) {  /* Its track */
+        size_t l = strlen(buf);
+        snprintf(buf + l, len - l, ", %s", tr(TRACKS[found[i].flags].name));
+    }
 }
 
 static void home_label(int i, char *buf, size_t len) {
@@ -536,7 +615,7 @@ static bool race_buttons(const app_buttons_t *b, absolute_time_t now) {
         if ((b->pressed & UI_BTN_B) && ! busy_game()) {
             party_set_handler(handler);
             if (sel == 0) {
-                party_host(PARTY_GAME_RACE, true, MAX_CARS, 0);
+                party_host(PARTY_GAME_RACE, true, MAX_CARS, (uint8_t)track_i);  /* The flags: the track */
                 printf("race: hosting\n");
                 page = P_LOBBY;
             } else {
@@ -575,6 +654,11 @@ static bool race_buttons(const app_buttons_t *b, absolute_time_t now) {
             printf("race: left the lobby\n");
             back_home();
             break;
+        }
+        if ((b->pressed & (UI_BTN_X | UI_BTN_Y)) && party_state() == PARTY_HOSTING) {  /* The track */
+            track_i = (track_i + ((b->pressed & UI_BTN_X) ? 1 : N_TRACKS - 1)) % N_TRACKS;
+            party_set_flags((uint8_t)track_i);
+            printf("race: track %d\n", track_i + 1);
         }
         if ((b->pressed & UI_BTN_B) && party_state() == PARTY_HOSTING && party_count() >= MIN_PLAYERS) {
             printf("race: start, %d players\n", party_count());
@@ -808,7 +892,7 @@ static void render_lobby(uint8_t *fb) {
     case PARTY_HOSTING:
         ui_title(fb, N_("Ta partie"));
         snprintf(text, sizeof(text), _("%d / %d pilotes"), n_lobby, MAX_CARS);
-        ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text : N_("Il faut 2 joueurs au moins."));
+        ui_lines(fb, UI_TITLE_H + 1, &gfx_font_small, n_lobby >= MIN_PLAYERS ? text : N_("Il faut 2 joueurs au moins."));
         break;
     case PARTY_JOINING:
         ui_title(fb, N_("Rejoindre"));
@@ -818,7 +902,7 @@ static void render_lobby(uint8_t *fb) {
     case PARTY_JOINED:
         ui_title(fb, N_("Salle d'attente"));
         snprintf(text, sizeof(text), _("Partie de %s"), party_name(party_host_id()));
-        ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
+        ui_lines(fb, UI_TITLE_H + 1, &gfx_font_small, text);
         break;
     default:
         ui_title(fb, N_("Mini-bolides"));
@@ -826,9 +910,14 @@ static void render_lobby(uint8_t *fb) {
         ui_footer(fb, N_("B : OK"));
         return;
     }
+    /* The track (chosen by the host: Y / X) */
+    int t = party_state() == PARTY_HOSTING ? track_i : party_flags();
+    snprintf(text, sizeof(text), _("Circuit : %s"), t < N_TRACKS ? tr(TRACKS[t].name) : "?");
+    ui_scroll_text(fb, GFX_WIDTH / 2, UI_TITLE_H + 16, GFX_WIDTH - 8, &gfx_font_small, text, GFX_BLACK,
+                   GFX_ALIGN_CENTER);
     /* The cars: 2 columns of 4, the pattern (as on the track), the name, the color (the LEDs of that badge) */
     for (int i = 0; i < n_lobby && i < MAX_CARS; ++i) {
-        int x = i % 2 ? GFX_WIDTH / 2 + 2 : 4, y = UI_TITLE_H + 24 + i / 2 * 32;
+        int x = i % 2 ? GFX_WIDTH / 2 + 2 : 4, y = UI_TITLE_H + 34 + i / 2 * 29;
         draw_square(fb, x + 8, y + 14, i, 2, 0, GFX_BLACK);
         bool mine = lobby[i].id == net_id();
         snprintf(text, sizeof(text), "%s", lobby[i].id ? lobby[i].name : "...");
@@ -837,7 +926,7 @@ static void render_lobby(uint8_t *fb) {
         ui_scroll_text(fb, x + 20, y + 15, GFX_WIDTH / 2 - 24, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
     }
     ui_footer(fb, party_state() == PARTY_JOINED ? N_("A : quitter")
-              : n_lobby >= MIN_PLAYERS ? N_("A : annuler  B : lancer") : N_("A : annuler"));
+              : n_lobby >= MIN_PLAYERS ? N_("Y X : circuit  A : annuler  B : lancer") : N_("Y X : circuit  A : annuler"));
 }
 
 static void race_render(uint8_t *fb, absolute_time_t now) {
@@ -855,7 +944,7 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
         } else {
             ui_list(fb, 2, sel, home_label);
             ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 12, &gfx_font_small, N_("Course de petites voitures, 2 à 8 "
-                       "pilotes, 3 tours. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"), 5);
+                       "pilotes, 3 tours, 4 circuits. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"), 5);
             ui_footer(fb, N_("A : retour  B : choisir"));
         }
         break;
