@@ -94,7 +94,26 @@ module**, en notification, ou sur l'écran de veille. Le Wi-Fi n'est allumé que
 | 46 | **Traduction** d'un message de cigale reçu dans la langue du badge | API de traduction 🔑 | ★★ 🌐 |
 
 
-## 7. Idées farfelues 🤪
+## 7. Appareil photo (module avec caméra et flash)
+
+Le module caméra est décrit dans [etude_module_esp32.md](etude_module_esp32.md) § 7. 📷 = demande la caméra.
+
+| # | Idée | Effort |
+|---|---|---|
+| 53 | **Appareil photo e-Paper** : viseur tramé sur l'écran, photo sur la carte, à revoir dans Médias > Images | ★★ 📷 |
+| 54 | **Photomaton de badge** : une photo de soi devient le badge nominatif (portrait tramé + nom) | ★★ 📷 |
+| 55 | **Lecteur de QR codes** : scanner les QR du programme, des stands, des scores des autres cigales, une carte de contact | ★★ 📷 |
+| 56 | **Échange de contacts par QR** : la cigale affiche sa carte en QR, l'autre la photographie | ★ 📷 |
+| 57 | **Scanner de documents** : une diapo, une affiche, un plan de salle, recadrés et gardés sur la carte | ★★ 📷 |
+| 58 | **Lecture de texte** (OCR, par une API ou localement) : le titre d'une diapo ou d'une affiche devient une note | ★★ 📷 🌐 |
+| 59 | **Filtres e-Paper** : trames (points, lignes, ASCII art), 4 niveaux de gris, contours : un rendu « gravure » | ★ 📷 |
+| 60 | **Time-lapse et stop-motion** : une image toutes les N secondes, rejouée en vidéo `.epv` sur le badge | ★★ 📷 |
+| 61 | **Détecteur de mouvement** : la cigale garde le stand, LEDs et son quand quelqu'un passe | ★★ 📷 |
+| 62 | **Chasse au trésor photo** : retrouver un lieu ou un objet à partir d'une image tramée | ★ 📷 |
+| 63 | **Jeu de couleurs** : trouver un objet de la couleur demandée (la caméra mesure la teinte), LEDs de la même couleur | ★★ 📷 |
+| 64 | **Webcam Wi-Fi** de la cigale pour un live du stand, avec un voyant allumé | ★★ 📷 🌐 |
+
+## 8. Idées farfelues 🤪
 
 | # | Idée | Effort |
 |---|---|---|
@@ -108,6 +127,7 @@ module**, en notification, ou sur l'écran de veille. Le Wi-Fi n'est allumé que
 
 ## Pistes pour le tri
 
+- **Avec la caméra** : appareil photo (53), photomaton (54), lecteur de QR codes (55), dans cet ordre.
 - **Premier lot** (peu d'effort, montre tout le chemin : Wi-Fi, widget, LEDs, notification) : météo (1), horloge
   (6), notifications du téléphone (11), écran agrandi (30), scanner Wi-Fi (23).
 - **Le plus utile au quotidien** : trajet (2), transports (3), agenda (5), Home Assistant (36).

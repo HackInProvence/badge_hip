@@ -24,7 +24,8 @@ Objectifs :
 | ESP32 classique | Wi-Fi 4, BLE 4.2, Bluetooth classique | SPP (port série Bluetooth) | plus gros, plus gourmand |
 
 Le C3 suffit : le rôle de l'ESP32 est une passerelle (BLE et Wi-Fi vers une liaison série), pas du calcul.
-Le S3 se justifie seulement pour rendre des images côté module (cartes, photos tramées).
+Le S3 (avec PSRAM) se justifie pour rendre des images côté module (cartes, photos tramées) et pour la
+**variante appareil photo** (§ 7 : un module avec caméra et flash).
 
 ### Le branchement : le port J2
 
@@ -177,7 +178,46 @@ Deux façons de montrer un service web sur le badge :
 Le badge peut aussi afficher un widget sur l'**écran de veille** : la météo ou le trajet visibles sans rien toucher, mis à jour toutes les 10-15 minutes pour la batterie.
 
 
-## 7. Étapes proposées
+## 7. La variante appareil photo
+
+Un module ESP32 avec **caméra et flash** fait de la cigale un appareil photo : l'e-Paper sert de viseur et
+d'écran de visualisation, les boutons de déclencheur.
+
+### Les modules
+
+| Module | Puce, mémoire | Caméra | Atouts | Limites |
+|---|---|---|---|---|
+| **Seeed XIAO ESP32S3 Sense** (recommandé) | ESP32-S3, 8 Mo de PSRAM, 8 Mo de flash | OV2640 (2 Mpx) ou OV3660 (3 Mpx), amovible | 21 × 17 mm, USB-C, micro-SD et micro intégrés, ~15 € | pas de flash LED : les LEDs du badge (blanc) en font office |
+| ESP32-CAM (AI-Thinker) | ESP32, 4 Mo de PSRAM | OV2640 | **flash LED** intégrée, micro-SD, ~8 € | ESP32 classique (pas de BLE 5), programmation par un adaptateur série, pointes de courant fortes avec le flash |
+| Freenove ESP32-S3 CAM, ESP32-S3-EYE | ESP32-S3, 8 Mo de PSRAM | OV2640 | USB, LED | plus gros |
+
+Le **S3 avec PSRAM** est nécessaire pour traiter une image (une photo 1600 × 1200 en JPEG fait 150-400 Ko).
+
+### Le fonctionnement
+
+- **Viseur** : l'ESP32 capture en niveaux de gris (QVGA), recadre en 200 × 200, tramé (Floyd-Steinberg ou
+  Atkinson), et l'envoie au badge (`SCREEN_PUSH`, 5 000 octets, ~55 ms) : un rafraîchissement partiel de l'e-Paper,
+  ~1 image par seconde. Suffisant pour cadrer.
+- **Déclencheur** : B (appui long : retardateur 3 s) ; Y / X : réglages (luminosité, contraste, trame, flash).
+  Les LEDs du badge clignotent pendant le retardateur et servent de flash (ou la LED de l'ESP32-CAM).
+- **La photo** : le JPEG en pleine définition sur la micro-SD du module (ou envoyé au téléphone par le Wi-Fi ou
+  le BLE) ; une version `.epi` 200 × 200 (2 bits, 4 niveaux de gris) copiée sur la carte du badge, dans
+  `IMAGES/PHOTOS/` (`FILE_WRITE`, ~10 Ko : moins d'une seconde) : la photo se revoit dans Médias > Images, peut
+  devenir l'écran de veille, le badge nominatif, ou partir par radio (Envoyer une image).
+- **API en plus** : `CAMERA_START` (viseur, réglages), `CAMERA_SHOT` (photo : nom du fichier en retour),
+  `CAMERA_STOP` ; côté badge, une page **Badge > Appareil photo** quand le module annonce une caméra (`HELLO`).
+
+### Contraintes
+
+- **Courant** : caméra ~100-150 mA en capture, flash LED jusqu'à ~300 mA : à valider avec le TPS63000, flash
+  limité en durée et en intensité.
+- **RAM du badge** : le viseur utilise `shared_buf` (deux images), rien de plus.
+- **Vie privée et règles des événements** : beaucoup de conférences de hacking interdisent les photos sans
+  accord (et SecSea a ses règles) : un voyant (LEDs du badge) allumé quand la caméra est active, pas de prise de vue
+  silencieuse, pas de diffusion automatique ; le mode appareil photo désactivable par l'organisation (commande
+  admin).
+
+## 8. Étapes proposées
 
 1. **Prototype matériel** : une carte de développement ESP32-C3 câblée sur J2 ; mesurer la tension pendant les
    pointes, la consommation par mode.
@@ -187,11 +227,13 @@ Le badge peut aussi afficher un widget sur l'**écran de veille** : la météo o
    Bluetooth.
 4. **Notifications** : les événements du badge vers le téléphone.
 5. **Wi-Fi et widgets** : un premier service (la météo, sans clé d'API : Open-Meteo).
-6. **Carte SD** : échange de fichiers, bac à sable.
-7. **Application Flutter**, si les étapes précédentes sont concluantes ; **carte d'extension** (ESP32 + IR) pour la
+6. **Carte SD** : échange de fichiers, bac à sable. Déjà fait par l'USB (commande `0x05`, `tools/sd_files.py`,
+   dates comprises) : l'ESP32 reprend les mêmes commandes.
+7. **Appareil photo** (§ 7) : viseur, photo, `.epi` dans `IMAGES/PHOTOS/`.
+8. **Application Flutter**, si les étapes précédentes sont concluantes ; **carte d'extension** (ESP32 + IR) pour la
    V1.3 du badge, avec un transistor de coupure de l'ESP32.
 
-## 8. Risques et questions ouvertes
+## 9. Risques et questions ouvertes
 
 - L'**autonomie** : à mesurer ; le Wi-Fi permanent est exclu.
 - La **tenue du 3,3 V** pendant les pointes cumulées (Wi-Fi + CC1101 + e-Paper).
