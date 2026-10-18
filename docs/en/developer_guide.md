@@ -1236,6 +1236,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # sm
 | `tools/smuggler_icons.py` | 32 × 32 icons of the goods → `src/menu/smuggler_goods.c`; `--png sheet.png`, `--check` (§ 6.26) |
 | `tools/gamebook_check.py` | checks a gamebook (errors, warnings), `--pages`, `--play` (play it in the terminal), `--c` (writes the built-in book) (§ 6.28) |
 | `tools/test_party_games.py`, `tools/test_werewolf.py`, `tools/test_smuggler.py` | two-badge tests (§ 9.3) |
+| `tools/docs_site.py` | the web site of the badge in `build/docs_site/` (`--out`, `--repo`, `--uf2`): home page, all the `.md` documentation in HTML (guides, features, notes of `docs/`; never `docs/analyses`), and in `ressources/` the firmware, the SD card (`carte_sd.zip`), the tools (`outils.zip`), the Flipper files, the hardware (KiCad as a `.zip`); needs `pip install markdown` |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | video → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sounds → 8-bit 16 kHz WAV (wildcards, folders, `--no-filter`, `--start`, `--duration`) |
