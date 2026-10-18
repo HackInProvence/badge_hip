@@ -903,20 +903,18 @@ static void render_blind_test(void) {
 
     if (bt_revealed) {
         /* "Composer - Title": one line each, in the medium font */
-        char title[PATH_MAX_LEN], fitted[PATH_MAX_LEN];
+        char title[PATH_MAX_LEN];
         track_title(playlist[bt_order[bt_index]], title, sizeof(title));
         char *second = strstr(title, " - ");
         if (second) {
             *second = 0;
             second += 3;
         }
-        int y = second ? 75 : 90;
-        fit_text_font(&gfx_font_medium, fitted, sizeof(fitted), title, GFX_WIDTH - 8);
-        gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_medium, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
-        if (second) {
-            fit_text_font(&gfx_font_medium, fitted, sizeof(fitted), second, GFX_WIDTH - 8);
-            gfx_text(fb, GFX_WIDTH/2, y + gfx_font_medium.height + 6, &gfx_font_medium, fitted, GFX_BLACK, GFX_ALIGN_CENTER);
-        }
+        int y = second ? 75 : 90;  /* Long names scroll (never cut) */
+        ui_scroll_text(fb, GFX_WIDTH/2, y, GFX_WIDTH - 8, &gfx_font_medium, title, GFX_BLACK, GFX_ALIGN_CENTER);
+        if (second)
+            ui_scroll_text(fb, GFX_WIDTH/2, y + gfx_font_medium.height + 6, GFX_WIDTH - 8, &gfx_font_medium, second,
+                           GFX_BLACK, GFX_ALIGN_CENTER);
     } else {
         gfx_text(fb, GFX_WIDTH/2, 70, &gfx_font_large, "? ? ?", GFX_BLACK, GFX_ALIGN_CENTER);
     }
