@@ -528,7 +528,11 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
   - the delay before sleep ("Start after: 5 min", also shown in the menu: "Screensaver: 5 min"): 1, 2, 3, 5, 10, 15
     or 30 minutes, 1 hour, or off (B: the next one);
   - the image shown while asleep ("SecSea (built-in)" by default, or an image from the `IMAGES` folder);
-  - "Screensaver preview" (Aperçu de la veille) to try it out.
+  - "Screensaver preview" (Aperçu de la veille) to try it out;
+  - the "Cleaning" of the screen (Nettoyage, B: the next one). The e-Paper keeps traces (ghosting) of the fast
+    images: a full refresh erases them. It never comes while the badge is used, only after 3 s without change.
+    **discreet** (default): a page that stays is redrawn once; **full**: black, white, then the page (the sharpest,
+    ~9 s); **off**: only the refresh after 3 s remains.
 
   The screensaver image is shown in dithered black and white (grays become dot patterns):
   it is the most stable display of the screen, the image stays sharp for hours without power.

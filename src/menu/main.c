@@ -1074,6 +1074,14 @@ static void display_name(const char *p, char *buf, size_t len) {
         *dot = 0;
 }
 
+/* The cleaning of the ghosts outside the games (display.h), saved */
+static const char *const CLEAN_NAMES[DISPLAY_CLEAN_MODES] = {N_("discret"), N_("complet"), N_("désactivé")};
+
+static display_clean_t clean_mode(void) {
+    uint8_t v = store_get()->display_clean;
+    return v >= 1 && v <= DISPLAY_CLEAN_MODES ? (display_clean_t)(v - 1) : DISPLAY_CLEAN_DISCREET;
+}
+
 static void settings_label(int i, char *buf, size_t len) {
     char name[SD_NAME_MAX];
     switch (i) {
@@ -1084,6 +1092,9 @@ static void settings_label(int i, char *buf, size_t len) {
     case 1:
         display_name(saver_image(), name, sizeof(name));
         snprintf(buf, len, _("Image : %s"), saver_image()[0] ? name : "SecSea");
+        break;
+    case 3:
+        snprintf(buf, len, _("Nettoyage : %s"), tr(CLEAN_NAMES[clean_mode()]));
         break;
     default:
         snprintf(buf, len, N_("Aperçu de la veille"));
@@ -1103,7 +1114,7 @@ static void saver_image_label(int i, char *buf, size_t len) {
 static void render_settings(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Veille de l'écran"));  /* Not "Réglages": the name of its theme */
-    draw_list(3, settings_selected, settings_label);
+    draw_list(4, settings_selected, settings_label);
     draw_footer(N_("A : retour  B : changer"));
 }
 
@@ -1161,6 +1172,15 @@ static void settings_validate(void) {
     case 1:
         open_saver_images();
         break;
+    case 3: {
+        /* Next way of cleaning the ghosts: discreet, full, off */
+        display_clean_t m = (display_clean_t)((clean_mode() + 1) % DISPLAY_CLEAN_MODES);
+        s->display_clean = (uint8_t)(m + 1);
+        store_changed();
+        display_set_clean(m);
+        printf("display: cleaning %s\n", CLEAN_NAMES[m]);
+        break;
+    }
     default:
         start_saver(A_SETTINGS);
         break;
@@ -2499,6 +2519,7 @@ int main() {
     noise_gen_set_enabled(false);  /* init_play starts the sound, we start silent */
     display_init();
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
+    display_set_clean(clean_mode());  /* Réglages > Veille de l'écran > Nettoyage */
     i18n_init();  /* The language of the texts */
     if (store_get()->asleep == STORE_ASLEEP)
         sleep_mode();  /* Put to sleep by an admin: until the manual unlock (it reboots) */
@@ -2773,7 +2794,7 @@ int main() {
                 ctf_selected = (ctf_selected + delta + 2) % 2;
                 redraw = true;
             } else if (app == A_SETTINGS) {
-                settings_selected = (settings_selected + delta + 3) % 3;
+                settings_selected = (settings_selected + delta + 4) % 4;
                 redraw = true;
             } else if (app == A_SAVER_IMAGES) {
                 int rows = sd_list_rows(&saver_list) + 1;

@@ -8,10 +8,11 @@
  * \brief Non blocking display of frame buffers (see gfx.h) for user interfaces.
  *
  * Updates use a fast refresh (multiframe mode with the 10 fps waveform, ~0.3s) that only changes what differs,
- * and a full refresh every DISPLAY_FULL_EVERY updates (or when requested) to remove the ghosting.
+ * and a full refresh after DISPLAY_FULL_EVERY updates (or when requested) to remove the ghosting: never while the
+ * badge is used (it blocks the screen ~2 s), only once the screen did not change for DISPLAY_FULL_IDLE_MS.
  * A page that stays (DISPLAY_SETTLE_MS without update, or less when the page asks it with display_settle_soon()) is
- * cleaned like the screensaver: full refreshes with the waveform of the screen (OTP) in black, in white, then the
- * page (~9 s, once): the short waveforms leave ghosts that come back. A new update or a user of the screen
+ * cleaned (display_clean_t): discreet, the page redrawn once with the waveform of the screen (OTP); full, in black,
+ * in white, then the page (~9 s, once): the short waveforms leave ghosts that come back. A new update or a user of the screen
  * (display_is_idle()) stops the cleaning after its current step (~3 s at most).
  * The screen goes to deep sleep after DISPLAY_SLEEP_MS without update, as recommended by the datasheet.
  *
@@ -27,7 +28,17 @@
 
 #include "pico/time.h"
 
-#define DISPLAY_FULL_EVERY 15
+#define DISPLAY_FULL_EVERY 15  /* DISPLAY_CLEAN_FULL */
+#define DISPLAY_FULL_EVERY_DISCREET 30  /* DISPLAY_CLEAN_DISCREET and DISPLAY_CLEAN_OFF */
+#define DISPLAY_FULL_IDLE_MS 3000  /* The full refresh waits until the screen did not change for this long */
+
+/* How the ghosts are cleaned outside the games (Réglages > Veille de l'écran > Nettoyage) */
+typedef enum {
+    DISPLAY_CLEAN_DISCREET,  /* Default: a page that stays redrawn once (~3 s), a full refresh every 30 updates */
+    DISPLAY_CLEAN_FULL,  /* A page that stays: black, white, the page (~9 s); a full refresh every 15 updates */
+    DISPLAY_CLEAN_OFF,  /* No cleaning of the pages that stay; a full refresh every 30 updates */
+    DISPLAY_CLEAN_MODES
+} display_clean_t;
 #define DISPLAY_SLEEP_MS 20000  /* After the cleaning (it counts as an update) */
 #define DISPLAY_SETTLE_MS 15000  /* A page unchanged this long is cleaned */
 #define DISPLAY_SETTLE_SOON_MS 1500
@@ -47,6 +58,9 @@ void display_task(absolute_time_t now);
 /** \brief Allow the full refresh every DISPLAY_FULL_EVERY updates (default), or delay it while false
  * (games: the full refresh blinks for ~2s). */
 void display_set_periodic_full(bool allowed);
+
+/** \brief The cleaning of the ghosts outside the games (see display_clean_t). */
+void display_set_clean(display_clean_t mode);
 
 /** \brief Whether all updates are done and the screen can be used by someone else (a cleaning in progress is
  * stopped: ask again until true). */

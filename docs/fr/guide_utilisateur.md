@@ -519,7 +519,11 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
   - le délai avant la veille, affiché dans le menu (« Veille : 5 min ») : 1, 2, 3, 5, 10, 15 ou 30 minutes, 1 heure, ou
     désactivée (B : le suivant) ;
   - l'image affichée pendant la veille (la SecSea par défaut, ou une image du dossier `IMAGES`) ;
-  - « Aperçu » pour l'essayer.
+  - « Aperçu » pour l'essayer ;
+  - « Nettoyage » de l'écran (B : le suivant). L'e-Paper garde des traces (rémanence) des images rapides : un
+    rafraîchissement complet les efface. Il ne vient jamais pendant que l'on utilise le badge, seulement après 3 s
+    sans changement. **discret** (par défaut) : une page qui reste est redessinée une fois ; **complet** : noir,
+    blanc, puis la page (le plus net, ~9 s) ; **désactivé** : seul le rafraîchissement après 3 s reste.
 
   L'image de veille est affichée en noir et blanc tramé (les gris deviennent des motifs de points) :
   c'est l'affichage le plus stable de l'écran, l'image reste nette pendant des heures sans courant.

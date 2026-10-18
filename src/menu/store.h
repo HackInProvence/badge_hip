@@ -97,6 +97,7 @@ typedef struct {
     uint16_t batt_unplug_raw;  /* ADC when unplugged (the level on battery: the final fall goes below it) */
     uint8_t net_rate;  /* Bit rate of the network: index + 1 in radio_tools.c RATES (0, 0xFF: default, 10 kbit/s) */
     uint8_t detector;  /* STORE_DETECTOR: the cigale detector is on (Social > Détecteur de cigales) */
+    uint8_t display_clean;  /* display_clean_t + 1 (Réglages > Veille de l'écran > Nettoyage); 0, 0xFF: discreet */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1

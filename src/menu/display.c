@@ -28,6 +28,7 @@ static bool full_needed = true;
 static unsigned fast_count = 0;
 static bool asleep = true;
 static bool periodic_full = true;
+static display_clean_t clean_mode = DISPLAY_CLEAN_DISCREET;
 static absolute_time_t last_update = 0;
 static bool settled = true;  /* The image on the screen was cleaned (or nothing to clean) */
 static bool settle_soon = false;  /* The image shown is a page made to stay */
@@ -63,6 +64,11 @@ void display_invalidate(void) {
 
 void display_set_periodic_full(bool allowed) {
     periodic_full = allowed;
+}
+
+
+void display_set_clean(display_clean_t mode) {
+    clean_mode = mode;
 }
 
 
@@ -105,17 +111,35 @@ void display_task(absolute_time_t now) {
         return;
     }
     if (state == D_IDLE && ! dirty) {
+        /* The full refresh against the ghosts of the fast ones: only once the screen did not change for
+         * DISPLAY_FULL_IDLE_MS (the user reads, nothing is pressed), as the games do it between the rounds */
+        unsigned every = clean_mode == DISPLAY_CLEAN_FULL ? DISPLAY_FULL_EVERY : DISPLAY_FULL_EVERY_DISCREET;
+        if (periodic_full && fast_count >= every && ! screen_busy()
+                && absolute_time_diff_us(last_update, now) > DISPLAY_FULL_IDLE_MS * 1000ll) {
+            if (! screen_boot())
+                return;
+            screen_show_image_bw(shown);
+            fast_count = 0;
+            last_update = now;
+            if (clean_mode != DISPLAY_CLEAN_FULL)
+                settled = true;  /* Just redrawn in full: no second cleaning of this page */
+            printf("display: full refresh (idle)\n");
+            return;
+        }
         /* A page that stays: cleaned once, like the screensaver (only after our own drawings, and not in the games
          * that refuse the periodic full refresh) */
-        if (! settled && periodic_full && ! screen_busy()
+        if (! settled && periodic_full && clean_mode != DISPLAY_CLEAN_OFF && ! screen_busy()
                 && absolute_time_diff_us(last_update, now) > (settle_soon ? DISPLAY_SETTLE_SOON_MS : DISPLAY_SETTLE_MS) * 1000ll) {
             if (! screen_boot())
                 return;
             settle_stop = false;
-            state = D_SETTLE_BLACK;
+            /* Full: black, white, then the page (~9 s); discreet: the page once (~3 s) */
+            state = clean_mode == DISPLAY_CLEAN_FULL ? D_SETTLE_BLACK : D_SETTLE_SHOW;
             printf("display: cleaning the page that stays\n");
             return;
         }
+        if (! settled && clean_mode == DISPLAY_CLEAN_OFF)
+            settled = true;
         /* Deep sleep when unused for a while */
         if (! asleep && ! screen_busy() && absolute_time_diff_us(last_update, now) > DISPLAY_SLEEP_MS*1000ll) {
             if (screen_boot())  /* Only if booted, otherwise it is already asleep */
@@ -133,7 +157,8 @@ void display_task(absolute_time_t now) {
 
     switch (state) {
     case D_IDLE:
-        if (full_needed || (periodic_full && fast_count >= DISPLAY_FULL_EVERY)) {
+        /* Never the periodic full refresh while the badge is used: it blocks the screen ~2 s (below, once idle) */
+        if (full_needed) {
             screen_show_image_bw(wanted);
             memcpy(shown, wanted, GFX_FB_SIZE);
             dirty = false;
