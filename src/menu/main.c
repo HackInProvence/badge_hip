@@ -932,8 +932,7 @@ static void render_social(void) {
     draw_title(N_("Réseau cigales"));
     snprintf(text, sizeof(text), _("%s : %lu pts, %u rencontres"), social_name(), (unsigned long)social_score(),
              social_met_count());
-    fit_text(fitted, sizeof(fitted), text, GFX_WIDTH - 12);
-    gfx_text(fb, 6, TITLE_H + 4, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
+    ui_scroll_text(fb, 6, TITLE_H + 4, GFX_WIDTH - 12, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);  /* Never cut */
     gfx_text(fb, 6, TITLE_H + 24, &gfx_font_small,
              social_enabled() ? N_("Balises : actives") : N_("Balises : coupées"), GFX_BLACK, GFX_ALIGN_LEFT);
     gfx_fill_rect(fb, 0, TITLE_H + 45, GFX_WIDTH, 1, GFX_BLACK);
