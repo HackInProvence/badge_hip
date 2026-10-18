@@ -911,4 +911,5 @@ const app_t app_race = {
     .stop = race_stop,
     .no_saver = true,
     .owns_leds = true,  /* The color of the car, then the rank: the animation of the badge does not change them */
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

@@ -395,4 +395,5 @@ const app_t app_duel = {
     .buttons = duel_buttons,
     .task = duel_task,
     .render = duel_render,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

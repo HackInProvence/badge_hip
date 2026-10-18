@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "shared_buf.h"
 #include "pico/rand.h"
 
 #include "ff.h"
@@ -39,7 +40,8 @@ static FIL video;
 static bool video_open = false;
 static uint32_t video_frames = 0;
 static uint32_t video_fps = 10;
-static uint8_t epv_frame[EPV_FRAME_SIZE];
+#define epv_frame shared_buf  /* The shared buffer (shared_buf.h): the video plays alone */
+_Static_assert(EPV_FRAME_SIZE <= SHARED_BUF_SIZE, "a frame in the shared buffer");
 
 
 const char *oled_demo_name(int d) {

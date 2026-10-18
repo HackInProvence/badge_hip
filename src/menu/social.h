@@ -93,6 +93,25 @@ uint32_t social_beacon_period_ms(void);
 /** \brief Beacons of new badges ignored because the table of the neighbours was full of stronger ones. */
 uint32_t social_ignored(void);
 
+/* ------ The cigale detector (Social > Détecteur de cigales): every cigale heard (new, or back after it was lost),
+ * whatever the distance, is a detection: a notification (main.c: a sound, the LEDs, the footer) and a log line
+ * "detect: <id> <name> rssi <dBm>" (a Bluetooth module on the serial port can send it to a phone) ------ */
+#define SOCIAL_DETECTIONS 8
+
+typedef struct {
+    uint32_t id;
+    char name[9];
+    int16_t rssi;
+    absolute_time_t at;
+} social_detection_t;
+
+bool social_detector(void);
+void social_set_detector(bool on);
+/** \brief A new detection, once (for the notification: "Cigale détectée : <name>"). */
+bool social_detect_event(char *buf, int len);
+/** \brief The last detections, the newest first. \return their number */
+int social_detections(social_detection_t *out, int max);
+
 /** \brief A buffer for a copy of all the neighbours, shared (the RAM): only inside a function, never kept from one
  * call to the next (another feature uses it in between). */
 extern social_neighbour_t social_tmp[SOCIAL_MAX_NEIGHBOURS];

@@ -11,7 +11,8 @@ mesures) ou un **fichier WAV** de la carte SD (dossier `MUSIQUE`).
 > **Note légale.** La bande 433,05 - 434,79 MHz est une bande ISM / SRD (appareils de faible portée) : en France et
 > en Europe, l'émission y est libre sous conditions (puissance apparente ≤ 10 mW, rapport cyclique limité selon
 > l'usage). Ce n'est **pas** une bande de radiodiffusion : réservez la Radio pirate à des **essais courts**, à
-> **faible puissance** (-10 dBm par défaut), dans la salle, sans gêner les autres utilisateurs de la bande
+> **faible puissance** (0 dBm par défaut : le maximum pour une émission continue dans la bande, 1 mW ; +10 dBm
+> seulement 10 % du temps), dans la salle, sans gêner les autres utilisateurs de la bande
 > (télécommandes, capteurs...). C'est pourquoi elle n'est accessible que **depuis le mode admin**, et l'émission
 > s'arrête d'elle-même au bout de **10 minutes**.
 
@@ -58,7 +59,7 @@ Flancs : ligne précédente / suivante ; ailes : valeur précédente / suivante 
 |---|---|---|
 | Source | Mélodie, Tonalité 1 kHz, Fichier SD | Mélodie |
 | Fréquence | 433,300 / 433,650 / **433,920** / 434,200 / 434,500 MHz | 433,920 MHz |
-| Puissance | -20, **-10**, 0, +5, +10 dBm | -10 dBm |
+| Puissance | -20, -10, **0**, +5, +10 dBm | 0 dBm |
 | Excursion | 2,5 / 5 / 12,5 / 25 / **47,6 kHz** (crête, son à pleine échelle) ; 47,6 kHz s'affiche « (Flipper) » | 47,6 kHz |
 | Gain du son | x1 / **x2** / x4 : les échantillons amplifiés autour du silence, écrêtés | x2 |
 | Haut-parleur | oui / non : le badge joue aussi le son | non |
@@ -109,7 +110,7 @@ Application **Audio** (Receive > Audio), fréquence **433,920 MHz** (ou celle ch
 - excursion **5 kHz** sur la cigale : modulation **NFM**, filtre **16k** (ou **11k** pour 2,5 kHz) ;
 - excursion **47,6 kHz** : modulation **WFM** (une NFM étroite serait saturée et distordue).
 
-Approchez-vous : à -10 dBm la portée est de quelques mètres.
+Approchez-vous : à 0 dBm la portée est de quelques mètres.
 
 ### Avec un SDR (RTL-SDR, Airspy, HackRF...)
 
@@ -136,7 +137,7 @@ Le deuxième badge est un vrai récepteur pour ce signal :
 4. **Correction de fréquence (AFC)** : les quartz des deux badges diffèrent (jusqu'à ±20 ppm chacun, soit ±17 kHz).
    Le rapport cyclique moyen doit valoir 50 % : sinon le récepteur décale sa fréquence par pas de ~400 Hz (toutes
    les 250 ms, par pas de 2 kHz quand le signal est saturé), uniquement quand une porteuse est reçue
-   (RSSI ≥ -92 dBm). S'il atteint ±32 kHz sans trouver, il essaie la polarité inverse du démodulateur.
+   (RSSI ≥ -100 dBm). S'il atteint ±32 kHz sans trouver, il essaie la polarité inverse du démodulateur.
 
 Écran : fréquence, signal (dBm et jauge), correction de fréquence, tonalité détectée (seulement si c'est une vraie
 tonalité : pureté ≥ 50 % et niveau ≥ 5 %), niveau et rapport cyclique moyen, état du silencieux. Flancs : canal
@@ -151,10 +152,10 @@ pirate: rx tone 1000 Hz, level 38 %, purity 1 kHz 97 %, duty 50 %, rssi -62 dBm,
 ## Essai avec deux badges
 
 1. Badge A (récepteur) : ouvrir « Écouter la radio pirate », sur 433,920 MHz. Brancher son USB, ouvrir le port série.
-2. Badge B (émetteur, mode admin) : Admin > Radio pirate, Source « Tonalité 1 kHz », Puissance **0 dBm** (ou +10 dBm
-   si les badges sont loin : à -10 dBm on mesure ~-97 dBm à 1 m, en limite de sensibilité dans un canal de 406 kHz),
-   Excursion 47,6 kHz et Gain du son x2 (les défauts), « > Émettre ». Les deux badges à 1 m l'un de l'autre.
-3. Sur A, en quelques secondes : RSSI nettement au-dessus de -92 dBm, la correction se stabilise, et le port série
+2. Badge B (émetteur, mode admin) : Admin > Radio pirate, Source « Tonalité 1 kHz », Puissance **0 dBm** (le défaut ; +10 dBm
+   pour un essai court si les badges sont loin ; à -10 dBm on mesure ~-97 dBm à 1 m, en limite de sensibilité dans un
+   canal de 406 kHz), Excursion 47,6 kHz et Gain du son x2 (les défauts), « > Émettre ». Les deux badges à 1 m l'un de l'autre.
+3. Sur A, en quelques secondes : RSSI nettement au-dessus de -100 dBm (le silencieux), la correction se stabilise, et le port série
    affiche `rx tone 1000 Hz` (±5 Hz) avec une pureté élevée ; le haut-parleur siffle à 1 kHz.
 4. Puis la Mélodie (on la reconnaît sur A), puis un WAV de la carte SD. Arrêt : aile gauche sur B ; la ligne
    `no carrier` apparaît sur A.
@@ -170,7 +171,7 @@ Mesurés sur la cigale qui écoute, tonalité de test de 1 kHz, mêmes badges, m
 
 ## Messages sur le port série
 
-- `pirate: start on 433920000 Hz, deviation 47607 Hz (DEVIATN for 47600 Hz), power -10 dBm (PATABLE 0x34),
+- `pirate: start on 433920000 Hz, deviation 47607 Hz (DEVIATN for 47600 Hz), power 0 dBm (PATABLE 0x60),
   source Mélodie, PWM 32002 Hz, data rate 500000`
 - `pirate: stop (fin du morceau | arrêt manuel | page quittée | sécurité : 10 min max) after N s`
 - `pirate: error, ...`, `pirate: radio busy ...` (récepteur OOK actif, par exemple le badge de talk : réessayer

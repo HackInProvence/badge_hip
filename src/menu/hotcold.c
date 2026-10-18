@@ -22,9 +22,10 @@
 #define MASTER_PERIOD_MS 1000
 #define LOST_MS 5000  /* No beacon for this long: lost */
 /* The scale of the hot / cold gauge: from HOT_SPAN dB below "hot" (glacial) to "hot" (the top of the gauge; "BRÛLANT"
- * from 85 % of it). The beacon at +10 dBm is heard at ~-70 to -83 dBm at 1 m: the default makes it hot at about 1 m.
+ * from 85 % of it). The beacon at +10 dBm is heard at ~-70 to -83 dBm at 1 m, ~-105 dBm at 7 m (10 kbit/s): the
+ * default makes it burning within ~1 m and hot at 2-3 m (it was -70: hot only at contact).
  * The admin sets it on the page of the beacon (store.h hot_dbm), and the beacon sends it to the hunters. */
-#define HOT_DEFAULT_DBM (-70)
+#define HOT_DEFAULT_DBM (-78)  /* "BRÛLANT" from ~-82 dBm (~1 m), "Chaud" from ~-88 dBm (2-3 m), "Glacial" at the edge of the range */
 #define HOT_MIN_DBM (-90)
 #define HOT_MAX_DBM (-40)
 #define HOT_STEP_DB 5

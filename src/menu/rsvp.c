@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "shared_buf.h"
 #include "ff.h"
 #include "gfx.h"
 #include "i18n.h"
@@ -292,8 +293,9 @@ static bool next_word(word_t *w) {
 
 /* ------ Display ------ */
 
-static uint8_t frames[2][GFX_FB_SIZE];
-static uint8_t *shown = frames[0], *drawing = frames[1];
+/* The two frames: the shared buffer (shared_buf.h: the reader is alone on the screen while it reads) */
+static uint8_t *shown = shared_buf, *drawing = shared_buf + GFX_FB_SIZE;
+_Static_assert(2 * GFX_FB_SIZE <= SHARED_BUF_SIZE, "two frames in the shared buffer");
 static word_t word;  /* Current word */
 static bool have_word = false;
 static int chunk = 0;  /* Current chunk of a long word */

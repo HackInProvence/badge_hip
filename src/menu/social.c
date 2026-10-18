@@ -49,6 +49,48 @@ static char event[48];
 static bool event_pending = false;
 static uint32_t n_sent = 0, n_received = 0;
 static uint32_t n_ignored = 0;  /* Beacons of new badges ignored: the table full of stronger ones */
+static social_detection_t detections[SOCIAL_DETECTIONS];  /* The newest first */
+static int n_detections = 0;
+static bool detect_pending = false;
+
+bool social_detector(void) {
+    return store_get()->detector == STORE_DETECTOR;
+}
+
+void social_set_detector(bool on) {
+    store_get()->detector = on ? STORE_DETECTOR : 0;
+    store_changed();
+    printf("detect: %s\n", on ? "on" : "off");
+}
+
+bool social_detect_event(char *buf, int len) {
+    if (! detect_pending)
+        return false;
+    detect_pending = false;
+    snprintf(buf, len, _("Cigale détectée : %s (%d dBm)"), detections[0].name, detections[0].rssi);
+    return true;
+}
+
+int social_detections(social_detection_t *out, int max) {
+    int n = n_detections < max ? n_detections : max;
+    memcpy(out, detections, n * sizeof(detections[0]));
+    return n;
+}
+
+/* A cigale heard for the first time, or back after it was forgotten (NEIGHBOUR_TIMEOUT_MS) */
+static void detected(const neighbour_t *nb, absolute_time_t now) {
+    if (! social_detector())
+        return;
+    memmove(detections + 1, detections, (SOCIAL_DETECTIONS - 1) * sizeof(detections[0]));
+    detections[0].id = nb->pub.id;
+    memcpy(detections[0].name, nb->pub.name, sizeof(detections[0].name));
+    detections[0].rssi = nb->pub.rssi;
+    detections[0].at = now;
+    if (n_detections < SOCIAL_DETECTIONS)
+        ++n_detections;
+    detect_pending = true;
+    printf("detect: %08lX %s rssi %d\n", (unsigned long)nb->pub.id, nb->pub.name, nb->pub.rssi);
+}
 
 
 /* The period of the beacons: 2 s, longer when the channel is busy (the load stays about the same with more badges) */
@@ -240,6 +282,7 @@ static void handle_beacon(const net_packet_t *packet) {
      * received stronger than the oldest one was at its last beacon (a crowd must not push out the badge at hand,
      * whose meeting needs several beacons) */
     neighbour_t *nb = NULL, *oldest = NULL, *free_slot = NULL;
+    bool is_new = false;
     for (int i = 0; i < SOCIAL_MAX_NEIGHBOURS && ! nb; ++i) {
         if (neighbours[i].pub.id == id)
             nb = &neighbours[i];
@@ -259,6 +302,7 @@ static void handle_beacon(const net_packet_t *packet) {
         }
         nb = free_slot ? free_slot : oldest;
         memset(nb, 0, sizeof(*nb));
+        is_new = true;
         nb->pub.id = id;
         store_t *s = store_get();
         for (uint16_t i = 0; i < s->n_met; ++i)
@@ -284,6 +328,8 @@ static void handle_beacon(const net_packet_t *packet) {
                nb->pub.batt_raw, nb->pub.batt_mv, nb->pub.batt_usb, rssi, nb->pub.batt_est);
     }
     nb->last_seen = now;
+    if (is_new)
+        detected(nb, now);  /* The name and the RSSI are known now */
     uint32_t common = nb->pub.skills & store_get()->skills;
     if (common && rssi >= SOCIAL_RSSI_CLOSE && ! nb->skills_told) {
         nb->skills_told = true;  /* A cicada close by shares a skill: once per visit */

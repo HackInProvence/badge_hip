@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "shared_buf.h"
 #include "app.h"
 #include "i18n.h"
 #include "skills.h"
@@ -24,7 +25,7 @@ const char *nametag_type(void) {
 
 /* The rows really inked by \p text at y = 0 (the fonts have room above and below the letters) */
 static void ink_rows(const gfx_font_t *font, const char *text, int *top, int *bottom) {
-    static uint8_t scratch[GFX_FB_SIZE];
+    uint8_t *scratch = shared_buf;  /* The shared buffer (shared_buf.h): the name tag is alone on the screen */
     gfx_clear(scratch, GFX_WHITE);
     gfx_text(scratch, GFX_WIDTH/2, 0, font, text, GFX_BLACK, GFX_ALIGN_CENTER);
     *top = -1;

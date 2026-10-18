@@ -2205,6 +2205,7 @@ const app_t app_werewolf = {
     .render = ww_render,
     .calm = ww_calm,
     .no_saver = true,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };
 
 

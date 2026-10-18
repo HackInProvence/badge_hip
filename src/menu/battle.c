@@ -445,4 +445,5 @@ const app_t app_battle = {
     .buttons = battle_buttons,
     .task = battle_task,
     .render = battle_render,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

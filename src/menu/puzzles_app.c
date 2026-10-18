@@ -30,7 +30,7 @@ static bool pz_calm(void) {
 #define PUZZLE_APP(id, var, title) \
     static void var##_start(absolute_time_t now) { puzzles_start(id, now); } \
     const app_t var = {.name = title, .start = var##_start, .buttons = pz_buttons, \
-                       .task = pz_task, .render = pz_render, .calm = pz_calm};
+                       .task = pz_task, .render = pz_render, .calm = pz_calm, .confirm_exit = true};
 
 PUZZLE_APP(PUZZLE_MINES, app_mines, N_("Démineur"))
 PUZZLE_APP(PUZZLE_2048, app_2048, "2048")

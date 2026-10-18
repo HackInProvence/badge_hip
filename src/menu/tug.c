@@ -677,5 +677,6 @@ const app_t app_tug = {
     .render = tug_render,
     .calm = tug_calm,
     .stop = tug_stop,
-    .no_saver = true,
+    .no_saver = true,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

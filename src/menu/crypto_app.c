@@ -245,4 +245,5 @@ const app_t app_crypto = {
     .task = crypto_task,
     .render = crypto_render,
     .stop = crypto_stop,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

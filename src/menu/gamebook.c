@@ -773,5 +773,6 @@ const app_t app_gamebook = {
     .start = gamebook_start,
     .buttons = gamebook_buttons,
     .render = gamebook_render,
-    .stop = gamebook_stop,
+    .stop = gamebook_stop,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

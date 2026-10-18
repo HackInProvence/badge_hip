@@ -69,7 +69,9 @@ static const uint32_t FREQS[] = {433300000, 433650000, 433920000, 434200000, 434
 /* PATABLE[0] at 433 MHz (CC1101 datasheet) */
 static const struct { int8_t dbm; uint8_t pa; } POWERS[] = {{-20, 0x0E}, {-10, 0x34}, {0, 0x60}, {5, 0x84}, {10, 0xC0}};
 #define N_POWERS ((int)(sizeof(POWERS) / sizeof(POWERS[0])))
-#define POWER_DEFAULT 1  /* -10 dBm */
+/* 0 dBm: the most for a continuous transmission in the 433 MHz band (1 mW, no limit of duty cycle; +10 dBm only for
+ * 10 % of the time: short tests). At -10 dBm, the receiver got ~-97 dBm at 1 m: heard at contact only */
+#define POWER_DEFAULT 2
 
 static const uint32_t DEVIATIONS[] = {2500, 5000, 12500, 25000, 47600};
 static const char *const DEVIATION_TEXTS[] = {"2,5", "5", "12,5", "25", "47,6"};
@@ -636,7 +638,8 @@ const app_t app_pirate_radio = {
 #define CAP_BITS 12  /* 4096 copies of the counter: 256 ms */
 #define CAP_SIZE (1u << CAP_BITS)
 #define RX_DEVIATION 5000  /* Only the transmitter uses it (the channel of the receiver is wide) */
-#define SQUELCH_DBM (-92)  /* Below: no carrier, the demodulator only gives noise */
+#define SQUELCH_DBM (-100)  /* Below: no carrier, the demodulator only gives noise (the noise floor of the 406 kHz
+                            * channel: ~-105 dBm; it was -92: silent beyond the contact) */
 #define RSSI_MS 100
 #define AFC_BLOCK (RX_RATE / 4)  /* Correction of the frequency every 250 ms */
 #define AFC_LIMIT 80  /* Steps of fXOSC / 2^16 (~400 Hz): +-32 kHz, two crystals of +-20 ppm and more */

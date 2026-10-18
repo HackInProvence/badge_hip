@@ -729,9 +729,9 @@ static const submenu_t SUBMENUS[] = {
                            M_APP(APP_TUG), M_APP(APP_RACE)}},
     /* Programme (program.c) is not in the menu: the program of the conference can change after the badges are
      * flashed. To put it back: M_APP(APP_PROGRAM) after APP_SKILLS, 12 entries, and MENU_PROGRAM 1 (the demo mode) */
-    {N_("Social"), 11, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS),
+    {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS),
                     M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
-                    M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER)}},
+                    M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER), M_APP(APP_DETECTOR)}},
     {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
     {N_("Badge"), 10, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
@@ -1689,6 +1689,39 @@ static void play_chime(void) {
 /* Sound of the games: a square wave, like the chime */
 static bool buzzer_claimed = false;  /* An application drives the buzzer (app_buzzer_claim()) */
 
+/* A game (the games of games.c, the applications with confirm_exit) left by a short press on A: a message asks for a
+ * long press (a game is not left by mistake); a long press on A leaves, any other press closes the message */
+static bool exit_confirm = false;
+static bool exit_confirm_skip_release = false;  /* The release of the press that opened the message */
+#define EXIT_CONFIRM_TEXT N_("Pour sortir :\nappui long sur A")
+
+/* The buttons while the message is shown. \return true: leave the game */
+static bool exit_confirm_buttons(uint8_t pressed, const app_buttons_t *ev, bool *redraw_flag) {
+    if (ev->long_pressed & UI_BTN_A) {
+        exit_confirm = false;
+        return true;
+    }
+    if (exit_confirm_skip_release && (ev->released_short & UI_BTN_A) && ! pressed) {
+        exit_confirm_skip_release = false;
+        return false;
+    }
+    if (pressed || ev->released_short) {
+        exit_confirm = false;  /* Closed: the game goes on */
+        *redraw_flag = true;
+    }
+    return false;
+}
+
+/* The game wants to stop on this event: only for a long press on A (otherwise the message). \return leave */
+static bool exit_allowed(uint8_t pressed, const app_buttons_t *ev) {
+    if (ev->long_pressed & UI_BTN_A)
+        return true;
+    exit_confirm = true;
+    exit_confirm_skip_release = (pressed & UI_BTN_A) != 0;
+    printf("ui: exit asked (long press on A to leave)\n");
+    return false;
+}
+
 static void game_tone(uint16_t hz, uint16_t ms) {
     if (wav_is_paused() || buzzer_claimed)
         return;
@@ -1927,6 +1960,7 @@ static void long_item_ok(uint8_t pressed, absolute_time_t now) {
             radio_test_start(now);
         } else if (games_show_record(item - M_TICTACTOE)) {
             ui_trace("Record");
+            exit_confirm = false;
             app = A_GAME;
         } else {
             set_status(N_("Pas encore de record"));
@@ -2024,6 +2058,7 @@ static void validate(void) {
     case M_SNAKE:
         games_start(selected - M_TICTACTOE, get_absolute_time());
         ui_trace(games_name(selected - M_TICTACTOE));
+        exit_confirm = false;
         app = A_GAME;
         break;
     case M_REMOTE_TOGGLE:
@@ -2478,6 +2513,7 @@ int main() {
             app_pending = NULL;
             ui_trace(cur_app->name);
             app = A_APP;
+            exit_confirm = false;  /* A new page: no message of the previous game */
             cur_app->start(now);
             redraw = true;
             if (still_pending) {
@@ -2488,10 +2524,28 @@ int main() {
                 cur_app = NULL;
                 start_saver(A_MENU);
             }
+        } else if (app == A_APP && exit_confirm) {
+            if (exit_confirm_buttons(pressed, &app_ev, &redraw)) {
+                if (cur_app->stop)
+                    cur_app->stop();
+                cur_app = NULL;
+                display_set_periodic_full(true);
+                set_leds(led_mode);
+                app = A_MENU;
+                redraw = true;
+            }
+        } else if (app == A_GAME && exit_confirm) {
+            if (exit_confirm_buttons(pressed, &app_ev, &redraw)) {
+                set_leds(led_mode);  /* The games used the LEDs */
+                display_set_periodic_full(true);
+                app = A_MENU;
+                redraw = true;
+            }
         } else if (app == A_APP) {
             bool typed = ui_edit_typed_pending();
             if ((pressed || app_ev.released_short || app_ev.long_pressed || app_ev.held || typed)
-                    && ! cur_app->buttons(&app_ev, now)) {
+                    && ! cur_app->buttons(&app_ev, now)
+                    && (! cur_app->confirm_exit || exit_allowed(pressed, &app_ev))) {
                 if (cur_app->stop)
                     cur_app->stop();
                 cur_app = NULL;
@@ -2504,7 +2558,7 @@ int main() {
                 redraw = true;
             ui_edit_typed_clear();  /* Not used by the page: dropped */
         } else if (app == A_GAME) {
-            if (! games_buttons(pressed, now)) {
+            if (! games_buttons(pressed, now) && exit_allowed(pressed, &app_ev)) {
                 set_leds(led_mode);  /* The games used the LEDs */
                 display_set_periodic_full(true);
                 app = A_MENU;
@@ -2714,6 +2768,20 @@ int main() {
         messages_task(now);
         if (messages_new(notif, sizeof(notif)))
             notify(APPS[APP_MESSAGES], notif);  /* The page shows the whole message (messages.c) */
+        /* The cigale detector (social.c): a sound, a flash of the LEDs, the footer */
+        static absolute_time_t detect_leds_off = 0;
+        if (social_detect_event(notif, sizeof(notif))) {
+            notify(NULL, notif);
+            if (! (app == A_APP && cur_app->owns_leds) && app != A_GAME) {
+                game_leds(0, 255, 0);
+                detect_leds_off = delayed_by_ms(now, 1500);
+            }
+        }
+        if (detect_leds_off && absolute_time_diff_us(detect_leds_off, now) >= 0) {
+            detect_leds_off = 0;
+            if (! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
+                set_leds(led_mode);
+        }
         announce_task(now);
         if (announce_new(notif, sizeof(notif))) {
             announce_open_newest();  /* The page shows it right away */
@@ -3038,13 +3106,18 @@ int main() {
                             N_("G : arrêter"));
                 else if (app == A_PAGE)
                     render_page(page_title, page_text, N_("G ou D : retour"));
-                else if (app == A_GAME)
+                else if (app == A_GAME) {
                     games_render(fb);
+                    if (exit_confirm)
+                        ui_box(fb, EXIT_CONFIRM_TEXT);
+                }
                 else if (app == A_RADIO_TEST)
                     render_radio_test(now);
                 else if (app == A_APP) {
                     gfx_clear(fb, GFX_WHITE);
                     cur_app->render(fb, now);
+                    if (exit_confirm)
+                        ui_box(fb, EXIT_CONFIRM_TEXT);
                 }
                 else if (app == A_CREDITS) {
                     credits_render(fb, credits_page);

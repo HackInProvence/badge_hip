@@ -52,6 +52,7 @@ typedef struct {
     void (*stop)(void);  /* Optional: when leaving (LEDs, sound...) */
     bool no_saver;  /* The screensaver must not start (the page shows something alive) */
     bool owns_leds;  /* The application drives the LEDs itself, even in mute mode (talk badge) */
+    bool confirm_exit;  /* A game: leaving it by a short press on A asks for a long press (main.c, exit_confirm) */
 } app_t;
 
 /** \brief Opens an application (from a service: e.g. a message received shows the program), implemented in main.c. */

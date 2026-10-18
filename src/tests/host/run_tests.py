@@ -233,8 +233,10 @@ def test_rsvp(work):
     # rsvp.c is copied next to the stand-ins of its dependencies, so that its "store.h", "screen.h"... are them
     for h in os.listdir(os.path.join(STUBS, 'rsvp')):
         shutil.copy(os.path.join(STUBS, 'rsvp', h), work)
-    return c_test('test_rsvp', ['gfx/gfx.c', 'gfx/gfx_fonts.c'] + I18N, [work, STUBS, os.path.join(SRC, 'gfx')], work,
-                  copy=[('menu/rsvp.c', 'rsvp.c'), ('menu/rsvp.h', 'rsvp.h'), ('menu/i18n.h', 'i18n.h')],
+    return c_test('test_rsvp', ['gfx/gfx.c', 'gfx/gfx_fonts.c', 'menu/shared_buf.c'] + I18N,
+                  [work, STUBS, os.path.join(SRC, 'gfx')], work,
+                  copy=[('menu/rsvp.c', 'rsvp.c'), ('menu/rsvp.h', 'rsvp.h'), ('menu/i18n.h', 'i18n.h'),
+                        ('menu/shared_buf.h', 'shared_buf.h')],
                   defines=I18N_DEFINES)
 
 

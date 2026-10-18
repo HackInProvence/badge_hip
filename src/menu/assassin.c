@@ -977,5 +977,6 @@ const app_t app_assassin = {
     .buttons = assassin_buttons,
     .task = assassin_task,
     .render = assassin_render,
-    .stop = assassin_stop,
+    .stop = assassin_stop,
+    .confirm_exit = true,  /* A game: leaving it asks for a long press on A */
 };

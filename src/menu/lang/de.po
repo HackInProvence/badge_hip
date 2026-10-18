@@ -22,7 +22,7 @@ msgid "Carte SD non formatée (FAT/exFAT)"
 msgstr "SD-Karte unformatiert (FAT/exFAT)"
 
 #: src/audio/wav.c:105
-#: src/menu/rsvp.c:550
+#: src/menu/rsvp.c:552
 #: src/menu/rtttl.c:333
 #: src/video/video.c:75
 msgid "Pas de carte SD"
@@ -33,7 +33,7 @@ msgid "Impossible d'ouvrir le fichier"
 msgstr "Datei nicht lesbar"
 
 #: src/audio/wav.c:116
-#: src/menu/pirate_radio.c:323
+#: src/menu/pirate_radio.c:325
 msgid "Audio indisponible"
 msgstr "Kein Audio"
 
@@ -563,7 +563,7 @@ msgstr ""
 #: src/menu/assassin.c:947
 #: src/menu/lang.c:47
 #: src/menu/messages.c:306
-#: src/menu/race.c:846
+#: src/menu/race.c:860
 #: src/menu/reset.c:123
 msgid "G : retour  D : choisir"
 msgstr "L: zurück  R: wählen"
@@ -727,34 +727,34 @@ msgid "Éliminé par %s"
 msgstr "Erledigt: %s"
 
 #: src/menu/assassin.c:597
-#: src/menu/race.c:464
+#: src/menu/race.c:478
 #: src/menu/tug.c:305
 #: src/menu/werewolf.c:1441
 msgid "%s  %u joueurs"
 msgstr "%s  %u Spieler"
 
 #: src/menu/assassin.c:598
-#: src/menu/race.c:464
+#: src/menu/race.c:478
 #: src/menu/tug.c:306
 #: src/menu/werewolf.c:1442
 msgid "%s  %u joueur"
 msgstr "%s  %u Spieler"
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:469
+#: src/menu/race.c:483
 #: src/menu/tug.c:310
 msgid "Créer une partie"
 msgstr "Spiel erstellen"
 
 #: src/menu/assassin.c:602
-#: src/menu/race.c:469
+#: src/menu/race.c:483
 #: src/menu/tug.c:310
 #: src/menu/werewolf.c:1417
 msgid "Rejoindre une partie"
 msgstr "Spiel beitreten"
 
 #: src/menu/assassin.c:609
-#: src/menu/race.c:489
+#: src/menu/race.c:503
 #: src/menu/tug.c:504
 #: src/menu/tug.c:539
 #: src/menu/tug.c:545
@@ -763,7 +763,7 @@ msgid "Tir à la corde"
 msgstr "Tauziehen"
 
 #: src/menu/assassin.c:610
-#: src/menu/race.c:490
+#: src/menu/race.c:504
 #: src/menu/tug.c:332
 #: src/menu/werewolf.c:258
 #: src/menu/werewolf.c:1582
@@ -772,11 +772,11 @@ msgid "Loup-garou"
 msgstr "Werwolf"
 
 #: src/menu/assassin.c:611
-#: src/menu/race.c:810
-#: src/menu/race.c:834
-#: src/menu/race.c:865
-#: src/menu/race.c:869
-#: src/menu/race.c:891
+#: src/menu/race.c:824
+#: src/menu/race.c:848
+#: src/menu/race.c:879
+#: src/menu/race.c:883
+#: src/menu/race.c:905
 msgid "Mini-bolides"
 msgstr "Mini-Flitzer"
 
@@ -786,7 +786,7 @@ msgid "+%d autres"
 msgstr "+%d mehr"
 
 #: src/menu/assassin.c:811
-#: src/menu/race.c:795
+#: src/menu/race.c:809
 #: src/menu/tug.c:483
 msgid "Ta partie"
 msgstr "Dein Spiel"
@@ -802,42 +802,42 @@ msgstr "Mindestens %d Spieler nötig."
 
 #: src/menu/assassin.c:818
 #: src/menu/assassin.c:823
-#: src/menu/main.c:3021
-#: src/menu/race.c:802
-#: src/menu/race.c:826
+#: src/menu/main.c:3089
+#: src/menu/race.c:816
+#: src/menu/race.c:840
 #: src/menu/smuggler.c:536
 msgid "G : annuler"
 msgstr "L: Abbruch"
 
 #: src/menu/assassin.c:818
-#: src/menu/race.c:826
+#: src/menu/race.c:840
 #: src/menu/tug.c:488
 msgid "G : annuler  D : lancer"
 msgstr "L: Abbruch  R: starten"
 
 #: src/menu/assassin.c:821
 #: src/menu/assassin.c:952
-#: src/menu/race.c:800
-#: src/menu/race.c:851
+#: src/menu/race.c:814
+#: src/menu/race.c:865
 #: src/menu/tug.c:491
 #: src/menu/tug.c:645
 msgid "Rejoindre"
 msgstr "Beitreten"
 
 #: src/menu/assassin.c:822
-#: src/menu/race.c:801
+#: src/menu/race.c:815
 #: src/menu/tug.c:492
 msgid "Connexion..."
 msgstr "Verbinden..."
 
 #: src/menu/assassin.c:826
-#: src/menu/race.c:805
+#: src/menu/race.c:819
 #: src/menu/tug.c:496
 msgid "Salle d'attente"
 msgstr "Warteraum"
 
 #: src/menu/assassin.c:827
-#: src/menu/race.c:806
+#: src/menu/race.c:820
 #: src/menu/tug.c:497
 msgid "Partie de %s"
 msgstr "Spiel von %s"
@@ -849,7 +849,7 @@ msgstr "Warte auf den Start..."
 
 #: src/menu/assassin.c:831
 #: src/menu/games.c:873
-#: src/menu/race.c:825
+#: src/menu/race.c:839
 #: src/menu/tug.c:501
 msgid "G : quitter"
 msgstr "L: Ende"
@@ -864,7 +864,7 @@ msgid "Assassin"
 msgstr "Assassin"
 
 #: src/menu/assassin.c:835
-#: src/menu/race.c:811
+#: src/menu/race.c:825
 #: src/menu/tug.c:505
 msgid ""
 "Partie annulée par l'hôte\n"
@@ -874,7 +874,7 @@ msgstr ""
 "(oder ohne dich begonnen)."
 
 #: src/menu/assassin.c:836
-#: src/menu/race.c:812
+#: src/menu/race.c:826
 #: src/menu/tug.c:506
 msgid "D : OK"
 msgstr "R: OK"
@@ -884,22 +884,22 @@ msgid "Brûlant !"
 msgstr "Glühend!"
 
 #: src/menu/assassin.c:842
-#: src/menu/hotcold.c:62
+#: src/menu/hotcold.c:63
 msgid "Chaud"
 msgstr "Heiß"
 
 #: src/menu/assassin.c:842
-#: src/menu/hotcold.c:62
+#: src/menu/hotcold.c:63
 msgid "Tiède"
 msgstr "Warm"
 
 #: src/menu/assassin.c:843
-#: src/menu/hotcold.c:63
+#: src/menu/hotcold.c:64
 msgid "Froid"
 msgstr "Kalt"
 
 #: src/menu/assassin.c:843
-#: src/menu/hotcold.c:63
+#: src/menu/hotcold.c:64
 msgid "Glacial"
 msgstr "Eisig"
 
@@ -920,7 +920,7 @@ msgid "Distribution des cibles..."
 msgstr "Ziele werden verteilt..."
 
 #: src/menu/assassin.c:859
-#: src/menu/race.c:870
+#: src/menu/race.c:884
 #: src/menu/tug.c:546
 msgid ""
 "Réception de la liste\n"
@@ -1050,7 +1050,7 @@ msgid "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %
 msgstr "Jeder hat ein geheimes Ziel: geh ganz nah ran, um es zu erledigen. Min. %d Spieler."
 
 #: src/menu/assassin.c:955
-#: src/menu/race.c:854
+#: src/menu/race.c:868
 #: src/menu/tug.c:648
 #: src/menu/werewolf.c:1853
 msgid "G : retour  D : rejoindre"
@@ -1127,13 +1127,13 @@ msgstr "> Punkt %d speichern"
 
 #: src/menu/battcal.c:154
 #: src/menu/ledcast.c:327
-#: src/menu/pirate_radio.c:614
+#: src/menu/pirate_radio.c:616
 msgid "Ailes : -  +"
 msgstr "Flügel: -  +"
 
 #: src/menu/battcal.c:154
 #: src/menu/ledcast.c:324
-#: src/menu/pirate_radio.c:614
+#: src/menu/pirate_radio.c:616
 msgid "G : retour  D : valider"
 msgstr "L: zurück  R: OK"
 
@@ -1328,7 +1328,7 @@ msgstr "Senden: %s"
 #: src/menu/battradio.c:70
 #: src/menu/main.c:679
 #: src/menu/main.c:680
-#: src/menu/pirate_radio.c:541
+#: src/menu/pirate_radio.c:543
 msgid "non"
 msgstr "aus"
 
@@ -1336,7 +1336,7 @@ msgstr "aus"
 #: src/menu/battradio.c:70
 #: src/menu/main.c:679
 #: src/menu/main.c:680
-#: src/menu/pirate_radio.c:541
+#: src/menu/pirate_radio.c:543
 msgid "oui"
 msgstr "an"
 
@@ -1547,7 +1547,7 @@ msgstr "Kontakte"
 
 #: src/menu/contacts.c:330
 #: src/menu/crypto_app.c:194
-#: src/menu/pirate_radio.c:566
+#: src/menu/pirate_radio.c:568
 #: src/menu/werewolf.c:1828
 msgid "G : retour  D : ouvrir"
 msgstr "L: zurück  R: öffnen"
@@ -1584,8 +1584,8 @@ msgstr ""
 
 #: src/menu/contacts.c:352
 #: src/menu/fsk_id.c:163
-#: src/menu/main.c:3038
-#: src/menu/pirate_radio.c:593
+#: src/menu/main.c:3106
+#: src/menu/pirate_radio.c:595
 #: src/menu/radio_tune.c:196
 msgid "G : arrêter"
 msgstr "L: stoppen"
@@ -1781,6 +1781,43 @@ msgstr ""
 msgid "D : lancer  G : retour"
 msgstr "R: starten  L: zurück"
 
+#: src/menu/detector.c:45
+#: src/menu/detector.c:66
+msgid "Détecteur de cigales"
+msgstr "Zikaden-Detektor"
+
+#: src/menu/detector.c:47
+msgid "Activé"
+msgstr "An"
+
+#: src/menu/detector.c:47
+msgid "Désactivé"
+msgstr "Aus"
+
+#: src/menu/detector.c:49
+msgid "Chaque cigale captée, même loin, est signalée (son, LEDs, message)."
+msgstr "Jede empfangene Zikade, auch weit weg, wird gemeldet (Ton, LEDs, Nachricht)."
+
+#: src/menu/detector.c:50
+msgid "B : activer. Chaque cigale captée, même loin, sera signalée."
+msgstr "B: an. Jede empfangene Zikade, auch weit weg, wird gemeldet."
+
+#: src/menu/detector.c:56
+msgid "%s %d dBm, %d s"
+msgstr "%s %d dBm, %d s"
+
+#: src/menu/detector.c:58
+msgid "%s %d dBm, %d min"
+msgstr "%s %d dBm, %d min"
+
+#: src/menu/detector.c:62
+msgid "A : retour  B : activer"
+msgstr "A: zurück  B: an"
+
+#: src/menu/detector.c:62
+msgid "A : retour  B : désactiver"
+msgstr "A: zurück  B: aus"
+
 #: src/menu/duel.c:30
 msgid "Ciseaux"
 msgstr "Schere"
@@ -1908,7 +1945,7 @@ msgid "Sur un téléphone ou un PC : la page fsk-buzzer-link.html, bouton Écout
 msgstr "Auf einem Handy oder PC: die Seite fsk-buzzer-link.html, Knopf Écouter (hören), nahe am Badge."
 
 #: src/menu/fsk_id.c:163
-#: src/menu/pirate_radio.c:567
+#: src/menu/pirate_radio.c:569
 msgid "G : retour  D : émettre"
 msgstr "L: zurück  R: senden"
 
@@ -2216,7 +2253,7 @@ msgid "Pause  D : reprendre"
 msgstr "Pause  R: weiter"
 
 #: src/menu/games.c:1106
-#: src/menu/main.c:1932
+#: src/menu/main.c:1966
 #: src/menu/puzzles.c:1328
 msgid "Pas encore de record"
 msgstr "Noch kein Rekord"
@@ -2242,49 +2279,49 @@ msgstr "Rekord "
 msgid "Score signé  Bouton : retour"
 msgstr "Score signiert  Taste: zurück"
 
-#: src/menu/hotcold.c:62
+#: src/menu/hotcold.c:63
 msgid "BRÛLANT !"
 msgstr "GLÜHEND!"
 
-#: src/menu/hotcold.c:84
+#: src/menu/hotcold.c:85
 msgid "%s hors de portée"
 msgstr "%s zu weit weg"
 
-#: src/menu/hotcold.c:91
+#: src/menu/hotcold.c:92
 msgid "%s : %d dBm"
 msgstr "%s: %d dBm"
 
-#: src/menu/hotcold.c:93
+#: src/menu/hotcold.c:94
 msgid "Bougez : suivez la chaleur !"
 msgstr "Beweg dich: folge der Hitze!"
 
-#: src/menu/hotcold.c:155
-#: src/menu/hotcold.c:169
+#: src/menu/hotcold.c:156
+#: src/menu/hotcold.c:170
 msgid "Chaud - froid"
 msgstr "Heiß - kalt"
 
-#: src/menu/hotcold.c:156
+#: src/menu/hotcold.c:157
 msgid "Balise"
 msgstr "Bake"
 
-#: src/menu/hotcold.c:157
+#: src/menu/hotcold.c:158
 msgid "G : quitter  D : autre balise"
 msgstr "L: Ende  R: andere Bake"
 
-#: src/menu/hotcold.c:221
-#: src/menu/hotcold.c:238
+#: src/menu/hotcold.c:222
+#: src/menu/hotcold.c:239
 msgid "Balise chaud-froid"
 msgstr "Heiß-kalt-Bake"
 
-#: src/menu/hotcold.c:222
+#: src/menu/hotcold.c:223
 msgid "Arrêtée"
 msgstr "Aus"
 
-#: src/menu/hotcold.c:222
+#: src/menu/hotcold.c:223
 msgid "Emission"
 msgstr "Sendet"
 
-#: src/menu/hotcold.c:224
+#: src/menu/hotcold.c:225
 msgid ""
 "Une balise par seconde\n"
 "(+10 dBm). Cachez ce badge :\n"
@@ -2296,33 +2333,33 @@ msgstr ""
 "Badge: die anderen suchen\n"
 "es mit Social > Heiß - kalt."
 
-#: src/menu/hotcold.c:227
+#: src/menu/hotcold.c:228
 msgid "Brûlant dès %d dBm"
 msgstr "Glühend ab %d dBm"
 
-#: src/menu/hotcold.c:229
+#: src/menu/hotcold.c:230
 msgid "G : quitter  D : arrêter"
 msgstr "L: Ende  R: stoppen"
 
-#: src/menu/hotcold.c:229
+#: src/menu/hotcold.c:230
 msgid "G : quitter  D : émettre"
 msgstr "L: Ende  R: senden"
 
-#: src/menu/hotcold.c:323
+#: src/menu/hotcold.c:324
 msgid "Radar : %s"
 msgstr "Radar: %s"
 
-#: src/menu/hotcold.c:326
-#: src/menu/hotcold.c:476
+#: src/menu/hotcold.c:327
+#: src/menu/hotcold.c:477
 msgid "G : retour à la liste"
 msgstr "L: zurück zur Liste"
 
-#: src/menu/hotcold.c:329
-#: src/menu/hotcold.c:347
+#: src/menu/hotcold.c:330
+#: src/menu/hotcold.c:348
 msgid "Radar des cigales"
 msgstr "Zikaden-Radar"
 
-#: src/menu/hotcold.c:331
+#: src/menu/hotcold.c:332
 msgid ""
 "Aucune cigale entendue.\n"
 "Les badges proches\n"
@@ -2334,17 +2371,17 @@ msgstr ""
 "erscheinen hier (Baken\n"
 "alle 2 s)."
 
-#: src/menu/hotcold.c:335
+#: src/menu/hotcold.c:336
 msgid "G : quitter  D : suivre"
 msgstr "L: Ende  R: folgen"
 
-#: src/menu/hotcold.c:474
-#: src/menu/hotcold.c:479
-#: src/menu/hotcold.c:491
+#: src/menu/hotcold.c:475
+#: src/menu/hotcold.c:480
+#: src/menu/hotcold.c:492
 msgid "Chasse 433 MHz"
 msgstr "433-MHz-Jagd"
 
-#: src/menu/hotcold.c:482
+#: src/menu/hotcold.c:483
 msgid ""
 "Écoute des émetteurs\n"
 "433 MHz (télécommandes,\n"
@@ -2354,7 +2391,7 @@ msgstr ""
 "(Fernbedienungen,\n"
 "Sensoren, Störsender)..."
 
-#: src/menu/hotcold.c:487
+#: src/menu/hotcold.c:488
 msgid "G : retour  D : le chasser"
 msgstr "L: zurück  R: jagen"
 
@@ -2800,12 +2837,12 @@ msgstr "grün"
 
 #: src/menu/main.c:538
 #: src/menu/main.c:670
-#: src/menu/main.c:2863
+#: src/menu/main.c:2931
 msgid "Images"
 msgstr "Bilder"
 
 #: src/menu/main.c:538
-#: src/menu/main.c:2914
+#: src/menu/main.c:2982
 msgid "Lecture rapide"
 msgstr "Schnelllesen"
 
@@ -2866,13 +2903,13 @@ msgstr "Zikadennetz: %lu Pkt."
 
 #: src/menu/main.c:660
 #: src/menu/main.c:1366
-#: src/menu/main.c:3018
+#: src/menu/main.c:3086
 msgid "Infrarouge"
 msgstr "Infrarot"
 
 #: src/menu/main.c:661
 #: src/menu/main.c:1377
-#: src/menu/main.c:1993
+#: src/menu/main.c:2027
 msgid "Écran OLED"
 msgstr "OLED-Display"
 
@@ -2987,7 +3024,7 @@ msgstr "Spielt..."
 
 #: src/menu/main.c:909
 #: src/menu/main.c:1470
-#: src/menu/rsvp.c:718
+#: src/menu/rsvp.c:720
 msgid "Pause"
 msgstr "Pause"
 
@@ -3238,55 +3275,63 @@ msgstr ""
 "\n"
 "%u Stücke gespielt."
 
-#: src/menu/main.c:1868
+#: src/menu/main.c:1696
+msgid ""
+"Pour sortir :\n"
+"appui long sur A"
+msgstr ""
+"Zum Verlassen:\n"
+"A lange drücken"
+
+#: src/menu/main.c:1901
 msgid "%lu s"
 msgstr "%lu s"
 
-#: src/menu/main.c:1870
+#: src/menu/main.c:1903
 msgid "%lu min"
 msgstr "%lu min"
 
-#: src/menu/main.c:1870
+#: src/menu/main.c:1903
 msgid "%lu min %02lu s"
 msgstr "%lu min %02lu s"
 
-#: src/menu/main.c:1873
+#: src/menu/main.c:1906
 msgid "%lu h %02lu min"
 msgstr "%lu h %02lu min"
 
-#: src/menu/main.c:1879
+#: src/menu/main.c:1912
 msgid "Test radio"
 msgstr "Funktest"
 
-#: src/menu/main.c:1880
+#: src/menu/main.c:1913
 msgid "Un message toutes les"
 msgstr "Eine Nachricht alle"
 
-#: src/menu/main.c:1883
+#: src/menu/main.c:1916
 msgid "Flancs : - / +  (maintenir : vite)"
 msgstr "Seiten: - / +  (halten: schnell)"
 
-#: src/menu/main.c:1885
+#: src/menu/main.c:1918
 msgid "Messages envoyés : %u"
 msgstr "Gesendet: %u"
 
-#: src/menu/main.c:1896
+#: src/menu/main.c:1929
 msgid "En pause"
 msgstr "Pausiert"
 
-#: src/menu/main.c:1901
+#: src/menu/main.c:1934
 msgid "Prochain dans %s"
 msgstr "Nächste in %s"
 
-#: src/menu/main.c:1904
+#: src/menu/main.c:1937
 msgid "G : quitter  D : pause"
 msgstr "L: Ende  R: Pause"
 
-#: src/menu/main.c:1904
+#: src/menu/main.c:1937
 msgid "G : quitter  D : reprendre"
 msgstr "L: Ende  R: weiter"
 
-#: src/menu/main.c:1995
+#: src/menu/main.c:2029
 msgid ""
 "Aucun écran détecté.\n"
 "\n"
@@ -3302,33 +3347,33 @@ msgstr ""
 "SDA Pin 4, SCL Pin 3,\n"
 "3,3 V Pin 1, GND 11."
 
-#: src/menu/main.c:2045
-#: src/menu/pirate_radio.c:306
-#: src/menu/pirate_radio.c:939
+#: src/menu/main.c:2080
+#: src/menu/pirate_radio.c:308
+#: src/menu/pirate_radio.c:942
 msgid "Radio occupée"
 msgstr "Funk belegt"
 
-#: src/menu/main.c:2070
+#: src/menu/main.c:2105
 msgid "Son et LEDs coupés"
 msgstr "Ton und LEDs aus"
 
-#: src/menu/main.c:2282
+#: src/menu/main.c:2317
 msgid "Mode démo arrêté"
 msgstr "Demo-Modus aus"
 
-#: src/menu/main.c:2318
+#: src/menu/main.c:2353
 msgid "SOMMEIL"
 msgstr "SCHLAF"
 
-#: src/menu/main.c:2319
+#: src/menu/main.c:2354
 msgid "Le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un organisateur."
 msgstr "Das Badge wurde von einem Admin schlafen gelegt. Hängt es fest, geh zu einem Organisator."
 
-#: src/menu/main.c:2444
+#: src/menu/main.c:2479
 msgid "Langue : English"
 msgstr "Sprache: English"
 
-#: src/menu/main.c:2532
+#: src/menu/main.c:2586
 msgid ""
 "Bravo, code Konami !\n"
 "\n"
@@ -3340,7 +3385,7 @@ msgstr ""
 "Flag:\n"
 "%s"
 
-#: src/menu/main.c:2537
+#: src/menu/main.c:2591
 msgid ""
 "Code incorrect.\n"
 "\n"
@@ -3352,35 +3397,35 @@ msgstr ""
 "Tipp: berühmter Code\n"
 "aus Videospielen..."
 
-#: src/menu/main.c:2591
+#: src/menu/main.c:2645
 msgid "Flags trouvés"
 msgstr "Deine Flags"
 
-#: src/menu/main.c:2593
+#: src/menu/main.c:2647
 msgid "Aucun pour l'instant."
 msgstr "Noch keine."
 
-#: src/menu/main.c:2687
+#: src/menu/main.c:2741
 msgid "Batterie faible : économie"
 msgstr "Akku schwach: sparen"
 
-#: src/menu/main.c:2689
+#: src/menu/main.c:2743
 msgid "Batterie : mode normal"
 msgstr "Akku: Normalmodus"
 
-#: src/menu/main.c:2723
+#: src/menu/main.c:2791
 msgid "Vote ouvert : Social > Vote"
 msgstr "Umfrage: Social > Umfrage"
 
-#: src/menu/main.c:2740
+#: src/menu/main.c:2808
 msgid "Kof kof ! (virus des cigales)"
 msgstr "Hust hust! (Zikadenvirus)"
 
-#: src/menu/main.c:2744
+#: src/menu/main.c:2812
 msgid "Vous êtes infecté !"
 msgstr "Du bist infiziert!"
 
-#: src/menu/main.c:2864
+#: src/menu/main.c:2932
 msgid ""
 "%s\n"
 "\n"
@@ -3392,11 +3437,11 @@ msgstr ""
 "Ungültiges .EPI-Bild\n"
 "(siehe image2epi.py)."
 
-#: src/menu/main.c:2900
+#: src/menu/main.c:2968
 msgid "Vidéo"
 msgstr "Video"
 
-#: src/menu/main.c:3019
+#: src/menu/main.c:3087
 msgid ""
 "Enregistrement...\n"
 "\n"
@@ -3410,11 +3455,11 @@ msgstr ""
 "auf den Empfänger (rechter\n"
 "Port) und drück eine Taste."
 
-#: src/menu/main.c:3035
+#: src/menu/main.c:3103
 msgid "Porteuse"
 msgstr "Träger"
 
-#: src/menu/main.c:3036
+#: src/menu/main.c:3104
 msgid ""
 "433,92 MHz + 19 kHz\n"
 "en continu, +10 dBm\n"
@@ -3430,7 +3475,7 @@ msgstr ""
 "analysator des Flippers.\n"
 "Auto-Stopp nach 30 s."
 
-#: src/menu/main.c:3040
+#: src/menu/main.c:3108
 msgid "G ou D : retour"
 msgstr "L/R: zurück"
 
@@ -3556,205 +3601,205 @@ msgstr "R: Posteingang"
 msgid "Messages"
 msgstr "Chat"
 
-#: src/menu/nametag.c:18
+#: src/menu/nametag.c:19
 msgid "ORATEUR"
 msgstr "REDNER"
 
-#: src/menu/nametag.c:18
+#: src/menu/nametag.c:19
 msgid "PARTICIPANT"
 msgstr "TEILNEHMER"
 
-#: src/menu/nametag.c:18
+#: src/menu/nametag.c:19
 msgid "STAFF"
 msgstr "STAFF"
 
-#: src/menu/nametag.c:87
+#: src/menu/nametag.c:88
 msgid "Badge nominatif"
 msgstr "Namensschild"
 
-#: src/menu/oled_demo.c:26
+#: src/menu/oled_demo.c:27
 msgid "Cigale"
 msgstr "Zikade"
 
-#: src/menu/oled_demo.c:26
+#: src/menu/oled_demo.c:27
 msgid "Cube 3D"
 msgstr "3D-Würfel"
 
-#: src/menu/oled_demo.c:26
+#: src/menu/oled_demo.c:27
 msgid "Texte défilant"
 msgstr "Lauftext"
 
-#: src/menu/oled_demo.c:26
+#: src/menu/oled_demo.c:27
 msgid "Étoiles"
 msgstr "Sterne"
 
-#: src/menu/oled_demo.c:27
+#: src/menu/oled_demo.c:28
 msgid "Vidéo (carte SD)"
 msgstr "Video (SD-Karte)"
 
-#: src/menu/oled_demo.c:198
+#: src/menu/oled_demo.c:200
 msgid "Pas de vidéo"
 msgstr "Kein Video"
 
-#: src/menu/oled_demo.c:199
+#: src/menu/oled_demo.c:201
 msgid "sur la carte SD"
 msgstr "auf SD-Karte"
 
-#: src/menu/pirate_radio.c:186
+#: src/menu/pirate_radio.c:188
 msgid "Fichier SD"
 msgstr "SD-Datei"
 
-#: src/menu/pirate_radio.c:186
+#: src/menu/pirate_radio.c:188
 msgid "Mélodie"
 msgstr "Melodie"
 
-#: src/menu/pirate_radio.c:186
+#: src/menu/pirate_radio.c:188
 msgid "Tonalité 1 kHz"
 msgstr "1-kHz-Ton"
 
-#: src/menu/pirate_radio.c:417
+#: src/menu/pirate_radio.c:419
 msgid "page quittée"
 msgstr "verlassen"
 
-#: src/menu/pirate_radio.c:437
-#: src/menu/pirate_radio.c:441
+#: src/menu/pirate_radio.c:439
+#: src/menu/pirate_radio.c:443
 msgid "arrêt manuel"
 msgstr "manuell"
 
-#: src/menu/pirate_radio.c:509
+#: src/menu/pirate_radio.c:511
 msgid "fin du morceau"
 msgstr "Stück zu Ende"
 
-#: src/menu/pirate_radio.c:513
+#: src/menu/pirate_radio.c:515
 #: src/menu/rtttl_parse.c:422
 msgid "fin"
 msgstr "Ende"
 
-#: src/menu/pirate_radio.c:513
+#: src/menu/pirate_radio.c:515
 msgid "fin de la mélodie"
 msgstr "Ende der Melodie"
 
-#: src/menu/pirate_radio.c:517
+#: src/menu/pirate_radio.c:519
 msgid "sécurité : 10 min max"
 msgstr "Schutz: max. 10 min"
 
-#: src/menu/pirate_radio.c:533
+#: src/menu/pirate_radio.c:535
 msgid "Source : %s"
 msgstr "Quelle: %s"
 
-#: src/menu/pirate_radio.c:534
+#: src/menu/pirate_radio.c:536
 msgid "Fréquence : %s"
 msgstr "Frequenz: %s"
 
-#: src/menu/pirate_radio.c:535
+#: src/menu/pirate_radio.c:537
 msgid "Puissance : %d dBm"
 msgstr "Leistung: %d dBm"
 
-#: src/menu/pirate_radio.c:537
+#: src/menu/pirate_radio.c:539
 msgid "Excursion : %s kHz%s"
 msgstr "Hub: %s kHz%s"
 
-#: src/menu/pirate_radio.c:540
+#: src/menu/pirate_radio.c:542
 msgid "Gain du son : x%u"
 msgstr "Tonpegel: x%u"
 
-#: src/menu/pirate_radio.c:541
+#: src/menu/pirate_radio.c:543
 msgid "Haut-parleur : %s"
 msgstr "Lautsprecher: %s"
 
-#: src/menu/pirate_radio.c:542
+#: src/menu/pirate_radio.c:544
 msgid "> Choisir le fichier"
 msgstr "> Datei wählen"
 
-#: src/menu/pirate_radio.c:542
+#: src/menu/pirate_radio.c:544
 msgid "> Émettre"
 msgstr "> Senden"
 
-#: src/menu/pirate_radio.c:557
+#: src/menu/pirate_radio.c:559
 msgid "Carte SD"
 msgstr "SD-Karte"
 
-#: src/menu/pirate_radio.c:561
+#: src/menu/pirate_radio.c:563
 #: src/menu/rtttl.c:853
 msgid "Lecture de la carte..."
 msgstr "Lese die Karte..."
 
-#: src/menu/pirate_radio.c:565
+#: src/menu/pirate_radio.c:567
 msgid "Ni dossier ni fichier .WAV ici"
 msgstr "Kein Ordner, keine .WAV-Datei"
 
-#: src/menu/pirate_radio.c:571
-#: src/menu/pirate_radio.c:596
-#: src/menu/pirate_radio.c:622
+#: src/menu/pirate_radio.c:573
+#: src/menu/pirate_radio.c:598
+#: src/menu/pirate_radio.c:624
 msgid "Radio pirate"
 msgstr "Piratenradio"
 
-#: src/menu/pirate_radio.c:573
+#: src/menu/pirate_radio.c:575
 msgid "ÉMISSION"
 msgstr "SENDET"
 
-#: src/menu/pirate_radio.c:579
+#: src/menu/pirate_radio.c:581
 msgid "%d dBm, excursion %s kHz"
 msgstr "%d dBm, Hub %s kHz"
 
-#: src/menu/pirate_radio.c:609
-#: src/menu/pirate_radio.c:939
+#: src/menu/pirate_radio.c:611
+#: src/menu/pirate_radio.c:942
 msgid "Attente du réseau..."
 msgstr "Warte auf Netz..."
 
-#: src/menu/pirate_radio.c:613
+#: src/menu/pirate_radio.c:615
 msgid "ISM 433 MHz : essais courts"
 msgstr "ISM 433 MHz: kurze Tests"
 
-#: src/menu/pirate_radio.c:937
+#: src/menu/pirate_radio.c:940
 msgid "Écoute pirate"
 msgstr "Piratenempfang"
 
-#: src/menu/pirate_radio.c:940
+#: src/menu/pirate_radio.c:943
 msgid "G : retour  D : réessayer"
 msgstr "L: zurück  R: nochmal"
 
-#: src/menu/pirate_radio.c:948
+#: src/menu/pirate_radio.c:951
 msgid "Signal : %d dBm"
 msgstr "Signal: %d dBm"
 
-#: src/menu/pirate_radio.c:955
+#: src/menu/pirate_radio.c:958
 msgid "Pas d'émission"
 msgstr "Kein Sender"
 
-#: src/menu/pirate_radio.c:958
+#: src/menu/pirate_radio.c:961
 msgid "Correction : %+ld Hz"
 msgstr "Korrektur: %+ld Hz"
 
-#: src/menu/pirate_radio.c:963
+#: src/menu/pirate_radio.c:966
 msgid "Tonalité : %lu Hz"
 msgstr "Ton: %lu Hz"
 
-#: src/menu/pirate_radio.c:965
+#: src/menu/pirate_radio.c:968
 msgid "Tonalité : -"
 msgstr "Ton: -"
 
-#: src/menu/pirate_radio.c:969
+#: src/menu/pirate_radio.c:972
 msgid "Niveau %lu %%  Cycle %lu %%"
 msgstr "Pegel %lu %%  Tastgr. %lu %%"
 
-#: src/menu/pirate_radio.c:972
+#: src/menu/pirate_radio.c:975
 msgid "Niveau : -"
 msgstr "Pegel: -"
 
-#: src/menu/pirate_radio.c:976
+#: src/menu/pirate_radio.c:979
 msgid "Silencieux : non"
 msgstr "Sperre: aus"
 
-#: src/menu/pirate_radio.c:976
+#: src/menu/pirate_radio.c:979
 msgid "Silencieux : oui"
 msgstr "Sperre: an"
 
-#: src/menu/pirate_radio.c:977
+#: src/menu/pirate_radio.c:980
 msgid "Flancs : canal  D : silencieux"
 msgstr "Seiten: Kanal  R: Sperre"
 
-#: src/menu/pirate_radio.c:985
+#: src/menu/pirate_radio.c:988
 msgid "Écouter la radio pirate"
 msgstr "Piratenradio hören"
 
@@ -4161,72 +4206,72 @@ msgstr "Rekord: %u Wort am Stück"
 msgid "Record : %u mots d'affilée"
 msgstr "Rekord: %u Wörter am Stück"
 
-#: src/menu/race.c:748
+#: src/menu/race.c:762
 msgid "Sur la grille"
 msgstr "Startaufstellung"
 
-#: src/menu/race.c:750
+#: src/menu/race.c:764
 msgid "Arrivé %u.%02u s"
 msgstr "Ziel %u.%02u s"
 
-#: src/menu/race.c:752
+#: src/menu/race.c:766
 msgid "Tour %d/%d"
 msgstr "Runde %d/%d"
 
-#: src/menu/race.c:762
+#: src/menu/race.c:776
 msgid "D : gaz  G : frein  flancs : tourner"
 msgstr "R: Gas  L: Bremse  Seiten: lenken"
 
-#: src/menu/race.c:768
+#: src/menu/race.c:782
 msgid "Arrivée"
 msgstr "Zieleinlauf"
 
-#: src/menu/race.c:777
+#: src/menu/race.c:791
 msgid "%d. %s  (tour %d)"
 msgstr "%d. %s  (Runde %d)"
 
-#: src/menu/race.c:788
+#: src/menu/race.c:802
 #: src/menu/tug.c:620
 msgid "G : retour  D : rejouer"
 msgstr "L: zurück  R: nochmal"
 
-#: src/menu/race.c:796
+#: src/menu/race.c:810
 msgid "%d / %d pilotes"
 msgstr "%d / %d Fahrer"
 
-#: src/menu/race.c:797
+#: src/menu/race.c:811
 #: src/menu/tug.c:486
 msgid "Il faut 2 joueurs au moins."
 msgstr "Mindestens 2 Spieler nötig."
 
-#: src/menu/race.c:822
+#: src/menu/race.c:836
 msgid "%s (toi)"
 msgstr "%s (du)"
 
-#: src/menu/race.c:837
+#: src/menu/race.c:851
 #: src/menu/tug.c:632
 msgid "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la d'abord."
 msgstr "Auf deinem Badge läuft %s: beende oder verlass es zuerst."
 
-#: src/menu/race.c:843
+#: src/menu/race.c:857
 msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
 msgstr "Rennen kleiner Autos, 2 bis 8 Fahrer, 3 Runden. Rechter Flügel: Gas, linker Flügel: Bremse, Seiten: lenken. Neben der Strecke wird das Auto langsamer!"
 
-#: src/menu/race.c:856
+#: src/menu/race.c:870
 msgid "Recherche des courses..."
 msgstr "Suche nach Rennen..."
 
-#: src/menu/race.c:866
+#: src/menu/race.c:880
 #: src/menu/tug.c:540
 msgid "Partie annulée par l'hôte."
 msgstr "Vom Host abgebrochen."
 
-#: src/menu/race.c:867
+#: src/menu/race.c:881
 #: src/menu/tug.c:541
 msgid "G : retour  D : OK"
 msgstr "L: zurück  R: OK"
 
-#: src/menu/race.c:871
+#: src/menu/race.c:885
 #: src/menu/tug.c:547
 msgid "G long : quitter la page"
 msgstr "L lang: Seite verlassen"
@@ -4530,39 +4575,39 @@ msgstr "Zurücksetzen?"
 msgid "G : non  D long : oui"
 msgstr "L: nein  R lang: ja"
 
-#: src/menu/rsvp.c:555
+#: src/menu/rsvp.c:557
 msgid "Impossible d'ouvrir le texte"
 msgstr "Text nicht lesbar"
 
-#: src/menu/rsvp.c:574
+#: src/menu/rsvp.c:576
 msgid "Texte vide"
 msgstr "Text leer"
 
-#: src/menu/rsvp.c:583
+#: src/menu/rsvp.c:585
 msgid "Reprise"
 msgstr "Weiter"
 
-#: src/menu/rsvp.c:611
+#: src/menu/rsvp.c:613
 msgid "%u mots/min"
 msgstr "%u W/min"
 
-#: src/menu/rsvp.c:715
+#: src/menu/rsvp.c:717
 msgid "%u mots/min, %u %%"
 msgstr "%u W/min, %u %%"
 
-#: src/menu/rsvp.c:717
+#: src/menu/rsvp.c:719
 msgid "Flancs : vitesse, long: -/+%ds"
 msgstr "Seiten: Tempo, lang: -/+%ds"
 
-#: src/menu/rsvp.c:718
+#: src/menu/rsvp.c:720
 msgid "Fin du texte"
 msgstr "Textende"
 
-#: src/menu/rsvp.c:720
+#: src/menu/rsvp.c:722
 msgid "D : relire  G : quitter"
 msgstr "R: nochmal  L: Ende"
 
-#: src/menu/rsvp.c:720
+#: src/menu/rsvp.c:722
 msgid "D : reprendre  G : quitter"
 msgstr "R: weiter  L: Ende"
 
@@ -5421,11 +5466,15 @@ msgstr "rar"
 msgid "légendaire"
 msgstr "legendär"
 
-#: src/menu/social.c:222
+#: src/menu/social.c:70
+msgid "Cigale détectée : %s (%d dBm)"
+msgstr "Zikade erkannt: %s (%d dBm)"
+
+#: src/menu/social.c:264
 msgid "Rencontre : %s +%d"
 msgstr "Treffen: %s +%d"
 
-#: src/menu/social.c:293
+#: src/menu/social.c:339
 msgid "%s aime aussi : %s"
 msgstr "%s mag auch: %s"
 
@@ -6471,19 +6520,19 @@ msgstr ""
 msgid "G : non  D : oui"
 msgstr "L: nein  R: ja"
 
-#: src/menu/werewolf.c:2213
+#: src/menu/werewolf.c:2214
 msgid "8 joueurs minimum"
 msgstr "Min. 8 Spieler"
 
-#: src/menu/werewolf.c:2213
+#: src/menu/werewolf.c:2214
 msgid "Petites parties (4+)"
 msgstr "Kleine Spiele (4+)"
 
-#: src/menu/werewolf.c:2214
+#: src/menu/werewolf.c:2215
 msgid "Test : robots"
 msgstr "Test: Roboter"
 
-#: src/menu/werewolf.c:2216
+#: src/menu/werewolf.c:2217
 msgid ""
 "La règle du jeu :\n"
 "de 8 à 18 joueurs."
@@ -6491,7 +6540,7 @@ msgstr ""
 "Die Spielregeln:\n"
 "8 bis 18 Spieler."
 
-#: src/menu/werewolf.c:2217
+#: src/menu/werewolf.c:2218
 msgid ""
 "Dès 4 joueurs, avec\n"
 "1 loup-garou sous 8."
@@ -6499,7 +6548,7 @@ msgstr ""
 "Ab 4 Spielern, mit\n"
 "1 Werwolf unter 8."
 
-#: src/menu/werewolf.c:2218
+#: src/menu/werewolf.c:2219
 msgid ""
 "Dès 1 joueur : des robots\n"
 "complètent jusqu'à 8."
@@ -6507,12 +6556,12 @@ msgstr ""
 "Ab 1 Spieler: Roboter\n"
 "füllen bis 8 auf."
 
-#: src/menu/werewolf.c:2250
-#: src/menu/werewolf.c:2257
+#: src/menu/werewolf.c:2251
+#: src/menu/werewolf.c:2258
 msgid "Loup-garou (admin)"
 msgstr "Werwolf (Admin)"
 
-#: src/menu/werewolf.c:2253
+#: src/menu/werewolf.c:2254
 msgid "Flancs : choisir  D : valider"
 msgstr "Seiten: wählen  R: OK"
 
