@@ -231,7 +231,8 @@ d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
   salle d'attente montre le motif, le nom et la couleur de chaque pilote, « (toi) » pour la vôtre ; votre motif est
   aussi dans la barre de la course.
 - 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course. Pendant la course, les
-  LEDs donnent votre place : vertes en tête, rouges en dernier, orange entre les deux.
+  LEDs donnent votre place : vertes en tête, rouges en dernier, orange entre les deux. À la fin de la partie, le
+  gagnant a les LEDs **vertes qui clignotent**, les autres des LEDs **rouges en fondu**.
 - **A** : freiner puis reculer ; **B** : accélérer ; **Y / X** : tourner (maintenus ; Y
   à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. A et B maintenus 1,5 s : abandonner (les autres continuent). Les points de passage 1 (côté droit), 2 (haut de l'épingle), 3 (côté gauche), en pointillés sur la piste avec leur numéro (le prochain en gras), comptent dans l'ordre :
   couper par l'herbe en sautant l'un d'eux ne compte pas le tour.

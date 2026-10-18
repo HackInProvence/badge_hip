@@ -21,8 +21,10 @@
 #include "achievements.h"
 #include "app.h"
 #include "i18n.h"
+#include "leds.h"
 #include "net.h"
 #include "party.h"
+#include "remote.h"
 
 #define MAX_CARS 8
 #define MIN_PLAYERS 2
@@ -441,7 +443,14 @@ static void result(void) {
     }
     if (on_page()) {
         app_tone(won ? 1319 : 440, 400);
-        app_leds(won ? 0 : 255, won ? 255 : 80, 0);
+        /* The winner: green blinking; the others: red fading in and out (until the page is left or a new game) */
+        if (remote_muted())
+            app_leds(0, 0, 0);  /* The LEDs muted by the organizers */
+        else if (won)
+            leds_anim_blink(LED_RGB(0, 255, 0), 250000, 250000);
+        else
+            leds_anim_fade(LED_RGB(255, 0, 0), 1000000, 1000000);
+        printf("race: leds %s\n", won ? "green blinking" : "red fading");
         leds_car = -2;
     }
 }

@@ -238,7 +238,8 @@ of a track bigger than the screen (the screen follows your car, framed).
   waiting room shows the pattern, the name and the color of each driver, "(you)" for yours; your pattern is also in
   the bar of the race.
 - 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race. During the race, the LEDs give your
-  place: green in the lead, red last, orange in between.
+  place: green in the lead, red last, orange in between. At the end of the party, the winner's LEDs **blink green**,
+  the others' **fade in and out in red**.
 - **A**: brake then back up; **B**: accelerate; **Y / X**: steer (held; Y to the left, X to the right).
   Off the road (the grass), the car slows down a lot. A and B held 1.5 s: give up (the others go on). The checkpoints 1 (right side), 2 (top of the hairpin), 3 (left side), dashed on the track with their number (the next one bold), count in order: cutting through the grass and
   skipping one does not count the lap.
