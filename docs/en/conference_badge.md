@@ -31,7 +31,7 @@ An unknown key is ignored, a missing key is not shown. The keys are in French:
 
 | File | Keys |
 |---|---|
-| `infos.txt` (one block) | `nom` (name, shown in the list), `dates`, `lieu` (place), `adresse` (address), `site` (QR code), `description`, `source` (not shown) |
+| `infos.txt` (one block) | `nom` (name, shown in the list), `dates`, `debut` (start, YYYY-MM-DD: the order of the list), `lieu` (place), `adresse` (address), `site` (QR code), `description`, `source` (not shown) |
 | `conferences.txt`, `workshops.txt` | `jour` (day, YYYY-MM-DD), `heure` (time, HH:MM), `fin` (end), `salle` (room), `titre` (title), `orateur` (speaker), `resume` (summary), `lien` (link, QR code) |
 | `exposants.txt` (exhibitors) | `nom` (name), `stand` (booth), `description`, `lien` (link, QR code) |
 
@@ -51,14 +51,15 @@ sort them by day and time.
 
 ## Limits
 
-- Any number of events (by pages of 16), 100 blocks per file (the next ones are ignored).
+- Any number of events (by pages of 12), 80 blocks per file (the next ones are ignored).
 - 480 bytes per line, 1,280 bytes per block (the rest of the block is not shown).
 - Only the characters of the fonts of the badge are drawn (ASCII, French accents and a few others).
 - A link too long for a QR code shows "(QR code trop grand)".
 
 ## On the badge
 
-- The list of the events: Y / X choose, A back, B open.
+- The list of the events: **SecSea always first**, then the others by start date (`debut` of `infos.txt`; without
+  it, at the end); Y / X choose, A back, B open.
 - An event: Infos, Talks (n), Workshops (n), Exhibitors (n).
 - A list: the day, the time and the title (or the name of the exhibitor); the selected row scrolls when long.
 - An item: the title, the speaker, the room, the summary (scrolling a line at a time); Y / X the previous or next

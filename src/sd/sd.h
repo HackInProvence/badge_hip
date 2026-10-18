@@ -50,6 +50,7 @@ bool sd_detect(void);
 /* ------ File system helpers (FatFs) ------ */
 
 #define SD_NAME_MAX 64  /* Longer file names are ignored by sd_list_files() */
+#define SD_KEY_LEN (SD_NAME_MAX + 16)  /* sd_page_t.key: room for a date and the name */
 
 /** \brief Mount the card if not done yet (can be called before each use).
  * \return a FatFs FRESULT (FR_OK = 0) */
@@ -77,6 +78,10 @@ typedef struct {
     bool dirs;  /* List the sub-folders, before the files */
     const char *ext;  /* The files kept: this extension (case insensitive); NULL: no files */
     bool (*accept)(const char *name);  /* Or this test, when set (instead of ext) */
+    /* Optional, another order than the names: the key of an entry (e.g. a date read in the folder), compared with
+     * strcmp(), kept in keys (buffer of max); both set or both NULL */
+    void (*key)(const char *dir, const char *name, char *out, size_t len);
+    char (*keys)[SD_KEY_LEN];
     int n;  /* Entries of the page */
     bool prev, next;  /* Entries before / after the page */
 } sd_page_t;

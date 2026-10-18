@@ -30,7 +30,7 @@ sont des commentaires. Une clé inconnue est ignorée, une clé absente n'est pa
 
 | Fichier | Clés |
 |---|---|
-| `infos.txt` (un seul bloc) | `nom` (le nom dans la liste), `dates`, `lieu`, `adresse`, `site` (QR code), `description`, `source` (non affichée) |
+| `infos.txt` (un seul bloc) | `nom` (le nom dans la liste), `dates`, `debut` (AAAA-MM-JJ : l'ordre de la liste), `lieu`, `adresse`, `site` (QR code), `description`, `source` (non affichée) |
 | `conferences.txt`, `workshops.txt` | `jour` (AAAA-MM-JJ), `heure` (HH:MM), `fin`, `salle`, `titre`, `orateur`, `resume`, `lien` (QR code) |
 | `exposants.txt` | `nom`, `stand`, `description`, `lien` (QR code) |
 
@@ -50,14 +50,15 @@ classez-les par jour et heure.
 
 ## Limites
 
-- Événements en nombre quelconque (par pages de 16), 100 blocs par fichier (les suivants sont ignorés).
+- Événements en nombre quelconque (par pages de 12), 80 blocs par fichier (les suivants sont ignorés).
 - 480 octets par ligne, 1 280 octets par bloc (le reste du bloc n'est pas affiché).
 - Seuls les caractères des polices du badge s'affichent (ASCII, accents français et quelques autres).
 - Un lien trop long pour un QR code affiche « (QR code trop grand) ».
 
 ## Sur le badge
 
-- La liste des événements : Y / X choisir, A retour, B ouvrir.
+- La liste des événements : **SecSea toujours en tête**, puis les autres par date de début (`debut` de `infos.txt` ;
+  sans elle, à la fin) ; Y / X choisir, A retour, B ouvrir.
 - Un événement : Infos, Conférences (n), Workshops (n), Exposants (n).
 - Une liste : le jour, l'heure et le titre (ou le nom de l'exposant) ; la ligne choisie défile si elle est longue.
 - Une fiche : le titre, l'orateur, la salle, le résumé (qui défile ligne à ligne) ; Y / X la fiche précédente ou

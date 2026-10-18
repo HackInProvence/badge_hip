@@ -1,5 +1,6 @@
 nom: GreHack 2026
 dates: 13-14 novembre 2026
+debut: 2026-11-13
 lieu: Grenoble
 adresse: Conférence et workshops : MINATEC, Presqu'île scientifique, Grenoble (tram B arrêt Cité Internationale); CTF : ENSIMAG bâtiment H
 site: https://grehack.fr/

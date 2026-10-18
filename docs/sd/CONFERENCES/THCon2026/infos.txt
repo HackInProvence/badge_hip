@@ -1,6 +1,7 @@
 # THCon 2026 - Toulouse Hacking Convention (10e édition)
 nom: THCon 2026 - Toulouse Hacking Convention
 dates: 5-7 mai 2026
+debut: 2026-05-05
 lieu: Toulouse
 adresse: Amphithéâtre Marthe Condat, Université Paul Sabatier, Toulouse (CTF le 7 mai à l'ENSEEIHT, 2 rue Charles Camichel, 31000 Toulouse)
 site: https://thcon.party/

@@ -1,5 +1,6 @@
 nom: BARBHACK 2026
 dates: 29 août 2026 (Toxic BBQ le 28 au soir)
+debut: 2026-08-29
 lieu: Toulon
 adresse: Palais des Congrès Neptune, Av. de Besagne, 83000 Toulon
 site: https://www.barbhack.fr/2026/fr

@@ -1,5 +1,6 @@
 nom: leHACK 2026 - Brave New World
 dates: 26-28 juin 2026
+debut: 2026-06-26
 lieu: Paris
 adresse: Cité des Sciences et de l'Industrie, Paris (Amphithéâtre Gaston Berger, salles des niveaux S2 et S3)
 site: https://lehack.org/

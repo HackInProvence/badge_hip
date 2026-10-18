@@ -880,7 +880,7 @@ SD card
 | `TEXTES` | `.txt` UTF-8 (with or without BOM) or Windows-1252 | any number, by pages of 48 entries; the reading position is remembered | a text editor |
 | `SONNERIES`, `RTTTL` | one RTTTL tune per line (`#`: comment), or PICAXE `tune` commands (`.bas`) | 2048 characters per line; 40 sub-folders shown per folder; any number of files, in pages of 32; 128 tunes per page | `rtttl_sort.py`, [ringtones.md](ringtones.md) |
 | `LIVRES` | `.txt` gamebook (sections `== n`, choices `-> n : ...`) | any number, by pages of 16; 400 sections, 8 choices, 8 items; ~2,000 bytes of text per section | `gamebook_check.py`, [gamebooks.md](gamebooks.md) |
-| `CONFERENCES` | a sub-folder per event: `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (`key: value` blocks) | any number, by pages of 16; 100 blocks per file; 480 bytes per line, 1,280 per block | [conference_badge.md](conference_badge.md) |
+| `CONFERENCES` | a sub-folder per event: `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (`key: value` blocks) | any number, by pages of 12; 80 blocks per file; 480 bytes per line, 1,280 per block | [conference_badge.md](conference_badge.md) |
 
 A player (Images, Videos, Music, Speed reading) whose folder is missing or empty shows the **root** of the card:
 a `VIDEO.EPV` video (default name of `video2epaper.py`) copied at the root is played too, but rather put each file in

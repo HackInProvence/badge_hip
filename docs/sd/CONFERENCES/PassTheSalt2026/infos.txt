@@ -1,5 +1,6 @@
 nom: Pass the SALT 2026
 dates: 30 juin - 2 juillet 2026
+debut: 2026-06-30
 lieu: Lille
 adresse: Université Catholique de Lille, 83 Bd Vauban, 59800 Lille (campus Saint Raphaël, bâtiment Louise Weiss : amphi 122, salles LW109 et LW112)
 site: https://2026.pass-the-salt.org/

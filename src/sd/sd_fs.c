@@ -88,31 +88,38 @@ size_t sd_list_dirs(const char *dir, char (*names)[SD_NAME_MAX], size_t max) {
 
 /* ------ A folder read a page at a time ------ */
 
-/* The order of the entries: the folders, then the files, each by name */
-static int entry_cmp(bool a_dir, const char *a, bool b_dir, const char *b) {
+/* The order of the entries: the folders, then the files, each by name (or by its key, sd_page_t.key) */
+static int entry_cmp(const sd_page_t *p, bool a_dir, const char *a, bool b_dir, const char *b) {
     if (a_dir != b_dir)
         return a_dir ? -1 : 1;
-    return strcasecmp(a, b);
+    return p->keys ? strcmp(a, b) : strcasecmp(a, b);
 }
 
 static bool page_dir(const sd_page_t *p, int i) {
     return p->is_dir && p->is_dir[i];
 }
 
+/* What an entry of the page is sorted by: its key, or its name */
+static const char *page_sort(const sd_page_t *p, int i) {
+    return p->keys ? p->keys[i] : p->names[i];
+}
+
 static void page_move(sd_page_t *p, int to, int from) {
     strcpy(p->names[to], p->names[from]);
     if (p->is_dir)
         p->is_dir[to] = p->is_dir[from];
+    if (p->keys)
+        strcpy(p->keys[to], p->keys[from]);
 }
 
 int sd_page_read(sd_page_t *p, const char *dir, int way) {
-    /* The key: the last entry of the page (next page) or its first one (previous page) */
-    char key[SD_NAME_MAX];
-    bool key_dir = false;
+    /* The bound: the last entry of the page (next page) or its first one (previous page) */
+    char bound[SD_KEY_LEN];
+    bool bound_dir = false;
     if (way && p->n) {
         int k = way > 0 ? p->n - 1 : 0;
-        strcpy(key, p->names[k]);
-        key_dir = page_dir(p, k);
+        strcpy(bound, page_sort(p, k));
+        bound_dir = page_dir(p, k);
     } else {
         way = 0;
     }
@@ -125,7 +132,8 @@ int sd_page_read(sd_page_t *p, const char *dir, int way) {
     if (f_opendir(&d, dir) != FR_OK)
         return 0;
     bool more = false;  /* Entries beyond the page, in the direction read */
-    bool other = false;  /* Entries on the other side of the key */
+    bool other = false;  /* Entries on the other side of the bound */
+    char name[SD_NAME_MAX], sort[SD_KEY_LEN];
     while (f_readdir(&d, &info) == FR_OK && info.fname[0]) {
         bool is_dir = info.fattrib & AM_DIR;
         if ((info.fattrib & (AM_HID | AM_SYS)) || info.fname[0] == '.' || strlen(info.fname) >= SD_NAME_MAX)
@@ -134,7 +142,12 @@ int sd_page_read(sd_page_t *p, const char *dir, int way) {
             continue;
         if (! p->is_dir)
             is_dir = false;  /* Folders only (or files only): one kind, the order of the names */
-        int c = way ? entry_cmp(is_dir, info.fname, key_dir, key) : 0;
+        strcpy(name, info.fname);
+        if (p->keys)
+            p->key(dir, name, sort, sizeof(sort));  /* It may read the card (the directory stays open) */
+        else
+            strcpy(sort, name);
+        int c = way ? entry_cmp(p, is_dir, sort, bound_dir, bound) : 0;
         if ((way > 0 && c <= 0) || (way < 0 && c >= 0)) {
             other = true;
             continue;
@@ -142,11 +155,11 @@ int sd_page_read(sd_page_t *p, const char *dir, int way) {
         if (p->n == p->max) {
             more = true;
             if (way >= 0) {  /* Keep the first entries */
-                if (entry_cmp(is_dir, info.fname, page_dir(p, p->n - 1), p->names[p->n - 1]) > 0)
+                if (entry_cmp(p, is_dir, sort, page_dir(p, p->n - 1), page_sort(p, p->n - 1)) > 0)
                     continue;
                 --p->n;
             } else {  /* Keep the last ones */
-                if (entry_cmp(is_dir, info.fname, page_dir(p, 0), p->names[0]) < 0)
+                if (entry_cmp(p, is_dir, sort, page_dir(p, 0), page_sort(p, 0)) < 0)
                     continue;
                 for (int i = 0; i < p->n - 1; ++i)
                     page_move(p, i, i + 1);
@@ -155,13 +168,15 @@ int sd_page_read(sd_page_t *p, const char *dir, int way) {
         }
         /* Insertion sort */
         int i = p->n++;
-        while (i > 0 && entry_cmp(page_dir(p, i - 1), p->names[i - 1], is_dir, info.fname) > 0) {
+        while (i > 0 && entry_cmp(p, page_dir(p, i - 1), page_sort(p, i - 1), is_dir, sort) > 0) {
             page_move(p, i, i - 1);
             --i;
         }
-        strcpy(p->names[i], info.fname);
+        strcpy(p->names[i], name);
         if (p->is_dir)
             p->is_dir[i] = is_dir;
+        if (p->keys)
+            strcpy(p->keys[i], sort);
     }
     f_closedir(&d);
     p->prev = way >= 0 ? other : more;

@@ -1,6 +1,7 @@
 # SecSea 2k26 - Hack In Provence
 nom: SecSea 2k26
 dates: 16-18 octobre 2026
+debut: 2026-10-16
 lieu: La Ciotat
 adresse: Cinéma L'Eden, 25 boulevard Georges Clémenceau, 13600 La Ciotat
 site: https://secsea.org/

@@ -1,6 +1,7 @@
 # Hexacon 2026 (5e édition)
 nom: Hexacon 2026
 dates: 16-17 octobre 2026 (formations du 12 au 15 octobre)
+debut: 2026-10-16
 lieu: Paris
 adresse: Palais Brongniart, 16 place de la Bourse, 75002 Paris
 site: https://www.hexacon.fr/

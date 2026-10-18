@@ -883,7 +883,7 @@ carte SD
 | `TEXTES` | `.txt` UTF-8 (avec ou sans BOM) ou Windows-1252 | nombre quelconque, par pages de 48 entrées ; la position de lecture est retenue | un éditeur de texte |
 | `SONNERIES`, `RTTTL` | une sonnerie RTTTL par ligne (`#` : commentaire), ou commandes `tune` PICAXE (`.bas`) | 2048 caractères par ligne ; 40 sous-dossiers montrés par dossier ; fichiers en nombre quelconque, par pages de 32 ; 128 sonneries par page | `rtttl_sort.py`, [sonneries.md](sonneries.md) |
 | `LIVRES` | livre-jeu `.txt` (sections `== n`, choix `-> n : ...`) | nombre quelconque, par pages de 16 ; 400 sections, 8 choix, 8 objets ; ~2 000 octets de texte par section | `gamebook_check.py`, [livres_jeux.md](livres_jeux.md) |
-| `CONFERENCES` | un sous-dossier par événement : `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (blocs `clé: valeur`) | nombre quelconque, par pages de 16 ; 100 blocs par fichier ; 480 octets par ligne, 1 280 par bloc | [badge_conference.md](badge_conference.md) |
+| `CONFERENCES` | un sous-dossier par événement : `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (blocs `clé: valeur`) | nombre quelconque, par pages de 12 ; 80 blocs par fichier ; 480 octets par ligne, 1 280 par bloc | [badge_conference.md](badge_conference.md) |
 
 Un lecteur (Images, Vidéos, Musique, Lecture rapide) dont le dossier manque ou est vide affiche la **racine** de la
 carte : une vidéo `VIDEO.EPV` (nom par défaut de `video2epaper.py`) copiée à la racine est donc lue aussi, mais

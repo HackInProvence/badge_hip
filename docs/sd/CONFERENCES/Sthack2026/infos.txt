@@ -1,6 +1,7 @@
 # Sthack 2026 (Bordeaux)
 nom: Sthack 2026
 dates: 29 mai 2026
+debut: 2026-05-29
 lieu: Bordeaux
 adresse: Conférences à la Cité du Vin (9h-18h), CTF de nuit aux Salons de la mairie (20h-6h)
 site: https://sthack.fr/

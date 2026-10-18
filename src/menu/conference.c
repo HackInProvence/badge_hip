@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 #include "app.h"
 #include "ff.h"
@@ -26,8 +27,8 @@
 #include "shared_buf.h"
 
 #define CONF_DIR "CONFERENCES"
-#define MAX_EVENTS 16
-#define MAX_ITEMS 100
+#define MAX_EVENTS 12
+#define MAX_ITEMS 80
 #define LABEL_LEN 48
 #define LINE_LEN 480
 #define BLOCK_LEN 1280
@@ -46,6 +47,7 @@ typedef struct {
     char line[LINE_LEN];
     char dirs[MAX_EVENTS][SD_NAME_MAX];
     char names[MAX_EVENTS][LABEL_LEN];
+    char keys[MAX_EVENTS][SD_KEY_LEN];  /* Their order: SecSea first, then the date (event_key()) */
     uint32_t offsets[MAX_ITEMS];  /* The blocks of the file shown */
     char labels[MAX_ITEMS][LABEL_LEN];
     char block[BLOCK_LEN];  /* The item shown: its lines, each one ended by a 0 */
@@ -219,6 +221,26 @@ static const char *field(const char *key) {
     return "";
 }
 
+/* The order of the events: SecSea always first (the badge is its badge), then by date ("debut: YYYY-MM-DD" in
+ * infos.txt; without it, at the end), then by folder */
+static void event_key(const char *dir, const char *name, char *out, size_t len) {
+    char path[PATH_LEN], date[11] = "9999-99-99";
+    bool secsea = ! strncasecmp(name, "secsea", 6);
+    snprintf(path, sizeof(path), "%s/%s/%s", dir, name, FILES[0]);
+    if (reader_open(path)) {
+        uint32_t start;
+        const char *v;
+        while (reader_line(&start) >= 0) {
+            if ((v = value_of(C->line, "debut")) && strlen(v) >= 10)
+                snprintf(date, sizeof(date), "%.10s", v);
+            else if ((v = value_of(C->line, "nom")) && ! strncasecmp(v, "secsea", 6))
+                secsea = true;
+        }
+        f_close(&C->file);
+    }
+    snprintf(out, len, "%c%s %s", secsea ? '0' : '1', date, name);
+}
+
 static void scan_events(void) {
     n_events = 0;
     no_card = sd_mount() != FR_OK;
@@ -279,7 +301,8 @@ static void conf_start(absolute_time_t now) {
     (void)now;
     view = V_EVENTS;
     event_sel = 0;
-    events = (sd_list_t){.page = {.names = C->dirs, .max = MAX_EVENTS, .dirs = true}};
+    events = (sd_list_t){.page = {.names = C->dirs, .max = MAX_EVENTS, .dirs = true, .key = event_key,
+                                  .keys = C->keys}};
     scan_events();
 }
 
