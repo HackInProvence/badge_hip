@@ -356,7 +356,7 @@ static int small_line(uint8_t *fb, int y, const char *text) {
 
 /* The rest of the page for a long text (it scrolls a line at a time) */
 static void small_text(uint8_t *fb, int y, const char *text) {
-    int lines = (UI_FOOTER_Y - 2 - y) / gfx_font_small.height;
+    int lines = (UI_FOOTER_Y - 2 - y + 3) / (gfx_font_small.height + 3);  /* ui_wrapped(): 3 pixels between lines */
     if (text[0] && lines > 0)
         ui_wrapped(fb, y, &gfx_font_small, text, lines);
 }
