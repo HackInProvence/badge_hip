@@ -38,6 +38,62 @@ OUT = os.path.join(ROOT, 'docs', 'screens')
 NOT_PAGES = {('Médias', 6), ('Radio & IR', 0), ('Badge', 3), ('Badge', 4), ('Badge', 5), ('Réglages', 2), ('Réglages', 3),
              ('Admin', 12), ('Admin', 17), ('Admin', 18)}  # Démo écran (Badge, 5), Mode démo (Admin, 12): animations, not pages
 
+def slug(text):
+    t = text.lower()
+    for a, b in (('é', 'e'), ('è', 'e'), ('ê', 'e'), ('à', 'a'), ('ç', 'c'), ('ô', 'o'), ('î', 'i'), ('œ', 'oe')):
+        t = t.replace(a, b)
+    return re.sub(r'[^a-z0-9]+', '_', t).strip('_')
+
+
+# ------ The pages that list everything: every role of the werewolf, every achievement and rank, every good of the
+# smuggler (their names read in the sources, so that a new one is captured too). In the keys, '.' waits 1 s.
+
+def source_names(path, pattern):
+    src = open(os.path.join(ROOT, 'src', 'menu', path), encoding='utf-8').read()
+    return re.findall(pattern, src)
+
+
+def werewolf_steps():
+    roles = source_names('werewolf_cards.c', r'\[WW_[A-Z_]+\] = \{N_\("([^"]+)"\)')
+    steps = [('b', 'meneur', 'Mener une partie', 'a'), ('xxb', 'aide', 'Aide : une carte de rôle', None),
+             ('b', 'aide_detail', 'Aide : le détail du rôle', 'b')]
+    for role in roles[1:]:  # The first one (the villager) just above
+        steps += [('x', 'role_' + slug(role), 'Rôle : ' + role, None),
+                  ('b', 'role_' + slug(role) + '_detail', 'Rôle : ' + role + ' : détail', 'b')]
+    return steps
+
+
+def ranks(c, theme, page):
+    """Succès > Les grades: from the rank 1 to the last one, whatever the rank of this badge"""
+    t = c.t
+    t.mark()
+    t.keys('x', 0.5)  # The row after the last achievement: the ranks
+    t.mark()
+    t.keys('b', 0.5)
+    m = t.expect(r'^achv: rank (\d+) shown', 3)
+    level = int(m.group(1)) if m else 1
+    t.keys('x' * ((10 - level + 1) % 10), 0.4)  # Rank 1
+    for r in range(1, 11):
+        start = len(t.lines)
+        c.shot(theme, page, f'grade_{r}', f'Grade {r}', start)
+        t.keys('x', 0.4)
+    t.keys('a', 0.6)
+
+
+def achievements_steps():
+    names = source_names('achievements.c', r'\[ACHV_(?!LEVELS)[A-Z0-9_]+\] = \{N_\("([^"]+)"\)')
+    steps = [('b', 'rencontres', 'Les rencontres', 'b')]
+    for i, name in enumerate(names):
+        steps += [('x', None, None, None), ('b', f'succes_{i + 1:02d}', 'Succès : ' + name, 'b')]
+    steps.append((ranks, None, None, None))
+    return steps
+
+
+def smuggler_steps():
+    goods = source_names('smuggler_goods.c', r'\{N_\("([^"]+)"\), RARITY_')
+    return [('x', f'bien_{i + 2:02d}', 'Marchandise : ' + g, None) for i, g in enumerate(goods[1:])]
+
+
 # The pages inside an application: after it opened, the keys (a, b, x, y: short, A, B, X, Y: long press) and the
 # screen to capture, with its caption. "back" at the end of a step goes back where the page was.
 PAGES = {
@@ -50,8 +106,10 @@ PAGES = {
     'Morpion': [('b', 'jeu', 'La partie', None)],
     'Puissance 4': [('b', 'jeu', 'La partie', None)],
     'Simon': [('b', 'jeu', 'La partie', None)],
-    'Réflexes': [('b', 'jeu', 'La partie', None)],
-    'Snake': [('b', 'jeu', 'La partie', None)],
+    'Réflexes': [('b', 'jeu', 'La partie : attendre le signal (les LEDs)', None),
+                 ('......b', 'resultat', 'Le temps de réaction', None)],
+    'Snake': [('b', 'jeu', 'La partie', None), ('............', 'fin', 'Fin de partie (dans le mur)', None),
+              ('x', 'score', 'Le score en QR code (signé)', 'b')],
     'Démineur': [('b', 'jeu', 'La partie', None)],
     '2048': [('b', 'jeu', 'La partie', None)],
     'Taquin': [('b', 'jeu', 'La partie', None)],
@@ -76,7 +134,7 @@ PAGES = {
     'Recevoir une image': [],
     'Infrarouge': [],
     'Chasse 433 MHz': [],
-    'Lampe': [('x', 'plus', 'Plus fort', None)],
+    'Lampe': [('yy', 'moins', 'Moins fort', None)],
     'Badge de talk': [('x', 'vert', 'Vert : tout va bien', None), ('x', 'orange', 'Orange : 5 min', None),
                       ('x', 'rouge', 'Rouge : fini', None), ('x', None, None, None), ('x', None, None, None)],
     'Crédits': [('x', 'p2', 'Page 2', None), ('x', 'p3', 'Page 3', None), ('x', 'p4', 'Page 4', None),
@@ -95,23 +153,23 @@ PAGES = {
     'Vote (admin)': [],
     'Type du badge': [],
     'Compétences': [('b', 'miennes', 'Mes compétences', 'a'), ('xb', 'partage', 'Qui les partage ?', 'a')],
-    'Succès': [('b', 'detail', 'Comment obtenir un succès', 'a')],
+    'Succès': achievements_steps(),
     'Sonneries': [('b', 'lecture', 'Une sonnerie', 'a')],
     'Livres-jeux': [('b', 'livre', 'Un livre', None), ('b', 'lecture', 'La lecture', 'a')],
     'Contrebande': [('b', 'cale', 'La cale', 'a')],
-    'Loup-garou': [('b', 'meneur', 'Mener une partie', 'a'), ('xxb', 'aide', 'Aide : une carte de rôle', None),
-                   ('b', 'aide_detail', 'Aide : le détail du rôle', 'a')],
+    'Loup-garou': werewolf_steps(),
     'Radio pirate': [('x', 'source', 'Les réglages', None)],
+    'Blind test': [('b', 'morceau', 'Un morceau : deviner le titre', None), ('b', 'reponse', 'La réponse', 'b')],
+    'Contrebande (admin)': smuggler_steps(),
+    'Mini-bolides': [('b', 'salle', "Créer une partie : la salle d'attente", 'a'),
+                     ('xb', 'recherche', 'Rejoindre une partie : la recherche', 'a')],
 }
 
+STILL_PAGES = {'Badge nominatif', 'Mon grade'}  # Shown like the screensaver (several seconds of cleaning first)
 LONG_PAGES = {'Réglage radio': 20}  # Pages that work a while before their result (seconds)
 
 
-def slug(text):
-    t = text.lower()
-    for a, b in (('é', 'e'), ('è', 'e'), ('ê', 'e'), ('à', 'a'), ('ç', 'c'), ('ô', 'o'), ('î', 'i'), ('œ', 'oe')):
-        t = t.replace(a, b)
-    return re.sub(r'[^a-z0-9]+', '_', t).strip('_')
+
 
 
 def submenus():
@@ -138,10 +196,13 @@ class Crawler:
     def shot(self, theme, page, name, caption, start):
         self.t.pump(1.5)
         # A page made to stay is cleaned (black, white, then the page): wait for the page, not a step of the cleaning
+        if page in STILL_PAGES and not any(l.startswith('saver: still page') for l in self.t.lines[start:]):
+            self.t.expect(r'^saver: still page', 20)
+            self.t.pump(1)
         if any(l.startswith('display: cleaning the page') for l in self.t.lines[start:]):
             self.t.expect(r'^display: (page cleaned|cleaning stopped)', 15)
             self.t.pump(0.5)
-        fname = f'{slug(theme)}__{slug(page)}{"__" + name if name else ""}.png'
+        fname = f'{slug(theme)}_{slug(page)}{"_" + name if name else ""}.png'
         self.t.screenshot(os.path.splitext(fname)[0], 0.5)
         checks = self.checks_since(start)
         self.shots.append((theme, page, fname, caption, checks))
@@ -159,11 +220,82 @@ class Crawler:
         return False
 
 
+def vote_screens(c, admin_ports, voter_ports):
+    """Social > Vote with two other badges (their ports): the admin badge (the one of the capture) opens a question,
+    each voter answers another answer: the screen of a voter, then the histogram of the admin badge"""
+    t = c.t
+    voters = []
+    for i, port in enumerate(voter_ports):
+        b = Badge(port)
+        b.start()
+        while not b.connected():
+            time.sleep(0.1)
+        vt = st.Tester(b, t.out_dir, False)
+        vt.mark()
+        vt.keys('R')
+        vt.expect(r'^--- disconnected', 5)
+        while not b.connected():
+            time.sleep(0.2)
+        vt.pump(8)
+        vt.keys('[')
+        vt.keys('x' * st.THEMES.index('Social') + 'b' + 'x' * 4 + 'b', 0.4)  # Social > Vote
+        voters.append(vt)
+    if not st.open_admin(t):
+        print('  vote: Admin theme not opened')
+        return
+    start = len(t.lines)
+    t.keys('xxxb', 0.5)  # Admin > Vote (admin)
+    t.mark()
+    t.keys('b', 0.5)  # Opens the first question
+    for i, vt in enumerate(voters):
+        vt.expect(r'^vote: question', 10)
+        vt.keys('x' * i + 'b', 0.5)  # Each one another answer
+    vstart = len(voters[0].lines)
+    voters[0].pump(3)
+    path = voters[0].screenshot('social_vote_question', 1)
+    if path:
+        c.shots.append(('Social', 'Vote', 'social_vote_question.png',
+                        "Une cigale qui vote (l'autre a choisi une autre réponse)", []))
+    t.expect(r'^vote: %d voter' % len(voters), 20)
+    c.shot('Admin', 'Vote (admin)', 'resultat', 'Le résultat des deux cigales qui votent', start)
+    t.keys('b', 0.5)  # Closes the question
+    for vt in voters:
+        vt.keys('a', 0.5)
+        vt.badge.stop()
+    del vstart
+
+
+def check_shots(c, out):
+    """Every screenshot: there, not empty (the page below its title has something), not twice the same image"""
+    import hashlib
+    try:
+        from PIL import Image
+    except ImportError:
+        print('(pip install pillow to check the screenshots)')
+        return []
+    problems, seen = [], {}
+    for theme, page, fname, caption, _ in c.shots:
+        path = os.path.join(out, fname)
+        if not os.path.exists(path):
+            problems.append(f'{fname}: missing')
+            continue
+        im = Image.open(path).convert('L')
+        body = im.crop((0, im.height * 15 // 100, im.width, im.height * 88 // 100))
+        if sum(1 for v in body.getdata() if v < 128) < body.width * body.height // 500:
+            problems.append(f'{fname}: empty')
+        seen.setdefault(hashlib.md5(im.tobytes()).hexdigest(), []).append(fname)
+    problems += ['the same image: ' + ', '.join(v) for v in seen.values() if len(v) > 1]
+    for p in problems:
+        print('  ⚠ ' + p)
+    return problems
+
+
 def main():
     parser = argparse.ArgumentParser(description='Screenshots of every screen of the badge, and the check of the texts')
     parser.add_argument('--port', default=None)
     parser.add_argument('--only', default=None, help='comma separated themes (French names)')
     parser.add_argument('--lang', default='fr', help='language of the badge during the capture (fr, en...)')
+    parser.add_argument('--voters', default=None, help='two more badges (COM11,COM13): the screens of a vote')
     parser.add_argument('--out', default=None, help='folder of the screenshots and checks.txt, the docs not written '
                         '(to check the texts of a language)')
     args = parser.parse_args()
@@ -221,6 +353,10 @@ def main():
         return c.ui() == theme
 
     restart()
+    t.mark()
+    t.keys('!')
+    m = t.expect(r'admin (on|off)', 4)  # "remote: ..., admin on": given back at the end
+    admin_was_on = bool(m and m.group(1) == 'on')
     before = set_lang(args.lang)
     restart()
     c.shot('Menu', 'Accueil', None, 'Le menu principal', len(t.lines))
@@ -248,9 +384,16 @@ def main():
             t.pump(LONG_PAGES.get(page, 0))
             c.shot(theme, page, None, None, start)
             for keys, name, caption, back in PAGES.get(page, []):
+                if callable(keys):  # A step that captures by itself (the ranks)
+                    keys(c, theme, page)
+                    continue
                 start = len(t.lines)
                 t.mark()
-                t.keys(keys, 0.5)
+                for k in keys:
+                    if k == '.':
+                        t.pump(1)  # '.': wait 1 s (the end of a game)
+                    else:
+                        t.keys(k, 0.5)
                 if name:
                     c.shot(theme, page, name, caption, start)
                 if back:
@@ -265,12 +408,34 @@ def main():
             t.mark()
             t.badge.send('\x01a')
             t.expect(r'^admin: off', 3)
+    if args.voters and (not only or 'Social' in only or 'Admin' in only):
+        print('Vote')
+        restart()
+        n = len(c.shots)
+        vote_screens(c, None, args.voters.split(','))
+        # Each new screen after the other screens of its page (the docs are grouped by page)
+        for shot in c.shots[n:]:
+            c.shots.remove(shot)
+            last = max((k for k, s in enumerate(c.shots) if s[:2] == shot[:2]), default=len(c.shots) - 1)
+            c.shots.insert(last + 1, shot)
     t.keys('U')
     restore = before if before else 'fr'
     if restore != args.lang:
         set_lang(restore)  # The language the badge had
+    t.mark()
+    t.badge.send('\x01A' if admin_was_on else '\x01a')  # The admin mode the badge had
+    t.expect(r'^admin: ', 3)
     badge.stop()
+    problems = check_shots(c, out)
+    if not only and not args.out:  # A whole run: the screenshots of older runs (other names, pages gone) removed
+        keep = {s[2] for s in c.shots}
+        old = [f for f in os.listdir(out) if f.endswith('.png') and f not in keep]
+        for f in old:
+            os.remove(os.path.join(out, f))
+        print(f'{len(old)} old screenshot(s) removed')
     write_docs(c, args.lang, out, docs=not args.out)
+    if problems:
+        print(f'{len(problems)} screenshot(s) to look at (above)')
 
 
 def english_names():
@@ -307,6 +472,18 @@ CAPTIONS_EN = {
     'Les réglages': 'The settings', 'Accueil': 'Home', 'Menu': 'Menu',
     'Page 2': 'Page 2', 'Page 3': 'Page 3', 'Page 4': 'Page 4', 'Page 5': 'Page 5', 'Page 6': 'Page 6',
     'Page 7': 'Page 7', 'Page 8': 'Page 8',
+    'Rôle': 'Role', 'détail': 'details', 'Succès': 'Achievement', 'Marchandise': 'Goods',
+    'Les rencontres': 'The meetings', 'Fin de partie (dans le mur)': 'Game over (into the wall)',
+    'Le score en QR code (signé)': 'The score as a QR code (signed)',
+    'La partie : attendre le signal': 'The game: wait for the signal', 'Le signal : appuyer !': 'The signal: press!',
+    'Le temps de réaction': 'The reaction time',
+    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer',
+    'Un morceau : deviner le titre': 'A track: guess the title', 'La réponse': 'The answer',
+    "Une cigale qui vote (l'autre a choisi une autre réponse)": 'A cicada voting (the other one chose another answer)',
+    'Le résultat des deux cigales qui votent': 'The result of the two cicadas voting', "L'aide pendant la partie": 'The help during the game',
+    "Créer une partie : la salle d'attente": 'Create a party: the waiting room',
+    'Rejoindre une partie : la recherche': 'Join a party: the search',
+    **{f'Grade {r}': f'Rank {r}' for r in range(1, 11)},
 }
 
 
@@ -323,7 +500,10 @@ def write_docs(c, lang_run, out, docs=True):
             return text
         if text.startswith('Le thème '):
             return 'The theme ' + en.get(text[len('Le thème '):], text[len('Le thème '):])
-        return CAPTIONS_EN.get(text) or en.get(text) or text
+        if text in CAPTIONS_EN or text in en:
+            return CAPTIONS_EN.get(text) or en[text]
+        # "Rôle : Voyante : détail": each part (the names come from the translations of the firmware)
+        return ': '.join(CAPTIONS_EN.get(p) or en.get(p) or p for p in text.split(' : '))
 
     shots_dir = '../screens/' if lang_run == 'fr' else f'../screens/{lang_run}/'
     for lang, path, title, intro, t_problems, t_rows in (
