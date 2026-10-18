@@ -80,6 +80,19 @@ def ranks(c, theme, page):
     t.keys('a', 0.6)
 
 
+def reflexes(c, theme, page):
+    """Réflexes: the wait, then the signal is the LEDs only (2 s) and the result shows 1.5 s: follow the log"""
+    t = c.t
+    t.mark()
+    t.keys('b', 0.3)
+    c.shot(theme, page, 'jeu', 'La partie : attendre le signal (les LEDs)', len(t.lines), settle=0.5)
+    if t.expect(r'^game: reflex go$', 8):
+        t.keys('b', 0)
+        start = len(t.lines)
+        if t.expect(r'^game: reflex \d+ ms$', 3):
+            c.shot(theme, page, 'resultat', 'Le temps de réaction', start, settle=0.4)
+
+
 def achievements_steps():
     names = source_names('achievements.c', r'\[ACHV_(?!LEVELS)[A-Z0-9_]+\] = \{N_\("([^"]+)"\)')
     steps = [('b', 'rencontres', 'Les rencontres', 'b')]
@@ -106,8 +119,7 @@ PAGES = {
     'Morpion': [('b', 'jeu', 'La partie', None)],
     'Puissance 4': [('b', 'jeu', 'La partie', None)],
     'Simon': [('b', 'jeu', 'La partie', None)],
-    'Réflexes': [('b', 'jeu', 'La partie : attendre le signal (les LEDs)', None),
-                 ('......b', 'resultat', 'Le temps de réaction', None)],
+    'Réflexes': [(reflexes, None, None, None)],
     'Snake': [('b', 'jeu', 'La partie', None), ('............', 'fin', 'Fin de partie (dans le mur)', None),
               ('x', 'score', 'Le score en QR code (signé)', 'b')],
     'Démineur': [('b', 'jeu', 'La partie', None)],
@@ -193,8 +205,8 @@ class Crawler:
                  not l.startswith('uicheck: o')]
         return sorted(set(lines))
 
-    def shot(self, theme, page, name, caption, start):
-        self.t.pump(1.5)
+    def shot(self, theme, page, name, caption, start, settle=1.5):
+        self.t.pump(settle)
         # A page made to stay is cleaned (black, white, then the page): wait for the page, not a step of the cleaning
         if page in STILL_PAGES and not any(l.startswith('saver: still page') for l in self.t.lines[start:]):
             self.t.expect(r'^saver: still page', 20)
@@ -291,6 +303,8 @@ def check_shots(c, out):
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')  # The accents and the ⚠ of the report
     parser = argparse.ArgumentParser(description='Screenshots of every screen of the badge, and the check of the texts')
     parser.add_argument('--port', default=None)
     parser.add_argument('--only', default=None, help='comma separated themes (French names)')
