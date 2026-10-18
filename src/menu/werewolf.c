@@ -176,6 +176,7 @@ static bool notify_pending = false;
 /* The help: a card, its details, where it goes back */
 static int help_card = 0, help_back = PG_MENU;
 static bool help_details = false;
+static bool help_skip_release = false;  /* The release of the B that opened the help: not "détails" */
 static absolute_time_t help_until = 0;  /* The card of the player during the game: shown for a while */
 
 /* The chimes: {hz, ms} pairs, 0 to end */
@@ -1950,6 +1951,7 @@ static void player_choose(absolute_time_t now) {
 static void open_card(int card, int back, absolute_time_t now) {
     help_card = card;
     help_details = false;
+    help_skip_release = false;
     help_back = back;
     help_until = delayed_by_ms(now, CARD_SHOWN_MS);
     page = PG_HELP;
@@ -2039,6 +2041,7 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
             return false;
         if ((b->pressed & UI_BTN_B) && list_sel == MENU_HELP) {
             open_card(0, PG_MENU, now);
+            help_skip_release = ! (b->released_short & UI_BTN_B);  /* The card first: its details on the next B */
         } else if ((b->pressed & UI_BTN_B) && other_game()) {
             printf("werewolf: a party of %s is in progress\n", other_game());
         } else if (b->pressed & UI_BTN_B) {
@@ -2139,7 +2142,9 @@ static bool ww_buttons(const app_buttons_t *b, absolute_time_t now) {
             help_details = false;
             help_until = delayed_by_ms(now, CARD_SHOWN_MS);
         }
-        if (b->released_short & UI_BTN_B)
+        if ((b->released_short & UI_BTN_B) && help_skip_release)
+            help_skip_release = false;
+        else if (b->released_short & UI_BTN_B)
             help_details = ! help_details;
         if (b->released_short & UI_BTN_A) {
             page = help_back;
