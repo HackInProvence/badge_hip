@@ -874,18 +874,19 @@ SD card
 
 | Folder | Format | Limits and remarks | Prepare with |
 |---|---|---|---|
-| `IMAGES` | `.epi`: 200 × 200, 1 or 2 bits per pixel | 48 entries per folder (sub-folders + files) in the viewer; 32 pictures offered for the screensaver; 24 for "Send an image" (Envoyer une image) | `image2epi.py` |
-| `VIDEOS` | `.epv`: 200 × 200 black and white frames + 8 bit sound | 48 entries per folder; the demo mode and the OLED take the first one | `video2epaper.py` |
-| `MUSIQUE` | `.wav` PCM 8, 16, 24 or 32 bits, 32 bit float, mono or stereo, 4 to 192 kHz | 48 entries per folder; blind test: 16 sub-folders and 64 tracks at most; also the source of the pirate radio WAVs. Advised: 8 bit 16 kHz mono | `audio2wav.py` |
-| `TEXTES` | `.txt` UTF-8 (with or without BOM) or Windows-1252 | 48 entries per folder; the reading position is remembered | a text editor |
+| `IMAGES` | `.epi`: 200 × 200, 1 or 2 bits per pixel | any number; lists by pages (48 entries in the viewer, 32 for the screensaver, 24 for "Send an image" (Envoyer une image)) | `image2epi.py` |
+| `VIDEOS` | `.epv`: 200 × 200 black and white frames + 8 bit sound | any number, by pages of 48 entries; the demo mode and the OLED take the first one | `video2epaper.py` |
+| `MUSIQUE` | `.wav` PCM 8, 16, 24 or 32 bits, 32 bit float, mono or stereo, 4 to 192 kHz | any number, by pages of 48 entries (the pirate radio: 32); blind test: sub-folders by pages of 16, 64 tracks at most; also the source of the pirate radio WAVs. Advised: 8 bit 16 kHz mono | `audio2wav.py` |
+| `TEXTES` | `.txt` UTF-8 (with or without BOM) or Windows-1252 | any number, by pages of 48 entries; the reading position is remembered | a text editor |
 | `SONNERIES`, `RTTTL` | one RTTTL tune per line (`#`: comment), or PICAXE `tune` commands (`.bas`) | 2048 characters per line; 40 sub-folders shown per folder; any number of files, in pages of 32; 128 tunes per page | `rtttl_sort.py`, [ringtones.md](ringtones.md) |
-| `LIVRES` | `.txt` gamebook (sections `== n`, choices `-> n : ...`) | 16 books; 400 sections, 8 choices, 8 items; ~2,000 bytes of text per section | `gamebook_check.py`, [gamebooks.md](gamebooks.md) |
-| `CONFERENCES` | a sub-folder per event: `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (`key: value` blocks) | 16 events; 100 blocks per file; 480 bytes per line, 1,280 per block | [conference_badge.md](conference_badge.md) |
+| `LIVRES` | `.txt` gamebook (sections `== n`, choices `-> n : ...`) | any number, by pages of 16; 400 sections, 8 choices, 8 items; ~2,000 bytes of text per section | `gamebook_check.py`, [gamebooks.md](gamebooks.md) |
+| `CONFERENCES` | a sub-folder per event: `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (`key: value` blocks) | any number, by pages of 16; 100 blocks per file; 480 bytes per line, 1,280 per block | [conference_badge.md](conference_badge.md) |
 
 A player (Images, Videos, Music, Speed reading) whose folder is missing or empty shows the **root** of the card:
 a `VIDEO.EPV` video (default name of `video2epaper.py`) copied at the root is played too, but rather put each file in
-its folder. Beyond 48 entries in a folder, some are not listed (the first ones read on the card are kept, then
-sorted): make sub-folders.
+its folder. A folder can hold **any number of files**: wherever a file is
+chosen, the list is shown by pages (folders first, then files, in alphabetical order), with "< Précédents" (previous)
+at the top and "Suivants >" (next) at the bottom of the page.
 
 ### 6.3 The examples of the repository
 
@@ -1021,9 +1022,9 @@ menu). The serial port logs are not translated: the PC tools work whatever the l
 | The other cicadas are no longer heard | Normal while a page uses the radio: 433 MHz decoder, weather station, 433 MHz hunt, talk badge, contact exchange, pirate radio. |
 | No battery level | Battery not calibrated: § 4.3. |
 | "No SD card" (Pas de carte SD), `video: mount failed` | Card fully inserted, FAT32 or exFAT. |
-| A file does not show up | Right folder and extension; name of 63 bytes at most; no more than 48 entries in the folder; file not hidden. |
+| A file does not show up | Right folder and extension; name of 63 bytes at most; file not hidden; a big folder: see the next pages ("Suivants >"). |
 | A ringtone is marked `(!)` | B: line, column and reason; the console prints `rtttl: ... error ...` ([ringtones.md](ringtones.md)). |
-| A gamebook does not show up or stops | `python tools/gamebook_check.py LIVRES/book.txt`; 16 books at most. |
+| A gamebook does not show up or stops | `python tools/gamebook_check.py LIVRES/book.txt`. |
 | A video or a music stops before its end | `badge_media_test.py` to find it; convert it again with `video2epaper.py` / `audio2wav.py`. |
 | Sound too low | Media > Volume; WAV converted by `audio2wav.py` without `--no-filter`. |
 | `score_check.py` says every score is invalid | Wrong key, or key of another firmware version (`--make-key` changes the key). |

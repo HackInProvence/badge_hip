@@ -51,7 +51,7 @@ sort them by day and time.
 
 ## Limits
 
-- 16 events, 100 blocks per file (the next ones are ignored).
+- Any number of events (by pages of 16), 100 blocks per file (the next ones are ignored).
 - 480 bytes per line, 1,280 bytes per block (the rest of the block is not shown).
 - Only the characters of the fonts of the badge are drawn (ASCII, French accents and a few others).
 - A link too long for a QR code shows "(QR code trop grand)".

@@ -373,6 +373,11 @@ the SD card CS is driven as a plain GPIO. Only one user at a time:
   - code page 437.
 - `sd_mount()` mounts on demand; `sd_list_files()` and `sd_list_dirs()` return sorted lists
   (names shorter than 64 bytes).
+- **Choosing a file**: always with `sd_page_read()` (`sd.h`) and `sd_list.h` (`src/menu/sd_list.c`), never with a
+  cut list. A folder of any size is read by pages (folders then files, sorted, whatever the order on the card: the
+  next page is read again after the last entry of the page, the previous one before its first entry); the list adds
+  "< Précédents" and "Suivants >". Used by the media browser, the pirate radio, the screensaver, Send an image, the
+  blind test, the gamebooks, the conference badge (the ringtones have the same mechanism in `rtttl.c`).
 
 ### 6.4 Sound
 

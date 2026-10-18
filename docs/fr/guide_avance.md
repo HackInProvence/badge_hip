@@ -877,18 +877,19 @@ carte SD
 
 | Dossier | Format | Limites et remarques | Préparer avec |
 |---|---|---|---|
-| `IMAGES` | `.epi` : 200 × 200, 1 ou 2 bits par pixel | 48 entrées par dossier (sous-dossiers + fichiers) dans la visionneuse ; 32 images proposées pour la veille ; 24 pour Envoyer une image | `image2epi.py` |
-| `VIDEOS` | `.epv` : images 200 × 200 noir et blanc + son 8 bits | 48 entrées par dossier ; le mode démo et l'OLED prennent la première | `video2epaper.py` |
-| `MUSIQUE` | `.wav` PCM 8, 16, 24 ou 32 bits, flottant 32 bits, mono ou stéréo, 4 à 192 kHz | 48 entrées par dossier ; blind test : 16 sous-dossiers et 64 morceaux au plus ; aussi la source des WAV de la radio pirate. Conseillé : 8 bits 16 kHz mono | `audio2wav.py` |
-| `TEXTES` | `.txt` UTF-8 (avec ou sans BOM) ou Windows-1252 | 48 entrées par dossier ; la position de lecture est retenue | un éditeur de texte |
+| `IMAGES` | `.epi` : 200 × 200, 1 ou 2 bits par pixel | nombre quelconque ; listes par pages (48 entrées dans la visionneuse, 32 pour la veille, 24 pour Envoyer une image) | `image2epi.py` |
+| `VIDEOS` | `.epv` : images 200 × 200 noir et blanc + son 8 bits | nombre quelconque, par pages de 48 entrées ; le mode démo et l'OLED prennent la première | `video2epaper.py` |
+| `MUSIQUE` | `.wav` PCM 8, 16, 24 ou 32 bits, flottant 32 bits, mono ou stéréo, 4 à 192 kHz | nombre quelconque, par pages de 48 entrées (la radio pirate : 32) ; blind test : sous-dossiers par pages de 16, 64 morceaux au plus ; aussi la source des WAV de la radio pirate. Conseillé : 8 bits 16 kHz mono | `audio2wav.py` |
+| `TEXTES` | `.txt` UTF-8 (avec ou sans BOM) ou Windows-1252 | nombre quelconque, par pages de 48 entrées ; la position de lecture est retenue | un éditeur de texte |
 | `SONNERIES`, `RTTTL` | une sonnerie RTTTL par ligne (`#` : commentaire), ou commandes `tune` PICAXE (`.bas`) | 2048 caractères par ligne ; 40 sous-dossiers montrés par dossier ; fichiers en nombre quelconque, par pages de 32 ; 128 sonneries par page | `rtttl_sort.py`, [sonneries.md](sonneries.md) |
-| `LIVRES` | livre-jeu `.txt` (sections `== n`, choix `-> n : ...`) | 16 livres ; 400 sections, 8 choix, 8 objets ; ~2 000 octets de texte par section | `gamebook_check.py`, [livres_jeux.md](livres_jeux.md) |
-| `CONFERENCES` | un sous-dossier par événement : `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (blocs `clé: valeur`) | 16 événements ; 100 blocs par fichier ; 480 octets par ligne, 1 280 par bloc | [badge_conference.md](badge_conference.md) |
+| `LIVRES` | livre-jeu `.txt` (sections `== n`, choix `-> n : ...`) | nombre quelconque, par pages de 16 ; 400 sections, 8 choix, 8 objets ; ~2 000 octets de texte par section | `gamebook_check.py`, [livres_jeux.md](livres_jeux.md) |
+| `CONFERENCES` | un sous-dossier par événement : `infos.txt`, `conferences.txt`, `workshops.txt`, `exposants.txt` (blocs `clé: valeur`) | nombre quelconque, par pages de 16 ; 100 blocs par fichier ; 480 octets par ligne, 1 280 par bloc | [badge_conference.md](badge_conference.md) |
 
 Un lecteur (Images, Vidéos, Musique, Lecture rapide) dont le dossier manque ou est vide affiche la **racine** de la
 carte : une vidéo `VIDEO.EPV` (nom par défaut de `video2epaper.py`) copiée à la racine est donc lue aussi, mais
-rangez plutôt chaque fichier dans son dossier. Au-delà de 48 entrées dans un dossier, une partie n'est pas
-listée (les premières lues sur la carte sont gardées, puis triées) : faites des sous-dossiers.
+rangez plutôt chaque fichier dans son dossier. Un dossier peut contenir **autant de fichiers que
+l'on veut** : partout où l'on choisit un fichier, la liste est montrée par pages (dossiers d'abord, puis fichiers,
+par ordre alphabétique), avec « < Précédents » en haut et « Suivants > » en bas de la page.
 
 ### 6.3 Les exemples du dépôt
 
@@ -1026,9 +1027,9 @@ fonctionnent quelle que soit la langue.
 | Les autres cigales ne sont plus entendues | Normal tant qu'une page occupe la radio : Décodeur 433 MHz, Station météo, Chasse 433 MHz, Badge de talk, échange de contacts, radio pirate. |
 | Pas de niveau de batterie | Batterie non calibrée : § 4.3. |
 | « Carte SD absente », `video: mount failed` | Carte bien enfoncée, FAT32 ou exFAT. |
-| Un fichier n'apparaît pas | Bon dossier et bonne extension ; nom de 63 octets au plus ; pas plus de 48 entrées dans le dossier ; fichier non caché. |
+| Un fichier n'apparaît pas | Bon dossier et bonne extension ; nom de 63 octets au plus ; fichier non caché ; un grand dossier : voir les pages suivantes (« Suivants > »). |
 | Une sonnerie est marquée `(!)` | B : ligne, colonne et raison ; la console écrit `rtttl: ... error ...` ([sonneries.md](sonneries.md)). |
-| Un livre-jeu n'apparaît pas ou s'arrête | `python tools/gamebook_check.py LIVRES/livre.txt` ; 16 livres au plus. |
+| Un livre-jeu n'apparaît pas ou s'arrête | `python tools/gamebook_check.py LIVRES/livre.txt`. |
 | Une vidéo ou une musique s'arrête avant la fin | `badge_media_test.py` pour la retrouver ; reconvertir avec `video2epaper.py` / `audio2wav.py`. |
 | Son trop faible | Médias > Volume ; WAV converti par `audio2wav.py` sans `--no-filter`. |
 | `score_check.py` déclare tous les scores invalides | Mauvaise clé, ou clé d'une autre version du firmware (`--make-key` change la clé). |

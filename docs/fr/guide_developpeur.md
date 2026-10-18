@@ -371,6 +371,12 @@ le CS de la carte SD est piloté comme une GPIO. Un seul utilisateur à la fois 
   - page de code 437.
 - `sd_mount()` monte à la demande ; `sd_list_files()` et `sd_list_dirs()` rendent des listes triées
   (noms de moins de 64 octets).
+- **Choisir un fichier** : toujours par `sd_page_read()` (`sd.h`) et `sd_list.h` (`src/menu/sd_list.c`), jamais
+  par une liste tronquée. Un dossier de toute taille est lu par pages (dossiers puis fichiers, triés, quel que soit
+  l'ordre sur la carte : la page suivante est relue après la dernière entrée de la page, la précédente avant la
+  première) ; la liste ajoute « < Précédents » et « Suivants > ». Utilisé par le navigateur des médias, la radio
+  pirate, la veille, Envoyer une image, le blind test, les livres-jeux, le badge conférence (les sonneries ont le
+  même mécanisme dans `rtttl.c`).
 
 ### 6.4 Son
 

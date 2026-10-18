@@ -50,7 +50,7 @@ classez-les par jour et heure.
 
 ## Limites
 
-- 16 événements, 100 blocs par fichier (les suivants sont ignorés).
+- Événements en nombre quelconque (par pages de 16), 100 blocs par fichier (les suivants sont ignorés).
 - 480 octets par ligne, 1 280 octets par bloc (le reste du bloc n'est pas affiché).
 - Seuls les caractères des polices du badge s'affichent (ASCII, accents français et quelques autres).
 - Un lien trop long pour un QR code affiche « (QR code trop grand) ».

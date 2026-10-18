@@ -86,6 +86,90 @@ size_t sd_list_dirs(const char *dir, char (*names)[SD_NAME_MAX], size_t max) {
 }
 
 
+/* ------ A folder read a page at a time ------ */
+
+/* The order of the entries: the folders, then the files, each by name */
+static int entry_cmp(bool a_dir, const char *a, bool b_dir, const char *b) {
+    if (a_dir != b_dir)
+        return a_dir ? -1 : 1;
+    return strcasecmp(a, b);
+}
+
+static bool page_dir(const sd_page_t *p, int i) {
+    return p->is_dir && p->is_dir[i];
+}
+
+static void page_move(sd_page_t *p, int to, int from) {
+    strcpy(p->names[to], p->names[from]);
+    if (p->is_dir)
+        p->is_dir[to] = p->is_dir[from];
+}
+
+int sd_page_read(sd_page_t *p, const char *dir, int way) {
+    /* The key: the last entry of the page (next page) or its first one (previous page) */
+    char key[SD_NAME_MAX];
+    bool key_dir = false;
+    if (way && p->n) {
+        int k = way > 0 ? p->n - 1 : 0;
+        strcpy(key, p->names[k]);
+        key_dir = page_dir(p, k);
+    } else {
+        way = 0;
+    }
+    p->n = 0;
+    p->prev = p->next = false;
+    if (sd_mount() != FR_OK)
+        return 0;
+    DIR d;
+    FILINFO info;
+    if (f_opendir(&d, dir) != FR_OK)
+        return 0;
+    bool more = false;  /* Entries beyond the page, in the direction read */
+    bool other = false;  /* Entries on the other side of the key */
+    while (f_readdir(&d, &info) == FR_OK && info.fname[0]) {
+        bool is_dir = info.fattrib & AM_DIR;
+        if ((info.fattrib & (AM_HID | AM_SYS)) || info.fname[0] == '.' || strlen(info.fname) >= SD_NAME_MAX)
+            continue;
+        if (is_dir ? ! p->dirs : ! (p->accept ? p->accept(info.fname) : p->ext && ends_with(info.fname, p->ext)))
+            continue;
+        if (! p->is_dir)
+            is_dir = false;  /* Folders only (or files only): one kind, the order of the names */
+        int c = way ? entry_cmp(is_dir, info.fname, key_dir, key) : 0;
+        if ((way > 0 && c <= 0) || (way < 0 && c >= 0)) {
+            other = true;
+            continue;
+        }
+        if (p->n == p->max) {
+            more = true;
+            if (way >= 0) {  /* Keep the first entries */
+                if (entry_cmp(is_dir, info.fname, page_dir(p, p->n - 1), p->names[p->n - 1]) > 0)
+                    continue;
+                --p->n;
+            } else {  /* Keep the last ones */
+                if (entry_cmp(is_dir, info.fname, page_dir(p, 0), p->names[0]) < 0)
+                    continue;
+                for (int i = 0; i < p->n - 1; ++i)
+                    page_move(p, i, i + 1);
+                --p->n;
+            }
+        }
+        /* Insertion sort */
+        int i = p->n++;
+        while (i > 0 && entry_cmp(page_dir(p, i - 1), p->names[i - 1], is_dir, info.fname) > 0) {
+            page_move(p, i, i - 1);
+            --i;
+        }
+        strcpy(p->names[i], info.fname);
+        if (p->is_dir)
+            p->is_dir[i] = is_dir;
+    }
+    f_closedir(&d);
+    p->prev = way >= 0 ? other : more;
+    p->next = way >= 0 ? more : other;
+    return p->n;
+}
+
+
 /* ------ The date of the files written ------ */
 
 static int64_t clock_offset = 0;  /* Local time (seconds since 1970, as if UTC) - seconds since boot; 0: not set */

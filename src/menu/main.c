@@ -8,8 +8,8 @@
  * \brief Menu application: the features of the badge in a menu shown on the screen.
  *
  * Badge seen from the front, head up:
- * - flanks: left (Y) = up, right (X) = down (while playing a video or music: left = quieter, right = louder),
- * - wings: right (B) = validate (pause while playing), left (A) = cancel / back
+ * - Y (left flank) = up, X (right flank) = down (while playing a video or music: Y = quieter, X = louder),
+ * - B (right wing) = validate (pause while playing), A (left wing) = cancel / back
  *   (in the main menu: stops the sound and the LEDs).
  * The same keys (a, b, x, y) on the USB serial port simulate the buttons.
  *
@@ -56,6 +56,7 @@
 #include "net.h"
 #include "ook_rx.h"
 #include "party.h"
+#include "sd_list.h"
 #include "sd_serial.h"
 #include "social.h"
 #include "store.h"
@@ -73,10 +74,10 @@ void contacts_export(void);  /* contacts.c: the cards received as vCards on USB 
  * (the page and its code stay in the firmware). 1: back in the demo mode; the menu: see the Social theme below */
 #define MENU_PROGRAM 0
 
-#define BTN_A 0x01  /* left wing */
-#define BTN_B 0x02  /* right wing */
-#define BTN_X 0x04  /* right flank */
-#define BTN_Y 0x08  /* left flank */
+#define BTN_A 0x01  /* A */
+#define BTN_B 0x02  /* B */
+#define BTN_X 0x04  /* X */
+#define BTN_Y 0x08  /* Y */
 #define BTN_UP     BTN_Y
 #define BTN_DOWN   BTN_X
 #define BTN_OK     BTN_B
@@ -443,11 +444,11 @@ typedef enum {
     A_IMAGE,  /* Image viewer: the image is shown */
     A_CARRIER,
     A_INFO,
-    A_PAGE,  /* A message page (e.g. an error), back to the menu with any wing */
+    A_PAGE,  /* A message page (e.g. an error), back to the menu with A or B */
     A_GAME,  /* A mini game (games.c) owns the buttons and the page */
     A_RADIO_TEST,  /* Radio test: a message every radio_test_s seconds (long press on "Radio : message") */
     A_APP,  /* An application (app.h) owns the buttons and the page */
-    A_CREDITS,  /* One page per contributor, the flanks change the page */
+    A_CREDITS,  /* One page per contributor, Y / X change the page */
 } app_state_t;
 
 static app_state_t app = A_MENU;
@@ -532,11 +533,11 @@ static int credits_page = 0;
 static app_state_t credits_back = A_MENU;
 static char last_radio_msg[64] = "";
 
-/* File browser: the directories, then the files of the current directory */
+/* File browser: a page of the directories, then the files of the current directory (sd_list.h: any size) */
 static char files[MAX_FILES][SD_NAME_MAX];
 static bool file_is_dir[MAX_FILES];
-static size_t n_files = 0;
-static int file_selected = 0;
+static size_t n_files = 0;  /* Entries of the page */
+static sd_list_t browse = {.page = {.names = files, .is_dir = file_is_dir, .max = MAX_FILES, .dirs = true}};
 /* What the file browser lists */
 typedef enum { B_VIDEO, B_MUSIC, B_TEXT, B_IMAGE } browse_kind_t;
 static browse_kind_t browsing = B_VIDEO;
@@ -553,7 +554,8 @@ static absolute_time_t music_refresh_ts = 0;
 /* Blind test: the playlist is shuffled once at the start, so that no track is played twice */
 static char bt_dirs[BT_MAX_DIRS][SD_NAME_MAX];
 static size_t n_bt_dirs = 0;
-static int bt_dir_selected = 0;
+static int bt_dir_selected = 0;  /* 0: "Tout", then the rows of bt_list */
+static sd_list_t bt_list = {.page = {.names = bt_dirs, .max = BT_MAX_DIRS, .dirs = true}};  /* MUSIQUE, any size */
 static char playlist[BT_MAX_TRACKS][PATH_MAX_LEN];
 static uint8_t bt_order[BT_MAX_TRACKS];
 static size_t n_playlist = 0;
@@ -572,7 +574,7 @@ static int oled_running = -1;
 static int ctf_selected = 0;
 static absolute_time_t ctf_last_input = 0;
 
-/* Name editor, like the high scores of the arcade games: the flanks change the letter of the current cell */
+/* Name editor, like the high scores of the arcade games: Y / X change the letter of the current cell */
 #define NAME_LEN 8  /* The beacons carry 8 characters */
 #define NAME_LONG_PRESS_MS 1000
 #define NAME_REPEAT_DELAY_MS 500
@@ -698,15 +700,22 @@ static void item_label(int item, char *buf, size_t len) {
     }
 }
 
-static void file_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, file_is_dir[i] ? "> %s" : "%s", files[i]);
+static void file_label(int row, char *buf, size_t len) {
+    int i = sd_list_entry(&browse, row);
+    if (i < 0)
+        sd_list_label(&browse, row, buf, len);  /* "< Précédents", "Suivants >" */
+    else
+        snprintf(buf, len, file_is_dir[i] ? "> %s" : "%s", files[i]);
 }
 
 static void bt_dir_label(int i, char *buf, size_t len) {
+    int e = i ? sd_list_entry(&bt_list, i - 1) : 0;
     if (i == 0)
         snprintf(buf, len, N_("Tout"));
+    else if (e < 0)
+        sd_list_label(&bt_list, i - 1, buf, len);  /* "< Précédents", "Suivants >" */
     else
-        snprintf(buf, len, "> %s", bt_dirs[i-1]);
+        snprintf(buf, len, "> %s", bt_dirs[e]);
 }
 
 /* Title of a track: the file name without the directory and extension */
@@ -756,7 +765,7 @@ static const submenu_t SUBMENUS[] = {
 /* The admin menu is only shown in admin mode */
 #define N_SUBMENUS ((int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - (store_get()->admin == STORE_ADMIN_ON ? 0 : 1))
 
-/* Secret sequence of the flanks in the main menu that shows the admin menu (L = left flank, R = right flank) */
+/* Secret sequence of Y / X in the main menu that shows the admin menu (L = Y, R = X) */
 #define ADMIN_SEQUENCE "LLRRLRLR"
 #define ADMIN_SEQUENCE_MS 8000
 static char admin_keys[sizeof(ADMIN_SEQUENCE)] = "";
@@ -776,9 +785,9 @@ static bool admin_sequence(uint8_t flank, absolute_time_t now) {
     admin_keys[n + 1] = 0;
     return ! strcmp(admin_keys, ADMIN_SEQUENCE);
 }
-/* The left wing held LANG_HOLD_MS in the main menu sets the language back to English, for a badge left in a language
- * that the user can't read (docs: the left wing five times to come back to the main menu, then held 5 s). Nothing
- * else holds a wing there, and no sequence of the flanks (the admin one) can start it. */
+/* A held LANG_HOLD_MS in the main menu sets the language back to English, for a badge left in a language
+ * that the user can't read (docs: A five times to come back to the main menu, then held 5 s). Nothing
+ * else holds A or B there, and no sequence of Y / X (the admin one) can start it. */
 #define LANG_HOLD_MS 5000
 static bool lang_hold_done = false;  /* Once per press */
 
@@ -789,7 +798,7 @@ static bool redraw_menu = false;  /* The menu changed outside the handling of th
 
 static void set_status(const char *msg);
 
-/* The admin mode: by the secret sequence of the flanks, "Quitter le mode admin", or the serial port (0x01 A / a,
+/* The admin mode: by the secret sequence of Y / X, "Quitter le mode admin", or the serial port (0x01 A / a,
  * the check box of tools/badge_remote.py) */
 static void set_admin(bool on) {
     bool admin_theme = top_selected == (int)(sizeof(SUBMENUS) / sizeof(SUBMENUS[0])) - 1;
@@ -874,14 +883,14 @@ static void render_browser(void) {
     } else {
         draw_title(BROWSE_TITLES[browsing]);  /* Short; the "ui:" log stays in French (the tools read it) */
     }
-    draw_list(n_files, file_selected, file_label);
+    draw_list(sd_list_rows(&browse), browse.sel, file_label);
     draw_footer(N_("A : retour  B : ouvrir"));
 }
 
 static void render_bt_folders(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Blind test"));
-    draw_list(n_bt_dirs + 1, bt_dir_selected, bt_dir_label);
+    draw_list(sd_list_rows(&bt_list) + 1, bt_dir_selected, bt_dir_label);
     draw_footer(N_("A : retour  B : lancer"));
 }
 
@@ -1015,8 +1024,9 @@ static void name_edit_save(void) {
 static const uint8_t SAVER_DELAYS[] = {0, 1, 2, 3, 5, 10, 15, 30, 60};  /* Minutes, 0 = off */
 static int settings_selected = 0;
 static char saver_files[SAVER_MAX_IMAGES][SD_NAME_MAX];
-static size_t n_saver_files = 0;
-static int saver_selected = 0;
+static size_t n_saver_files = 0;  /* Images of the page (sd_list.h: IMAGES of any size) */
+static int saver_selected = 0;  /* 0: the built-in image, then the rows of saver_list */
+static sd_list_t saver_list = {.page = {.names = saver_files, .max = SAVER_MAX_IMAGES, .ext = ".EPI"}};
 static absolute_time_t last_activity = 0;
 static app_state_t saver_return = A_MENU;  /* Where the screensaver goes back to */
 static bool saver_shown = false;
@@ -1084,8 +1094,10 @@ static void settings_label(int i, char *buf, size_t len) {
 static void saver_image_label(int i, char *buf, size_t len) {
     if (i == 0)
         snprintf(buf, len, N_("SecSea (intégrée)"));
+    else if (sd_list_entry(&saver_list, i - 1) < 0)
+        sd_list_label(&saver_list, i - 1, buf, len);  /* "< Précédents", "Suivants >" */
     else
-        display_name(saver_files[i - 1], buf, len);
+        display_name(saver_files[sd_list_entry(&saver_list, i - 1)], buf, len);
 }
 
 static void render_settings(void) {
@@ -1098,12 +1110,13 @@ static void render_settings(void) {
 static void render_saver_images(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Image de veille"));
-    draw_list(n_saver_files + 1, saver_selected, saver_image_label);
+    draw_list(sd_list_rows(&saver_list) + 1, saver_selected, saver_image_label);
     draw_footer(N_("A : retour  B : choisir"));
 }
 
 static void open_saver_images(void) {
-    n_saver_files = sd_list_files(IMAGE_DIR, ".EPI", saver_files, SAVER_MAX_IMAGES);
+    saver_list.way = 0;
+    n_saver_files = sd_list_read(&saver_list, IMAGE_DIR);
     saver_selected = 0;
     char current[SD_NAME_MAX];
     display_name(saver_image(), current, sizeof(current));
@@ -1111,17 +1124,24 @@ static void open_saver_images(void) {
         char name[SD_NAME_MAX];
         display_name(saver_files[i], name, sizeof(name));
         if (saver_image()[0] && ! strcmp(name, current))
-            saver_selected = i + 1;
+            saver_selected = (int)i + 1;  /* No previous page on the first one */
     }
     app = A_SAVER_IMAGES;
 }
 
 static void choose_saver_image(void) {
     store_t *s = store_get();
+    saver_list.sel = saver_selected - 1;
+    if (saver_selected > 0 && sd_list_turn(&saver_list)) {  /* "< Précédents", "Suivants >" */
+        n_saver_files = sd_list_read(&saver_list, IMAGE_DIR);
+        saver_selected = saver_list.sel + 1;
+        return;
+    }
     if (saver_selected == 0)
         s->saver_image[0] = 0;
     else
-        snprintf(s->saver_image, STORE_SAVER_IMAGE_LEN, "%s/%s", IMAGE_DIR, saver_files[saver_selected - 1]);
+        snprintf(s->saver_image, STORE_SAVER_IMAGE_LEN, "%s/%s", IMAGE_DIR,
+                 saver_files[sd_list_entry(&saver_list, saver_selected - 1)]);
     store_changed();
     app = A_SETTINGS;
 }
@@ -1264,11 +1284,11 @@ static void send_screen(void) {
 }
 
 
-/* Fast reading: short press on a flank = speed -/+, long press = back/forward (repeated while held),
- * right wing = pause/resume, left wing = quit */
+/* Fast reading: short press on Y or X = speed -/+, long press = back/forward (repeated while held),
+ * B = pause/resume, A = quit */
 #define RSVP_LONG_PRESS_MS 700
 #define RSVP_REPEAT_MS 800
-static bool rsvp_flank_long[2];  /* Left, right flank: the long press was used (ignore the release) */
+static bool rsvp_flank_long[2];  /* Y, X: the long press was used (ignore the release) */
 static absolute_time_t rsvp_repeat_ts[2];
 
 static void rsvp_buttons(uint8_t pressed, absolute_time_t now) {
@@ -1316,7 +1336,7 @@ static void name_edit_buttons(uint8_t pressed, absolute_time_t now) {
             return;
         }
     }
-    /* Flanks: previous / next letter, repeated while held */
+    /* Y / X: previous / next letter, repeated while held */
     if (pressed & (BTN_Y | BTN_X)) {
         name_edit_change((pressed & BTN_Y) ? -1 : 1);
         name_repeat_ts = delayed_by_ms(now, NAME_REPEAT_DELAY_MS);
@@ -1325,7 +1345,7 @@ static void name_edit_buttons(uint8_t pressed, absolute_time_t now) {
         name_repeat_ts = delayed_by_ms(now, NAME_REPEAT_MS);
     }
 
-    /* Right wing: long press = save (as soon as the delay is reached), short press = next cell (on release) */
+    /* B: long press = save (as soon as the delay is reached), short press = next cell (on release) */
     if (pressed & BTN_B)
         name_long_done = false;
     if (! name_long_done && ((btn_simulated_long & BTN_B) || btn_held_ms(BTN_B, now) >= NAME_LONG_PRESS_MS)) {
@@ -1339,7 +1359,7 @@ static void name_edit_buttons(uint8_t pressed, absolute_time_t now) {
         redraw = true;
     }
 
-    /* Left wing: previous cell, or leave without saving from the first one */
+    /* A: previous cell, or leave without saving from the first one */
     if (pressed & BTN_A) {
         if (name_cursor > 0) {
             --name_cursor;
@@ -1491,20 +1511,24 @@ static void join_path(char *dst, size_t len, const char *d, const char *name) {
     snprintf(dst, len, "%s%s%s", d, d[0] ? "/" : "", name);
 }
 
-/* Loads the directories then the files of dir in the browser */
-static void load_browser(void) {
-    size_t n_dirs = sd_list_dirs(dir, files, MAX_FILES);
-    for (size_t i = 0; i < n_dirs; ++i)
-        file_is_dir[i] = true;
-    size_t n = sd_list_files(dir, BROWSE_EXTS[browsing], files + n_dirs, MAX_FILES - n_dirs);
-    for (size_t i = 0; i < n; ++i)
-        file_is_dir[n_dirs + i] = false;
-    n_files = n_dirs + n;
-    file_selected = 0;
-    printf("browser: /%s, %u dir(s), %u file(s):", dir, (unsigned)n_dirs, (unsigned)n);
+/* Loads a page (browse.way) of the directories then the files of dir in the browser */
+static void load_browser_page(void) {
+    browse.page.ext = BROWSE_EXTS[browsing];
+    n_files = sd_list_read(&browse, dir);
+    size_t n_dirs = 0;
+    while (n_dirs < n_files && file_is_dir[n_dirs])
+        ++n_dirs;
+    printf("browser: /%s, %u dir(s), %u file(s)%s%s:", dir, (unsigned)n_dirs, (unsigned)(n_files - n_dirs),
+           browse.page.prev ? ", previous page" : "", browse.page.next ? ", next page" : "");
     for (size_t i = 0; i < n_files && i < 8; ++i)
         printf(" [%s%s]", file_is_dir[i] ? "/" : "", files[i]);
     printf("\n");
+}
+
+/* The first page of dir */
+static void load_browser(void) {
+    browse.way = 0;
+    load_browser_page();
 }
 
 static void open_browser(browse_kind_t kind) {
@@ -1527,7 +1551,6 @@ static void open_browser(browse_kind_t kind) {
         sd_unmount();  /* Mount again next time, the card may be changed */
         app = A_PAGE;
     } else {
-        file_selected = 0;
         app = A_BROWSE;
     }
 }
@@ -1549,17 +1572,37 @@ static bool browser_up(void) {
 static int image_index = 0;
 static bool image_asleep = false;
 
-/* Next (delta > 0) or previous image of the directory (the directories of the list are skipped) */
+/* Next (delta > 0) or previous image of the directory (the directories of the list are skipped); at the end of
+ * the page, the next or previous page of the folder (after the last one: the first one) */
 static void image_next(int delta) {
-    for (size_t k = 0; k < n_files; ++k) {
-        image_index = (image_index + delta + (int)n_files) % (int)n_files;
+    for (size_t k = 0; k < 2 * MAX_FILES && n_files; ++k) {
+        int i = image_index + delta;
+        if (i < 0 || i >= (int)n_files) {
+            bool other = delta > 0 ? browse.page.next : browse.page.prev;
+            if (other || (delta > 0 && browse.page.prev)) {
+                browse.way = other ? delta : 0;  /* No next page: back to the first one */
+                load_browser_page();
+                i = delta > 0 ? 0 : (int)n_files - 1;
+            } else {
+                i = (i + (int)n_files) % (int)n_files;
+            }
+        }
+        image_index = i;
         if (! file_is_dir[image_index])
             break;
     }
+    browse.sel = image_index + browse.page.prev;  /* Back in the list: on this image */
     app = A_START_IMAGE;
 }
 
 static void play_selected(void) {
+    if (sd_list_turn(&browse)) {  /* "< Précédents", "Suivants >" */
+        load_browser_page();
+        return;
+    }
+    int file_selected = sd_list_entry(&browse, browse.sel);
+    if (file_selected < 0 || file_selected >= (int)n_files)
+        return;
     if (file_is_dir[file_selected]) {
         char sub[PATH_MAX_LEN];
         join_path(sub, sizeof(sub), dir, files[file_selected]);
@@ -1597,7 +1640,8 @@ static void open_blind_test(void) {
         app = A_PAGE;
         return;
     }
-    n_bt_dirs = sd_list_dirs(MUSIC_DIR, bt_dirs, BT_MAX_DIRS);
+    bt_list.way = 0;
+    n_bt_dirs = sd_list_read(&bt_list, MUSIC_DIR);
     bt_dir_selected = 0;
     app = A_BT_FOLDERS;
 }
@@ -1622,18 +1666,33 @@ static void bt_play_current(void) {
 }
 
 static void start_blind_test(void) {
+    bt_list.sel = bt_dir_selected - 1;
+    if (bt_dir_selected > 0 && sd_list_turn(&bt_list)) {  /* "< Précédents", "Suivants >" */
+        n_bt_dirs = sd_list_read(&bt_list, MUSIC_DIR);
+        bt_dir_selected = bt_list.sel + 1;
+        return;
+    }
     n_playlist = 0;
     if (bt_dir_selected == 0) {
-        /* Everything: MUSIQUE (or the root when it does not exist) and its sub-directories */
+        /* Everything: MUSIQUE (or the root when it does not exist) and its sub-directories, every page of them */
         add_tracks(n_bt_dirs || sd_list_files(MUSIC_DIR, ".WAV", files, 1) ? MUSIC_DIR : "");
-        for (size_t i = 0; i < n_bt_dirs; ++i) {
-            char d[PATH_MAX_LEN];
-            join_path(d, sizeof(d), MUSIC_DIR, bt_dirs[i]);
-            add_tracks(d);
+        bt_list.way = 0;
+        for (bool more = sd_list_read(&bt_list, MUSIC_DIR) > 0; more && n_playlist < BT_MAX_TRACKS; ) {
+            for (int i = 0; i < bt_list.page.n; ++i) {
+                char d[PATH_MAX_LEN];
+                join_path(d, sizeof(d), MUSIC_DIR, bt_dirs[i]);
+                add_tracks(d);
+            }
+            more = bt_list.page.next;
+            bt_list.way = 1;
+            if (more)
+                sd_list_read(&bt_list, MUSIC_DIR);
         }
+        bt_list.way = 0;
+        n_bt_dirs = sd_list_read(&bt_list, MUSIC_DIR);  /* The list again from its first page */
     } else {
         char d[PATH_MAX_LEN];
-        join_path(d, sizeof(d), MUSIC_DIR, bt_dirs[bt_dir_selected - 1]);
+        join_path(d, sizeof(d), MUSIC_DIR, bt_dirs[sd_list_entry(&bt_list, bt_dir_selected - 1)]);
         add_tracks(d);
     }
     if (n_playlist == 0) {
@@ -1828,7 +1887,7 @@ static const games_hooks_t GAME_HOOKS = {
     .badge_id = social_id,
 };
 
-/* Radio test mode: a message every radio_test_s seconds, the flanks change the pause (held: faster and faster) */
+/* Radio test mode: a message every radio_test_s seconds, Y / X change the pause (held: faster and faster) */
 #define RADIO_TEST_DEFAULT_S 5
 #define RADIO_TEST_MAX_S (99 * 3600)  /* Practically unlimited */
 #define RADIO_TEST_REPEAT_DELAY_MS 400
@@ -1850,7 +1909,7 @@ static void radio_test_start(absolute_time_t now) {
     printf("radio test: every %lu s\n", (unsigned long)radio_test_s);
 }
 
-/* Changes the pause, by bigger steps the longer the flank is held */
+/* Changes the pause, by bigger steps the longer Y / X is held */
 static void radio_test_change(int direction, uint32_t held_ms, bool simulated_long) {
     uint32_t step = simulated_long ? 10 : held_ms > 6000 ? 60 : held_ms > 4000 ? 10 : held_ms > 2000 ? 5 : 1;
     if (direction < 0)
@@ -1876,7 +1935,7 @@ static void radio_test_buttons(uint8_t pressed, absolute_time_t now) {
             radio_test_next = now;  /* Resume with a message */
         redraw = true;
     }
-    static const uint8_t flanks[2] = {BTN_Y, BTN_X};  /* Left flank: shorter, right flank: longer */
+    static const uint8_t flanks[2] = {BTN_Y, BTN_X};  /* Y: shorter, X: longer */
     for (int f = 0; f < 2; ++f) {
         if (pressed & flanks[f]) {
             radio_test_change(f ? 1 : -1, 0, btn_simulated_long & flanks[f]);
@@ -1943,7 +2002,7 @@ static void render_radio_test(absolute_time_t now) {
     draw_footer(radio_test_paused ? N_("A : quitter  B : reprendre") : N_("A : quitter  B : pause"));
 }
 
-/* Menu: right wing released = the usual action, held = another one (games: the record as a signed QR code,
+/* Menu: B released = the usual action, held = another one (games: the record as a signed QR code,
  * radio message: the test mode) */
 #define LONG_PRESS_MS 800
 static void validate(void);
@@ -2253,13 +2312,13 @@ static bool demo_media(browse_kind_t kind) {
     for (int depth = 0; depth < 2 && app == A_BROWSE; ++depth) {
         for (size_t i = 0; i < n_files; ++i)
             if (! file_is_dir[i]) {
-                file_selected = i;
+                browse.sel = (int)i + browse.page.prev;
                 play_selected();
                 return true;
             }
         if (! n_files)
             break;
-        file_selected = 0;  /* Only folders: the first one */
+        browse.sel = browse.page.prev;  /* Only folders: the first one */
         play_selected();
     }
     return false;
@@ -2346,7 +2405,7 @@ static void demo_task(absolute_time_t now, uint8_t pressed) {
 
 
 /* ------ Sleep (Admin > Commandes radio > Mise en sommeil, remote command 0x05): the badge starts in this mode
- * until the manual unlock, 5 times the left flank then 5 times the right one: only the screen (the page shown
+ * until the manual unlock, 5 times Y then 5 times X: only the screen (the page shown
  * without power) and the buttons; the radio is powered down, no LED, no sound, no service. A talk badge does not
  * obey. ------ */
 
@@ -2367,7 +2426,7 @@ static void sleep_wait_screen(void) {
 }
 
 static void sleep_mode(void) {
-    printf("sleep: on (unlock: %d x left flank, then %d x right flank)\n", SLEEP_PRESSES, SLEEP_PRESSES);
+    printf("sleep: on (unlock: %d x Y, then %d x X)\n", SLEEP_PRESSES, SLEEP_PRESSES);
     radio_init();
     radio_reset();
     radio_power_down();  /* The radio off */
@@ -2559,7 +2618,7 @@ int main() {
                 set_leds(led_mode);
                 app = A_MENU;
             }
-            /* A held flank repeats (text editors, lamp...): the page changes while it is held */
+            /* A held Y or X repeats (text editors, lamp...): the page changes while it is held */
             if (pressed || app_ev.released_short || app_ev.long_pressed || typed || (app_ev.held & (UI_BTN_X | UI_BTN_Y)))
                 redraw = true;
             ui_edit_typed_clear();  /* Not used by the page: dropped */
@@ -2683,20 +2742,21 @@ int main() {
             } else if (app == A_IMAGE || app == A_START_IMAGE) {
                 image_next(delta);
             } else if (app == A_BROWSE && n_files) {
-                file_selected = (file_selected + delta + n_files) % n_files;
+                sd_list_move(&browse, delta);
                 redraw = true;
             } else if (app == A_BT_FOLDERS) {
-                bt_dir_selected = (bt_dir_selected + delta + n_bt_dirs + 1) % (n_bt_dirs + 1);
+                int rows = sd_list_rows(&bt_list) + 1;
+                bt_dir_selected = (bt_dir_selected + delta + rows) % rows;
                 redraw = true;
             } else if (app == A_BLIND_TEST) {
-                /* Right flank: next track, left flank: pause */
+                /* X: next track, Y: pause */
                 if (delta > 0)
                     bt_next();
                 else if (! bt_finished)
                     wav_toggle_pause();
                 redraw = true;
             } else if (app == A_SOCIAL && delta > 0) {
-                /* Right flank: beacons on/off */
+                /* X: beacons on/off */
                 social_set_enabled(! social_enabled());
                 redraw = true;
             } else if (app == A_IR) {
@@ -2716,10 +2776,11 @@ int main() {
                 settings_selected = (settings_selected + delta + 3) % 3;
                 redraw = true;
             } else if (app == A_SAVER_IMAGES) {
-                saver_selected = (saver_selected + delta + n_saver_files + 1) % (n_saver_files + 1);
+                int rows = sd_list_rows(&saver_list) + 1;
+                saver_selected = (saver_selected + delta + rows) % rows;
                 redraw = true;
             } else if (app == A_MUSIC || app == A_VIDEO) {
-                change_volume(delta);  /* Left flank = quieter, right flank = louder */
+                change_volume(delta);  /* Y = quieter, X = louder */
             }
         }
 

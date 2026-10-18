@@ -23,6 +23,7 @@
 #include "remote.h"
 #include "screen_demo.h"
 #include "sd.h"
+#include "sd_list.h"
 
 #define BLOCK 48
 #define DATA_BLOCKS ((GFX_FB_SIZE + BLOCK - 1) / BLOCK)  /* 105 */
@@ -48,7 +49,8 @@ static int send_block = -1;  /* -1: not sending */
 static int rounds_left = 0;
 static absolute_time_t send_ts = 0;
 static char files[MAX_IMAGES][SD_NAME_MAX];
-static int n_files = 0, sel = 0;
+static int n_files = 0, sel = 0;  /* Images of the page; 0: the built-in image, then the rows of list */
+static sd_list_t list = {.page = {.names = files, .max = MAX_IMAGES, .ext = ".EPI"}};  /* IMAGES of any size */
 
 static bool has(int b) {
     return have[b / 8] & (1 << (b % 8));
@@ -208,12 +210,13 @@ static void file_label(int i, char *buf, size_t len) {
     if (i == 0)
         snprintf(buf, len, N_("SecSea (intégrée)"));
     else
-        snprintf(buf, len, "%s", files[i - 1]);
+        sd_list_label(&list, i - 1, buf, len);  /* An image, "< Précédents", "Suivants >" */
 }
 
 static void send_start(absolute_time_t now) {
     (void)now;
-    n_files = sd_mount() == FR_OK ? (int)sd_list_files("IMAGES", ".EPI", files, MAX_IMAGES) : 0;
+    list.way = 0;
+    n_files = sd_list_read(&list, "IMAGES");
     sel = 0;
 }
 
@@ -228,18 +231,26 @@ static bool send_buttons(const app_buttons_t *b, absolute_time_t now) {
     }
     if (send_block >= 0)
         return true;
+    int rows = sd_list_rows(&list) + 1;
     if (b->pressed & UI_BTN_Y)
-        sel = (sel + n_files) % (n_files + 1);
+        sel = (sel + rows - 1) % rows;
     if (b->pressed & UI_BTN_X)
-        sel = (sel + 1) % (n_files + 1);
-    if ((b->pressed & UI_BTN_B) && load(sel - 1)) {
+        sel = (sel + 1) % rows;
+    list.sel = sel - 1;
+    if ((b->pressed & UI_BTN_B) && sel > 0 && sd_list_turn(&list)) {  /* "< Précédents", "Suivants >" */
+        n_files = sd_list_read(&list, "IMAGES");
+        sel = list.sel + 1;
+        return true;
+    }
+    int index = sel ? sd_list_entry(&list, sel - 1) : -1;
+    if ((b->pressed & UI_BTN_B) && load(index)) {
         compute_parity();
         transfer = (get_rand_32() & 0xFFFE) + 1;
         send_block = 0;
         rounds_left = 2;  /* Twice: who missed a block the first time gets it the second time */
         send_ts = now;
         remote_pause_windows(true);
-        printf("image: sending %s\n", sel ? files[sel - 1] : "SecSea");
+        printf("image: sending %s\n", index >= 0 ? files[index] : "SecSea");
     }
     return true;
 }
@@ -261,7 +272,7 @@ static void send_render(uint8_t *fb, absolute_time_t now) {
         return;
     }
     ui_title(fb, N_("Envoyer une image"));
-    ui_list(fb, n_files + 1, sel, file_label);
+    ui_list(fb, sd_list_rows(&list) + 1, sel, file_label);
     ui_footer(fb, N_("A : retour  B : envoyer"));
 }
 

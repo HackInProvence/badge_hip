@@ -22,6 +22,7 @@
 #include "i18n.h"
 #include "score_code.h"
 #include "sd.h"
+#include "sd_list.h"
 #include "shared_buf.h"
 
 #define CONF_DIR "CONFERENCES"
@@ -58,7 +59,8 @@ typedef enum { V_EVENTS, V_EVENT, V_LIST, V_ITEM, V_QR } view_t;
 
 static view_t view;
 static bool no_card;
-static int n_events, event_sel;
+static int n_events, event_sel;  /* The events of the page, the one open */
+static sd_list_t events;  /* CONFERENCES of any size, a page at a time (its names: C->dirs) */
 static int counts[N_FILES];  /* Blocks of each file of the event, -1: no file */
 static int rows[N_FILES], n_rows, row_sel;  /* The files present */
 static int cur_file, n_items, item_sel;
@@ -222,7 +224,7 @@ static void scan_events(void) {
     no_card = sd_mount() != FR_OK;
     if (no_card)
         return;
-    n_events = (int)sd_list_dirs(CONF_DIR, C->dirs, MAX_EVENTS);
+    n_events = sd_list_read(&events, CONF_DIR);  /* The page asked (events.way) */
     for (int i = 0; i < n_events; ++i) {
         copy_text(C->names[i], LABEL_LEN, C->dirs[i]);  /* No infos.txt or no "nom": the name of the folder */
         char path[PATH_LEN];
@@ -277,6 +279,7 @@ static void conf_start(absolute_time_t now) {
     (void)now;
     view = V_EVENTS;
     event_sel = 0;
+    events = (sd_list_t){.page = {.names = C->dirs, .max = MAX_EVENTS, .dirs = true}};
     scan_events();
 }
 
@@ -295,9 +298,14 @@ static bool conf_buttons(const app_buttons_t *b, absolute_time_t now) {
     case V_EVENTS:
         if (b->pressed & UI_BTN_A)
             return false;
-        move(&event_sel, n_events, b);
-        if ((b->pressed & UI_BTN_B) && n_events)
-            open_event(event_sel);
+        if (b->pressed & (UI_BTN_X | UI_BTN_Y))
+            sd_list_move(&events, (b->pressed & UI_BTN_X) ? 1 : -1);
+        if ((b->pressed & UI_BTN_B) && n_events) {
+            if (sd_list_turn(&events))  /* "< Précédents", "Suivants >" */
+                scan_events();
+            else
+                open_event(sd_list_entry(&events, events.sel));
+        }
         break;
     case V_EVENT:
         if (b->pressed & UI_BTN_A)
@@ -333,8 +341,12 @@ static bool conf_buttons(const app_buttons_t *b, absolute_time_t now) {
     return true;
 }
 
-static void event_label(int i, char *buf, size_t len) {
-    snprintf(buf, len, "%s", C->names[i]);
+static void event_label(int row, char *buf, size_t len) {
+    int i = sd_list_entry(&events, row);
+    if (i < 0)
+        sd_list_label(&events, row, buf, len);
+    else
+        snprintf(buf, len, "%s", C->names[i]);
 }
 
 static void row_label(int i, char *buf, size_t len) {
@@ -423,7 +435,7 @@ static void conf_render(uint8_t *fb, absolute_time_t now) {
     case V_EVENTS:
         ui_title(fb, N_("Badge conférence"));
         if (n_events) {
-            ui_list(fb, n_events, event_sel, event_label);
+            ui_list(fb, sd_list_rows(&events), events.sel, event_label);
             ui_footer(fb, N_("A : retour  B : ouvrir"));
         } else {
             ui_wrapped(fb, UI_TITLE_H + 20, &gfx_font_small, no_card ? N_("Pas de carte SD.") :

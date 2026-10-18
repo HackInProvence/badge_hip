@@ -8,7 +8,7 @@
  * folder of the SD card. A book is indexed once (offsets of its sections), then only the current section is read.
  *
  * The page of a section: its text cut in lines, then the notes (die, items), then the choices, all paginated by 8
- * lines; the flanks go through the pages and the choices, D takes the selected choice, G goes to the menu of the book.
+ * lines; Y / X go through the pages and the choices, B takes the selected choice, A goes to the menu of the book.
  * The progress (book, section, items) is saved in the store: "Continuer" at the top of the list of the books. */
 
 #include <stdio.h>
@@ -23,6 +23,7 @@
 #include "gamebook_parse.h"
 #include "i18n.h"
 #include "sd.h"
+#include "sd_list.h"
 #include "store.h"
 
 #define BOOK_DIR "LIVRES"
@@ -56,6 +57,8 @@ typedef struct {
 static book_entry_t books[MAX_BOOKS];
 static int n_books = 0;
 static char sd_names[MAX_SD_BOOKS][SD_NAME_MAX];
+static int n_builtin = 0;  /* books[]: the built-in books, then a page of the books of the SD card (any number) */
+static sd_list_t sd_books = {.page = {.names = sd_names, .max = MAX_SD_BOOKS, .ext = ".TXT"}};
 
 static gb_src_t src;
 static FIL file;
@@ -137,7 +140,8 @@ static void scan_books(void) {
         if (! gb_read_title(&src, b->title, sizeof(b->title)))
             snprintf(b->title, sizeof(b->title), _("Livre intégré %d"), i + 1);
     }
-    int n_sd = sd_mount() == FR_OK ? (int)sd_list_files(BOOK_DIR, ".TXT", sd_names, MAX_SD_BOOKS) : 0;
+    n_builtin = n_books;
+    int n_sd = sd_list_read(&sd_books, BOOK_DIR);  /* The page asked (sd_books.way) */
     for (int i = 0; i < n_sd; ++i) {
         book_entry_t *b = &books[n_books];
         b->builtin = -1;
@@ -459,8 +463,17 @@ static uint8_t menu_rows[5];
 static int n_menu = 0, menu_sel = 0;
 static char message[80];
 
+/* The rows: "Continuer", the built-in books, then the page of the SD card ("< Précédents", "Suivants >") */
 static int list_count(void) {
-    return n_books + (list_resume >= 0);
+    return (list_resume >= 0) + n_builtin + sd_list_rows(&sd_books);
+}
+
+/* The book of a row (without "Continuer"): its index in books[], or SD_LIST_PREV / SD_LIST_NEXT */
+static int row_book(int r) {
+    if (r < n_builtin)
+        return r;
+    int e = sd_list_entry(&sd_books, r - n_builtin);
+    return e < 0 ? e : n_builtin + e;
 }
 
 static void list_label(int i, char *buf, size_t len) {
@@ -471,7 +484,11 @@ static void list_label(int i, char *buf, size_t len) {
         }
         --i;
     }
-    snprintf(buf, len, "%s", books[i].title);
+    int b = row_book(i);
+    if (b < 0)
+        sd_list_label(&sd_books, i - n_builtin, buf, len);
+    else
+        snprintf(buf, len, "%s", books[b].title);
 }
 
 static void show_list(void) {
@@ -520,6 +537,7 @@ static void gamebook_start(absolute_time_t now) {
     cur_book = -1;  /* The card may have changed */
     sec_valid = false;
     list_sel = 0;
+    sd_books.way = 0;
     scan_books();
     show_list();
 }
@@ -581,7 +599,15 @@ static bool gamebook_buttons(const app_buttons_t *b, absolute_time_t now) {
             list_sel = (list_sel + list_count() - 1) % list_count();
         if (b->pressed & UI_BTN_B) {
             bool resuming = list_resume >= 0 && list_sel == 0;
-            int i = resuming ? list_resume : list_sel - (list_resume >= 0);
+            int i = resuming ? list_resume : row_book(list_sel - (list_resume >= 0));
+            if (i < 0) {  /* Another page of the books of the card */
+                sd_books.sel = list_sel - (list_resume >= 0) - n_builtin;
+                sd_list_turn(&sd_books);
+                scan_books();
+                list_resume = saved_book();
+                list_sel = (list_resume >= 0) + n_builtin + sd_books.sel;
+                break;
+            }
             if (! index_book(i))
                 open_failed();
             else if (resuming) {

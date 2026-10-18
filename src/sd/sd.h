@@ -67,6 +67,24 @@ size_t sd_list_files(const char *dir, const char *ext, char (*names)[SD_NAME_MAX
 /** \brief List the sub-directories of \p dir (hidden and system ones excluded), sorted by name. */
 size_t sd_list_dirs(const char *dir, char (*names)[SD_NAME_MAX], size_t max);
 
+/** \brief A folder of any size, read a page at a time: the sub-folders (when \p dirs) then the files kept, sorted by
+ * name (case insensitive), whatever their order on the card. The caller gives the buffers and shows "< Précédents"
+ * before the page when \p prev, "Suivants >" after it when \p next (as the ringtones). */
+typedef struct {
+    char (*names)[SD_NAME_MAX];  /* The entries of the page (buffer of max names) */
+    bool *is_dir;  /* Whether each entry is a folder (buffer of max, NULL when \p dirs is false) */
+    int max;
+    bool dirs;  /* List the sub-folders, before the files */
+    const char *ext;  /* The files kept: this extension (case insensitive); NULL: no files */
+    bool (*accept)(const char *name);  /* Or this test, when set (instead of ext) */
+    int n;  /* Entries of the page */
+    bool prev, next;  /* Entries before / after the page */
+} sd_page_t;
+
+/** \brief Reads a page of \p dir: the first one (\p way 0), the one after the current page (1) or before it (-1).
+ * \return the number of entries (p->n), 0 without a card or folder */
+int sd_page_read(sd_page_t *p, const char *dir, int way);
+
 /* ------ The date of the files written (the badge has no clock: the PC, the phone or the ESP32 module gives it) */
 
 /** \brief Sets the clock: \p local = the local time in seconds since 1970-01-01 (counted as if it were UTC). */

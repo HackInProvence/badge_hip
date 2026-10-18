@@ -45,6 +45,7 @@
 #include "ook_tx.h"
 #include "pinouts.h"
 #include "radio.h"
+#include "sd_list.h"
 #include "radio_tools.h"
 #include "sd.h"
 #include "wav.h"
@@ -204,7 +205,9 @@ static absolute_time_t on_air_ts = 0, wait_ts = 0, redraw_ts = 0;
 
 static char files[MAX_FILES][SD_NAME_MAX];
 static bool file_is_dir[MAX_FILES];
-static int n_files = 0, file_sel = 0;
+static int n_files = 0, file_sel = 0;  /* Entries of the page, the one on air */
+static sd_list_t list = {.page = {.names = files, .is_dir = file_is_dir, .max = MAX_FILES, .dirs = true,
+                                  .ext = ".WAV"}};
 static char dir[2 * SD_NAME_MAX] = "";  /* The folder shown ("" = the root of the card) */
 static char path[3 * SD_NAME_MAX] = "";
 
@@ -356,21 +359,16 @@ static void tx_request(absolute_time_t now) {
 enum { LIST_NONE, LIST_DIR, LIST_START };
 static int list_pending = LIST_NONE;
 
-/* The folders, then the .WAV files of \p dir */
+/* A page of the folders, then the .WAV files of \p dir (sd_list.h: a folder of any size) */
 static void do_load_dir(void) {
-    int n_dirs = (int)sd_list_dirs(dir, files, MAX_FILES);
-    for (int i = 0; i < n_dirs; ++i)
-        file_is_dir[i] = true;
-    int n = (int)sd_list_files(dir, ".WAV", files + n_dirs, MAX_FILES - n_dirs);
-    for (int i = 0; i < n; ++i)
-        file_is_dir[n_dirs + i] = false;
-    n_files = n_dirs + n;
-    file_sel = 0;
-    printf("pirate: /%s, %d folder(s), %d file(s)\n", dir, n_dirs, n);
+    n_files = sd_list_read(&list, dir);
+    printf("pirate: /%s, %d entries%s%s\n", dir, n_files, list.page.prev ? ", previous page" : "",
+           list.page.next ? ", next page" : "");
 }
 
 static void load_dir(void) {
     n_files = 0;
+    list.way = 0;
     list_pending = LIST_DIR;
 }
 
@@ -378,6 +376,7 @@ static void load_dir(void) {
 static void load_files(void) {
     snprintf(dir, sizeof(dir), "%s", MUSIC_DIR);
     n_files = 0;
+    list.way = 0;
     list_pending = LIST_START;
 }
 
@@ -450,9 +449,17 @@ static bool tx_buttons(const app_buttons_t *b, absolute_time_t now) {
         if (b->pressed & UI_BTN_A) {
             if (! dir_up())
                 page = T_SETUP;  /* At the root: back to the settings */
-        } else if (n_files && (b->pressed & (UI_BTN_X | UI_BTN_Y))) {
-            file_sel = (file_sel + ((b->pressed & UI_BTN_X) ? 1 : n_files - 1)) % n_files;
+        } else if (b->pressed & (UI_BTN_X | UI_BTN_Y)) {
+            sd_list_move(&list, (b->pressed & UI_BTN_X) ? 1 : -1);
+        } else if (sd_list_turn(&list)) {
+            if (b->pressed & UI_BTN_B) {  /* "< Précédents" / "Suivants >" */
+                n_files = 0;
+                list_pending = LIST_DIR;
+            } else {
+                list.way = 0;
+            }
         } else if (n_files && (b->pressed & UI_BTN_B)) {
+            file_sel = sd_list_entry(&list, list.sel);
             if (dir[0])
                 snprintf(path, sizeof(path), "%s/%s", dir, files[file_sel]);
             else
@@ -547,7 +554,7 @@ static void row_text(int i, char *buf, size_t len) {
 
 static void file_label(int i, char *buf, size_t len) {
     char name[SD_NAME_MAX + 2];
-    snprintf(name, sizeof(name), "%s%s", files[i], file_is_dir[i] ? "/" : "");  /* A folder: "Name/" */
+    sd_list_label(&list, i, name, sizeof(name));  /* A folder: "Name/" */
     ui_fit_preview(&gfx_font_small, buf, len, name, GFX_WIDTH - 16);
 }
 
@@ -562,10 +569,11 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         if (list_pending != LIST_NONE)
             ui_wrapped(fb, 70, &gfx_font_small, N_("Lecture de la carte..."), 3);
         else if (n_files)
-            ui_list(fb, n_files, file_sel, file_label);
+            ui_list(fb, sd_list_rows(&list), list.sel, file_label);
         else
             ui_wrapped(fb, 70, &gfx_font_small, N_("Ni dossier ni fichier .WAV ici"), 3);
-        ui_footer(fb, ! n_files ? N_("A : retour") : file_is_dir[file_sel] ? N_("A : retour  B : ouvrir")
+        int e = n_files ? sd_list_entry(&list, list.sel) : SD_LIST_NEXT;
+        ui_footer(fb, ! n_files ? N_("A : retour") : e < 0 || file_is_dir[e] ? N_("A : retour  B : ouvrir")
                                                                               : N_("A : retour  B : émettre"));
         return;
     }
