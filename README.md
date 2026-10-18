@@ -1,233 +1,132 @@
-# Badge SecSea 2025
+# Badge SecSea — la cigale
 
-![](imgs/badge_front.webp)
+![Le badge](imgs/badge_front.webp)
 
-- base RP2040 (Raspberry Pi Pico),
-- flash 16Mo,
-- [ ] boutons,
-- [ ] buzzer,
-- [ ] LEDs WS2812,
-- [ ] chargeur,
-- [ ] radio CC1101,
-- [ ] écran [e-Paper 200x200 en SPI](https://www.waveshare.com/wiki/1.54inch_e-Paper_Module_Manual),
-- [ ] chipselect sur SPI0.
+Le badge électronique de [SecSea](https://secsea.org/), la conférence de hacking de **Hack In Provence** à La Ciotat.
+Les cigales se rencontrent par radio, échangent leurs contacts et des messages, jouent ensemble (mini-bolides,
+loup-garou, tir à la corde...), chantent en chœur, affichent le programme d'une conférence, et servent d'outil
+pédagogique de radio (433 MHz) et d'infrarouge.
+
+Version : voir [VERSION](VERSION) et l'[historique des versions](CHANGELOG.md). *English: [below](#english).*
 
 
-# Documentation
+## Le matériel
+
+| | |
+|---|---|
+| Microcontrôleur | RP2040 (2 cœurs à 133 MHz, 264 Ko de RAM), flash 16 Mo |
+| Écran | e-Paper 1,54" 200 × 200 noir et blanc (SSD1681) |
+| Radio | CC1101, 433 MHz, antenne céramique |
+| Boutons | 4 : **Y A B X** de gauche à droite (A et B sur les ailes, Y et X sur les flancs) |
+| Lumière, son | 2 LEDs RGB WS2812B, un buzzer |
+| Stockage | carte micro-SD (images, vidéos, musique, livres-jeux, programmes de conférences...) |
+| Alimentation | USB-C, batterie Li-ion avec chargeur (TP4056), régulateur 3,3 V, interrupteur |
+| Extensions | 2 ports 2 × 6 : I2C, UART, SPI, infrarouge |
+
+Le rôle de chaque composant : [l'électronique du badge](docs/fr/electronique.md). Le projet KiCad est dans
+[hardware/kicad](hardware/kicad).
+
+
+## Mettre en route un badge
+
+### 1. Flasher le firmware
+
+Le firmware est le fichier **`badge_menu.uf2`** : dans les [releases](../../releases) du dépôt, ou compilé (plus bas).
+
+1. Interrupteur du badge sur **ON**.
+2. Maintenir le bouton **BOOTSEL** (« BOOTLOAD ») du badge, brancher le câble USB, relâcher le bouton.
+3. Un disque **RPI-RP2** apparaît sur l'ordinateur : copier le fichier `.uf2` dessus.
+4. Le badge redémarre tout seul avec le nouveau firmware.
+
+Avec [picotool](https://github.com/raspberrypi/picotool), sans toucher au bouton : `picotool load -f -x badge_menu.uf2`.
+
+Au premier démarrage, le badge règle sa radio (quelques secondes), puis affiche le menu. Le numéro de version est
+dans Réglages > Infos.
+
+### 2. Préparer la carte micro-SD (facultatif)
+
+Carte formatée en FAT32 ou exFAT. Copier à la racine le contenu de [docs/sd](docs/sd) (exemples : sonneries,
+livres-jeux, programmes de conférences), puis vos images, vidéos et musiques converties (outils plus bas).
+
+Sans sortir la carte, par l'USB : `python tools/sd_files.py` (une fenêtre : le PC à gauche, la carte à droite).
+
+### 3. Utiliser le badge
+
+Y / X : monter / descendre ; B : choisir ; A : retour (appui long sur A pour quitter un jeu). Tout est dans le
+[guide utilisateur](docs/fr/guide_utilisateur.md).
+
+### 4. Les outils du PC
+
+Python 3, et selon l'outil `pip install pyserial pillow numpy` et [ffmpeg](https://ffmpeg.org/) dans le PATH.
+
+| Outil | Usage |
+|---|---|
+| [tools/badge_remote.py](tools/badge_remote.py) | l'écran du badge en grand sur le PC, la télécommande, les captures (pyserial) |
+| [tools/sd_files.py](tools/sd_files.py) | les fichiers de la carte SD par l'USB, dates conservées (pyserial) |
+| [tools/contacts_export.py](tools/contacts_export.py) | les contacts reçus par le badge en `.vcf` (pyserial) |
+| [src/images/image2epi.py](src/images/image2epi.py) | images → `.epi` pour l'écran (pillow) |
+| [src/video/video2epaper.py](src/video/video2epaper.py) | vidéos → `.epv` (ffmpeg, numpy, pillow) |
+| [src/audio/audio2wav.py](src/audio/audio2wav.py) | sons → `.wav` 8 bits 16 kHz (ffmpeg) |
+| [tools/rtttl_sort.py](tools/rtttl_sort.py) | trier une collection de sonneries RTTTL |
+| [tools/gamebook_check.py](tools/gamebook_check.py) | vérifier un livre-jeu avant de le copier |
+
+Le site de la documentation, avec ces outils et le firmware : `python tools/docs_site.py` (dans `build/docs_site`).
+
+
+## Compiler le firmware
+
+Pré-requis : le [Pico SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) 2.x, CMake, Ninja,
+la chaîne ARM GCC, Python 3 avec Pillow. Le plus simple : l'extension VS Code **Raspberry Pi Pico**, qui installe tout
+(ou le script `pico_setup.sh` de Raspberry Pi sous Debian / Ubuntu).
+
+```bash
+git clone https://github.com/HackInProvence/badge_hip.git
+cd badge_hip
+mkdir build && cd build
+cmake .. -G Ninja -DPICO_BOARD=badge_secsea
+ninja badge_menu           # → build/src/menu/badge_menu.uf2
+```
+
+Tests sur le PC : `python src/tests/host/run_tests.py` ; sur un badge branché : `python tools/badge_selftest.py`.
+
+Tout le détail (architecture, mécanismes, formats, protocole série, tests, nouvelle version) : le
+[guide développeur](docs/fr/guide_developpeur.md).
+
+
+## Documentation
 
 | | Français | English |
 |---|---|---|
-| Utiliser le badge (menus, jeux, médias, carte SD) | [Guide utilisateur](docs/fr/guide_utilisateur.md) | [User guide](docs/en/user_guide.md) |
-| Développer (architecture, mécanismes, formats, protocole USB, tests) | [Guide développeur](docs/fr/guide_developpeur.md) | [Developer guide](docs/en/developer_guide.md) |
+| Utiliser le badge | [Guide utilisateur](docs/fr/guide_utilisateur.md) | [User guide](docs/en/user_guide.md) |
+| Organisateurs, carte SD, outils, flashage, dépannage | [Guide avancé](docs/fr/guide_avance.md) | [Advanced guide](docs/en/advanced_guide.md) |
+| Développer | [Guide développeur](docs/fr/guide_developpeur.md) | [Developer guide](docs/en/developer_guide.md) |
+| Électronique | [L'électronique du badge](docs/fr/electronique.md) | [Electronics](docs/en/electronics.md) |
+| Tous les écrans | [Écrans](docs/fr/ecrans.md) | [Screens](docs/en/screens.md) |
+| Badge conférence | [Badge conférence](docs/fr/badge_conference.md) | [Conference badge](docs/en/conference_badge.md) |
+| Traduire | [Traduction](docs/fr/traduction.md) | [Translation](docs/en/translation.md) |
 
-Autres documents :
-- [lecture rapide PVSR](docs/pvsr.md) ;
-- [réseau des cigales, ports d'extension, CTF](docs/idees_reseau_extensions_ctf.md) ;
-- [idées d'applications](docs/idees_applications.md).
+Notes de conception : [réseau, extensions et CTF](docs/idees_reseau_extensions_ctf.md),
+[idées](docs/idees_brainstorm.md), [module ESP32](docs/etude_module_esp32.md) et [ses usages](docs/idees_esp32.md).
 
-Tests :
-- `python src/tests/host/run_tests.py` sur le PC ;
-- `python tools/badge_selftest.py` sur le badge branché en USB.
 
+## Licence
 
-# Hardware
+[CC BY-NC-SA 4.0](LICENSE) — Hack In Provence.
 
-La conception est faite sous KiCad.
-Les fichiers projets seront dans le dossier `hardware`.
 
-Pour l'instant, on trouve le fichier `ProPrj_*.pdf` qui donne le schéma électrique du badge.
+---
 
+## English
 
-# Software
+The electronic badge of [SecSea](https://secsea.org/), the hacking conference of Hack In Provence in La Ciotat
+(France): an RP2040, a 200 × 200 e-Paper screen, a CC1101 433 MHz radio, 2 RGB LEDs, a buzzer, 4 buttons
+(**Y A B X** from left to right), a micro-SD card, USB-C and a Li-ion battery.
 
-Le logiciel du badge est construit sur le [pico SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html#sdk-setup) écrit en C et compilé via cmake + make/ninja.
-Il devrait être accessible pré-compilé dans les [releases](../../releases), au format uf2.
-
-Pour compiler le badge, il faut donc commencer par installer le pico SDK.
-3 options détaillées dans la suite du document :
-
-- [utiliser VS Code](#installation-via-vscode), fonctionne sous Linux et Windows via PlatformIO qui s'occupe d'installer le SDK,
-  mais son aspect magique le rend difficile à debug en cas de problème d'installation,
-- [installer le SDK sur votre machine](#installation-via-pico_setup) avec le script `pico_setup.sh` qui utilise `apt` donc réservé aux Debian et dérivés (Ubuntu, Kali, Mint, ...),
-- [utiliser un docker](#installation-via-docker).
-
-
-## Pico C SDK
-
-
-### Pourquoi ?
-
-Le pico SDK est similaire à l'approche bare-metal.
-Ce sont des fonctions C réalisant une abstraction pour accéder aux fonctionnalités du RP2040 plus facilement.
-Elles sont groupées en bibliothèques cmake, et importées au cas par cas pour chaque exécutable les utilisant.
-
-Pourquoi abstraire ?
-
-Le RP2040 possède de nombreuses fonctionnalités matérielles ayant chacune un fonctionnement qui lui est propre.
-Par exemple, le PWM fonctionne en 2 blocs de 8 tranches, et chaque tranche contrôle 2 sorties.
-On peut régler l'activation, le mode (output ou input), la fréquence et le duty cycle de chaque GPIO via des `registres`
-(par exemple le bit 0 de l'octet `0x40050000` active ou désactive la tranche des pins 0 et 1).
-De son côté, le SDK fournit la fonction `pwm_set_enabled` qu'on peut appeler pour effectuer cette écriture.
-Le SDK fournit les abstractions pour accélérer un peu le travail sur le RP2040
-(et les faire correctement avec par exemple dans le cas précédent ne pas modifier les autres bits du registre),
-et rend le code plus lisible.
-
-*Le SDK ne constitue pas un OS* : il n'y a pas de notion de process, thread, tâches concurrentes, mémoire virtuelle, système de fichier, droits d'accès...
-
-Le SDK et les exemples suffisent le plus souvent à piloter nos périphériques.
-C'est le cas si on utilise le buzzer pour faire un son régulier (via PWM, comme une mélodie),
-piloter les LEDs via le protocole WS2812 ([example pio/ws2812](https://github.com/raspberrypi/pico-examples/tree/master/pio/ws2812)),
-utiliser le SPI (pour le CC1101 et l'écran).
-Mais ce ne sera pas le cas pour tout, comme par exemple faire un son de cigale plus réaliste, afficher une image sur l'écran, envoyer un paquet via la radio...
-
-
-### Installation via VSCode
-
-Le [document getting started](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf) détaille les étapes pour VSCode.
-
-Une fois ces étapes suivies, installez l'extension **CMake Tools**, puis configurez l'extension **Raspberry Pi Pico** pour activer "Use CMake Tools".
-
-Ouvrez ensuite le git du projet.
-Il devrait vous demander "*Voulez-vous l'importer en tant que projet Raspberry Pi Pico ?*" auquel il faut répondre Oui.
-
-Sur la page d'import, sélectionner "Enable CMake-Tools extension integration",
-puis cliquez sur Import.
-VSCode devrait télécharger 1 ou 2Go qui contiennent le SDK et PlatformIO.
-Une fois installé, il redémarre.
-
-Pour compiler, sélectionner le logo Pico dans la barre de gauche, puis Project -> Compile Project.
-Il vous demandera quel binaire compiler, choisissez `test_noise_gen`.
-
-Pour flasher, commencer par booter le badge en mode flash :
-tenir le bouton BOOTLOAD du badge enfoncer et brancher le badge en USB.
-Au bout d'une ou deux secondes, on peut lâcher le bouton (un "stockage de masse" a dû apparaître dans les périphériques).
-
-Pour flasher, sélectionner Project -> Run Project.
-
-Pour changer d'exécutable à compiler/flasher, cliquez sur l'icone CMake Tools dans la barre de gauche,
-puis Project Status -> Launch -> test_noise_gen [cliquez sur le crayon], puis choisissez un autre exécutable dans le menu qui s'affiche en haut.
-
-
-### Installation via pico_setup
-
-```bash
-cd ~/Downloads
-wget https://raw.githubusercontent.com/raspberrypi/pico-setup/master/pico_setup.sh
-chmod +x pico_setup.sh
-# Vous pouvez changer de dossier si vous voulez l'installer ailleurs.
-# Le script installe la toolchain dans ./pico/ (qu'il crée avec l'utilisateur courant, pas besoin de sudo).
-# Il installe également les exemples dans ./pico/pico-examples, et en compile certains.
-./pico_setup.sh
-export PICO_SDK_PATH="$PWD/pico/pico-sdk"
-```
-
-En cas de doutes, problèmes, questions supplémentaires,
-la [doc en ligne](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) apporte des liens supplémentaires.
-
-
-### Installation via docker
-
-Cette installation utilise une image docker pour la compilation.
-
-
-### Documentation du SDK
-
-Accessible sous au moins 3 formes :
-
-- le [PDF](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) téléchargeable,
-  plus pratique pour la présentation des sections,
-- [en ligne](https://www.raspberrypi.com/documentation/pico-sdk/),
-  plus pratique pour naviguer entre les documentations des fonctions,
-- la compiler en local au format HTML, pour avoir quelque chose de plus réactif :
-
-```bash
-sudo apt install doxygen
-cd "$PICO_SDK_PATH"
-mkdir build
-cd build
-cmake -DPICO_EXAMPLES_PATH=../../pico-examples -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=combined-docs ..
-make docs
-# le résultat est dans docs/doxygen/html/index.html
-```
-
-
-# Ce dépôt
-
-Ce dépôt contient le code de l'application du badge et ses dépendances supplémentaires à l'exception du pico SDK.
-
-
-## Compiler et Flasher
-
-### Ligne de commande
-
-```bash
-export PICO_SDK_PATH="$PWD/pico-sdk"  # A remplacer par votre chemin d'installation
-cd pico-examples
-mkdir -p build
-cd build
-cmake .. -GNinja -DPICO_BOARD=pico_w  # Pour l'instant je travaille sur une pico_w
-cmake --build . --target all
-```
-
-Pour flasher, commencer par booter le badge en mode flash :
-tenir le bouton BOOTLOAD du badge enfoncer et brancher le badge en USB.
-Au bout d'une ou deux secondes, on peut lâcher le bouton (un "stockage de masse" a dû apparaître dans les périphériques).
-
-Pour flasher :
-
-```bash
-picotool xxx.uf2  # Je n'ai pas encore le nom du fichier final
-picotool reboot
-```
-
-Sinon, copier directement le fichier `build/*.uf2` vers le "stockage de masse" et débrancher le badge.
-
-
-## Architecture logicielle
-
-L'architecture du projet prend exemple sur celle du SDK.
-Il s'agît de modules disponibles (bibliothèques CMake) qu'on utilise ou non.
-Exemples de modules du SDK : `pico_rand`, `hardware_gpio`, ...
-
-Lors de la compilation, tout le code est rassemblé dans une seule application qui est flashée sur la mémoire flash du Pico.
-
-Le projet est séparé en modules qui implémentent des fonctions isolées.
-Par exemple, la gestion du buzzer pour le son des cigales utilise le module PIO du Pico.
-
-L'application finale doit contenir un `main` qui est le point d'entrée du code.
-
-Il est possible de créer d'autres applicatifs pour avoir sous la main plusieurs versions du badge avec des configurations différentes,
-ou encore pour créer des applications de test et développer plus facilement.
-Ce dernier cas est montré dans le dossier `src/tests`, ou plusieurs applications de tests coexistent.
-On peut les flasher et bidouiller leur `main` pour tester divers paramètres, ajouter, débugger, ...
-
-Les modules développés dans ce projet font l'hypothèse que **le logiciel ne bloque jamais**.
-Comme il n'y a pas d'OS pour gérer la bascule entre plusieurs tâche,
-c'est de *la responsabilité de chaque module de rendre la main régulièrement*.
-Il est interdit par exemple d'utiliser les fonctions `*_blocking` comme `pio_sm_put_blocking` ou `sleep_ms`.
-
-Le but est que la fonction `main` boucle sur les actions courantes à traiter pour chaque module,
-et que chaque module puisse réagir aux événements entre 50 et 100 fois par secondes au moins.
-Ainsi, le programme **ne doit jamais resté coincé dans une fonction plus de 20ms** (à l'exception de l'initialisation).
-
-Cette manière de procéder à un coût sur la réalisation des modules car elle demande de pouvoir gérer une forme d'asynchronisme,
-mais elle garantit la réactivité du badge.
-
-
-## Ajouter une fonctionnalité
-
-La manière d'ajouter un module au badge est en gros :
-
-- chercher si un driver existe déjà en C pour le module et l'utiliser/l'adapter,
-- si non, chercher quel protocole électrique est utilisé (SPI/I2C/PWM/WS2812/...),
-- chercher dans la [datasheet du RP2040](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) comment faire fonctionner ce module,
-- être renvoyé vers la [documentation du SDK](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf) pour savoir quelles fonctions C utiliser,
-- réaliser une abstraction supplémentaire : initialisation, configuration du RP et du module,
-  implémentation des commandes, éventuellement abstraction plus haut niveau (e.g. jouer une liste de notes).
-
-Le SDK fonctionne avec CMake, ce qui peut être un peu déroutant pour ajouter du nouveau code.
-Prendre exemple soit sur les modules de ce dépôt, soit sur les `pico-examples` que vous avez installé avec le SDK.
-L'idée est d'ajouter des bibliothèques pour chaque nouveau module, comme conseillé par le SDK.
-C'est une bibliothèque au sens CMake, c'est à dire une `INTERFACE` et le code de l'application utilisera cette interface pour trouver le code à utiliser pour votre module.
-C'est comme ça que fonctionne le SDK, et seul les abstractions nécessaires au projet sont compilées.
-Ce n'est donc pas une bibliothèque au sens C/C++ (code précompilé et assemblé dans un `.so` ou une `.dll`).
+- **Flash it**: hold **BOOTSEL**, plug the USB cable, copy `badge_menu.uf2` (from the [releases](../../releases)) to
+  the **RPI-RP2** drive. Or `picotool load -f -x badge_menu.uf2`.
+- **SD card** (optional): copy [docs/sd](docs/sd) to a FAT32 / exFAT card, or use `python tools/sd_files.py` over
+  USB.
+- **Build**: Pico SDK 2.x, then `cmake .. -G Ninja -DPICO_BOARD=badge_secsea && ninja badge_menu` in `build/`.
+- **Docs**: [user guide](docs/en/user_guide.md), [advanced guide](docs/en/advanced_guide.md),
+  [developer guide](docs/en/developer_guide.md), [electronics](docs/en/electronics.md),
+  [changelog](CHANGELOG.md) (in French).

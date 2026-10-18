@@ -24,7 +24,7 @@ L'installation du SDK est détaillée dans le [README](../../README.md).
 | Extensions | 2 connecteurs 2×6 | port droit J2 (IR), port gauche J3 (I2C1 : SDA 2, SCL 3) |
 
 Les brochages sont dans [src/pinouts.h](../../src/pinouts.h) et la carte dans [src/badge_secsea.h](../../src/badge_secsea.h)
-(`-DPICO_BOARD=badge_secsea`). Les schémas sont dans [hardware/](../../hardware).
+(`-DPICO_BOARD=badge_secsea`). Les schémas sont dans [hardware/](../../hardware) ; le rôle de chaque composant, par fonction (alimentation, charge, radio, écran...) : [electronique.md](electronique.md).
 
 Points d'attention :
 - **Quartz de la radio** : le code d'origine supposait 26,998 MHz ; les badges mesurés ont un quartz de 26 MHz.

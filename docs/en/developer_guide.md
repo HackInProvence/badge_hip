@@ -24,7 +24,7 @@ SDK installation is detailed in the [README](../../README.md).
 | Extensions | 2 × 2×6 headers | right port J2 (IR), left port J3 (I2C1: SDA 2, SCL 3) |
 
 Pin assignments are in [src/pinouts.h](../../src/pinouts.h) and the board definition in [src/badge_secsea.h](../../src/badge_secsea.h)
-(`-DPICO_BOARD=badge_secsea`). The schematics are in [hardware/](../../hardware).
+(`-DPICO_BOARD=badge_secsea`). The schematics are in [hardware/](../../hardware); what each component does, by function (power, charging, radio, screen...): [electronics.md](electronics.md).
 
 Things to watch out for:
 - **Radio crystal**: the original code assumed 26.998 MHz; the badges we measured have a 26 MHz crystal.
