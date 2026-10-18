@@ -1525,14 +1525,14 @@ static void render_help(uint8_t *fb) {
     if (help_details) {
         ui_title(fb, c->name);
         text_box(fb, 4, UI_TITLE_H + 2, GFX_WIDTH - 8, &gfx_font_small, tr(c->details), 7);
-        ui_footer(fb, N_("D : la carte  G : retour"));
+        ui_footer(fb, N_("A : retour  B : la carte"));
         return;
     }
     render_card(fb, help_back == PG_GAME && help_card == my_role ? N_("Ta carte") : N_("Les rôles"), help_card,
                 NULL);
     char text[40];
-    snprintf(text, sizeof(text), _("%d/%d  Flancs, D : détails"), help_card + 1, WW_CARDS);
-    ui_footer(fb, help_back == PG_GAME ? N_("D : détails  G : la partie") : text);
+    snprintf(text, sizeof(text), _("%d/%d  Y X, B : détails"), help_card + 1, WW_CARDS);
+    ui_footer(fb, help_back == PG_GAME ? N_("A : la partie  B : détails") : text);
 }
 
 static void timer_text(char *buf, size_t len, absolute_time_t now) {
@@ -1573,7 +1573,7 @@ static void render_end(uint8_t *fb) {
         snprintf(text, sizeof(text), _("Tu étais : %s"), tr(ww_role_name(my_role)));
         ui_lines(fb, y + 8, &gfx_font_small, text);
     }
-    ui_footer(fb, N_("D : les cartes  G long : fin"));
+    ui_footer(fb, N_("A long : fin  B : les cartes"));
 }
 
 static void render_narrator(uint8_t *fb, absolute_time_t now) {
@@ -1607,7 +1607,7 @@ static void render_narrator(uint8_t *fb, absolute_time_t now) {
         y = ui_lines(fb, y, &gfx_font_small, text);
         ui_wrapped(fb, y + 4, &gfx_font_small, PHASES[phase].hint, 3);
     }
-    ui_footer(fb, N_("D : suite  X : +30 s"));
+    ui_footer(fb, N_("B : suite  X : +30 s"));
 }
 
 /* The prompt of a list of choices */
@@ -1678,10 +1678,10 @@ static const char *render_choices(uint8_t *fb, int y, const char *timer, const c
     if (lost_footer)
         return lost_footer;
     if (! my_seq)
-        return N_("Flancs : choix  D : valider");
+        return N_("Y X : choix  B : valider");
     if (ack_seq < my_seq || ! priv_fresh())
         return N_("Envoi...");
-    return phase == P_SEER && my_role == WW_SEER ? N_("Choix reçu") : N_("Choix reçu  D : changer");
+    return phase == P_SEER && my_role == WW_SEER ? N_("Choix reçu") : N_("Choix reçu  B : changer");
 }
 
 /* A phase where only one player acts (the hunter, the captain): what the others see */
@@ -1701,20 +1701,20 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
     if (cancelled) {
         ui_title(fb, N_("Loup-garou"));
         ui_box(fb, N_("Partie arrêtée\npar le meneur"));
-        ui_footer(fb, N_("G long : quitter"));
+        ui_footer(fb, N_("A long : quitter"));
         return;
     }
     if (! have_state || phase == P_NONE) {
         ui_title(fb, N_("Loup-garou"));
         ui_lines(fb, 70, &gfx_font_medium, N_("La partie\ncommence..."));
-        ui_footer(fb, N_("G : menu"));
+        ui_footer(fb, N_("A : menu"));
         return;
     }
     if (phase == P_ROLES) {
         if (my_role >= WW_ROLES) {
             ui_title(fb, N_("Ta carte"));
             ui_lines(fb, 80, &gfx_font_medium, N_("Carte en attente..."));
-            ui_footer(fb, N_("G : menu"));
+            ui_footer(fb, N_("A : menu"));
             return;
         }
         text[0] = 0;
@@ -1726,7 +1726,7 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
         }
         render_card(fb, N_("Ta carte"), my_role, text[0] ? text : NULL);
         ui_footer(fb, my_seq ? (ack_seq >= my_seq && priv_fresh() ? N_("Compris, reçu") : N_("Envoi..."))
-                  : N_("Cache l'écran !  D : compris"));
+                  : N_("Cache l'écran !  B : compris"));
         return;
     }
     phase_title(text, sizeof(text));
@@ -1738,7 +1738,7 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
     char timer[12];
     timer_text(timer, sizeof(timer), now);
     bool lost = absolute_time_diff_us(last_state, now) > LOST_MS * 1000ll;
-    const char *footer = lost ? N_("Meneur hors de portée !") : N_("G : menu  D long : carte");
+    const char *footer = lost ? N_("Meneur hors de portée !") : N_("A : menu  B long : carte");
     int y = UI_TITLE_H + 2;
     if (my_idx < WW_MAX && ! me_alive() && ! must_act()) {
         if (phase == P_DAWN || phase == P_VERDICT || phase == P_SHOT) {
@@ -1751,7 +1751,7 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
             if (timer[0])
                 ui_lines(fb, y + 4, &gfx_font_medium, timer);
         }
-        ui_footer(fb, lost ? footer : N_("G : menu"));
+        ui_footer(fb, lost ? footer : N_("A : menu"));
         return;
     }
     switch (phase) {
@@ -1778,7 +1778,7 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
         ui_lines(fb, y, &gfx_font_small, timer);
         ui_box(fb, text);
         if (! lost)
-            footer = my_seq ? (ack_seq >= my_seq && priv_fresh() ? N_("Vu, reçu") : N_("Envoi...")) : N_("D : vu");
+            footer = my_seq ? (ack_seq >= my_seq && priv_fresh() ? N_("Vu, reçu") : N_("Envoi...")) : N_("B : vu");
         break;
     default:
         if (! must_act()) {
@@ -1795,7 +1795,7 @@ static void render_player(uint8_t *fb, absolute_time_t now) {
 static void render_roles(uint8_t *fb) {
     ui_title(fb, N_("Les cartes"));
     list_at(fb, UI_TITLE_H + 3, 7, n_players, list_sel, role_label);
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 /* Another group game is in progress (party.c runs one at a time): its name, NULL when none */
@@ -1820,13 +1820,13 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
         else
             snprintf(text, sizeof(text), N_("Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge."));
         ui_wrapped(fb, UI_TITLE_H + 76, &gfx_font_small, text, 3);
-        ui_footer(fb, N_("G : retour  D : choisir"));
+        ui_footer(fb, N_("A : retour  B : choisir"));
         break;
     case PG_SETUP:
         ui_title(fb, N_("Mener une partie"));
         list_at(fb, UI_TITLE_H + 3, 7, SETUP_ROWS, setup_row, setup_label);
-        ui_footer(fb, setup_row == SETUP_OPEN ? N_("G : retour  D : ouvrir")
-                  : setup_row == SETUP_WOLVES ? N_("Selon la règle du jeu") : N_("Flancs : ligne  D : changer"));
+        ui_footer(fb, setup_row == SETUP_OPEN ? N_("A : retour  B : ouvrir")
+                  : setup_row == SETUP_WOLVES ? N_("Selon la règle du jeu") : N_("Y X : ligne  B : changer"));
         break;
     case PG_LOBBY: {
         ui_title(fb, N_("Partie ouverte"));
@@ -1843,24 +1843,24 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
                     lobby_label);
         else
             ui_wrapped(fb, y + 20, &gfx_font_small, N_("Les joueurs : Jeux multi > Loup-garou > Rejoindre."), 3);
-        ui_footer(fb, n_lobby >= min ? N_("G long : annuler  D : lancer") : N_("G long : annuler"));
+        ui_footer(fb, n_lobby >= min ? N_("A long : annuler  B : lancer") : N_("A long : annuler"));
         break;
     }
     case PG_SCAN:
         ui_title(fb, N_("Rejoindre"));
         if (n_found) {
             list_at(fb, UI_TITLE_H + 3, 7, n_found, list_sel < n_found ? list_sel : 0, found_label);
-            ui_footer(fb, N_("G : retour  D : rejoindre"));
+            ui_footer(fb, N_("A : retour  B : rejoindre"));
         } else {
             ui_lines(fb, 60, &gfx_font_small, N_("Recherche des parties...\nLe meneur doit ouvrir\nla sienne."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         break;
     case PG_WAIT: {
         ui_title(fb, N_("Loup-garou"));
         if (cancelled || party_state() == PARTY_CANCELLED || party_state() == PARTY_IDLE) {
             ui_box(fb, N_("Partie annulée"));
-            ui_footer(fb, N_("G long : quitter"));
+            ui_footer(fb, N_("A long : quitter"));
             break;
         }
         bool in = party_state() == PARTY_JOINED;
@@ -1873,7 +1873,7 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), _("Rôles : %s."), roles);
         y = ui_wrapped(fb, y + 4, &gfx_font_small, text, 4);
         ui_wrapped(fb, y + 6, &gfx_font_small, N_("En attente du meneur..."), 1);
-        ui_footer(fb, N_("G : menu  G long : quitter"));
+        ui_footer(fb, N_("A : menu  A long : quitter"));
         break;
     }
     case PG_ROLES:
@@ -1882,7 +1882,7 @@ static void ww_render(uint8_t *fb, absolute_time_t now) {
     case PG_QUIT:
         ui_title(fb, N_("Loup-garou"));
         ui_box(fb, mode == M_NARRATOR ? N_("Arrêter la partie\npour tous ?") : N_("Quitter\nla partie ?"));
-        ui_footer(fb, N_("G : non  D : oui"));
+        ui_footer(fb, N_("A : non  B : oui"));
         break;
     case PG_HELP:
         render_help(fb);
@@ -2251,7 +2251,7 @@ static void unlock_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Loup-garou (admin)"));
     ui_list(fb, WW_UNLOCKS, unlock_sel, unlock_label);
     ui_lines(fb, UI_TITLE_H + 3 + WW_UNLOCKS * UI_ROW_H + 10, &gfx_font_small, UNLOCK_HELP[unlock_sel]);
-    ui_footer(fb, N_("Flancs : choisir  D : valider"));
+    ui_footer(fb, N_("Y X : choisir  B : valider"));
 }
 
 const app_t app_werewolf_admin = {

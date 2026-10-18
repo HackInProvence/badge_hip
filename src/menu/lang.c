@@ -44,7 +44,7 @@ static void lang_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, "Langue / Language");
     ui_list(fb, I18N_N_LANGS, sel, lang_label_row);
-    ui_footer(fb, N_("G : retour  D : choisir"));
+    ui_footer(fb, N_("A : retour  B : choisir"));
 }
 
 static void lang_label(char *buf, int len) {

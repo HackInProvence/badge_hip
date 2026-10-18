@@ -334,14 +334,14 @@ static void duel_render(uint8_t *fb, absolute_time_t now) {
         if (invited) {
             snprintf(text, sizeof(text), _("%s vous défie !"), inviter_name);
             ui_lines(fb, 60, &gfx_font_medium, text);
-            ui_footer(fb, N_("G : refuser  D : accepter"));
+            ui_footer(fb, N_("A : refuser  B : accepter"));
         } else if (n_near) {
             ui_list(fb, n_near, sel, near_label);
-            ui_footer(fb, N_("G : retour  D : défier"));
+            ui_footer(fb, N_("A : retour  B : défier"));
         } else {
             ui_lines(fb, 60, &gfx_font_small, N_("Aucune cigale à portée.\nApprochez-vous d'un autre\n"
                                                  "badge pour le défier."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         return;
     }
@@ -385,8 +385,8 @@ static void duel_render(uint8_t *fb, absolute_time_t now) {
         ui_lines(fb, 60, &gfx_font_small, text);
         break;
     }
-    ui_footer(fb, state == S_CHOOSE ? N_("Flancs : choix  D : jouer") : state >= S_END ? N_("G : quitter  D : rejouer")
-              : N_("G : abandonner"));
+    ui_footer(fb, state == S_CHOOSE ? N_("Y X : choix  B : jouer") : state >= S_END ? N_("A : quitter  B : rejouer")
+              : N_("A : abandonner"));
 }
 
 const app_t app_duel = {

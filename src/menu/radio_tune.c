@@ -179,7 +179,7 @@ static void tune_render(uint8_t *fb, absolute_time_t now) {
                 ui_text(fb, 4, y, &gfx_font_small, text);
             }
         }
-        ui_footer(fb, N_("D : régler  G : retour"));
+        ui_footer(fb, N_("A : retour  B : régler"));
         return;
     }
     static const char *STEPS[] = {N_("1. Quartz"), N_("2. Bruit radio"), N_("3. Fréquence")};
@@ -193,7 +193,7 @@ static void tune_render(uint8_t *fb, absolute_time_t now) {
         done += (int)(absolute_time_diff_us(step_ts, now) / 1000);
     ui_gauge(fb, 14, y + 6, GFX_WIDTH - 28, 16, done, total);
     ui_lines(fb, y + 30, &gfx_font_small, N_("Restez près d'autres cigales."));
-    ui_footer(fb, N_("G : arrêter"));
+    ui_footer(fb, N_("A : arrêter"));
 }
 
 const app_t app_radio_tune = {

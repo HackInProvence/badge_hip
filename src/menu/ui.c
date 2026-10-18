@@ -545,11 +545,11 @@ void ui_edit_render(uint8_t *fb, const ui_edit_t *e, const char *title, const ch
     /* The whole text */
     char text[2 * UI_EDIT_MAX + 1];  /* UTF-8: 2 bytes per accented letter */
     ui_edit_result(e, text, sizeof(text));
-    y = ui_wrapped(fb, y, &gfx_font_small, text[0] ? text : "(vide)", 2) + 3;  /* A long text on 2 lines */
+    y = ui_wrapped(fb, y, &gfx_font_small, text[0] ? text : N_("(vide)"), 2) + 3;  /* A long text on 2 lines */
     /* The help, as many lines as fit above the footer (a long prompt leaves less room) */
-    static const char *HELP[] = {"Flancs : lettre (maintenir : vite)", "D : suivante  G : précédente",
-                                 "Espace = effacer"};
+    static const char *HELP[] = {N_("Y X : lettre (maintenir : vite)"), N_("A : précédente  B : suivante"),
+                                 N_("Espace = effacer")};
     for (int i = 0; i < (int)(sizeof(HELP) / sizeof(HELP[0])) && y + gfx_font_small.height <= UI_FOOTER_Y - 3; ++i)
         y = ui_lines(fb, y, &gfx_font_small, HELP[i]);
-    ui_footer(fb, e->cursor == 0 ? "G : annuler  D long : valider" : "D long : valider");
+    ui_footer(fb, e->cursor == 0 ? N_("A : annuler  B long : valider") : N_("B long : valider"));
 }

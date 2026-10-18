@@ -514,7 +514,7 @@ static int dark_lines(uint8_t *fb, int y, const gfx_font_t *font, const char *te
 
 static void render_invite(uint8_t *fb) {
     char text[64];
-    dark_page(fb, N_("Psst..."), N_("G : refuser  D : accepter"));
+    dark_page(fb, N_("Psst..."), N_("A : refuser  B : accepter"));
     if (trade.inv_mode == TRADE_GIFT) {
         snprintf(text, sizeof(text), _("%s vous offre :"), trade.inv_name);
         dark_lines(fb, UI_TITLE_H + 4, &gfx_font_small, text);
@@ -533,7 +533,7 @@ static void render_trade(uint8_t *fb) {
     bool gift = trade.mode == TRADE_GIFT;
     switch (trade.state) {
     case TS_INVITING:
-        dark_page(fb, header, N_("G : annuler"));
+        dark_page(fb, header, N_("A : annuler"));
         int y;
         if (gift) {
             draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.my_good, 2, GFX_WHITE, false);
@@ -550,15 +550,15 @@ static void render_trade(uint8_t *fb) {
     case TS_CHOOSE:
         snprintf(header, sizeof(header), _("Votre offre pour %s ?"), trade.peer_name);
         if (! cargo_kinds(cargo())) {
-            dark_page(fb, header, N_("G : annuler"));
+            dark_page(fb, header, N_("A : annuler"));
             dark_lines(fb, 70, &gfx_font_medium, _("Cale vide :\nrien à offrir."));
         } else {
-            dark_page(fb, header, N_("G : annuler  D : offrir"));
+            dark_page(fb, header, N_("A : annuler  B : offrir"));
             draw_grid(fb, true, false, grid_sel);
         }
         break;
     case TS_OFFERED:
-        dark_page(fb, header, N_("G : annuler"));
+        dark_page(fb, header, N_("A : annuler"));
         draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.my_good, 2, GFX_WHITE, false);
         dark_lines(fb, UI_TITLE_H + 78, &gfx_font_small, smuggler_goods[trade.my_good].name);
         snprintf(text, sizeof(text), _("En attente de l'offre\nde %s..."), trade.peer_name);
@@ -568,14 +568,14 @@ static void render_trade(uint8_t *fb) {
     case TS_CONFIRMED:
         if (gift) {
             /* The guest of a gift: it waits for the good */
-            dark_page(fb, header, N_("G : retour"));
+            dark_page(fb, header, N_("A : retour"));
             draw_icon(fb, GFX_WIDTH / 2 - 32, UI_TITLE_H + 6, trade.peer_good, 2, GFX_WHITE, false);
             snprintf(text, sizeof(text), _("%s\nRéception en cours..."), tr(smuggler_goods[trade.peer_good].name));
             dark_lines(fb, UI_TITLE_H + 78, &gfx_font_small, text);
             break;
         }
-        dark_page(fb, header, trade.state == TS_REVIEW ? N_("G : annuler  D : conclure") :
-                  trade_cancellable(&trade) ? N_("G : annuler") : N_("G : retour (scellé)"));
+        dark_page(fb, header, trade.state == TS_REVIEW ? N_("A : annuler  B : conclure") :
+                  trade_cancellable(&trade) ? N_("A : annuler") : N_("A : retour (scellé)"));
         draw_icon(fb, 12, UI_TITLE_H + 2, trade.my_good, 2, GFX_WHITE, false);
         draw_icon(fb, GFX_WIDTH - 76, UI_TITLE_H + 2, trade.peer_good, 2, GFX_WHITE, false);
         gfx_text(fb, GFX_WIDTH / 2, UI_TITLE_H + 22, &gfx_font_medium, "<>", GFX_WHITE, GFX_ALIGN_CENTER);
@@ -593,7 +593,7 @@ static void render_trade(uint8_t *fb) {
         dark_lines(fb, UI_TITLE_H + 108, &gfx_font_small, text);
         break;
     case TS_DONE: {
-        dark_page(fb, NULL, N_("D : continuer"));
+        dark_page(fb, NULL, N_("B : continuer"));
         bool gave = gift && trade.inviter;
         uint8_t good = gave ? trade.my_good : trade.peer_good;
         dark_lines(fb, 8, &gfx_font_medium, gave ? N_("Cadeau remis") : N_("Affaire conclue"));
@@ -604,17 +604,17 @@ static void render_trade(uint8_t *fb) {
         break;
     }
     case TS_REFUSED:
-        dark_page(fb, header, N_("D : continuer"));
+        dark_page(fb, header, N_("B : continuer"));
         snprintf(text, sizeof(text), _("%s\nrefuse l'affaire."), trade.peer_name);
         dark_lines(fb, 70, &gfx_font_medium, text);
         break;
     case TS_LOST:
-        dark_page(fb, header, N_("D : continuer"));
+        dark_page(fb, header, N_("B : continuer"));
         snprintf(text, sizeof(text), _("%s est\nhors de portée.\nAffaire annulée."), trade.peer_name);
         dark_lines(fb, 56, &gfx_font_medium, text);
         break;
     default:
-        dark_page(fb, header, N_("D : continuer"));
+        dark_page(fb, header, N_("B : continuer"));
         dark_lines(fb, 70, &gfx_font_medium, N_("Affaire annulée."));
         break;
     }
@@ -663,7 +663,7 @@ static void render_detail(uint8_t *fb) {
         gfx_text(fb, 80, UI_TITLE_H + 50, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
         ui_lines(fb, UI_TITLE_H + 84, &gfx_font_small, g->story);
     }
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 static void render_fortune(uint8_t *fb) {
@@ -678,7 +678,7 @@ static void render_fortune(uint8_t *fb) {
              rank(cargo_value(c)), cargo_total(c), cargo_kinds(c), SMUGGLER_GOODS,
              store_get()->achv_counters[ACHV_CNT_TRADES]);
     ui_text(fb, 10, UI_TITLE_H + 56, &gfx_font_small, text);
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 static void render(uint8_t *fb, absolute_time_t now) {
@@ -692,7 +692,7 @@ static void render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Contrebande"));
         ui_list(fb, H_ROWS, home_sel, home_label);
         ui_lines(fb, UI_TITLE_H + 3 + H_ROWS * UI_ROW_H + 10, &gfx_font_small, N_("Badge contre badge..."));
-        ui_footer(fb, N_("G : retour  D : choisir"));
+        ui_footer(fb, N_("A : retour  B : choisir"));
         break;
     case P_CARGO:
     case P_GIFT_PICK:
@@ -700,16 +700,16 @@ static void render(uint8_t *fb, absolute_time_t now) {
         if (! cargo_kinds(cargo())) {
             ui_lines(fb, 70, &gfx_font_small,
                      N_("La cale est vide.\nRencontrez des cigales :\nelles laissent des vivres."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         } else {
             draw_grid(fb, false, false, grid_sel);
-            ui_footer(fb, page == P_CARGO ? N_("G : retour  D : détails") : N_("G : retour  D : donner"));
+            ui_footer(fb, page == P_CARGO ? N_("A : retour  B : détails") : N_("A : retour  B : donner"));
         }
         break;
     case P_COLLECTION:
         ui_title(fb, N_("Collection"));
         draw_grid(fb, false, true, grid_sel);
-        ui_footer(fb, N_("G : retour  D : détails"));
+        ui_footer(fb, N_("A : retour  B : détails"));
         break;
     case P_DETAIL:
         render_detail(fb);
@@ -721,7 +721,7 @@ static void render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, near_mode == TRADE_GIFT ? N_("Donner à qui ?") : N_("À portée de main"));
         if (n_near) {
             ui_list(fb, n_near, near_sel, near_label);
-            ui_footer(fb, near_mode == TRADE_GIFT ? N_("G : retour  D : donner") : N_("G : retour  D : proposer"));
+            ui_footer(fb, near_mode == TRADE_GIFT ? N_("A : retour  B : donner") : N_("A : retour  B : proposer"));
         } else {
             char text[96];
             snprintf(text, sizeof(text), _("Personne à portée de main.\nCollez votre badge contre\ncelui d'une autre "
@@ -731,7 +731,7 @@ static void render(uint8_t *fb, absolute_time_t now) {
                 snprintf(text, sizeof(text), n_far > 1 ? _("%d cigales") : _("%d cigale"), n_far);
                 ui_lines(fb, y, &gfx_font_small, text);
             }
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         break;
     default:
@@ -800,7 +800,7 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
     snprintf(text, sizeof(text), _("Dans la cale : %d  (%d/%d)"), cargo_count(cargo(), admin_sel), admin_sel + 1,
              SMUGGLER_GOODS);
     fitted_text(fb, y, &gfx_font_small, text, GFX_BLACK);
-    ui_footer(fb, admin_status[0] ? admin_status : N_("Flancs : choisir  D : ajouter"));
+    ui_footer(fb, admin_status[0] ? admin_status : N_("Y X : choisir  B : ajouter"));
 }
 
 const app_t app_smuggler_admin = {

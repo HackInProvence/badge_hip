@@ -191,19 +191,19 @@ static void crypto_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), _("Crypto : %d / %d"), n_solved(), crypto_ctf_count());
         ui_title(fb, text);
         ui_list(fb, crypto_ctf_count() + 1, sel, list_label);
-        ui_footer(fb, N_("G : retour  D : ouvrir"));
+        ui_footer(fb, N_("A : retour  B : ouvrir"));
         break;
     case V_CHALLENGE:
         ui_title(fb, crypto_ctf_title(sel));
         ui_text(fb, 2, UI_TITLE_H + 4, &gfx_font_small, crypto_ctf_text(sel));  /* The lines are at most 196 px */
-        ui_footer(fb, crypto_ctf_morse(sel) ? N_("D : répondre  Flanc D : écouter")
-                                            : N_("D : répondre  D long : indice"));
+        ui_footer(fb, crypto_ctf_morse(sel) ? N_("B : répondre  X : écouter")
+                                            : N_("B : répondre  B long : indice"));
         break;
     case V_HINT:
         ui_title(fb, N_("Indice"));
         ui_text(fb, 2, UI_TITLE_H + 8, &gfx_font_small, crypto_ctf_hint(sel)[0] ? crypto_ctf_hint(sel)
                                                                                 : N_("Pas d'indice !"));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     case V_ANSWER:
         ui_edit_render(fb, &edit, N_("Réponse"), crypto_ctf_title(sel));
@@ -218,7 +218,7 @@ static void crypto_render(uint8_t *fb, absolute_time_t now) {
         } else {
             ui_box(fb, N_("Ce n'est pas ça..."));
         }
-        ui_footer(fb, N_("D : continuer"));
+        ui_footer(fb, N_("B : continuer"));
         break;
     }
     default: {
@@ -232,7 +232,7 @@ static void crypto_render(uint8_t *fb, absolute_time_t now) {
                                          : _("Encore %d défi à résoudre."), crypto_ctf_count() - n_solved());
             ui_lines(fb, 60, &gfx_font_small, text);
         }
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     }
     }

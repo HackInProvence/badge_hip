@@ -74,8 +74,8 @@ static void lamp_render(uint8_t *fb, absolute_time_t now) {
     if (remote_muted())
         ui_lines(fb, 118, &gfx_font_small, N_("Mode muet : LEDs coupées\n(Réglages)"));
     else
-        ui_lines(fb, 118, &gfx_font_small, N_("Flancs : - / +\n(maintenir : vite)"));
-    ui_footer(fb, on ? N_("G : quitter  D : éteindre") : N_("G : quitter  D : allumer"));
+        ui_lines(fb, 118, &gfx_font_small, N_("Y X : - / +\n(maintenir : vite)"));
+    ui_footer(fb, on ? N_("A : quitter  B : éteindre") : N_("A : quitter  B : allumer"));
 }
 
 static void lamp_stop(void) {

@@ -565,8 +565,8 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
             ui_list(fb, n_files, file_sel, file_label);
         else
             ui_wrapped(fb, 70, &gfx_font_small, N_("Ni dossier ni fichier .WAV ici"), 3);
-        ui_footer(fb, ! n_files ? N_("G : retour") : file_is_dir[file_sel] ? N_("G : retour  D : ouvrir")
-                                                                              : N_("G : retour  D : émettre"));
+        ui_footer(fb, ! n_files ? N_("A : retour") : file_is_dir[file_sel] ? N_("A : retour  B : ouvrir")
+                                                                              : N_("A : retour  B : émettre"));
         return;
     }
     if (page == T_ON_AIR) {
@@ -592,7 +592,7 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         else
             snprintf(text, sizeof(text), "%lu:%02lu (10 min max)", (unsigned long)(s / 60), (unsigned long)(s % 60));
         gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-        ui_footer(fb, N_("G : arrêter"));
+        ui_footer(fb, N_("A : arrêter"));
         return;
     }
     ui_title(fb, N_("Radio pirate"));
@@ -613,7 +613,7 @@ static void tx_render(uint8_t *fb, absolute_time_t now) {
         ui_wrapped(fb, y, &gfx_font_small, status, 2);
     else
         ui_wrapped(fb, y, &gfx_font_small, N_("ISM 433 MHz : essais courts"), 1);
-    ui_footer(fb, row == ROW_START ? N_("G : retour  D : valider") : N_("Ailes : -  +"));
+    ui_footer(fb, row == ROW_START ? N_("A : retour  B : valider") : N_("A : -  B : +"));
 }
 
 static bool tx_calm(void) {
@@ -940,7 +940,7 @@ static void rx_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Écoute pirate"));
     if (! listening) {
         ui_wrapped(fb, 70, &gfx_font_small, rx_waiting ? N_("Attente du réseau...") : N_("Radio occupée"), 2);
-        ui_footer(fb, rx_waiting ? N_("G : retour") : N_("G : retour  D : réessayer"));
+        ui_footer(fb, rx_waiting ? N_("A : retour") : N_("A : retour  B : réessayer"));
         return;
     }
     int y = UI_TITLE_H + 4;
@@ -977,7 +977,7 @@ static void rx_render(uint8_t *fb, absolute_time_t now) {
     }
     gfx_text(fb, GFX_WIDTH/2, UI_TITLE_H + 131, &gfx_font_small,
              squelch ? N_("Silencieux : oui") : N_("Silencieux : non"), GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_footer(fb, N_("Flancs : canal  D : silencieux"));
+    ui_footer(fb, N_("Y X : canal  B : silencieux"));
 }
 
 static bool rx_calm(void) {

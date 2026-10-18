@@ -108,7 +108,7 @@ static void talk_render(uint8_t *fb, absolute_time_t now) {
     gfx_text(fb, GFX_WIDTH/2, 57, &gfx_font_large, NAMES[state], alert ? GFX_WHITE : GFX_BLACK, GFX_ALIGN_CENTER);
     ui_lines(fb, 108, &gfx_font_small, DETAILS[state]);
     ui_lines(fb, 130, &gfx_font_small, N_("Télécommande : Princeton\n0xC16A10 à 0xC16A14"));
-    ui_footer(fb, N_("G : quitter  Flancs/D : état"));
+    ui_footer(fb, N_("Y X B : état  A : quitter"));
 }
 
 const app_t app_talk = {

@@ -73,7 +73,7 @@ static void commands_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, N_("Commandes radio"));
     ui_list(fb, N_COMMANDS + 1, cmd_selected, cmd_label);
-    ui_footer(fb, cmd_selected == ROW_TTL ? N_("G : retour  D : changer") : N_("G : retour  D : envoyer à tous"));
+    ui_footer(fb, cmd_selected == ROW_TTL ? N_("A : retour  B : changer") : N_("A : retour  B : envoyer à tous"));
 }
 
 const app_t app_admin_commands = {
@@ -121,7 +121,7 @@ static void type_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Type du badge"));
     ui_list(fb, 3, type_selected, type_label);
     ui_lines(fb, 110, &gfx_font_small, N_("Affiché par le\nbadge nominatif."));
-    ui_footer(fb, N_("G : retour  D : choisir"));
+    ui_footer(fb, N_("A : retour  B : choisir"));
 }
 
 const app_t app_admin_type = {

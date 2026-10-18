@@ -440,8 +440,8 @@ msgstr "%u incontro: %u XP"
 #: src/menu/assassin.c:861
 #: src/menu/assassin.c:902
 #: src/menu/assassin.c:909
-msgid "G : retour"
-msgstr "S: indietro"
+msgid "A : retour"
+msgstr "A: indietro"
 
 #: src/menu/achievements.c:206
 msgid "Obtenu !"
@@ -464,8 +464,8 @@ msgid "Rencontres : %u x 2 = %u XP"
 msgstr "Incontri: %u x 2 = %u XP"
 
 #: src/menu/achievements.c:260
-msgid "D : comment  G : retour"
-msgstr "D: come  S: indietro"
+msgid "A : retour  B : comment"
+msgstr "A: indietro  B: come"
 
 #: src/menu/achievements.c:264
 msgid "Succès"
@@ -523,12 +523,13 @@ msgid "Commandes radio"
 msgstr "Comandi radio"
 
 #: src/menu/admin.c:76
-msgid "G : retour  D : changer"
-msgstr "S: indietro  D: cambia"
+#: src/menu/main.c:1089
+msgid "A : retour  B : changer"
+msgstr "A: indietro  B: cambia"
 
 #: src/menu/admin.c:76
-msgid "G : retour  D : envoyer à tous"
-msgstr "S: indietro  D: invia a tutti"
+msgid "A : retour  B : envoyer à tous"
+msgstr "A: indietro  B: invia a tutti"
 
 #: src/menu/admin.c:89
 msgid "Orateur"
@@ -561,12 +562,12 @@ msgstr ""
 
 #: src/menu/admin.c:124
 #: src/menu/assassin.c:947
+#: src/menu/gamebook.c:722
 #: src/menu/lang.c:47
+#: src/menu/main.c:1096
 #: src/menu/messages.c:306
-#: src/menu/race.c:860
-#: src/menu/reset.c:123
-msgid "G : retour  D : choisir"
-msgstr "S: indietro  D: scegli"
+msgid "A : retour  B : choisir"
+msgstr "A: indietro  B: scegli"
 
 #: src/menu/announce.c:39
 msgid "Aucun"
@@ -631,10 +632,11 @@ msgstr ""
 "quando arrivano."
 
 #: src/menu/announce.c:323
-msgid "G : retour  D : afficher"
-msgstr "S: indietro  D: mostra"
+msgid "A : retour  B : afficher"
+msgstr "A: indietro  B: mostra"
 
 #: src/menu/announce.c:345
+#: src/menu/ui.c:548
 msgid "(vide)"
 msgstr "(vuoto)"
 
@@ -667,24 +669,24 @@ msgid "Envoyée à toutes les cigales"
 msgstr "Inviato a tutte le cicale"
 
 #: src/menu/announce.c:455
-msgid "G : retour  D : modifier, envoyer"
-msgstr "S: indietro  D: modifica, invia"
+msgid "A : retour  B : modifier, envoyer"
+msgstr "A: indietro  B: modifica, invia"
 
 #: src/menu/announce.c:459
 msgid "Annonce %d"
 msgstr "Avviso %d"
 
 #: src/menu/announce.c:462
-msgid "Ailes : type de QR code"
-msgstr "Ali: tipo di QR code"
+msgid "A B : type de QR code"
+msgstr "A B: tipo di QR code"
 
 #: src/menu/announce.c:463
-msgid "G : liste  D : modifier"
-msgstr "S: lista  D: modifica"
+msgid "A : liste  B : modifier"
+msgstr "A: lista  B: modifica"
 
 #: src/menu/announce.c:463
-msgid "G : liste  D : valider"
-msgstr "S: lista  D: OK"
+msgid "A : liste  B : valider"
+msgstr "A: lista  B: OK"
 
 #: src/menu/announce.c:468
 msgid "Heure (ex. 10:30)"
@@ -774,9 +776,9 @@ msgstr "Lupo mannaro"
 #: src/menu/assassin.c:611
 #: src/menu/race.c:824
 #: src/menu/race.c:848
-#: src/menu/race.c:879
-#: src/menu/race.c:883
-#: src/menu/race.c:905
+#: src/menu/race.c:878
+#: src/menu/race.c:882
+#: src/menu/race.c:904
 msgid "Mini-bolides"
 msgstr "Mini bolidi"
 
@@ -806,21 +808,21 @@ msgstr "Servono almeno %d giocatori."
 #: src/menu/race.c:816
 #: src/menu/race.c:840
 #: src/menu/smuggler.c:536
-msgid "G : annuler"
-msgstr "S: annulla"
+msgid "A : annuler"
+msgstr "A: annulla"
 
 #: src/menu/assassin.c:818
 #: src/menu/race.c:840
 #: src/menu/tug.c:488
-msgid "G : annuler  D : lancer"
-msgstr "S: annulla  D: avvia"
+msgid "A : annuler  B : lancer"
+msgstr "A: annulla  B: avvia"
 
 #: src/menu/assassin.c:821
 #: src/menu/assassin.c:952
 #: src/menu/race.c:814
-#: src/menu/race.c:865
+#: src/menu/race.c:864
 #: src/menu/tug.c:491
-#: src/menu/tug.c:645
+#: src/menu/tug.c:644
 msgid "Rejoindre"
 msgstr "Entra"
 
@@ -851,8 +853,8 @@ msgstr "In attesa dell'avvio..."
 #: src/menu/games.c:873
 #: src/menu/race.c:839
 #: src/menu/tug.c:501
-msgid "G : quitter"
-msgstr "S: esci"
+msgid "A : quitter"
+msgstr "A: esci"
 
 #: src/menu/assassin.c:834
 #: src/menu/assassin.c:858
@@ -876,8 +878,8 @@ msgstr ""
 #: src/menu/assassin.c:836
 #: src/menu/race.c:826
 #: src/menu/tug.c:506
-msgid "D : OK"
-msgstr "D: OK"
+msgid "B : OK"
+msgstr "B: OK"
 
 #: src/menu/assassin.c:842
 msgid "Brûlant !"
@@ -912,15 +914,15 @@ msgid "Tu quittes la partie : ta cible ira à ton chasseur. Pas de retour possib
 msgstr "Lasci la partita: il tuo bersaglio passa al tuo cacciatore. Irreversibile."
 
 #: src/menu/assassin.c:853
-msgid "G : non  D : abandonner"
-msgstr "S: no  D: abbandona"
+msgid "A : non  B : abandonner"
+msgstr "A: no  B: abbandona"
 
 #: src/menu/assassin.c:859
 msgid "Distribution des cibles..."
 msgstr "Assegnazione bersagli..."
 
 #: src/menu/assassin.c:859
-#: src/menu/race.c:884
+#: src/menu/race.c:883
 #: src/menu/tug.c:546
 msgid ""
 "Réception de la liste\n"
@@ -955,16 +957,16 @@ msgid "Cible éliminée !"
 msgstr "Eliminato!"
 
 #: src/menu/assassin.c:885
-msgid "Flanc : abandonner"
-msgstr "Lato: abbandona"
-
-#: src/menu/assassin.c:885
 msgid "Victimes : %d"
 msgstr "Vittime: %d"
 
+#: src/menu/assassin.c:885
+msgid "Y X : abandonner"
+msgstr "Y X: abbandona"
+
 #: src/menu/assassin.c:887
-msgid "G : retour  D : éliminer"
-msgstr "S: indietro  D: elimina"
+msgid "A : retour  B : éliminer"
+msgstr "A: indietro  B: elimina"
 
 #: src/menu/assassin.c:891
 msgid "Éliminé"
@@ -992,8 +994,8 @@ msgid "Ton badge héberge la partie : garde-le allumé."
 msgstr "Il badge ospita la partita: tienilo acceso."
 
 #: src/menu/assassin.c:902
-msgid "G : retour  D : quitter"
-msgstr "S: indietro  D: esci"
+msgid "A : retour  B : quitter"
+msgstr "A: indietro  B: esci"
 
 #: src/menu/assassin.c:907
 msgid ""
@@ -1038,8 +1040,8 @@ msgstr ""
 "%s"
 
 #: src/menu/assassin.c:925
-msgid "G : retour  D : nouvelle partie"
-msgstr "S: indietro  D: nuova partita"
+msgid "A : retour  B : nouvelle partie"
+msgstr "A: indietro  B: nuova partita"
 
 #: src/menu/assassin.c:937
 msgid "Une partie de %s est en cours sur ton badge : termine-la d'abord."
@@ -1050,11 +1052,11 @@ msgid "Chacun a une cible secrète : approche-toi tout près pour l'éliminer. %
 msgstr "Ognuno ha un bersaglio segreto: avvicinati molto per eliminarlo. Min. %d giocatori."
 
 #: src/menu/assassin.c:955
-#: src/menu/race.c:868
-#: src/menu/tug.c:648
+#: src/menu/race.c:867
+#: src/menu/tug.c:647
 #: src/menu/werewolf.c:1853
-msgid "G : retour  D : rejoindre"
-msgstr "S: indietro  D: entra"
+msgid "A : retour  B : rejoindre"
+msgstr "A: indietro  B: entra"
 
 #: src/menu/assassin.c:957
 msgid ""
@@ -1086,8 +1088,8 @@ msgid "ADC trop proche du point %d"
 msgstr "ADC troppo vicino al punto %d"
 
 #: src/menu/battcal.c:92
-msgid "D encore : effacer"
-msgstr "D ancora: azzera"
+msgid "B encore : effacer"
+msgstr "B ancora: azzera"
 
 #: src/menu/battcal.c:95
 msgid "Calibration effacée"
@@ -1128,14 +1130,14 @@ msgstr "> Salva il punto %d"
 #: src/menu/battcal.c:154
 #: src/menu/ledcast.c:327
 #: src/menu/pirate_radio.c:616
-msgid "Ailes : -  +"
-msgstr "Ali: -  +"
+msgid "A : -  B : +"
+msgstr "A: -  B: +"
 
 #: src/menu/battcal.c:154
 #: src/menu/ledcast.c:324
 #: src/menu/pirate_radio.c:616
-msgid "G : retour  D : valider"
-msgstr "S: indietro  D: OK"
+msgid "A : retour  B : valider"
+msgstr "A: indietro  B: OK"
 
 #: src/menu/battcal.c:158
 msgid "Batterie (calibration)"
@@ -1207,21 +1209,21 @@ msgstr ""
 #: src/menu/battcal.c:219
 msgid ""
 "Pas encore calibrée.\n"
-"D : démarrer, puis\n"
+"B : démarrer, puis\n"
 "suivre les étapes."
 msgstr ""
 "Non ancora calibrata.\n"
-"D: avvia, poi\n"
+"B: avvia, poi\n"
 "segui i passi."
 
 #: src/menu/battcal.c:223
-msgid "G : retour  D : démarrer"
-msgstr "S: indietro  D: avvia"
+msgid "A : retour  B : démarrer"
+msgstr "A: indietro  B: avvia"
 
 #: src/menu/battcal.c:224
 #: src/menu/chorus.c:550
-msgid "G : retour  D : arrêter"
-msgstr "S: indietro  D: ferma"
+msgid "A : retour  B : arrêter"
+msgstr "A: indietro  B: ferma"
 
 #: src/menu/battle.c:401
 #: src/menu/battle.c:443
@@ -1236,13 +1238,13 @@ msgstr "%s ti sfida!"
 #: src/menu/battle.c:405
 #: src/menu/duel.c:337
 #: src/menu/smuggler.c:517
-msgid "G : refuser  D : accepter"
-msgstr "S: rifiuta  D: accetta"
+msgid "A : refuser  B : accepter"
+msgstr "A: rifiuta  B: accetta"
 
 #: src/menu/battle.c:408
 #: src/menu/duel.c:340
-msgid "G : retour  D : défier"
-msgstr "S: indietro  D: sfida"
+msgid "A : retour  B : défier"
+msgstr "A: indietro  B: sfida"
 
 #: src/menu/battle.c:410
 msgid "Aucune cigale à portée."
@@ -1294,18 +1296,18 @@ msgid "TRICHE !"
 msgstr "BARO!"
 
 #: src/menu/battle.c:428
-msgid "Flancs : viser  D : tirer"
-msgstr "Lati: mira  D: fuoco"
+#: src/menu/duel.c:388
+msgid "A : quitter  B : rejouer"
+msgstr "A: esci  B: rigioca"
 
 #: src/menu/battle.c:428
-#: src/menu/duel.c:388
-msgid "G : quitter  D : rejouer"
-msgstr "S: esci  D: rigioca"
+msgid "Y X : viser  B : tirer"
+msgstr "Y X: mira  B: fuoco"
 
 #: src/menu/battle.c:429
 #: src/menu/duel.c:389
-msgid "G : abandonner"
-msgstr "S: abbandona"
+msgid "A : abandonner"
+msgstr "A: abbandona"
 
 #: src/menu/battle.c:438
 msgid "%s : bataille navale ?"
@@ -1355,8 +1357,8 @@ msgstr ""
 "(ogni 2 s)."
 
 #: src/menu/battradio.c:66
-msgid "G : retour  D : oui / non"
-msgstr "S: indietro  D: sì / no"
+msgid "A : retour  B : oui / non"
+msgstr "A: indietro  B: sì / no"
 
 #: src/menu/battradio.c:70
 msgid "Batterie radio : %s"
@@ -1452,12 +1454,12 @@ msgid "Départ dans %lld s"
 msgstr "Inizio tra %lld s"
 
 #: src/menu/chorus.c:510
-msgid "G : retour  D : ne plus chanter"
-msgstr "S: indietro  D: non cantare"
+msgid "A : retour  B : ne plus chanter"
+msgstr "A: indietro  B: non cantare"
 
 #: src/menu/chorus.c:510
-msgid "G : retour  D : participer"
-msgstr "S: indietro  D: partecipa"
+msgid "A : retour  B : participer"
+msgstr "A: indietro  B: partecipa"
 
 #: src/menu/chorus.c:514
 msgid "Choeur"
@@ -1479,8 +1481,11 @@ msgstr ""
 "sincronizzato via radio)."
 
 #: src/menu/chorus.c:550
-msgid "G : retour  D : lancer"
-msgstr "S: indietro  D: avvia"
+#: src/menu/demo.c:32
+#: src/menu/main.c:879
+#: src/menu/main.c:1379
+msgid "A : retour  B : lancer"
+msgstr "A: indietro  B: avvia"
 
 #: src/menu/contacts.c:40
 msgid "Prénom"
@@ -1547,14 +1552,16 @@ msgstr "Contatti"
 
 #: src/menu/contacts.c:330
 #: src/menu/crypto_app.c:194
+#: src/menu/main.c:872
 #: src/menu/pirate_radio.c:568
+#: src/menu/skills.c:188
 #: src/menu/werewolf.c:1828
-msgid "G : retour  D : ouvrir"
-msgstr "S: indietro  D: apri"
+msgid "A : retour  B : ouvrir"
+msgstr "A: indietro  B: apri"
 
 #: src/menu/contacts.c:335
-msgid "D : modifier  D long : cocher"
-msgstr "D: modifica  D lungo: spunta"
+msgid "B : modifier  B long : cocher"
+msgstr "B: modifica  B lungo: spunta"
 
 #: src/menu/contacts.c:341
 msgid "Échange de cartes"
@@ -1565,8 +1572,8 @@ msgid "Carte reçue :"
 msgstr "Ricevuto:"
 
 #: src/menu/contacts.c:347
-msgid "G : ignorer  D : garder"
-msgstr "S: ignora  D: tieni"
+msgid "A : ignorer  B : garder"
+msgstr "A: ignora  B: tieni"
 
 #: src/menu/contacts.c:349
 msgid ""
@@ -1587,8 +1594,8 @@ msgstr ""
 #: src/menu/main.c:3106
 #: src/menu/pirate_radio.c:595
 #: src/menu/radio_tune.c:196
-msgid "G : arrêter"
-msgstr "S: ferma"
+msgid "A : arrêter"
+msgstr "A: ferma"
 
 #: src/menu/contacts.c:356
 msgid "Contacts (%u)"
@@ -1605,8 +1612,8 @@ msgstr ""
 "(tools/contacts_export.py)"
 
 #: src/menu/contacts.c:363
-msgid "D : voir  D long : supprimer"
-msgstr "D: vedi  D lungo: elimina"
+msgid "B : voir  B long : supprimer"
+msgstr "B: vedi  B lungo: elimina"
 
 #: src/menu/credits.c:34
 msgid ""
@@ -1679,8 +1686,8 @@ msgid "Crédits %d/%d"
 msgstr "Crediti %d/%d"
 
 #: src/menu/credits.c:151
-msgid "Flancs : défiler  G : retour"
-msgstr "Lati: scorri  S: indietro"
+msgid "Y X : défiler  A : retour"
+msgstr "Y X: scorri  A: indietro"
 
 #: src/menu/crypto_app.c:48
 msgid "> Le flag final"
@@ -1691,12 +1698,12 @@ msgid "Crypto : %d / %d"
 msgstr "Crypto: %d / %d"
 
 #: src/menu/crypto_app.c:199
-msgid "D : répondre  Flanc D : écouter"
-msgstr "D: rispondi  Lato D: ascolta"
+msgid "B : répondre  X : écouter"
+msgstr "B: rispondi  X: ascolta"
 
 #: src/menu/crypto_app.c:200
-msgid "D : répondre  D long : indice"
-msgstr "D: rispondi  D lungo: aiuto"
+msgid "B : répondre  B long : indice"
+msgstr "B: rispondi  B lungo: aiuto"
 
 #: src/menu/crypto_app.c:203
 msgid "Indice"
@@ -1729,8 +1736,8 @@ msgstr "Non è questo..."
 #: src/menu/smuggler.c:607
 #: src/menu/smuggler.c:612
 #: src/menu/smuggler.c:617
-msgid "D : continuer"
-msgstr "D: continua"
+msgid "B : continuer"
+msgstr "B: continua"
 
 #: src/menu/crypto_app.c:225
 msgid "Le flag final"
@@ -1774,12 +1781,6 @@ msgstr ""
 "\n"
 "Per uno stand.\n"
 "Un tasto la ferma."
-
-#: src/menu/demo.c:32
-#: src/menu/main.c:879
-#: src/menu/main.c:1379
-msgid "D : lancer  G : retour"
-msgstr "D: avvia  S: indietro"
 
 #: src/menu/detector.c:45
 #: src/menu/detector.c:66
@@ -1904,8 +1905,8 @@ msgstr ""
 "(o fuori portata)."
 
 #: src/menu/duel.c:388
-msgid "Flancs : choix  D : jouer"
-msgstr "Lati: scegli  D: gioca"
+msgid "Y X : choix  B : jouer"
+msgstr "Y X: scegli  B: gioca"
 
 #: src/menu/duel.c:393
 msgid "Duel"
@@ -1946,8 +1947,8 @@ msgstr "Su un telefono o un PC: la pagina fsk-buzzer-link.html, pulsante Écoute
 
 #: src/menu/fsk_id.c:163
 #: src/menu/pirate_radio.c:569
-msgid "G : retour  D : émettre"
-msgstr "S: indietro  D: trasmetti"
+msgid "A : retour  B : émettre"
+msgstr "A: indietro  B: trasmetti"
 
 #: src/menu/gamebook.c:138
 msgid "Livre intégré %d"
@@ -2035,19 +2036,19 @@ msgstr ""
 "(una riga \"== 1\")"
 
 #: src/menu/gamebook.c:692
-msgid "D : choisir  G : menu"
-msgstr "D: scegli  S: menu"
-
-#: src/menu/gamebook.c:693
-msgid "Flancs, D : suite  G : menu"
-msgstr "Lati, D: avanti  S: menu"
+msgid "A : menu  B : choisir"
+msgstr "A: menu  B: scegli"
 
 #: src/menu/gamebook.c:693
 #: src/menu/werewolf.c:1710
 #: src/menu/werewolf.c:1717
 #: src/menu/werewolf.c:1754
-msgid "G : menu"
-msgstr "S: menu"
+msgid "A : menu"
+msgstr "A: menu"
+
+#: src/menu/gamebook.c:693
+msgid "Y X, B : suite  A : menu"
+msgstr "Y X, B: avanti  A: menu"
 
 #: src/menu/gamebook.c:702
 msgid "par %s"
@@ -2061,11 +2062,6 @@ msgstr "Sezione %u"
 msgid "%u sections"
 msgstr "%u sezioni"
 
-#: src/menu/gamebook.c:722
-#: src/menu/main.c:1096
-msgid "D : choisir  G : retour"
-msgstr "D: scegli  S: indietro"
-
 #: src/menu/gamebook.c:738
 msgid "Aucun objet pour l'instant."
 msgstr "Ancora nessun oggetto."
@@ -2077,8 +2073,8 @@ msgid "Livres-jeux"
 msgstr "Librogame"
 
 #: src/menu/gamebook.c:748
-msgid "D : ouvrir  G : quitter"
-msgstr "D: apri  S: esci"
+msgid "A : quitter  B : ouvrir"
+msgstr "A: esci  B: apri"
 
 #: src/menu/gamebook_parse.c:619
 msgid "Continuer"
@@ -2102,8 +2098,8 @@ msgid "Match nul"
 msgstr "Pareggio"
 
 #: src/menu/games.c:150
-msgid "G : menu  Flanc : QR  D : rejouer"
-msgstr "S: menu  Lato: QR  D: rigioca"
+msgid "Y X : QR  A : menu  B : rejouer"
+msgstr "Y X: QR  A: menu  B: rigioca"
 
 #: src/menu/games.c:326
 msgid "Morpion : %u - %u"
@@ -2115,32 +2111,32 @@ msgid "La cigale réfléchit..."
 msgstr "La cicala pensa..."
 
 #: src/menu/games.c:349
-msgid "Flancs : case  D : jouer"
-msgstr "Lati: casella  D: gioca"
+msgid "Y X : case  B : jouer"
+msgstr "Y X: casella  B: gioca"
 
 #: src/menu/games.c:559
 msgid "Puissance 4 : %u - %u"
 msgstr "Forza 4: %u - %u"
 
 #: src/menu/games.c:585
-msgid "Flancs : colonne  D : jouer"
-msgstr "Lati: colonna  D: gioca"
+msgid "Y X : colonne  B : jouer"
+msgstr "Y X: colonna  B: gioca"
 
 #: src/menu/games.c:605
-msgid "Aile D"
-msgstr "Ala D"
+msgid "A"
+msgstr "A"
 
 #: src/menu/games.c:605
-msgid "Aile G"
-msgstr "Ala S"
+msgid "B"
+msgstr "B"
 
 #: src/menu/games.c:605
-msgid "Flanc D"
-msgstr "Lato D"
+msgid "X"
+msgstr "X"
 
 #: src/menu/games.c:605
-msgid "Flanc G"
-msgstr "Lato S"
+msgid "Y"
+msgstr "Y"
 
 #: src/menu/games.c:730
 msgid "Simon : %d"
@@ -2184,19 +2180,17 @@ msgstr "Riflessi: %d / %d"
 msgid ""
 "Quand les LEDs s'allument\n"
 "en vert, appuyez vite\n"
-"sur l'aile droite\n"
-"ou sur un flanc.\n"
+"sur B, ou sur Y ou X.\n"
 "5 essais, la moyenne compte."
 msgstr ""
 "Quando i LED diventano\n"
 "verdi, premi subito\n"
-"l'ala destra\n"
-"o un lato.\n"
+"B, oppure Y o X.\n"
 "5 prove, conta la media."
 
 #: src/menu/games.c:881
-msgid "G : quitter  D : commencer"
-msgstr "S: esci  D: inizia"
+msgid "A : quitter  B : commencer"
+msgstr "A: esci  B: inizia"
 
 #: src/menu/games.c:884
 msgid "Attendez..."
@@ -2241,20 +2235,20 @@ msgstr ""
 "%s"
 
 #: src/menu/games.c:1080
-msgid "D : partir  Flancs : tourner"
-msgstr "D: via  Lati: gira"
+msgid "Y X : tourner  B : partir"
+msgstr "Y X: gira  B: via"
 
 #: src/menu/games.c:1081
-msgid "Flancs : tourner  D : pause"
-msgstr "Lati: gira  D: pausa"
+msgid "Y X : tourner  B : pause"
+msgstr "Y X: gira  B: pausa"
 
 #: src/menu/games.c:1082
-msgid "Pause  D : reprendre"
-msgstr "Pausa  D: riprendi"
+msgid "Pause  B : reprendre"
+msgstr "Pausa  B: riprendi"
 
 #: src/menu/games.c:1106
 #: src/menu/main.c:1966
-#: src/menu/puzzles.c:1328
+#: src/menu/puzzles.c:1324
 msgid "Pas encore de record"
 msgstr "Ancora nessun record"
 
@@ -2263,7 +2257,7 @@ msgid "Victoires : %u"
 msgstr "Vittorie: %u"
 
 #: src/menu/games.c:1110
-#: src/menu/puzzles.c:1340
+#: src/menu/puzzles.c:1336
 msgid "Record : %u"
 msgstr "Record: %u"
 
@@ -2305,8 +2299,8 @@ msgid "Balise"
 msgstr "Faro"
 
 #: src/menu/hotcold.c:158
-msgid "G : quitter  D : autre balise"
-msgstr "S: esci  D: altro faro"
+msgid "A : quitter  B : autre balise"
+msgstr "A: esci  B: altro faro"
 
 #: src/menu/hotcold.c:222
 #: src/menu/hotcold.c:239
@@ -2338,12 +2332,12 @@ msgid "Brûlant dès %d dBm"
 msgstr "Bollente da %d dBm"
 
 #: src/menu/hotcold.c:230
-msgid "G : quitter  D : arrêter"
-msgstr "S: esci  D: ferma"
+msgid "A : quitter  B : arrêter"
+msgstr "A: esci  B: ferma"
 
 #: src/menu/hotcold.c:230
-msgid "G : quitter  D : émettre"
-msgstr "S: esci  D: trasmetti"
+msgid "A : quitter  B : émettre"
+msgstr "A: esci  B: trasmetti"
 
 #: src/menu/hotcold.c:324
 msgid "Radar : %s"
@@ -2351,8 +2345,8 @@ msgstr "Radar: %s"
 
 #: src/menu/hotcold.c:327
 #: src/menu/hotcold.c:477
-msgid "G : retour à la liste"
-msgstr "S: torna alla lista"
+msgid "A : retour à la liste"
+msgstr "A: torna alla lista"
 
 #: src/menu/hotcold.c:330
 #: src/menu/hotcold.c:348
@@ -2372,8 +2366,8 @@ msgstr ""
 "ogni 2 s)."
 
 #: src/menu/hotcold.c:336
-msgid "G : quitter  D : suivre"
-msgstr "S: esci  D: segui"
+msgid "A : quitter  B : suivre"
+msgstr "A: esci  B: segui"
 
 #: src/menu/hotcold.c:475
 #: src/menu/hotcold.c:480
@@ -2392,8 +2386,8 @@ msgstr ""
 "sensori, jammer)..."
 
 #: src/menu/hotcold.c:488
-msgid "G : retour  D : le chasser"
-msgstr "S: indietro  D: caccialo"
+msgid "A : retour  B : le chasser"
+msgstr "A: indietro  B: caccialo"
 
 #: src/menu/image_radio.c:209
 #: src/menu/main.c:1080
@@ -2401,12 +2395,12 @@ msgid "SecSea (intégrée)"
 msgstr "SecSea (interna)"
 
 #: src/menu/image_radio.c:259
-msgid "Envoi (1/2)... G : arrêter"
-msgstr "Invio (1/2)... S: ferma"
+msgid "Envoi (1/2)... A : arrêter"
+msgstr "Invio (1/2)... A: ferma"
 
 #: src/menu/image_radio.c:260
-msgid "Envoi (2/2)... G : arrêter"
-msgstr "Invio (2/2)... S: ferma"
+msgid "Envoi (2/2)... A : arrêter"
+msgstr "Invio (2/2)... A: ferma"
 
 #: src/menu/image_radio.c:263
 #: src/menu/image_radio.c:269
@@ -2415,8 +2409,8 @@ msgstr "Invia un'immagine"
 
 #: src/menu/image_radio.c:265
 #: src/menu/messages.c:312
-msgid "G : retour  D : envoyer"
-msgstr "S: indietro  D: invia"
+msgid "A : retour  B : envoyer"
+msgstr "A: indietro  B: invia"
 
 #: src/menu/image_radio.c:307
 msgid "Reçue (%d bloc corrigé)"
@@ -2452,8 +2446,8 @@ msgstr ""
 "%d / %d blocchi"
 
 #: src/menu/image_radio.c:341
-msgid "G : arrêter  D : recommencer"
-msgstr "S: ferma  D: ricomincia"
+msgid "A : arrêter  B : recommencer"
+msgstr "A: ferma  B: ricomincia"
 
 #: src/menu/infection.c:184
 #: src/menu/infection.c:212
@@ -2483,8 +2477,8 @@ msgid "Mauvaise réponse..."
 msgstr "Sbagliato..."
 
 #: src/menu/infection.c:194
-msgid "G : retour  D : se soigner"
-msgstr "S: indietro  D: curati"
+msgid "A : retour  B : se soigner"
+msgstr "A: indietro  B: curati"
 
 #: src/menu/infection.c:198
 msgid "Immunisé"
@@ -2540,12 +2534,12 @@ msgstr ""
 "vicino la prendono (60 %)."
 
 #: src/menu/infection.c:241
-msgid "Flanc G : guérir ce badge"
-msgstr "Lato S: guarisci il badge"
+msgid "Y : guérir ce badge"
+msgstr "Y: guarisci il badge"
 
 #: src/menu/infection.c:242
-msgid "G : retour  D : infecter"
-msgstr "S: indietro  D: infetta"
+msgid "A : retour  B : infecter"
+msgstr "A: indietro  B: infetta"
 
 #: src/menu/lamp.c:70
 #: src/menu/lamp.c:90
@@ -2566,19 +2560,19 @@ msgstr ""
 
 #: src/menu/lamp.c:77
 msgid ""
-"Flancs : - / +\n"
+"Y X : - / +\n"
 "(maintenir : vite)"
 msgstr ""
-"Lati: - / +\n"
+"Y X: - / +\n"
 "(tieni: veloce)"
 
 #: src/menu/lamp.c:78
-msgid "G : quitter  D : allumer"
-msgstr "S: esci  D: accendi"
+msgid "A : quitter  B : allumer"
+msgstr "A: esci  B: accendi"
 
 #: src/menu/lamp.c:78
-msgid "G : quitter  D : éteindre"
-msgstr "S: esci  D: spegni"
+msgid "A : quitter  B : éteindre"
+msgstr "A: esci  B: spegni"
 
 #: src/menu/lamp.c:86
 msgid "Lampe : %d %%"
@@ -2724,15 +2718,15 @@ msgstr "%s: %u ms"
 
 #: src/menu/ledcast.c:318
 msgid ""
-"Flancs : choisir\n"
-"Ailes : - / +  (maintenir : vite)"
+"Y X : choisir\n"
+"A B : - / +  (maintenir : vite)"
 msgstr ""
-"Lati: scegli\n"
-"Ali: - / +  (tieni: veloce)"
+"Y X: scegli\n"
+"A B: - / +  (tieni: veloce)"
 
 #: src/menu/ledcast.c:319
-msgid "Aile longue : retour"
-msgstr "Ala lunga: indietro"
+msgid "A / B long : retour"
+msgstr "A / B lungo: indietro"
 
 #: src/menu/ledcast.c:322
 #: src/menu/ledcast.c:332
@@ -2740,12 +2734,12 @@ msgid "LEDs des cigales"
 msgstr "LED delle cicale"
 
 #: src/menu/ledcast.c:325
-msgid "Ailes : mode"
-msgstr "Ali: modo"
+msgid "A B : mode"
+msgstr "A B: modo"
 
 #: src/menu/ledcast.c:326
-msgid "Ailes : mode  D long : temps"
-msgstr "Ali: modo  D lungo: tempi"
+msgid "A B : mode  B long : temps"
+msgstr "A B: modo  B lungo: tempi"
 
 #: src/menu/lowbatt.c:35
 #: src/menu/lowbatt.c:43
@@ -2801,14 +2795,14 @@ msgstr ""
 #: src/menu/lowbatt.c:116
 msgid ""
 "Arrêté.\n"
-"D : relancer."
+"B : relancer."
 msgstr ""
 "Fermato.\n"
-"D: riavvia."
+"B: riavvia."
 
 #: src/menu/lowbatt.c:122
-msgid "G : retour  D : marche / arrêt"
-msgstr "S: indietro  D: avvia / ferma"
+msgid "A : retour  B : marche / arrêt"
+msgstr "A: indietro  B: avvia / ferma"
 
 #: src/menu/main.c:351
 msgid "arc-en-ciel"
@@ -3005,13 +2999,8 @@ msgid "Mode admin désactivé"
 msgstr "Modo admin spento"
 
 #: src/menu/main.c:857
-msgid "Flancs : choix  D : OK  G : retour"
-msgstr "Lati: scegli  D: OK  S: indietro"
-
-#: src/menu/main.c:872
-#: src/menu/skills.c:188
-msgid "D : ouvrir  G : retour"
-msgstr "D: apri  S: indietro"
+msgid "Y X : choix  A : retour  B : OK"
+msgstr "Y X: scegli  A: indietro  B: OK"
 
 #: src/menu/main.c:886
 msgid "Morceau %u / %u"
@@ -3032,8 +3021,8 @@ msgid "Terminé"
 msgstr "Finito"
 
 #: src/menu/main.c:911
-msgid "D : titre  Flanc D : suivant"
-msgstr "D: titolo  Lato D: avanti"
+msgid "B : titre  X : suivant"
+msgstr "B: titolo  X: avanti"
 
 #: src/menu/main.c:917
 msgid "Réseau cigales"
@@ -3056,32 +3045,32 @@ msgid "Aucune cigale à portée"
 msgstr "Nessuna cicala vicina"
 
 #: src/menu/main.c:939
-msgid "D : nom  Flanc D : balises"
-msgstr "D: nome  Lato D: fari"
+msgid "B : nom  X : balises"
+msgstr "B: nome  X: fari"
 
 #: src/menu/main.c:944
 msgid "Nom de la cigale"
 msgstr "Nome cicala"
 
 #: src/menu/main.c:960
-msgid "Flancs : changer la lettre"
-msgstr "Lati: cambia lettera"
+msgid "Y X : changer la lettre"
+msgstr "Y X: cambia lettera"
 
 #: src/menu/main.c:961
-msgid "Aile D : case suivante"
-msgstr "Ala D: casella dopo"
+msgid "B : case suivante"
+msgstr "B: casella dopo"
 
 #: src/menu/main.c:962
-msgid "Aile G : case précédente"
-msgstr "Ala S: casella prima"
+msgid "A : case précédente"
+msgstr "A: casella prima"
 
 #: src/menu/main.c:963
-msgid "Aile D longue : enregistrer"
-msgstr "Ala D lunga: salva"
+msgid "B long : enregistrer"
+msgstr "B lungo: salva"
 
 #: src/menu/main.c:967
-msgid "Aile G ici : annuler"
-msgstr "Ala S qui: annulla"
+msgid "A ici : annuler"
+msgstr "A qui: annulla"
 
 #: src/menu/main.c:967
 msgid "Espace = effacer une lettre"
@@ -3115,10 +3104,6 @@ msgstr "Prova screensaver"
 msgid "Veille de l'écran"
 msgstr "Screensaver"
 
-#: src/menu/main.c:1089
-msgid "D : changer  G : retour"
-msgstr "D: cambia  S: indietro"
-
 #: src/menu/main.c:1094
 msgid "Image de veille"
 msgstr "Foto di sfondo"
@@ -3140,8 +3125,8 @@ msgid "%d : brut, %u impulsions"
 msgstr "%d: grezzo, %u impulsi"
 
 #: src/menu/main.c:1368
-msgid "D : enregistrer/émettre"
-msgstr "D: registra/invia"
+msgid "B : enregistrer/émettre"
+msgstr "B: registra/invia"
 
 #: src/menu/main.c:1368
 msgid "Emission..."
@@ -3156,8 +3141,10 @@ msgid "Flags trouvés : %d/%d"
 msgstr "Flag trovati: %d/%d"
 
 #: src/menu/main.c:1393
-msgid "D : OK  G : retour"
-msgstr "D: OK  S: indietro"
+#: src/menu/race.c:880
+#: src/menu/tug.c:541
+msgid "A : retour  B : OK"
+msgstr "A: indietro  B: OK"
 
 #: src/menu/main.c:1400
 msgid "Code secret"
@@ -3212,8 +3199,8 @@ msgid "prête"
 msgstr "pronta"
 
 #: src/menu/main.c:1456
-msgid "D : crédits  G : retour"
-msgstr "D: crediti  S: indietro"
+msgid "A : retour  B : crédits"
+msgstr "A: indietro  B: crediti"
 
 #: src/menu/main.c:1469
 msgid ""
@@ -3234,8 +3221,8 @@ msgid "Lecture"
 msgstr "Suona"
 
 #: src/menu/main.c:1472
-msgid "D : pause  G : stop  Flancs : - +"
-msgstr "D: pausa  S: stop  Lati: - +"
+msgid "Y X : - +  A : stop  B : pause"
+msgstr "Y X: - +  A: stop  B: pausa"
 
 #: src/menu/main.c:1517
 #: src/menu/main.c:1589
@@ -3307,8 +3294,8 @@ msgid "Un message toutes les"
 msgstr "Un messaggio ogni"
 
 #: src/menu/main.c:1916
-msgid "Flancs : - / +  (maintenir : vite)"
-msgstr "Lati: - / +  (tieni: veloce)"
+msgid "Y X : - / +  (maintenir : vite)"
+msgstr "Y X: - / +  (tieni: veloce)"
 
 #: src/menu/main.c:1918
 msgid "Messages envoyés : %u"
@@ -3323,12 +3310,13 @@ msgid "Prochain dans %s"
 msgstr "Prossimo tra %s"
 
 #: src/menu/main.c:1937
-msgid "G : quitter  D : pause"
-msgstr "S: esci  D: pausa"
+msgid "A : quitter  B : pause"
+msgstr "A: esci  B: pausa"
 
 #: src/menu/main.c:1937
-msgid "G : quitter  D : reprendre"
-msgstr "S: esci  D: riprendi"
+#: src/menu/rsvp.c:722
+msgid "A : quitter  B : reprendre"
+msgstr "A: esci  B: riprendi"
 
 #: src/menu/main.c:2029
 msgid ""
@@ -3475,8 +3463,8 @@ msgstr ""
 "Stop auto dopo 30 s."
 
 #: src/menu/main.c:3108
-msgid "G ou D : retour"
-msgstr "S o D: indietro"
+msgid "A ou B : retour"
+msgstr "A o B: indietro"
 
 #: src/menu/messages.c:30
 msgid "Café ?"
@@ -3559,20 +3547,20 @@ msgid "Messages (%d)"
 msgstr "Messaggi (%d)"
 
 #: src/menu/messages.c:290
-msgid "G : retour  D : lire"
-msgstr "S: indietro  D: leggi"
+msgid "A : retour  B : lire"
+msgstr "A: indietro  B: leggi"
 
 #: src/menu/messages.c:290
-msgid "G : retour  D : écrire"
-msgstr "S: indietro  D: scrivi"
+msgid "A : retour  B : écrire"
+msgstr "A: indietro  B: scrivi"
 
 #: src/menu/messages.c:298
 msgid "Message privé"
 msgstr "Messaggio privato"
 
 #: src/menu/messages.c:300
-msgid "G : retour  D : répondre"
-msgstr "S: indietro  D: rispondi"
+msgid "A : retour  B : répondre"
+msgstr "A: indietro  B: rispondi"
 
 #: src/menu/messages.c:304
 msgid "A qui ?"
@@ -3593,8 +3581,8 @@ msgstr ""
 "arrivi a destinazione."
 
 #: src/menu/messages.c:318
-msgid "D : boîte de réception"
-msgstr "D: posta in arrivo"
+msgid "B : boîte de réception"
+msgstr "B: posta in arrivo"
 
 #: src/menu/messages.c:324
 msgid "Messages"
@@ -3755,8 +3743,8 @@ msgid "Écoute pirate"
 msgstr "RX pirata"
 
 #: src/menu/pirate_radio.c:943
-msgid "G : retour  D : réessayer"
-msgstr "S: indietro  D: riprova"
+msgid "A : retour  B : réessayer"
+msgstr "A: indietro  B: riprova"
 
 #: src/menu/pirate_radio.c:951
 msgid "Signal : %d dBm"
@@ -3795,8 +3783,8 @@ msgid "Silencieux : oui"
 msgstr "Squelch: sì"
 
 #: src/menu/pirate_radio.c:980
-msgid "Flancs : canal  D : silencieux"
-msgstr "Lati: canale  D: squelch"
+msgid "Y X : canal  B : silencieux"
+msgstr "Y X: canale  B: squelch"
 
 #: src/menu/pirate_radio.c:988
 msgid "Écouter la radio pirate"
@@ -3881,16 +3869,16 @@ msgstr "Programma"
 #: src/menu/program.c:78
 #: src/menu/smuggler.c:706
 #: src/menu/smuggler.c:712
-msgid "G : retour  D : détails"
-msgstr "S: indietro  D: info"
+msgid "A : retour  B : détails"
+msgstr "A: indietro  B: info"
 
 #: src/menu/program.c:84
 msgid "Programme : %s"
 msgstr "Programma: %s"
 
 #: src/menu/program.c:97
-msgid "G : liste  Flancs : autre talk"
-msgstr "S: lista  Lati: altro talk"
+msgid "Y X : autre talk  A : liste"
+msgstr "Y X: altro talk  A: lista"
 
 #: src/menu/puzzles.c:23
 #: src/menu/puzzles.c:396
@@ -3909,12 +3897,12 @@ msgid "Pendu"
 msgstr "Impiccato"
 
 #: src/menu/puzzles.c:33
-msgid "G : menu  D : rejouer"
-msgstr "S: menu  D: rigioca"
+msgid "A : menu  B : rejouer"
+msgstr "A: menu  B: rigioca"
 
 #: src/menu/puzzles.c:34
-msgid "Long : G menu, flanc D aide"
-msgstr "Lungo: S menu, lato D aiuto"
+msgid "Long : A menu, X aide"
+msgstr "Lungo: A menu, X aiuto"
 
 #: src/menu/puzzles.c:394
 msgid "Gagné en %u s !"
@@ -3940,8 +3928,8 @@ msgid "Record !"
 msgstr "Record!"
 
 #: src/menu/puzzles.c:444
-msgid "Long : fl. G drapeau, D ouvre"
-msgstr "Lungo: l. S bandiera, D apre"
+msgid "Long : Y drapeau, B ouvre"
+msgstr "Lungo: Y bandiera, B apre"
 
 #: src/menu/puzzles.c:583
 msgid "2048 : %lu"
@@ -4012,8 +4000,8 @@ msgstr ""
 "Tutti i livelli!"
 
 #: src/menu/puzzles.c:941
-msgid "G : menu  D : niveau suivant"
-msgstr "S: menu  D: livello dopo"
+msgid "A : menu  B : niveau suivant"
+msgstr "A: menu  B: livello dopo"
 
 #: src/menu/puzzles.c:943
 msgid "Long : fl. G annuler, D refaire"
@@ -4028,8 +4016,8 @@ msgid "Gagné en %d essais !"
 msgstr "Vinto in %d prove!"
 
 #: src/menu/puzzles.c:1094
-msgid "Ailes : symbole  D long : ok"
-msgstr "Ali: simbolo  D lungo: OK"
+msgid "A B : symbole  B long : ok"
+msgstr "A B: simbolo  B lungo: OK"
 
 #: src/menu/puzzles.c:1218
 msgid "Trouvé ! Série : %u"
@@ -4056,152 +4044,152 @@ msgid "%u mot"
 msgstr "%u parola"
 
 #: src/menu/puzzles.c:1266
-msgid "D long : proposer la lettre"
-msgstr "D lungo: prova la lettera"
+msgid "B long : proposer la lettre"
+msgstr "B lungo: prova la lettera"
 
 #: src/menu/puzzles.c:1267
-msgid "G : menu  D : mot suivant"
-msgstr "S: menu  D: parola dopo"
+msgid "A : menu  B : mot suivant"
+msgstr "A: menu  B: parola dopo"
 
 #: src/menu/puzzles.c:1276
 msgid ""
 "Ouvrez les cases sans mine.\n"
 "Le chiffre : mines autour.\n"
-"Flancs : gauche, droite\n"
-"Ailes : haut (G), bas (D)\n"
-"Aile D longue : ouvrir\n"
-"Flanc G long : drapeau\n"
-"Long : G quitte, flanc D aide"
+"Y X : gauche, droite\n"
+"A B : haut, bas\n"
+"B long : ouvrir\n"
+"Y long : drapeau\n"
+"Long : A quitte, X aide"
 msgstr ""
 "Apri le caselle senza mine.\n"
 "Il numero: mine intorno.\n"
-"Lati: sinistra, destra\n"
-"Ali: su (S), giù (D)\n"
-"Ala D lunga: apri\n"
-"Lato S lungo: bandiera\n"
-"Lungo: S esce, lato D aiuto"
+"Y X: sinistra, destra\n"
+"A B: su, giù\n"
+"B lungo: apri\n"
+"Y lungo: bandiera\n"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1279
+#: src/menu/puzzles.c:1278
 msgid ""
 "Deux tuiles égales qui se\n"
 "touchent fusionnent.\n"
 "Atteignez la tuile 2048 !\n"
-"Flancs : gauche, droite\n"
-"Ailes : haut (G), bas (D)\n"
+"Y X : gauche, droite\n"
+"A B : haut, bas\n"
 "Tout glisse vers la touche.\n"
-"Long : G quitte, flanc D aide"
+"Long : A quitte, X aide"
 msgstr ""
 "Due tessere uguali che si\n"
 "toccano si fondono.\n"
 "Arriva alla tessera 2048!\n"
-"Lati: sinistra, destra\n"
-"Ali: su (S), giù (D)\n"
+"Y X: sinistra, destra\n"
+"A B: su, giù\n"
 "Tutto scivola verso il tasto.\n"
-"Lungo: S esce, lato D aiuto"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1282
+#: src/menu/puzzles.c:1280
 msgid ""
 "Remettez les cases de 1 à 15\n"
 "dans l'ordre, trou à la fin.\n"
 "Une case voisine du trou\n"
 "glisse vers la touche :\n"
-"Flancs : gauche, droite\n"
-"Ailes : haut (G), bas (D)\n"
-"Long : G quitte, flanc D aide"
+"Y X : gauche, droite\n"
+"A B : haut, bas\n"
+"Long : A quitte, X aide"
 msgstr ""
 "Rimetti le caselle da 1 a 15\n"
 "in ordine, buco alla fine.\n"
 "Una casella vicina al buco\n"
 "scivola verso il tasto:\n"
-"Lati: sinistra, destra\n"
-"Ali: su (S), giù (D)\n"
-"Lungo: S esce, lato D aiuto"
+"Y X: sinistra, destra\n"
+"A B: su, giù\n"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1285
+#: src/menu/puzzles.c:1282
 msgid ""
 "Poussez les caisses sur les\n"
 "cibles, une à la fois.\n"
-"Flancs : gauche, droite\n"
-"Ailes : haut (G), bas (D)\n"
-"Flanc G long : annuler\n"
-"Aile D longue : recommencer\n"
-"Long : G quitte, flanc D aide"
+"Y X : gauche, droite\n"
+"A B : haut, bas\n"
+"Y long : annuler\n"
+"B long : recommencer\n"
+"Long : A quitte, X aide"
 msgstr ""
 "Spingi le casse sui\n"
 "bersagli, una alla volta.\n"
-"Lati: sinistra, destra\n"
-"Ali: su (S), giù (D)\n"
-"Lato S lungo: annulla\n"
-"Ala D lunga: ricomincia\n"
-"Lungo: S esce, lato D aiuto"
+"Y X: sinistra, destra\n"
+"A B: su, giù\n"
+"Y lungo: annulla\n"
+"B lungo: ricomincia\n"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1288
+#: src/menu/puzzles.c:1284
 msgid ""
 "Trouvez le code secret :\n"
 "4 symboles parmi 6, 10 essais.\n"
 "Point : bien placé,\n"
 "rond : mal placé.\n"
-"Flancs : case, ailes : symbole\n"
-"Aile D longue : valider\n"
-"Long : G quitte, flanc D aide"
+"Y X : case, A B : symbole\n"
+"B long : valider\n"
+"Long : A quitte, X aide"
 msgstr ""
 "Trova il codice segreto:\n"
 "4 simboli su 6, 10 prove.\n"
 "Punto: posto giusto,\n"
 "cerchio: posto sbagliato.\n"
-"Lati: casella, ali: simbolo\n"
-"Ala D lunga: conferma\n"
-"Lungo: S esce, lato D aiuto"
+"Y X: casella, A B: simbolo\n"
+"B lungo: conferma\n"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1290
+#: src/menu/puzzles.c:1286
 msgid ""
 "Trouvez le mot, lettre par\n"
 "lettre, avant d'être pendu\n"
 "(8 erreurs).\n"
-"Flancs, ailes : choisir\n"
-"Aile D longue : proposer\n"
-"Long : G quitte, flanc D aide"
+"Y X, A B : choisir\n"
+"B long : proposer\n"
+"Long : A quitte, X aide"
 msgstr ""
 "Trova la parola, lettera per\n"
 "lettera, prima della forca\n"
 "(8 errori).\n"
-"Lati, ali: scegli\n"
-"Ala D lunga: proponi\n"
-"Lungo: S esce, lato D aiuto"
+"Y X, A B: scegli\n"
+"B lungo: proponi\n"
+"Lungo: A esce, X aiuto"
 
-#: src/menu/puzzles.c:1299
-msgid "Niveau %d/%d (flancs : changer)"
-msgstr "Livello %d/%d (lati: cambia)"
+#: src/menu/puzzles.c:1295
+msgid "Niveau %d/%d (Y X : changer)"
+msgstr "Livello %d/%d (Y X: cambia)"
 
-#: src/menu/puzzles.c:1304
-msgid "G : menu  D : jouer"
-msgstr "S: menu  D: gioca"
+#: src/menu/puzzles.c:1300
+msgid "A : menu  B : jouer"
+msgstr "A: menu  B: gioca"
 
-#: src/menu/puzzles.c:1330
+#: src/menu/puzzles.c:1326
 msgid "Record : %u s"
 msgstr "Record: %u s"
 
-#: src/menu/puzzles.c:1332
+#: src/menu/puzzles.c:1328
 msgid "Record : %u coups"
 msgstr "Record: %u mosse"
 
-#: src/menu/puzzles.c:1334
+#: src/menu/puzzles.c:1330
 msgid "Niveaux réussis : %u / %d"
 msgstr "Livelli superati: %u / %d"
 
-#: src/menu/puzzles.c:1336
+#: src/menu/puzzles.c:1332
 msgid "Record : %u essai"
 msgstr "Record: %u prova"
 
-#: src/menu/puzzles.c:1336
+#: src/menu/puzzles.c:1332
 msgid "Record : %u essais"
 msgstr "Record: %u prove"
 
-#: src/menu/puzzles.c:1338
+#: src/menu/puzzles.c:1334
 msgid "Record : %u mot d'affilée"
 msgstr "Record: %u parola di fila"
 
-#: src/menu/puzzles.c:1338
+#: src/menu/puzzles.c:1334
 msgid "Record : %u mots d'affilée"
 msgstr "Record: %u parole di fila"
 
@@ -4218,8 +4206,8 @@ msgid "Tour %d/%d"
 msgstr "Giro %d/%d"
 
 #: src/menu/race.c:776
-msgid "D : gaz  G : frein  flancs : tourner"
-msgstr "D: gas  S: freno  lati: sterza"
+msgid "Y X : tourner  A : frein  B : gaz"
+msgstr "Y X: sterza  A: freno  B: gas"
 
 #: src/menu/race.c:782
 msgid "Arrivée"
@@ -4231,8 +4219,8 @@ msgstr "%d. %s  (giro %d)"
 
 #: src/menu/race.c:802
 #: src/menu/tug.c:620
-msgid "G : retour  D : rejouer"
-msgstr "S: indietro  D: rigioca"
+msgid "A : retour  B : rejouer"
+msgstr "A: indietro  B: rigioca"
 
 #: src/menu/race.c:810
 msgid "%d / %d pilotes"
@@ -4253,27 +4241,22 @@ msgid "Une partie de %s est en cours sur ton badge : termine-la ou quitte-la d'a
 msgstr "Una partita di %s è in corso sul tuo badge: finiscila o lasciala prima."
 
 #: src/menu/race.c:857
-msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la piste, la voiture ralentit !"
-msgstr "Corsa di macchinine, da 2 a 8 piloti, 3 giri. Ala destra: gas, ala sinistra: freno, lati: sterzare. Fuori pista l'auto rallenta!"
+msgid "Course de petites voitures, 2 à 8 pilotes, 3 tours. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"
+msgstr "Corsa di macchinine, da 2 a 8 piloti, 3 giri. Y X: sterzare, A: freno, B: gas. Fuori pista l'auto rallenta!"
 
-#: src/menu/race.c:870
+#: src/menu/race.c:869
 msgid "Recherche des courses..."
 msgstr "Ricerca delle corse..."
 
-#: src/menu/race.c:880
+#: src/menu/race.c:879
 #: src/menu/tug.c:540
 msgid "Partie annulée par l'hôte."
 msgstr "Annullata dall'host."
 
-#: src/menu/race.c:881
-#: src/menu/tug.c:541
-msgid "G : retour  D : OK"
-msgstr "S: indietro  D: OK"
-
-#: src/menu/race.c:885
+#: src/menu/race.c:884
 #: src/menu/tug.c:547
-msgid "G long : quitter la page"
-msgstr "S lungo: esci"
+msgid "A long : quitter la page"
+msgstr "A lungo: esci"
 
 #: src/menu/radio433.c:105
 #: src/menu/radio433.c:161
@@ -4298,8 +4281,8 @@ msgstr "Impulsi: %lu"
 
 #: src/menu/radio433.c:121
 #: src/menu/radio433.c:157
-msgid "G : retour  D : effacer"
-msgstr "S: indietro  D: azzera"
+msgid "A : retour  B : effacer"
+msgstr "A: indietro  B: azzera"
 
 #: src/menu/radio433.c:126
 #: src/menu/radio433.c:171
@@ -4396,8 +4379,8 @@ msgid "(pas d'autre cigale)"
 msgstr "(nessuna cicala)"
 
 #: src/menu/radio_tune.c:182
-msgid "D : régler  G : retour"
-msgstr "D: regola  S: indietro"
+msgid "A : retour  B : régler"
+msgstr "A: indietro  B: regola"
 
 #: src/menu/radio_tune.c:185
 msgid "1. Quartz"
@@ -4571,8 +4554,8 @@ msgid "Remettre à zéro ?"
 msgstr "Azzerare?"
 
 #: src/menu/reset.c:119
-msgid "G : non  D long : oui"
-msgstr "S: no  D lungo: sì"
+msgid "A : non  B long : oui"
+msgstr "A: no  B lungo: sì"
 
 #: src/menu/rsvp.c:557
 msgid "Impossible d'ouvrir le texte"
@@ -4595,20 +4578,16 @@ msgid "%u mots/min, %u %%"
 msgstr "%u ppm, %u %%"
 
 #: src/menu/rsvp.c:719
-msgid "Flancs : vitesse, long: -/+%ds"
-msgstr "Lati: velocità, lungo: -/+%ds"
+msgid "Y X : vitesse, long: -/+%ds"
+msgstr "Y X: velocità, lungo: -/+%ds"
 
 #: src/menu/rsvp.c:720
 msgid "Fin du texte"
 msgstr "Fine testo"
 
 #: src/menu/rsvp.c:722
-msgid "D : relire  G : quitter"
-msgstr "D: rileggi  S: esci"
-
-#: src/menu/rsvp.c:722
-msgid "D : reprendre  G : quitter"
-msgstr "D: riprendi  S: esci"
+msgid "A : quitter  B : relire"
+msgstr "A: esci  B: rileggi"
 
 #: src/menu/rtttl.c:221
 msgid "Sans nom"
@@ -4655,8 +4634,8 @@ msgid "Sonnerie %d / %d"
 msgstr "Suoneria %d / %d"
 
 #: src/menu/rtttl.c:822
-msgid "G : stop  Flancs : préc./suiv."
-msgstr "S: stop  Lati: prec./succ."
+msgid "Y X : préc./suiv.  A : stop"
+msgstr "Y X: prec./succ.  A: stop"
 
 #: src/menu/rtttl.c:827
 msgid "Sonnerie invalide"
@@ -4780,8 +4759,8 @@ msgstr ""
 "competenze."
 
 #: src/menu/skills.c:225
-msgid "D : cocher  G : retour"
-msgstr "D: spunta  S: indietro"
+msgid "A : retour  B : cocher"
+msgstr "A: indietro  B: spunta"
 
 #: src/menu/smuggler.c:93
 msgid "Reçu en douce : %s"
@@ -4862,8 +4841,8 @@ msgstr ""
 "niente merci."
 
 #: src/menu/smuggler.c:556
-msgid "G : annuler  D : offrir"
-msgstr "S: annulla  D: offri"
+msgid "A : annuler  B : offrir"
+msgstr "A: annulla  B: offri"
 
 #: src/menu/smuggler.c:564
 msgid ""
@@ -4882,12 +4861,12 @@ msgstr ""
 "Ricezione..."
 
 #: src/menu/smuggler.c:577
-msgid "G : annuler  D : conclure"
-msgstr "S: annulla  D: concludi"
+msgid "A : annuler  B : conclure"
+msgstr "A: annulla  B: concludi"
 
 #: src/menu/smuggler.c:578
-msgid "G : retour (scellé)"
-msgstr "S: esci (sigillato)"
+msgid "A : retour (scellé)"
+msgstr "A: esci (sigillato)"
 
 #: src/menu/smuggler.c:582
 msgid "Votre %s"
@@ -5078,8 +5057,8 @@ msgstr ""
 
 #: src/menu/smuggler.c:706
 #: src/menu/smuggler.c:724
-msgid "G : retour  D : donner"
-msgstr "S: indietro  D: dona"
+msgid "A : retour  B : donner"
+msgstr "A: indietro  B: dona"
 
 #: src/menu/smuggler.c:710
 msgid "Collection"
@@ -5094,8 +5073,8 @@ msgid "À portée de main"
 msgstr "A portata"
 
 #: src/menu/smuggler.c:724
-msgid "G : retour  D : proposer"
-msgstr "S: indietro  D: proponi"
+msgid "A : retour  B : proposer"
+msgstr "A: indietro  B: proponi"
 
 #: src/menu/smuggler.c:727
 msgid ""
@@ -5146,8 +5125,8 @@ msgid "Dans la cale : %d  (%d/%d)"
 msgstr "Nella stiva: %d  (%d/%d)"
 
 #: src/menu/smuggler.c:803
-msgid "Flancs : choisir  D : ajouter"
-msgstr "Lati: scegli  D: aggiungi"
+msgid "Y X : choisir  B : ajouter"
+msgstr "Y X: scegli  B: aggiungi"
 
 #: src/menu/smuggler.c:807
 msgid "Contrebande (admin)"
@@ -5527,8 +5506,8 @@ msgstr ""
 "0xC16A10 a 0xC16A14"
 
 #: src/menu/talk.c:111
-msgid "G : quitter  Flancs/D : état"
-msgstr "S: esci  Lati/D: stato"
+msgid "Y X B : état  A : quitter"
+msgstr "Y X B: stato  A: esci"
 
 #: src/menu/tug.c:41
 #: src/menu/tug.c:591
@@ -5588,8 +5567,8 @@ msgid "Équipe des %s"
 msgstr "Squadra %s"
 
 #: src/menu/tug.c:579
-msgid "G puis D : une traction"
-msgstr "S poi D: una tirata"
+msgid "A puis B : une traction"
+msgstr "A poi B: una tirata"
 
 #: src/menu/tug.c:579
 #: src/menu/tug.c:595
@@ -5617,8 +5596,8 @@ msgid "Décompte final..."
 msgstr "Conto finale..."
 
 #: src/menu/tug.c:596
-msgid "G puis D, vite !"
-msgstr "S poi D, veloce!"
+msgid "A puis B, vite !"
+msgstr "A poi B, veloce!"
 
 #: src/menu/tug.c:600
 msgid "Résultat"
@@ -5657,16 +5636,36 @@ msgid "Meilleur : %u, %s"
 msgstr "Migliore: %u, %s"
 
 #: src/menu/tug.c:638
-msgid "Deux équipes tirent sur la corde : appuie sur G puis D, le plus vite possible !"
-msgstr "Due squadre tirano la corda: premi S poi D, più veloce che puoi!"
+msgid "Deux équipes tirent sur la corde : appuie sur A puis B, le plus vite possible !"
+msgstr "Due squadre tirano la corda: premi A poi B, più veloce che puoi!"
 
-#: src/menu/tug.c:650
+#: src/menu/tug.c:649
 msgid ""
 "Recherche des parties\n"
 "de tir à la corde..."
 msgstr ""
 "Ricerca partite\n"
 "di tiro alla fune..."
+
+#: src/menu/ui.c:550
+msgid "A : précédente  B : suivante"
+msgstr "A: precedente  B: successiva"
+
+#: src/menu/ui.c:550
+msgid "Y X : lettre (maintenir : vite)"
+msgstr "Y X: lettera (tieni: veloce)"
+
+#: src/menu/ui.c:551
+msgid "Espace = effacer"
+msgstr "Spazio = cancella"
+
+#: src/menu/ui.c:554
+msgid "A : annuler  B long : valider"
+msgstr "A: annulla  B lungo: OK"
+
+#: src/menu/ui.c:554
+msgid "B long : valider"
+msgstr "B lungo: OK"
 
 #: src/menu/vote.c:34
 msgid "Assez"
@@ -5778,20 +5777,20 @@ msgstr ""
 "organizzatori arrivano qui."
 
 #: src/menu/vote.c:212
-msgid "G : retour  D : changer mon vote"
-msgstr "S: indietro  D: cambia voto"
+msgid "A : retour  B : changer mon vote"
+msgstr "A: indietro  B: cambia voto"
 
 #: src/menu/vote.c:212
-msgid "G : retour  D : voter"
-msgstr "S: indietro  D: vota"
+msgid "A : retour  B : voter"
+msgstr "A: indietro  B: vota"
 
 #: src/menu/vote.c:273
 msgid "Vote : questions"
 msgstr "Voto: domande"
 
 #: src/menu/vote.c:275
-msgid "G : retour  D : ouvrir le vote"
-msgstr "S: indietro  D: apri il voto"
+msgid "A : retour  B : ouvrir le vote"
+msgstr "A: indietro  B: apri il voto"
 
 #: src/menu/vote.c:287
 msgid "Vote : %d votant"
@@ -5802,8 +5801,8 @@ msgid "Vote : %d votants"
 msgstr "Voto: %d votanti"
 
 #: src/menu/vote.c:302
-msgid "G : retour  D : fermer le vote"
-msgstr "S: indietro  D: chiudi il voto"
+msgid "A : retour  B : fermer le vote"
+msgstr "A: indietro  B: chiudi il voto"
 
 #: src/menu/vote.c:306
 msgid "Vote (admin)"
@@ -6098,20 +6097,20 @@ msgid "> Ouvrir la partie"
 msgstr "> Apri la partita"
 
 #: src/menu/werewolf.c:1528
-msgid "D : la carte  G : retour"
-msgstr "D: la carta  S: indietro"
+msgid "A : retour  B : la carte"
+msgstr "A: indietro  B: la carta"
 
 #: src/menu/werewolf.c:1531
 msgid "Les rôles"
 msgstr "I ruoli"
 
 #: src/menu/werewolf.c:1534
-msgid "%d/%d  Flancs, D : détails"
-msgstr "%d/%d  Lati, D: dettagli"
+msgid "%d/%d  Y X, B : détails"
+msgstr "%d/%d  Y X, B: dettagli"
 
 #: src/menu/werewolf.c:1535
-msgid "D : détails  G : la partie"
-msgstr "D: dettagli  S: la partita"
+msgid "A : la partie  B : détails"
+msgstr "A: la partita  B: dettagli"
 
 #: src/menu/werewolf.c:1548
 msgid "Cette nuit :"
@@ -6139,8 +6138,8 @@ msgid "Tu étais : %s"
 msgstr "Eri: %s"
 
 #: src/menu/werewolf.c:1576
-msgid "D : les cartes  G long : fin"
-msgstr "D: le carte  S lungo: fine"
+msgid "A long : fin  B : les cartes"
+msgstr "A lungo: fine  B: le carte"
 
 #: src/menu/werewolf.c:1583
 msgid ""
@@ -6163,8 +6162,8 @@ msgid "   Choix : %d / %d"
 msgstr "   Scelte: %d / %d"
 
 #: src/menu/werewolf.c:1610
-msgid "D : suite  X : +30 s"
-msgstr "D: avanti  X: +30 s"
+msgid "B : suite  X : +30 s"
+msgstr "B: avanti  X: +30 s"
 
 #: src/menu/werewolf.c:1616
 msgid "Fais semblant de choisir"
@@ -6259,8 +6258,8 @@ msgid "Ton successeur ?"
 msgstr "Il tuo successore?"
 
 #: src/menu/werewolf.c:1681
-msgid "Flancs : choix  D : valider"
-msgstr "Lati: scelta  D: OK"
+msgid "Y X : choix  B : valider"
+msgstr "Y X: scelta  B: OK"
 
 #: src/menu/werewolf.c:1683
 #: src/menu/werewolf.c:1728
@@ -6273,8 +6272,8 @@ msgid "Choix reçu"
 msgstr "Ricevuta"
 
 #: src/menu/werewolf.c:1684
-msgid "Choix reçu  D : changer"
-msgstr "Ricevuta  D: cambia"
+msgid "Choix reçu  B : changer"
+msgstr "Ricevuta  B: cambia"
 
 #: src/menu/werewolf.c:1691
 msgid ""
@@ -6310,8 +6309,8 @@ msgstr ""
 
 #: src/menu/werewolf.c:1704
 #: src/menu/werewolf.c:1863
-msgid "G long : quitter"
-msgstr "S lungo: esci"
+msgid "A long : quitter"
+msgstr "A lungo: esci"
 
 #: src/menu/werewolf.c:1709
 msgid ""
@@ -6334,12 +6333,12 @@ msgid "Compris, reçu"
 msgstr "Ok, ricevuto"
 
 #: src/menu/werewolf.c:1729
-msgid "Cache l'écran !  D : compris"
-msgstr "Copri lo schermo!  D: capito"
+msgid "Cache l'écran !  B : compris"
+msgstr "Copri lo schermo!  B: capito"
 
 #: src/menu/werewolf.c:1741
-msgid "G : menu  D long : carte"
-msgstr "S: menu  D lungo: carta"
+msgid "A : menu  B long : carte"
+msgstr "A: menu  B lungo: carta"
 
 #: src/menu/werewolf.c:1741
 msgid "Meneur hors de portée !"
@@ -6394,8 +6393,8 @@ msgstr ""
 "si riconoscono..."
 
 #: src/menu/werewolf.c:1781
-msgid "D : vu"
-msgstr "D: ok"
+msgid "B : vu"
+msgstr "B: ok"
 
 #: src/menu/werewolf.c:1781
 msgid "Vu, reçu"
@@ -6422,12 +6421,12 @@ msgid "Un meneur (qui ne joue pas) et 8 à 18 joueurs, chacun avec son badge."
 msgstr "Un narratore (non gioca) e 8-18 giocatori, ognuno col suo badge."
 
 #: src/menu/werewolf.c:1829
-msgid "Flancs : ligne  D : changer"
-msgstr "Lati: riga  D: cambia"
-
-#: src/menu/werewolf.c:1829
 msgid "Selon la règle du jeu"
 msgstr "Come da regolamento"
+
+#: src/menu/werewolf.c:1829
+msgid "Y X : ligne  B : changer"
+msgstr "Y X: riga  B: cambia"
 
 #: src/menu/werewolf.c:1832
 msgid "Partie ouverte"
@@ -6450,12 +6449,12 @@ msgid "Les joueurs : Jeux multi > Loup-garou > Rejoindre."
 msgstr "Giocatori: Giochi multi > Lupo mannaro > Entra."
 
 #: src/menu/werewolf.c:1846
-msgid "G long : annuler"
-msgstr "S lungo: annulla"
+msgid "A long : annuler"
+msgstr "A lungo: annulla"
 
 #: src/menu/werewolf.c:1846
-msgid "G long : annuler  D : lancer"
-msgstr "S lungo: annulla  D: avvia"
+msgid "A long : annuler  B : lancer"
+msgstr "A lungo: annulla  B: avvia"
 
 #: src/menu/werewolf.c:1855
 msgid ""
@@ -6496,8 +6495,8 @@ msgid "En attente du meneur..."
 msgstr "Attesa del narratore..."
 
 #: src/menu/werewolf.c:1876
-msgid "G : menu  G long : quitter"
-msgstr "S: menu  S lungo: esci"
+msgid "A : menu  A long : quitter"
+msgstr "A: menu  A lungo: esci"
 
 #: src/menu/werewolf.c:1884
 msgid ""
@@ -6516,8 +6515,8 @@ msgstr ""
 "la partita?"
 
 #: src/menu/werewolf.c:1885
-msgid "G : non  D : oui"
-msgstr "S: no  D: sì"
+msgid "A : non  B : oui"
+msgstr "A: no  B: sì"
 
 #: src/menu/werewolf.c:2214
 msgid "8 joueurs minimum"
@@ -6561,8 +6560,8 @@ msgid "Loup-garou (admin)"
 msgstr "Lupo mannaro (adm)"
 
 #: src/menu/werewolf.c:2254
-msgid "Flancs : choisir  D : valider"
-msgstr "Lati: scegli  D: OK"
+msgid "Y X : choisir  B : valider"
+msgstr "Y X: scegli  B: OK"
 
 #: src/menu/werewolf_cards.c:116
 #: src/menu/werewolf_cards.c:125

@@ -689,8 +689,8 @@ static void render_read(uint8_t *fb) {
             break;
         }
     }
-    ui_footer(fb, sel >= 0 ? N_("D : choisir  G : menu")
-              : page < n_pages - 1 ? N_("Flancs, D : suite  G : menu") : N_("G : menu"));
+    ui_footer(fb, sel >= 0 ? N_("A : menu  B : choisir")
+              : page < n_pages - 1 ? N_("Y X, B : suite  A : menu") : N_("A : menu"));
 }
 
 static void render_menu(uint8_t *fb) {
@@ -719,7 +719,7 @@ static void render_menu(uint8_t *fb) {
             gfx_text(fb, GFX_WIDTH / 2, y, &gfx_font_small, label, GFX_BLACK, GFX_ALIGN_CENTER);
         }
     }
-    ui_footer(fb, N_("D : choisir  G : retour"));
+    ui_footer(fb, N_("A : retour  B : choisir"));
 }
 
 static void render_items(uint8_t *fb) {
@@ -736,7 +736,7 @@ static void render_items(uint8_t *fb) {
         }
     if (! shown)
         ui_lines(fb, 80, &gfx_font_small, N_("Aucun objet pour l'instant."));
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 static void gamebook_render(uint8_t *fb, absolute_time_t now) {
@@ -745,7 +745,7 @@ static void gamebook_render(uint8_t *fb, absolute_time_t now) {
     case V_LIST:
         ui_title(fb, N_("Livres-jeux"));
         ui_list(fb, list_count(), list_sel, list_label);
-        ui_footer(fb, N_("D : ouvrir  G : quitter"));
+        ui_footer(fb, N_("A : quitter  B : ouvrir"));
         break;
     case V_MENU:
         render_menu(fb);
@@ -759,7 +759,7 @@ static void gamebook_render(uint8_t *fb, absolute_time_t now) {
     case V_MESSAGE:
         ui_title(fb, N_("Livres-jeux"));
         ui_lines(fb, 70, &gfx_font_small, message);
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     }
 }

@@ -854,7 +854,7 @@ static void render_menu(absolute_time_t now) {
     }
     draw_battery();
     bool show_status = status[0] && absolute_time_diff_us(status_ts, now) < STATUS_MS*1000ll;
-    draw_footer(show_status ? status : N_("Flancs : choix  D : OK  G : retour"));
+    draw_footer(show_status ? status : N_("Y X : choix  A : retour  B : OK"));
 }
 
 static void render_browser(void) {
@@ -869,14 +869,14 @@ static void render_browser(void) {
         draw_title(BROWSE_TITLES[browsing]);  /* Short; the "ui:" log stays in French (the tools read it) */
     }
     draw_list(n_files, file_selected, file_label);
-    draw_footer(N_("D : ouvrir  G : retour"));
+    draw_footer(N_("A : retour  B : ouvrir"));
 }
 
 static void render_bt_folders(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Blind test"));
     draw_list(n_bt_dirs + 1, bt_dir_selected, bt_dir_label);
-    draw_footer(N_("D : lancer  G : retour"));
+    draw_footer(N_("A : retour  B : lancer"));
 }
 
 static void render_blind_test(void) {
@@ -908,7 +908,7 @@ static void render_blind_test(void) {
 
     const char *state = bt_finished ? N_("Terminé") : (wav_is_paused() ? N_("Pause") : N_("Lecture..."));
     gfx_text(fb, GFX_WIDTH/2, 150, &gfx_font_small, state, GFX_BLACK, GFX_ALIGN_CENTER);
-    draw_footer(N_("D : titre  Flanc D : suivant"));
+    draw_footer(N_("B : titre  X : suivant"));
 }
 
 static void render_social(void) {
@@ -936,7 +936,7 @@ static void render_social(void) {
         snprintf(text, sizeof(text), "%d dBm", nb[i].rssi);
         gfx_text(fb, GFX_WIDTH - 6, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    draw_footer(N_("D : nom  Flanc D : balises"));
+    draw_footer(N_("B : nom  X : balises"));
 }
 
 static void render_name_edit(void) {
@@ -957,14 +957,14 @@ static void render_name_edit(void) {
     }
     /* Usage */
     static const char *help[] = {
-        N_("Flancs : changer la lettre"),
-        N_("Aile D : case suivante"),
-        N_("Aile G : case précédente"),
-        N_("Aile D longue : enregistrer"),
+        N_("Y X : changer la lettre"),
+        N_("B : case suivante"),
+        N_("A : case précédente"),
+        N_("B long : enregistrer"),
     };
     for (int i = 0; i < 4; ++i)
         gfx_text(fb, 6, 88 + i * 21, &gfx_font_small, help[i], GFX_BLACK, GFX_ALIGN_LEFT);
-    draw_footer(name_cursor == 0 ? N_("Aile G ici : annuler") : N_("Espace = effacer une lettre"));
+    draw_footer(name_cursor == 0 ? N_("A ici : annuler") : N_("Espace = effacer une lettre"));
 }
 
 static void name_edit_start(void) {
@@ -1086,14 +1086,14 @@ static void render_settings(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Veille de l'écran"));  /* Not "Réglages": the name of its theme */
     draw_list(3, settings_selected, settings_label);
-    draw_footer(N_("D : changer  G : retour"));
+    draw_footer(N_("A : retour  B : changer"));
 }
 
 static void render_saver_images(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Image de veille"));
     draw_list(n_saver_files + 1, saver_selected, saver_image_label);
-    draw_footer(N_("D : choisir  G : retour"));
+    draw_footer(N_("A : retour  B : choisir"));
 }
 
 static void open_saver_images(void) {
@@ -1365,7 +1365,7 @@ static void render_ir(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Infrarouge"));
     draw_list(1 + STORE_IR_SLOTS, ir_selected, ir_label);
-    draw_footer(ir_sending() ? N_("Emission...") : (status[0] ? status : N_("D : enregistrer/émettre")));
+    draw_footer(ir_sending() ? N_("Emission...") : (status[0] ? status : N_("B : enregistrer/émettre")));
 }
 
 static void oled_label(int i, char *buf, size_t len) {
@@ -1376,7 +1376,7 @@ static void render_oled(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title(N_("Écran OLED"));
     draw_list(OLED_DEMO_COUNT, oled_selected, oled_label);
-    draw_footer(N_("D : lancer  G : retour"));
+    draw_footer(N_("A : retour  B : lancer"));
 }
 
 static void ctf_label(int i, char *buf, size_t len) {
@@ -1390,7 +1390,7 @@ static void render_ctf(void) {
     gfx_clear(fb, GFX_WHITE);
     draw_title("CTF");
     draw_list(2, ctf_selected, ctf_label);
-    draw_footer(N_("D : OK  G : retour"));
+    draw_footer(N_("A : retour  B : OK"));
 }
 
 static void render_ctf_code(void) {
@@ -1453,7 +1453,7 @@ static void render_info(void) {
                "Batterie : %s"),
              BADGE_VERSION, build, date ? date : "?", radio_tools_chip_version(), xosc,
              sd_is_ready() ? _("prête") : _("absente"), bat);
-    render_page(N_("Infos"), text, N_("D : crédits  G : retour"));
+    render_page(N_("Infos"), text, N_("A : retour  B : crédits"));
 }
 
 static void render_music(void) {
@@ -1469,7 +1469,7 @@ static void render_music(void) {
     snprintf(text, sizeof(text), _("%s\n\n%s   %lu:%02lu / %lu:%02lu\n\nVolume : %s"),
              name, wav_is_paused() ? _("Pause") : _("Lecture"),
              (unsigned long)pos/60, (unsigned long)pos%60, (unsigned long)dur/60, (unsigned long)dur%60, bar);
-    render_page(N_("Musique"), text, N_("D : pause  G : stop  Flancs : - +"));
+    render_page(N_("Musique"), text, N_("Y X : - +  A : stop  B : pause"));
     /* Progress bar */
     int y = FOOTER_Y - 14;
     gfx_rect(fb, 6, y, GFX_WIDTH - 12, 8, GFX_BLACK);
@@ -1913,7 +1913,7 @@ static void render_radio_test(absolute_time_t now) {
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 6, &gfx_font_small, N_("Un message toutes les"), GFX_BLACK, GFX_ALIGN_CENTER);
     format_duration(text, sizeof(text), radio_test_s);
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 24, &gfx_font_large, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 54, &gfx_font_small, N_("Flancs : - / +  (maintenir : vite)"), GFX_BLACK,
+    gfx_text(fb, GFX_WIDTH/2, TITLE_H + 54, &gfx_font_small, N_("Y X : - / +  (maintenir : vite)"), GFX_BLACK,
              GFX_ALIGN_CENTER);
     snprintf(text, sizeof(text), _("Messages envoyés : %u"), radio_test_sent);
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 80, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
@@ -1934,7 +1934,7 @@ static void render_radio_test(absolute_time_t now) {
         snprintf(text, sizeof(text), _("Prochain dans %s"), d);
     }
     gfx_text(fb, GFX_WIDTH/2, TITLE_H + 132, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    draw_footer(radio_test_paused ? N_("G : quitter  D : reprendre") : N_("G : quitter  D : pause"));
+    draw_footer(radio_test_paused ? N_("A : quitter  B : reprendre") : N_("A : quitter  B : pause"));
 }
 
 /* Menu: right wing released = the usual action, held = another one (games: the record as a signed QR code,
@@ -3086,7 +3086,7 @@ int main() {
                     render_page(N_("Infrarouge"),
                             _("Enregistrement...\n\nVisez le récepteur (port\ndroit) avec la télécommande\n"
                               "et appuyez sur une touche."),
-                            N_("G : annuler"));
+                            N_("A : annuler"));
                 else if (app == A_OLED)
                     render_oled();
                 else if (app == A_CTF)
@@ -3103,9 +3103,9 @@ int main() {
                     render_page(N_("Porteuse"),
                             _("433,92 MHz + 19 kHz\nen continu, +10 dBm\n\nVisible avec l'analyseur\n"
                               "de fréquence du Flipper.\nArrêt auto après 30 s."),
-                            N_("G : arrêter"));
+                            N_("A : arrêter"));
                 else if (app == A_PAGE)
-                    render_page(page_title, page_text, N_("G ou D : retour"));
+                    render_page(page_title, page_text, N_("A ou B : retour"));
                 else if (app == A_GAME) {
                     games_render(fb);
                     if (exit_confirm)

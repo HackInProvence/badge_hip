@@ -190,7 +190,7 @@ static void voter_render(uint8_t *fb, absolute_time_t now) {
     if (! vote_open()) {
         ui_lines(fb, 60, &gfx_font_small, heard_session ? N_("Le vote est fermé.\nMerci !") :
                  N_("Aucun vote en cours.\nLes questions des\norganisateurs arrivent ici."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     char fitted[48];
@@ -209,7 +209,7 @@ static void voter_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, 8, y + 1, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
         }
     }
-    ui_footer(fb, my_answer >= 0 ? N_("G : retour  D : changer mon vote") : N_("G : retour  D : voter"));
+    ui_footer(fb, my_answer >= 0 ? N_("A : retour  B : changer mon vote") : N_("A : retour  B : voter"));
 }
 
 const app_t app_vote = {
@@ -272,7 +272,7 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
     if (! my_session) {
         ui_title(fb, N_("Vote : questions"));
         ui_list(fb, N_QUESTIONS, admin_sel, admin_label);
-        ui_footer(fb, N_("G : retour  D : ouvrir le vote"));
+        ui_footer(fb, N_("A : retour  B : ouvrir le vote"));
         return;
     }
     /* Histogram */
@@ -299,7 +299,7 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
         snprintf(label, sizeof(label), "%d", counts[i]);
         gfx_text(fb, 62 + w + 3, y + (row - gfx_font_small.height) / 2, &gfx_font_small, label, GFX_BLACK, GFX_ALIGN_LEFT);
     }
-    ui_footer(fb, N_("G : retour  D : fermer le vote"));
+    ui_footer(fb, N_("A : retour  B : fermer le vote"));
 }
 
 const app_t app_vote_admin = {

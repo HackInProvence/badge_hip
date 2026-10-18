@@ -148,6 +148,6 @@ void credits_render(uint8_t *fb, int page) {
     }
 
     gfx_fill_rect(fb, 0, FOOTER_Y - 2, GFX_WIDTH, 1, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, N_("Flancs : défiler  G : retour"), GFX_BLACK,
+    gfx_text(fb, GFX_WIDTH/2, FOOTER_Y, &gfx_font_small, N_("Y X : défiler  A : retour"), GFX_BLACK,
              GFX_ALIGN_CENTER);
 }

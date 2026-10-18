@@ -316,11 +316,11 @@ static void announces_render(uint8_t *fb, absolute_time_t now) {
     if (! n_received) {
         ui_lines(fb, 60, &gfx_font_small,
                  N_("Aucune annonce reçue.\nElles s'affichent toutes\nseules quand elles arrivent."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     ui_list(fb, n_received, list_sel, received_label);
-    ui_footer(fb, N_("G : retour  D : afficher"));
+    ui_footer(fb, N_("A : retour  B : afficher"));
 }
 
 const app_t app_announces = {
@@ -452,15 +452,15 @@ static void admin_render(uint8_t *fb, absolute_time_t now) {
     case V_LIST:
         ui_title(fb, N_("Annonces"));
         ui_list(fb, STORE_ANNOUNCES, sel, admin_label);
-        ui_footer(fb, N_("G : retour  D : modifier, envoyer"));
+        ui_footer(fb, N_("A : retour  B : modifier, envoyer"));
         break;
     case V_EDIT: {
         char title[24];
         snprintf(title, sizeof(title), _("Annonce %d"), sel + 1);
         ui_title(fb, title);
         ui_list(fb, N_ROWS, row, row_label);
-        const char *help = row == ROW_QR_TYPE ? N_("Ailes : type de QR code") : row == ROW_PREVIEW || row == ROW_SEND
-                           ? N_("G : liste  D : valider") : N_("G : liste  D : modifier");
+        const char *help = row == ROW_QR_TYPE ? N_("A B : type de QR code") : row == ROW_PREVIEW || row == ROW_SEND
+                           ? N_("A : liste  B : valider") : N_("A : liste  B : modifier");
         ui_footer(fb, status[0] ? status : help);
         break;
     }

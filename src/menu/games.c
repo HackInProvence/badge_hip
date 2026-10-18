@@ -147,7 +147,7 @@ static const char *result_text(uint8_t result) {
 }
 
 /* Footer of the end pages: the buttons in the order of the badge, left wing on the left */
-#define OVER_FOOTER N_("G : menu  Flanc : QR  D : rejouer")
+#define OVER_FOOTER N_("Y X : QR  A : menu  B : rejouer")
 
 static void end_sound(uint8_t result) {
     if (result == 1) {
@@ -346,7 +346,7 @@ static void ttt_render(uint8_t *fb) {
                    TTT_X0 + (l[2] % 3)*TTT_CELL + TTT_CELL/2, TTT_Y0 + (l[2] / 3)*TTT_CELL + TTT_CELL/2, 6);
     }
     draw_footer(fb, ttt_result ? OVER_FOOTER : ttt_badge_turn ? N_("La cigale réfléchit...")
-                                                         : N_("Flancs : case  D : jouer"));
+                                                         : N_("Y X : case  B : jouer"));
 }
 
 
@@ -582,7 +582,7 @@ static void c4_render(uint8_t *fb) {
             gfx_fill_rect(fb, cx - 6 + i, 31 + i, 13 - 2*i, 1, GFX_BLACK);
     }
     draw_footer(fb, c4_result ? OVER_FOOTER : c4_badge_turn ? N_("La cigale réfléchit...")
-                                                       : N_("Flancs : colonne  D : jouer"));
+                                                       : N_("Y X : colonne  B : jouer"));
 }
 
 
@@ -602,7 +602,7 @@ static absolute_time_t simon_ts = 0, simon_lit_ts = 0;
 static bool simon_new_record = false;
 
 /* Pads where the buttons are on the badge seen from the front: flanks at the top, wings at the bottom */
-static const char *SIMON_LABELS[4] = {N_("Flanc G"), N_("Flanc D"), N_("Aile G"), N_("Aile D")};
+static const char *SIMON_LABELS[4] = {N_("Y"), N_("X"), N_("A"), N_("B")};
 static const uint8_t SIMON_BUTTONS[4] = {GAMES_BTN_Y, GAMES_BTN_X, GAMES_BTN_A, GAMES_BTN_B};
 static const uint16_t SIMON_HZ[4] = {659, 880, 1109, 1319};  /* E A C# E, like the original */
 static const uint8_t SIMON_RGB[4][3] = {{0, 255, 0}, {255, 0, 0}, {255, 160, 0}, {0, 64, 255}};
@@ -870,15 +870,15 @@ static void reflex_render(uint8_t *fb) {
     snprintf(text, sizeof(text), _("Réflexes : %d / %d"), reflex_round + (reflex_phase == REFLEX_WAIT
              || reflex_phase == REFLEX_GO || reflex_phase == REFLEX_MISSED), REFLEX_ROUNDS);
     draw_title(fb, reflex_phase == REFLEX_READY ? N_("Réflexes") : text);
-    const char *footer = N_("G : quitter");
+    const char *footer = N_("A : quitter");
     switch (reflex_phase) {
     case REFLEX_READY:
         games_record_text(GAME_REFLEX, text + 64, 32);
-        draw_lines(fb, 40, &gfx_font_small, _("Quand les LEDs s'allument\nen vert, appuyez vite\nsur l'aile droite\n"
-                                              "ou sur un flanc.\n5 essais, la moyenne compte."),
+        draw_lines(fb, 40, &gfx_font_small, _("Quand les LEDs s'allument\nen vert, appuyez vite\nsur B, ou sur Y ou X.\n"
+                                              "5 essais, la moyenne compte."),
                    GFX_BLACK);
         draw_lines(fb, 154, &gfx_font_small, text + 64, GFX_BLACK);
-        footer = N_("G : quitter  D : commencer");
+        footer = N_("A : quitter  B : commencer");
         break;
     case REFLEX_WAIT:
         draw_lines(fb, 85, &gfx_font_large, N_("Attendez..."), GFX_BLACK);
@@ -1077,9 +1077,9 @@ static void snake_render(uint8_t *fb) {
                  snake_new_record ? _("Nouveau record !") : rec);
         draw_box(fb, text);
     }
-    draw_footer(fb, snake_phase == SNAKE_READY ? N_("D : partir  Flancs : tourner")
-                  : snake_phase == SNAKE_RUN ? N_("Flancs : tourner  D : pause")
-                  : snake_phase == SNAKE_PAUSE ? N_("Pause  D : reprendre")
+    draw_footer(fb, snake_phase == SNAKE_READY ? N_("Y X : tourner  B : partir")
+                  : snake_phase == SNAKE_RUN ? N_("Y X : tourner  B : pause")
+                  : snake_phase == SNAKE_PAUSE ? N_("Pause  B : reprendre")
                   : OVER_FOOTER);
 }
 

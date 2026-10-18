@@ -155,7 +155,7 @@ static bool hunt_task(absolute_time_t now) {
 static void hunt_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Chaud - froid"));
     signal_render(fb, &hunt, now, _("Balise"));
-    ui_footer(fb, N_("G : quitter  D : autre balise"));
+    ui_footer(fb, N_("A : quitter  B : autre balise"));
 }
 
 static void hunt_stop(void) {
@@ -227,7 +227,7 @@ static void master_render(uint8_t *fb, absolute_time_t now) {
     char text[40];
     snprintf(text, sizeof(text), _("Brûlant dès %d dBm"), (hot_dbm() * 100 - 15 * HOT_SPAN) / 100);
     ui_lines(fb, 150, &gfx_font_small, text);
-    ui_footer(fb, master ? N_("G : quitter  D : arrêter") : N_("G : quitter  D : émettre"));
+    ui_footer(fb, master ? N_("A : quitter  B : arrêter") : N_("A : quitter  B : émettre"));
 }
 
 static void master_stop(void) {
@@ -324,7 +324,7 @@ static void radar_render(uint8_t *fb, absolute_time_t now) {
         snprintf(title, sizeof(title), _("Radar : %s"), followed_name);
         ui_title(fb, title);
         signal_render(fb, &follow, now, followed_name);
-        ui_footer(fb, N_("G : retour à la liste"));
+        ui_footer(fb, N_("A : retour à la liste"));
         return;
     }
     ui_title(fb, N_("Radar des cigales"));
@@ -333,7 +333,7 @@ static void radar_render(uint8_t *fb, absolute_time_t now) {
                                              "apparaissent ici (balises\ntoutes les 2 s)."));
     else
         ui_list(fb, n_near, radar_sel, radar_label);
-    ui_footer(fb, N_("G : quitter  D : suivre"));
+    ui_footer(fb, N_("A : quitter  B : suivre"));
 }
 
 static void radar_stop(void) {
@@ -474,18 +474,18 @@ static void hunt433_render(uint8_t *fb, absolute_time_t now) {
     if (hunted >= 0) {
         ui_title(fb, N_("Chasse 433 MHz"));
         signal_render(fb, &target_signal, now, targets[hunted].text);
-        ui_footer(fb, N_("G : retour à la liste"));
+        ui_footer(fb, N_("A : retour à la liste"));
         return;
     }
     ui_title(fb, N_("Chasse 433 MHz"));
     if (! n_targets) {
         ui_lines(fb, 50, &gfx_font_small,
                  N_("Écoute des émetteurs\n433 MHz (télécommandes,\ncapteurs, brouilleurs)..."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     ui_list(fb, n_targets, target_sel, target_label);
-    ui_footer(fb, N_("G : retour  D : le chasser"));
+    ui_footer(fb, N_("A : retour  B : le chasser"));
 }
 
 const app_t app_hunt433 = {

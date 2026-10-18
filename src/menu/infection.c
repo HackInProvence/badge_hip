@@ -191,19 +191,19 @@ static void infection_render(uint8_t *fb, absolute_time_t now) {
                                        "être contaminées !"), generation);
         ui_lines(fb, 84, &gfx_font_small, text);
         ui_lines(fb, 142, &gfx_font_small, wrong ? N_("Mauvaise réponse...") : N_("Le remède : une énigme."));
-        ui_footer(fb, N_("G : retour  D : se soigner"));
+        ui_footer(fb, N_("A : retour  B : se soigner"));
         break;
     }
     case IMMUNE:
         gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, N_("Immunisé"), GFX_BLACK, GFX_ALIGN_CENTER);
         ui_lines(fb, 90, &gfx_font_small, N_("Vous avez trouvé le remède :\nce virus ne vous atteint plus."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     default:
         gfx_text(fb, GFX_WIDTH/2, 45, &gfx_font_large, N_("En forme"), GFX_BLACK, GFX_ALIGN_CENTER);
         ui_lines(fb, 90, &gfx_font_small, N_("Un virus (inoffensif) circule\nde cigale en cigale...\n"
                                               "Restez trop près d'une cigale\ninfectée et vous l'attrapez !"));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     }
 }
@@ -238,8 +238,8 @@ static void zero_render(uint8_t *fb, absolute_time_t now) {
     ui_lines(fb, 40, &gfx_font_small, state() == INFECTED ? N_("Ce badge est infecté :\nil tousse toutes les 4 s.") :
              N_("Infectez ce badge pour\nlancer l'épidémie : les\nbadges qui restent près de\n"
                 "lui l'attrapent (60 %)."));
-    ui_lines(fb, 120, &gfx_font_small, N_("Flanc G : guérir ce badge"));
-    ui_footer(fb, N_("G : retour  D : infecter"));
+    ui_lines(fb, 120, &gfx_font_small, N_("Y : guérir ce badge"));
+    ui_footer(fb, N_("A : retour  B : infecter"));
 }
 
 const app_t app_infection_zero = {

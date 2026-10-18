@@ -160,7 +160,7 @@ static void fsk_render(uint8_t *fb, absolute_time_t now) {
     y = ui_lines(fb, y + 6, &gfx_font_small, line);
     ui_wrapped(fb, y + 6, &gfx_font_small, N_("Sur un téléphone ou un PC : la page fsk-buzzer-link.html, "
                "bouton Écouter, près du badge."), 2);  /* 2 lines above the footer: the rest scrolls */
-    ui_footer(fb, sending ? N_("G : arrêter") : N_("G : retour  D : émettre"));
+    ui_footer(fb, sending ? N_("A : arrêter") : N_("A : retour  B : émettre"));
 }
 
 static void fsk_stop(void) {

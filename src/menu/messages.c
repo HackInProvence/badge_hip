@@ -287,7 +287,7 @@ static void msg_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), _("Messages (%d)"), n_inbox);
         ui_title(fb, text);
         ui_list(fb, n_inbox + 1, sel, inbox_label);
-        ui_footer(fb, sel ? N_("G : retour  D : lire") : N_("G : retour  D : écrire"));
+        ui_footer(fb, sel ? N_("A : retour  B : lire") : N_("A : retour  B : écrire"));
         break;
     case V_READ: {
         const inbox_t *m = &inbox[sel - 1];
@@ -297,25 +297,25 @@ static void msg_render(uint8_t *fb, absolute_time_t now) {
         if (m->to_me)
             y = ui_lines(fb, y, &gfx_font_small, N_("Message privé")) + 2;
         ui_wrapped(fb, y + 4, &gfx_font_medium, MESSAGES[m->message], 5);
-        ui_footer(fb, N_("G : retour  D : répondre"));
+        ui_footer(fb, N_("A : retour  B : répondre"));
         break;
     }
     case V_RECIPIENT:
         ui_title(fb, N_("A qui ?"));
         ui_list(fb, n_recipients, sel, recipient_label);
-        ui_footer(fb, N_("G : retour  D : choisir"));
+        ui_footer(fb, N_("A : retour  B : choisir"));
         break;
     case V_MESSAGE:
         recipient_label(recipient, text, sizeof(text));
         ui_title(fb, text);
         ui_list(fb, N_MESSAGES, sel, message_label);
-        ui_footer(fb, N_("G : retour  D : envoyer"));
+        ui_footer(fb, N_("A : retour  B : envoyer"));
         break;
     default:
         ui_title(fb, N_("Message envoyé"));
         ui_lines(fb, 60, &gfx_font_small,
                  N_("Les cigales le relaient\njusqu'à 3 fois pour qu'il\narrive à destination."));
-        ui_footer(fb, N_("D : boîte de réception"));
+        ui_footer(fb, N_("B : boîte de réception"));
         break;
     }
 }

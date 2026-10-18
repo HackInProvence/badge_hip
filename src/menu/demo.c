@@ -29,7 +29,7 @@ static void demo_page_render(uint8_t *fb, absolute_time_t now) {
     ui_lines(fb, UI_TITLE_H + 14, &gfx_font_small,
              N_("Le badge présente ses\nfonctions en boucle :\nbadge nominatif, images,\nvidéo, musique, jeux...\n\n"
                 "Pour un stand.\nUn bouton l'arrête."));
-    ui_footer(fb, N_("D : lancer  G : retour"));
+    ui_footer(fb, N_("A : retour  B : lancer"));
 }
 
 const app_t app_demo = {

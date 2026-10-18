@@ -716,10 +716,10 @@ bool rsvp_task(absolute_time_t now) {
         }
         snprintf(text, sizeof(text), _("%u mots/min, %u %%"), wpm,
                  file_size ? (unsigned)((uint64_t)word.offset * 100 / file_size) : 0);
-        snprintf(text2, sizeof(text2), _("Flancs : vitesse, long: -/+%ds"), RSVP_SEEK_S);
+        snprintf(text2, sizeof(text2), _("Y X : vitesse, long: -/+%ds"), RSVP_SEEK_S);
         draw_frame(at_end ? N_("Fin du texte") : N_("Pause"), text, text2);
         gfx_text(drawing, GFX_WIDTH / 2, 174, &gfx_font_small,
-                 at_end ? N_("D : relire  G : quitter") : N_("D : reprendre  G : quitter"),
+                 at_end ? N_("A : quitter  B : relire") : N_("A : quitter  B : reprendre"),
                  GFX_BLACK, GFX_ALIGN_CENTER);
         screen_push_ws(screen_ws_10fps);  /* Best contrast for the page */
         screen_push_rams(drawing, shown, GFX_FB_SIZE);

@@ -89,7 +89,7 @@ static bool battcal_buttons(const app_buttons_t *b, absolute_time_t now) {
             snprintf(status, sizeof(status), _("ADC trop proche du point %d"), 2 - i);  /* Not calibrated */
     } else if (! confirm) {
         confirm = true;
-        snprintf(status, sizeof(status), _("D encore : effacer"));
+        snprintf(status, sizeof(status), _("B encore : effacer"));
     } else {
         confirm = false;
         snprintf(status, sizeof(status), battery_clear_points() ? _("Calibration effacée") : _("Erreur d'écriture"));
@@ -151,7 +151,7 @@ static void battcal_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
         }
     }
-    ui_footer(fb, status[0] ? status : row == ROW_MV ? N_("Ailes : -  +") : N_("G : retour  D : valider"));
+    ui_footer(fb, status[0] ? status : row == ROW_MV ? N_("A : -  B : +") : N_("A : retour  B : valider"));
 }
 
 const app_t app_battcal = {
@@ -216,12 +216,12 @@ static void battauto_render(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), _("Autonomie : %u h %02u\nRestant : inconnu (après\nune charge complète)"),
                      life / 60, life % 60);
         else
-            snprintf(text, sizeof(text), "%s", _("Pas encore calibrée.\nD : démarrer, puis\nsuivre les étapes."));
+            snprintf(text, sizeof(text), "%s", _("Pas encore calibrée.\nB : démarrer, puis\nsuivre les étapes."));
         break;
     }
     ui_lines(fb, UI_TITLE_H + 10, &gfx_font_small, text);
-    ui_footer(fb, battery_auto_step() == BATTERY_AUTO_NONE ? N_("G : retour  D : démarrer")
-                                                          : N_("G : retour  D : arrêter"));
+    ui_footer(fb, battery_auto_step() == BATTERY_AUTO_NONE ? N_("A : retour  B : démarrer")
+                                                          : N_("A : retour  B : arrêter"));
 }
 
 const app_t app_battauto = {

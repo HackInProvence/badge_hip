@@ -75,7 +75,7 @@ static void program_render(uint8_t *fb, absolute_time_t now) {
     if (! details) {
         ui_title(fb, N_("Programme"));
         ui_list(fb, N_TALKS, selected, talk_label);
-        ui_footer(fb, N_("G : retour  D : détails"));
+        ui_footer(fb, N_("A : retour  B : détails"));
         return;
     }
     const talk_t *t = &TALKS[selected];
@@ -94,7 +94,7 @@ static void program_render(uint8_t *fb, absolute_time_t now) {
         scale = 3;
     if (scale >= 2)
         score_code_draw(fb, t->url, y + 2, scale);
-    ui_footer(fb, N_("G : liste  Flancs : autre talk"));
+    ui_footer(fb, N_("Y X : autre talk  A : liste"));
 }
 
 const app_t app_program = {

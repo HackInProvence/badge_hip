@@ -135,7 +135,7 @@ static const challenge_t CHALLENGES[] = {
     },
     {  /* Ultrason */
         "Ultrason",
-        "La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l'entend, lui.\nQui d'autre entend ça ?\n\nFlanc D : chanter (en boucle),\nencore : arrêter.",
+        "La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l'entend, lui.\nQui d'autre entend ça ?\n\nX : chanter (en boucle),\nencore : arrêter.",
         "Appli de spectrogramme\n(Spectroid, Spek...) : des\ntraits vers 19 kHz, en Morse.",
         "-.. .- ..- .--. .... .. -.",
         true,

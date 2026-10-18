@@ -256,13 +256,13 @@ static void send_render(uint8_t *fb, absolute_time_t now) {
     if (send_block >= 0) {
         memcpy(fb, image, GFX_FB_SIZE);  /* The image being sent */
         gfx_fill_rect(fb, 0, GFX_HEIGHT - 20, GFX_WIDTH, 20, GFX_WHITE);
-        gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, rounds_left > 1 ? N_("Envoi (1/2)... G : arrêter") :
-                 N_("Envoi (2/2)... G : arrêter"), GFX_BLACK, GFX_ALIGN_CENTER);
+        gfx_text(fb, GFX_WIDTH/2, GFX_HEIGHT - 18, &gfx_font_small, rounds_left > 1 ? N_("Envoi (1/2)... A : arrêter") :
+                 N_("Envoi (2/2)... A : arrêter"), GFX_BLACK, GFX_ALIGN_CENTER);
         return;
     }
     ui_title(fb, N_("Envoyer une image"));
     ui_list(fb, n_files + 1, sel, file_label);
-    ui_footer(fb, N_("G : retour  D : envoyer"));
+    ui_footer(fb, N_("A : retour  B : envoyer"));
 }
 
 const app_t app_image_send = {
@@ -329,7 +329,7 @@ static void recv_render(uint8_t *fb, absolute_time_t now) {
     if (! transfer) {
         ui_lines(fb, 50, &gfx_font_small,
                  N_("En attente d'une image...\nSur l'autre badge :\nRadio & IR > Envoyer\nune image."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     /* Only the progress: the image comes at the end, drawn cleanly (the fast refreshes leave ghosts) */
@@ -338,7 +338,7 @@ static void recv_render(uint8_t *fb, absolute_time_t now) {
     snprintf(text, sizeof(text), _("Réception...\n%d / %d blocs"), ok, DATA_BLOCKS);
     ui_lines(fb, 60, &gfx_font_medium, text);
     ui_gauge(fb, 20, 125, GFX_WIDTH - 40, 16, ok, DATA_BLOCKS);
-    ui_footer(fb, N_("G : arrêter  D : recommencer"));
+    ui_footer(fb, N_("A : arrêter  B : recommencer"));
 }
 
 const app_t app_image_recv = {

@@ -402,13 +402,13 @@ static void battle_render(uint8_t *fb, absolute_time_t now) {
         if (invited) {
             snprintf(text, sizeof(text), _("%s vous défie !"), inviter_name);
             ui_lines(fb, 60, &gfx_font_medium, text);
-            ui_footer(fb, N_("G : refuser  D : accepter"));
+            ui_footer(fb, N_("A : refuser  B : accepter"));
         } else if (n_near) {
             ui_list(fb, n_near, sel, near_label);
-            ui_footer(fb, N_("G : retour  D : défier"));
+            ui_footer(fb, N_("A : retour  B : défier"));
         } else {
             ui_lines(fb, 60, &gfx_font_small, N_("Aucune cigale à portée."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         return;
     }
@@ -425,8 +425,8 @@ static void battle_render(uint8_t *fb, absolute_time_t now) {
     ui_text(fb, 136, UI_TITLE_H + 92, &gfx_font_small, status);
     if (state == S_END && peer_revealed)
         ui_text(fb, 136, UI_TITLE_H + 110, &gfx_font_small, cheat ? N_("TRICHE !") : N_("Flotte OK"));
-    ui_footer(fb, state == S_AIM ? N_("Flancs : viser  D : tirer") : state >= S_END ? N_("G : quitter  D : rejouer")
-              : N_("G : abandonner"));
+    ui_footer(fb, state == S_AIM ? N_("Y X : viser  B : tirer") : state >= S_END ? N_("A : quitter  B : rejouer")
+              : N_("A : abandonner"));
 }
 
 /* The invitation, for the notification */

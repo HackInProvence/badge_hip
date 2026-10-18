@@ -819,7 +819,7 @@ static void render_play(uint8_t *fb) {
     snprintf(text, sizeof(text), "%lu:%02lu / %lu:%02lu", (unsigned long)(ms / 60000), (unsigned long)(ms / 1000 % 60),
              (unsigned long)(song_ms / 60000), (unsigned long)(song_ms / 1000 % 60));
     gfx_text(fb, GFX_WIDTH/2, 156, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    ui_footer(fb, N_("G : stop  Flancs : préc./suiv."));
+    ui_footer(fb, N_("Y X : préc./suiv.  A : stop"));
 }
 
 static void render_error(uint8_t *fb) {
@@ -837,7 +837,7 @@ static void render_error(uint8_t *fb) {
         snprintf(text, sizeof(text), _("Colonne %u :"), (unsigned)song.err_pos + 1);
     gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
     ui_wrapped(fb, y + 18, &gfx_font_small, rtttl_error_text(song_err), 2);
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 static void rtttl_render(uint8_t *fb, absolute_time_t now) {
@@ -850,7 +850,7 @@ static void rtttl_render(uint8_t *fb, absolute_time_t now) {
         const char *slash = strrchr(dir, '/');
         ui_title(fb, ! dir[0] ? N_("Sonneries") : slash ? slash + 1 : dir);
         ui_list(fb, n_rows(), sel, row_label);
-        ui_footer(fb, list_pending ? N_("Lecture de la carte...") : status[0] ? status : N_("G : retour  D : choisir"));
+        ui_footer(fb, list_pending ? N_("Lecture de la carte...") : status[0] ? status : N_("A : retour  B : choisir"));
     }
 }
 

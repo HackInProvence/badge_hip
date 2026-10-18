@@ -36,7 +36,7 @@ static void warning_render(uint8_t *fb, absolute_time_t now) {
     ui_lines(fb, UI_TITLE_H + 12, &gfx_font_medium, N_("Batterie faible !"));
     ui_lines(fb, UI_TITLE_H + 44, &gfx_font_small,
              N_("Mode économie : muet,\nLEDs éteintes,\ntélécommande coupée.\nRecharger le badge\n(USB) pour en sortir."));
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 const app_t app_low_battery = {
@@ -113,13 +113,13 @@ static void drain_render(uint8_t *fb, absolute_time_t now) {
     else if (battery_low())
         snprintf(text, sizeof(text), "%s", _("Batterie faible :\narrêté, le mode\néconomie a pris\nle relais."));
     else
-        snprintf(text, sizeof(text), "%s", _("Arrêté.\nD : relancer."));
+        snprintf(text, sizeof(text), "%s", _("Arrêté.\nB : relancer."));
     ui_lines(fb, UI_TITLE_H + 10, &gfx_font_small, text);
     /* A pattern that changes at each redraw: the whole screen moves */
     if (draining)
         for (int y = 150; y < UI_FOOTER_Y - 4; y += 4)
             gfx_fill_rect(fb, (int)((s * 7 + y) % 40), y, GFX_WIDTH - 40, 2, GFX_BLACK);
-    ui_footer(fb, battery_low() ? N_("G : retour") : N_("G : retour  D : marche / arrêt"));
+    ui_footer(fb, battery_low() ? N_("A : retour") : N_("A : retour  B : marche / arrêt"));
 }
 
 static void drain_stop(void) {

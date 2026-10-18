@@ -185,7 +185,7 @@ static void skills_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Compétences"));
         ui_list(fb, 2, sel, main_label);
         skills_draw_row(fb, GFX_WIDTH/2, UI_FOOTER_Y - 24, store_get()->skills, 9, GFX_BLACK);
-        ui_footer(fb, N_("D : ouvrir  G : retour"));
+        ui_footer(fb, N_("A : retour  B : ouvrir"));
         return;
     }
     const int rows = 7, row_h = UI_ROW_H, y0 = UI_TITLE_H + 3;
@@ -194,7 +194,7 @@ static void skills_render(uint8_t *fb, absolute_time_t now) {
     if (view == V_NEAR && ! n_near) {
         ui_lines(fb, 60, &gfx_font_small, store_get()->skills ? N_("Aucune cigale proche\nne partage vos\ncompétences.")
                                                               : N_("Cochez d'abord vos\ncompétences."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     int first = sel - rows / 2;
@@ -222,7 +222,7 @@ static void skills_render(uint8_t *fb, absolute_time_t now) {
             skills_draw_row(fb, 150, y + 2, near[i].skills & mine, 4, fg);
         }
     }
-    ui_footer(fb, view == V_MINE ? N_("D : cocher  G : retour") : N_("G : retour"));
+    ui_footer(fb, view == V_MINE ? N_("A : retour  B : cocher") : N_("A : retour"));
 }
 
 const app_t app_skills = {

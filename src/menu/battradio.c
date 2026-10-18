@@ -63,7 +63,7 @@ static void share_render(uint8_t *fb, absolute_time_t now) {
     if (battery_charging())
         y = ui_lines(fb, y, &gfx_font_small, N_("USB : en charge"));
     ui_lines(fb, y + 8, &gfx_font_small, N_("Le nom et la batterie\npartent avec les balises\n(toutes les 2 s)."));
-    ui_footer(fb, N_("G : retour  D : oui / non"));
+    ui_footer(fb, N_("A : retour  B : oui / non"));
 }
 
 static void share_label(char *buf, int len) {
@@ -145,7 +145,7 @@ static void view_render(uint8_t *fb, absolute_time_t now) {
         ui_lines(fb, 60, &gfx_font_small, N_("Aucune batterie reçue.\nSur le badge à suivre :\nRéglages > Batterie\npar radio : oui."));
     else
         ui_list(fb, n_near, sel, view_label);
-    ui_footer(fb, N_("G : retour"));
+    ui_footer(fb, N_("A : retour"));
 }
 
 const app_t app_batt_view = {

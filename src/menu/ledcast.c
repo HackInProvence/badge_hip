@@ -315,16 +315,16 @@ static void ledcast_render(uint8_t *fb, absolute_time_t now) {
                 gfx_text(fb, GFX_WIDTH/2, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
             }
         }
-        ui_lines(fb, UI_TITLE_H + 90, &gfx_font_small, N_("Flancs : choisir\nAiles : - / +  (maintenir : vite)"));
-        ui_footer(fb, N_("Aile longue : retour"));
+        ui_lines(fb, UI_TITLE_H + 90, &gfx_font_small, N_("Y X : choisir\nA B : - / +  (maintenir : vite)"));
+        ui_footer(fb, N_("A / B long : retour"));
         return;
     }
     ui_title(fb, N_("LEDs des cigales"));
     ui_list(fb, N_ROWS, row, row_label);
-    const char *help = row == ROW_SEND || row == ROW_RESTORE ? N_("G : retour  D : valider")
-                       : row == ROW_MODE ? (order.mode == MODE_FIXED ? N_("Ailes : mode")
-                                                                     : N_("Ailes : mode  D long : temps"))
-                       : N_("Ailes : -  +");
+    const char *help = row == ROW_SEND || row == ROW_RESTORE ? N_("A : retour  B : valider")
+                       : row == ROW_MODE ? (order.mode == MODE_FIXED ? N_("A B : mode")
+                                                                     : N_("A B : mode  B long : temps"))
+                       : N_("A : -  B : +");
     ui_footer(fb, status[0] && (row == ROW_SEND || row == ROW_RESTORE) ? status : help);
 }
 

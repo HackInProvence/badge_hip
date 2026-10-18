@@ -116,11 +116,11 @@ static void reset_render(uint8_t *fb, absolute_time_t now) {
         ui_lines(fb, UI_TITLE_H + 10, &gfx_font_medium, NAMES[sel]);
         ui_lines(fb, UI_TITLE_H + 45, &gfx_font_small, DETAILS[sel]);
         ui_lines(fb, UI_TITLE_H + 120, &gfx_font_small, N_("Remettre à zéro ?"));
-        ui_footer(fb, N_("G : non  D long : oui"));
+        ui_footer(fb, N_("A : non  B long : oui"));
         return;
     }
     ui_list(fb, N_RESETS, sel, label);
-    ui_footer(fb, done[0] ? done : N_("G : retour  D : choisir"));
+    ui_footer(fb, done[0] ? done : N_("A : retour  B : choisir"));
 }
 
 const app_t app_reset = {

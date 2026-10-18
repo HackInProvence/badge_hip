@@ -194,7 +194,7 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
                                      : _("%u rencontre : %u XP"), social_met_count(),
                  social_met_count() * XP_PER_MEETING);
         ui_lines(fb, y + 12, &gfx_font_small, text);
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     if (detail) {
@@ -204,7 +204,7 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         snprintf(text, sizeof(text), "+%u XP", a->xp);
         y = ui_lines(fb, y + 12, &gfx_font_small, text);
         ui_lines(fb, y + 8, &gfx_font_small, achv_unlocked(sel - 1) ? N_("Obtenu !") : N_("Pas encore obtenu"));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         return;
     }
     uint8_t level = achv_level();
@@ -257,7 +257,7 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
         ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
         gfx_text(fb, 22, y + 1, &gfx_font_small, fitted, fg, GFX_ALIGN_LEFT);
     }
-    ui_footer(fb, N_("D : comment  G : retour"));
+    ui_footer(fb, N_("A : retour  B : comment"));
 }
 
 const app_t app_achievements = {

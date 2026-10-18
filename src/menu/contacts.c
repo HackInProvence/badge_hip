@@ -327,12 +327,12 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
     case V_MAIN:
         ui_title(fb, N_("Contacts"));
         ui_list(fb, 3, sel, main_label);
-        ui_footer(fb, N_("G : retour  D : ouvrir"));
+        ui_footer(fb, N_("A : retour  B : ouvrir"));
         break;
     case V_CARD:
         ui_title(fb, N_("Ma carte"));
         ui_list(fb, N_FIELDS, card_sel, card_label);
-        ui_footer(fb, N_("D : modifier  D long : cocher"));
+        ui_footer(fb, N_("B : modifier  B long : cocher"));
         break;
     case V_EDIT:
         ui_edit_render(fb, &edit, FIELDS[card_sel].label, "");
@@ -344,12 +344,12 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
             ui_lines(fb, 40, &gfx_font_small, N_("Carte reçue :"));
             ui_lines(fb, 60, &gfx_font_medium, text);
             ui_lines(fb, 90, &gfx_font_small, field(&rx_card, 4));
-            ui_footer(fb, N_("G : ignorer  D : garder"));
+            ui_footer(fb, N_("A : ignorer  B : garder"));
         } else {
             ui_lines(fb, 40, &gfx_font_small, N_("Votre carte (vCard) est\nenvoyée aux cigales en mode\n"
                                                  "échange, et lisible par un\nFlipper (subghz chat).\n"
                                                  "Rapprochez les badges !"));
-            ui_footer(fb, N_("G : arrêter"));
+            ui_footer(fb, N_("A : arrêter"));
         }
         break;
     case V_LIST:
@@ -360,7 +360,7 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
         else
             ui_lines(fb, 60, &gfx_font_small,
                      N_("Aucun contact reçu.\nExport USB : touche k\n(tools/contacts_export.py)"));
-        ui_footer(fb, e->n_contacts ? N_("D : voir  D long : supprimer") : N_("G : retour"));
+        ui_footer(fb, e->n_contacts ? N_("B : voir  B long : supprimer") : N_("A : retour"));
         break;
     default: {
         contact_card_t *c = &e->contacts[list_sel];
@@ -376,7 +376,7 @@ static void contacts_render(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), _("%s : %s"), tr(FIELDS[f].label), field(c, f));
             y = ui_text(fb, 3, y, &gfx_font_small, text) - 1;
         }
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     }
     }

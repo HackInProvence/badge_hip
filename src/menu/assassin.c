@@ -815,12 +815,12 @@ static void render_lobby(uint8_t *fb) {
             snprintf(text, sizeof(text), _("Il faut %d joueurs au moins."), min_players());
         ui_lines(fb, UI_TITLE_H + 4, &gfx_font_small, text);
         draw_names(fb, UI_TITLE_H + 24, n_lobby);
-        ui_footer(fb, n_lobby >= min_players() ? N_("G : annuler  D : lancer") : N_("G : annuler"));
+        ui_footer(fb, n_lobby >= min_players() ? N_("A : annuler  B : lancer") : N_("A : annuler"));
         break;
     case PARTY_JOINING:
         ui_title(fb, N_("Rejoindre"));
         ui_lines(fb, 70, &gfx_font_small, N_("Connexion..."));
-        ui_footer(fb, N_("G : annuler"));
+        ui_footer(fb, N_("A : annuler"));
         break;
     case PARTY_JOINED:
         ui_title(fb, N_("Salle d'attente"));
@@ -828,12 +828,12 @@ static void render_lobby(uint8_t *fb) {
         ui_lines(fb, UI_TITLE_H + 2, &gfx_font_small, text);
         ui_lines(fb, UI_TITLE_H + 21, &gfx_font_small, N_("En attente du lancement..."));
         draw_names(fb, UI_TITLE_H + 44, n_lobby);
-        ui_footer(fb, N_("G : quitter"));
+        ui_footer(fb, N_("A : quitter"));
         break;
     default:
         ui_title(fb, N_("Assassin"));
         ui_lines(fb, 60, &gfx_font_small, N_("Partie annulée par l'hôte\n(ou lancée sans toi)."));
-        ui_footer(fb, N_("D : OK"));
+        ui_footer(fb, N_("B : OK"));
         break;
     }
 }
@@ -850,7 +850,7 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Abandonner ?"));
         ui_wrapped(fb, 50, &gfx_font_small, N_("Tu quittes la partie : ta cible ira à ton chasseur. Pas de "
                    "retour possible."), 5);
-        ui_footer(fb, N_("G : non  D : abandonner"));
+        ui_footer(fb, N_("A : non  B : abandonner"));
         return;
     }
     switch (st) {
@@ -858,7 +858,7 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Assassin"));
         ui_lines(fb, 60, &gfx_font_small, ready ? N_("Distribution des cibles...") : N_("Réception de la liste\n"
                  "des joueurs..."));
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     case S_ALIVE: {
         ui_title(fb, N_("Assassin"));
@@ -882,9 +882,9 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
         else if (kill_state == KILL_OK)
             snprintf(text, sizeof(text), N_("Cible éliminée !"));
         else
-            snprintf(text, sizeof(text), kills ? _("Victimes : %d") : _("Flanc : abandonner"), kills);
+            snprintf(text, sizeof(text), kills ? _("Victimes : %d") : _("Y X : abandonner"), kills);
         ui_lines(fb, 146, &gfx_font_small, text);
-        ui_footer(fb, N_("G : retour  D : éliminer"));
+        ui_footer(fb, N_("A : retour  B : éliminer"));
         break;
     }
     case S_DEAD: {
@@ -899,14 +899,14 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
             ui_lines(fb, y, &gfx_font_small, N_("Ta cible passe à ton tueur..."));
         else if (hosting)
             ui_wrapped(fb, y, &gfx_font_small, N_("Ton badge héberge la partie : garde-le allumé."), 2);
-        ui_footer(fb, dead_may_leave(now) ? N_("G : retour  D : quitter") : N_("G : retour"));
+        ui_footer(fb, dead_may_leave(now) ? N_("A : retour  B : quitter") : N_("A : retour"));
         break;
     }
     case S_LEFT:
         ui_title(fb, N_("Assassin"));
         snprintf(text, sizeof(text), _("Tu as abandonné.\nSurvivants : %d / %d"), survivors, n);
         ui_lines(fb, 60, &gfx_font_small, text);
-        ui_footer(fb, N_("G : retour"));
+        ui_footer(fb, N_("A : retour"));
         break;
     default:
         ui_title(fb, N_("Fin de la partie"));
@@ -922,7 +922,7 @@ static void render_game(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), _("Tes victimes : %d"), kills);
             ui_lines(fb, y + 8, &gfx_font_small, text);
         }
-        ui_footer(fb, N_("G : retour  D : nouvelle partie"));
+        ui_footer(fb, N_("A : retour  B : nouvelle partie"));
         break;
     }
 }
@@ -937,14 +937,14 @@ static void assassin_render(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), _("Une partie de %s est en cours sur ton badge : termine-la d'abord."),
                      tr(busy));
             ui_wrapped(fb, 60, &gfx_font_small, text, 5);
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         } else {
             ui_list(fb, 2, sel, home_label);
             char text[140];
             snprintf(text, sizeof(text), _("Chacun a une cible secrète : approche-toi tout près pour "
                      "l'éliminer. %d joueurs min."), min_players());
             ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 10, &gfx_font_small, text, 4);
-            ui_footer(fb, N_("G : retour  D : choisir"));
+            ui_footer(fb, N_("A : retour  B : choisir"));
         }
         break;
     }
@@ -952,10 +952,10 @@ static void assassin_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Rejoindre"));
         if (n_found) {
             ui_list(fb, n_found, sel, found_label);
-            ui_footer(fb, N_("G : retour  D : rejoindre"));
+            ui_footer(fb, N_("A : retour  B : rejoindre"));
         } else {
             ui_lines(fb, 60, &gfx_font_small, N_("Recherche des parties\nd'assassin..."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         break;
     case P_LOBBY:

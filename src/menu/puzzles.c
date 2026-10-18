@@ -30,8 +30,8 @@ static const int8_t DIR_DY[4] = {-1, 0, 1, 0};
 static const uint8_t DIR_BUTTONS[4] = {GAMES_BTN_A, GAMES_BTN_X, GAMES_BTN_B, GAMES_BTN_Y};
 
 /* Footers, the buttons in the order of the badge: left wing on the left */
-#define PZ_OVER_FOOTER N_("G : menu  D : rejouer")
-#define PZ_PLAY_FOOTER N_("Long : G menu, flanc D aide")
+#define PZ_OVER_FOOTER N_("A : menu  B : rejouer")
+#define PZ_PLAY_FOOTER N_("Long : A menu, X aide")
 
 
 /* ------ Common ------ */
@@ -441,7 +441,7 @@ static void mines_render(uint8_t *fb) {
     else
         snprintf(text, sizeof(text), "%u s", pz_records[PUZZLE_MINES]);
     gfx_text(fb, px, 148, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_CENTER);
-    pz_draw_footer(fb, over ? PZ_OVER_FOOTER : N_("Long : fl. G drapeau, D ouvre"));
+    pz_draw_footer(fb, over ? PZ_OVER_FOOTER : N_("Long : Y drapeau, B ouvre"));
 }
 
 
@@ -938,7 +938,7 @@ static void soko_render(uint8_t *fb) {
                  : _("Bravo !\n%u coups\nTous les niveaux !"), soko_moves);
         pz_draw_box(fb, text);
     }
-    pz_draw_footer(fb, soko_solved ? soko_level + 1 < SOKO_LEVELS_N ? N_("G : menu  D : niveau suivant")
+    pz_draw_footer(fb, soko_solved ? soko_level + 1 < SOKO_LEVELS_N ? N_("A : menu  B : niveau suivant")
                                                                     : PZ_OVER_FOOTER
                    : N_("Long : fl. G annuler, D refaire"));
 }
@@ -1091,7 +1091,7 @@ static void mm_render(uint8_t *fb) {
             text[0] = 0;
         gfx_text(fb, GFX_WIDTH - 4, y, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    pz_draw_footer(fb, mm_state != MM_PLAY ? PZ_OVER_FOOTER : N_("Ailes : symbole  D long : ok"));
+    pz_draw_footer(fb, mm_state != MM_PLAY ? PZ_OVER_FOOTER : N_("A B : symbole  B long : ok"));
 }
 
 
@@ -1263,32 +1263,28 @@ static void pendu_render(uint8_t *fb) {
         if (l == pendu_cursor && pendu_state == PENDU_PLAY)
             pz_frame(fb, x - 1, y - 1, PENDU_CELL_W + 1, PENDU_CELL_H + 1, 2, good ? GFX_INVERT : GFX_BLACK);
     }
-    pz_draw_footer(fb, pendu_state == PENDU_PLAY ? N_("D long : proposer la lettre")
-                   : N_("G : menu  D : mot suivant"));
+    pz_draw_footer(fb, pendu_state == PENDU_PLAY ? N_("B long : proposer la lettre")
+                   : N_("A : menu  B : mot suivant"));
 }
 
 
 /* ------ Help pages ------ */
 
 static const char *const PZ_HELP[PUZZLE_COUNT] = {
-    /* The common lines ("Flancs : gauche...", "Long : G quitte...") are written in each text: the whole text is
+    /* The common lines ("Y X : gauche...", "Long : A quitte...") are written in each text: the whole text is
      * translated (tr() in pz_help_render()) */
-    N_("Ouvrez les cases sans mine.\nLe chiffre : mines autour.\n"
-       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\n"
-       "Aile D longue : ouvrir\nFlanc G long : drapeau\nLong : G quitte, flanc D aide"),
+    N_("Ouvrez les cases sans mine.\nLe chiffre : mines autour.\nY X : gauche, droite\n"
+       "A B : haut, bas\nB long : ouvrir\nY long : drapeau\nLong : A quitte, X aide"),
     N_("Deux tuiles égales qui se\ntouchent fusionnent.\nAtteignez la tuile 2048 !\n"
-       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\n"
-       "Tout glisse vers la touche.\nLong : G quitte, flanc D aide"),
-    N_("Remettez les cases de 1 à 15\ndans l'ordre, trou à la fin.\n"
-       "Une case voisine du trou\nglisse vers la touche :\n"
-       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\nLong : G quitte, flanc D aide"),
-    N_("Poussez les caisses sur les\ncibles, une à la fois.\n"
-       "Flancs : gauche, droite\nAiles : haut (G), bas (D)\nFlanc G long : annuler\n"
-       "Aile D longue : recommencer\nLong : G quitte, flanc D aide"),
-    N_("Trouvez le code secret :\n4 symboles parmi 6, 10 essais.\nPoint : bien placé,\nrond : mal placé.\n"
-       "Flancs : case, ailes : symbole\nAile D longue : valider\nLong : G quitte, flanc D aide"),
-    N_("Trouvez le mot, lettre par\nlettre, avant d'être pendu\n(8 erreurs).\n"
-       "Flancs, ailes : choisir\nAile D longue : proposer\nLong : G quitte, flanc D aide"),
+       "Y X : gauche, droite\nA B : haut, bas\nTout glisse vers la touche.\nLong : A quitte, X aide"),
+    N_("Remettez les cases de 1 à 15\ndans l'ordre, trou à la fin.\nUne case voisine du trou\n"
+       "glisse vers la touche :\nY X : gauche, droite\nA B : haut, bas\nLong : A quitte, X aide"),
+    N_("Poussez les caisses sur les\ncibles, une à la fois.\nY X : gauche, droite\nA B : haut, bas\n"
+       "Y long : annuler\nB long : recommencer\nLong : A quitte, X aide"),
+    N_("Trouvez le code secret :\n4 symboles parmi 6, 10 essais.\nPoint : bien placé,\n"
+       "rond : mal placé.\nY X : case, A B : symbole\nB long : valider\nLong : A quitte, X aide"),
+    N_("Trouvez le mot, lettre par\nlettre, avant d'être pendu\n(8 erreurs).\nY X, A B : choisir\n"
+       "B long : proposer\nLong : A quitte, X aide"),
 };
 
 static void pz_help_render(uint8_t *fb) {
@@ -1296,12 +1292,12 @@ static void pz_help_render(uint8_t *fb) {
     pz_draw_title(fb, PZ_NAMES[pz_game]);
     int y = pz_draw_lines(fb, 32, 15, &gfx_font_small, tr(PZ_HELP[pz_game]), GFX_BLACK);
     if (pz_game == PUZZLE_SOKOBAN) {
-        snprintf(text, sizeof(text), _("Niveau %d/%d (flancs : changer)"), soko_level + 1, SOKO_LEVELS_N);
+        snprintf(text, sizeof(text), _("Niveau %d/%d (Y X : changer)"), soko_level + 1, SOKO_LEVELS_N);
         y = pz_draw_lines(fb, y, 15, &gfx_font_small, text, GFX_BLACK);
     }
     puzzles_record_text(pz_game, text, sizeof(text));
     pz_draw_lines(fb, y + 2, 15, &gfx_font_small, text, GFX_BLACK);
-    pz_draw_footer(fb, N_("G : menu  D : jouer"));
+    pz_draw_footer(fb, N_("A : menu  B : jouer"));
 }
 
 

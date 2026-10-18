@@ -773,7 +773,7 @@ static void render_race(uint8_t *fb) {
     draw_square(fb, px, 8, me, 2, 0, GFX_WHITE);  /* In white on the black bar, twice as big */
     if (phase == PH_GRID) {  /* The controls, before the start */
         gfx_fill_rect(fb, 0, UI_FOOTER_Y - 3, GFX_WIDTH, GFX_HEIGHT - UI_FOOTER_Y + 3, GFX_WHITE);
-        ui_footer(fb, N_("D : gaz  G : frein  flancs : tourner"));  /* (G + D held: give up) */
+        ui_footer(fb, N_("Y X : tourner  A : frein  B : gaz"));  /* (G + D held: give up) */
     }
 }
 
@@ -799,7 +799,7 @@ static void render_result(uint8_t *fb) {
         }
         y += row;
     }
-    ui_footer(fb, N_("G : retour  D : rejouer"));
+    ui_footer(fb, N_("A : retour  B : rejouer"));
 }
 
 static void render_lobby(uint8_t *fb) {
@@ -813,7 +813,7 @@ static void render_lobby(uint8_t *fb) {
     case PARTY_JOINING:
         ui_title(fb, N_("Rejoindre"));
         ui_lines(fb, 70, &gfx_font_small, N_("Connexion..."));
-        ui_footer(fb, N_("G : annuler"));
+        ui_footer(fb, N_("A : annuler"));
         return;
     case PARTY_JOINED:
         ui_title(fb, N_("Salle d'attente"));
@@ -823,7 +823,7 @@ static void render_lobby(uint8_t *fb) {
     default:
         ui_title(fb, N_("Mini-bolides"));
         ui_lines(fb, 60, &gfx_font_small, N_("Partie annulée par l'hôte\n(ou lancée sans toi)."));
-        ui_footer(fb, N_("D : OK"));
+        ui_footer(fb, N_("B : OK"));
         return;
     }
     /* The cars: 2 columns of 4, the pattern (as on the track), the name, the color (the LEDs of that badge) */
@@ -836,8 +836,8 @@ static void render_lobby(uint8_t *fb) {
         snprintf(text, sizeof(text), mine ? _("%s (toi)") : "%s", tr(COLOR_NAMES[i]));
         ui_scroll_text(fb, x + 20, y + 15, GFX_WIDTH / 2 - 24, &gfx_font_small, text, GFX_BLACK, GFX_ALIGN_LEFT);
     }
-    ui_footer(fb, party_state() == PARTY_JOINED ? N_("G : quitter")
-              : n_lobby >= MIN_PLAYERS ? N_("G : annuler  D : lancer") : N_("G : annuler"));
+    ui_footer(fb, party_state() == PARTY_JOINED ? N_("A : quitter")
+              : n_lobby >= MIN_PLAYERS ? N_("A : annuler  B : lancer") : N_("A : annuler"));
 }
 
 static void race_render(uint8_t *fb, absolute_time_t now) {
@@ -851,13 +851,12 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
             snprintf(text, sizeof(text), _("Une partie de %s est en cours sur ton badge : termine-la ou quitte-la "
                      "d'abord."), tr(busy));
             ui_wrapped(fb, 60, &gfx_font_small, text, 5);
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         } else {
             ui_list(fb, 2, sel, home_label);
             ui_wrapped(fb, UI_TITLE_H + 2 * UI_ROW_H + 12, &gfx_font_small, N_("Course de petites voitures, 2 à 8 "
-                       "pilotes, 3 tours. Aile droite : gaz, aile gauche : frein, flancs : tourner. Hors de la "
-                       "piste, la voiture ralentit !"), 5);
-            ui_footer(fb, N_("G : retour  D : choisir"));
+                       "pilotes, 3 tours. Y X : tourner, A : frein, B : gaz. Hors de la piste, la voiture ralentit !"), 5);
+            ui_footer(fb, N_("A : retour  B : choisir"));
         }
         break;
     }
@@ -865,10 +864,10 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
         ui_title(fb, N_("Rejoindre"));
         if (n_found) {
             ui_list(fb, n_found, sel, found_label);
-            ui_footer(fb, N_("G : retour  D : rejoindre"));
+            ui_footer(fb, N_("A : retour  B : rejoindre"));
         } else {
             ui_lines(fb, 60, &gfx_font_small, N_("Recherche des courses..."));
-            ui_footer(fb, N_("G : retour"));
+            ui_footer(fb, N_("A : retour"));
         }
         break;
     case P_LOBBY:
@@ -878,11 +877,11 @@ static void race_render(uint8_t *fb, absolute_time_t now) {
         if (cancelled && phase != PH_RESULT) {
             ui_title(fb, N_("Mini-bolides"));
             ui_lines(fb, 60, &gfx_font_small, N_("Partie annulée par l'hôte."));
-            ui_footer(fb, N_("G : retour  D : OK"));
+            ui_footer(fb, N_("A : retour  B : OK"));
         } else if (! ready) {
             ui_title(fb, N_("Mini-bolides"));
             ui_lines(fb, 60, &gfx_font_small, N_("Réception de la liste\ndes joueurs..."));
-            ui_footer(fb, N_("G long : quitter la page"));
+            ui_footer(fb, N_("A long : quitter la page"));
         } else if (phase == PH_RESULT) {
             render_result(fb);
         } else {

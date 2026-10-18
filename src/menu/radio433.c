@@ -118,7 +118,7 @@ static void decoder_render(uint8_t *fb, absolute_time_t now) {
         gfx_text(fb, 3, y, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         gfx_text(fb, GFX_WIDTH - 3, y, &gfx_font_small, a, GFX_BLACK, GFX_ALIGN_RIGHT);
     }
-    ui_footer(fb, N_("G : retour  D : effacer"));
+    ui_footer(fb, N_("A : retour  B : effacer"));
 }
 
 static void weather_render(uint8_t *fb, absolute_time_t now) {
@@ -154,7 +154,7 @@ static void weather_render(uint8_t *fb, absolute_time_t now) {
             gfx_text(fb, 3, UI_TITLE_H + 66 + i * 20, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
     }
-    ui_footer(fb, N_("G : retour  D : effacer"));
+    ui_footer(fb, N_("A : retour  B : effacer"));
 }
 
 const app_t app_decoder = {

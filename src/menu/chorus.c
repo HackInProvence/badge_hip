@@ -507,7 +507,7 @@ static void chorus_render(uint8_t *fb, absolute_time_t now) {
             ui_gauge(fb, 14, 96, GFX_WIDTH - 28, 16, since, total);
         }
     }
-    ui_footer(fb, joined ? N_("G : retour  D : ne plus chanter") : N_("G : retour  D : participer"));
+    ui_footer(fb, joined ? N_("A : retour  B : ne plus chanter") : N_("A : retour  B : participer"));
 }
 
 const app_t app_chorus = {
@@ -547,7 +547,7 @@ static void lead_render(uint8_t *fb, absolute_time_t now) {
     ui_list(fb, N_SONGS, sel, song_label);
     ui_lines(fb, 90, &gfx_font_small,
              N_("Les cigales autour chantent\nchacune une voix (départ\nsynchronisé par radio)."));
-    ui_footer(fb, song >= 0 && leader == net_id() ? N_("G : retour  D : arrêter") : N_("G : retour  D : lancer"));
+    ui_footer(fb, song >= 0 && leader == net_id() ? N_("A : retour  B : arrêter") : N_("A : retour  B : lancer"));
 }
 
 const app_t app_chorus_lead = {
