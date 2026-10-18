@@ -220,13 +220,14 @@ static bool master_task(absolute_time_t now) {
 static void master_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     ui_title(fb, N_("Balise chaud-froid"));
-    gfx_text(fb, GFX_WIDTH/2, 40, &gfx_font_large, master ? N_("Emission") : N_("Arrêtée"), GFX_BLACK,
+    gfx_text(fb, GFX_WIDTH/2, 32, &gfx_font_large, master ? N_("Emission") : N_("Arrêtée"), GFX_BLACK,
              GFX_ALIGN_CENTER);
-    ui_lines(fb, 82, &gfx_font_small, N_("Une balise par seconde\n(+10 dBm). Cachez ce badge :\n"
-                                         "les autres le cherchent avec\nSocial > Chaud - froid."));
+    int y = ui_lines(fb, 32 + gfx_font_large.height + 2, &gfx_font_small,
+                     N_("Une balise par seconde\n(+10 dBm). Cachez ce badge :\n"
+                        "les autres le cherchent avec\nSocial > Chaud - froid."));
     char text[40];
     snprintf(text, sizeof(text), _("Brûlant dès %d dBm"), (hot_dbm() * 100 - 15 * HOT_SPAN) / 100);
-    ui_lines(fb, 150, &gfx_font_small, text);
+    ui_lines(fb, y + 2, &gfx_font_small, text);  /* Under the explanation, never over it */
     ui_footer(fb, master ? N_("A : quitter  B : arrêter") : N_("A : quitter  B : émettre"));
 }
 

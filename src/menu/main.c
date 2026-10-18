@@ -1019,6 +1019,26 @@ static void name_edit_save(void) {
 
 /* ------ Settings and screensaver ------ */
 
+/* ------ At the start: the cicada of Hack In Provence and the version of the firmware ------ */
+
+#define SPLASH_MS 3000
+extern const uint8_t hip_bw[];  /* The logo (tests/imgs/hip_bw.png, built by badge_images, in screen_demo.c) */
+
+/* Shown for SPLASH_MS during the initialization (the only time the main loop may wait) */
+static void show_splash(void) {
+    memcpy(fb, hip_bw, GFX_FB_SIZE);  /* Same format as the frame buffer: 1 = white */
+    gfx_fill_rect(fb, 0, 146, GFX_WIDTH, GFX_HEIGHT - 146, GFX_BLACK);  /* Below the cicada: the version */
+    char text[40];
+    snprintf(text, sizeof(text), _("Version %s"), BADGE_VERSION);
+    gfx_text(fb, GFX_WIDTH / 2, 152, &gfx_font_medium, text, GFX_WHITE, GFX_ALIGN_CENTER);
+    gfx_text(fb, GFX_WIDTH / 2, 178, &gfx_font_small, BADGE_BUILD, GFX_WHITE, GFX_ALIGN_CENTER);
+    printf("splash: version " BADGE_VERSION "\n");
+    absolute_time_t until = make_timeout_time_ms(SPLASH_MS);
+    display_show(fb);
+    while (! display_is_idle() || ! time_reached(until))
+        display_task(get_absolute_time());
+}
+
 #define SAVER_DEFAULT_MINUTES 5
 #define SAVER_MAX_IMAGES 32
 static const uint8_t SAVER_DELAYS[] = {0, 1, 2, 3, 5, 10, 15, 30, 60};  /* Minutes, 0 = off */
@@ -2521,6 +2541,7 @@ int main() {
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
     display_set_clean(clean_mode());  /* Réglages > Veille de l'écran > Nettoyage */
     i18n_init();  /* The language of the texts */
+    show_splash();
     if (store_get()->asleep == STORE_ASLEEP)
         sleep_mode();  /* Put to sleep by an admin: until the manual unlock (it reboots) */
     radio_tools_init();
