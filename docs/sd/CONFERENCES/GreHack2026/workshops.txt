@@ -1,0 +1,75 @@
+# GreHack 2026 - workshops du vendredi 13 novembre au soir
+# Horaires pas encore publiés ("the timetable will be published soon")
+# Source : https://grehack.fr/workshops
+
+jour: 2026-11-13
+titre: Accelerate your reverse engineering process using SightHouse
+orateur: Sami Babigeon, MadSquirrel
+resume: Reverse engineers frequently encounter firmware or large binaries containing a mixture of proprietary code and numerous third-party libraries. Identifying which components belong to external libraries is a recurring and time-consuming challenge that can significantly slow down analysis.
+lien: https://cfp.grehack.fr/grehack-2026/talk/TKNRTM/
+
+jour: 2026-11-13
+titre: Building a MITM Tool from Scratch in Rust
+orateur: Corentin Liaud, Thomas Halipré
+resume: In this hands-on training, participants will learn how to design and build a full-fledged Man-In-The-Middle (MITM) tool using the Rust programming language. The course provides a practical dive into low-level networking, from Layer 2 packet crafting to HTTP/TLS interception if time permits.
+lien: https://cfp.grehack.fr/grehack-2026/talk/ZYGBXE/
+
+jour: 2026-11-13
+titre: Cracking protobufs: schema recovery, type inference, anomaly detection
+orateur: Frédéric Ruget
+resume: This is a 2-hour hands-on workshop, companion to the eponymous talk - although attending the talk is not needed to participate in the workshop: it is self-contained and opens with the wire-format background it needs. The talk demonstrates the techniques; the workshop lets participants apply them.
+lien: https://cfp.grehack.fr/grehack-2026/talk/TT98VU/
+
+jour: 2026-11-13
+titre: From Malware Sample to Actionable Intelligence: A Practical Approach to Malware Analysis for IR and CTI
+orateur: KrysCat, Tw0nte
+resume: Have you ever found yourself in the middle of an incident response with too few logs? Too little information in the logs? Going through line after line, hoping to find some trace of the attacker? Sometimes, this happens. However, you will often find binary files or obfuscated scripts dropped by the attacker.
+lien: https://cfp.grehack.fr/grehack-2026/talk/ZFHPUH/
+
+jour: 2026-11-13
+titre: Fun with video streams (Pentesting cameras 101)
+orateur: Lex (Claire Vacherot)
+resume: Video surveillance systems are everywhere, but how many tools and techniques do you know for addressing such systems during IT/OT pentests, especially considering the availability constraints in this type of environment?
+lien: https://cfp.grehack.fr/grehack-2026/talk/QBZZU3/
+
+jour: 2026-11-13
+titre: Hardware Hacking Basics
+orateur: Noë Flatreaud (@beemo)
+resume: One does not simply break hardware... do you? Interested in hardware hacking, but don't know where to start? This workshop aims to give you a basic understanding of the techniques and methodology used to reverse engineer and break electronic devices, including: No prior hardware experience is required, but it is recommended. Resources:
+lien: https://cfp.grehack.fr/grehack-2026/talk/P9JHZM/
+
+jour: 2026-11-13
+titre: How to build a phishing simulation campaign?
+orateur: Elian Loraux
+resume: Phishing is the most used attack vector. Phishing campaign simulations are a method for strengthening system resilience against phishing. In this workshop, we will look into the building of a phishing simulation campaign, what its challenges could be, the known issues and methods.
+lien: https://cfp.grehack.fr/grehack-2026/talk/RCH7TT/
+
+jour: 2026-11-13
+titre: Introduction à l'instrumentation dynamique binaire avec QBDI
+orateur: Victor, TRIKKSS
+resume: This workshop introduces dynamic binary instrumentation through a series of guided exercises using PyQBDI. Attendees will go from zero to writing their own instrumentation scripts: tracing instruction execution, intercepting memory accesses, building a fuzzer harness for a native library, and ultimately bypassing anti-debugging protections to extract a hidden flag.
+lien: https://cfp.grehack.fr/grehack-2026/talk/ZMV3MG/
+
+jour: 2026-11-13
+titre: Reverse Engineering Super Powers with AI
+orateur: Axelle Apvrille
+resume: This is a workshop to enhance your reverse engineering skills with Artificial Intelligence. Like an electric-assist bicycle or an exoskeleton, AI won't do all the reverse engineering for you, but it will allow you to go further. For example, it can automatically rename functions, or write scripts that would have been time consuming for you.
+lien: https://cfp.grehack.fr/grehack-2026/talk/WMML8D/
+
+jour: 2026-11-13
+titre: Social Lockpicking Evening
+orateur: Steph
+resume: How about picking a few locks during the afternoon? Join our Lockpicking Fun Event - a casual, beginner-friendly workshop where you will not only open your first lock (almost guaranteed: 95%!), but also get the chance to try a wide variety of locks. You can start with simple practice locks and work your way up to more challenging ones.
+lien: https://cfp.grehack.fr/grehack-2026/talk/VJPKQN/
+
+jour: 2026-11-13
+titre: Reverse engineering the Mitra 15 / IBM 1130
+orateur: ACONIT - Caroline Collange (Inria), Antoine Hébert
+resume: An introduction to the history and work of ACONIT, a non-profit organization founded in the '80s to advocate for the creation of a computer conservatory in France. We'll discuss reverse-engineering techniques for computing history preservation, with a use case on the CII Mitra 15 French minicomputer from the 1970s.
+lien: https://grehack.fr/workshops#aconit
+
+jour: 2026-11-13
+titre: OSINT Workshop: Guided Investigation Based on a Real-World Case
+orateur: a member of the Legendary Badgers
+resume: After a real-world use case is presented, participants will take part in a guided OSINT investigation, with support at each stage: The objective is to discover a practical investigation methodology and understand the reasoning behind each step. You'll leave with reusable techniques, methods and tools that you can apply directly to future investigations.
+lien: https://grehack.fr/workshops#osint

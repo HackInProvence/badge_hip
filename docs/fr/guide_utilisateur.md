@@ -65,7 +65,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Jeux multi** | Duel, Bataille navale, Loup-garou, Assassin, Tir à la corde, Mini-bolides |
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
-| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès, Mon grade, Identifiant sonore |
+| **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès, Mon grade, Identifiant sonore, Badge conférence ([badge_conference.md](badge_conference.md)) |
 | **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).

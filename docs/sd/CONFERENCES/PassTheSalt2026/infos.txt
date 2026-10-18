@@ -1,0 +1,7 @@
+nom: Pass the SALT 2026
+dates: 30 juin - 2 juillet 2026
+lieu: Lille
+adresse: Université Catholique de Lille, 83 Bd Vauban, 59800 Lille (campus Saint Raphaël, bâtiment Louise Weiss : amphi 122, salles LW109 et LW112)
+site: https://2026.pass-the-salt.org/
+description: Conférence gratuite, en anglais, dédiée aux logiciels libres et à la sécurité : trois jours de talks et de workshops donnés par des experts et des mainteneurs de projets.
+source: https://2026.pass-the-salt.org/ https://2026.pass-the-salt.org/practical/ https://cfp.pass-the-salt.org/pts2026/schedule/

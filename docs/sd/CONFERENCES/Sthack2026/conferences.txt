@@ -1,0 +1,79 @@
+# Sthack 2026 - programme officiel (https://sthack.fr/editions/2026/)
+jour: 2026-05-29
+heure: 10:00
+fin: 10:30
+salle: Cité du Vin
+titre: Keynote
+orateur: Roni "0xLupin" Carta
+lien: https://sthack.fr/editions/2026/#keynote
+
+jour: 2026-05-29
+heure: 10:30
+fin: 11:15
+salle: Cité du Vin
+titre: Trust Issues: How Upstream Dependencies Turn Their Attack Surface Into Yours
+orateur: Garance de la Brosse
+resume: Attack techniques against GitHub Actions workflows giving remote code execution on CI runners and exfiltration of repository secrets, chained to inject malicious code, tamper with releases and publish packages on behalf of the target: a misconfigured workflow becomes a full supply-chain compromise.
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 11:15
+fin: 12:00
+salle: Cité du Vin
+titre: Synthetic Sthackframe, ou l'art de manipuler la stack pour effacer les traces
+orateur: BlackWasp
+resume: Les EDR modernes ne se contentent plus de hooker ntdll: ils inspectent la pile d'appel lors des syscalls sensibles, à la recherche d'adresses de retour incohérentes (régions exécutables non backées par un fichier, signature d'un shellcode injecté). Et si la pile pouvait être masquée ?
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 14:00
+fin: 14:30
+salle: Cité du Vin
+titre: What We Didn't Publish About SHADOW-VOID-042
+orateur: Daniel Lunghi
+resume: Campaigns of SHADOW-VOID-042, a Russia-aligned intrusion set: social engineering (fake HR complaints, research invitations, spoofed Trend Micro advisories), browser exploitation (CVE-2018-6065 and newer), per-target encrypted payloads, overlaps with Void Rabisu, and how attacker choices allowed analysing more stages.
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 14:30
+fin: 15:15
+salle: Cité du Vin
+titre: Runtime blindspot : Abusing .NET Runtime Internals to Evade EDRs
+orateur: Ossama "0x3lk" Ait-El Mouddene
+resume: The .NET CLR (clr.dll) as an EDR blind spot: ETW and AMSI suppressed by acting on internal CLR variables in writable memory, without permission change or monitored API; Reflection.Emit assemblies with forged identities. A loader deploying a Mythic agent in memory: zero alerts on a top-tier EDR.
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 15:30
+fin: 16:15
+salle: Cité du Vin
+titre: Invite-only: from invite.php to a 1,400-domain phishing operator
+orateur: Axel "4rchibald" Zengers
+resume: Derrière les campagnes ClickFix, une infrastructure qui laisse des traces. Partant d'un nom de fichier récurrent, invite.php, une série de pivots reproductibles (urlscan, analyse DOM, clustering ASN, DNS SOA, OSINT) remonte vers plus de 1 400 domaines et un opérateur cohérent. Surtout une méthode, avec des outils publics.
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 16:15
+fin: 17:00
+salle: Cité du Vin
+titre: Red Team : 20 missions plus tard - Autopsie de quatre années de mutation offensive
+orateur: Cyril "Mayfly" Servieres
+resume: Retour d'expérience sur la mutation de la Red Team: défenses industrialisées, environnements hybrides, centre de gravité déplacé d'Active Directory vers Azure et Entra ID, implants détectés avant le premier callback, tooling public devenu indicateur de compromission, hypothèses historiques qui ne tiennent plus.
+lien: https://sthack.fr/editions/2026/
+
+jour: 2026-05-29
+heure: 17:00
+fin: 18:00
+salle: Cité du Vin
+titre: RUMPS
+orateur: Vous
+resume: Prepare your best rump !
+lien: https://sthack.fr/editions/2026/#rumps
+
+jour: 2026-05-29
+heure: 20:00
+fin: 06:00
+salle: Salons de la mairie
+titre: CTF Night
+resume: Let's have some CTF tasks! Beers and Food are waiting for you.
+lien: https://sthack.fr/editions/2026/ctf.html

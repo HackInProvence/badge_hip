@@ -1,0 +1,34 @@
+# BreizhCTF 2026 - Hack&Kids, Hack&Teens, Hack&Job (https://www.breizhctf.com/hackteens/, https://www.breizhctf.com/hackjob/)
+jour: 2026-05-22
+heure: 10:00
+fin: 12:00
+salle: Couvent des Jacobins
+titre: Hack&Kids - Parcours découverte des métiers pour les primaires
+orateur: SaxX, Kaluche
+resume: Nouveauté de la 10e édition (accueil à 9h30). Rencontre avec des « hackers éthiques », démonstrations ludiques de hacking, fresque des cybercitoyens, exposition Astrapi « Le Numérique pas de panique ! ». Inscriptions closes.
+lien: https://www.breizhctf.com/hackteens/
+
+jour: 2026-05-22
+heure: 14:00
+fin: 17:00
+salle: Couvent des Jacobins
+titre: Hack&Teens - Parcours découverte des métiers pour collégiens et lycéens
+orateur: SaxX, Kaluche
+resume: Accueil à 13h30. 8 temps forts: accueil par l'ANSSI (enjeux géopolitiques, cybercriminalité, menaces), démonstrations de hacking, rencontre avec des « hackers éthiques », permis cyber, challenge en équipe, fresque des cybercitoyens, écoles et entreprises de la cyber bretonne.
+lien: https://www.breizhctf.com/hackteens/
+
+jour: 2026-05-23
+heure: 10:00
+fin: 13:00
+salle: Couvent des Jacobins
+titre: Hack&Job : job dating avec les sponsors du BreizhCTF
+resume: Rendez-vous avec les sponsors qui recrutent, à prendre sur la plateforme B2Match. Gratuit, inclus dans l'inscription au CTF.
+lien: https://www.breizhctf.com/hackjob/
+
+jour: 2026-05-23
+heure: 14:00
+fin: 18:30
+salle: Couvent des Jacobins
+titre: Hack&Job : salon emploi et formations
+resume: Startups, PME, grands groupes de la cybersécurité, écoles spécialisées et partenaires institutionnels présentent leurs métiers et leurs offres. Inscription possible sur place.
+lien: https://www.breizhctf.com/hackjob/

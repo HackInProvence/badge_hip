@@ -1,0 +1,8 @@
+# BreizhCTF 2026 (10e édition)
+nom: BreizhCTF 2026
+dates: 22-23 mai 2026
+lieu: Rennes
+adresse: Le Couvent des Jacobins - Centre des Congrès de Rennes Métropole, 20 place Sainte-Anne, 35000 Rennes (métro A, arrêt Sainte-Anne)
+site: https://www.breizhctf.com/
+description: Le plus grand CTF de France en présentiel: 600 participants sur un challenge de 8h30 le samedi, avec un salon emploi et formations (Hack&Job) et des parcours de découverte des métiers pour les jeunes (Hack&Kids, Hack&Teens). Gratuit, organisé par l'agence Bretagne Next.
+source: https://www.breizhctf.com/ https://www.breizhctf.com/infos-pratiques/ https://www.breizhctf.com/hackjob/ https://www.breizhctf.com/hackteens/ https://www.breizhctf.com/sponsors/

@@ -1,0 +1,7 @@
+nom: GreHack 2026
+dates: 13-14 novembre 2026
+lieu: Grenoble
+adresse: Conférence et workshops : MINATEC, Presqu'île scientifique, Grenoble (tram B arrêt Cité Internationale); CTF : ENSIMAG bâtiment H
+site: https://grehack.fr/
+description: Conférence de hacking éthique et CTF à Grenoble : conférences le vendredi 13 novembre, workshops et social event le soir, CTF de 8 heures le samedi 14 novembre (10h-18h).
+source: https://grehack.fr/ https://grehack.fr/program https://grehack.fr/workshops https://grehack.fr/informations https://grehack.fr/sponsors

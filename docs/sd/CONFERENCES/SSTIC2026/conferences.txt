@@ -1,0 +1,263 @@
+# SSTIC 2026 - programme des conférences
+# Source : https://www.sstic.org/2026/programme/
+
+jour: 2026-06-03
+heure: 10:00
+fin: 11:00
+titre: Ouverture 2026
+orateur: Céline Entfellner
+resume: Conférence d'ouverture par Céline Entfellner, directrice de la Fabrique Numérique au sein du commissariat numérique de défense, au Ministère des Armées.
+lien: https://www.sstic.org/2026/presentation/ouverture_2026/
+
+jour: 2026-06-03
+heure: 11:30
+fin: 12:00
+titre: Flicker and fall: rooting the Philips Hue Bridge both remotely and wirelessly
+orateur: Anthony Remy, Baptiste Verstraeten, Guillaume Chantrel, Maxime Turlure, Valentino Ricotta
+resume: Home automation technologies are widely deployed in both domestic and enterprise environments. Philips Hue, in particular, is a leading smart lighting platform. As with many IoT products, however, uneven code quality and limited hardening can lead to serious security implications.
+lien: https://www.sstic.org/2026/presentation/flicker_and_fall_rooting_the_philips_hue_bridge_both_remotely_and_wirelessly/
+
+jour: 2026-06-03
+heure: 12:00
+fin: 12:15
+titre: Unblob : évolution d'un outil d'extraction de firmwares
+orateur: Quentin Kaiser
+resume: Présentation d'Unblob Unblob est une suite d'extraction open source (licence MIT) dédiée à l'analyse de firmwares et autres binary blobs, conçue pour être à la fois précise, sûre et rapide. Elle prend en charge une large gamme* de formats (archives, compressions, systèmes de fichiers) et permet une extraction récursive tout en signalant les données inconnues restantes.
+lien: https://www.sstic.org/2026/presentation/unblob_evolution_dun_outil_dextraction_de_firmwares/
+
+jour: 2026-06-03
+heure: 14:15
+fin: 14:45
+titre: MLA et l'implémentation d'une hybridation cryptographique
+orateur: Camille Mougey, Jérémy Barallon
+resume: Dans le cadre de ses missions, l'ANSSI collecte et analyse des données techniques potentiellement sensibles sur les systèmes de ses bénéficiaires. Pour sécuriser ces informations tout au long de leur cycle de vie (collecte, transport, archivage), leur chiffrement est indispensable.
+lien: https://www.sstic.org/2026/presentation/mla_et_l_implementation_d_une_hybridation_cryptographique/
+
+jour: 2026-06-03
+heure: 14:45
+fin: 15:00
+titre: Migrating Protocols to the Post-Quantum Setting: The Case of Signal's Double Ratchet
+orateur: Thomas Prest
+resume: Secure Messaging apps are used by billions of people daily. However, due to imminent threat of a "Harvest Now, Decrypt Later" attack, secure messaging providers must react now in order to make their protocols hybrid-secure: at least as secure as before, but now also postquantum (PQ) secure.
+lien: https://www.sstic.org/2026/presentation/triple_ratchet/
+
+jour: 2026-06-03
+heure: 15:00
+fin: 15:15
+titre: Migrating Protocols to the Post-Quantum Setting: The Case of Wireguard
+orateur: Guilhem Niot
+resume: WireGuard is widely deployed in industry thanks to its performance, simplicity, and reduced attack surface. As organizations prepare for the post-quantum transition and the "harvest now, decrypt later" threat, VPN handshakes must evolve without compromising operational constraints such as packet size, latency, and extended attack mitigation.
+lien: https://www.sstic.org/2026/presentation/post_quantum_wireguard/
+
+jour: 2026-06-03
+heure: 15:15
+fin: 15:30
+titre: mlkemkeyfind : reconstruire des clés depuis des résidus mémoire
+orateur: Andy Russon
+resume: Cet outil recherche des polynômes secrets ML-KEM en mémoire (dans un processus ou dans un dump), et tente de reconstruire une clé secrète ou un secret partagé encapsulé. Le programme utilise la représentation sous la forme NTT (Number Theoritic Transform) des polynômes secrets pour détecter leur présence en mémoire.
+lien: https://www.sstic.org/2026/presentation/mlkemkeyfind__reconstruire_des_cles_depuis_des_residus_memoire/
+
+jour: 2026-06-03
+heure: 16:00
+fin: 16:30
+titre: Spatial Frinet : application des index spatiaux aux traces d'exécution
+orateur: Théo Emeriau
+resume: Frinet est un plugin pour IDA qui intègre les données de trace d'exécution au désassembleur. Ces traces représentent une mine d'or d'informations à propos du programme cible. La corrélation de ces données permet de traiter efficacement des tâches qui étaient jusque-là manuelles et fastidieuses.
+lien: https://www.sstic.org/2026/presentation/spatial_frinet/
+
+jour: 2026-06-03
+heure: 16:30
+fin: 17:00
+titre: Les graphes de provenance à états étendus pour la recherche de scénarios d'attaque dans les systèmes complexes
+orateur: Eric Lacombe, Loïc Robert, Vincent Nicomette
+resume: La complexité croissante des systèmes modernes rend la recherche de vulnérabilités difficile, car l'identification des chemins d'attaque est elle-même difficile. Les graphes de provenance sont une abstraction qui facilitent cette identification, en reliant les processus, les ressources et les flux d'information.
+lien: https://www.sstic.org/2026/presentation/les_graphes_de_provenance_a_etats_etendus_pour_la_recherche_de_scenarios_d_attaque_dans_les_systemes/
+
+jour: 2026-06-03
+heure: 17:00
+fin: 17:15
+titre: Denial of Service using recursions: not even Rust is going to save you
+orateur: Alexis Challande
+resume: Recursive functions are a fundamental programming pattern for processing nested data structures. However, recursion on untrusted input introduces a frequently overlooked vulnerability: attackers can trigger stack exhaustion to cause Denial of Service (DoS) attacks. This vulnerable pattern affects diverse programming languages, including memory-safe languages like Rust.
+lien: https://www.sstic.org/2026/presentation/dos_using_recursions_not_even_rust_is_going_to_save_you/
+
+jour: 2026-06-03
+heure: 17:15
+fin: 17:30
+titre: Bas les masques: Analyse d'une carte SD sécurisée
+orateur: Nicolas Oberli
+resume: Un fabricant propose des cartes SD permettant de protéger leur contenu à l'aide d'un mot de passe. Le mécanisme utilisé est relativement simple mais avec de nombreuses couches d'obfuscation ce qui le rend plutôt intéressant à analyser.
+lien: https://www.sstic.org/2026/presentation/bas_les_masques_analyse_dune_carte_sd_scurise/
+
+jour: 2026-06-03
+heure: 17:30
+fin: 17:45
+titre: Fuzzing en boîte noire assisté par trace matérielle avec LibAFL et Intel PT
+orateur: Marco Cavenati, Romain Malmain
+resume: En plus des fuzzers traditionnels s'appuyant sur l'instrumentation de code source, beaucoup d'efforts ont été investis dans le développement de fuzzers pour logiciels en boîte noire. Des exemples notables de tels fuzzers, basés sur l'émulation, sont qemuafl ou encore TriforceAFL. LibAFL est une bibliothèque qui fournit une multitude de composants afin de construire des fuzzers.
+lien: https://www.sstic.org/2026/presentation/fuzzing_en_bote_noire_assist_par_trace_matrielle_avec_libafl_et_intel_pt/
+
+jour: 2026-06-03
+heure: 17:45
+fin: 18:00
+titre: Fuzzwizard
+orateur: Marion Lafon
+resume: Fuzzwizard est un orchestrateur permettant de gérer des fuzzers 24/7.
+lien: https://www.sstic.org/2026/presentation/fuzzwizard/
+
+jour: 2026-06-04
+heure: 09:30
+fin: 10:00
+titre: Rétro-ingénierie d'un micrologiciel pour architecture Pi32v2
+orateur: Damien Cauquil
+resume: Cette soumission présente l'analyse d'un micrologiciel de montre connectée conçu pour un système-sur-puce JieLi AC6958 qui repose sur un processeur Pi32v2. Cette architecture héritée des processeurs Blackfin n'est pas entièrement supportée par Ghidra, rendant la rétro-ingénierie de code très difficile.
+lien: https://www.sstic.org/2026/presentation/retro-ingenierie-micrologiciel-pi32v2/
+
+jour: 2026-06-04
+heure: 10:00
+fin: 10:30
+titre: Étude expérimentale de la sécurité du protocole WirelessHART
+orateur: Elies Tali, Guillaume Auriol, Kais Sellami, Pierre Ayoub, Romain Cayre, Vincent Nicomette
+resume: Les réseaux de capteurs industriels s'appuient sur des mécanismes de communication déterministes et sécurisés afin de répondre à des contraintes strictes de fiabilité et de temps réel. WirelessHART est un protocole sans fil basé sur la norme IEEE 802.15.4 qui répond à ces exigences.
+lien: https://www.sstic.org/2026/presentation/wirelessHART_security/
+
+jour: 2026-06-04
+heure: 11:00
+fin: 11:15
+titre: GroupPolicyBackdoor : un outil offensif stable et modulaire pour l'exploitation des GPOs Active Directory
+orateur: Quentin Roland
+resume: Les vecteurs d'attaque basés sur les Group Policy Objects (GPOs) peuvent être décrits comme les vilains petits canards de l'exploitation Active Directory. Dans le monde de l'audit offensif d'environnements internes, une certaine réticence à l'implémentation de chemins de compromission supposant la manipulation de GPOs est régulièrement observée, et ce, malgré leur potentiel certain.
+lien: https://www.sstic.org/2026/presentation/grouppolicybackdoor_un_outil_offensif_stable_et_modulaire_pour_lexploitation_des_gpos_ad/
+
+jour: 2026-06-04
+heure: 11:15
+fin: 11:30
+titre: Metamorph - Un outil pour répliquer la télémétrie ETW des EDR
+orateur: Jean-Baptiste Mesnard-Sense
+resume: ETW (Event Tracing for Windows) est une infrastructure de télémétrie puissante mais souvent méconnue des équipes Blue Team et Red Team.
+lien: https://www.sstic.org/2026/presentation/metamorph-un_outil_pour_repliquer_la_telemetrie_etw_des_edr/
+
+jour: 2026-06-04
+heure: 11:30
+fin: 12:15
+titre: High Score, High Risk: The Evolving Threat Landscape of the Video Game Industry
+orateur: Philippe Paquet
+resume: The video game industry is a $200B+ market with 3.3 billion users, yet its security receives a fraction of the scrutiny it deserves.
+lien: https://www.sstic.org/2026/presentation/invite_2026_1/
+
+jour: 2026-06-04
+heure: 14:15
+fin: 14:45
+titre: CI/CD sous le prisme offensif : exploitation de l'environnement d'exécution
+orateur: Adrien Monteiro, Lucas Pech
+resume: Les chaînes CI/CD constituent des environnements complexes, reposant sur de nombreux composants en interdépendances, et occupent une place de plus en plus critique au sein des entreprises. Ces caractéristiques en font des cibles privilégiées pour les attaquants et rendent les tests d'intrusions particulièrement pertinents pour évaluer et renforcer leur niveau de sécurité.
+lien: https://www.sstic.org/2026/presentation/cicd_sous_le_prisme_offensif__exploitation_de_lenvironnement_dexecution/
+
+jour: 2026-06-04
+heure: 14:45
+fin: 15:00
+titre: Charting your way in: Injection de templates Helm
+orateur: Paul Barbé
+resume: Les pipelines CI/CD sont par nature des systèmes privilégiés. Ils détiennent des secrets, déploient des charges de travail et communiquent directement avec des systèmes de production. Contrairement aux interfaces d'administration classiques, ces systèmes sont accessibles par un public bien plus large (développeurs, opérateurs, processus automatisés).
+lien: https://www.sstic.org/2026/presentation/charting_your_way_in_injection_de_templates_helm/
+
+jour: 2026-06-04
+heure: 15:00
+fin: 15:15
+titre: Github Kingdom: From Internet to Internal Privileged Access
+orateur: Anthony Corsiez
+resume: GitHub est une plateforme largement utilisée par les particuliers comme par les entreprises pour héberger du code et automatiser des pipelines CI/CD via GitHub Actions, ce qui en fait une surface d'attaque intéressante.
+lien: https://www.sstic.org/2026/presentation/github_kingdom_from_internet_to_internal_privileged_access/
+
+jour: 2026-06-04
+heure: 15:15
+fin: 15:45
+titre: Un ticket pour les gouverner tous - Autorisation et authentification sur SAP
+orateur: Aloïs Colléaux-Le Chêne
+resume: Un système SAP ERP, aussi appelé simplement SAP, est un environnement de logiciels assistant les entreprises dans de nombreux processus métier (Gestion des stocks, paies des employés, gestion clients, etc.).
+lien: https://www.sstic.org/2026/presentation/un_ticket_pour_les_gouverner_tous_-_autorisation_et_authentification_sur_sap/
+
+jour: 2026-06-04
+heure: 16:15
+fin: 17:00
+titre: Solution du challenge
+lien: https://www.sstic.org/2026/presentation/challenge_2026/
+
+jour: 2026-06-04
+heure: 17:00
+fin: 19:00
+titre: Rumps
+resume: Rump 0 (CO) SAEtan ou tofu? petite vue sur SAE-PK (Jézabel 'Ajabep' Parmentier) La crypto-agilité (et son importance en milieu industriel) (Quentin Delage) Fuites en transition sur HQC (Arthur Villard) The bot left a fingerprint: détecter et attribuer des mots de passes générés par des LLMs (Gaetan Ferry) Hacke ton corps au SSTIC (Aris Adamantiadis) Retex: avoir un C2 à son insu...
+lien: https://www.sstic.org/2026/presentation/rumps_2026/
+
+jour: 2026-06-05
+heure: 09:30
+fin: 10:00
+titre: APT28, sarA Is watching you!
+orateur: Charles Meslay, Robin Kwiatkowski
+resume: Nous commencerons par présenter APT28, un mode opératoire d'attaque associé à la Direction Générale des Renseignements (GRU) de l'État-Major des Forces Armées de la Fédération de Russie. Ce mode opératoire s'inscrit dans le contexte de la guerre en Ukraine, ce qui en fait une menace actuelle ciblant l'Ukraine, et ses alliés, dont la France.
+lien: https://www.sstic.org/2026/presentation/apt28_sara_is_watching_you/
+
+jour: 2026-06-05
+heure: 10:00
+fin: 10:30
+titre: Private Key Leaks in the Wild: Insights from Certificate Transparency
+orateur: Gaetan Ferry, Guillaume Valadon
+resume: Private key leaks represent a critical security vulnerability, with over 430,000 leaked keys on GitHub in 2025, yet their real-world impact remains largely unknown due to the challenge of linking these mathematical objects to their operational usage.
+lien: https://www.sstic.org/2026/presentation/private-key-leaks_insights-from-certificate-transparency/
+
+jour: 2026-06-05
+heure: 11:00
+fin: 11:15
+titre: Nouvelles aventures d'IronHusky, un acteur de menace sinophone passionné par les États-Unis
+orateur: Georgy Kucherin
+resume: IronHusky est un acteur de menace persistante avancée sinophone apparu en 2017. Ses cibles principales sont les agences gouvernementales, qu'il attaque à des fins de cyberespionnage. Ce groupe est particulièrement connu pour exploiter les vulnérabilités afin de déployer ses implants, qu'il s'agisse de failles zero-day ou déjà connues.
+lien: https://www.sstic.org/2026/presentation/nouvelles_aventures_dironhusky_un_acteur_de_menace_sinophone_passionn_par_les_tats-unis/
+
+jour: 2026-06-05
+heure: 11:15
+fin: 11:30
+titre: Island : Intégration transparente du sandboxing
+orateur: Mickaël Salaun
+resume: Island est un nouvel outil qui s'appuie sur Landlock pour créer des environnements d'exécution restreints. Chacune de ces sandbox est définie par un ensemble de fichiers de configuration comprenant une politique de sécurité et un contexte d'exécution.
+lien: https://www.sstic.org/2026/presentation/island/
+
+jour: 2026-06-05
+heure: 11:30
+fin: 12:15
+titre: Shift Happens: Uncovering two built-in command injections in Windows context menus
+orateur: Rémi Gascou
+resume: Les menus contextuels font partie intégrante et familière de l'expérience utilisateur de Windows : un clic droit, le choix d'une action, et le travail continue. Mais que se passerait-il si cette interaction quotidienne pouvait être détournée pour déclencher une injection de commandes ?
+lien: https://www.sstic.org/2026/presentation/invite_2026_2/
+
+jour: 2026-06-05
+heure: 14:15
+fin: 14:45
+titre: Using Active Automata Learning to Find Vulnerabilities in Network Stacks
+orateur: Aina Toky Rasoamanana, Olivier Levillain, Yohan Pipereau
+resume: Network protocol implementations (stacks) are pervasive in our modern systems. Indeed, we rely on various protocols on a daily basis, the most proeminent thereof being TLS. One of the problem with network stacks is that they can exhibit wrong transitions in their state machines, which can lead to security issues.
+lien: https://www.sstic.org/2026/presentation/using_active_automata_learning_to_find_vulnerabilities_in_network_stacks/
+
+jour: 2026-06-05
+heure: 14:45
+fin: 15:00
+titre: Shovel : utiliser Suricata pour mieux se défendre en CTF
+orateur: Ambre Iooss
+resume: Lors de compétitions Capture-the-Flag (CTF) au format "Attaque-Défense", les équipes ont besoin d'analyser efficacement les flots réseau pour détecter les attaques et corriger rapidement les vulnérabilités. Pour remplir ce besoin, l'équipe nationale de CTF formée par l'ANSSI développe depuis 2023 l'outil Shovel.
+lien: https://www.sstic.org/2026/presentation/shovel__utiliser_suricata_pour_mieux_se_dfendre_en_ctf/
+
+jour: 2026-06-05
+heure: 15:00
+fin: 15:15
+titre: Clear NDR Community
+orateur: Eric Leblond, Valentin Vivier
+resume: Clear NDR Community est une solution open source de détection des menaces sur le réseau basée sur Suricata développée par Stamus Networks. Il s'agit du successeur de SELKS. Basée sur Docker, elle bénéficie d'un tout nouvel outil de déploiement et de gestion de la configuration.
+lien: https://www.sstic.org/2026/presentation/clear_ndr_community/
+
+jour: 2026-06-05
+heure: 15:15
+fin: 16:15
+titre: Cloture 2026
+orateur: Renaud Deraison
+resume: Conférence de cloture. Le nom de l'orateur et le contenu seront précisés ultérieurement.
+lien: https://www.sstic.org/2026/presentation/cloture_2026/

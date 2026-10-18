@@ -183,6 +183,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `pirate_radio.c` | radio pirate : émission FM et écoute (§ 6.27, [radio_pirate.md](radio_pirate.md)) |
 | `rtttl.c`, `rtttl_parse.c` | sonneries RTTTL (§ 6.28, [sonneries.md](sonneries.md)) |
 | `gamebook.c`, `gamebook_parse.c`, `gamebook_builtin.c` | livres-jeux (§ 6.28, [livres_jeux.md](livres_jeux.md)) |
+| `conference.c` | Badge conférence : le programme d'un événement lu dans `CONFERENCES/` de la carte SD, tout dans `shared_buf` ([badge_conference.md](badge_conference.md)) |
 | `demo.c` | page du mode démo (admin), la démo elle-même est dans `main.c` (§ 6.29) |
 | `reset.c` | remise à zéro des scores et de la progression (admin) |
 | `credits.c` | pages des crédits |

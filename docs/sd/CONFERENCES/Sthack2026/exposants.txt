@@ -1,0 +1,68 @@
+# Sthack 2026 - sponsors (logos de https://sthack.fr/editions/2026/#sponsors)
+nom: Cultura
+stand: Sponsor
+lien: https://www.cultura.com/
+
+nom: Orange Cyberdefense
+stand: Sponsor
+lien: https://www.orangecyberdefense.com/fr/
+
+nom: Believe
+stand: Sponsor
+lien: https://www.believe.com/
+
+nom: Epsilon
+stand: Sponsor
+lien: https://www.epsilon-sec.com/
+
+nom: Nystek
+stand: Sponsor
+lien: https://www.nystek.com/
+
+nom: Quarkslab
+stand: Sponsor
+lien: https://www.quarkslab.com/
+
+nom: RandoriSec
+stand: Sponsor
+lien: https://www.randorisec.fr/
+
+nom: Synacktiv
+stand: Sponsor
+lien: https://www.synacktiv.com/
+
+nom: Betclic
+stand: Sponsor
+lien: https://www.betclic.fr/
+
+nom: Cdiscount
+stand: Sponsor
+lien: https://www.cdiscount.com/
+
+nom: MARL
+stand: Sponsor
+lien: https://www.marl-ds.com/
+
+nom: Adista
+stand: Sponsor
+lien: https://www.adista.fr/
+
+nom: Devensys
+stand: Sponsor
+lien: https://www.devensys.com/
+
+nom: CEFCYS
+stand: Sponsor
+lien: https://cefcys.fr/
+
+nom: Hack4Values
+stand: Sponsor
+lien: https://hack4values.eu/
+
+nom: Depi
+stand: Sponsor
+lien: https://depi.security/
+
+nom: Bordeaux Métropole
+stand: Sponsor
+lien: https://www.bordeaux.fr/

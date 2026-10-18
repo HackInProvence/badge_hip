@@ -1,0 +1,263 @@
+# leHACK 2026 - workshops (piste Workshops, leLAB et village OSINT)
+# Source : https://lehack.org/2026/tracks/ (conferences, osint, lelab, workshops)
+
+jour: 2026-06-26
+heure: 10:00
+fin: 10:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures
+
+jour: 2026-06-26
+heure: 11:05
+fin: 11:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-2
+
+jour: 2026-06-26
+heure: 12:05
+fin: 12:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: NFC/RFID Lab
+orateur: Beemo
+resume: - Installer et utiliser proxmark3 - Utiliser la CLI pour discuter avec un Tag/Lecteur - Clone de badges (LF, HF) - Tester les différentes attaques possible en NFC (relay, replay, clone, fuzz...) Challenge : Cracker plusieurs cibles, à plusieurs niveaux. Matériel principal : Handheld RFID, Cameleon, Proxmark, Flipper Zero, Cartes Magic, PN532.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-nfc-rfid-lab
+
+jour: 2026-06-26
+heure: 13:00
+fin: 16:00
+salle: Workshop Room 4 (S3)
+titre: Lockpicking with the Red Team Alliance.
+orateur: Red Team Alliance
+resume: Red Team Alliance is coming to LeHack Paris! Ever wondered what physical penetration testers actually do? Come experience it for yourself. Stop by our booth to watch our experts in action and learn how we train the best of the best. Live demonstrations, conversations with the team, and a look inside a profession few people ever get to see. We'll be waiting at LeHack. Come say Hello!
+lien: https://lehack.org/2026/tracks/workshops/#lockpicking-with-the-red-team-alliance
+
+jour: 2026-06-26
+heure: 13:05
+fin: 13:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Hacking de Tag ESL via esp32
+orateur: 7h30th3r0n3
+resume: - Comprendre le protocole - Flasher l'esp32 pour interagir avec le tag - Exploration des différentes fonctionnalités Matériel principal : Tag ESL, esp32 (M5Stack Cardputer ou C6).
+lien: https://lehack.org/2026/tracks/lelab/#workshop-hacking-de-tag-esl-via-esp32
+
+jour: 2026-06-26
+heure: 14:05
+fin: 14:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-3
+
+jour: 2026-06-26
+heure: 15:05
+fin: 15:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-4
+
+jour: 2026-06-26
+heure: 16:05
+fin: 16:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-5
+
+jour: 2026-06-26
+heure: 17:00
+fin: 20:00
+salle: Workshop Room 4 (S3)
+titre: Lockpicking with the Red Team Alliance.
+orateur: Red Team Alliance
+resume: Red Team Alliance is coming to LeHack Paris! Ever wondered what physical penetration testers actually do? Come experience it for yourself. Stop by our booth to watch our experts in action and learn how we train the best of the best. Live demonstrations, conversations with the team, and a look inside a profession few people ever get to see. We'll be waiting at LeHack. Come say Hello!
+lien: https://lehack.org/2026/tracks/workshops/#lockpicking-with-the-red-team-alliance-copy
+
+jour: 2026-06-26
+heure: 17:05
+fin: 17:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Explorer les signaux avec le DigiLab
+orateur: tixlegeek
+resume: - Installer le DigiLab sur son Flipper Zero - Tour d'horizon et limitations - Détecter des grandeurs - Configurer les retours sensoriels - Aller plus loin Matériel nécessaire : Un Flipper Zero par personne, installation propre.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-explorer-les-signaux-avec-le-digilab
+
+jour: 2026-06-27
+heure: 10:00
+fin: 10:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-6
+
+jour: 2026-06-27
+heure: 11:05
+fin: 11:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-7
+
+jour: 2026-06-27
+heure: 12:05
+fin: 12:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: NFC/RFID Lab
+orateur: Beemo
+resume: - Installer et utiliser proxmark3 - Utiliser la CLI pour discuter avec un Tag/Lecteur - Clone de badges (LF, HF) - Tester les différentes attaques possible en NFC (relay, replay, clone, fuzz...) Challenge : Cracker plusieurs cibles, à plusieurs niveaux. Matériel principal : Handheld RFID, Cameleon, Proxmark, Flipper Zero, Cartes Magic, PN532.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-nfc-rfid-lab-2
+
+jour: 2026-06-27
+heure: 13:00
+fin: 16:00
+salle: Workshop Room 4 (S3)
+titre: Lockpicking with the Red Team Alliance.
+orateur: Red Team Alliance
+resume: Red Team Alliance is coming to LeHack Paris! Ever wondered what physical penetration testers actually do? Come experience it for yourself. Stop by our booth to watch our experts in action and learn how we train the best of the best. Live demonstrations, conversations with the team, and a look inside a profession few people ever get to see. We'll be waiting at LeHack. Come say Hello!
+lien: https://lehack.org/2026/tracks/workshops/#lockpicking-with-the-red-team-alliance-copy-2
+
+jour: 2026-06-27
+heure: 13:05
+fin: 13:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Hacking de Tag ESL via esp32
+orateur: 7h30th3r0n3
+resume: - Comprendre le protocole - Flasher l'esp32 pour interagir avec le tag - Exploration des différentes fonctionnalités Matériel principal : Tag pricer, esp32 (M5Stack Cardputer ou C6).
+lien: https://lehack.org/2026/tracks/lelab/#workshop-hacking-de-tag-esl-via-esp32-2
+
+jour: 2026-06-27
+heure: 14:05
+fin: 14:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-8
+
+jour: 2026-06-27
+heure: 15:05
+fin: 15:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-9
+
+jour: 2026-06-27
+heure: 16:05
+fin: 16:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Badge Hackropole + Atelier mesures
+orateur: team badge FCSC, GadgetMCS
+resume: BADGE Hackropole - Soudure d'un badge lumineux capacitif Venez découvrir la soudure en assemblant un badge lumineux capacitif. - Soudure d'un microcontrôleur et de 8 LED (composants de surface) au fer à souder, à l'air chaud ou à la plaque chauffante. - Programmation du microcontrôleur avec un micrologiciel WLED pré-configuré.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-badge-fcsc-atelier-mesures-10
+
+jour: 2026-06-27
+heure: 17:00
+fin: 22:00
+salle: Workshop Room 4 (S3)
+titre: Lockpicking with the Red Team Alliance.
+orateur: Red Team Alliance
+resume: Red Team Alliance is coming to LeHack Paris! Ever wondered what physical penetration testers actually do? Come experience it for yourself. Stop by our booth to watch our experts in action and learn how we train the best of the best. Live demonstrations, conversations with the team, and a look inside a profession few people ever get to see. We'll be waiting at LeHack. Come say Hello!
+lien: https://lehack.org/2026/tracks/workshops/#lockpicking-with-the-red-team-alliance-copy-3
+
+jour: 2026-06-27
+heure: 17:05
+fin: 17:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Explorer les signaux avec le DigiLab
+orateur: tixlegeek
+resume: - Installer le DigiLab sur son Flipper Zero - Tour d'horizon et limitations - Détecter des grandeurs - Configurer les retours sensoriels - Aller plus loin Matériel nécessaire : Un Flipper Zero par personne, installation propre.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-explorer-les-signaux-avec-le-digilab-2
+
+jour: 2026-06-27
+heure: 18:05
+fin: 20:05
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: le top 5 des vulnérabilités IoT est-il réaliste pour un rookie? (DVID)
+orateur: yggdrasil
+resume: Pendant deux heures, nous explorerons les cinq principales vulnérabilités liées à l'IoT - qu'il s'agisse d'embarqué, de cloud, de mobile, de données ou de processus. L'objectif est de montrer qu'avec très peu de matériel et des compétences de base, il est déjà possible de compromettre un firmware, d'altérer des données ou encore d'élever ses privilèges.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-le-top-5-des-vulnerabilites-iot-est-il-realiste-pour-un-rookie-dvid
+
+jour: 2026-06-27
+heure: 20:05
+fin: 20:55
+salle: LeLAB village hardware Salle C et D niveau S2
+titre: Outil de bypass de protection JTAG (pratique)
+orateur: Croute, GotoHack
+resume: Chaque participant démarre avec une plateforme d'attaque et un STM32 vérouillée. l'objectif : casser la protection RDP et récupérer le firmware en reproduisant des attaques réelles utilisées en laboratoire de sécurité matérielle.
+lien: https://lehack.org/2026/tracks/lelab/#workshop-outil-de-bypass-de-protection-jtag-pratique
+
+jour: 2026-06-27
+heure: 21:00
+fin: 22:30
+salle: Salle Louis Armand
+titre: Efficient Web Hacking with Caido
+orateur: Emile Fugulin, Christopher Guay
+resume: The world of Web Hacking is evolving, and with it, our tooling must evolve as well. Caido, the new guy on the HTTP Proxy block, brings a new set of tools and capabilities to web hackers that minimize friction and increase efficiency in your hacking process.
+lien: https://lehack.org/2026/tracks/workshops/#efficient-web-hacking-with-caido
+
+jour: 2026-06-27
+heure: 21:00
+fin: 22:30
+salle: Workshop Room 3 S3
+titre: Teaching hooks to hunt: automated Android app reversing
+orateur: Georges-Bastien MICHEL (@FrenchYeti)
+resume: Your favorite Android mobile apps or smart TV are probably fortresses: obfuscated code, anti hooking defenses, encrypted protocols. Traditional RE tools? Weeks of manual grinding. But what if you could teach your hooks to evolve, fuzz vendor services for hidden root commands, and let an AI orchestrate the entire RE workflow?
+lien: https://lehack.org/2026/tracks/workshops/#teaching-hooks-to-hunt-automated-android-app-reversing
+
+jour: 2026-06-27
+heure: 21:00
+fin: 22:30
+salle: Workshop Salle 2 S3
+titre: Hardware hacking : keep digging for that root shell
+orateur: Noë Flatreaud (Beemo)
+resume: keep digging for that root shell Still wondering how to gain root access to a device via hardware ? Why not trying yourself ? Again ? This workshop will equip you with the skills and knowledge to understand the basics of hardware hacking. In this workshop, you may : - Learn what UART is and why it's a crucial interface for embedded systems.
+lien: https://lehack.org/2026/tracks/workshops/#hardware-hacking-keep-digging-for-that-root-shell
+
+jour: 2026-06-27
+heure: 22:30
+fin: 23:15
+salle: Salle Louis Armand
+titre: Introduction à l'instrumentation dynamique binaire avec QBDI
+orateur: Victor Houal, Daniel Janson
+resume: Most reverse engineering workflows treat a binary as a static artifact. Dynamic Binary Instrumentation flips that: instead of reading code, you *watch it run*, intercepting every instruction and memory access with nothing but Python. This workshop is a hands-on introduction to DBI using PyQBDI.
+lien: https://lehack.org/2026/tracks/workshops/#introduction-a-linstrumentation-dynamique-binaire-avec-qbdi
+
+jour: 2026-06-27
+heure: 23:00
+fin: 00:30
+salle: Workshop Room 2 S3
+titre: Hacking Bluetooth Low Energy Devices with WHAD
+orateur: Virtualabs
+resume: Ce workshop introduit un framework dédié aux attaques de protocoles sans-fil, WHAD, avec un focus tout particulier sur le protocole Bluetooth Low Energy. Il fait écho au talk soumis par l'auteur sur le même sujet, et permettra de mettre en pratique les attaques évoquées dans ce dernier sur de véritables équipements connectés.
+lien: https://lehack.org/2026/tracks/workshops/#hacking-bluetooth-low-energy-devices-with-whad
+
+jour: 2026-06-27
+heure: 23:00
+fin: 00:30
+salle: Workshop Room 3 S3
+titre: Apkpatcher: Reverse Engineering and Modifying Android Applications Without Rooting
+orateur: MadSquirrel Benoît Forgette
+resume: Understand the fundamentals of reverse engineering Android applications. Learn to use debugging tools to analyze Android app behavior. Bypass security mechanisms using Frida scripts. Sniff and replay Bluetooth Low Energy (BLE) communications. Modify Smali code to alter app functionality. Reverse engineer native libraries used in Android apps.
+lien: https://lehack.org/2026/tracks/workshops/#apkpatcher-reverse-engineering-and-modifying-android-applications-without-rooting
+
+jour: 2026-06-28
+heure: 01:00
+fin: 02:30
+salle: Salle Louis Armand s3
+titre: GeoGuessr Party
+orateur: OpenFacto
+resume: Come learn and show off your GeoGuessr skills at this IRL workshop organized by OpenFacto.
+lien: https://lehack.org/2026/tracks/osint/#workshop-geoguessr-party

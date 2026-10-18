@@ -1,0 +1,96 @@
+# Barbhack 2026 - conférences du samedi 29 août
+# Source : https://www.barbhack.fr/2026/fr/conferences (lien : slides PDF quand publiées)
+
+jour: 2026-08-29
+heure: 09:30
+fin: 10:00
+titre: Choisir sans renoncer : construire sa stratégie de détection autour de la matrice MITRE ATT&CK
+orateur: Francis Hauguet
+resume: Un parcours, accompagné de REX, de la construction d'une stratégie de détection multi-périmètres chez Naval Group. Dans la continuité de l'intervention de l'an dernier, l'épisode 2 présente une stratégie de détection orientée produit et métier.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 10:05
+fin: 10:35
+titre: Weaponizing Browser Extensions: C2 Agent Injection and Fileless Persistence in Chromium
+orateur: Firenox
+resume: Les extensions de navigateur sont un vecteur d'attaque massivement sous-estimé. Légitimes aux yeux des EDR, peu surveillées par les SOC, elles offrent un accès natif aux cookies, au réseau et aux pages web : un vecteur stratégique pour tout redteamer.
+lien: https://www.barbhack.fr/2026/assets/slides/firenox-weaponizing-browser-extensions.pdf
+
+jour: 2026-08-29
+heure: 10:40
+fin: 11:10
+titre: You are building your MCP wrong
+orateur: MPGN
+resume: How a security MCP server with 126 tools taught me that the way everyone builds MCP servers is quietly broken for every model that isn't a frontier cloud model, and what ~2,000 benchmark runs said about the fix.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 11:20
+fin: 11:50
+titre: Peace, Love & Heap Corruption : Introducing Hippie
+orateur: 0xMitsurugi
+resume: AFL++ et Unicorn sont devenus des outils incontournables pour le fuzzing de firmwares et de binaires propriétaires. Pourtant, une corruption mémoire subtile remonte souvent peu d'information : crash tardif, origine difficile à identifier, corruption silencieuse.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 11:55
+fin: 12:25
+titre: Glitch me et glitch moi sont dans une auto
+orateur: Philippe Azalbert
+resume: Comment accéder à une interface de debug protégée sans connaître son mot de passe ? Cette présentation revient sur une attaque par injection de faute ayant permis de contourner la protection IDCODE des microcontrôleurs Renesas RH850 : enjeux des protections anti-debug, principes de l'injection de faute, méthodologie et difficultés pour obtenir une attaque reproductible.
+lien: https://www.barbhack.fr/2026/assets/slides/azalbert-glitch-me-et-glitch-moi.pdf
+
+jour: 2026-08-29
+heure: 14:00
+fin: 14:30
+titre: BindKey
+orateur: Équipe BindKey - ISEN Méditerranée
+resume: BindKey - Security at your fingertip. Projet étudiant (ISEN Méditerranée, 4e année, option Cybersécurité). Un proxy matériel sécurisé qui protège et partage les périphériques de stockage externes sensibles en milieu isolé, par authentification biométrique et de façon transparente sur n'importe quel OS.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 14:35
+fin: 15:05
+titre: I own your "internal" domain... Weaponizing name collisions at scale
+orateur: Philippe Caturegli
+resume: Que se passe-t-il lorsque votre nom de domaine interne est en réalité enregistré et exploité par quelqu'un d'autre ? Des identifiants fuitent, des e-mails partent au mauvais endroit, des pipelines de déploiement récupèrent du code depuis des sources non fiables - et la plupart du temps, personne ne s'en aperçoit pendant des années.
+lien: https://www.barbhack.fr/2026/assets/slides/caturegli-domain-collision.pdf
+
+jour: 2026-08-29
+heure: 15:10
+fin: 15:40
+titre: Trust me, I'm self-attested: bypassing Passkey filtering in Keycloak
+orateur: Sylvain Pélissier
+resume: Keycloak permet de filtrer les Passkeys selon leur modèle pour imposer, par exemple, des Passkeys matérielles à haut niveau de sécurité. Mais la norme WebAuthn prévoit aussi des Passkeys auto-attestées, ce qui permet de contourner facilement cette vérification de modèle.
+lien: https://www.barbhack.fr/2026/assets/slides/pelissier-passkey-keycloak.pdf
+
+jour: 2026-08-29
+heure: 15:55
+fin: 16:25
+titre: There is no Système d'Information (my dear White Lapin)
+orateur: Koreth
+resume: Un attaquant humain, on peut le semer. Mais aujourd'hui, ce qui frappe à la porte n'est plus toujours humain : c'est un agent. Il cartographie, planifie, enchaîne les étapes - et croit que le monde tient en place. Alors on fait bouger le sol : en live sur un lab, les IP tournent, les noms changent, les services migrent d'un hôte à l'autre en pleine session, et l'agent perd la tête.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 16:30
+fin: 17:00
+titre: Big Trouble in Little China
+orateur: Semtex
+resume: L'urgence de devoir faire le point sur la surveillance de masse en Europe (et dans le monde). Un dive-in dans ce que Huxley, Orwell et P.K. Dick ont cauchemardé.
+lien: https://www.barbhack.fr/2026/assets/slides/semtex-big-trouble-in-little-china.pdf
+
+jour: 2026-08-29
+heure: 17:05
+fin: 17:35
+titre: Ce n'est qu'une ampoule connectée... Compromission d'un réseau via un Philips Hue Bridge
+orateur: Maxime Turlure (AlphaTartine)
+resume: Le Philips Hue Bridge occupe une position centrale dans l'écosystème Hue, présent dans de nombreux foyers - une cible idéale pour un point d'entrée persistant sur un réseau domestique.
+lien: https://www.barbhack.fr/2026/fr/conferences
+
+jour: 2026-08-29
+heure: 17:45
+fin: 18:15
+titre: Rumps
+lien: https://www.barbhack.fr/2026/fr/conferences

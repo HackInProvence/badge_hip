@@ -1,0 +1,75 @@
+# GreHack 2026 - talks du vendredi 13 novembre
+# Horaires et ordre pas encore publiés par l'organisation ("Detailed schedule coming soon")
+# Source : https://grehack.fr/program
+
+jour: 2026-11-13
+titre: Pretend to be NOR: SPI Flash Emulation on Raspberry Pi Pico
+orateur: Paul Viel
+resume: This submission introduces a cost-effective SPI flash emulation tool built on the Raspberry Pi RP2040 microcontroller. Debugging hardware and exploiting Time-of-Check-Time-of-Use (TOCTOU) vulnerabilities on SPI flash typically involve slow, repetitive physical erase and reprogram cycles. The tool eliminates this significant bottleneck.
+lien: https://grehack.fr/program#talk-01
+
+jour: 2026-11-13
+titre: Glitching Sega: extracting game keys from Lindbergh arcade security dongles with a $4 microcontroller
+orateur: Romain Gay
+resume: You have a 700kg arcade machine paperweight and you're trying to fix it with no ressources available anywhere - what could go wrong? Let's start backing things up first! Sega's Lindbergh arcade platform protects each game with a small security dongle: a code-protected PIC microcontroller that authenticates the board by proving knowledge of a per-game secret key.
+lien: https://grehack.fr/program#talk-02
+
+jour: 2026-11-13
+titre: Fake It Til You Make It: POCing Kerberos N-Days for Clout
+orateur: Félix Billières
+resume: Security engineers are famously people of impeccable ethics, driven only by the greater good of the community. I am a student, so I am exempt. This is the story of how I turned a Kerberos n-day with zero public exploit into a working PoC, armed with one vague blog post, one patch note, and a genuinely embarrassing amount of trial and error.
+lien: https://grehack.fr/program#talk-03
+
+jour: 2026-11-13
+titre: From Zero to APT: Building an Offensive Cyber Capability in Six Weeks
+orateur: KrysCat, Lucas Petit, Leautalb, Lucie Bredin, ilyass, Natfazur
+resume: Everyone knows what it takes to build an APT. A campaign like Stuxnet took years to develop. Huge teams. Dedicated facilities. People who had spent years becoming very, very good at what they do. Malware specialists. Exploit developers. Infrastructure people. Intelligence. Operations. And a lot of things in between. To sum up, a lot of skills that needs years and years to be mastered.
+lien: https://grehack.fr/program#talk-04
+
+jour: 2026-11-13
+titre: Mind the gap between the review and the checkout
+orateur: Worty
+resume: Plenty of repos ship a bot you summon from a pull request with a magic comment like /style or /format. A maintainer reviews the PR, drops the command, and a privileged workflow springs to life with a write token and repo secrets. Convenient. Also a time-of-check to time-of-use bug waiting to happen. This talk walks through a real finding in a popular project's CI.
+lien: https://grehack.fr/program#talk-05
+
+jour: 2026-11-13
+titre: 0-click server-to-client RCE in Xpra
+orateur: Thomas Borot
+resume: At Synacktiv, we heavily use virtual machines for almost everything, closely isolating every use case. Using them with RDP, VNC, or the native Virt-Manager display is a bit painful, especially when you need to use several machines at the same time.
+lien: https://grehack.fr/program#talk-06
+
+jour: 2026-11-13
+titre: DevPUBdency Confusion: Weaponizing the Flutter Supply Chain
+orateur: pwnii
+resume: This research examines a Flutter dependency-confusion supply-chain attack that begins with a production Android APK, crosses pub.dev, the default public package repository operated by Google's Dart team, and ends in remote code execution on hosts running Flutter's build or analysis tooling.
+lien: https://grehack.fr/program#talk-07
+
+jour: 2026-11-13
+titre: All your waves are belong to us
+orateur: Noë Flatreaud (Beemo)
+resume: A short demo on HDMI eavesdropping and TEMPEST attacks using affordable electronics.
+lien: https://grehack.fr/program#talk-08
+
+jour: 2026-11-13
+titre: PathQuarry: Watching RL Agents Discover Privilege Escalation
+orateur: Maria Khodak
+resume: Your cloud environment has privilege escalation paths you haven't found yet. Static tools dump tables of misconfigurations, but they don't show you how those misconfigurations chain together into full attack paths or which ones an attacker would actually find first.
+lien: https://grehack.fr/program#talk-09
+
+jour: 2026-11-13
+titre: BinQL: a CodeQL extension to binary format
+orateur: Raphaël Louvigny, Maxime Turlure
+resume: Variant analysis tools excel at finding similar bugs in source code. But move to binaries and those tools disappear, forcing analysts into a slow and tedious manual hunt. We reverse-engineered CodeQL's undocumented extractor internals and created BinQL: a CodeQL extractor for binaries. Built on IDA Pro's decompiler, BinQL queries decompiled code the same way you would query source code.
+lien: https://grehack.fr/program#talk-10
+
+jour: 2026-11-13
+titre: Cracking protobufs: schema recovery, type inference, anomaly detection
+orateur: Frederic Ruget
+resume: Protocol Buffers are ubiquitous in modern infrastructure - gRPC services, cloud platforms, mobile apps - yet they are routinely treated as opaque. The standard tool, protoc --decode, requires the original descriptors and message type and silently normalizes non-canonical encodings, making wire-level anomalies invisible.
+lien: https://grehack.fr/program#talk-11
+
+jour: 2026-11-13
+titre: From Legacy to Tragedy: Hacking a Robot Arm in Five Acts
+orateur: Matthieu Plagnol (Volthax)
+resume: A robot arm. A DOS workstation. A PLC. Five acts. Things will move that shouldn't. Things should stop that can't. And by the curtain call, nothing will work the way you thought it did. Live hardware. Real consequences. No simulation. Bring your Chartreuse. This one ends badly.
+lien: https://grehack.fr/program#talk-12

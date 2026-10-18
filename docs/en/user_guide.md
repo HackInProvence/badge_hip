@@ -68,7 +68,7 @@ The main menu groups the features by theme:
 | **Multiplayer** (Jeux multi) | Duel, Battleship, Werewolf, Assassin, Tug of war, Micro racers |
 | **Social** | Cicada network, Messages, Contacts, Skills, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
-| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements, My rank, Sound ID |
+| **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements, My rank, Sound ID, Conference badge ([conference_badge.md](conference_badge.md)) |
 | **Settings** (Réglages) | Screensaver, Language, Remote, Mute mode, Info, Credits, Radio tuning |
 
 Some entries show their value in the menu: "Volume: 4/8", "Cicada network: 12 pts", "CTF: 0/1 flags",

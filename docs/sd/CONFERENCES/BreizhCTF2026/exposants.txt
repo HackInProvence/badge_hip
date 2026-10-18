@@ -1,0 +1,149 @@
+# BreizhCTF 2026 - sponsors présents au Hack&Job (https://www.breizhctf.com/sponsors/)
+nom: ACCEIS
+stand: Sponsor - Hack&Job
+description: Centre d'expertise en cybersécurité, qualifié PASSI et agréé CESTI par l'ANSSI.
+lien: https://www.acceis.fr/
+
+nom: Advens
+stand: Sponsor - Hack&Job
+description: Spécialiste européen de la cybersécurité, près de 600 experts, entreprise à mission.
+lien: https://www.advens.fr/
+
+nom: APIXIT
+stand: Sponsor - Hack&Job
+description: Société de service en infrastructures et cybersécurité (groupe Bechtle).
+lien: https://www.apixit.fr/
+
+nom: CEFCYS
+stand: Sponsor - Hack&Job
+description: Cercle des Femmes de la Cybersécurité: promouvoir la présence et le leadership des femmes dans la cyber. Séances de coaching.
+
+nom: Claranet
+stand: Sponsor - Hack&Job
+description: Toute la chaîne cyber: offensif, défensif et opérationnel (pentest, SOC, réponse à incident, WAF).
+lien: https://www.claranet.com/fr/
+
+nom: COMCYBER
+stand: Sponsor - Hack&Job
+description: Commandement de la cyberdéfense du ministère des Armées.
+lien: https://www.welcometothejungle.com/fr/companies/commandement-de-la-cyberdefense-comcyber/equipe
+
+nom: CyberSchool
+stand: Sponsor - Hack&Job
+description: École Universitaire de Recherche en cybersécurité (Rennes), formations du bac au bac+5.
+lien: https://cyberschool.univ-rennes.fr/
+
+nom: DGA MI
+stand: Sponsor - Hack&Job
+description: DGA Maîtrise de l'information (Bruz), expert technique du ministère des Armées en cyberdéfense.
+lien: http://www.defense.gouv.fr/dga
+
+nom: EDF
+stand: Sponsor - Hack&Job
+description: Premier producteur et fournisseur d'électricité en France; la cybersécurité de ses infrastructures critiques.
+lien: https://particulier.edf.fr/fr/accueil.html
+
+nom: ENI École Informatique
+stand: Sponsor - Hack&Job
+description: École du numérique: développement, systèmes et réseaux, cybersécurité, DevOps, IA, du bac+2 au bac+5.
+lien: https://www.eni-ecole.fr/
+
+nom: ESNA Bretagne
+stand: Sponsor - Hack&Job
+description: École du numérique, de la cybersécurité et des drones, campus de Ker Lann à Bruz, en alternance.
+lien: https://esna.bzh/
+
+nom: ENSIBS
+stand: Sponsor - Hack&Job
+description: École d'ingénieurs de l'Université Bretagne-Sud (Lorient, Vannes): cyberdéfense, informatique et cybersécurité.
+lien: https://www-ensibs.univ-ubs.fr/fr/index.html
+
+nom: EPITA
+stand: Sponsor - Hack&Job
+description: École d'ingénieurs en informatique et numérique fondée en 1984, dont IA et cybersécurité; campus de Rennes.
+lien: https://www.epita.fr/
+
+nom: Epitech
+stand: Sponsor - Hack&Job
+description: École supérieure d'informatique fondée en 1999, pédagogie par projets.
+lien: https://www.epitech.eu/
+
+nom: EPSI
+stand: Sponsor - Hack&Job
+description: École de l'ingénierie informatique créée en 1961: IA, cybersécurité, cloud, data.
+lien: https://www.epsi.fr/
+
+nom: Epsilon Cyber
+stand: Sponsor - Hack&Job
+description: Cybersécurité offensive: technologies d'accès mobile (0-days iOS, Android, navigateurs), bureaux à Paris et Barcelone.
+lien: https://www.epsilon-sec.com/
+
+nom: Formind
+stand: Sponsor - Hack&Job
+description: Expert français indépendant en cybersécurité, 300 experts.
+lien: https://www.formind.fr/
+
+nom: GLIMPS
+stand: Sponsor - Hack&Job
+description: Analyse profonde de fichiers par IA pour détecter et caractériser les menaces.
+lien: http://www.glimps.re/
+
+nom: Groupe La Poste
+stand: Sponsor - Hack&Job
+description: Groupe public (Caisse des Dépôts et État).
+lien: https://www.lapostegroupe.com/fr
+
+nom: Groupe Saint-Jean - Lycée Pôle Sup de La Salle
+stand: Sponsor - Hack&Job
+description: Formations à l'informatique et à la cybersécurité du bac+2 au bac+5, temps plein ou alternance.
+lien: https://www.groupe-saintjean.fr/
+
+nom: Icodia
+stand: Sponsor - Hack&Job
+description: Hébergeur haute disponibilité certifié ISO 27001.
+lien: https://www.icodia.com/
+
+nom: Inria
+stand: Sponsor - Hack&Job
+description: Institut national de recherche en sciences et technologies du numérique.
+lien: https://www.inria.fr/fr
+
+nom: IUT Saint-Malo
+stand: Sponsor - Hack&Job
+description: BUT Réseaux informatiques & Télécommunications: administration et sécurisation des réseaux.
+lien: https://iut-stmalo.univ-rennes.fr/reseaux-informatiques-telecommunications
+
+nom: NEVERHACK
+stand: Sponsor - Hack&Job
+description: Groupe français de cybersécurité, plus de 1 200 collaborateurs dans plus de 10 pays, approche 360°.
+lien: https://neverhack.com/
+
+nom: Orange Cyberdefense
+stand: Sponsor - Hack&Job
+description: Filiale d'Orange dédiée à la sécurité numérique, 3 200 experts dans 12 pays.
+lien: https://www.orangecyberdefense.com/fr/
+
+nom: OTERIA
+stand: Sponsor - Hack&Job
+description: École de cybersécurité en 5 ans, 7 spécialités (sécurité offensive, blue team, GRC, CTI, DevSecOps, embarqué, DPO).
+lien: https://www.oteria.fr/
+
+nom: Quarkslab
+stand: Sponsor - Hack&Job
+description: Sécurité applicative du silicium à l'exécution, R&D interne.
+lien: https://www.quarkslab.com/fr/
+
+nom: Région Bretagne
+stand: Sponsor - Hack&Job
+description: Soutien de la filière cybersécurité bretonne, à l'origine du Pôle d'excellence cyber (2014). Partenaire qui rend l'événement gratuit.
+lien: https://www.bretagne.bzh/
+
+nom: Rennes Métropole
+stand: Sponsor - Hack&Job
+description: Territoire de la cybersécurité où civils, militaires, industriels et académiques travaillent ensemble. Partenaire qui rend l'événement gratuit.
+lien: https://www.rennes-business.com/fr/pourquoi-rennes/secteurs-excellence/cybersecurite/
+
+nom: Synacktiv
+stand: Sponsor - Hack&Job
+description: Aide les entreprises à évaluer et renforcer la sécurité de leur système d'information.
+lien: https://www.synacktiv.com/

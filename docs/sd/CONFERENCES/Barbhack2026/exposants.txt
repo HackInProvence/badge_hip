@@ -1,0 +1,82 @@
+# Barbhack 2026 - sponsors et partenaires (catégorie dans la description)
+# Source : https://www.barbhack.fr/2026/fr/sponsors
+
+nom: Naval Group
+description: Sponsors Gold. Acteur international du naval de défense, Naval Group est partenaire des États dans la maîtrise de leur souveraineté maritime.
+lien: https://www.naval-group.com/fr
+
+nom: Squad
+description: Sponsors Silver. Depuis 2011, Squad s'impose comme un acteur clé de la cybersécurité, avec plus de 1000 experts répartis dans 12 agences en France, en Suisse, en Espagne et au Canada.
+lien: https://www.squadgroup.com/fr/
+
+nom: Ecole 18.06
+description: Sponsors Silver. L'École 18.06, acteur de l'enseignement supérieur, hors Parcoursup, en sciences informatiques et politiques, située à Molsheim (Bas-Rhin), propose des cursus académiques post-Baccalauréat en 3 et 5 ans.
+lien: https://18.06.fr
+
+nom: Cabinet Louis Reynaud - CLR Labs
+description: Sponsors Silver. Le Cabinet Louis Reynaud est un cabinet d'expertise technologique, normative et réglementaire et un laboratoire indépendant d'évaluation de la sécurité des technologies, produits et services d'identités numériques, de biométrie, de sécurité mobile, de protection des données et de cyber sécurité.
+lien: https://cabinet-louis-reynaud.eu/
+
+nom: Marine Nationale
+description: Sponsors Silver. Afin d'assurer la sécurité des Français, la Marine nationale opère 365 jours par an, 24h/24, sur toutes les mers du monde. Des eaux territoriales à la haute mer, elle conduit des missions de défense et de sécurité pour protéger les approches maritimes et les intérêts nationaux.
+lien: https://www.defense.gouv.fr/marine
+
+nom: Synacktiv
+description: Sponsors Bronze. Synacktiv est une société spécialisée en sécurité offensive fondée en 2012 par des experts du domaine. Nous recrutons des passionnés dans nos différents pôles : pentest, reverse-engineering, réponse à incident et développement d'outils offensifs.
+lien: https://www.synacktiv.com/
+
+nom: Epsilon
+description: Sponsors Bronze. Epsilon est une entreprise Européenne qui fournit des services de R&D. Nous nous spécialisons dans la recherche de vulnérabilités et le développement d'exploits sur mobile (iOS / Android). Nous recrutons des chercheurs talentueux qui souhaitent évoluer dans un environnement amical et bienveillant.
+lien: https://www.epsilon-sec.com/
+
+nom: Orange Cyberdéfense
+description: Sponsors Bronze. Orange Cyberdefense est l'entité du Groupe Orange dédiée à la cybersécurité. Elle protège 50 000 entreprises de toute taille du début à la fin du cycle de vie des menaces dans plus de 160 pays.
+lien: https://www.orangecyberdefense.com/fr/
+
+nom: ISEN Méditerranée
+description: Écoles. Depuis 1991, l'ISEN Méditerranée (présent à Toulon et Marseille) forme des ingénieurs dans les champs disciplinaires du numérique et des hautes technologies.
+lien: https://isen-mediterranee.com
+
+nom: CEFCYS
+description: Associations. Le CEFCYS (CErcle des Femmes de la CYberSécurité) est une association créée par le Dr Nacira Salvan. Son principal objectif est de promouvoir et faire progresser la présence et le leadership des femmes dans les métiers de la cybersécurité.
+lien: https://cefcys.fr
+
+nom: WOCSA
+description: Associations. La World Open Cyber Security Association (WOCSA) est une association à but non lucratif dédiée à l'amélioration de la sensibilisation, de l'éducation et des solutions en matière de cybersécurité mondiale à travers une collaboration ouverte.
+lien: https://www.wocsa.org/
+
+nom: Urgence Cyber Région Sud
+description: Associations. Urgence Cyber région Sud est une association soutenue par la Région Sud et l'ANSSI, dédiée à la cybersécurité des collectivités et entreprises territoriales. En tant que CSIRT régional, elle accompagne les acteurs locaux dans la prévention et la gestion des incidents cyber.
+lien: https://www.urgencecyber-regionsud.fr/
+
+nom: OSINT-FR
+description: Associations. Communauté francophone dédiée au renseignement en sources ouvertes (OSINT).
+lien: https://osintfr.com/
+
+nom: HackerZVoice
+description: Partenaires. Association à but non lucratif qui promeut le hacking éthique et la sensibilisation à la cybersécurité. Soutien historique de BARBHACK.
+lien: https://hzv.fr/
+
+nom: MISC
+description: Partenaires. MISC est un magazine bimestriel français spécialisé dans la sécurité informatique.
+lien: https://connect.ed-diamond.com/misc
+
+nom: ZATAZ
+description: Partenaires. Zataz est un site de référence dédié à la cybersécurité et la protection de l'identité numérique.
+lien: https://www.zataz.com/
+
+nom: Lab401
+description: Partenaires. LAB401 est le partenaire européen de référence pour l'achat de matériel de pentesting Hardware, RF et RFID. LAB401 vous fait bénéficier de ses outils, expertise et logistique locale, avec un service professionnel adapté aux besoins des hackers éthiques, entreprises et forces de l'ordre.
+lien: https://lab401.com/
+
+nom: Campus Cyber
+description: Partenaires. Le Campus Euromed a pour but d'oeuvrer à la confiance, la résilience, la performance et l'inclusivité de l'espace numérique sur le territoire d'Aix-Marseille, au service d'une grande nation cyber.
+lien: https://ares.campuscyber-regionsud.fr/
+
+nom: Ville de Toulon
+description: Partenaires. La Ville de Toulon, hôte de BARBHACK 2026 au Palais des Congrès Neptune.
+lien: https://www.toulon.fr/
+
+nom: BrHackeuses
+description: Partenaires. Collectif 100% féminin, passionné et dédié à promouvoir l'inclusion des femmes dans le domaine du hacking éthique.
+lien: https://brhackeuses.com/

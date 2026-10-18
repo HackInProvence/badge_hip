@@ -1,0 +1,169 @@
+# Hexacon 2026 - agenda officiel (https://www.hexacon.fr/conference/agenda/)
+# Fin calculée d'après la durée annoncée. Résumés raccourcis depuis https://www.hexacon.fr/conference/speakers/
+jour: 2026-10-16
+heure: 10:00
+fin: 10:15
+salle: Palais Brongniart
+titre: Introduction
+
+jour: 2026-10-16
+heure: 10:15
+fin: 11:00
+salle: Palais Brongniart
+titre: Opening Keynote
+orateur: Bruce Dang, Thai Duong
+resume: 2026 has been the year of AI for vulnerability research: frontier models changed the outlook of the whole community. Their experience using AI for vulnerability research, its strengths and limits, and how the industry may need to rethink disclosure, detection/response and software updates.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 11:30
+fin: 12:15
+salle: Palais Brongniart
+titre: Coruna vax - Deep dive and takeaways
+orateur: Littlelailo
+resume: After GTIG and iVerify blogposts on the Coruna exploit kit, access to a sample: weeks spent defeating obfuscation, reversing the chains and building root cause analyses of the bugs. Some of that analysis and the takeaways.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 12:15
+fin: 12:45
+salle: Palais Brongniart
+titre: Reinventing the vPhone - A Next-Generation iOS Security Research Platform
+orateur: Maximilian Pass
+resume: In 2026 Apple shipped firmware for its internal virtual device vphone600, enabling an open-source iOS 26 virtualisation environment. Recreating Apple's firmware generation pipeline lets the virtual device boot with core security mitigations kept, for more realistic offensive research.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 14:15
+fin: 15:00
+salle: Palais Brongniart
+titre: The Last Proof of Human Craft: Forging a Microsoft Edge Full Chain with Logic Bugs Only!
+orateur: Orange Tsai
+resume: A logic-only full chain against Microsoft Edge at Pwn2Own Berlin 2026, the only browser pwned there and the first Chromium sandbox escape at Pwn2Own since 2016 ($175,000, Master of Pwn): five bugs chained with pure logic, no memory corruption, no AI.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 15:00
+fin: 15:45
+salle: Palais Brongniart
+titre: Consoling Windows: Racing the Console Driver to escape the sandbox
+orateur: Guillaume André
+resume: The Windows Console Driver attack surface has been overlooked since Windows 8.1. A simple bug giving privilege escalation: winning a precise race, turning a limited write into a SYSTEM shell, then reaching it from restricted contexts to escape the LPAC sandbox.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 15:45
+fin: 16:30
+salle: Palais Brongniart
+titre: Dirty Pedit: Semantic Variant Hunting for Root in Under a Second
+orateur: Rajat Gupta
+resume: Semantic variant hunting of page-cache corruption bugs (after Dirty COW, Dirty Pipe, Copy Fail, Dirty Frag): exploit chains split into queryable stages, 16 CodeQL queries, three unprivileged root exploits including Dirty Pedit (CVE-2026-46331), deterministic root in under a second via Linux traffic control.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 17:15
+fin: 18:00
+salle: Palais Brongniart
+titre: Wasm Spills The Beans on Chrome and Safari
+orateur: Javier Jimenez
+resume: A similar register allocator bug in the WebAssembly JIT pipelines of V8 (Chrome) and JavaScriptCore (Safari), found by fuzzing: one only an info-leak, the other fully exploitable, turning a type confusion into renderer code execution.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 18:00
+fin: 18:45
+salle: Palais Brongniart
+titre: One Parser, Two Bugs, Many Routers: Exploiting Broadcom WiFi Across eCos and Linux
+orateur: Quentin Kaiser
+resume: Two undocumented flaws in Broadcom's 802.11 implementation, from eCos cable gateways to Linux platforms, reachable from radio range without the network key: information disclosure and code execution on ARM and MIPS, SDK propagation to OEMs and ISPs, fingerprinting tools released.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-16
+heure: 19:00
+salle: La Nef, Palais Brongniart
+titre: Social event & Speedrun challenge finals
+resume: Soirée dans la Nef du palais jusqu'à 2h, finales du speedrun challenge.
+
+jour: 2026-10-17
+heure: 09:30
+fin: 10:15
+salle: Palais Brongniart
+titre: Freedom of the Cache - Democratizing Page Caches With RDMA
+orateur: Philip Tsukerman
+resume: A distant cousin of page cache corruption bugs like Copy Fail, in the Linux RDMA subsystem found on multi-GPU systems: the generalized flaw, RDMA internals, the vulnerability and a 100% reliable LPE exploit.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 10:15
+fin: 11:00
+salle: Palais Brongniart
+titre: The Cloud Runs on GPUs. So Do We: Breaking Out Through GPU Drivers
+orateur: Lei Lu, Ji'an Zhou
+resume: GPU driver stacks of the two major vendors powering cloud GPUs: host GPU devices are exposed to untrusted AI containers, and kernel driver bugs give powerful primitives leading directly to full container escape.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 11:30
+fin: 12:15
+salle: Palais Brongniart
+titre: Revisiting SecureROM Adventures
+orateur: Steven De Franco
+resume: A variant of the DWC2 USB controller DMA bug (usbliter8) in Apple's SecureROM, exploited generically from A5 to A13: an exploit rebuilt as SecureROM and iBoot hardened, a strange undocumented SoC behavior that helped, and making a temperamental USB attack reliable.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 12:15
+fin: 13:00
+salle: Palais Brongniart
+titre: MTEscape: Bypassing ARM's Asynchronous MTE with General Memory Corruption Vulnerabilities
+orateur: Kyeongmin Kim, Insu Yun
+resume: Asynchronous MTE defers tag-fault handling, leaving a short window. MTEscape uses OOB write and UAF bugs to interfere with the fault handling before the violation is handled in the Linux kernel, winning a single-attempt race; applied to two real kernel bugs.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 14:30
+fin: 15:15
+salle: Palais Brongniart
+titre: Full Root: Kernel-driver page uaf and confused-deputy vuln in Samsungs DualDAR subsystem
+orateur: Lukas Maar
+resume: Samsung's Dual Data-at-Rest encryption (Knox) adds a sandbox escape into the dualdard daemon and a mapping-lifetime bug giving access to freed physical memory: a full chain from a zero-permission app to root on Galaxy S26 and S26 Ultra (Android 16, locked bootloader).
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 15:15
+fin: 16:00
+salle: Palais Brongniart
+titre: Double Agents: Weaponizing Synchronization Mechanisms to Reliably Exploit Race Conditions
+orateur: Robert Huey
+resume: An unpublished chain against NVIDIA Linux Open GPU Kernel Modules: timing side-channel on a GPU semaphore to leak kernel memory, then a TOCTOU use-after-free with a tiny window, made reliable by turning synchronization primitives against the code; local privilege escalation and container escape.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 16:45
+fin: 17:30
+salle: Palais Brongniart
+titre: When Picos Attack - USB Exploit Engineering
+orateur: Alex Plaskett
+resume: How practical is USB memory corruption exploitation on modern OSes? The D.U.E.T. framework on Raspberry Pi Picos coordinated over Wi-Fi, Linux USB attack surface, three exploited bugs (Tesla IVI, Linux kernel, CVE-2024-53150, CVE-2024-53104) and an end-to-end exploit on Ubuntu.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 17:30
+fin: 18:15
+salle: Palais Brongniart
+titre: Parcel Security in Android: From Mismatch to Use-After-Free
+orateur: Yang Kudurshian, John Wu
+resume: Four years after the Android 13 Parcel hardening: its effectiveness, and a file descriptor leak fix that introduced a Parcel use-after-free. Three UAF exploits from the Android VRP (CVE-2022-20452, CVE-2025-22429, CVE-2025-48583), lessons and mitigations.
+lien: https://www.hexacon.fr/conference/speakers/
+
+jour: 2026-10-17
+heure: 18:30
+fin: 18:45
+salle: Palais Brongniart
+titre: Closing session
+
+jour: 2026-10-17
+heure: 19:00
+salle: Brique Machine, 161 rue Montmartre, 75002 Paris
+titre: Closing party
+resume: Soirée de clôture jusqu'à 2h.

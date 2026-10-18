@@ -1,0 +1,18 @@
+# Barbhack 2026 - workshops du samedi 29 août au soir
+# Source : https://www.barbhack.fr/2026/fr/conferences (lien : slides PDF quand publiées)
+
+jour: 2026-08-29
+heure: 21:00
+fin: 22:00
+titre: Détecter les vulnérabilités dans un environnement souverain
+orateur: Christophe Villeneuve
+resume: Démo et tests OSV Scanner avec EUVD au lieu de CVE.
+lien: https://www.barbhack.fr/2026/assets/slides/villeneuve-detecter-vulnerabilites-souverain.pdf
+
+jour: 2026-08-29
+heure: 21:00
+fin: 22:00
+titre: CoolKidsExploration
+orateur: Tixlegeek
+resume: Explorer le CoolKidsBadge et commencer à flagger.
+lien: https://www.barbhack.fr/2026/fr/conferences

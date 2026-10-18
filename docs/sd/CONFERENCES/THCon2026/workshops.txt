@@ -1,0 +1,16 @@
+# THCon 2026 - événement associé et CTF (https://thcon.party/program/, https://thcon.party/)
+jour: 2026-05-04
+heure: 14:00
+fin: 17:45
+salle: IRIT, Auditorium Jacques Herbrand, Université de Toulouse
+titre: Sécurité pour et par le matériel
+resume: Événement organisé la veille de la THCon. Gratuit, sur inscription.
+lien: https://thcon.party/program/
+
+jour: 2026-05-07
+heure: 13:00
+fin: 21:00
+salle: ENSEEIHT, 2 rue Charles Camichel, Toulouse
+titre: Capture The Flag
+resume: CTF sur place à l'ENSEEIHT, aussi en ligne du 7 mai 13h au 8 mai 13h. Venir avec son ordinateur et un casque.
+lien: https://ctf.thcon.party/

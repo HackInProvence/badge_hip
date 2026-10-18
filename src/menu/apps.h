@@ -74,6 +74,7 @@ typedef enum {
     APP_RACE,
     APP_FSK_ID,
     APP_DETECTOR,
+    APP_CONFERENCE,
     APP_COUNT,
 } app_id_t;
 

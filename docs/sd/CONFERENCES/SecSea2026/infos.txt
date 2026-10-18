@@ -1,0 +1,8 @@
+# SecSea 2k26 - Hack In Provence
+nom: SecSea 2k26
+dates: 16-18 octobre 2026
+lieu: La Ciotat
+adresse: Cinéma L'Eden, 25 boulevard Georges Clémenceau, 13600 La Ciotat
+site: https://secsea.org/
+description: La conférence de hacking et de cybersécurité de Provence, organisée par l'association Hack In Provence dans le plus vieux cinéma du monde, l'Eden à La Ciotat. Ateliers le matin, conférences l'après-midi, CTF et soirées le soir. Inscription préalable obligatoire.
+source: https://secsea.org/ (programme publié en images: vendredi2026-2.png, samedi2026-2-edited.png, dimanche2026-edited.png) https://secsea.org/?page_id=288

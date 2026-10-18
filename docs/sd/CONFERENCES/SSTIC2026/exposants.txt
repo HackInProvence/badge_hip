@@ -1,0 +1,22 @@
+# SSTIC 2026 - partenaires
+# Source : https://www.sstic.org/2026/partenaires/
+
+nom: Airbus
+description: Employeur de membres du comité d'organisation, remercié par l'association STIC (page Partenaires)
+lien: https://www.airbus.com
+
+nom: ANSSI
+description: Employeur de membres du comité d'organisation, remercié par l'association STIC (page Partenaires)
+lien: https://www.ssi.gouv.fr
+
+nom: Ledger
+description: Employeur de membres du comité d'organisation, remercié par l'association STIC (page Partenaires)
+lien: https://www.ledger.com
+
+nom: SEKOIA.IO
+description: Employeur de membres du comité d'organisation, remercié par l'association STIC (page Partenaires)
+lien: https://www.sekoia.io
+
+nom: Thales
+description: Employeur de membres du comité d'organisation, remercié par l'association STIC (page Partenaires)
+lien: https://www.thalesgroup.com

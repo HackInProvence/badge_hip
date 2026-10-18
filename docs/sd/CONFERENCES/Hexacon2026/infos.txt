@@ -1,0 +1,8 @@
+# Hexacon 2026 (5e édition)
+nom: Hexacon 2026
+dates: 16-17 octobre 2026 (formations du 12 au 15 octobre)
+lieu: Paris
+adresse: Palais Brongniart, 16 place de la Bourse, 75002 Paris
+site: https://www.hexacon.fr/
+description: Conférence internationale de sécurité offensive organisée par Synacktiv à Paris. Deux jours de conférences (16 talks, en anglais) et deux soirées, précédés de quatre jours de formations à l'Espace Vinci.
+source: https://www.hexacon.fr/ https://www.hexacon.fr/conference/agenda/ https://www.hexacon.fr/conference/speakers/ https://www.hexacon.fr/conference/venue/ https://www.hexacon.fr/trainings/ https://www.hexacon.fr/sponsors/

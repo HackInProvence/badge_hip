@@ -1,0 +1,104 @@
+# Événements hacking / cybersécurité en France (et Monaco), édition la plus récente ou à venir
+# Vérifié sur les sites officiels en octobre 2026
+
+nom: Ph0wn
+ville: Sophia Antipolis (SophiaTech Campus)
+periode: 12-13 mars 2027 (prochaine édition)
+site: https://ph0wn.org/
+description: CTF et workshops gratuits dédiés au monde connecté (IoT, embarqué, OT), avec du matériel physique à attaquer sur place.
+
+nom: Forum InCyber Europe (ex-FIC)
+ville: Lille (Lille Grand Palais)
+periode: 9-11 mars 2027 (prochaine édition)
+site: https://www.forum-incyber.com/
+description: Forum International de la Cybersécurité : l'événement européen de référence sur la confiance numérique.
+
+nom: Hack'In
+ville: Aix-en-Provence (Ynov Campus)
+periode: 10-11 avril 2026
+site: https://hackin.fr/
+description: Depuis 2022, 24 h de CTF (plus de 50 challenges), de conférences, de rumps et de rencontres pour la communauté cyber.
+
+nom: Botconf
+ville: Vannes - Golfe du Morbihan
+periode: 27-30 avril 2027 (édition 2026 : Reims, 14-17 avril 2026)
+site: https://www.botconf.eu/
+description: The Botnet & Malware Ecosystems Fighting Conference : environ 400 participants (forces de l'ordre, CSIRT, chercheurs, éditeurs) contre les malwares; workshops le premier jour.
+
+nom: THCon - Toulouse Hacking Convention
+ville: Toulouse (Université Paul Sabatier, CTF à l'ENSEEIHT)
+periode: 5-7 mai 2026
+site: https://thcon.party/
+description: Conférence de cybersécurité qui réunit passionnés, professionnels et chercheurs; 10e édition en 2026, conférences les 5 et 6 mai, CTF le 7 mai.
+
+nom: BreizhCTF
+ville: Rennes
+periode: 22-23 mai 2026
+site: https://www.breizhctf.com/
+description: Le plus grand CTF de France en présentiel (environ 600 participants), avec Hack&Job et Hack&Teens; organisé par Bretagne Next.
+
+nom: Sthack
+ville: Bordeaux (Cité du Vin, CTF aux salons de la mairie)
+periode: 29 mai 2026
+site: https://sthack.fr/
+description: Créé en 2011 : conférences de sécurité avec des orateurs du monde entier et CTF de nuit, dans l'esprit épicurien bordelais.
+
+nom: SSTIC
+ville: Rennes (Couvent des Jacobins)
+periode: 3-5 juin 2026
+site: https://www.sstic.org/
+description: Symposium sur la sécurité des technologies de l'information et des communications : conférence francophone de référence, challenge et rump sessions.
+
+nom: HSR - HackSecu'R
+ville: Reims (UFR Sciences Exactes et Naturelles)
+periode: 5-6 juin 2026 (21h-9h)
+site: https://www.hacksecureims.eu/
+description: CTF de nuit en présentiel (8e édition en 2026), connexion filaire, prix pour les 4 premières équipes.
+
+nom: leHACK
+ville: Paris (Cité des Sciences et de l'Industrie)
+periode: 26-28 juin 2026
+site: https://lehack.org/
+description: Convention de hacking héritière de la Nuit du Hack, organisée par HZV : conférences, village OSINT, leLAB hardware, workshops et wargame de nuit.
+
+nom: Pass the SALT
+ville: Lille (Université Catholique de Lille)
+periode: 30 juin - 2 juillet 2026
+site: https://www.pass-the-salt.org/
+description: Conférence gratuite en anglais dédiée aux logiciels libres et à la sécurité : 3 jours de talks et de workshops.
+
+nom: Barbhack
+ville: Toulon (Palais des Congrès Neptune)
+periode: 29 août 2026
+site: https://www.barbhack.fr/
+description: La conf hacking la plus au sud de la France : conférences, workshops, CTF de nuit et BBQ, avec le support de HackerZVoice.
+
+nom: Les Assises de la cybersécurité
+ville: Monaco (Grimaldi Forum)
+periode: 7-10 octobre 2026
+site: https://www.lesassisesdelacybersecurite.com/
+description: Rendez-vous annuel des professionnels de la cybersécurité (RSSI, offreurs de solutions) à Monaco.
+
+nom: Hexacon
+ville: Paris
+periode: 16-17 octobre 2026
+site: https://www.hexacon.fr/
+description: Conférence de sécurité offensive au coeur de Paris.
+
+nom: GreHack
+ville: Grenoble (MINATEC, CTF à l'ENSIMAG)
+periode: 13-14 novembre 2026
+site: https://grehack.fr/
+description: Conférence de hacking éthique et CTF : talks et workshops le vendredi, CTF de 8 heures le samedi.
+
+nom: European Cyber Week
+ville: Rennes (Couvent des Jacobins)
+periode: 16-19 novembre 2026
+site: https://www.european-cyber-week.eu/
+description: The Sovereign Cyber & Defence AI forum : quatre jours réunissant les acteurs français et européens de la cybersécurité et de l'IA de défense.
+
+nom: BSides Paris
+ville: Paris
+periode: 2e édition annoncée pour 2026 (date non publiée sur le site)
+site: https://bsidesparis.fr/
+description: Événement communautaire BSides dédié aux innovations et techniques de cybersécurité : conférences, CTF et ateliers (1re édition en 2024).

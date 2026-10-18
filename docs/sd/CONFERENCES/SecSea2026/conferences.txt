@@ -1,0 +1,102 @@
+# SecSea 2k26 - programme officiel (images du programme sur https://secsea.org/)
+# Pas de résumés ni d'heures de fin publiés. Salle unique: cinéma L'Eden.
+jour: 2026-10-16
+heure: 13:37
+salle: L'Eden
+titre: Opening
+orateur: Root
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 14:00
+salle: L'Eden
+titre: 1 an de hack
+orateur: Miaou
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 14:45
+salle: L'Eden
+titre: On est tous dans l'annuaire
+orateur: Maurice
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 16:00
+salle: L'Eden
+titre: Wifi Sensing
+orateur: Alain
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 16:45
+salle: L'Eden
+titre: How I dumped Bob's firmware ?
+orateur: Skilo
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 17:30
+salle: L'Eden
+titre: Biométrie : usurper un visage
+orateur: Ilyes Azouni
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 18:15
+salle: L'Eden
+titre: Rumps
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 19:00
+titre: Tournoi Mario Kart / Pizzas - CTF HiP
+orateur: Everyone
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 14:00
+salle: L'Eden
+titre: Derrière les plateformes MaaS
+orateur: Trystan
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 14:45
+salle: L'Eden
+titre: ERP Pwned !
+orateur: T0t0r0
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 15:30
+salle: L'Eden
+titre: Pwn the Brick
+orateur: Mh4ck
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 16:45
+salle: L'Eden
+titre: Claude "Audit my repo, make no mistake"
+orateur: Roro
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 17:30
+salle: L'Eden
+titre: Coming soon
+orateur: p1lot
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 18:15
+salle: L'Eden
+titre: Rumps
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 19:00
+titre: Soirée Quizz "Qui veut gagner des Monero ?" + Pizza - CTF HiP
+orateur: Everyone
+lien: https://secsea.org/

@@ -1,0 +1,79 @@
+# Hexacon 2026 - sponsors (https://www.hexacon.fr/sponsors/)
+nom: Synacktiv
+stand: Organisateur
+description: Référence française de la sécurité offensive, fondée en 2012.
+lien: https://www.synacktiv.com
+
+nom: SAFA
+stand: Sponsor SMM
+description: Société de sécurité offensive: recherche de vulnérabilités et conseil (noyaux, mobiles, IoT).
+lien: https://safateam.com/
+
+nom: Catalyst Security
+stand: Sponsor SMM
+description: Équipe de chercheurs en vulnérabilités (iOS, Android, navigateurs, 0-click).
+lien: https://catalystsecurity.com/
+
+nom: Cellebrite
+stand: Sponsor SMM
+description: Digital Intelligence pour les laboratoires forensiques: extraction, déverrouillage, déchiffrement.
+lien: https://cellebrite.com
+
+nom: Paradigm Shift
+stand: Sponsor SMM
+description: Fournisseur européen de recherche en cybersécurité, vulnérabilités zero-day.
+lien: https://ps.tc/
+
+nom: Magnet Forensics
+stand: Sponsor SMM
+description: Solutions d'investigation numérique pour les forces de l'ordre, dont Magnet Graykey.
+lien: https://www.magnetforensics.com/
+
+nom: Cyonyx
+stand: Sponsor SMM
+description: Unité de L3Harris Technologies: recherche de vulnérabilités et outils cyber.
+lien: https://www.l3harris.com/cyonyx
+
+nom: DGSE - Direction Générale de la Sécurité Extérieure
+stand: Sponsor Hypervisor
+description: Le service de renseignement extérieur français, rattaché au ministère des Armées.
+lien: https://www.dgse.gouv.fr
+
+nom: DGSI - Direction Générale de la Sécurité Intérieure
+stand: Sponsor Hypervisor
+description: Service de renseignement: contre-terrorisme, contre-ingérence économique, cyberdéfense, contre-espionnage.
+lien: https://www.dgsi.interieur.gouv.fr/
+
+nom: Interrupt Labs
+stand: Sponsor Hypervisor
+description: Société de recherche de vulnérabilités: navigateurs, téléphones, voitures.
+lien: https://interruptlabs.co.uk
+
+nom: Trend AI
+stand: Sponsor Hypervisor
+description: Zero Day Initiative (ZDI): achat de vulnérabilités 0-day pour divulgation coordonnée aux éditeurs.
+lien: https://www.trendaisecurity.com/
+
+nom: Aesir
+stand: Sponsor Ring0
+description: Capacités cyber offensives, recherche de vulnérabilités et red team.
+
+nom: eShard
+stand: Sponsor Ring0
+description: Plateforme esReverse pour l'investigation de logiciels et malwares, analyse assistée par IA.
+lien: https://www.eshard.com/
+
+nom: RandoriSec
+stand: Sponsor Ring0
+description: Tests d'intrusion, reverse engineering, sécurité mobile, formations, depuis 2015.
+lien: https://www.randorisec.fr
+
+nom: Trail of Bits
+stand: Sponsor Ring0
+description: Recherche en sécurité et audit de code.
+lien: https://trailofbits.com/
+
+nom: Binary Gecko
+stand: Sponsor Ring0
+description: Solutions de cybersécurité et laboratoire de recherche de vulnérabilités (Binary Gecko Labs).
+lien: https://binarygecko.com/

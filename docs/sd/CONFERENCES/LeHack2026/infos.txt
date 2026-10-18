@@ -1,0 +1,7 @@
+nom: leHACK 2026 - Brave New World
+dates: 26-28 juin 2026
+lieu: Paris
+adresse: Cité des Sciences et de l'Industrie, Paris (Amphithéâtre Gaston Berger, salles des niveaux S2 et S3)
+site: https://lehack.org/
+description: Convention de hacking organisée par l'association HZV (héritière de la Nuit du Hack). Conférences, village OSINT, village hardware leLAB, workshops et wargame de nuit; l'édition 2026 relie les générations de hackers, du stack smashing aux exploits de LLM.
+source: https://lehack.org/2026/tracks/conferences/ https://cfp.lehack.org/lehack-2026/cfp https://lehack.org/fr/sponsors/

@@ -1,0 +1,66 @@
+# GreHack 2026 - sponsors (catégories 16 bits, 8 bits, Friends)
+# Source : https://grehack.fr/sponsors
+
+nom: Dataflow Security
+description: Sponsor 16 bits
+lien: https://dfsec.com/
+
+nom: Root-Me PRO
+description: Sponsor 16 bits
+lien: https://root-me.pro/
+
+nom: Schneider Electric
+description: Sponsor 16 bits
+lien: https://www.se.com/
+
+nom: Synacktiv
+description: Sponsor 8 bits
+lien: https://www.synacktiv.com/
+
+nom: EDF
+description: Sponsor 8 bits
+lien: https://www.edf.fr/
+
+nom: CEA
+description: Sponsor 8 bits
+lien: https://www.cea.fr/
+
+nom: DGSE
+description: Sponsor 8 bits
+lien: https://www.dgse.gouv.fr/
+
+nom: Randorisec
+description: Sponsor 8 bits
+lien: https://www.randorisec.fr/
+
+nom: Google Cloud
+description: Sponsor 8 bits
+lien: https://cloud.google.com/
+
+nom: MISC Magazine
+description: Friends (partenaire)
+lien: https://connect.ed-diamond.com/misc
+
+nom: Ensimag
+description: Friends (partenaire)
+lien: https://ensimag.grenoble-inp.fr/
+
+nom: Université Grenoble Alpes
+description: Friends (partenaire)
+lien: https://www.univ-grenoble-alpes.fr/
+
+nom: ACONIT
+description: Friends (partenaire)
+lien: http://www.aconit.fr/
+
+nom: BlackAlps
+description: Friends (partenaire)
+lien: https://www.blackalps.ch/
+
+nom: ph0wn
+description: Friends (partenaire)
+lien: https://ph0wn.org
+
+nom: inércia
+description: Friends (partenaire)
+lien: https://inercia.pt/

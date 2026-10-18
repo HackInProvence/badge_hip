@@ -1,0 +1,75 @@
+# THCon 2026 - sponsors (https://thcon.party/sponsors/)
+nom: Orange Cyberdefense
+stand: Sponsor Gold
+description: Partenaire cyber de confiance, pour une société numérique plus sûre.
+lien: https://www.orangecyberdefense.com/fr/solutions
+
+nom: ITrust
+stand: Sponsor Gold
+description: Cybersécurité IA made in France: détection avancée et machine learning (Reveelium, IKare), depuis 2007.
+lien: https://www.itrust.fr/
+
+nom: Epsilon
+stand: Sponsor Gold
+description: Entreprise européenne de recherche en sécurité: mobile (iOS / Android), formation et R&D bas niveau.
+lien: https://www.epsilon-sec.com/
+
+nom: ESGI
+stand: Sponsor Gold
+description: École Supérieure de Génie Informatique, présente dans 18 villes dont Toulouse, depuis 1983.
+lien: https://www.esgi.fr/
+
+nom: Sopra Steria
+stand: Sponsor Gold
+description: Accompagnement en cybersécurité: prévention, protection, détection et réponse, solutions souveraines.
+lien: https://www.soprasteria.com/fr
+
+nom: Root-Me PRO
+stand: Sponsor Silver
+description: Contenus pratiques pour la formation, la sensibilisation et l'évaluation des compétences en cybersécurité.
+lien: https://www.root-me.pro/
+
+nom: Lyra
+stand: Sponsor Silver
+description: Sécurité des transactions de paiement en magasin, en ligne et sur mobile, depuis 2001.
+lien: https://www.lyra.com/fr/
+
+nom: Holberton Actual Digital School
+stand: Sponsor Silver
+description: École de formation aux métiers de la tech par projets, sans prérequis.
+lien: https://www.holbertonschool.fr/
+
+nom: Viveris
+stand: Sponsor Silver
+description: Transformation digitale: systèmes d'information, informatique technique, systèmes embarqués, réseaux.
+lien: https://www.viveris.fr/
+
+nom: MISC
+stand: Sponsor Silver
+description: Le magazine de référence de la sécurité informatique en France depuis 2001.
+lien: https://connect.ed-diamond.com/misc
+
+nom: NEVERHACK
+stand: Sponsor Silver
+description: Entreprise mondiale de cybersécurité, approche à 360° de la gestion des risques cyber.
+lien: https://neverhack.com/fr
+
+nom: Eurecia
+stand: Sponsor Bronze
+description: Solutions RH, PME basée à Toulouse.
+lien: https://www.eurecia.com/
+
+nom: Synacktiv
+stand: Sponsor Bronze
+description: Sécurité offensive: pentest, reverse engineering, réponse aux incidents, développement d'outils.
+lien: https://www.synacktiv.com/
+
+nom: IMS Networks
+stand: Sponsor Bronze
+description: Infrastructures réseau critiques et services de cybersécurité (Cyber-SOC), fondé en 1997 à Castres.
+lien: https://www.imsnetworks.com/
+
+nom: G echo
+stand: Sponsor Bronze
+description: Formation et audits EBIOS.
+lien: https://g-echo.fr/

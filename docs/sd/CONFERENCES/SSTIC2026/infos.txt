@@ -1,0 +1,7 @@
+nom: SSTIC 2026 - Symposium sur la sécurité des technologies de l'information et des communications
+dates: 3-5 juin 2026
+lieu: Rennes
+adresse: Centre des congrès Le Couvent des Jacobins, place Sainte-Anne, 35000 Rennes
+site: https://www.sstic.org/2026/
+description: Conférence francophone sur le thème de la sécurité de l'information. Trois jours de présentations techniques, la solution du challenge et les rump sessions; déjeuners et cocktail à la Halle Martenot.
+source: https://www.sstic.org/2026/programme/ https://www.sstic.org/2026/pratique/

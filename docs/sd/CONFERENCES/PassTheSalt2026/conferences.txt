@@ -1,0 +1,290 @@
+# Pass the SALT 2026 - talks, short talks et rumps
+# Source : https://cfp.pass-the-salt.org/pts2026/schedule/
+
+jour: 2026-06-30
+heure: 14:10
+fin: 14:45
+salle: Amphitheater 122
+titre: Finding the Needle in the Haystack with Dicozorus - A New Companion for Advanced Web Fuzzing
+orateur: Vincent Herbulot
+resume: URL fuzzing is a critical step in penetration testing, yet its effectiveness often hinges on the quality of wordlists. Publicly available lists frequently suffer from missing critical entries, poor sorting, lack of modularity, and irrelevant content, leading to inefficient scans and missed vulnerabilities.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/XGWGAK/
+
+jour: 2026-06-30
+heure: 14:45
+fin: 15:05
+salle: Amphitheater 122
+titre: Fuzzwizard
+orateur: Marion Lafon
+resume: Fuzzwizard is a self-hosted fuzzer orchestrator for continuous fuzzing. It was built to help teams run fuzzers 24/7, monitor their status, centralize crashes, receive notifications, and inspect coverage. Developers now add fuzzers alongside their unit tests, running them manually and keeping track of their results becomes difficult.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/UA97SY/
+
+jour: 2026-06-30
+heure: 15:05
+fin: 15:40
+salle: Amphitheater 122
+titre: Automated Vulnerability Detection in Go: Concolic Execution for Multi-Threaded Binaries
+orateur: Karolina Gorna
+resume: Go powers critical infrastructure, but analyzing compiled Go binaries for security issues remains difficult in practice. In this talk, we present Zorya, an open-source concolic analysis framework designed to detect vulnerabilities directly at the binary level, including bugs that do not immediately crash the program.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/KM8MUR/
+
+jour: 2026-06-30
+heure: 16:10
+fin: 16:45
+salle: Amphitheater 122
+titre: Invited talk: Firefox & security LLM - retex
+orateur: Sylvestre Ledru
+resume: This talk shares a practical return of experience from exploring how Large Language Models can support Firefox security work (Mythos and others). The goal is to provide a pragmatic view: LLMs can accelerate some security workflows, but they must be grounded, reviewed, and integrated carefully into existing Firefox engineering practices.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/PGCUTT/
+
+jour: 2026-06-30
+heure: 16:45
+fin: 17:20
+salle: Amphitheater 122
+titre: __Salty Firmware - Adventures in Firmware Encryption Reversing
+orateur: Quentin Kaiser
+resume: With the increased scrutiny on embedded device security, firmware encryption is rapidly becoming a standard hurdle in the analysis pipeline. As vendors increasingly attempt to lock down their systems, we're encountering a growing variety of encryption schemes applied at different layers-ranging from full firmware blobs to kernel images and root file systems.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/NRFUKL/
+
+jour: 2026-06-30
+heure: 17:20
+fin: 17:40
+salle: Amphitheater 122
+titre: Introducing Sighthouse for Seamless Function Detection
+orateur: Sami Babigeon, Benoit Forgette
+resume: The aim of this talk is to address a common challenge faced by reverse engineers: distinguishing relevant software from third-party libraries within firmware or programs. This task often wastes time as unnecessary code is reversed.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/KVCNWM/
+
+jour: 2026-07-01
+heure: 09:30
+fin: 10:05
+salle: Amphitheater 122
+titre: Quantum Apocalypse Update.ical
+orateur: Yvan Vanhullebus
+resume: In the future, Quantum computers will be able to break today's asymmetric cryptography, especially RSA, CC and DH variants. This would lead to a catastrophic situation sometimes called "Quantum Apocalypse".
+lien: https://cfp.pass-the-salt.org/pts2026/talk/BLUZVX/
+
+jour: 2026-07-01
+heure: 10:05
+fin: 10:40
+salle: Amphitheater 122
+titre: CryptPad experimented on Post-Quantum Cryptography
+orateur: Fabrice Mouhartem
+resume: CryptPad is an open-source end-to-end encrypted collaborative office suite focusing on being easy to use and protecting the privacy of its user, including from the service provider itself. While security against a quantum adversary becomes more and more relevant, we experimented on the realisability of Post-Quantum CryptPad.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/MV83GM/
+
+jour: 2026-07-01
+heure: 11:10
+fin: 11:45
+salle: Amphitheater 122
+titre: Invited talk: Let's stay encrypted-rethinking WebPKI for post-quantum age with Merkle Tree Certificates
+orateur: Bas Westerbaan
+resume: The Web PKI is the foundation on which many security systems depend, and for many the gold standard of how to do PKI. On closer inspection, the Web PKI is an old system evolved with patches added from one crisis to the next. In this talk, we discuss recent efforts to modernize the Web PKI to maintain reliability and security in the face of the imminent threat from quantum computers.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/DVVX3Z/
+
+jour: 2026-07-01
+heure: 11:45
+fin: 12:20
+salle: Amphitheater 122
+titre: Suricata and IOCs, latest news on a love story
+orateur: Eric Leblond
+resume: Suricata's approach to handling Indicators of Compromise (IoCs) has fundamentally evolved from basic IP-only rules to the highly performant Dataset concept. The talk will outline the key advancements, particularly the evolution in Suricata 8.0 to support JSON-based context within Datasets. This upgrade is crucial as an IOC is nothing without context.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/8JJSMR/
+
+jour: 2026-07-01
+heure: 14:15
+fin: 14:50
+salle: Amphitheater 122
+titre: CVE-2025-54068 : Deep dive into Livewire, from weak typing to pre-authenticated remote command execution
+orateur: Rémi Matasse, Pierre Martin
+resume: CVE-2025-54068 exposed a critical vulnerability in Livewire, a popular full-stack framework for Laravel, enabling pre-authenticated remote command execution (RCE) by exploiting PHP's weak typing and Livewire's hydration mechanism. According to GitHub, Livewire was downloaded more than 74 million times, making it one of the most used Laravel dependency ever.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/XKQRMJ/
+
+jour: 2026-07-01
+heure: 14:50
+fin: 15:25
+salle: Amphitheater 122
+titre: ChainLeak: From AI Framework to Cloud Secrets
+orateur: Gal Zaban, Ido Shani
+resume: As organizations rapidly adopt AI frameworks and third-party components, traditional software vulnerabilities are increasingly being introduced into AI infrastructure. While AI security discussions often focus on model level issues such as prompt injections, the most dangerous risks frequently arise from traditional software vulnerabilities within the frameworks that power AI systems.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/MPAYUX/
+
+jour: 2026-07-01
+heure: 15:55
+fin: 16:30
+salle: Amphitheater 122
+titre: Bypassing BitLocker in under 5 min using boot manager downgrade attacks
+orateur: Cassius Garat
+resume: BitLocker without a pre-boot PIN is widely deployed across enterprise environments and often considered a sufficient protection against physical access attacks.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/RVFD8B/
+
+jour: 2026-07-01
+heure: 16:30
+fin: 16:50
+salle: Amphitheater 122
+titre: Zero Dependencies sounds great... until you try to share your code for the security good.
+orateur: Eddie Billoir
+resume: The Rust ecosystem is often praised for its "harmonized chaos" of crates, but a new trend is emerging in security-critical tools: the total avoidance of dependencies. While projects like sudo-rs aim to reduce the supply chain attack surface, this architectural choice comes with a cost.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/J9JGWE/
+
+jour: 2026-07-01
+heure: 17:15
+fin: 17:20
+salle: Amphitheater 122
+titre: Rump : BadUSB forensic
+orateur: Cervoise
+resume: Quick methodology for investigate over suspicious usb cable.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/XYDTXX/
+
+jour: 2026-07-01
+heure: 17:20
+fin: 17:25
+salle: Amphitheater 122
+titre: Rump : OWE Pentest
+orateur: Ajabep
+resume: What is OWE (Opportunistic Wi-Fi Encryption)? How does it work? How to pentest it?
+lien: https://cfp.pass-the-salt.org/pts2026/talk/7RT77X/
+
+jour: 2026-07-01
+heure: 17:25
+fin: 17:30
+salle: Amphitheater 122
+titre: Rump : Le dico du scam
+orateur: Thomas 'tAd' Damonneville
+resume: A short talk about a project I started 3 months ago: Le Dico du Scam, a glossary of words commonly used by french scammers.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/WUPZSD/
+
+jour: 2026-07-01
+heure: 17:30
+fin: 17:35
+salle: Amphitheater 122
+titre: Rump : Why cache is a problem in github ? (And why was it patched)
+orateur: Pierre Martin
+resume: Cache in github is widely used by attackers as for now to elevate their privileges when compromising CI/CD pipelines. Through a real exploit as en example, we will see how it was exploited, because as of yesterday, this was patched by github.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/EW9XLJ/
+
+jour: 2026-07-01
+heure: 17:35
+fin: 17:40
+salle: Amphitheater 122
+titre: Rump : Free Censorship-Resistant Infrastructure: When Malware Uses the BSC Testnet Better Than Web3 Startups
+orateur: thomas
+resume: EtherHiding has recently been documented as a technique where attackers use blockchain infrastructure to host payloads or resolve command-and-control (C2) endpoints. In this talk, I present the analysis of a ClickFix campaign that goes one step further: using smart contracts not for payload delivery, but for victim tracking.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/SLJQQG/
+
+jour: 2026-07-01
+heure: 17:40
+fin: 17:45
+salle: Amphitheater 122
+titre: Rump : Rulezet.org The Open Source Security Intelligence Repository
+orateur: Alexandre Dulaunoy
+resume: https://rulezet.org/ - Explore, share and manage detection rules across all major formats. An open source project and open free online service.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/XY7SVQ/
+
+jour: 2026-07-01
+heure: 17:45
+fin: 17:50
+salle: Amphitheater 122
+titre: Rump : RootAsRole project update
+orateur: Eddie Billoir
+resume: This rump is a quick dive into RootAsRole's recent technical updates. In short: new branding, a new crate, upcoming Debian packaging, AI policy updates, and a working directory feature. It also adds more flexible configuration via folder-based policy handling, and many more. Also: Accessit Prize for PhD artifact, etc.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/AWCBMF/
+
+jour: 2026-07-01
+heure: 17:50
+fin: 17:55
+salle: Amphitheater 122
+titre: Rump : Suricata rules writing with AI
+orateur: Eric Leblond
+resume: How Suricata Language Server and AI skills can be used to analyze and write rules.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/9AGYUZ/
+
+jour: 2026-07-01
+heure: 17:55
+fin: 18:00
+salle: Amphitheater 122
+titre: Rump : Architecture Detection: Teaching Machines to Read Raw Binaries
+orateur: Quentin Kaiser
+resume: If you want to understand binary code, you first need to disassemble and decompile it. But to do that, you must know the target architecture the code was built for. Think of it like using Google Translate: if you feed a Spanish text but tell the tool it's German, the English output will be complete nonsense. The same is true for machine code: the wrong architecture produces garbage.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/3EF7YY/
+
+jour: 2026-07-02
+heure: 09:30
+fin: 10:05
+salle: Amphitheater 122
+titre: Simplifying log management, not just for security logs
+orateur: Peter Czanik
+resume: We live in an age where all decisions are based on data, and in case of IT security, the most important data are log messages. Logs are collected centrally and analyzed by various applications, so there are several trends to simplify log message collection.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/PJHY3V/
+
+jour: 2026-07-02
+heure: 10:05
+fin: 10:40
+salle: Amphitheater 122
+titre: Private Key Leaks in the Wild: from PTS to RWC, and back to PTS
+orateur: Guillaume Valadon, Gaetan Ferry
+resume: Private key leaks represent a critical security vulnerability, with over 400,000 leaked keys on GitHub in 2025, yet their real-world impact remains largely unknown due to the challenge of linking these mathematical objects to their operational usage.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/MVPRCH/
+
+jour: 2026-07-02
+heure: 11:10
+fin: 11:45
+salle: Amphitheater 122
+titre: GCVE: Rebooting Vulnerability Tracking for an Open Security Ecosystem
+orateur: Alexandre Dulaunoy
+resume: The vulnerability ecosystem has become critical infrastructure for defenders, vendors, researchers, and open source maintainers. Yet the way identifiers and vulnerability data are assigned, published, and distributed still reflects a centralized model that does not always match the speed, diversity, and realities of today's security landscape.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/QNGYSR/
+
+jour: 2026-07-02
+heure: 11:45
+fin: 12:20
+salle: Amphitheater 122
+titre: Your credentials were leaked, so what?
+orateur: Xavier Mertens, Pascal Kahn
+resume: Everyday, all of us are flooded with phishing emails trying to impersonate many well-known brands (Netflix, DHL, Microsoft, Google, Facebook & co). Some phishing campaigns are poorly prepared and can be easily spotted. On the other side, some are really well crafted and, be honest, who never clicked on a malicious link? If the flood is constant, it means that it works!
+lien: https://cfp.pass-the-salt.org/pts2026/talk/8SANMK/
+
+jour: 2026-07-02
+heure: 14:00
+fin: 14:35
+salle: Amphitheater 122
+titre: Oblivious HTTP - when the server does not want to see your IP
+orateur: Thibault Meunier
+resume: It's common for users to look to hide their IP addresses. With Oblivious HTTP, it's reversed: the service chooses to blind itself. We'll go over how this IETF standard ended up in Apple, Google, Mozilla, and Meta products, and how it evolved.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/B8AN9M/
+
+jour: 2026-07-02
+heure: 14:35
+fin: 15:10
+salle: Amphitheater 122
+titre: KeibiDrop: Post-Quantum Encrypted Peer-to-Peer File Transfer Without the Cloud
+orateur: Marius-Florin Cristian
+resume: We present KeibiDrop, an open-source (MPL 2.0) peer-to-peer file transfer tool that provides end-to-end encryption using a hybrid post-quantum key exchange (ML-KEM-1024 + X25519) with ChaCha20-Poly1305 at the transport layer. KeibiDrop operates over direct IPv6 connections with no cloud intermediary, no STUN/TURN servers, and no persistent metadata.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/33DFWY/
+
+jour: 2026-07-02
+heure: 15:10
+fin: 15:45
+salle: Amphitheater 122
+titre: Fractum: an open-source CLI for Threshold-Based Cold Storage of Critical Secrets
+orateur: Cédric
+resume: Shamir's Secret Sharing (SSS) has been trusted for decades by organizations like ICANN (DNSSEC root key ceremonies), Banks, Coinbase, Defense industry ; yet it remains largely inaccessible to individual practitioners and small teams who need cold storage for cryptocurrency wallets, SSH keys, infra recovery keys, or root CA credentials.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/9VXT39/
+
+jour: 2026-07-02
+heure: 15:45
+fin: 16:05
+salle: Amphitheater 122
+titre: Rust, PAM and Typestate: Cooking up spotless authentication with nonstick
+orateur: Eddie Billoir
+resume: Bim bam PAM! In this talk, we're diving into the kitchen of system security to look at the PAM (Pluggable Authentication Modules) architecture. We'll start by deconstructing the classic PAM lifecycle. But instead of just "wrapping" the C API in Rust and hoping for the best, we'll introduce nonstick and typestate pattern for a foolproof library crate.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/NHZTG7/
+
+jour: 2026-07-02
+heure: 16:05
+fin: 16:25
+salle: Amphitheater 122
+titre: DesktopRanger Blocks Keystroke Spying: Hardening Windows Desktop Isolation (RECORDED TALK)
+orateur: Igor Korkin
+resume: Modern businesses routinely handle sensitive data-entering passwords, managing internal documents and emails, or conducting confidential meetings in applications such as Zoom and Signal. Windows desktop isolation can block basic keyloggers from capturing keystrokes from applications running on newly created desktops.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/FJZPZL/

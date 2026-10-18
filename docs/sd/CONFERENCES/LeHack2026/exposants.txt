@@ -1,0 +1,193 @@
+# leHACK 2026 - sponsors (catégorie dans la description)
+# Source : https://lehack.org/fr/sponsors/
+
+nom: DGSE
+description: Sponsor Diamond. La Direction Générale de la Sécurité Extérieure est le service secret français. Nos agents travaillent, de manière clandestine, pour protéger la France et les Français. Les menaces n'ont jamais été aussi nombreuses dans le cyberespace.
+lien: https://www.dgse.gouv.fr
+
+nom: YesWeHack
+description: Sponsor Diamond. YesWeHack est une plateforme de sécurité offensive et de gestion de l'exposition aux menaces de premier plan. Elle propose une suite complète de solutions intégrées, basées sur des API, conçues pour sécuriser la surface d'attaque croissante des organisations.
+lien: https://www.yeswehack.com/
+
+nom: DGSI
+description: Sponsor Platinum. La Direction générale de la sécurité intérieure (DGSI) est le service de renseignement français, placé sous l'autorité du ministère de l'Intérieur.
+lien: https://www.dgsi.interieur.gouv.fr/
+
+nom: PASSBOLT
+description: Sponsor Platinum. Passbolt est la plateforme européenne open source de gestion des mots de passe, des secrets et des accès privilégiés. Conçue pour les équipes techniques soucieuses de la sécurité, elle s'adapte à de multiples cas d'usage, des flux de travail IT et DevOps à la gestion des identifiants à l'échelle...
+lien: https://www.passbolt.com/
+
+nom: ANSSI
+description: Sponsor Platinum. Créée en 2009 au sein du cabinet du Premier ministre et sous l'autorité du Secrétaire général de la défense et de la sécurité nationale, l'Agence française de la sécurité des systèmes d'information (ANSSI) est l'autorité nationale en matière de cybersécurité et de cyberdéfense.
+lien: https://www.ssi.gouv.fr/
+
+nom: SYNACKTIV
+description: Sponsor Platinum. Synacktiv a pour objectif d'aider les organisations à évaluer et à renforcer la sécurité de leurs systèmes d'information. Fondée en 2012 par deux experts en cybersécurité, Nicolas Collignon et Renaud Feil, l'entreprise est devenue au fil des années le leader français de la sécurité offensive.
+lien: https://www.synacktiv.com/
+
+nom: HACK THE BOX
+description: Sponsor Platinum. Hack The Box est la plateforme de référence en matière de préparation à la cybersécurité à l'ère de l'intelligence artificielle. Elle permet de tester et de perfectionner les compétences des humains et des agents IA afin d'améliorer la cyber-résilience des organisations.
+lien: https://www.hackthebox.com/
+
+nom: OVHcloud
+description: Sponsor Platinum. OVHcloud est un acteur mondial du cloud et le premier fournisseur européen de cloud exploitant plus de 450 000 serveurs dans 43 centres de données répartis sur 4 continents pour atteindre 1,6 million de clients dans plus de 140 pays.
+
+nom: EC-Council
+description: Sponsor Platinum. Depuis 2006 en France, EC-Council, à travers un réseau de centres de formation et d'écoles/universités, propose des formations en cybersécurité menant à des certifications. Ces formations et certifications s'adressent à tous les niveaux, du débutant au RSSI/testeur d'intrusion.
+lien: https://www.eccouncil.org/
+
+nom: Campus OSINT
+description: Sponsor Platinum. Le Campus OSINT de la Délégation générale de l'armement (DGA) : des missions au profit de l'ensemble du Ministère des Armées (Minarm) Fédérer l'écosystème des créateurs d'outils en stimulant le développement de l'OSINT : coordination des travaux des différents acteurs, partenariat avec...
+
+nom: Commandement de la Cyberdéfense
+description: Sponsor Platinum. Le commandement cyber (COMCYBER), créé en 2017, est une entité stratégique placée sous l'autorité du chef d'état-major des armées.
+lien: https://www.welcometothejungle.com/fr/companies/commandement-de-la-cyberdefense-comcyber
+
+nom: HS2
+description: Sponsor Platinum. Créée en juin 2018, HS2 est la société d'Hervé Schauer, formateur en cybersécurité depuis 1989, pionnier de la formation continue francophone en cybersécurité et vie privée, attaché à la qualité des formations et la satisfaction de ses clients.
+lien: https://www.hs2.fr/
+
+nom: Red Team Alliance
+description: Sponsor Platinum. La mission de la Red Team Alliance est de faire progresser la discipline de la sécurité en faisant progresser les personnes en matière de sécurité.
+lien: https://shop.redteamalliance.com/
+
+nom: NAVAL GROUP
+description: Sponsor Platinum. Naval Group est l'entreprise du naval de défense. Une entreprise de savoir-faire unique positionnée sur un marché très dynamique.
+lien: https://www.naval-group.com/fr/nous-rejoindre
+
+nom: DIRECTION DE LA TRANSFORMATION NUMERIQUE (DTNUM)
+description: Sponsor Platinum. Rattachée au Secrétaire général adjoint aux affaires numériques, la Direction de la transformation numérique (DTNUM) pilote la stratégie numérique du ministère de l'Intérieur.
+lien: https://www.interieur.gouv.fr/ministere/secretariat-general/direction-du-numerique
+
+nom: DGA
+description: Sponsor Platinum. La DGA est l'expert technique référent du ministère des Armées en matière de cyberdéfense, de l'anticipation de la menace à la mise en oeuvre de cybersolutions pour la défense et les hautes autorités de l'État.
+lien: https://www.defense.gouv.fr/dga
+
+nom: SysDream
+description: Sponsor Platinum. SysDream, filiale du groupe Hub One, est spécialisée en cybersécurité des systèmes d'information. Nous aidons nos clients à identifier et à hiérarchiser leurs vulnérabilités grâce à des audits techniques approfondis, incluant des tests d'intrusion, Active Directory, des applications web,...
+lien: https://sysdream.com/
+
+nom: Claranet
+description: Sponsor Gold. Claranet accompagne les organisations tout au long du cycle de vie de la cybersécurité : sécurité offensive, sécurité défensive et opérations de sécurité.
+lien: https://www.claranet.com/fr/
+
+nom: EPSILON
+description: Sponsor Gold. Epsilon est spécialisé dans la recherche de vulnérabilités sur les plateformes mobiles (iOS, Android) et les navigateurs. Notre équipe d'experts est répartie à travers le monde, avec des bureaux en France et en Espagne, ainsi qu'une présence au Canada.
+lien: https://www.epsilon-sec.com/
+
+nom: ITRUST
+description: Sponsor Gold. Pôle d'expertise en cybersécurité IA depuis 2007, ITrust est une société française, filiale du Groupe Iliad. Elle accompagne les organisations en proposant son expertise et une suite logicielle, développées et hébergées en France, pour renforcer leur cybersécurité.
+lien: https://www.itrust.fr/
+
+nom: FORWARD CYBER
+description: Sponsor Gold. Forward Cyber réunit les expertises cybersécurité de Forward Global, pure player international de la gestion des risques numériques, économiques et informationnels.
+lien: https://forwardglobal.com/
+
+nom: DATAFLOW Security
+description: Sponsor Social event. Dataflow Security est une entreprise européenne pionnière en R&D, spécialisée dans la recherche sur les vulnérabilités et le développement d'exploits. Notre équipe de recherche fait progresser l'état de l'art des systèmes d'exploitation, navigateurs et applications les plus utilisés.
+lien: https://dfsec.com/#careers
+
+nom: EPIEOS
+description: Sponsor OSINT. Depuis 2020, Epieos.com est le meilleur outil OSINT (Open Source Intelligence) qui permet de retracer l'empreinte numérique d'une personne à partir d'une adresse email ou d'un numéro de téléphone.
+lien: https://epieos.com/
+
+nom: UserSearch
+description: Sponsor OSINT. est une plateforme d'investigation OSINT (Open Source Intelligence) de pointe, spécialisée dans le renseignement en temps réel et historique sur les empreintes numériques.
+lien: https://usersearch.org/
+
+nom: H2LAB
+description: Sponsor leLAB. H2Lab est une association de piratage matériel ciblant la sécurité et la conception des objets connectés et des appareils embarqués.
+lien: https://x.com/H2lab_org
+
+nom: TWISTED WIRES
+description: Sponsor leLAB. Société française spécialisée en cybersécurité, Twisted Wires se concentre sur la sécurité des systèmes embarqués. À travers une approche orientée recherche et innovation, elle accompagne ses clients via des services de test d'intrusion, d'audit de sécurité, de criminalistique et de R&D...
+lien: https://www.twistedwires.io/fr/
+
+nom: QUARKSLAB
+description: Sponsor leLAB. Fondé en 2011 en tant que laboratoire privé de R&D en sécurité informatique, Quarkslab transforme la recherche en sécurité en solutions concrètes. Notre mission est d'aider les organisations à relever des défis de sécurité complexes grâce à des logiciels et services spécialisés.
+lien: https://www.quarkslab.com/
+
+nom: GT BIDOUILLE
+description: Sponsor leLAB.
+
+nom: HACKROPOLE
+description: Sponsor leLAB. Hackropole est une plateforme d'archives des épreuves du France Cybersecurity Challenge (FCSC). Les épreuves sont rejouables par tout le monde, avec ou sans compte.
+lien: https://hackropole.fr/fr/
+
+nom: PTCC
+description: Sponsor leLAB. Le programme de Transfert au Campus Cyber est une initiative nationale française financée dans le cadre de la Stratégie Nationale pour la Cybersécurité.
+lien: https://ptcc.fr/
+
+nom: M5STACK
+description: Sponsor leLAB. M5Stack est un acteur majeur de l'IoT modulaire, reconnu pour ses solutions open source, rapides à déployer et accessibles aussi bien aux développeurs, entreprises, éducateurs qu'aux makers.
+lien: https://m5stack.com/
+
+nom: OTERIA CYBER SCHOOL
+description: Sponsor School. OTERIA est une école dédiée à la cybersécurité, formant 350 étudiants encadrés par 100 professeurs Elle propose 7 spécialisations en M2 couvrant l'ensemble du spectre cyber : Sécurité offensive, Blue Team, DevSecOps, GRC, DPO, DevSecOps, Sécurité Industrielle, CTI.
+lien: https://www.oteria.fr/
+
+nom: ESIEA
+description: Sponsor School. L'ESIEA est une école d'ingénieurs prestigieuse spécialisée dans les technologies numériques et l'informatique, avec des campus à Paris, Ivry-sur-Seine, Laval et Agen.
+lien: https://www.esiea.fr
+
+nom: CYBERSUP
+description: Sponsor School. Cybersup est l'École de cybersécurité et d'IA, fruit d'une alliance exceptionnelle entre le groupe FROJAL (Lefebvre Dalloz) et l'école numérique La Plateforme. Cybersup forme des professionnels clés de la cybersécurité à l'interface des technologies de l'information et de la réglementation.
+lien: https://www.cybersup.ai
+
+nom: ECOLE 2600
+description: Sponsor Challenges. L'École 2600 est une école 100% dédiée à la cybersécurité. L'école est organisme certificateur auprès de France Compétences. Nous délivrons, à l'issue d'un cursus de 3 ans en alternance, un titre RNCP de niveau 7 (Bac+5).
+lien: https://ecole2600.com
+
+nom: MOZILLA
+description: Sponsor Association. Mozilla Francophone remplit sa mission de principe en développant le navigateur libre et open source Firefox, ainsi que des applications et services comme Mozilla VPN et Firefox Monitor, mais l'association à but non lucratif Mozilla se bat également pour faire d'Internet une ressource publique...
+lien: https://www.mozilla.org/fr/
+
+nom: OpenFacto
+description: Sponsor Association. OpenFacto est une association à but non lucratif (loi 1901), dont l'objectif est de fédérer et de promouvoir la scène OSINT francophone.
+lien: https://openfacto.fr/
+
+nom: ELECTROLAB
+description: Sponsor Association. L'association Electrolab a pour objectif de favoriser le transfert non commercial de connaissances et d'expertises scientifiques et techniques, de mener des activités de promotion des sciences et des technologies auprès du grand public et de mettre à disposition de ses membres un espace de...
+lien: https://www.electrolab.fr
+
+nom: Certhub
+description: Sponsor Association. Certhub est une organisation à but non lucratif dédiée à la cybersécurité et au partage des connaissances. Notre mission est de rendre ce domaine accessible à tous, en mettant l'accent sur le soutien aux personnes en reconversion professionnelle et aux jeunes intéressés par une carrière dans la...
+
+nom: ARCSI
+description: Sponsor Association. Cette association a été créée en 1928 par les officiers de réserve des sections de chiffrement parmi lesquels se trouvaient les glorieux acteurs des grands succès de la cryptologie française pendant la Grande Guerre.
+lien: https://www.arcsi.fr
+
+nom: ISSA France Security Tuesday- Lumérique
+description: Sponsor Association. L'association ISSA France Sécurité a lancé mardi Lumérique, un mouvement citoyen et collectif pour la protection des mineurs en ligne.
+lien: https://securitytuesday.com/
+
+nom: Hack'In
+description: Sponsor Association. Hack'In est un événement annuel organisé sous le soleil du sud de la France. Au programme, du try hard, beaucoup de cadeaux, un beau before (avec quelques talks tout de même) et surtout des passionnés venus se réunir pour gagner le cashprize !
+lien: https://hackin.fr/
+
+nom: CEFCYS
+description: Sponsor Association. Le CEFCYS (Cercle des Femmes en Cybersécurité) est une association créée par Nacira Salvan en 2016. Son objectif principal est de promouvoir et de développer la présence et le leadership des femmes dans les métiers de la cybersécurité.
+lien: https://cefcys.fr
+
+nom: OCOI
+description: Sponsor Association. L'Observatoire de la cybersécurité de l'océan Indien (OCOI) est une association dédiée à la promotion de la cybersécurité dans la région de l'océan Indien. Fondé en juillet 2023, l'OCOI rassemble des experts en cybersécurité, des chercheurs, des professionnels de l'informatique et des étudiants.
+lien: https://www.ocoi.org/
+
+nom: CyberV
+description: Sponsor Association. CyberV est une association de cybersécurité à but non lucratif, fondée en 2022, qui compte plus de 2200 membres dans le monde entier. Notre mission ? Favoriser un environnement d'apprentissage stimulant et stimulant pour les étudiants et les passionnés de cybersécurité.
+lien: https://discord.gg/DB9kbCJyhT
+
+nom: OSINT-FR
+description: Sponsor Association. OSINT-FR est une organisation à but non lucratif dédiée au renseignement open source. Nous réunissons passionnés et professionnels à travers des événements, des formations et des projets collaboratifs.
+lien: https://osintfr.com
+
+nom: OSSIR
+description: Sponsor Association. L'Observatoire de la Sécurité des Systèmes d' Information et des Réseaux (OSSIR) est une association à but non lucratif (loi de 1901), existant depuis 1996, qui regroupe toutes les personnes intéressées par la cybersécurité.
+lien: https://www.ossir.org/
+
+nom: Cyberun
+description: Sponsor Medias.
+
+nom: MISC - Editions DIAMOND
+description: Sponsor Medias. Crée en 2001, MISC Magazine est rédigé par des experts du milieu qui fournissent un état de l'art sur les dernières techniques défensives et offensives. Aujourd'hui nous proposons pour les services informatiques un accès en ligne de toute la documentation technique de MISC.
+lien: https://boutique.ed-diamond.com

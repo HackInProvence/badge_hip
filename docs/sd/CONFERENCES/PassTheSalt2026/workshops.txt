@@ -1,0 +1,65 @@
+# Pass the SALT 2026 - workshops
+# Source : https://cfp.pass-the-salt.org/pts2026/schedule/
+
+jour: 2026-06-30
+heure: 14:10
+fin: 17:10
+salle: Room LW109
+titre: Design Your First PCB: From Concept to Board
+orateur: tcccorp
+resume: This workshop introduces you to the entire printed circuit board (PCB) design process, from the initial idea to the creation of your own board. You'll discover why creating a custom PCB can be a high-performance alternative to using standard modules and review the essential electronic concepts for designing reliable circuits.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/AACNG9/
+
+jour: 2026-06-30
+heure: 14:10
+fin: 17:10
+salle: Room LW112
+titre: In bed with Qubes OS, hands-on workshop
+orateur: William Robinet
+resume: This workshop begins by introducing the fundamental principles behind Qubes OS. We'll cover the entire process, from installation and configuration to common challenges and practical solutions. We'll then explore various aspects of Qubes OS through demonstrations, hands-on labs, and exercises using pre-installed virtualized instances available to attendees.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/J7EGL7/
+
+jour: 2026-07-01
+heure: 09:30
+fin: 12:30
+salle: Room LW109
+titre: Web forensics with Lookyloo and Lacus
+orateur: Raphaël Vinot, Quinn Norton
+resume: Websites are complex, they change all the time, it is extremely tedious to reproduce the load of one URL, especially when the malicious actors don't want you to probe their infrastructure. During this workshop, we will look at techniques used by malicious actors to trick unsuspecting users, find phishing campaigns, and see a lot of slop.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/3EQEU7/
+
+jour: 2026-07-01
+heure: 09:30
+fin: 12:30
+salle: Room LW112
+titre: Workshop to explore SightHouse! Learn how to use it to accelerate your reverse engineering process
+orateur: Benoit Forgette, Sami Babigeon
+resume: Reverse engineers frequently encounter firmware or large binaries containing a mixture of proprietary code and numerous third-party libraries. Identifying which components belong to external libraries is a recurring and time-consuming challenge that can significantly slow down analysis.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/UUCD9C/
+
+jour: 2026-07-01
+heure: 14:15
+fin: 17:00
+salle: Room LW109
+titre: Threat Detection Engineering with Suricata
+orateur: Eric Leblond
+resume: This hands-on workshop provides an in-depth exploration of advanced techniques for maximizing network threat detection using Suricata. Building upon core Suricata capabilities, this session delves into critical areas such as effective utilization of metadata keywords, including MITRE and regular metadata, to enrich detection context.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/THXBWZ/
+
+jour: 2026-07-01
+heure: 14:15
+fin: 17:00
+salle: Room LW112
+titre: Hands-on Firmware Extraction, Exploration, and Emulation
+orateur: Quentin Kaiser
+resume: Join us for this hands-on demo of Unblob, the flexible firmware extractor. In this session, we will extract firmware from an EV charger, dig into the firmware, and eventually emulate it so we can interact with the services in real-time. Unblob works on both hardware and downloadable versions of firmware so we have a target rich environment.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/TZJESW/
+
+jour: 2026-07-02
+heure: 09:30
+fin: 12:00
+salle: Room LW112
+titre: A phishing trip with Fancy Bear - Let's analyze APT malware together!
+orateur: Marius Genheimer
+resume: In this beginner-friendly, hands-on workshop, participants will walk through the full attack chain of a real-world Fancy Bear (APT28/GRU) intrusion - from the initial phishing email to command & control - guided by a purpose-built interactive training platform.
+lien: https://cfp.pass-the-salt.org/pts2026/talk/UJGHEX/

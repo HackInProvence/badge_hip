@@ -1,0 +1,54 @@
+# SecSea 2k26 - ateliers du matin (images du programme sur https://secsea.org/)
+jour: 2026-10-16
+heure: 09:00
+titre: Flipper Zero
+orateur: Tristus1er
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 09:00
+titre: Badge Electronique
+orateur: Miaou
+lien: https://secsea.org/
+
+jour: 2026-10-16
+heure: 09:00
+titre: Débuter en Bug bounty Android
+orateur: Mhack
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 09:00
+titre: Purple Team Indus
+orateur: Biero
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 09:00
+titre: Flipper Zero
+orateur: Tristus1er
+lien: https://secsea.org/
+
+jour: 2026-10-17
+heure: 09:00
+titre: Badge Electronique
+orateur: Miaou
+lien: https://secsea.org/
+
+jour: 2026-10-18
+heure: 09:00
+titre: Purple Team Indus
+orateur: Biero
+lien: https://secsea.org/
+
+jour: 2026-10-18
+heure: 09:00
+titre: Débuter en Bug bounty Android
+orateur: Mhack
+lien: https://secsea.org/
+
+jour: 2026-10-18
+heure: 09:00
+titre: Badge électronique
+orateur: Miaou
+lien: https://secsea.org/

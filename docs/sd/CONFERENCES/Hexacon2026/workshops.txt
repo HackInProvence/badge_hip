@@ -1,0 +1,57 @@
+# Hexacon 2026 - formations (https://www.hexacon.fr/trainings/)
+# Quatre jours, du 12 au 15 octobre 2026, à l'Espace Vinci (rue des Jeûneurs, Paris 2e), pas au lieu de la conférence.
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Attacking Instant Messaging Applications in the LLM Era
+orateur: Nitay Artenstein
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Bug Hunting in Hypervisors
+orateur: Corentin Bayet, Bruno Pujos
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Exploiting the Android Kernel
+orateur: Andrey Konovalov
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: iOS for Security Engineers
+orateur: Quentin Meffre, Victor Cutillas
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Modern Malware OPSEC & Anti-Reverse Techniques Implementation and Reversing
+orateur: Silvio La Porta, Antonio Villani
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Practical Baseband Exploitation
+orateur: Pedro Ribeiro, Vitor Pedreira
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Software Deobfuscation Techniques for Automated and Agentic Reverse Engineering
+orateur: Tim Blazytko
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/
+
+jour: 2026-10-12
+salle: Espace Vinci
+titre: Windows Internals for Security Engineers
+orateur: Yarden Shafir
+resume: Formation de 4 jours, du 12 au 15 octobre 2026.
+lien: https://www.hexacon.fr/trainings/

@@ -1,0 +1,528 @@
+# leHACK 2026 - conférences (Amphithéâtre Gaston Berger), village OSINT et talks du leLAB
+# Source : https://lehack.org/2026/tracks/ (conferences, osint, lelab, workshops)
+
+jour: 2026-06-26
+heure: 10:00
+fin: 10:45
+salle: Amphithéâtre Gaston Berger
+titre: Keynote : Pas besoin d'être un Mythos pour faire de l'offensif
+orateur: Patrick Ventuzelo
+resume: Avril 2026 : Anthropic dévoile Claude Mythos, capable de trouver des 0-days dans tous les OS majeurs, et réserve son accès à 40 organisations triées sur le volet. Faut-il vraiment un frontier model classifié pour faire de la recherche offensive sérieuse en 2026 ? Ce talk défend l'inverse. DARPA AIxCC l'a prouvé en 2025 : les systèmes battent les modèles.
+lien: https://lehack.org/2026/tracks/conferences/#keynot-temp-placeholder
+
+jour: 2026-06-26
+heure: 10:30
+fin: 11:30
+salle: Salle Louis Armand s3
+titre: [>_] Agents in the Basement
+orateur: Sergio Coronado
+resume: AI agents are starting to change OSINT work, not because they replace analysts, but because they can take over parts of the research loop: searching, extracting, comparing sources, drafting briefs, and leaving traces that a human can inspect. This talk presents a practitioner's view of that shift.
+lien: https://lehack.org/2026/tracks/osint/#talk-_-agents-in-the-basement
+
+jour: 2026-06-26
+heure: 10:45
+fin: 11:30
+salle: Amphithéâtre Gaston Berger
+titre: Entra ID & Microsoft 365 Under Siege : Autopsie des Compromissions Cloud Modernes et Stratégies de Riposte
+orateur: Kondah Hamza
+resume: L'écosystème Microsoft Entra ID et Microsoft 365 est devenu en 2025-2026 l'épicentre des compromissions cloud en entreprise. Les rapports sont unanimes : l'identité est le premier vecteur d'attaque, et les environnements M365 représentent la surface d'attaque la plus convoitée : des APT étatiques aux opérateurs de Phishing-as-a-Service.
+lien: https://lehack.org/2026/tracks/conferences/#entra-id-microsoft-365-under-siege-autopsie-des-compromissions-cloud-modernes-et-strategies-de-riposte
+
+jour: 2026-06-26
+heure: 11:05
+fin: 11:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy
+
+jour: 2026-06-26
+heure: 11:30
+fin: 11:50
+salle: Amphithéâtre Gaston Berger
+titre: Trust Me, I'm A Shortcut: New LNK Abuse Methods
+orateur: Wietze Beukema
+resume: Windows shortcut (.LNK) files remain a persistent threat vector. While simple bypasses like adding spaces exist, this session reveals undocumented techniques for deceptive payload delivery and execution. We'll explore why these methods work, the black-box research methodology used to find them, and the defensive implications.
+lien: https://lehack.org/2026/tracks/conferences/#trust-me-im-a-shortcut-new-lnk-abuse-methods
+
+jour: 2026-06-26
+heure: 11:30
+fin: 12:30
+salle: Salle Louis Armand s3
+titre: Sun, Sea, and SQLite: Open-Source Facial Recognition for Fugitive Hunting
+orateur: Joshua Richards
+resume: This talk will demonstrate a research project focused on transforming everyday tourist videos and walking tours into an automated investigative tool for tracking international fugitives. Attendees will discover how high-definition public footage can be leveraged for open-source intelligence, turning casual holiday backdrops into an effective search mechanism.
+lien: https://lehack.org/2026/tracks/osint/#talk-sun-sea-and-sqlite-open-source-facial-recognition-for-fugitive-hunting
+
+jour: 2026-06-26
+heure: 11:50
+fin: 12:10
+salle: Amphithéâtre Gaston Berger
+titre: RF : une menace invisible ? Le monde caché du TSCM
+orateur: Stéphane
+resume: Dans cette conférence, l'intervenant propose une immersion dans un univers rarement visible du grand public : celui de la menace RF, de l'écoute clandestine et des opérations de TSCM. L'objectif est de montrer comment des environnements en apparence ordinaires peuvent dissimuler des risques techniques réels, souvent ignorés jusqu'au dernier moment.
+lien: https://lehack.org/2026/tracks/conferences/#rf-une-menace-invisible-le-monde-cache-du-tscm-stephane
+
+jour: 2026-06-26
+heure: 12:05
+fin: 12:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-2
+
+jour: 2026-06-26
+heure: 13:05
+fin: 13:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-3
+
+jour: 2026-06-26
+heure: 13:30
+fin: 14:30
+salle: Salle Louis Armand s3
+titre: Needle in a haystack: influence operations hiding in a dataset of 10 million users
+orateur: Clément Hammel, Mathis Hammel
+resume: Analyzing manipulation campaigns on social media is a complex topic, especially when you want to draw an accurate and complete picture of the operation. Inauthentic accounts and posts are diluted in a huge ocean of legitimate content, but what if we had the ability to scan the entire ocean?
+lien: https://lehack.org/2026/tracks/osint/#talk-needle-in-a-haystack-influence-operations-hiding-in-a-dataset-of-10-million-users
+
+jour: 2026-06-26
+heure: 14:00
+fin: 14:45
+salle: Amphithéâtre Gaston Berger
+titre: Getting Lost in SAP: From LPE to Remote Memory Corruption
+orateur: Tao Sauvage
+resume: SAP is widely used by Fortune 500 companies and often underpins critical business processes, yet its attack surface is difficult to evaluate due to its proprietary nature. In this talk, I retrace how I approached that problem in practice: starting from a single thread and following it through reverse engineering, archive format internals, black-box fuzzing, and exploit development.
+lien: https://lehack.org/2026/tracks/conferences/#getting-lost-in-sap-from-lpe-to-remote-memory-corruption
+
+jour: 2026-06-26
+heure: 14:30
+fin: 14:50
+salle: Salle 3 niveau S3
+titre: IoT Horror Stories: Beneath the Plastic Shell
+orateur: Skander Belabed
+resume: For several years now, IoT devices have become part of our daily lives, sometimes even into our most personal spaces. Yet, they are not explored as much as they should be from a security analysis perspective, perhaps due to this plastic shell which could act as a psychological barrier.
+lien: https://lehack.org/2026/tracks/lelab/#talk-iot-horror-stories-beneath-the-plastic-shell
+
+jour: 2026-06-26
+heure: 14:30
+fin: 15:30
+salle: Salle Louis Armand s3
+titre: Decoding China's OSINT Ecosystem
+orateur: Côme
+resume: This session dives into China's OSINT ecosystem: how public and private actors intertwine to equip the Party-state with powerful capabilities to collect and exploit publicly available data. We'll unpack the tools, workflows, and partnerships that sustain this system, with a particular focus on how information is extracted and processed from Chinese sources
+lien: https://lehack.org/2026/tracks/osint/#talk-decoding-chinas-osint-ecosystem
+
+jour: 2026-06-26
+heure: 14:45
+fin: 15:30
+salle: Amphithéâtre Gaston Berger
+titre: Overcast Panda
+orateur: Jake Lomas, Antoine Vianey-Liaud
+resume: Whilst organisations and individuals continue to heavily focus on digital initial access vectors, many continue to overlook physical access. OVERCAST PANDA's operatives, however, do not discriminate against the physical realm to achieve their targeting objectives.
+lien: https://lehack.org/2026/tracks/conferences/#overcast-panda-temp
+
+jour: 2026-06-26
+heure: 15:05
+fin: 15:55
+salle: Salle 3 niveau S3
+titre: ESP32 au-delà des limites
+orateur: 7h30th3r0n3
+resume: Depuis deux ans et demi, Evil-M5Project transforme les produits M5Stack notament le Cardputer en couteau suisse de la sécurité offensive. 88 modules, 43 000 lignes de C++, 2300+ stars GitHub, le tout sur un ESP32-S3 à 30 avec clavier, écran et slot SD.
+lien: https://lehack.org/2026/tracks/lelab/#talk-esp32-au-dela-des-limites
+
+jour: 2026-06-26
+heure: 15:30
+fin: 16:15
+salle: Amphithéâtre Gaston Berger
+titre: The Hidden Agenda: Exposing Qilin Ransomware Operations
+orateur: Thibault Seret (Glacius_)
+resume: Throughout this presentation we'd like to expose Qilin's methodology, from compromising victims to exfiltration. We'll also have a look at the infrastructure involved since the TA left a few gifts that most of people will overlook, and the cryptocurrency tracking we've done to identify how the core team and its affiliates operate together.
+lien: https://lehack.org/2026/tracks/conferences/#pas-besoin-detre-un-mytho-pour-faire-de-loffensif-temp
+
+jour: 2026-06-26
+heure: 15:30
+fin: 16:30
+salle: Salle Louis Armand s3
+titre: Fight for Facts! Investigations at Reporters Without Borders (RSF)
+orateur: Arnaud Froger
+resume: As the mandate of Reporters sans frontières (RSF) has expanded, the organization launched its own investigations desk in 2022.
+lien: https://lehack.org/2026/tracks/osint/#talk-fight-for-facts-investigations-at-reporters-without-borders-rsf
+
+jour: 2026-06-26
+heure: 16:05
+fin: 16:55
+salle: Salle 3 niveau S3
+titre: Offensive AI on ESP32: Breaking Embedded Limits
+orateur: x42en, Ben Mz
+resume: Vandal, c'est l'implémentation en pur C d'une plateforme d'analyse RF multi-protocoles basée sur de l'ESP32-S3. On a soupoudré notre layer-cake cyber avec : - du WiFi avec injection de trames, deauth, captive_portal, sniffing, scanners et autres surprises - du Bluetooth BLE 5.0 avec scan de services, monitoring d'attributs et détection de security profile + bruteforce de pin - du...
+lien: https://lehack.org/2026/tracks/lelab/#talk-vandal-yet-another-dongle
+
+jour: 2026-06-26
+heure: 16:15
+fin: 16:35
+salle: Amphithéâtre Gaston Berger
+titre: Attacking WSO2: 0-Days and N-Day Chains for Pre-Auth RCE on Enterprise Java
+orateur: Noel MACCARY
+resume: WSO2 products (API Manager, Identity Server) are massively deployed across critical infrastructure (banking, insurance, defense, government) in France and worldwide.
+lien: https://lehack.org/2026/tracks/conferences/#attacking-wso2-0-days-and-n-day-chains-for-pre-auth-rce-on-enterprise-java
+
+jour: 2026-06-26
+heure: 16:35
+fin: 16:55
+salle: Amphithéâtre Gaston Berger
+titre: From USB to ESP: Security Vulnerabilities in Espressif Firmware
+orateur: Maxime Rossi Bellom, Ramtine Tofighi Shirazi
+resume: Espressif designs small, low-cost system-on-chips primarily intended for wireless connectivity such as Wi-Fi and Bluetooth Low Energy. These SoCs are widely used as the networking and control component in IoT and embedded products, handling external inputs, protocol parsing, and communication with the rest of the system.
+lien: https://lehack.org/2026/tracks/conferences/#from-usb-to-esp-security-vulnerabilities-in-espressif-firmware
+
+jour: 2026-06-26
+heure: 17:00
+fin: 17:45
+salle: Amphithéâtre Gaston Berger
+titre: Reversense: One Hook, Then the Universe
+orateur: Georges-Bastien Michel (@FrenchYeti)
+resume: Est ce que le reverse c'est IDA, R2, Frida, Ghidra, QEMU, et bien d'autres ? Non, c'est tout ça, et tout ça ce n'est pas le secret que l'on veut découvrir, la DRM que l'on veut casser, ce n'est que le moyen.
+lien: https://lehack.org/2026/tracks/conferences/#reversense-one-hook-then-the-universe
+
+jour: 2026-06-26
+heure: 17:05
+fin: 17:55
+salle: Room 3 niveau S3
+titre: outil de bypass de protection JTAG (théorie)
+orateur: GotoHack, Croute
+lien: https://lehack.org/2026/tracks/lelab/#talk-outil-de-bypass-de-protection-jtag-theorie
+
+jour: 2026-06-26
+heure: 17:45
+fin: 18:05
+salle: Amphithéâtre Gaston Berger
+titre: The Art of Staying In, Part II: Target Weakening
+orateur: m101
+resume: What if the backdoor phase required no code at all? Last year at leHack, I introduced a framework for reasoning about unconventional persistence - backdoors built from configuration and trust rather than malware. The audience asked for more demos, more operational reality. This talk delivers.
+lien: https://lehack.org/2026/tracks/conferences/#the-art-of-staying-in-part-ii-target-weakening
+
+jour: 2026-06-26
+heure: 18:00
+fin: 21:00
+salle: Salle Louis Armand s3
+titre: CTF: Tracelabs Search Party
+orateur: TRACELABS
+resume: Help find the missing. Join the Trace Labs Search Party CTF at leHACK! The Trace Labs Search Party is a unique OSINT CTF where participants investigate real missing persons cases using open-source intelligence techniques. The intelligence gathered during the event is shared with partner organizations assisting families and law enforcement.
+lien: https://lehack.org/2026/tracks/osint/#ctf-tracelabs-search-party
+
+jour: 2026-06-26
+heure: 18:05
+fin: 18:25
+salle: Amphithéâtre Gaston Berger
+titre: Reverse Engineering of FCC Unlocks in DJI Fly clones
+orateur: Klcium
+resume: Modified drone companion apps claiming to unlock FCC transmission modes are widely circulated among hobbyist communities, yet their internal mechanisms remain largely undocumented.
+lien: https://lehack.org/2026/tracks/conferences/#reverse-engineering-of-fcc-unlocks-in-dji-fly-clones
+
+jour: 2026-06-26
+heure: 18:30
+fin: 19:15
+salle: Amphithéâtre Gaston Berger
+titre: Titre non communiqué (undisclosed)
+orateur: x86
+resume: Together, we'll explore what lies behind the sale of vulnerability, a reality often far removed from what people imagine (or what's said online). This subject, encompassing legal, ethical, and technical aspects, has generated much discussion, and we'll attempt to shed some light on this rather unique activity.
+lien: https://lehack.org/2026/tracks/conferences/#x86-temp-placeholder
+
+jour: 2026-06-27
+heure: 10:00
+fin: 10:45
+salle: Amphithéâtre Gaston Berger
+titre: From NDH2K11 to LeHack XXVI: A 15 year Retrospective... or Oh my how things (really haven't) changed!"
+orateur: Jayson E. Street
+resume: Fifteen years ago, compromising an organization could be as simple as walking through the front door with confidence, dropping a USB drive in a parking lot, or sending a poorly crafted phishing email. At NDH2K11, Jayson E. Street demonstrated just how easily organizations could be compromised using little more than human trust and a bit of creativity. Fast-forward fifteen years.
+lien: https://lehack.org/2026/tracks/conferences/#from-ndh2k11-to-lehack-xxvi-a-15-year-retrospective-or-oh-my-how-things-really-havent-changed
+
+jour: 2026-06-27
+heure: 10:00
+fin: 10:20
+salle: Salle 3 niveau S3
+titre: KeyProxy : un keylogger physique sécurisé et open-source conçu pour la Red Team
+orateur: Rémi GUILLON
+resume: Le keylogger physique est un outil incontournable de l'arsenal Red Team, permettant de profiter d'une intrusion physique réussie afin de collecter facilement des informations sensibles (e.g. mots de passe, noms de serveurs ou d'application critiques, données confidentielles).
+lien: https://lehack.org/2026/tracks/lelab/#talk-keyproxy-un-keylogger-physique-securise-et-open-source-concu-pour-la-red-team
+
+jour: 2026-06-27
+heure: 10:30
+fin: 10:50
+salle: Salle 3 niveau S3
+titre: Getting your first CVE with hardware hacking (the easy way)
+orateur: Yassine Damiri
+resume: Finding CVEs in open-source projects or bug bounty programs has become extremely competitive. This talk shows an alternative path: hardware and IoT targets that nobody wants to analyze. With minimal budget and basic tools, I will explain how hardware hacking can help you get your first CVE.
+lien: https://lehack.org/2026/tracks/lelab/#talk-getting-your-first-cve-with-hardware-hacking-the-easy-way
+
+jour: 2026-06-27
+heure: 10:30
+fin: 11:30
+salle: Salle Louis Armand s3
+titre: From Open Data to Evidence
+orateur: Lorand Bodo
+resume: Lorand Bodo is an international civil servant at the International, Impartial and Independent Mechanism for Syria (IIIM), where he works as an Internet Resources Analyst.
+lien: https://lehack.org/2026/tracks/osint/#talk-from-open-data-to-evidence
+
+jour: 2026-06-27
+heure: 10:45
+fin: 11:05
+salle: Amphithéâtre Gaston Berger
+titre: Gestion de crise at scale : le cas Leboncoin
+orateur: Zakaria Rachid
+resume: Oubliez les communiqués de presse lissés et les présentations institutionnelles : en coulisses, une attaque majeure est tout sauf clinique. Quand des attaquants ont frappé l'écosystème leboncoin, la théorie a volé en éclats pour laisser place à une bataille de terrain intense, chaotique et profondément humaine.
+lien: https://lehack.org/2026/tracks/conferences/#gestion-de-crise-at-scale-le-cas-leboncoin-zak
+
+jour: 2026-06-27
+heure: 11:05
+fin: 11:25
+salle: Amphithéâtre Gaston Berger
+titre: Crypto-surprise
+orateur: Florian BOUDOT, Charlie Bromberg
+resume: On va parler crypto, finances, et gros sous. Ce talk ne sera pas enregistré. Pas besoin de compétences techniques. On ne peut pas en dire plus...
+lien: https://lehack.org/2026/tracks/conferences/#crypto-surprise-charlie-bromberg
+
+jour: 2026-06-27
+heure: 11:05
+fin: 11:50
+salle: Salle 3 niveau S3
+titre: De la PS Vita au Flipper Zero en quelques milliers de lignes de code
+orateur: Jeremie Amsellem
+resume: En 2024, un nouvel intérêt spécifique a germé dans mon cerveau : j'adore les consoles de jeux, et j'adore le hacking. Pourquoi n'ai-je jamais exploré le hacking de consoles ?!
+lien: https://lehack.org/2026/tracks/lelab/#talk-de-la-ps-vita-au-flipper-zero-en-quelques-milliers-de-lignes-de-code
+
+jour: 2026-06-27
+heure: 11:30
+fin: 12:15
+salle: Amphithéâtre Gaston Berger
+titre: n8ive by Design: One Leaked Key, Three Attack Chains
+orateur: Guillaume Valadon (guedou)
+resume: n8n is an open-source workflow automation platform with AI agents, used by thousands of organizations worldwide. With more than 70,000 publicly accessible instances on Shodan and recent critical CVEs listed in CISA's Known Exploited Vulnerabilities catalog, it has become a high-value target for attackers. This talk first explores what attackers can do with leaked n8n credentials.
+lien: https://lehack.org/2026/tracks/conferences/#n8ive-by-design-one-leaked-key-three-attack-chains
+
+jour: 2026-06-27
+heure: 11:30
+fin: 12:30
+salle: Salle Louis Armand s3
+titre: The Phisher's Inbox: Reading Telegram Exfiltration Channels with the Bot Token
+orateur: Oleg O.
+resume: Phishing kits increasingly send stolen credentials straight into Telegram, posting them to a bot the operator controls. That design is also the weakness: anyone holding the bot token reads the same channel the operator does.
+lien: https://lehack.org/2026/tracks/osint/#talk-the-phishers-inbox-reading-telegram-exfiltration-channels-with-the-bot-token
+
+jour: 2026-06-27
+heure: 12:05
+fin: 12:50
+salle: Room 3 niveau S3
+titre: Bootstrapping Kindle research for the lazy attacker
+orateur: Tanguy Dubroca
+resume: The Kindle is a very popular device with a long history of public jailbreaks. As time went on, Amazon gradually improved the security of its products and jailbreaks became scarcer. This talk presents a new jailbreak, developed to answer a personal question of how to bootstrap research on a closed platform.
+lien: https://lehack.org/2026/tracks/lelab/#talk-bootstrapping-kindle-research-for-the-lazy-attacker
+
+jour: 2026-06-27
+heure: 14:00
+fin: 14:20
+salle: Amphithéâtre Gaston Berger
+titre: Physical intrusion: Success and Failure
+orateur: Joker2a
+resume: Souvent sous-estimée par les organisations, l'intrusion physique constitue pourtant un vecteur de compromission particulièrement efficace, en dépit des investissements croissants dans les dispositifs techniques et humains.
+lien: https://lehack.org/2026/tracks/conferences/#physical-intrusion-success-and-failure
+
+jour: 2026-06-27
+heure: 14:00
+fin: 15:00
+salle: Salle Louis Armand s3
+titre: On the information frontline. A human and digital investigation in the Russian-speaking region of Gagauzia (Moldova)
+orateur: Kélian Sanz Pascual, Kevin Limonier
+resume: This study offers a cross-analysis of the circulation and reception of Russian and pro-Russian narratives in Moldova. The country currently serves as a testing ground for Russia to trial new techniques that are subsequently rolled out in other countries.
+lien: https://lehack.org/2026/tracks/osint/#talk-on-the-information-frontline-a-human-and-digital-investigation-in-the-russian-speaking-region-of-gagauzia-moldova
+
+jour: 2026-06-27
+heure: 14:05
+fin: 14:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-4
+
+jour: 2026-06-27
+heure: 14:20
+fin: 14:40
+salle: Amphithéâtre Gaston Berger
+titre: Parcours d'un fraudeur
+orateur: Cybermoustache
+resume: Venez découvrir le quotidien des missions terrain sur la partie fraude documentaire, un entre deux entre le pentest et le redteam! Dans le domaine de la lutte contre la fraude depuis 2016, Cyber Moustache teste le parcours du fraudeur pour mieux le comprendre et proposer de la remédiation aux sociétés qui l'engagent pour les frauder sous contrat!
+lien: https://lehack.org/2026/tracks/conferences/#parcours-dun-fraudeur
+
+jour: 2026-06-27
+heure: 14:45
+fin: 15:30
+salle: Amphithéâtre Gaston Berger
+titre: macOS Zero Mercy: Inside the Mind of a Malware Developer
+orateur: Zoziel Freire
+resume: macOS has long been perceived as a low-risk platform, often treated as a secondary concern compared to Windows and Linux. That assumption no longer holds. As MacBooks become increasingly common in corporate environments, adversaries have followed, turning macOS into a viable and attractive target for real-world attacks.
+lien: https://lehack.org/2026/tracks/conferences/#macos-zero-mercy-inside-the-mind-of-a-malware-developer
+
+jour: 2026-06-27
+heure: 15:00
+fin: 16:00
+salle: Salle Louis Armand s3
+titre: The Digital Armoury; Mapping the Global 3D-Printed Firearms Movement
+orateur: Zoltan Furedi
+resume: The Digital Armoury maps the brief history of the global 3D-printed firearms ecosystem, from designers and design communities to files, distribution platforms, physical objects, end users, and emerging practices.
+lien: https://lehack.org/2026/tracks/osint/#talk-the-digital-armoury-mapping-the-global-3d-printed-firearms-movement
+
+jour: 2026-06-27
+heure: 15:05
+fin: 15:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-5
+
+jour: 2026-06-27
+heure: 15:30
+fin: 15:50
+salle: Amphithéâtre Gaston Berger
+titre: Sighax deep dive: breaking the 3DS chain of trust
+orateur: Cyprien Molinet (@cypelf)
+resume: This talk aims at reviewing and explaining in detail the technical Sighax exploit. The Nintendo 3DS, despite having layered security based on a strong chain of trust and a privilege split between two processors ARM11 and ARM9, implements improper validation of the RSA PKCS#1 v1.5 padding in the ARM9 bootrom code.
+lien: https://lehack.org/2026/tracks/conferences/#sighax-deep-dive-breaking-the-3ds-chain-of-trust
+
+jour: 2026-06-27
+heure: 15:50
+fin: 16:10
+salle: Amphithéâtre Gaston Berger
+titre: Warez for the working man : investigations d'une warez des logiciel de contrôle commande industrielle.
+orateur: biero-el-corridor, Mayeul Fargier (l0key)
+resume: Quand on pense au warez, on pense aux jeux vidéo, à la suite Adobe ou à Microsoft Word. Mais il existe une autre scène, présente elle aussi depuis longtemps : celle des logiciels de contrôle-commande industriels. Ces logiciels sont les environnements de développement et d'interaction des systèmes de contrôle physique et de programmation des automates industriels.
+lien: https://lehack.org/2026/tracks/conferences/#warez-for-the-working-man-investigations-dune-warez-des-logiciel-de-controle-commande-industrielle
+
+jour: 2026-06-27
+heure: 16:00
+fin: 17:00
+salle: Salle Louis Armand s3
+titre: Hunting spies for a living
+orateur: Nicolas Quenel
+resume: How OSINT can help identify Russian spies in journalistic investigations : ethical considerations and real-world examples.
+lien: https://lehack.org/2026/tracks/osint/#talk-hunting-spies-for-a-living
+
+jour: 2026-06-27
+heure: 16:05
+fin: 16:55
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-6
+
+jour: 2026-06-27
+heure: 16:15
+fin: 17:00
+salle: Amphithéâtre Gaston Berger
+titre: Pwning bluetooth devices in unexpected ways
+orateur: virtualabs
+resume: Le protocole Bluetooth Low Energy et ses vulnérabilités, tout le monde les connaît car elles font régulièrement la une des actualités et 2026 n'a pas dérogé à la régle.
+lien: https://lehack.org/2026/tracks/conferences/#pwning-bluetooth-devices-in-unexpected-ways
+
+jour: 2026-06-27
+heure: 17:00
+fin: 17:20
+salle: Amphithéâtre Gaston Berger
+titre: R4di0_P1r4cy
+orateur: Beemo (Noë Flatreaud)
+resume: Les fréquences radio transportent toutes sortes de données, des communications aériennes aux télécommandes de voiture, et la plupart d'entre elles sont étonnamment faciles à intercepter. Ce talk vous montre comment fonctionne réellement le piratage radio. Pas besoin d'équipement coûteux ni d'années d'expérience.
+lien: https://lehack.org/2026/tracks/conferences/#r4di0_p1r4cy
+
+jour: 2026-06-27
+heure: 17:00
+fin: 19:30
+salle: Salle Louis Armand s3
+titre: Rumps
+resume: RUMPS are small talk sessions, where you can freely grab the mic to present random speech about hacking without control, censorship, pressure, and inside a 'plausible deniability' setup. No lineup, no recording, no endorsements, anonymity is guaranteed if needed but you bring your own countermeasures (face mask allowed).
+lien: https://lehack.org/2026/tracks/osint/#talk-rumps
+
+jour: 2026-06-27
+heure: 17:05
+fin: 17:30
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/lelab/#live-talk-car-hacking-copy-7
+
+jour: 2026-06-27
+heure: 17:20
+fin: 17:40
+salle: Amphithéâtre Gaston Berger
+titre: LeHack 117 : Permis d'illuminer toute la ville
+orateur: MadSquirrel Benoît Forgette
+resume: Les applications de "smart city" promettent sécurité, modernité et économies d'énergie. Sur le papier, tout est parfaitement sous contrôle. Dans la réalité... disons que c'est plus lumineux que sécurisé. Cette présentation propose l'analyse d'une application mobile permettant de contrôler l'éclairage public, signaler des zones dangereuses et partager sa position avec des proches.
+lien: https://lehack.org/2026/tracks/conferences/#lehack-117-permis-dilluminer-toute-la-ville
+
+jour: 2026-06-27
+heure: 17:45
+fin: 18:30
+salle: Amphithéâtre Gaston Berger
+titre: ALL ACCESS AUTHORIZED : How to infiltrate major events for fun and profit
+orateur: SkyZe
+resume: Avez-vous déjà tenté de vous infiltrer dans un événement hautement sécurisé ? Probablement non - nous, si :). À travers cette conférence, nous verrons comment les dispositifs de sécurité de certains des plus grands événements peuvent être contournés à l'aide de différentes méthodes, outils et techniques, allant de l'OSINT à l'ingénierie sociale.
+lien: https://lehack.org/2026/tracks/conferences/#all-access-authorized-how-to-infiltrate-major-events-for-fun-and-profit
+
+jour: 2026-06-27
+heure: 18:05
+fin: 18:50
+salle: Salle 3 niveau S3
+titre: CyberpunkGuide to hardware hacking
+orateur: tixlegeek
+resume: Vous pouvez tout faire; il suffit d'y passer suffisamment de temps. En attendant, voilà un guide simple pour se lancer dans le hardware.
+lien: https://lehack.org/2026/tracks/lelab/#talk-cyberpunkguide-to-hardware-hacking
+
+jour: 2026-06-27
+heure: 18:30
+fin: 18:50
+salle: Amphithéâtre Gaston Berger
+titre: simple_IMSI-catcher déjà 11 ans!
+orateur: Oros
+resume: Comment écouter le réseau 3G avec ce que l'on a sous la main ? Avec un récepteur TV, une antenne bricolé, gr-gsm et simple_IMSI-catcher.py !
+lien: https://lehack.org/2026/tracks/conferences/#simple_imsi-catcher-deja-11-ans
+
+jour: 2026-06-27
+heure: 18:50
+fin: 19:10
+salle: Amphithéâtre Gaston Berger
+titre: Surprise Talk
+orateur: MrJack, Babak Javadi
+lien: https://lehack.org/2026/tracks/conferences/#%f0%9f%94%90-suprise-talk
+
+jour: 2026-06-27
+heure: 19:05
+fin: 19:55
+salle: Salle 3 niveau S3
+titre: Offensive AI on ESP32: Breaking Embedded Limits
+orateur: x42en, Ben Mz
+resume: Vandal, c'est l'implémentation en pur C d'une plateforme d'analyse RF multi-protocoles basée sur de l'ESP32-S3. On a soupoudré notre layer-cake cyber avec : - du WiFi avec injection de trames, deauth, captive_portal, sniffing, scanners et autres surprises - du Bluetooth BLE 5.0 avec scan de services, monitoring d'attributs et détection de security profile + bruteforce de pin - du...
+lien: https://lehack.org/2026/tracks/lelab/#talk-vandal-yet-another-dongle-2
+
+jour: 2026-06-27
+heure: 21:00
+fin: 23:00
+salle: Amphithéâtre Gaston Berger
+titre: Qui Veut Gagner des Bitcoins
+lien: https://lehack.org/2026/tracks/conferences/#qui-veut-gagner-des-bitcoins
+
+jour: 2026-06-27
+heure: 21:30
+fin: 22:15
+salle: Salle Louis Armand S3
+titre: LIVE TALK: Car Hacking
+orateur: RatzillaS
+resume: Following the serie of workshops Ratzilla gave on car hacking, he will give a closure talk on the same topic.
+lien: https://lehack.org/2026/tracks/osint/#car-hacking

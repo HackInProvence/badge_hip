@@ -1,0 +1,50 @@
+# Pass the SALT 2026 - sponsors et partenaires
+# Source : https://2026.pass-the-salt.org/#sponsors
+
+nom: Gandi
+description: Platinum sponsor
+lien: https://www.gandi.net/
+
+nom: Passbolt
+description: Platinum sponsor
+lien: https://www.passbolt.com/
+
+nom: Huawei
+description: Platinum sponsor
+lien: https://www.huawei.com/
+
+nom: Université Catholique de Lille
+description: Platinum partner (lieu de la conférence)
+lien: https://www.univ-catholille.fr/en/
+
+nom: Quarkslab
+description: Gold sponsor
+lien: https://www.quarkslab.com/
+
+nom: Ledger
+description: Gold sponsor
+lien: https://www.ledger.com/
+
+nom: Synacktiv
+description: Silver sponsor
+lien: https://www.synacktiv.com/
+
+nom: Randorisec
+description: Silver sponsor
+lien: https://www.randorisec.fr/
+
+nom: Penthertz
+description: Silver sponsor
+lien: https://www.penthertz.com/
+
+nom: Pretix
+description: FLOSS Event Booking service
+lien: https://www.pretix.eu/
+
+nom: Pretalx
+description: FLOSS CFP solution
+lien: https://www.pretalx.com/
+
+nom: Ubicast
+description: Video capture/streaming partner
+lien: https://www.ubicast.eu/

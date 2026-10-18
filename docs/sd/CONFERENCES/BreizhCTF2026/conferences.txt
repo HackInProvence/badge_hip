@@ -1,0 +1,29 @@
+# BreizhCTF 2026 - programme officiel (https://www.breizhctf.com/)
+# Le BreizhCTF est une compétition: pas de conférences, seulement le CTF, la remise des prix et les rumps.
+jour: 2026-05-23
+heure: 08:30
+salle: Couvent des Jacobins
+titre: Accueil des participants au CTF
+lien: https://www.breizhctf.com/
+
+jour: 2026-05-23
+heure: 10:00
+fin: 18:30
+salle: Couvent des Jacobins
+titre: Challenges du CTF
+resume: 600 participants venus de toute la France s'affrontent sur un challenge de 8h30. Ouvert à tous sur inscription: professionnels, étudiants, passionnés ou curieux de sécurité informatique.
+lien: https://www.breizhctf.com/
+
+jour: 2026-05-23
+heure: 18:30
+fin: 19:00
+salle: Couvent des Jacobins
+titre: Remise des prix du CTF
+lien: https://www.breizhctf.com/
+
+jour: 2026-05-23
+heure: 19:00
+fin: 19:30
+salle: Couvent des Jacobins
+titre: Session de rumps
+lien: https://www.breizhctf.com/

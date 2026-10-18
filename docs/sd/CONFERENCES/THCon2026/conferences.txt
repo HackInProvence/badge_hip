@@ -1,0 +1,230 @@
+# THCon 2026 - programme officiel (https://thcon.party/program/)
+# Salle: amphithéâtre Marthe Condat (salle unique). Résumés raccourcis depuis https://thcon.party/events/
+jour: 2026-05-05
+heure: 09:15
+fin: 09:30
+salle: Amphi Marthe Condat
+titre: Opening
+orateur: Mohamed Kâaniche
+resume: Discours d'ouverture par Mohamed Kâaniche, directeur du LAAS.
+lien: https://thcon.party/events/#opening
+
+jour: 2026-05-05
+heure: 09:30
+fin: 10:15
+salle: Amphi Marthe Condat
+titre: [Keynote] Backdoors in your smartphones? Why? How ? Not?
+orateur: Aurélien Francillon
+resume: Smartphones are more secure and end-to-end encryption is widespread; governments push client-side scanning (ChatControl) and lawful access, France debated backdoors in chat apps. Can secure systems stay secure while granting exceptional access? What "backdoors" mean for systems and protocols, concrete proposals, and their fundamental limits.
+lien: https://thcon.party/events/#keynote1
+
+jour: 2026-05-05
+heure: 10:15
+fin: 10:45
+salle: Amphi Marthe Condat
+titre: Key Recovery from Side-Channel Power Analysis Attacks on Non-SIMD HQC Decryption
+orateur: Nathan Maillet, Cyrius Nugier, Vincent Migliore, Jean-Christophe Deneuville
+resume: Two power side-channel attacks on the production implementation of HQC (code-based cryptosystem chosen by NIST) with SIMD disabled: one gives a theoretical full key recovery on each tested ISA, the other recovers the key experimentally with 99% chance from 83 decryptions.
+lien: https://thcon.party/events/#hqc-decryption
+
+jour: 2026-05-05
+heure: 11:15
+fin: 11:45
+salle: Amphi Marthe Condat
+titre: Experimental study of the security of WirelessHART
+orateur: Kais Sellami, Romain Cayre, Elies Tali, Pierre Ayoub, Vincent Nicomette, Guillaume Auriol
+resume: Security evaluation of WirelessHART industrial sensor networks on a realistic Dust network: the WHAD framework extended with a custom sniffer for packet injection, state-of-the-art attacks demonstrated, a desynchronization vulnerability found, threat model and counter-measures.
+lien: https://thcon.party/events/#wirelessHART
+
+jour: 2026-05-05
+heure: 11:45
+fin: 12:05
+salle: Amphi Marthe Condat
+titre: CasinoLimit: An Offensive Dataset Labeled with MITRE ATT&CK Techniques
+orateur: Sébastien Kilian, Valérie Viet Triem Tong, Jean-François Lalande
+resume: A dataset built from a large penetration testing exercise on 114 identical instances: system and network logs labeled with MITRE ATT&CK techniques by a semi-automatic process. Labeling method, what it reveals about attacker behavior, and uses for detection research.
+lien: https://thcon.party/events/#CasinoLimit
+
+jour: 2026-05-05
+heure: 12:05
+fin: 12:25
+salle: Amphi Marthe Condat
+titre: Using hardware signals to detect malware in critical embedded systems
+orateur: Lucas Georget, Vincent Migliore, Vincent Nicomette, Frédéric Silvi, Arthur Villard, Philippe Leleux
+resume: Supply-chain compromises reach down to the firmware of industrial components. As a last line of defense, runtime monitoring in the device itself: using microarchitectural signals to identify software deviations during execution.
+lien: https://thcon.party/events/#hardware-signals
+
+jour: 2026-05-05
+heure: 14:00
+fin: 14:30
+salle: Amphi Marthe Condat
+titre: Vibe Coding at Scale: Systematic Discovery of Authorization Failures and Data Exposure in AI-Generated Web Apps
+orateur: Nohé Hinniger-Forayi, Gabin Fouquet, Gabriel Marquet, Gwendal Mognie, Alexandra Charikova
+resume: Over 35,000 vulnerabilities found in AI-generated apps exposed on the internet: methodology, broken authentication, exposed secrets, PII leaks, zero-click account takeovers and exposed admin payment API secrets, then mitigations for teams building AI-generated apps.
+lien: https://thcon.party/events/#vibe-coding
+
+jour: 2026-05-05
+heure: 14:30
+fin: 14:50
+salle: Amphi Marthe Condat
+titre: AI for Vulnerability Detection and Repair: Opportunities and Challenges
+orateur: Merve Sahin, Kendrick Gruenberg, Malte Wessels
+resume: State of the art of AI and LLMs for vulnerability detection and automated repair, recent research on automated vulnerability repair, the difficulty of building an evaluation benchmark, and how AI-generated fixes compare with those of human developers.
+lien: https://thcon.party/events/#ai-software-vuln
+
+jour: 2026-05-05
+heure: 14:50
+fin: 15:10
+salle: Amphi Marthe Condat
+titre: Wireless-(in)Fidelity: A 2025 Return on Experience
+orateur: Quentin Vacher
+resume: Real-world Wi-Fi exploitation scenarios from 2025 engagements, methods to optimize online attacks against WPA PSK, and relaying WPA3 Enterprise authentication with updated tooling.
+lien: https://thcon.party/events/#WirelessFidelity
+
+jour: 2026-05-05
+heure: 15:10
+fin: 15:30
+salle: Amphi Marthe Condat
+titre: Attack Scenarios and Embedded Intrusion Detection for Space Systems
+orateur: Louis Lolive, Guillaume Auriol, Vincent Nicomette, Florent Galtier, Simone Urbano, Jacques Girard
+resume: Design and proof of concept of an intrusion detection system embedded on a satellite, with several probes and detection strategies fitting space constraints, a set of attacks to assess it, and its performance impact.
+lien: https://thcon.party/events/
+
+jour: 2026-05-05
+heure: 16:00
+fin: 16:20
+salle: Amphi Marthe Condat
+titre: Integration of EBIOS-RM in a secure product development process
+orateur: Rémi Bonrepaux
+resume: Recurring limits of secure product development processes under tight deadlines and budgets, and how Viveris Technologies integrates the EBIOS Risk Manager method (ANSSI, Club EBIOS) into development, with dedicated tooling for more efficient risk analysis.
+lien: https://thcon.party/events/#tbd1
+
+jour: 2026-05-05
+heure: 16:20
+fin: 16:45
+salle: Amphi Marthe Condat
+titre: Ten Years Surprise
+orateur: Anciens membres de l'association
+resume: Surprise !!! (10e édition de la THCon)
+lien: https://thcon.party/events/#tbd2
+
+jour: 2026-05-05
+heure: 16:45
+fin: 17:15
+salle: Amphi Marthe Condat
+titre: Prechallenge Writeups and Results
+resume: Solutions et résultats du pré-challenge.
+lien: https://thcon.party/events/#prechall
+
+jour: 2026-05-05
+heure: 17:15
+fin: 18:15
+salle: Amphi Marthe Condat
+titre: Rump sessions
+resume: Présentations éclair.
+
+jour: 2026-05-06
+heure: 09:15
+fin: 10:00
+salle: Amphi Marthe Condat
+titre: [Keynote] Your CPU Is the New Software: Exploiting Architectural Bugs at Hardware Speed
+orateur: Michael Schwarz
+resume: After side channels and transient execution, architectural CPU bugs make hardware produce wrong results exploitable like software bugs. Examples on Intel, AMD and T-Head RISC-V: arbitrary read/write across isolation boundaries up to TEEs, why testing and mitigations fall short.
+lien: https://thcon.party/events/#keynote2
+
+jour: 2026-05-06
+heure: 10:00
+fin: 10:30
+salle: Amphi Marthe Condat
+titre: Towards programming languages free of injection-based vulnerabilities by design
+orateur: Pierre-François Gimenez, Eric Alata
+resume: Injection flaws stem from the structure of languages themselves. Applying theoretical work on the definition of injection vulnerabilities, it is possible to design languages immune to them; example: slight modifications of LDAP give a more secure version.
+lien: https://thcon.party/events/#programming-languages
+
+jour: 2026-05-06
+heure: 10:30
+fin: 11:00
+salle: Amphi Marthe Condat
+titre: Infostealers and Ransomware: Feeding the Cybercrime Economy
+orateur: Steph Shample
+resume: Defender-focused comparison of ransomware and infostealers: objectives, infection vectors, visibility and detection blind spots. 2024-2025 trends: infostealers as access brokers for ransomware, and why MFA and antivirus often fail.
+lien: https://thcon.party/events/#ransomware-infostealer
+
+jour: 2026-05-06
+heure: 11:30
+fin: 12:00
+salle: Amphi Marthe Condat
+titre: Multi-domain Anomaly Detection in 5G Networks through Continuous Dynamic Graphs
+orateur: Thomas Hoger, Philippe Owezarski, Mariamdouni
+resume: 5G exchanges formalized as a dynamic graph, with graph-based learning to detect anomalies: fine-grained analysis of packet content while capturing sequential and topological context, to identify sophisticated multi-stage attacks.
+lien: https://thcon.party/events/#multi-domain-anomaly
+
+jour: 2026-05-06
+heure: 12:00
+fin: 12:40
+salle: Amphi Marthe Condat
+titre: Chain of Thought F's Everybody
+orateur: Axelle Apvrille, Damien Cauquil
+resume: AI chatbots are now in the hacker's toolbox and change how CTF challenges are solved. Experiments by CTF designers to fight or embrace AI, lessons and tricks, and new AI-friendly CTF formats that stay fun and challenging.
+lien: https://thcon.party/events/#chain-of-thought
+
+jour: 2026-05-06
+heure: 14:15
+fin: 14:45
+salle: Amphi Marthe Condat
+titre: The Airbus Method: Transforming Vulnerability Noise into Actionable Intelligence
+orateur: Jérémy Richard, Paul Vargas, Bertrand Leconte, Eric Caussin
+resume: Prioritizing 25,000+ CVEs a year in sensitive defense environments: a Python pipeline enriching Cyberwatch scans with threat intelligence and a two-level prioritization to end alert fatigue and focus on genuine threats.
+lien: https://thcon.party/events/#airbus-method
+
+jour: 2026-05-06
+heure: 14:45
+fin: 15:15
+salle: Amphi Marthe Condat
+titre: Master Boot Record Bootkit Analysis and Reverse Engineering
+orateur: Diyar Saadi
+resume: Static and dynamic analysis of MBR bootkits: infection chain, disk manipulation, bootloader modifications for persistence before the OS, hardware communication, evasion and self-protection, memory forensics and an MBR ransomware locker in action.
+lien: https://thcon.party/events/#MBR
+
+jour: 2026-05-06
+heure: 15:15
+fin: 15:35
+salle: Amphi Marthe Condat
+titre: Exposing Visual Aimbots: In-Game Honeypots for Proactive Cheat Detection
+orateur: Salman Shaikh, Marc Dacier, Tao Ni
+resume: How visual aimbots, which bypass commercial anti-cheat solutions, work in a controlled custom game environment, and a defense that deploys in-game honeytokens to expose players who rely on them.
+lien: https://thcon.party/events/#aimbots
+
+jour: 2026-05-06
+heure: 16:00
+fin: 16:30
+salle: Amphi Marthe Condat
+titre: Identifying potential attack scenarios in complex systems by means of provenance graphs
+orateur: Loic Robert, Vincent Nicomette, Eric Lacombe, Marie-José Huguet, Emmanuel Hebrard
+resume: State-Expanded Provenance Graphs built from lightweight system-call traces to evaluate partially characterized systems; two techniques against over-linking in long-running services and an interactive tool to explore traces and refine the graph.
+lien: https://thcon.party/events/#provenance-graph
+
+jour: 2026-05-06
+heure: 16:30
+fin: 16:50
+salle: Amphi Marthe Condat
+titre: Implementing cross-domain & cross-forest RBCD attacks
+orateur: Simon Miska
+resume: Resource-based Constrained Delegation is well documented on a single domain; this talk presents the cross-domain and cross-forest RBCD workflow and an Impacket script implementing these attacks.
+lien: https://thcon.party/events/#cross-RBCD-attacks
+
+jour: 2026-05-06
+heure: 16:50
+fin: 17:10
+salle: Amphi Marthe Condat
+titre: Ah, the good old days
+orateur: Yann Bachy
+resume: In the early 2010s, studies showed attacks on internet boxes able to corrupt a typical home network. More than ten years later, a new set of experiments checks the assumptions and attack paths of the time.
+lien: https://thcon.party/events/#good-ol-days
+
+jour: 2026-05-06
+heure: 17:10
+fin: 17:15
+salle: Amphi Marthe Condat
+titre: Closing session
+resume: Discours de clôture.
