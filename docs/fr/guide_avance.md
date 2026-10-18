@@ -657,6 +657,7 @@ PuTTY (Windows, type « Serial ») convient aussi. Chaque caractère est une com
 | `W` | batterie faible simulée (mode économie : muet, télécommande coupée, alerte, icône) : marche / arrêt |
 | `K` | débit radio du réseau suivant : 10, 38,4, 50, 100 kbit/s (défaut 10), gardé ; **tous les badges doivent avoir le même** (essais de portée) |
 | `0x04` + `0`..`3` | débit radio du réseau : 10, 38,4, 50 ou 100 kbit/s (la liste « Débit radio » de `badge_remote.py`) |
+| `0x05` + ligne | carte SD : lister, lire, écrire, effacer des fichiers (`tools/sd_files.py`, § 6.5) |
 | `R` | redémarrage immédiat du badge |
 | `[` / `]` | envoi de l'écran à chaque changement : marche / arrêt (lignes `@FB ...`) |
 | `s` | envoi de l'écran une fois |
@@ -856,7 +857,7 @@ en tête de leurs dossiers (ordre alphabétique).
 ### 6.1 La carte
 
 - Toute capacité (micro-SD, SDHC, SDXC), formatée en **FAT32** ou **exFAT**. Le badge ne formate jamais la carte
-  et n'y écrit rien : elle peut être préparée sur un ordinateur et dupliquée.
+  et n'y écrit que ce qu'on lui envoie par l'USB (§ 6.5) : elle peut être préparée sur un ordinateur et dupliquée.
 - Noms de fichiers longs et accentués acceptés, **63 octets au plus** (en UTF-8, une lettre accentuée compte 2) :
   un nom plus long est ignoré. Les fichiers cachés, système et commençant par `.` (fichiers `._` de macOS) sont ignorés.
 - Les extensions ne tiennent pas compte des majuscules (`.EPI` = `.epi`). Les listes sont triées par ordre alphabétique.
@@ -908,6 +909,26 @@ listée (les premières lues sur la carte sont gardées, puis triées) : faites 
 
 > Respectez les droits d'auteur : utilisez des œuvres libres ou dont vous avez les droits.
 
+
+### 6.5 Copier des fichiers par l'USB
+
+Sans sortir la carte : `tools/sd_files.py`, badge allumé et branché en USB (fermer `badge_remote.py` avant).
+
+```
+python tools/sd_files.py ls                                   le contenu de la racine
+python tools/sd_files.py tree CONFERENCES                     tous les fichiers d'un dossier
+python tools/sd_files.py put docs/sd/CONFERENCES CONFERENCES  copier un dossier (ou un fichier) sur la carte
+python tools/sd_files.py get IMAGES/chat.epi                  copier un fichier (ou un dossier) sur le PC
+python tools/sd_files.py rm -r ZZTEST                         effacer (-r : un dossier et son contenu)
+python tools/sd_files.py mkdir A/B    /    mv ANCIEN NOUVEAU    /    df (place libre)
+python tools/sd_files.py shell                                les mêmes commandes, plus cd, en interactif
+```
+
+`--port COM9` pour choisir le badge. Débit : ~85 Ko/s en lecture, ~40 Ko/s en écriture (une vidéo de 1 Mo en
+~25 s) : pour de gros fichiers, le lecteur de cartes reste plus rapide. Les fichiers écrits sont datés du
+1er octobre 2026 (le badge n'a pas d'horloge). Le protocole (octet `0x05` puis une ligne de commande, réponses
+`@SD ...`) est décrit dans `src/menu/sd_serial.c` ; ce sont les mêmes opérations que l'API fichiers du futur module
+ESP32 ([etude_module_esp32.md](../etude_module_esp32.md)).
 
 ## 7. Flasher et mettre à jour le firmware
 

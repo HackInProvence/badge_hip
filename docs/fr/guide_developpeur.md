@@ -1243,6 +1243,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # co
 | `tools/smuggler_icons.py` | icônes 32 × 32 des marchandises → `src/menu/smuggler_goods.c` ; `--png planche.png`, `--check` (§ 6.26) |
 | `tools/gamebook_check.py` | vérifie un livre-jeu (erreurs, remarques), `--pages`, `--play` (y jouer dans le terminal), `--c` (écrit le livre intégré) (§ 6.28) |
 | `tools/test_party_games.py`, `tools/test_werewolf.py`, `tools/test_smuggler.py` | tests à deux badges (§ 9.3) |
+| `tools/sd_files.py` | gestionnaire de fichiers de la carte SD par l'USB : `ls`, `tree`, `get`, `put` (dossiers compris), `rm [-r]`, `mkdir`, `mv`, `df`, `shell` ; protocole `0x05` de `sd_serial.c` (lecture ~85 Ko/s, écriture ~40 Ko/s) |
 | `tools/docs_site.py` | le site web du badge dans `build/docs_site/` (`--out`, `--repo`, `--uf2`) : page d'accueil, toute la documentation `.md` en HTML (guides, fonctions, notes de `docs/` ; jamais `docs/analyses`), et dans `ressources/` le firmware, la carte SD (`carte_sd.zip`), les outils (`outils.zip`), les fichiers Flipper, le matériel (KiCad en `.zip`) ; il faut `pip install markdown` |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | vidéo → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |

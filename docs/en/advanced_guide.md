@@ -657,6 +657,7 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 | `W` | simulated low battery (saving mode: mute, remote control off, warning, icon): on / off |
 | `K` | next bit rate of the network: 10, 38.4, 50, 100 kbit/s (default 10), saved; **all the badges must use the same** (range tests) |
 | `0x04` + `0`..`3` | bit rate of the network: 10, 38.4, 50 or 100 kbit/s (the "Débit radio" list of `badge_remote.py`) |
+| `0x05` + line | SD card: list, read, write, delete files (`tools/sd_files.py`, § 6.5) |
 | `R` | immediate reboot of the badge |
 | `[` / `]` | sending the screen on every change: on / off (`@FB ...` lines) |
 | `s` | sends the screen once |
@@ -853,7 +854,7 @@ in their folders (alphabetical order).
 ### 6.1 The card
 
 - Any capacity (micro-SD, SDHC, SDXC), formatted in **FAT32** or **exFAT**. The badge never formats the card and
-  never writes on it: it can be prepared on a computer and duplicated.
+  only writes what is sent to it through the USB (§ 6.5): it can be prepared on a computer and duplicated.
 - Long and accented file names are accepted, **63 bytes at most** (in UTF-8, an accented letter counts 2): a longer
   name is ignored. Hidden and system files and files starting with `.` (macOS `._` files) are ignored.
 - The extensions are case insensitive (`.EPI` = `.epi`). The lists are sorted alphabetically.
@@ -905,6 +906,26 @@ sorted): make sub-folders.
 
 > Respect copyright: use free works or works you have the rights to.
 
+
+### 6.5 Copying files through the USB
+
+Without taking the card out: `tools/sd_files.py`, badge on and plugged in USB (close `badge_remote.py` first).
+
+```
+python tools/sd_files.py ls                                   the content of the root
+python tools/sd_files.py tree CONFERENCES                     every file of a folder
+python tools/sd_files.py put docs/sd/CONFERENCES CONFERENCES  copy a folder (or a file) to the card
+python tools/sd_files.py get IMAGES/chat.epi                  copy a file (or a folder) to the PC
+python tools/sd_files.py rm -r ZZTEST                         delete (-r: a folder and its content)
+python tools/sd_files.py mkdir A/B    /    mv OLD NEW    /    df (free space)
+python tools/sd_files.py shell                                the same commands, plus cd, interactive
+```
+
+`--port COM9` to choose the badge. Speed: ~85 KB/s reading, ~40 KB/s writing (a 1 MB video in ~25 s): for big
+files, a card reader is still faster. The files written are dated October 1st, 2026 (the badge has no clock). The
+protocol (byte `0x05` then a command line, `@SD ...` answers) is described in `src/menu/sd_serial.c`; these are the
+same operations as the file API of the future ESP32 module ([etude_module_esp32.md](../etude_module_esp32.md), in
+French).
 
 ## 7. Flashing and updating the firmware
 

@@ -52,6 +52,7 @@ target_sources(badge_menu PRIVATE
     fsk_id.c
     detector.c
     conference.c
+    sd_serial.c
     shared_buf.c
     tug_logic.c
     assassin_logic.c

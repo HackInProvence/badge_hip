@@ -3,7 +3,7 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/* Glue between FatFs (read-only configuration, see fatfs/ffconf.h) and the SD card driver */
+/* Glue between FatFs (read / write, see fatfs/ffconf.h) and the SD card driver */
 
 #include "ff.h"
 #include "diskio.h"
@@ -34,10 +34,21 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count) {
 }
 
 
+DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count) {
+    if (pdrv != 0 || count == 0)
+        return RES_PARERR;
+    if (! sd_is_ready())
+        return RES_NOTRDY;
+    return sd_write_blocks(sector, buff, count) ? RES_OK : RES_ERROR;
+}
+
+
 DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff) {
     (void)buff;
     if (pdrv != 0)
         return RES_PARERR;
-    /* Read-only: nothing to flush, and the sector count is only needed by f_mkfs */
-    return cmd == CTRL_SYNC ? RES_OK : RES_PARERR;
+    /* The writes return once programmed; the sector count is only needed by f_mkfs (not used) */
+    if (cmd == CTRL_SYNC)
+        return sd_sync() ? RES_OK : RES_ERROR;
+    return RES_PARERR;
 }

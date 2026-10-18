@@ -5,7 +5,7 @@
 
 /** \file sd.h
  *
- * \brief SD card API: read sectors of the micro SD card (board V1.1) in SPI mode, used by FatFs (see fatfs/ff.h).
+ * \brief SD card API: read sectors of the micro SD card (board V1.1) (and write them) in SPI mode, used by FatFs (see fatfs/ff.h).
  *
  * The SD card shares SPI0 with the screen, and is selected through the 74HC139 decoder (address BADGE_SPI0_ADDR_SD).
  * The hardware chip select of the RP2040 goes high between each byte, which the screen accepts but not the SD card:
@@ -36,6 +36,12 @@ bool sd_is_ready(void);
 
 /** \brief Read \p count sectors of 512 bytes starting at sector \p lba. */
 bool sd_read_blocks(uint32_t lba, uint8_t *buf, size_t count);
+
+/** \brief Write \p count sectors of 512 bytes starting at sector \p lba (returns once the card programmed them). */
+bool sd_write_blocks(uint32_t lba, const uint8_t *buf, size_t count);
+
+/** \brief Waits until the card is no longer busy. */
+bool sd_sync(void);
 
 /** \brief Level of the card detect pin (the polarity depends on the socket). */
 bool sd_detect(void);

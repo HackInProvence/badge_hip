@@ -56,6 +56,7 @@
 #include "net.h"
 #include "ook_rx.h"
 #include "party.h"
+#include "sd_serial.h"
 #include "social.h"
 #include "store.h"
 #include "i18n.h"
@@ -175,6 +176,10 @@ static uint8_t buttons_pressed(absolute_time_t now) {
             radio_tools_set_social_rate(c - '0');
         break;
     }
+    case 0x05:
+        /* The SD card from the PC (tools/sd_files.py): 0x05 then a command line, see sd_serial.c */
+        sd_serial_command();
+        break;
     case 'K':
         /* Bit rate of the network: the next one (10, 38.4, 50, 100 kbit/s), saved */
         radio_tools_set_social_rate((radio_tools_social_rate() + 1) % RADIO_TOOLS_SOCIAL_RATES);

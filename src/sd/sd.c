@@ -25,6 +25,8 @@
 #define CMD16 16  /* SET_BLOCKLEN */
 #define CMD17 17  /* READ_SINGLE_BLOCK */
 #define CMD18 18  /* READ_MULTIPLE_BLOCK */
+#define CMD24 24  /* WRITE_BLOCK */
+#define CMD25 25  /* WRITE_MULTIPLE_BLOCK */
 #define CMD55 55  /* APP_CMD */
 #define CMD58 58  /* READ_OCR */
 #define ACMD41 (0x80 | 41)  /* SD_SEND_OP_COND (application command, prefixed by CMD55) */
@@ -202,5 +204,63 @@ bool sd_read_blocks(uint32_t lba, uint8_t *buf, size_t count) {
     release_bus();
     if (! ok)
         log_warning("sd: read error at sector %lu", (unsigned long)lba);
+    return ok;
+}
+
+
+/* Sends a data block after a write command: \p token 0xFE (single block) or 0xFC (multiple blocks); true when the
+ * card accepted it (data response xxx00101), it is then busy programming it */
+static bool send_block(const uint8_t *buf, uint8_t token) {
+    if (! wait_ready(500))
+        return false;
+    xchg(token);
+    spi_write_blocking(spi0, buf, 512);
+    xchg(0xFF);  /* CRC, ignored in SPI mode */
+    xchg(0xFF);
+    return (xchg(0xFF) & 0x1F) == 0x05;
+}
+
+
+bool sd_write_blocks(uint32_t lba, const uint8_t *buf, size_t count) {
+    if (! ready || count == 0)
+        return false;
+    uint32_t sector = lba;
+    if (! block_addressing)
+        lba *= 512;
+
+    take_bus();
+    gpio_put(BADGE_SPI0_CSn, 0);
+    bool ok;
+    if (count == 1) {
+        ok = send_cmd(CMD24, lba) == 0 && send_block(buf, 0xFE);
+    } else {
+        if (send_cmd(CMD25, lba) == 0) {
+            do {
+                if (! send_block(buf, 0xFC))
+                    break;
+                buf += 512;
+            } while (--count);
+            /* Stop token, then the card is busy until everything is written */
+            if (wait_ready(500))
+                xchg(0xFD);
+            xchg(0xFF);
+        }
+        ok = count == 0;
+    }
+    ok &= wait_ready(500);  /* Programmed */
+    release_bus();
+    if (! ok)
+        log_warning("sd: write error at sector %lu", (unsigned long)sector);
+    return ok;
+}
+
+
+bool sd_sync(void) {
+    if (! ready)
+        return false;
+    take_bus();
+    gpio_put(BADGE_SPI0_CSn, 0);
+    bool ok = wait_ready(500);
+    release_bus();
     return ok;
 }

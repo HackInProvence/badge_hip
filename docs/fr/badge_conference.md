@@ -18,6 +18,8 @@ CONFERENCES/
     ...
 ```
 
+Copie par l'USB, sans sortir la carte : `python tools/sd_files.py put docs/sd/CONFERENCES CONFERENCES`.
+
 Chaque fichier est facultatif : seuls ceux présents (et non vides) sont proposés. Exemples complets pour dix
 événements français dans [docs/sd/CONFERENCES](../sd/CONFERENCES) (à copier tels quels sur la carte).
 

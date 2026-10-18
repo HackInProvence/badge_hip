@@ -19,6 +19,8 @@ CONFERENCES/
     ...
 ```
 
+Copy through the USB, without taking the card out: `python tools/sd_files.py put docs/sd/CONFERENCES CONFERENCES`.
+
 Every file is optional: only the ones present (and not empty) are shown. Full examples for ten French events in
 [docs/sd/CONFERENCES](../sd/CONFERENCES) (copy them as they are to the card).
 

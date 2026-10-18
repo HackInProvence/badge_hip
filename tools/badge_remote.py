@@ -78,6 +78,7 @@ SERIAL_COMMANDS = [
     ('M', 'Radio : envoie le message radio (profil chat du Flipper)'),
     ('r', 'Radio : registres du CC1101 et sa PATABLE'),
     ('W', 'Test : batterie faible simulée, mode économie (marche / arrêt)'),
+    ('0x05 + ligne', 'Carte SD : lister, lire, écrire, effacer des fichiers (tools/sd_files.py, protocole dans src/menu/sd_serial.c)'),
     ('K', 'Réseau : débit radio suivant (10, 38,4, 50, 100 kbit/s), gardé ; tous les badges doivent avoir le même'),
     ('E', 'Langue : retour à l\'anglais'),
     ('N', 'Langue : langue suivante'),
