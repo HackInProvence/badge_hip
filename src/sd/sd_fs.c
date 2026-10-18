@@ -8,6 +8,8 @@
 #include <string.h>
 #include <strings.h>
 
+#include "pico/time.h"
+
 #include "ff.h"
 #include "log.h"
 #include "sd.h"
@@ -81,4 +83,66 @@ size_t sd_list_files(const char *dir, const char *ext, char (*names)[SD_NAME_MAX
 
 size_t sd_list_dirs(const char *dir, char (*names)[SD_NAME_MAX], size_t max) {
     return list(dir, NULL, names, max);
+}
+
+
+/* ------ The date of the files written ------ */
+
+static int64_t clock_offset = 0;  /* Local time (seconds since 1970, as if UTC) - seconds since boot; 0: not set */
+
+void sd_set_time(uint32_t local) {
+    clock_offset = (int64_t)local - (int64_t)(time_us_64() / 1000000);
+}
+
+
+uint32_t sd_time(void) {
+    return clock_offset ? (uint32_t)(clock_offset + (int64_t)(time_us_64() / 1000000)) : 0;
+}
+
+
+/* Days since 1970-01-01 <-> year, month, day (Howard Hinnant's algorithms) */
+static int32_t days_from_civil(int y, int m, int d) {
+    y -= m <= 2;
+    int era = y / 400;
+    int yoe = y - era * 400;
+    int doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    int doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
+
+static void civil_from_days(int32_t z, int *y, int *m, int *d) {
+    z += 719468;
+    int era = z / 146097;
+    int doe = z - era * 146097;
+    int yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    int doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    int mp = (5 * doy + 2) / 153;
+    *d = doy - (153 * mp + 2) / 5 + 1;
+    *m = mp + (mp < 10 ? 3 : -9);
+    *y = yoe + era * 400 + (*m <= 2);
+}
+
+
+uint32_t sd_fat_datetime(uint32_t local) {
+    int y, m, d;
+    civil_from_days((int32_t)(local / 86400), &y, &m, &d);
+    if (y < 1980)
+        return (uint32_t)(1 << 21 | 1 << 16);  /* 1980-01-01, the first FAT date */
+    uint32_t s = local % 86400;
+    return (uint32_t)(y - 1980) << 25 | (uint32_t)m << 21 | (uint32_t)d << 16 | (s / 3600) << 11 | (s / 60 % 60) << 5 |
+           (s % 60) / 2;
+}
+
+
+uint32_t sd_local_time(uint16_t fdate, uint16_t ftime) {
+    int32_t days = days_from_civil(1980 + (fdate >> 9), (fdate >> 5) & 15, fdate & 31);
+    return (uint32_t)days * 86400 + (ftime >> 11) * 3600 + ((ftime >> 5) & 63) * 60 + (ftime & 31) * 2;
+}
+
+
+/* FatFs: the date of the files created or written. Without a clock set by the PC (or the phone, the ESP32...):
+ * October 1st, 2026 */
+DWORD get_fattime(void) {
+    uint32_t t = sd_time();
+    return t ? sd_fat_datetime(t) : (DWORD)(2026 - 1980) << 25 | 10 << 21 | 1 << 16;
 }

@@ -913,6 +913,9 @@ listée (les premières lues sur la carte sont gardées, puis triées) : faites 
 ### 6.5 Copier des fichiers par l'USB
 
 Sans sortir la carte : `tools/sd_files.py`, badge allumé et branché en USB (fermer `badge_remote.py` avant).
+Sans argument, une **fenêtre** : les fichiers du PC à gauche, ceux de la carte à droite (double-clic : ouvrir un
+dossier), et les boutons Envoyer sur la carte, Récupérer sur le PC, Nouveau dossier, Renommer, Supprimer
+(plusieurs fichiers ou dossiers à la fois). Les mêmes opérations en ligne de commande :
 
 ```
 python tools/sd_files.py ls                                   le contenu de la racine
@@ -925,8 +928,10 @@ python tools/sd_files.py shell                                les mêmes command
 ```
 
 `--port COM9` pour choisir le badge. Débit : ~85 Ko/s en lecture, ~40 Ko/s en écriture (une vidéo de 1 Mo en
-~25 s) : pour de gros fichiers, le lecteur de cartes reste plus rapide. Les fichiers écrits sont datés du
-1er octobre 2026 (le badge n'a pas d'horloge). Le protocole (octet `0x05` puis une ligne de commande, réponses
+~25 s) : pour de gros fichiers, le lecteur de cartes reste plus rapide. **Les dates** : à la
+connexion, le PC donne son heure au badge (qui n'a pas d'horloge) ; un fichier copié garde la date de son original,
+dans les deux sens. Sans heure reçue, un fichier créé par le badge est daté du 1er octobre 2026. Le téléphone ou le
+module ESP32 donneront la leur de la même façon (commande `T`). Le protocole (octet `0x05` puis une ligne de commande, réponses
 `@SD ...`) est décrit dans `src/menu/sd_serial.c` ; ce sont les mêmes opérations que l'API fichiers du futur module
 ESP32 ([etude_module_esp32.md](../etude_module_esp32.md)).
 

@@ -6,8 +6,8 @@
 /* The SD card through the USB serial port (tools/sd_files.py): the byte 0x05, then a command line ended by '\n'.
  * The path is always the last argument (it may contain spaces), the data is in base64:
  *
- *   L <dir>                    list:  "@SD E <d|f> <size> <name>" per entry, then "@SD OK <n>"
- *   S <path>                   stat:  "@SD OK <d|f> <size>"
+ *   L <dir>                    list:  "@SD E <d|f> <size> <date> <name>" per entry, then "@SD OK <n>"
+ *   S <path>                   stat:  "@SD OK <d|f> <size> <date>"
  *   R <offset> <len> <file>    read at most SD_SERIAL_CHUNK bytes: "@SD OK <n> <base64>"
  *   W <offset> <base64> <file> write (offset 0: the file is created or emptied): "@SD OK <n>"; the file stays open
  *                              for the next chunk, until C or another command
@@ -16,7 +16,10 @@
  *   M <path>                   make a folder
  *   N <old>\t<new>             rename / move
  *   F                          free space: "@SD OK <free KB> <total KB>"
+ *   T <date>                   set the clock (the date of the files created or written from now on)
+ *   U <date> <path>            set the date of a file or folder (the date of the original, after a copy)
  *
+ * A date: the local time of the sender (the PC, the phone...) in seconds since 1970-01-01, counted as if UTC.
  * An error: "@SD ERR <FatFs code> <text>". The same operations as the FILE_* API of the ESP32 module
  * (docs/etude_module_esp32.md). Everything runs in the main loop, like the other users of the card. */
 
@@ -106,7 +109,8 @@ static void cmd_list(const char *path) {
         return reply_error(fr);
     int n = 0;
     while (f_readdir(&d, &info) == FR_OK && info.fname[0]) {
-        printf("@SD E %c %llu %s\n", info.fattrib & AM_DIR ? 'd' : 'f', (unsigned long long)info.fsize, info.fname);
+        printf("@SD E %c %llu %lu %s\n", info.fattrib & AM_DIR ? 'd' : 'f', (unsigned long long)info.fsize,
+               (unsigned long)sd_local_time(info.fdate, info.ftime), info.fname);
         ++n;
     }
     f_closedir(&d);
@@ -116,13 +120,14 @@ static void cmd_list(const char *path) {
 static void cmd_stat(const char *path) {
     FILINFO info;
     if (! path[0] || ! strcmp(path, "/")) {  /* The root has no entry */
-        printf("@SD OK d 0\n");
+        printf("@SD OK d 0 0\n");
         return;
     }
     int fr = f_stat(path, &info);
     if (fr != FR_OK)
         return reply_error(fr);
-    printf("@SD OK %c %llu\n", info.fattrib & AM_DIR ? 'd' : 'f', (unsigned long long)info.fsize);
+    printf("@SD OK %c %llu %lu\n", info.fattrib & AM_DIR ? 'd' : 'f', (unsigned long long)info.fsize,
+           (unsigned long)sd_local_time(info.fdate, info.ftime));
 }
 
 static void cmd_read(char *args) {
@@ -210,6 +215,11 @@ void sd_serial_command(void) {
     char *args = line[1] == ' ' ? line + 2 : line + 1;
     if (cmd != 'W')
         close_written();
+    if (cmd == 'T') {  /* The clock: no card needed */
+        sd_set_time(strtoul(args, NULL, 10));
+        printf("@SD OK\n");
+        return;
+    }
     int fr = sd_mount();
     if (fr != FR_OK) {
         sd_unmount();  /* The card may have been changed: mounted again next time */
@@ -234,6 +244,18 @@ void sd_serial_command(void) {
         break;
     }
     case 'F': cmd_free(); break;
+    case 'U': {
+        uint32_t t;
+        if (! number(&args, &t))
+            return reply_error(FR_INVALID_PARAMETER);
+        FILINFO info;
+        uint32_t fat = sd_fat_datetime(t);
+        info.fdate = (WORD)(fat >> 16);
+        info.ftime = (WORD)fat;
+        fr = f_utime(args, &info);
+        fr == FR_OK ? (void)printf("@SD OK\n") : reply_error(fr);
+        break;
+    }
     default: printf("@SD ERR %d unknown command %c\n", FR_INVALID_PARAMETER, cmd); break;
     }
 }

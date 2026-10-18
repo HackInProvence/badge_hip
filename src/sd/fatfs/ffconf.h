@@ -42,7 +42,7 @@
 /* This option switches f_expand(). (0:Disable or 1:Enable) */
 
 
-#define FF_USE_CHMOD	0
+#define FF_USE_CHMOD	1	/* badge: f_utime(), the date of the file copied */
 /* This option switches attribute control API functions, f_chmod() and f_utime().
 /  (0:Disable or 1:Enable) Also FF_FS_READONLY needs to be 0 to enable this option. */
 
@@ -237,7 +237,7 @@
 /  Note that enabling exFAT discards ANSI C (C89) compatibility. */
 
 
-#define FF_FS_NORTC		1	/* badge: no RTC, the files written get this date */
+#define FF_FS_NORTC		0	/* badge: get_fattime() of sd_fs.c, the clock set by the PC (sd_set_time) */
 #define FF_NORTC_MON	10
 #define FF_NORTC_MDAY	1
 #define FF_NORTC_YEAR	2026

@@ -7,11 +7,15 @@
 
 """File manager of the SD card of the badge, through its USB serial port (no need to take the card out).
 
+Without a command: a window with the files of the PC on the left and the ones of the card on the right (send,
+fetch, new folder, rename, delete; several files or folders at once).
+
+The same from the command line:
     python tools/sd_files.py ls [DIR]                    list a folder (default: the root)
     python tools/sd_files.py tree [DIR]                  every file below a folder
-    python tools/sd_files.py get CARD_PATH [LOCAL]       copy a file (or a folder, -r) to the PC
-    python tools/sd_files.py put LOCAL [CARD_PATH]       copy a file (or a folder, recursively) to the card
-    python tools/sd_files.py rm CARD_PATH                delete a file (or a folder and its content, -r)
+    python tools/sd_files.py get CARD_PATH [LOCAL]       copy a file or a folder to the PC
+    python tools/sd_files.py put LOCAL [CARD_PATH]       copy a file or a folder to the card
+    python tools/sd_files.py rm [-r] CARD_PATH           delete a file (-r: a folder and its content)
     python tools/sd_files.py mkdir CARD_PATH             make a folder (and its parents)
     python tools/sd_files.py mv OLD NEW                  rename or move
     python tools/sd_files.py df                          free space
@@ -21,17 +25,24 @@ Examples:
     python tools/sd_files.py put docs/sd/CONFERENCES CONFERENCES
     python tools/sd_files.py --port COM9 get IMAGES/chat.epi
 
+The dates: on connection the badge gets the time of the PC (the files it creates are dated with it), and a file
+copied keeps the date of its original, both ways.
+
 Protocol (src/menu/sd_serial.c): the byte 0x05, then a command line; the badge answers "@SD OK ..." or
-"@SD ERR <code> <text>"; the data goes in base64, 512 bytes per command. The other lines are the log of the badge.
+"@SD ERR <code> <text>"; the data goes in base64, 512 bytes per command; a date is the local time in seconds since
+1970 counted as if UTC (FAT stores local times). The other lines are the log of the badge.
 Close the other applications that use the serial port (badge_remote.py, a terminal...) first.
 """
 
 import argparse
 import base64
+import calendar
 import os
 import posixpath
+import queue
 import shlex
 import sys
+import threading
 import time
 
 try:
@@ -48,11 +59,29 @@ class SdError(Exception):
     pass
 
 
+def badge_ports():
+    """The badges plugged in: [(port, label)]"""
+    return sorted((p.device, f'{p.device}  ({p.serial_number or "?"})')
+                  for p in serial.tools.list_ports.comports() if p.vid == PICO_VID)
+
+
 def find_port():
-    for p in serial.tools.list_ports.comports():
-        if p.vid == PICO_VID:
-            return p.device
-    return None
+    ports = badge_ports()
+    return ports[0][0] if ports else None
+
+
+# ------ Dates: the card keeps local times (FAT), the PC real times (seconds since 1970 UTC)
+
+def to_card_time(epoch):
+    return calendar.timegm(time.localtime(epoch))
+
+
+def from_card_time(local):
+    return time.mktime(time.gmtime(local)[:8] + (-1,))
+
+
+def card_time_text(local):
+    return time.strftime('%Y-%m-%d %H:%M', time.gmtime(local)) if local else ''
 
 
 class Card:
@@ -62,6 +91,7 @@ class Card:
         self.buf = b''
         time.sleep(0.2)
         self.ser.reset_input_buffer()
+        self.command(f'T {to_card_time(time.time())}')  # The clock of the badge: the date of the files it writes
 
     def close(self):
         self.ser.close()
@@ -96,29 +126,30 @@ class Card:
     # ------ The operations
 
     def ls(self, path):
-        """[(name, is_dir, size)]"""
+        """[(name, is_dir, size, date)], folders first"""
         entries, _ = self.command('L ' + path)
         out = []
         for e in entries:
-            kind, size, name = e.split(' ', 2)
-            out.append((name, kind == 'd', int(size)))
+            kind, size, date, name = e.split(' ', 3)
+            out.append((name, kind == 'd', int(size), int(date)))
         return sorted(out, key=lambda x: (not x[1], x[0].lower()))
 
     def stat(self, path):
-        """(is_dir, size), None when it does not exist"""
+        """(is_dir, size, date), None when it does not exist"""
         try:
             _, r = self.command('S ' + path)
         except SdError as e:
             if 'no file' in str(e) or 'no path' in str(e):
                 return None
             raise
-        kind, size = r.split()
-        return kind == 'd', int(size)
+        kind, size, date = r.split()
+        return kind == 'd', int(size), int(date)
 
     def read(self, path, progress=None):
-        is_dir, size = self.stat(path) or (None, None)
-        if size is None or is_dir:
+        st = self.stat(path)
+        if st is None or st[0]:
             raise SdError(f'{path}: not a file')
+        size = st[1]
         data = bytearray()
         while len(data) < size:
             _, r = self.command(f'R {len(data)} {CHUNK} {path}')
@@ -131,7 +162,7 @@ class Card:
                 progress(len(data), size)
         return bytes(data)
 
-    def write(self, path, data, progress=None):
+    def write(self, path, data, progress=None, date=None):
         offset = 0
         while True:
             chunk = data[offset:offset + CHUNK]
@@ -144,6 +175,11 @@ class Card:
             if offset >= len(data):
                 break
         self.command('C')
+        if date is not None:
+            self.set_date(path, date)
+
+    def set_date(self, path, epoch):
+        self.command(f'U {to_card_time(epoch)} {path}')
 
     def mkdir(self, path):
         parts = [p for p in path.strip('/').split('/') if p]
@@ -160,7 +196,7 @@ class Card:
         if st is None:
             raise SdError(f'{path}: not found')
         if st[0] and recursive:
-            for name, _, _ in self.ls(path):
+            for name, _, _, _ in self.ls(path):
                 self.rm(posixpath.join(path, name), True)
         self.command('D ' + path)
 
@@ -172,6 +208,40 @@ class Card:
         free, total = (int(x) for x in r.split())
         return free, total
 
+    # ------ Copies of whole trees, keeping the dates
+
+    def put(self, src, dst, progress=None, log=print):
+        """Local file or folder -> card path (created)"""
+        if os.path.isdir(src):
+            self.mkdir(dst)
+            for name in sorted(os.listdir(src)):
+                self.put(os.path.join(src, name), posixpath.join(dst, name), progress, log)
+            self.set_date(dst, os.path.getmtime(src))
+            return
+        if posixpath.dirname(dst):
+            self.mkdir(posixpath.dirname(dst))
+        log(f'{src} -> {dst}')
+        with open(src, 'rb') as f:
+            self.write(dst, f.read(), progress and (lambda d, t: progress(dst, d, t)), os.path.getmtime(src))
+
+    def get(self, src, dst, progress=None, log=print):
+        """Card file or folder -> local path (created)"""
+        st = self.stat(src)
+        if st is None:
+            raise SdError(f'{src}: not found')
+        if st[0]:
+            os.makedirs(dst, exist_ok=True)
+            for name, _, _, _ in self.ls(src):
+                self.get(posixpath.join(src, name), os.path.join(dst, name), progress, log)
+        else:
+            log(f'{src} -> {dst}')
+            data = self.read(src, progress and (lambda d, t: progress(src, d, t)))
+            with open(dst, 'wb') as f:
+                f.write(data)
+        if st[2]:
+            t = from_card_time(st[2])
+            os.utime(dst, (t, t))
+
 
 def human(n):
     for unit in ('B', 'KB', 'MB', 'GB'):
@@ -180,12 +250,10 @@ def human(n):
         n /= 1024
 
 
-def progress_bar(name):
-    start = time.time()
+def progress_bar():
+    start, last = time.time(), [0.0]
 
-    last = [0.0]
-
-    def show(done, total):
+    def show(name, done, total):
         if done < total and time.time() - last[0] < 0.5:
             return
         last[0] = time.time()
@@ -195,21 +263,21 @@ def progress_bar(name):
 
 
 def norm(path, cwd='/'):
-    path = posixpath.normpath(posixpath.join(cwd, path)) if path else cwd
-    return path.lstrip('/')
+    path = posixpath.normpath(posixpath.join(cwd, path or '.'))
+    return '' if path in ('/', '.') else path.lstrip('/')
 
 
-# ------ The commands
+# ------ The command line
 
 def do_ls(card, args, cwd):
-    path = norm(args[0] if args else '', cwd)
-    for name, is_dir, size in card.ls(path):
-        print(f'  {name}/' if is_dir else f'  {name:<40} {human(size):>10}')
+    for name, is_dir, size, date in card.ls(norm(args[0] if args else '', cwd)):
+        print(f'  {name + "/":<40} {"":>10}  {card_time_text(date)}' if is_dir else
+              f'  {name:<40} {human(size):>10}  {card_time_text(date)}')
 
 
 def do_tree(card, args, cwd):
     def walk(path, indent):
-        for name, is_dir, size in card.ls(path):
+        for name, is_dir, size, _ in card.ls(path):
             print(f'{indent}{name}/' if is_dir else f'{indent}{name}  ({human(size)})')
             if is_dir:
                 walk(posixpath.join(path, name), indent + '  ')
@@ -219,36 +287,18 @@ def do_tree(card, args, cwd):
 def do_get(card, args, cwd):
     src = norm(args[0], cwd)
     dst = args[1] if len(args) > 1 else posixpath.basename(src) or '.'
-    st = card.stat(src)
-    if st is None:
-        raise SdError(f'{src}: not found')
-    if st[0]:
-        os.makedirs(dst, exist_ok=True)
-        for name, is_dir, _ in card.ls(src):
-            do_get(card, [posixpath.join('/', src, name), os.path.join(dst, name)], '/')
-        return
     if os.path.isdir(dst):
         dst = os.path.join(dst, posixpath.basename(src))
-    data = card.read(src, progress_bar(src))
-    with open(dst, 'wb') as f:
-        f.write(data)
+    card.get(src, dst, progress_bar(), lambda s: None)
 
 
 def do_put(card, args, cwd):
     src = args[0]
     dst = norm(args[1] if len(args) > 1 else os.path.basename(os.path.normpath(src)), cwd)
-    if os.path.isdir(src):
-        card.mkdir(dst)
-        for name in sorted(os.listdir(src)):
-            do_put(card, [os.path.join(src, name), '/' + posixpath.join(dst, name)], '/')
-        return
     st = card.stat(dst)
-    if st and st[0]:
+    if st and st[0] and not os.path.isdir(src):
         dst = posixpath.join(dst, os.path.basename(src))
-    if posixpath.dirname(dst):
-        card.mkdir(posixpath.dirname(dst))
-    with open(src, 'rb') as f:
-        card.write(dst, f.read(), progress_bar(dst))
+    card.put(src, dst, progress_bar(), lambda s: None)
 
 
 def do_rm(card, args, cwd):
@@ -311,6 +361,290 @@ def shell(card):
             print(f'  error: {e}' if not isinstance(e, IndexError) else '  missing argument')
 
 
+# ------ The window
+
+def gui(port_arg):
+    import tkinter as tk
+    from tkinter import filedialog, messagebox, simpledialog, ttk
+
+    root = tk.Tk()
+    root.title('Carte SD du badge')
+    root.geometry('1000x620')
+    root.minsize(700, 400)
+
+    jobs = queue.Queue()  # Work for the thread of the card: functions taking the card
+    events = queue.Queue()  # Its results for the window: functions to call
+    state = {'card': None, 'busy': False, 'pc': os.path.expanduser('~'), 'sd': ''}
+
+    def worker():
+        while True:
+            job = jobs.get()
+            try:
+                job()
+            except (SdError, OSError, serial.SerialException) as e:
+                events.put(lambda e=e: (status.set(f'Erreur : {e}'), messagebox.showerror('Carte SD', str(e))))
+            events.put(lambda: done())
+    threading.Thread(target=worker, daemon=True).start()
+
+    def run(job, text):
+        if state['busy']:
+            return
+        state['busy'] = True
+        status.set(text)
+        root.config(cursor='watch')
+        jobs.put(job)
+
+    def done():
+        state['busy'] = False
+        root.config(cursor='')
+
+    def poll():
+        while not events.empty():
+            events.get()()
+        root.after(50, poll)
+
+    def progress(name, d, t):
+        events.put(lambda: (bar.config(maximum=max(t, 1), value=d),
+                            status.set(f'{name} : {human(d)} / {human(t)}')))
+
+    def log(text):
+        events.put(lambda: status.set(text))
+
+    # --- The bar of the badge
+    top = ttk.Frame(root, padding=6)
+    top.pack(fill='x')
+    ttk.Label(top, text='Badge :').pack(side='left')
+    port_var = tk.StringVar()
+    ports = ttk.Combobox(top, textvariable=port_var, width=32, state='readonly')
+    ports.pack(side='left', padx=4)
+    free_var = tk.StringVar()
+
+    def refresh_ports():
+        found = badge_ports()
+        ports['values'] = [label for _, label in found]
+        if found and not port_var.get():
+            wanted = [label for p, label in found if p == port_arg]
+            port_var.set(wanted[0] if wanted else found[0][1])
+
+    def connect():
+        label = port_var.get()
+        if not label:
+            return
+        port = label.split()[0]
+
+        def job():
+            if state['card']:
+                state['card'].close()
+                state['card'] = None
+            card = Card(port)
+            state['card'] = card
+            free, total = card.df()
+            entries = card.ls(state['sd'])
+            events.put(lambda: (free_var.set(f'{human(free * 1024)} libres sur {human(total * 1024)}'),
+                                show_sd(entries), status.set(f'Connecté à {port}, heure du PC envoyée')))
+        run(job, f'Connexion à {port}...')
+
+    ttk.Button(top, text='Rechercher', command=refresh_ports).pack(side='left')
+    ttk.Button(top, text='Connecter', command=connect).pack(side='left', padx=4)
+    ttk.Label(top, textvariable=free_var).pack(side='right')
+
+    # --- The two lists
+    panes = ttk.PanedWindow(root, orient='horizontal')
+    panes.pack(fill='both', expand=True, padx=6)
+
+    def make_list(title):
+        frame = ttk.Frame(panes)
+        head = ttk.Frame(frame)
+        head.pack(fill='x')
+        ttk.Label(head, text=title, font=('', 10, 'bold')).pack(side='left')
+        path_var = tk.StringVar()
+        ttk.Label(head, textvariable=path_var).pack(side='left', padx=8)
+        tree = ttk.Treeview(frame, columns=('size', 'date'), selectmode='extended')
+        tree.heading('#0', text='Nom')
+        tree.heading('size', text='Taille')
+        tree.heading('date', text='Date')
+        tree.column('#0', width=240)
+        tree.column('size', width=80, anchor='e')
+        tree.column('date', width=120)
+        scroll = ttk.Scrollbar(frame, orient='vertical', command=tree.yview)
+        tree.configure(yscrollcommand=scroll.set)
+        scroll.pack(side='right', fill='y')
+        tree.pack(fill='both', expand=True)
+        panes.add(frame, weight=1)
+        return tree, path_var
+
+    pc_tree, pc_path = make_list('PC')
+    sd_tree, sd_path = make_list('Carte SD')
+
+    def fill(tree, rows, up):
+        tree.delete(*tree.get_children())
+        if up:
+            tree.insert('', 'end', iid='..', text='📁 ..', values=('', ''))
+        for name, is_dir, size, date in rows:
+            tree.insert('', 'end', iid=name, text=('📁 ' if is_dir else '') + name,
+                        values=('' if is_dir else human(size), date), tags=('dir',) if is_dir else ())
+
+    def show_pc():
+        path = state['pc']
+        rows = []
+        try:
+            for name in os.listdir(path):
+                full = os.path.join(path, name)
+                try:
+                    st = os.stat(full)
+                except OSError:
+                    continue
+                rows.append((name, os.path.isdir(full), st.st_size,
+                             time.strftime('%Y-%m-%d %H:%M', time.localtime(st.st_mtime))))
+        except OSError as e:
+            status.set(f'Erreur : {e}')
+        rows.sort(key=lambda r: (not r[1], r[0].lower()))
+        fill(pc_tree, rows, os.path.dirname(path) != path)
+        pc_path.set(path)
+
+    def show_sd(entries):
+        fill(sd_tree, [(n, d, s, card_time_text(t)) for n, d, s, t in entries], bool(state['sd']))
+        sd_path.set('/' + state['sd'])
+
+    def reload_sd(then_text='Prêt'):
+        def job():
+            entries = state['card'].ls(state['sd'])
+            free, total = state['card'].df()
+            events.put(lambda: (show_sd(entries), status.set(then_text),
+                                free_var.set(f'{human(free * 1024)} libres sur {human(total * 1024)}')))
+        if state['card']:
+            run(job, 'Lecture de la carte...')
+
+    def pc_open(_event=None):
+        sel = pc_tree.focus()
+        if not sel:
+            return
+        path = os.path.dirname(state['pc']) if sel == '..' else os.path.join(state['pc'], sel)
+        if os.path.isdir(path):
+            state['pc'] = path
+            show_pc()
+
+    def sd_open(_event=None):
+        sel = sd_tree.focus()
+        if not sel or not state['card']:
+            return
+        if sel == '..':
+            state['sd'] = posixpath.dirname(state['sd'])
+        elif 'dir' in sd_tree.item(sel, 'tags'):
+            state['sd'] = posixpath.join(state['sd'], sel)
+        else:
+            return
+        reload_sd()
+
+    pc_tree.bind('<Double-1>', pc_open)
+    pc_tree.bind('<Return>', pc_open)
+    sd_tree.bind('<Double-1>', sd_open)
+    sd_tree.bind('<Return>', sd_open)
+
+    def selected(tree):
+        return [i for i in tree.selection() if i != '..']
+
+    # --- The actions
+    def send():
+        names = selected(pc_tree)
+        if not names or not state['card']:
+            return
+        srcs = [os.path.join(state['pc'], n) for n in names]
+        dst_dir = state['sd']
+
+        def job():
+            for src in srcs:
+                state['card'].put(src, posixpath.join(dst_dir, os.path.basename(src)), progress, log)
+            entries = state['card'].ls(dst_dir)
+            events.put(lambda: (show_sd(entries), status.set(f'{len(srcs)} élément(s) envoyé(s)')))
+        run(job, 'Envoi...')
+
+    def fetch():
+        names = selected(sd_tree)
+        if not names or not state['card']:
+            return
+        src_dir, dst_dir = state['sd'], state['pc']
+
+        def job():
+            for n in names:
+                state['card'].get(posixpath.join(src_dir, n), os.path.join(dst_dir, n), progress, log)
+            events.put(lambda: (show_pc(), status.set(f'{len(names)} élément(s) récupéré(s)')))
+        run(job, 'Récupération...')
+
+    def new_folder():
+        if not state['card']:
+            return
+        name = simpledialog.askstring('Nouveau dossier', 'Nom du dossier :', parent=root)
+        if name:
+            path = posixpath.join(state['sd'], name)
+            run(lambda: (state['card'].mkdir(path), reload_sd_now()), 'Création...')
+
+    def reload_sd_now():
+        entries = state['card'].ls(state['sd'])
+        events.put(lambda: (show_sd(entries), status.set('Prêt')))
+
+    def rename():
+        names = selected(sd_tree)
+        if len(names) != 1 or not state['card']:
+            return
+        new = simpledialog.askstring('Renommer', 'Nouveau nom :', initialvalue=names[0], parent=root)
+        if new and new != names[0]:
+            old, path = posixpath.join(state['sd'], names[0]), posixpath.join(state['sd'], new)
+            run(lambda: (state['card'].mv(old, path), reload_sd_now()), 'Renommage...')
+
+    def delete():
+        names = selected(sd_tree)
+        if not names or not state['card']:
+            return
+        if not messagebox.askyesno('Supprimer', f'Supprimer de la carte : {", ".join(names[:5])}'
+                                   f'{"..." if len(names) > 5 else ""} (dossiers compris) ?'):
+            return
+        paths = [posixpath.join(state['sd'], n) for n in names]
+
+        def job():
+            for p in paths:
+                log(f'Suppression de {p}...')
+                state['card'].rm(p, True)
+            reload_sd_now()
+        run(job, 'Suppression...')
+
+    def choose_pc_folder():
+        path = filedialog.askdirectory(initialdir=state['pc'], parent=root)
+        if path:
+            state['pc'] = os.path.normpath(path)
+            show_pc()
+
+    actions = ttk.Frame(root, padding=6)
+    actions.pack(fill='x')
+    ttk.Button(actions, text='Dossier du PC...', command=choose_pc_folder).pack(side='left')
+    ttk.Button(actions, text='Envoyer sur la carte →', command=send).pack(side='left', padx=(16, 4))
+    ttk.Button(actions, text='← Récupérer sur le PC', command=fetch).pack(side='left')
+    ttk.Button(actions, text='Supprimer', command=delete).pack(side='right')
+    ttk.Button(actions, text='Renommer', command=rename).pack(side='right', padx=4)
+    ttk.Button(actions, text='Nouveau dossier', command=new_folder).pack(side='right')
+    ttk.Button(actions, text='Actualiser', command=lambda: (show_pc(), reload_sd())).pack(side='right', padx=4)
+
+    bottom = ttk.Frame(root, padding=(6, 0, 6, 6))
+    bottom.pack(fill='x')
+    bar = ttk.Progressbar(bottom, length=200)
+    bar.pack(side='right')
+    status = tk.StringVar(value='Choisir le badge, puis Connecter (fermer badge_remote.py avant)')
+    ttk.Label(bottom, textvariable=status, anchor='w').pack(side='left', fill='x', expand=True)
+
+    def on_close():
+        if state['card']:
+            state['card'].close()
+        root.destroy()
+    root.protocol('WM_DELETE_WINDOW', on_close)
+
+    refresh_ports()
+    show_pc()
+    poll()
+    if port_var.get():
+        root.after(200, connect)
+    root.mainloop()
+
+
 def main():
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -319,9 +653,13 @@ def main():
     parser.add_argument('--port', help='serial port (default: the first Raspberry Pi Pico found)')
     parser.add_argument('-v', '--verbose', action='store_true', help='show the log lines of the badge')
     parser.add_argument('-r', '--recursive', action='store_true', help='rm: a folder and its content')
-    parser.add_argument('command', choices=list(COMMANDS) + ['shell'])
+    parser.add_argument('command', nargs='?', choices=list(COMMANDS) + ['shell'],
+                        help='without a command: the window')
     parser.add_argument('args', nargs='*')
     a = parser.parse_args()
+    if not a.command:
+        gui(a.port)
+        return
     port = a.port or find_port()
     if not port:
         sys.exit('no badge found: is it connected and switched on?')
@@ -329,6 +667,8 @@ def main():
         card = Card(port, a.verbose)
     except serial.SerialException as e:
         sys.exit(f'cannot open {port}: {e} (used by another application?)')
+    except SdError as e:
+        sys.exit(f'error: {e}')
     try:
         if a.command == 'shell':
             shell(card)

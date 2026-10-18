@@ -79,6 +79,12 @@ periode: 7-10 octobre 2026
 site: https://www.lesassisesdelacybersecurite.com/
 description: Rendez-vous annuel des professionnels de la cybersécurité (RSSI, offreurs de solutions) à Monaco.
 
+nom: SecSea 2k26
+ville: La Ciotat (cinéma L'Eden)
+periode: 16-18 octobre 2026
+site: https://secsea.org/
+description: La conférence de hacking et de cybersécurité de Provence, organisée par Hack In Provence dans le plus vieux cinéma du monde : ateliers le matin, conférences l'après-midi, CTF et soirées le soir. Le badge cigale vient de là.
+
 nom: Hexacon
 ville: Paris
 periode: 16-17 octobre 2026

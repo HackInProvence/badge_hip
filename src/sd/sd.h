@@ -67,4 +67,18 @@ size_t sd_list_files(const char *dir, const char *ext, char (*names)[SD_NAME_MAX
 /** \brief List the sub-directories of \p dir (hidden and system ones excluded), sorted by name. */
 size_t sd_list_dirs(const char *dir, char (*names)[SD_NAME_MAX], size_t max);
 
+/* ------ The date of the files written (the badge has no clock: the PC, the phone or the ESP32 module gives it) */
+
+/** \brief Sets the clock: \p local = the local time in seconds since 1970-01-01 (counted as if it were UTC). */
+void sd_set_time(uint32_t local);
+
+/** \brief The local time (same unit), 0 when never set: the files then get the date 2026-10-01. */
+uint32_t sd_time(void);
+
+/** \brief Local time -> FAT date (high 16 bits) and time (low 16 bits), 2 seconds resolution. */
+uint32_t sd_fat_datetime(uint32_t local);
+
+/** \brief FAT date and time (FILINFO.fdate, ftime) -> local time. */
+uint32_t sd_local_time(uint16_t fdate, uint16_t ftime);
+
 #endif /* _SD_H */

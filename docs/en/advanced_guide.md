@@ -910,6 +910,9 @@ sorted): make sub-folders.
 ### 6.5 Copying files through the USB
 
 Without taking the card out: `tools/sd_files.py`, badge on and plugged in USB (close `badge_remote.py` first).
+Without argument, a **window**: the files of the PC on the left, the ones of the card on the right (double click:
+open a folder), and the buttons Send to the card, Fetch to the PC, New folder, Rename, Delete (several files or
+folders at once). The same operations from the command line:
 
 ```
 python tools/sd_files.py ls                                   the content of the root
@@ -922,7 +925,9 @@ python tools/sd_files.py shell                                the same commands,
 ```
 
 `--port COM9` to choose the badge. Speed: ~85 KB/s reading, ~40 KB/s writing (a 1 MB video in ~25 s): for big
-files, a card reader is still faster. The files written are dated October 1st, 2026 (the badge has no clock). The
+files, a card reader is still faster. **The dates**: on connection, the PC gives its time to the badge (which
+has no clock); a file copied keeps the date of its original, both ways. Without a time received, a file created by
+the badge is dated October 1st, 2026. The phone or the ESP32 module will give theirs the same way (command `T`). The
 protocol (byte `0x05` then a command line, `@SD ...` answers) is described in `src/menu/sd_serial.c`; these are the
 same operations as the file API of the future ESP32 module ([etude_module_esp32.md](../etude_module_esp32.md), in
 French).
