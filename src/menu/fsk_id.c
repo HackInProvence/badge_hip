@@ -158,8 +158,7 @@ static void fsk_render(uint8_t *fb, absolute_time_t now) {
     }
     snprintf(line, sizeof(line), _("%d tons de %d ms, %.1f s"), n_syms, FSK_SYMBOL_MS, n_syms * FSK_SYMBOL_MS / 1000.0);
     y = ui_lines(fb, y + 6, &gfx_font_small, line);
-    ui_wrapped(fb, y + 6, &gfx_font_small, N_("Sur un téléphone ou un PC : la page fsk-buzzer-link.html, "
-               "bouton Écouter, près du badge."), 3);  /* 3 lines above the footer: more would scroll */
+    ui_wrapped(fb, y + 6, &gfx_font_small, N_("Écoute sur téléphone ou PC : fsk-buzzer-link.html"), 2);
     ui_footer(fb, sending ? N_("A : arrêter") : N_("A : retour  B : émettre"));
 }
 
