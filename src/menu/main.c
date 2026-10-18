@@ -2559,7 +2559,8 @@ int main() {
                 redraw = true;
             ui_edit_typed_clear();  /* Not used by the page: dropped */
         } else if (app == A_GAME) {
-            if (! games_buttons(pressed, now) && exit_allowed(pressed, &app_ev)) {
+            bool record = games_record_shown();  /* Not a game: closed at once */
+            if (! games_buttons(pressed, now) && (record || exit_allowed(pressed, &app_ev))) {
                 set_leds(led_mode);  /* The games used the LEDs */
                 display_set_periodic_full(true);
                 app = A_MENU;

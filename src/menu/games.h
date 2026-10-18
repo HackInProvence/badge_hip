@@ -69,6 +69,8 @@ void games_record_text(game_t game, char *buf, int len);
 /** \brief Shows the record of the game as a signed QR code (long press in the menu), until a button is pressed
  * (then games_buttons() returns false). Returns false when the game has no record yet. */
 bool games_show_record(game_t game);
+/** rief The record shown from the menu (not a game): closing it needs no confirmation. */
+bool games_record_shown(void);
 
 /** \brief Start a new game (the scores of the previous rounds are reset). */
 void games_start(game_t game, absolute_time_t now);

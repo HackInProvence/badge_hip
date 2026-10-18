@@ -1163,6 +1163,10 @@ bool games_show_record(game_t g) {
     return true;
 }
 
+bool games_record_shown(void) {
+    return qr_shown && qr_record;
+}
+
 void games_start(game_t g, absolute_time_t now) {
     game = g;
     qr_shown = false;

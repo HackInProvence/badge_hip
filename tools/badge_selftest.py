@@ -223,11 +223,11 @@ def test_games(t):
             else:
                 ok, detail = False, 'no game over'
         t.screenshot('game_' + re.sub(r'\W+', '_', name), 0.8)
-        # Quit. In Simon the left wing is also a pad: a wrong pad ends the game, then it quits
+        # Quit: a long press on A (a short one only shows "Pour sortir : appui long sur A")
         t.mark()
         quit_ok = False
         for _ in range(4):
-            t.keys('a')
+            t.keys('A')
             if t.expect(r'^ui: Jeux solo$', 1.5):
                 quit_ok = True
                 break
