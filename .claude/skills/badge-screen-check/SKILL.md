@@ -11,16 +11,17 @@ point" row and the firmware chose the slot itself; with the ADC almost flat, the
 "Enregistrer le point 2" could never be reached. Fixed with one row per point, chosen by the user.
 
 ## Read the code of the screen (src/menu/<app>.c)
-- List the choices: the rows (enum ROW_..., N_ROWS, a table), the actions of each wing on each row, the long presses.
-- Navigation: the flanks (UI_BTN_X down, UI_BTN_Y up) go through **all** the rows, with wrap-around when the other
+- List the choices: the rows (enum ROW_..., N_ROWS, a table), the actions of A and B on each row, the long presses.
+- Navigation: Y and X (UI_BTN_Y up, UI_BTN_X down) go through **all** the rows, with wrap-around when the other
   lists do; no row skipped by a condition that is never true; a list longer than UI_VISIBLE_ROWS (7) scrolls.
 - Each action has its own effect: no choice made by the firmware in the user's place when the user can tell
   (a slot, a point, a target), no choice silently replaced by another one, no state where an action does nothing
   without a message. When an action is refused, the footer or the status says why.
-- Every way out: the left wing (G) goes back from each row (except the rows where the wings change a value: then a
-  long press of G, as written in the footer).
+- Every way out: A goes back from each row (except the rows where A and B change a value: then a long press of A,
+  as written in the footer). In a game, a short press of A shows "Pour sortir : appui long sur A".
 - Drawing: every row above the footer (UI_FOOTER_Y 180) and below the title (UI_TITLE_H 28), the selected row
-  visible, the footer text matching the row (`G : retour  D : valider`, `Ailes : -  +`...).
+  visible, the footer text matching the row (`A : retour  B : valider`, `A : -  B : +`...).
+  Button names in the texts: A before B, Y before X (`Y X : choisir`).
 - An app_t: `.start`, `.buttons` and `.render` are called without a NULL check by main.c: always define them (a
   missing `.start` froze the badge with its USB port stuck).
 - Each action writes a log line (`printf`) the tests can wait for (`battery: point 2 set ...`).

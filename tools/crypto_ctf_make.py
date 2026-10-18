@@ -225,7 +225,7 @@ CHALLENGES = [
          solve=lambda c: [w for w in HASH_WORDS if sha1_prefix(w) == c['text'].split('\n')[2]][0]),
     # The Morse is not shown: the badge plays it at 19 kHz (hardly heard), a phone sees it on a spectrogram
     dict(title='Ultrason', answer='DAUPHIN',
-         text='La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l\'entend, lui.\nQui d\'autre entend ça ?\n\nFlanc D : chanter (en boucle),\nencore : arrêter.',
+         text='La cigale chante trop aigu\npour vos oreilles : 19 kHz.\nUn téléphone l\'entend, lui.\nQui d\'autre entend ça ?\n\nX : chanter (en boucle),\nencore : arrêter.',
          morse=morse('DAUPHIN'), ultrasound=True,
          hint='Appli de spectrogramme\n(Spectroid, Spek...) : des\ntraits vers 19 kHz, en Morse.',
          solve=lambda c: unmorse(c['morse'])),

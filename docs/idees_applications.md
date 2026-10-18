@@ -5,7 +5,7 @@ Ce document complète [idees_reseau_extensions_ctf.md](idees_reseau_extensions_c
 ports d'extension, challenges CTF) : ces idées-là ne sont pas répétées ici, on s'appuie dessus et on va plus loin.
 
 Rappel du matériel (contraintes réelles) : RP2040 (2 × M0+ 133 MHz, 264 Ko de RAM, 2 PIO), flash 16 Mo,
-USB CDC, e-Paper 200×200 N/B (4 gris en ~2 s, partiel ~0,3 s), **4 boutons** (ailes G/D, flancs G/D, courts et longs),
+USB CDC, e-Paper 200×200 N/B (4 gris en ~2 s, partiel ~0,3 s), **4 boutons** (de gauche à droite Y, A, B, X : A et B sur les ailes, Y et X sur les flancs, courts et longs),
 2 LEDs RGB WS2812, buzzer PWM (8 bits 16 kHz, son faible), CC1101 433 MHz (portée de quelques dizaines de mètres),
 micro-SD, 2 ports 2×6 (I2C, GPIO, 3,3 V ; aujourd'hui IR à droite, OLED 128×64 à gauche), batterie Li-ion,
 un secteur de flash de 4 Ko pour les réglages.
@@ -62,7 +62,7 @@ et un clavier en « roue » (voir U8), ou depuis l'application PC.
 - **Moyen** : routage par inondation contrôlée (TTL 3-4, identifiants de messages déjà vus), attention au rapport cyclique radio.
 
 ### S4. Votes du public en direct *(fait : questions prédéfinies, histogramme sur le badge admin)*
-L'orateur pose une question, chaque cigale vote avec les ailes (A/B/C/D), la station de base affiche le résultat en temps réel.
+L'orateur pose une question, chaque cigale vote avec les boutons (réponses A/B/C/D), la station de base affiche le résultat en temps réel.
 Utilisable aussi pour élire le meilleur talk, le meilleur costume, le prochain morceau du DJ.
 - **Facile** : un paquet de 8 octets par vote ; un vote par badge et par question (identifiant de question dans le paquet).
 
@@ -132,7 +132,7 @@ et ce qui le protège. On repart en sachant choisir ses équipements.
 
 ### H4. Défis de cryptographie sur l'écran *(fait : 12 défis)*
 Une série d'énigmes progressives : César, Vigenère, XOR, hash tronqué, signature à vérifier... L'écran affiche le chiffré,
-les ailes font défiler les indices, la réponse se saisit avec la roue de caractères (celle du nom de la cigale).
+A / B font défiler les indices, la réponse se saisit avec la roue de caractères (celle du nom de la cigale).
 Chaque défi réussi donne un fragment du grand flag final.
 - **Facile** : du texte et un peu de calcul ; les solutions sont stockées sous forme de hash dans le firmware.
 
@@ -180,7 +180,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 
 | Idée | Description | Faisabilité |
 |---|---|---|
-| **P1. Éditeur de pixel art** | Dessiner une image 25×25 agrandie (les flancs déplacent, les ailes changent la couleur), en faire son image de veille | Moyen |
+| **P1. Éditeur de pixel art** | Dessiner une image 25×25 agrandie (Y / X déplacent, A / B changent la couleur), en faire son image de veille | Moyen |
 | **P2. Badge nominatif** *(fait, sans QR)* | Grand pseudo en police large, sous-titre (« Orateur », « Staff »), QR de contact : l'écran e-Paper reste affiché même éteint | Facile |
 | **P3. Galerie souvenir** | Les photos de l'événement copiées sur la SD à la sortie, la cigale devient un cadre photo qui change d'image chaque jour | Facile |
 | **P4. SSTV** | Recevoir une image transmise en son (SSTV) par l'orga... ou l'afficher depuis le PC, clin d'œil radioamateur | Difficile |
@@ -214,7 +214,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 
 ## 8. Musique et son
 
-- **M1. Instrument** : les 4 boutons jouent des notes, les flancs changent d'octave ; enregistrer et rejouer une boucle. *Facile.*
+- **M1. Instrument** : les 4 boutons jouent des notes, Y / X changent d'octave ; enregistrer et rejouer une boucle. *Facile.*
 - **M2. Boîte à rythmes** : séquenceur 16 pas affiché sur l'écran. *Moyen.*
 - **M3. Karaoké de la cigale** : paroles synchronisées sur une musique de la SD. *Moyen.*
 - **M4. Orchestre de cigales** : la version musicale du chœur (S1), chaque badge une partition. *Moyen.*

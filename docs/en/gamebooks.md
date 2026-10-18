@@ -18,7 +18,7 @@ Menu: **Media > Gamebooks** (Médias > Livres-jeux).
 
 - The book built into the badge, then the books of the `LIVRES` folder of the SD card (16 at most).
 - **Continue: ...** (Continuer : ...) at the top of the list: resumes the last book where you left it.
-- Sides: choose a book, **R** (right wing): open it, **L** (left wing): quit.
+- Y / X: choose a book, **A**: quit, **B**: open it.
 
 ### 1.2 The menu of a book
 
@@ -44,17 +44,17 @@ The title, the author, then:
 │ > Open the door             │  the selected choice is in black
 │ > Turn back                 │
 ├─────────────────────────────┤
-│   R: choose  L: menu        │
+│   A: menu  B: choose        │
 └─────────────────────────────┘
 ```
 
 | Button | Effect |
 |---|---|
-| Right side | Next page, then next choice. |
-| Left side | Previous choice, then previous page. |
-| R (right wing) | Take the selected choice (or next page when no choice is on the screen yet). |
-| L (left wing) | The menu of the book. |
-| L held | Quit the gamebooks. |
+| Y (left side) | Previous choice, then previous page. |
+| X (right side) | Next page, then next choice. |
+| A (left wing) | The menu of the book. |
+| B (right wing) | Take the selected choice (or next page when no choice is on the screen yet). |
+| A held | Quit the gamebooks. |
 
 - When the book rolls a **die**, the result is shown ("The die rolls... 4.", Le dé roule... et donne 4.) and
   only the matching choices are offered.

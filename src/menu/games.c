@@ -146,7 +146,7 @@ static const char *result_text(uint8_t result) {
     return result == 1 ? _("Gagné !") : result == 2 ? _("Perdu...") : _("Match nul");
 }
 
-/* Footer of the end pages: the buttons in the order of the badge, left wing on the left */
+/* Footer of the end pages: the buttons in the order of the badge, A on the left */
 #define OVER_FOOTER N_("Y X : QR  A : menu  B : rejouer")
 
 static void end_sound(uint8_t result) {
@@ -601,7 +601,7 @@ static bool simon_showing = false;  /* The lit pad is from the sequence (not the
 static absolute_time_t simon_ts = 0, simon_lit_ts = 0;
 static bool simon_new_record = false;
 
-/* Pads where the buttons are on the badge seen from the front: flanks at the top, wings at the bottom */
+/* Pads where the buttons are on the badge seen from the front: Y / X at the top, A / B at the bottom */
 static const char *SIMON_LABELS[4] = {N_("Y"), N_("X"), N_("A"), N_("B")};
 static const uint8_t SIMON_BUTTONS[4] = {GAMES_BTN_Y, GAMES_BTN_X, GAMES_BTN_A, GAMES_BTN_B};
 static const uint16_t SIMON_HZ[4] = {659, 880, 1109, 1319};  /* E A C# E, like the original */
@@ -665,7 +665,7 @@ static bool simon_buttons(uint8_t pressed, absolute_time_t now) {
         return true;
     }
     if (simon_phase != SIMON_INPUT)
-        return ! (pressed & GAMES_BTN_A);  /* While the sequence is shown, the left wing quits */
+        return ! (pressed & GAMES_BTN_A);  /* While the sequence is shown, A quits */
     for (int pad = 0; pad < 4; ++pad) {
         if (! (pressed & SIMON_BUTTONS[pad]))
             continue;
@@ -913,7 +913,7 @@ static void reflex_render(uint8_t *fb) {
 }
 
 
-/* ------ Snake: the flanks turn left or right ------ */
+/* ------ Snake: Y / X turn left or right ------ */
 
 #define SNAKE_COLS 19
 #define SNAKE_ROWS 14
@@ -1219,7 +1219,7 @@ bool games_buttons(uint8_t pressed, absolute_time_t now) {
     }
     bool stay;
     if (game == GAME_SIMON)
-        stay = simon_buttons(pressed, now);  /* The left wing is also a pad */
+        stay = simon_buttons(pressed, now);  /* A is also a pad */
     else if (pressed & GAMES_BTN_A)
         stay = false;
     else if (game == GAME_TICTACTOE)

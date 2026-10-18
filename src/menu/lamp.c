@@ -3,7 +3,7 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/* Lamp: the LEDs in white, the flanks change the brightness (kept in the flash) */
+/* Lamp: the LEDs in white, Y / X change the brightness (kept in the flash) */
 
 #include <stdio.h>
 
@@ -50,7 +50,7 @@ static bool lamp_buttons(const app_buttons_t *b, absolute_time_t now) {
         on = ! on;
         apply();
     }
-    /* Flanks: -/+ one step, repeated while held */
+    /* Y / X: -/+ one step, repeated while held */
     for (int f = 0; f < 2; ++f) {
         uint8_t bit = f ? UI_BTN_X : UI_BTN_Y;
         if (b->pressed & bit) {

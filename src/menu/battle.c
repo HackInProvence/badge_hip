@@ -291,7 +291,7 @@ static bool battle_buttons(const app_buttons_t *b, absolute_time_t now) {
         }
         break;
     case S_AIM:
-        /* The flanks move the aim (left / right, the rows follow), the right wing fires */
+        /* Y / X move the aim (left / right, the rows follow), B fires */
         if (b->pressed & UI_BTN_Y)
             cursor = (cursor + CELLS - 1) % CELLS;
         if (b->pressed & UI_BTN_X)

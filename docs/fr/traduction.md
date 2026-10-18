@@ -8,11 +8,11 @@ commencer. Le système est modulaire : ajouter une langue, c'est ajouter un fich
 ## Pour l'utilisateur
 
 - **Choisir la langue** : Réglages > Langue. Chaque langue est écrite dans sa propre langue (« English »,
-  « Français ») et le titre de la page est dans toutes (« Langue / Language ») : D choisit, G revient.
+  « Français ») et le titre de la page est dans toutes (« Langue / Language ») : A revient, B choisit.
   Le choix est gardé (même après une mise à jour du firmware).
 - **Retour à l'anglais** (badge resté dans une langue illisible) :
-  1. appuyer **5 fois sur l'aile gauche (G)** : on revient au menu principal, quelle que soit la page ;
-  2. puis **maintenir l'aile gauche 5 secondes** (dans le menu principal ; rien d'autre n'y maintient une aile, et
+  1. appuyer **5 fois sur A** (l'aile gauche) : on revient au menu principal, quelle que soit la page ;
+  2. puis **maintenir A 5 secondes** (dans le menu principal ; rien d'autre n'y maintient A ou B, et
      aucune suite d'appuis ne s'y confond avec la séquence du mode admin).
   Le badge passe en anglais et affiche « Language: English ».
 - **Par le port série** (USB) : la touche `E` met le badge en anglais, `N` passe à la langue suivante.
@@ -68,5 +68,7 @@ intégré. Les médias de la carte SD (livres, textes, sonneries) sont dans la l
 - L'écran fait 200 × 200 pixels : une traduction ne doit pas être plus longue que le français (titre : environ
   16 caractères, pied de page : environ 30). `tools/badge_screens.py` avec la touche `U` signale les textes coupés.
 - Garder les mêmes formats (`%d`, `%s`, `%02u`...) dans le même ordre, et les mêmes retours à la ligne (`\n`).
-- Les boutons : G = aile gauche, D = aile droite, flancs = côtés (en anglais : L, R, sides).
+- Les boutons : A, B, Y et X, les noms imprimés sur le circuit (A = aile gauche, B = aile droite, Y = flanc gauche,
+  X = flanc droit), restent les mêmes dans toutes les langues : « A : retour » devient « A: back ». Dans les
+  textes, A avant B et Y avant X (« Y X : choisir », « A : retour  B : choisir »).
 - Les captures d'écran d'une langue : `python tools/badge_screens.py --lang en` (voir le [guide avancé](guide_avance.md)).

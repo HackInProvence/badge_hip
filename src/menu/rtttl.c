@@ -631,7 +631,7 @@ static void rtttl_stop(void) {
     stop_playing("stopped");
 }
 
-/* Flanks in the list: one step, repeated while held */
+/* Y / X in the list: one step, repeated while held */
 static int list_step(const app_buttons_t *b, absolute_time_t now) {
     static absolute_time_t repeat_ts = 0;
     for (int w = 0; w < 2; ++w) {

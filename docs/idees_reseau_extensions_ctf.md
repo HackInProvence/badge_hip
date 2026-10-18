@@ -139,7 +139,7 @@ Chaque challenge exploite une capacité du badge. Les flags au format `SECSEA{..
 
 ### Débutant
 
-- **Code Konami** : une séquence de boutons (↑↑↓↓ avec les flancs, ailes...) débloque un menu caché qui affiche un flag.
+- **Code Konami** : une séquence de boutons (↑↑↓↓ avec Y / X, puis A, B...) débloque un menu caché qui affiche un flag.
 - **Morse sur les LEDs ou le buzzer** : un menu « Cigale bavarde » clignote ou chante un flag en morse.
 - **Port série** : le badge affiche un message d'accueil sur l'USB ; une commande cachée (`help` ne la montre pas) donne un flag.
 - **Carte SD** : un fichier caché, ou un flag dans une seule image d'une vidéo (image subliminale à 10 i/s).

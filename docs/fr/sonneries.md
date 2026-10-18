@@ -13,14 +13,14 @@ carte SD.
   ses sous-dossiers (`Nom/`), puis ses sonneries, avec le nom du fichier entre parenthèses. Les fichiers sont lus
   par pages de 32, dans l'ordre alphabétique : les lignes `< Précédents` et `Suivants >` changent de page (un dossier
   peut donc contenir des milliers de fichiers).
-  Flancs : monter / descendre (maintenus : défilement), aile droite (D) : ouvrir le dossier ou jouer, aile gauche
-  (G) : dossier parent, puis retour au menu.
-  Une sonnerie marquée `(!)` contient une erreur : D affiche la ligne, la colonne et la raison.
+  Y / X : monter / descendre (maintenus : défilement), A : dossier parent, puis retour au menu, B : ouvrir le
+  dossier ou jouer.
+  Une sonnerie marquée `(!)` contient une erreur : B affiche la ligne, la colonne et la raison.
 - **Les réglages**, en bas de la liste principale : « Volume : 6/8 » (le volume du badge) et « LEDs : 25 % » (la
-  luminosité des LEDs pendant la lecture : éteintes, 10, 25 (par défaut), 50 ou 100 %) ; D : valeur suivante.
+  luminosité des LEDs pendant la lecture : éteintes, 10, 25 (par défaut), 50 ou 100 %) ; B : valeur suivante.
 - **Pendant la lecture** : le nom, la note jouée (ex. `La#5`, `Silence`), une barre de progression et le temps.
   Les LEDs s'allument à chaque note, d'une couleur par note (Do rouge, Ré orange, Mi vert clair, Sol cyan, La bleu...).
-  G : arrêter, flancs : sonnerie précédente / suivante, D : reprendre au début.
+  Y / X : sonnerie précédente / suivante, A : arrêter, B : reprendre au début.
 - Le **mode muet** est respecté : pas de son ni de LEDs (la lecture continue en silence).
 - Jouer une sonnerie débloque le succès **Mélomane**.
 
@@ -47,7 +47,7 @@ carte SD
 - texte en UTF-8 (les accents des noms s'affichent) ou ASCII ; lignes de 2048 caractères au plus ;
 - dans un dossier : 40 sous-dossiers montrés, des fichiers en nombre quelconque (par pages de 32), 128 sonneries
   par page au plus ;
-- la page de lecture montre le chemin complet du fichier ; les flancs passent aux sonneries de la même page.
+- la page de lecture montre le chemin complet du fichier ; Y / X passent aux sonneries de la même page.
 
 Des exemples sont dans [`docs/sd/SONNERIES`](../sd/SONNERIES) : copier ce dossier sur la carte SD.
 
@@ -130,7 +130,7 @@ python tools/rtttl_sort.py F:/RTTTL_origine F:/RTTTL --categories categories.tsv
 
 ## Les erreurs
 
-Une ligne invalide reste dans la liste, marquée `(!)` ; D affiche sa ligne, sa colonne (en octets depuis le début
+Une ligne invalide reste dans la liste, marquée `(!)` ; B affiche sa ligne, sa colonne (en octets depuis le début
 de la ligne) et la raison : `':' manquant après le nom`, `':' manquant avant les notes`, `réglage d, o ou b invalide`,
 `durée invalide`, `note invalide`, `octave invalide`, `',' attendue après la note`, `aucune note`,
 `ligne trop longue`, `commande tune PICAXE invalide`. Le port série (USB) affiche aussi les détails : lignes `rtttl: ...`.

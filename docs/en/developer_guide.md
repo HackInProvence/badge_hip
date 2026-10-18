@@ -214,7 +214,8 @@ An application is a `const app_t`:
 The buttons come in an `app_buttons_t`: `pressed` (pressed since the last call), `released_short` (released without
 a long press: use it for a button that also has a long press), `long_pressed` (held for `APP_LONG_PRESS_MS` = 800 ms,
 reported once), `held` and `held_ms[]` (to repeat while held).
-Bits: `UI_BTN_A` (left wing), `UI_BTN_B` (right wing), `UI_BTN_X` (right flank), `UI_BTN_Y` (left flank).
+Bits: `UI_BTN_A` (button A, left wing), `UI_BTN_B` (B, right wing), `UI_BTN_X` (X, right flank), `UI_BTN_Y` (Y,
+left flank).
 
 For sound and LEDs, use `app_tone()` and `app_leds()`: they respect the mute mode; `app_leds(0, 0, 0)` gives the LEDs
 back to the badge's animation. `app_open(app)` opens an application from a service (a notification).
@@ -270,10 +271,10 @@ and the cure of the virus:
   announcements). In the editor, an accented letter takes one cell (one byte, 0x80 + its rank in `ACCENTS`);
   `ui_edit_start()` reads it as UTF-8 and `ui_edit_result()` gives it back as UTF-8 (2 bytes): the destination
   must have the room;
-- flanks: `ui_edit_change(e, -1 / +1)` (repeating while held is up to the caller);
-- right wing (short press): `ui_edit_move(e, 1)`; left wing: `ui_edit_move(e, -1)`, which returns `false`
+- Y / X: `ui_edit_change(e, -1 / +1)` (repeating while held is up to the caller);
+- B (short press): `ui_edit_move(e, 1)`; A: `ui_edit_move(e, -1)`, which returns `false`
   from the first position (cancel);
-- right wing (long press): done, `ui_edit_result()` returns the text without the trailing spaces;
+- B (long press): done, `ui_edit_result()` returns the text without the trailing spaces;
 - `ui_edit_render()` draws the prompt, the text around the cursor and the instructions;
 - the PC keyboard (keyboard mode of `badge_remote.py`: byte 0x02 followed by the character on the USB) **inserts**
   the character at the cursor of the open editor (the rest moves right, the last character is lost when the text is
@@ -298,7 +299,7 @@ For an entry handled directly by `main.c` (the older features):
 
 An application (above) saves steps 3 to 5.
 
-**Admin mode**: in the main menu, the sequence `ADMIN_SEQUENCE` (`"LLRRLRLR"`, L = left flank, R = right flank)
+**Admin mode**: in the main menu, the sequence `ADMIN_SEQUENCE` (`"LLRRLRLR"`, L = Y (left flank), R = X (right flank))
 typed within 8 s (`ADMIN_SEQUENCE_MS`) sets `store_t.admin` to `STORE_ADMIN_ON` and selects the Admin theme;
 "Quitter le mode admin" sets it back to 0. On the serial port, the byte 0x01 followed by `A` (on) or `a` (off) does
 the same (the "Mode admin" check box of `badge_remote.py`). All three go through `set_admin()` (`main.c`), which
@@ -317,7 +318,7 @@ It hooks them into the `switch` statements of the API. High scores live in `stor
 Then add tests in [tests/host/test_games.c](../../src/tests/host/test_games.c).
 
 The puzzles ([puzzles.h](../../src/menu/puzzles.h)) follow the same principle, with the *hooks* of `games.h`:
-short presses to move, long presses to act (long left wing: quit), a help page at the start.
+short presses to move, long presses to act (long A: quit), a help page at the start.
 Each one becomes an application through the `PUZZLE_APP` macro of [puzzles_app.c](../../src/menu/puzzles_app.c);
 their records are in `store_t.puzzle_records`, their tests in
 [tests/host/test_puzzles.c](../../src/tests/host/test_puzzles.c).
@@ -627,7 +628,7 @@ A command received both ways is only executed once (same command within 4 s).
 |---|---|---|
 | 0x01 | the cicada sings for 6 s | `remote.c` |
 | 0x02 / 0x03 | mute mode / end of the mute mode | `remote.c` |
-| 0x05 | sleep: `store_t.asleep` = `STORE_ASLEEP` and a reboot; at the start, `sleep_mode()` (main.c): the radio in `SPWD` (`radio_power_down()`), the SOMMEIL page (OTP), the buttons only, until 5 x left flank then 5 x right flank; ignored in Princeton, by the badge that sends it and by the page of the talk badge | `remote.c`, `main.c` |
+| 0x05 | sleep: `store_t.asleep` = `STORE_ASLEEP` and a reboot; at the start, `sleep_mode()` (main.c): the radio in `SPWD` (`radio_power_down()`), the SOMMEIL page (OTP), the buttons only, until 5 x Y then 5 x X; ignored in Princeton, by the badge that sends it and by the page of the talk badge | `remote.c`, `main.c` |
 | 0x10 to 0x14 | lights of the talk badge: off, green, orange, red, angry red | `talk.c` (page open) |
 | 0x30 + n | starts song n of the choir | `chorus.c` |
 
@@ -863,8 +864,8 @@ suspended during the measures (the network listens all the time). Three steps:
 At the end, `radio_tuned`, `radio_noise_dbm` and `radio_freq_offset` are saved, `radio_tools_set_freq_offset()`
 applies the correction and `net_reconfigure()` makes the radio configured again; `radio_tools_init()` reads it back
 at boot. Log: `tune: crystal ... Hz, noise ... dBm (remotes above ... dBm), frequency offset <before> -> <after>
-(<n> packets, mean <m>)`. The page shows the steps with a gauge (footer "G : arrêter"), then the crystal, the noise,
-the threshold of the remote controls, the correction and the number of packets heard ("D : régler  G : retour").
+(<n> packets, mean <m>)`. The page shows the steps with a gauge (footer "A : arrêter"), then the crystal, the noise,
+the threshold of the remote controls, the correction and the number of packets heard ("A : retour  B : régler").
 
 
 ### 6.22 LEDs of the cicadas (admin badge)
@@ -908,7 +909,7 @@ what they receive (no image is sent).
   the badge is on the menus or the screensaver; otherwise, it shows at the next opening of Social > Annonces.
 - **Admin** (Admin > Annonces (admin), `app_announce_admin`): 20 editable announcements (`STORE_ANNOUNCES`), kept in
   `store_ext_t` (§ 6.8), examples at first (`DEFAULTS`). Rows: Heure (editor `UI_CHARSET_TEXT`, 5 characters), Texte
-  and Contenu (`UI_CHARSET_LONG`, 56 characters), type of the QR code (wings), Aperçu (`announce_draw()` with the fast
+  and Contenu (`UI_CHARSET_LONG`, 56 characters), type of the QR code (A / B), Aperçu (`announce_draw()` with the fast
   refresh), Envoyer (`announce_send()`, in the background).
 
 
@@ -963,7 +964,7 @@ on a badge (a game page shows "Une partie de ... est en cours" when another grou
 **Tug of war** ([tug.c](../../src/menu/tug.c), hardware-free rules in [tug_logic.c](../../src/menu/tug_logic.c)):
 2 players at least. `tug_teams()` draws the Cigales / Fourmis teams with the common seed (Fisher-Yates, xorshift:
 the same on every badge), the referee is the extra player. Phases computed from the common start time: teams 5 s,
-countdown 3 s, pulling 20 s (`PULL_MS`), final count, result. A pull = left wing then right wing (`tug_pull()`).
+countdown 3 s, pulling 20 s (`PULL_MS`), final count, result. A pull = A then B (`tug_pull()`).
 Each badge sends its total (`K_COUNT`: pulls 2 bytes, "stopped" flag) every 300 ms + 40 ms per player; each badge
 adds up the totals of each team: the screens agree even far from the host. A team ahead by `tug_margin()` (20 pulls
 per player of the team) stops the game at once (the flag stops the others). After the result, the badge leaves the
@@ -973,7 +974,7 @@ party (5 s). Log: `tug: ...`.
 at least (2 when the host is in admin mode, for the tests). The host draws a **secret ring** with its own random
 generator (not the common seed) and a secret code per player, and sends each one **its** target only (`K_TARGET`,
 masked with `party_mask()` of its key) until the acknowledgement (`K_TARGET_ACK`).
-- **Kill**: the right wing sends `K_KILL` to the target (every 400 ms for 4 s) with a proof (hash of the code of the
+- **Kill**: B sends `K_KILL` to the target (every 400 ms for 4 s) with a proof (hash of the code of the
   target and of the killer's id). The target accepts it with a right proof and an RSSI ≥ `ASSASSIN_KILL_RSSI`
   (**−50 dBm**, badges almost touching, **to calibrate**: the victim logs `assassin: KILL from <name>, rssi <n>` at
   each attempt; `-DASSASSIN_KILL_RSSI=-90` for a test). It then sends `K_DEAD` back to the killer: its own target,
@@ -1079,7 +1080,7 @@ The badge shows up as a USB serial port (115200 baud, irrelevant over USB). One 
 
 | Key | Action |
 |---|---|
-| `a` `b` `x` `y` | short press: left wing, right wing, right flank, left flank |
+| `a` `b` `x` `y` | short press: buttons A, B, X, Y |
 | `A` `B` `X` `Y` | long press (quit a puzzle, save the name, fast-reading forward / back...) |
 | `[` / `]` | send the screen on every change: on / off |
 | `s` | send the screen once |
@@ -1168,7 +1169,7 @@ Sequence:
 A test is SKIPped when the hardware is missing (no SD card, uncalibrated battery).
 No badge setting is changed, except with `--ctf` (and the game records, since a game can end with 0 points).
 The `admin` and `net` groups turn on the admin mode, the mute mode or the virus for the test, then turn them off.
-The `admin` group checks the secret sequence of the flanks; the others open the Admin theme with the serial command
+The `admin` group checks the secret sequence of Y / X; the others open the Admin theme with the serial command
 0x01 `A` (`open_admin()`), like the check box of `badge_remote.py`. The `SOCIAL` and `ADMIN` lists of the script
 follow the order of the menus: to update along with `SUBMENUS`.
 
@@ -1179,7 +1180,7 @@ The groups (`--only`):
 | `diag` | `!` diagnostic: firmware version, CC1101 version, crystal, battery |
 | `menus` | each theme opens, back to the themes |
 | `games` | mini games, score QR code, record (long press) |
-| `puzzles` | each puzzle: help page, start, a move, quitting with a long press on the left wing |
+| `puzzles` | each puzzle: help page, start, a move, quitting with a long press on A |
 | `ctf` | Konami code (only with `--ctf`) |
 | `settings` | screensaver preview and wake-up, credits |
 | `radio` | radio message, test mode, beacons of the cicada network |

@@ -7,7 +7,7 @@ Le badge sait déjà beaucoup de choses : chœur, virus, messages, contacts vCar
 annonces, images radio, LEDs pilotées, chasse 433 MHz, CTF, jeux, vidéos et musique.
 
 **Ce qu'il y a dans la cigale** : RP2040 (2 cœurs, PIO), radio CC1101 433 MHz, e-Paper 200×200, émetteur et
-récepteur IR, haut-parleur (son PWM, jusqu'à ~19 kHz), 2 LEDs RGB, carte SD, 4 boutons (2 ailes, 2 flancs),
+récepteur IR, haut-parleur (son PWM, jusqu'à ~19 kHz), 2 LEDs RGB, carte SD, 4 boutons (A, B sur les ailes, Y, X sur les flancs),
 USB, ports d'extension, batterie Li-ion.
 
 **Légende**
@@ -54,7 +54,7 @@ USB, ports d'extension, batterie Li-ion.
 | 25 | **Enchères** : chaque cigale mise ses points sociaux sur des goodies réels | ★★ |
 | 26 | **Bourse aux cigales** : le score de chaque cigale est une action ; on achète, on vend, des krachs aléatoires | ★★★ 🤪 |
 | 27 | **Simon collectif** : la séquence de couleurs passe d'un badge à l'autre ; chaque joueur ajoute une note | ★★ |
-| 28 | **Tir à la corde** *(fait : Jeux > Tir à la corde, Cigales contre Fourmis)* : deux équipes martèlent les ailes, le compteur radio décide | ★ |
+| 28 | **Tir à la corde** *(fait : Jeux > Tir à la corde, Cigales contre Fourmis)* : deux équipes martèlent A et B, le compteur radio décide | ★ |
 
 ## 3. Radio et hacking pédagogique
 
@@ -65,7 +65,7 @@ USB, ports d'extension, batterie Li-ion.
 | 31 | **Rolling code expliqué** : une démo KeeLoq-like entre deux cigales, avec l'attaque « RollJam » expliquée (sans brouillage réel) | ★★★ |
 | 32 | **Oscilloscope du pauvre** : visualiser la trame OOK démodulée (GDO0) sur l'écran | ★★ |
 | 33 | **Décodeur de Morse** : écouter un signal OOK manuel et le traduire en texte | ★ |
-| 34 | **Émetteur Morse « QRP »** : apprendre le Morse avec l'aile droite et l'émettre en OOK, reçu par les autres cigales | ★ |
+| 34 | **Émetteur Morse « QRP »** : apprendre le Morse avec B et l'émettre en OOK, reçu par les autres cigales | ★ |
 | 35 | **POCSAG** : afficher les pages des bipeurs de démonstration émises par l'orga (pas les vrais réseaux) | ★★ |
 | 36 | **Détecteur de brouilleur** : alerte quand le plancher de bruit monte anormalement | ★ |
 | 37 | **Chasse au renard (ARDF)** : un vrai foxhunting avec affichage de la direction par la variation du RSSI | ★★ |
@@ -113,7 +113,7 @@ USB, ports d'extension, batterie Li-ion.
 | 69 | **Mode portrait** : photo + nom + pronoms + « demandez-moi : ... » | ★ |
 | 70 | **Avatar généré** : un identicon unique dessiné à partir de l'identifiant de la cigale | ★ |
 | 71 | **Bande dessinée** : une BD en cases sur la SD, une case par appui | ★ |
-| 72 | **Livre dont vous êtes le héros** *(fait : Médias > Livres-jeux, dossier LIVRES)* : choix avec les ailes, histoire sur la SD | ★ |
+| 72 | **Livre dont vous êtes le héros** *(fait : Médias > Livres-jeux, dossier LIVRES)* : choix avec Y / X et B, histoire sur la SD | ★ |
 | 73 | **Lecture de l'écran à voix haute** : synthèse vocale très simple (formants) pour l'accessibilité | ★★★ 🤪 |
 | 74 | **Mode « gros caractères »** : polices agrandies, pour l'accessibilité | ★★ |
 | 75 | **Génératif** : fractales (Mandelbrot), automates cellulaires (jeu de la vie) sur la veille | ★ |
@@ -123,7 +123,7 @@ USB, ports d'extension, batterie Li-ion.
 
 | # | Idée | Effort |
 |---|---|---|
-| 77 | **Synthé** : les 4 boutons + accords ; flanc maintenu = octave | ★ |
+| 77 | **Synthé** : les 4 boutons + accords ; Y ou X maintenu = octave | ★ |
 | 78 | **Séquenceur 16 pas** affiché sur l'écran, partagé par radio pour faire un groupe | ★★ |
 | 79 | **Lecteur de MOD / chiptune** : de vraies musiques de démo sur la SD | ★★ |
 | 80 | **Lecteur RTTTL** *(fait : Médias > Sonneries, dossier SONNERIES)* : les sonneries Nokia, téléchargeables | ★ |

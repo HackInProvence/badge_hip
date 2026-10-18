@@ -12,13 +12,13 @@
 
 
 /* Buttons flags from btns_get_state() */
-#define BTN_A 0x01  /* left wing */
-#define BTN_B 0x02  /* right wing */
-#define BTN_X 0x04  /* right flank */
-#define BTN_Y 0x08  /* left flank */
+#define BTN_A 0x01  /* A */
+#define BTN_B 0x02  /* B */
+#define BTN_X 0x04  /* X */
+#define BTN_Y 0x08  /* Y */
 
-/* The Konami code, with the 4 buttons of the badge: up, down = the flanks, left, right = the wings... then B and A.
- * As left = A and right = B, the wings are pressed 6 times in a row. */
+/* The Konami code, with the 4 buttons of the badge: up, down = Y / X, left, right = A / B... then B and A.
+ * As left = A and right = B, A and B are pressed 6 times in a row. */
 static const uint8_t KONAMI[CTF_CODE_LEN] = {BTN_Y, BTN_Y, BTN_X, BTN_X, BTN_A, BTN_B, BTN_A, BTN_B, BTN_B, BTN_A};
 
 /* Flag 0, XORed with the key "cigale" and 7*i (nothing readable with "strings") */
@@ -44,7 +44,7 @@ int ctf_code_press(uint8_t btn_mask) {
 
 
 void ctf_code_text(char *buf, int len) {
-    /* ^ v for the flanks, < > for the wings: the player sees what he typed, not whether it is right */
+    /* ^ v for Y / X, < > for A / B: the player sees what he typed, not whether it is right */
     int pos = 0;
     buf[0] = 0;
     for (int i = 0; i < n_typed && pos < len - 3; ++i) {

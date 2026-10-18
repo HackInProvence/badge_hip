@@ -6,7 +6,7 @@
 /* Tir à la corde: a group game in the lobby of party.c. A host opens the party, the cicadas around join it, the host
  * starts it. Every badge then computes the same two teams (Cigales and Fourmis, as in La Fontaine) from the shared
  * seed and the roster (tug_logic.c); with an odd number of players, one of them is the referee.
- * After a synchronized countdown, the players pull for PULL_MS: a press of the left wing then of the right wing is one
+ * After a synchronized countdown, the players pull for PULL_MS: a press of A then of B is one
  * pull. Each badge sends its count now and then (K_COUNT, to everybody), and every badge sums the counts of each team
  * to place the knot of the rope: the screens agree even far from the host. A team that gets tug_margin() pulls ahead
  * reaches its mark and stops the game at once (the "stopped" flag in K_COUNT stops the others too).

@@ -43,7 +43,7 @@ Le CC1101 ne sait pas faire de FM analogique : il fait de la modulation numériq
 
 Le réseau des cigales est mis en pause pendant l'émission (`net_pause()`), la radio est empruntée à `radio_tools.c`
 (`radio_tools_claim()` / `radio_tools_release()`) puis rendue au réseau, qui la reconfigure (profil GFSK, mot de
-synchronisation, réception). L'émission s'arrête à la fin du morceau, avec l'aile gauche ou droite, quand on quitte
+synchronisation, réception). L'émission s'arrête à la fin du morceau, avec A ou B, quand on quitte
 la page, et au bout de 10 minutes dans tous les cas.
 
 ## Les réglages
@@ -52,8 +52,8 @@ La page affiche, une par ligne : **Source**, **Fréquence**, **Puissance**, **Ex
 **Haut-parleur**, puis **> Émettre** (**> Choisir le fichier** avec la source Fichier SD), et en bas « ISM 433 MHz :
 essais courts » (ou le message du dernier arrêt).
 
-Flancs : ligne précédente / suivante ; ailes : valeur précédente / suivante ; sur la dernière ligne, aile droite :
-émettre (ou choisir le fichier), aile gauche : retour. Appui long sur l'aile gauche : quitter.
+Y / X : ligne précédente / suivante ; A / B : valeur précédente / suivante ; sur la dernière ligne, A : retour,
+B : émettre (ou choisir le fichier). Appui long sur A : quitter.
 
 | Réglage | Valeurs | Défaut |
 |---|---|---|
@@ -73,8 +73,8 @@ Flancs : ligne précédente / suivante ; ailes : valeur précédente / suivante 
 - **Tonalité 1 kHz** : sinus continu à 78 % de la pleine échelle avant le gain (jusqu'à l'arrêt ou aux 10 minutes) :
   pour les mesures.
 - **Fichier SD** : les `.WAV` de la carte : on part du dossier `MUSIQUE` (ou de la racine) et on navigue dans les
-  dossiers et sous-dossiers (affichés « Nom/ » en tête de liste ; aile droite : ouvrir le dossier ou émettre le
-  fichier, aile gauche : dossier parent, puis retour aux réglages depuis la racine). Les fichiers sont lus par le lecteur WAV du badge (8, 16, 24 ou
+  dossiers et sous-dossiers (affichés « Nom/ » en tête de liste ; A : dossier parent, puis retour aux réglages
+  depuis la racine ; B : ouvrir le dossier ou émettre le fichier). Les fichiers sont lus par le lecteur WAV du badge (8, 16, 24 ou
   32 bits, float, mono ou stéréo, jusqu'à 192 kHz). Conseillé : mono 16 kHz, normalisé (`audio2wav.py`). Le son est
   émis tel quel (pas de pré-accentuation, pas de filtre) : un son très aigu élargit un peu le spectre.
 
@@ -140,8 +140,8 @@ Le deuxième badge est un vrai récepteur pour ce signal :
    (RSSI ≥ -100 dBm). S'il atteint ±32 kHz sans trouver, il essaie la polarité inverse du démodulateur.
 
 Écran : fréquence, signal (dBm et jauge), correction de fréquence, tonalité détectée (seulement si c'est une vraie
-tonalité : pureté ≥ 50 % et niveau ≥ 5 %), niveau et rapport cyclique moyen, état du silencieux. Flancs : canal
-précédent / suivant ; aile droite : silencieux (squelch) oui / non ; aile gauche : retour.
+tonalité : pureté ≥ 50 % et niveau ≥ 5 %), niveau et rapport cyclique moyen, état du silencieux. Y / X : canal
+précédent / suivant ; A : retour ; B : silencieux (squelch) oui / non.
 
 Sur le port série USB, une ligne par seconde (valeurs d'exemple) :
 
@@ -151,14 +151,14 @@ pirate: rx tone 1000 Hz, level 38 %, purity 1 kHz 97 %, duty 50 %, rssi -62 dBm,
 
 ## Essai avec deux badges
 
-1. Badge A (récepteur) : ouvrir « Écouter la radio pirate », sur 433,920 MHz. Brancher son USB, ouvrir le port série.
-2. Badge B (émetteur, mode admin) : Admin > Radio pirate, Source « Tonalité 1 kHz », Puissance **0 dBm** (le défaut ; +10 dBm
+1. Badge 1 (récepteur) : ouvrir « Écouter la radio pirate », sur 433,920 MHz. Brancher son USB, ouvrir le port série.
+2. Badge 2 (émetteur, mode admin) : Admin > Radio pirate, Source « Tonalité 1 kHz », Puissance **0 dBm** (le défaut ; +10 dBm
    pour un essai court si les badges sont loin ; à -10 dBm on mesure ~-97 dBm à 1 m, en limite de sensibilité dans un
    canal de 406 kHz), Excursion 47,6 kHz et Gain du son x2 (les défauts), « > Émettre ». Les deux badges à 1 m l'un de l'autre.
-3. Sur A, en quelques secondes : RSSI nettement au-dessus de -100 dBm (le silencieux), la correction se stabilise, et le port série
+3. Sur le badge 1, en quelques secondes : RSSI nettement au-dessus de -100 dBm (le silencieux), la correction se stabilise, et le port série
    affiche `rx tone 1000 Hz` (±5 Hz) avec une pureté élevée ; le haut-parleur siffle à 1 kHz.
-4. Puis la Mélodie (on la reconnaît sur A), puis un WAV de la carte SD. Arrêt : aile gauche sur B ; la ligne
-   `no carrier` apparaît sur A.
+4. Puis la Mélodie (on la reconnaît sur le badge 1), puis un WAV de la carte SD. Arrêt : bouton A du badge 2 ; la
+   ligne `no carrier` apparaît sur le badge 1.
 
 ### Résultats
 

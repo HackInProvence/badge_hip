@@ -22,10 +22,10 @@ enum { TUG_CIGALES, TUG_FOURMIS, TUG_REFEREE };
  * with an odd number of players, the last one of the shuffle is the referee. */
 void tug_teams(uint32_t seed, int n, uint8_t *team);
 
-/** \brief Pull detector: a press of the left wing then of the right wing is one pull; holding a wing or pressing
+/** \brief Pull detector: a press of A then of B is one pull; holding A or B or pressing
  * both at once does nothing. */
 typedef struct {
-    bool armed;  /* The left wing was pressed, the right one is expected */
+    bool armed;  /* A was pressed, B is expected */
 } tug_pull_t;
 
 /** \brief The buttons pressed since the last call (\p left, \p right). \return true for a pull */

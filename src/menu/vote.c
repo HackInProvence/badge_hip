@@ -234,7 +234,7 @@ static void admin_start(absolute_time_t now) {
 
 static bool admin_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_A)
-        return false;  /* The question stays open (closed with the right wing) */
+        return false;  /* The question stays open (closed with B) */
     if (my_session) {
         if (b->pressed & UI_BTN_B) {
             /* Close: tell it 3 times */

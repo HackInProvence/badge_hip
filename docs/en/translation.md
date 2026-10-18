@@ -8,11 +8,11 @@ with. The system is modular: adding a language means adding a file, without touc
 ## For the user
 
 - **Choosing the language**: Settings > Language (Réglages > Langue). Each language is written in itself
-  ("English", "Français") and the title of the page in all of them ("Langue / Language"): R chooses, L goes back.
+  ("English", "Français") and the title of the page in all of them ("Langue / Language"): A goes back, B chooses.
   The choice is kept (even after a firmware update).
 - **Back to English** (a badge left in a language you can't read):
-  1. press the **left wing (L) 5 times**: you come back to the main menu, whatever the page;
-  2. then **hold the left wing for 5 seconds** (in the main menu: nothing else holds a wing there, and no presses
+  1. press **A** (the left wing) **5 times**: you come back to the main menu, whatever the page;
+  2. then **hold A for 5 seconds** (in the main menu: nothing else holds A or B there, and no presses
      there can be mistaken for the admin mode sequence).
   The badge switches to English and shows "Language: English".
 - **From the serial port** (USB): the key `E` sets the badge to English, `N` goes to the next language.
@@ -67,5 +67,7 @@ texts, ringtones) are in the language they were written in.
 - The screen is 200 × 200 pixels: a translation should not be longer than the French (title: about 16 characters,
   footer: about 30). `tools/badge_screens.py` with the `U` key reports the texts that are cut.
 - Keep the same formats (`%d`, `%s`, `%02u`...) in the same order, and the same line breaks (`\n`).
-- The buttons: G = left wing, D = right wing, flancs = sides (in English: L, R, sides).
+- The buttons: A, B, Y and X, the names printed on the board (A = left wing, B = right wing, Y = left side,
+  X = right side), stay the same in every language: "A : retour" becomes "A: back". In the texts, A before B and
+  Y before X ("Y X: choose", "A: back  B: choose").
 - Screenshots of a language: `python tools/badge_screens.py --lang en` (see the [advanced guide](advanced_guide.md)).

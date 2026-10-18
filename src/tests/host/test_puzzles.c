@@ -133,7 +133,7 @@ static void test_2048(void) {
     /* Through the buttons: a tile appears after each real move, the score goes up */
     set_board(B1);
     t48_score = 0;
-    press(GAMES_BTN_X);  /* Right flank: right */
+    press(GAMES_BTN_X);  /* X: right */
     CHECK_EQ(t48_score, 12);
     CHECK_EQ(count_tiles(), 4);  /* 3 + the new one */
     static const uint8_t STUCK_LEFT[16] = {1, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0};
@@ -252,7 +252,7 @@ static void test_mines(void) {
         CHECK_EQ(opened, mines_opened);
     }
 
-    /* Through the buttons: the cursor starts in the middle, a long press on the right wing opens */
+    /* Through the buttons: the cursor starts in the middle, a long press on B opens */
     seed = 7;
     start(PUZZLE_MINES);
     CHECK_EQ(mines_cursor, 40);
@@ -280,7 +280,7 @@ static void test_mines(void) {
     CHECK(puzzles_task(host_time_us));
     CHECK_EQ(mines_seconds, s + 1);
     CHECK(! puzzles_task(host_time_us + 1000));
-    hold(GAMES_BTN_X);  /* Right flank long: help */
+    hold(GAMES_BTN_X);  /* X long: help */
     CHECK(pz_help);
     render();
     host_time_us += 60000000;
@@ -361,7 +361,7 @@ static void test_mines(void) {
     press(GAMES_BTN_B);  /* Plays again */
     CHECK_EQ(mines_state, MINES_READY);
     CHECK_EQ(count_mines(), 0);
-    press(GAMES_BTN_A);  /* Short left wing: up, doesn't quit while playing */
+    press(GAMES_BTN_A);  /* Short press on A: up, doesn't quit while playing */
     CHECK(puzzles_buttons(GAMES_BTN_A, 0, host_time_us));
     CHECK(hold(GAMES_BTN_A) == false);
 }
@@ -417,7 +417,7 @@ static void test_taquin(void) {
     CHECK_EQ(recs[PUZZLE_TAQUIN], 6);
     CHECK(saves > before);
     render();
-    press(GAMES_BTN_X);  /* Finished: the flanks do nothing */
+    press(GAMES_BTN_X);  /* Finished: Y / X do nothing */
     CHECK(taq_solved);
     /* A move against the border doesn't count */
     press(GAMES_BTN_B);  /* Plays again */
@@ -512,7 +512,7 @@ static void test_sokoban(void) {
     CHECK(soko_x == 4 && soko_y == 1);
     CHECK_EQ(soko[1][5], SOKO_GOAL | SOKO_BOX);
     CHECK(! soko_solved);  /* 2 boxes are not on a target */
-    /* Restart the level (long press on the right wing) */
+    /* Restart the level (long press on B) */
     hold(GAMES_BTN_B);
     CHECK_EQ(soko_moves, 0);
     CHECK_EQ(soko_level, 0);  /* The level of the game is loaded again */
@@ -601,7 +601,7 @@ static void test_mastermind(void) {
     CHECK_EQ(mm_try, 1);
     CHECK(! memcmp(mm_rows[1], mm_rows[0], 4));  /* The next row starts from the previous guess */
     render();
-    /* The left wing goes to the previous symbol: 0 -> 5 */
+    /* A goes to the previous symbol: 0 -> 5 */
     press(GAMES_BTN_A);
     CHECK_EQ(mm_rows[1][0], 5);
     press(GAMES_BTN_Y);  /* The cursor wraps to the last case */
@@ -663,7 +663,7 @@ static void test_pendu(void) {
     start(PUZZLE_PENDU);
     pendu_word = 0;  /* BADGE */
     CHECK_STR(PENDU_WORDS[pendu_word], "BADGE");
-    /* The cursor: flanks previous / next letter, wings the other row */
+    /* The cursor: Y / X previous / next letter, A / B the other row */
     press(GAMES_BTN_X);
     CHECK_EQ(pendu_cursor, 1);
     press(GAMES_BTN_B);
@@ -709,7 +709,7 @@ static void test_pendu(void) {
     CHECK_EQ(pendu_state, PENDU_LOST);
     CHECK_EQ(pendu_streak, 0);
     CHECK_EQ(recs[PUZZLE_PENDU], 2);
-    CHECK(press(GAMES_BTN_A) == false);  /* Finished: the short left wing goes back to the menu */
+    CHECK(press(GAMES_BTN_A) == false);  /* Finished: a short press on A goes back to the menu */
 }
 
 int main(void) {
@@ -723,7 +723,7 @@ int main(void) {
     puzzles_record_text(PUZZLE_TAQUIN, text, sizeof(text));
     CHECK_STR(text, "Pas encore de record");
 
-    /* The help page: the right wing plays, the left wing leaves */
+    /* The help page: B plays, A leaves */
     puzzles_start(PUZZLE_2048, host_time_us);
     CHECK(pz_help);
     CHECK(puzzles_calm());

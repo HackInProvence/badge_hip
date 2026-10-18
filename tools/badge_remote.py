@@ -14,10 +14,10 @@ Remote control of the badge (firmware badge_menu) from a PC, over its USB serial
 Requires Python 3 with Tkinter (included in the Windows and macOS installers, "python3-tk" on Debian/Ubuntu) and pyserial.
 
 Keyboard (the window must have the focus):
-    Up / y          left flank (up in the lists)          Shift: long press
-    Down / x        right flank (down in the lists)       Shift: long press
-    Left / a        left wing (back, cancel)              Shift: long press
-    Right / Enter / b   right wing (OK)                   Shift: long press
+    Up / y          button Y (up in the lists)            Shift: long press
+    Down / x        button X (down in the lists)          Shift: long press
+    Left / a        button A (back, cancel)               Shift: long press
+    Right / Enter / b   button B (OK)                     Shift: long press
     F5              ask the screen again
     F12             screenshot (PNG)
     F1 / "?" button the help and the table of all the commands of the serial port (SERIAL_COMMANDS)
@@ -57,14 +57,14 @@ PICO_VID = 0x2E8A
 # does. Shown by the "?" button. Keep it up to date when a command is added: the host test "remote_help"
 # (src/tests/host/run_tests.py) fails when a command of main.c is missing here.
 SERIAL_COMMANDS = [
-    ('a', 'Aile gauche (retour, annuler)'),
-    ('A', 'Aile gauche, appui long'),
-    ('b', 'Aile droite (OK, choisir)'),
-    ('B', 'Aile droite, appui long'),
-    ('x', 'Flanc droit (descendre)'),
-    ('X', 'Flanc droit, appui long'),
-    ('y', 'Flanc gauche (monter)'),
-    ('Y', 'Flanc gauche, appui long'),
+    ('a', 'Bouton A (retour, annuler)'),
+    ('A', 'Bouton A, appui long'),
+    ('b', 'Bouton B (OK, choisir)'),
+    ('B', 'Bouton B, appui long'),
+    ('x', 'Bouton X (descendre)'),
+    ('X', 'Bouton X, appui long'),
+    ('y', 'Bouton Y (monter)'),
+    ('Y', 'Bouton Y, appui long'),
     ('!', 'Diagnostic : extensions, réseau, cigales voisines, CTF, télécommande, batterie, version'),
     ('?', 'Diagnostic : état de l\'audio'),
     ('i', 'Test infrarouge : construit, décode et émet une trame NEC'),
@@ -99,8 +99,8 @@ RATE_LABELS = {'10.0': RATES[0], '38.4': RATES[1], '50.0': RATES[2], '100.0': RA
 HELP_TEXT = '''Télécommande du badge SecSea par son port série USB.
 
 Clavier (la fenêtre doit avoir le focus) :
-  Haut / y : flanc gauche (monter)       Bas / x : flanc droit (descendre)
-  Gauche / a : aile gauche (retour)      Droite / Entrée / b : aile droite (OK)
+  Haut / y : bouton Y (monter)           Bas / x : bouton X (descendre)
+  Gauche / a : bouton A (retour)         Droite / Entrée / b : bouton B (OK)
   Maj + touche : appui long              F5 : redemander l'écran
   F12 : capture d'écran (PNG)            F1 : cette aide
 Débit radio (liste) : le débit du réseau des cigales, pour les essais de portée (tous les badges le même).
@@ -362,16 +362,16 @@ def run_window(port, zoom, on_ready=None):
         last['rows'] = rows
         last['count'] += 1
 
-    # Buttons of the badge, placed like on the badge (flanks outside, wings inside)
+    # Buttons of the badge, placed like on the PCB from left to right: Y, A, B, X (Y / X on the flanks, A / B on the wings)
     def press(key):
         badge.send(key)
         root.focus_set()
 
     buttons = [
-        ('Flanc gauche\n▲', 'y', 'Y'),
-        ('Aile gauche\nretour', 'a', 'A'),
-        ('Aile droite\nOK', 'b', 'B'),
-        ('Flanc droit\n▼', 'x', 'X'),
+        ('Y  ▲\n(flanc gauche)', 'y', 'Y'),
+        ('A  retour\n(aile gauche)', 'a', 'A'),
+        ('B  OK\n(aile droite)', 'b', 'B'),
+        ('X  ▼\n(flanc droit)', 'x', 'X'),
     ]
     for col, (label, key, long_key) in enumerate(buttons):
         frame = tk.Frame(root)
@@ -429,7 +429,7 @@ def run_window(port, zoom, on_ready=None):
                     command=lambda: log.grid() if log_visible.get() else log.grid_remove()).pack(side='right')
     ttk.Checkbutton(tools, text='Mode clavier (saisie de texte)', variable=keyboard,
                     command=lambda: root.focus_set()).pack(side='right', padx=8)
-    # The admin mode of the badge (the secret sequence of the flanks does the same, less discreetly): the box
+    # The admin mode of the badge (the secret sequence of Y / X does the same, less discreetly): the box
     # follows the state of the badge, read in its log ("admin: on/off", and "!" when it connects)
     admin = tk.BooleanVar(value=False)
 
@@ -567,7 +567,7 @@ def run_window(port, zoom, on_ready=None):
         if time.time() - last['t0'] > 3:
             last['count'], last['t0'] = 0, time.time()
         help_ = ('mode clavier : tapez le texte, Entrée = valider, Échap = annuler' if keyboard.get()
-                 else '↑↓ flancs, ← retour, → OK, Maj = appui long')
+                 else '↑ Y, ↓ X, ← A retour, → B OK, Maj = appui long')
         state = 'connecté' if badge.connected() else ('⚠ ' + badge.error if badge.error else 'recherche du badge...')
         status.set(state + f'   —   {fps:.1f} images/s   —   ' + help_)
 

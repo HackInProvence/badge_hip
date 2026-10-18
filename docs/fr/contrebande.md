@@ -12,15 +12,15 @@ trois marchandises légendaires.
 
 | Page | Contenu | Boutons |
 |---|---|---|
-| Accueil | Cale (nombre), Échanger en douce, Donner, Collection (x / 26), Fortune (doublons) | flancs : choisir, D : ouvrir, G : retour |
-| Cale | Grille des icônes possédées, avec leur nombre ; sous la grille : nom, rareté, valeur | flancs : choisir, D : détails, G : retour |
+| Accueil | Cale (nombre), Échanger en douce, Donner, Collection (x / 26), Fortune (doublons) | Y X : choisir, A : retour, B : ouvrir |
+| Cale | Grille des icônes possédées, avec leur nombre ; sous la grille : nom, rareté, valeur | Y X : choisir, A : retour, B : détails |
 | Collection | Toutes les marchandises ; celles jamais possédées en silhouette grise avec « ? » | idem |
-| Détails | Grande icône, rareté, valeur, nombre en cale, une petite histoire | G : retour |
-| Fortune | Valeur totale en doublons, rang (Mousse, Matelot, Contrebandier, Capitaine, Roi de la contrebande), marchandises, différentes, affaires conclues | G : retour |
-| À portée de main | Les cigales assez proches pour échanger (nom, RSSI) | flancs : choisir, D : proposer, G : retour |
+| Détails | Grande icône, rareté, valeur, nombre en cale, une petite histoire | A : retour |
+| Fortune | Valeur totale en doublons, rang (Mousse, Matelot, Contrebandier, Capitaine, Roi de la contrebande), marchandises, différentes, affaires conclues | A : retour |
+| À portée de main | Les cigales assez proches pour échanger (nom, RSSI) | Y X : choisir, A : retour, B : proposer |
 | Échange (page sombre) | Proposition, choix de l'offre, les deux offres côte à côte, conclusion | voir ci-dessous |
 
-Un appui long sur G quitte la page (une affaire en cours est annulée, sauf si votre marchandise est déjà scellée).
+Un appui long sur A quitte la page (une affaire en cours est annulée, sauf si votre marchandise est déjà scellée).
 
 ### Obtenir des marchandises
 
@@ -33,9 +33,9 @@ Un appui long sur G quitte la page (une affaire en cours est annulée, sauf si v
 ### Échanger en douce
 
 1. Accueil > *Échanger en douce* : la liste des cigales **à portée de main** (badges collés, voir § 3).
-2. D sur une cigale : elle reçoit « Psst... *nom* propose une affaire en douce » ; D accepte, G refuse.
-3. Chacun choisit dans sa cale la marchandise qu'il offre (grille sombre, D : offrir).
-4. Les deux badges montrent les deux offres (« Votre X contre Y ») : D conclut, G annule.
+2. B sur une cigale : elle reçoit « Psst... *nom* propose une affaire en douce » ; A refuse, B accepte.
+3. Chacun choisit dans sa cale la marchandise qu'il offre (grille sombre, B : offrir).
+4. Les deux badges montrent les deux offres (« Votre X contre Y ») : A annule, B conclut.
 5. Quand les deux ont conclu, l'échange se fait sur les deux badges : « Affaire conclue », avec la marchandise reçue.
 
 Celui qui a été invité ne peut plus annuler après avoir conclu : sa marchandise est **scellée** (sortie de sa cale)
@@ -45,12 +45,12 @@ annonce la marchandise reçue (« Reçu en douce : ... »).
 ### Donner
 
 Accueil > *Donner* : choisir la marchandise, puis la cigale à portée de main. Elle voit « *nom* vous offre : » avec
-l'icône, D accepte (la marchandise passe d'une cale à l'autre), G refuse.
+l'icône, A refuse, B accepte (la marchandise passe d'une cale à l'autre).
 
 ### Admin : ajouter une marchandise
 
-Admin > Contrebande (admin) : les 26 marchandises une à une (flancs), avec leur rareté et le nombre dans la cale ;
-l'aile droite en ajoute une à la cale de ce badge (enregistrée tout de suite), avec les succès d'une vraie
+Admin > Contrebande (admin) : les 26 marchandises une à une (Y / X), avec leur rareté et le nombre dans la cale ;
+B en ajoute une à la cale de ce badge (enregistrée tout de suite), avec les succès d'une vraie
 acquisition (« Trésor » pour une légendaire, « Collectionneur »). Pour débloquer une marchandise rare, la mettre en
 jeu, ou préparer un badge de démonstration. Trace : `smuggler: admin added <nom> (<nombre>)`.
 

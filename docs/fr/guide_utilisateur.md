@@ -32,26 +32,28 @@ c'est normal, il se « nettoie » régulièrement pour éviter les traces des im
 
 ## 3. Les boutons
 
-Le badge est vu de face, la tête de la cigale en haut.
+Le badge est vu de face, la tête de la cigale en haut. Les 4 boutons portent leur nom sur le circuit imprimé,
+dans l'ordre **Y A B X** de gauche à droite : **A** et **B** sur les ailes (gauche, droite), **Y** et **X** sur les
+flancs (gauche, droite).
 
 | Bouton | Dans les menus | Rôle habituel |
 |---|---|---|
-| **Aile droite** (D) | valider | OK, pause, lancer |
-| **Aile gauche** (G) | retour | annuler, quitter |
-| **Flanc gauche** | monter | précédent, moins |
-| **Flanc droit** | descendre | suivant, plus |
+| **A** | retour | annuler, quitter |
+| **B** | valider | OK, pause, lancer |
+| **Y** | monter | précédent, moins |
+| **X** | descendre | suivant, plus |
 
-Le bas de chaque écran rappelle les boutons utiles, par exemple « Flancs : choix  D : OK  G : retour ».
-Dans le menu principal, l'aile gauche coupe aussi le son de la cigale et les LEDs.
+Le bas de chaque écran rappelle les boutons utiles, par exemple « Y X : choix  A : retour  B : OK ».
+Dans le menu principal, A coupe aussi le son de la cigale et les LEDs.
 
-Certaines pages utilisent aussi l'**appui long** (environ 0,8 s) : dans les casse-têtes, l'appui long sur
-l'aile gauche quitte le jeu ; dans les saisies de texte, l'appui long sur l'aile droite valide.
+Certaines pages utilisent aussi l'**appui long** (environ 0,8 s) : dans les jeux, l'appui long sur A quitte le jeu
+(un appui court affiche « Pour sortir : appui long sur A ») ; dans les saisies de texte, l'appui long sur B valide.
 
 **Saisir du texte avec 4 boutons** (cartes de visite, réponses aux défis, remède du virus) :
-- flancs : caractère précédent / suivant (en maintenant, les caractères défilent) ;
-- aile droite (appui court) : position suivante ; aile gauche : position précédente ;
-- aile gauche sur la première position : annuler ;
-- aile droite (appui long) : valider.
+- Y / X : caractère précédent / suivant (en maintenant, les caractères défilent) ;
+- A : position précédente ; B (appui court) : position suivante ;
+- A sur la première position : annuler ;
+- B (appui long) : valider.
 
 
 ## 4. Les menus
@@ -83,46 +85,46 @@ Les médias sont lus sur la carte SD (voir [§ 7](#7-préparer-la-carte-sd)).
 Chaque lecteur affiche la liste des fichiers ; les sous-dossiers sont précédés de « > ».
 
 **Images** (dossier `IMAGES`)
-- Flancs : image précédente / suivante.
-- Aile droite : choisir cette image comme image de veille.
-- Aile gauche : retour à la liste.
+- Y / X : image précédente / suivante.
+- B : choisir cette image comme image de veille.
+- A : retour à la liste.
 
 **Vidéos** (dossier `VIDEOS`)
-- Aile droite : pause / reprise ; flancs : volume ; aile gauche : arrêt.
+- B : pause / reprise ; Y / X : volume ; A : arrêt.
 - Le son sort par le buzzer : il est reconnaissable, pas hi-fi.
 
 **Musique** (dossier `MUSIQUE`)
-- Aile droite : pause ; aile gauche : stop ; flanc gauche : moins fort ; flanc droit : plus fort.
+- B : pause ; A : stop ; Y : moins fort ; X : plus fort.
 - Les fichiers WAV sont lus en PCM 8, 16, 24 ou 32 bits, ou en flottant 32 bits, mono ou stéréo, de 4 à 192 kHz ;
   le mieux reste le 8 bits 16 kHz mono de `audio2wav.py` (voir [§ 7.3](#73-convertir-ses-fichiers)).
 
 **Sonneries** (dossiers `SONNERIES` ou `RTTTL` et leurs sous-dossiers, facultatif) : des sonneries au format RTTTL, celui des vieux téléphones Nokia.
 12 mélodies du domaine public sont dans le badge (Lettre à Élise, Ode à la joie, Frère Jacques, La Marseillaise,
 Korobeiniki...), celles de la carte SD suivent.
-- Flancs : choisir ; aile droite : jouer ; aile gauche : retour. Une sonnerie marquée `(!)` contient une erreur :
-  aile droite affiche la ligne, la colonne et la raison.
+- Y / X : choisir ; B : jouer ; A : retour. Une sonnerie marquée `(!)` contient une erreur :
+  B affiche la ligne, la colonne et la raison.
 - Pendant la lecture : le nom, la note jouée, une barre de progression ; les LEDs s'allument d'une couleur par note.
-  Aile gauche : arrêter ; flancs : sonnerie précédente / suivante ; aile droite : reprendre au début.
+  A : arrêter ; Y / X : sonnerie précédente / suivante ; B : reprendre au début.
 - Le format et l'ajout de sonneries : [sonneries.md](sonneries.md).
 
 **Lecture rapide** (dossier `TEXTES`)
 - Les mots s'affichent un par un au même endroit, les yeux ne bougent plus : on lit beaucoup plus vite
   (méthode PVSR, voir [pvsr.md](../pvsr.md)).
-- Aile droite : pause / reprise ; aile gauche : quitter.
-- Flancs (appui court) : vitesse −/+ (de 100 à 900 mots par minute, 250 au départ).
-- Flancs (appui long) : recul / avance d'environ 10 secondes de lecture.
+- B : pause / reprise ; A : quitter.
+- Y / X (appui court) : vitesse −/+ (de 100 à 900 mots par minute, 250 au départ).
+- Y / X (appui long) : recul / avance d'environ 10 secondes de lecture.
 - La position est retenue : un texte reprend là où vous l'avez quitté.
 
 **Livres-jeux** (dossier `LIVRES`, facultatif) : des livres dont vous êtes le héros. Un livre est dans le badge,
 « Le Trésor du capitaine Cigalon », les livres `.txt` de la carte SD suivent (16 au plus).
-- La liste : « Continuer : ... » reprend le dernier livre ; flancs : choisir ; aile droite : ouvrir ; aile gauche : quitter.
+- La liste : « Continuer : ... » reprend le dernier livre ; Y / X : choisir ; A : quitter ; B : ouvrir.
 - Le menu d'un livre : Commencer, Reprendre la lecture, Recommencer, Objets, Autres livres.
-- La lecture : flanc droit : page suivante, puis choix suivant ; flanc gauche : choix précédent, puis page précédente ;
-  aile droite : prendre le choix sélectionné ; aile gauche : le menu du livre ; aile gauche maintenue : quitter.
+- La lecture : Y : choix précédent, puis page précédente ; X : page suivante, puis choix suivant ;
+  A : le menu du livre ; appui long sur A : quitter ; B : prendre le choix sélectionné.
 - Dés, objets, fins gagnées ou perdues ; la progression est gardée même badge éteint (un seul livre à la fois).
 - Lire, ajouter et écrire des livres : [livres_jeux.md](livres_jeux.md).
 
-**Volume** : chaque appui sur l'aile droite augmente le volume (0 à 8, puis retour à 0) et joue un petit carillon.
+**Volume** : chaque appui sur B augmente le volume (0 à 8, puis retour à 0) et joue un petit carillon.
 
 
 ### 4.2 Jeux
@@ -130,47 +132,47 @@ Korobeiniki...), celles de la carte SD suivent.
 Deux thèmes : **Jeux solo** (contre la cigale ou seul) et **Jeux multi** (entre cigales, par radio : duel, bataille
 navale et les jeux de groupe).
 
-Dans les jeux du tableau ci-dessous (sauf Simon), **l'aile gauche quitte le jeu**.
-Dans les casse-têtes, c'est un **appui long sur l'aile gauche**.
+Dans les jeux (sauf le blind test et le CTF, que A quitte tout de suite), **un appui long sur A quitte le jeu** :
+un appui court sur A affiche
+« Pour sortir : appui long sur A » (n'importe quel autre bouton referme ce message, la partie continue).
 
 | Jeu | Comment jouer |
 |---|---|
-| **Morpion** | Flancs : choisir la case ; aile droite : jouer. Vous avez les croix, la cigale les ronds. Chacun commence à son tour. La cigale se trompe de temps en temps... |
-| **Puissance 4** | Flancs : choisir la colonne ; aile droite : lâcher le pion. Alignez 4 pions pleins avant les anneaux de la cigale. |
-| **Simon** | Chaque bouton est une zone de l'écran, à sa place sur le badge (flancs en haut, ailes en bas), avec sa couleur et sa note. Répétez la séquence, qui s'allonge à chaque tour. Ici l'aile gauche est une zone du jeu : pour quitter, attendez la fin de la partie puis aile gauche. |
-| **Réflexes** | Quand les LEDs s'allument en vert (avec un bip), appuyez vite sur l'aile droite ou un flanc. 5 essais, la moyenne compte. Trop tôt : l'essai recommence. |
-| **Snake** | Aile droite : départ / pause. Flanc gauche : tourner à gauche ; flanc droit : tourner à droite (par rapport à la direction du serpent). |
-| **Blind test** | Choisissez un dossier de musiques : les morceaux passent dans un ordre aléatoire, sans répétition. Aile droite : afficher le titre ; flanc droit : morceau suivant ; flanc gauche : pause. |
+| **Morpion** | Y / X : choisir la case ; B : jouer. Vous avez les croix, la cigale les ronds. Chacun commence à son tour. La cigale se trompe de temps en temps... |
+| **Puissance 4** | Y / X : choisir la colonne ; B : lâcher le pion. Alignez 4 pions pleins avant les anneaux de la cigale. |
+| **Simon** | Chaque bouton est une zone de l'écran, à sa place sur le badge (Y et X en haut, A et B en bas), avec sa couleur et sa note. Répétez la séquence, qui s'allonge à chaque tour. Ici A est une zone du jeu : pour quitter, attendez la fin de la partie puis appui long sur A. |
+| **Réflexes** | Quand les LEDs s'allument en vert (avec un bip), appuyez vite sur B, Y ou X. 5 essais, la moyenne compte. Trop tôt : l'essai recommence. |
+| **Snake** | B : départ / pause. Y : tourner à gauche ; X : tourner à droite (par rapport à la direction du serpent). |
+| **Blind test** | Choisissez un dossier de musiques : les morceaux passent dans un ordre aléatoire, sans répétition. B : afficher le titre ; Y : pause ; X : morceau suivant. |
 | **CTF** | Un défi : entrer un code célèbre des jeux vidéo avec les 4 boutons pour obtenir un « flag ». |
 
 Les records sont gardés même après extinction : meilleur score de Simon et Snake, meilleure moyenne de Réflexes,
 nombre de victoires contre la cigale au Morpion et au Puissance 4.
 
-**Score en QR code** : à la fin d'une partie, un appui sur un flanc affiche un QR code qui contient le jeu, le score,
+**Score en QR code** : à la fin d'une partie, un appui sur Y ou X affiche un QR code qui contient le jeu, le score,
 le nom de votre cigale et une signature : les organisateurs peuvent le scanner pour un classement, et un score
 modifié à la main est refusé. N'importe quel bouton referme le QR code.
-Dans le menu Jeux, un **appui long sur l'aile droite** sur le nom d'un jeu affiche de la même façon le QR code de son record.
+Dans le menu Jeux, un **appui long sur B** sur le nom d'un jeu affiche de la même façon le QR code de son record.
 
-En bas de l'écran, les boutons sont indiqués dans l'ordre où ils sont sur le badge : G (aile gauche) à gauche,
-D (aile droite) à droite.
+En bas de l'écran, les boutons sont indiqués dans l'ordre où ils sont sur le badge : Y avant X, A avant B.
 
 **Casse-têtes** : Démineur, 2048, Taquin, Sokoban, Mastermind et Pendu se jouent au tour par tour, au rythme de l'écran.
 Ils partagent les mêmes commandes :
-- appuis courts : se déplacer. Flanc gauche : à gauche ; flanc droit : à droite ; aile gauche : en haut ;
-  aile droite : en bas (le badge vu de face a ses flancs en haut et ses ailes en bas) ;
-- appuis longs : agir. Aile droite : action principale (ouvrir, valider...) ; flanc gauche : action secondaire
-  (drapeau, annuler) ; flanc droit : page d'aide ; aile gauche : quitter.
+- appuis courts : se déplacer. Y : à gauche ; X : à droite ; A : en haut ;
+  B : en bas (le badge vu de face a Y et X en haut, A et B en bas) ;
+- appuis longs : agir. A : quitter ; B : action principale (ouvrir, valider...) ; Y : action secondaire
+  (drapeau, annuler) ; X : page d'aide.
 
 Chaque jeu commence par sa page d'aide (règles, commandes, record).
 
 | Jeu | Comment jouer |
 |---|---|
-| **Démineur** | Grille de 9 × 9 avec 12 mines ; la première case ouverte n'est jamais une mine. Aile droite longue : ouvrir ; flanc gauche long : drapeau. Le chiffre d'une case donne le nombre de mines autour. |
+| **Démineur** | Grille de 9 × 9 avec 12 mines ; la première case ouverte n'est jamais une mine. B long : ouvrir ; Y long : drapeau. Le chiffre d'une case donne le nombre de mines autour. |
 | **2048** | Toutes les tuiles glissent vers le bouton pressé ; deux tuiles égales qui se touchent fusionnent. Atteignez la tuile 2048 ! |
 | **Taquin** | Remettez les cases de 1 à 15 dans l'ordre, le trou à la fin : la case voisine du trou glisse vers le bouton pressé. |
-| **Sokoban** | Poussez les caisses sur les cibles, une à la fois. 6 niveaux ; flanc gauche long : annuler le dernier coup ; aile droite longue : recommencer le niveau. |
-| **Mastermind** | Trouvez le code secret de 4 symboles parmi 6 (disque, anneau, carré plein, carré vide, triangle, croix) en 10 essais. Flancs : case ; ailes : symbole ; aile droite longue : valider. Un point : un symbole bien placé ; un rond : un symbole présent mais mal placé. |
-| **Pendu** | Trouvez le mot, lettre par lettre, avant d'être pendu (8 erreurs). Flancs et ailes : choisir la lettre ; aile droite longue : la proposer. |
+| **Sokoban** | Poussez les caisses sur les cibles, une à la fois. 6 niveaux ; B long : recommencer le niveau ; Y long : annuler le dernier coup. |
+| **Mastermind** | Trouvez le code secret de 4 symboles parmi 6 (disque, anneau, carré plein, carré vide, triangle, croix) en 10 essais. Y / X : case ; A / B : symbole ; B long : valider. Un point : un symbole bien placé ; un rond : un symbole présent mais mal placé. |
+| **Pendu** | Trouvez le mot, lettre par lettre, avant d'être pendu (8 erreurs). Y, X, A et B : choisir la lettre ; B long : la proposer. |
 
 Records gardés : meilleur temps au Démineur, meilleur score au 2048, moins de coups au Taquin, nombre de niveaux
 réussis au Sokoban, moins d'essais au Mastermind, plus de mots trouvés d'affilée au Pendu.
@@ -178,45 +180,45 @@ réussis au Sokoban, moins d'essais au Mastermind, plus de mots trouvés d'affil
 **Défis crypto** : 13 énigmes de cryptographie classique, de la plus simple à la plus difficile
 (acrostiche, César, ROT13, Morse, binaire, hexadécimal, base64, Atbash, scytale, XOR, Vigenère, hash tronqué,
 ultrason).
-- La liste coche les défis résolus ; aile droite : ouvrir un défi.
-- Sur un défi : aile droite (appui court) : répondre ; aile droite (appui long) : un indice ;
-  flanc droit : écouter le Morse (buzzer et LEDs), pour les défis qui en contiennent. Le défi « Ultrason »
+- La liste coche les défis résolus ; B : ouvrir un défi.
+- Sur un défi : B (appui court) : répondre ; B (appui long) : un indice ;
+  X : écouter le Morse (buzzer et LEDs), pour les défis qui en contiennent. Le défi « Ultrason »
   joue son Morse en boucle à 19 kHz, sans LEDs : presque inaudible, il se lit sur le spectrogramme d'un
-  téléphone (Spectroid, Spek...) ; flanc droit à nouveau : arrêter.
-- La réponse se saisit avec les 4 boutons (lettres majuscules, chiffres, espace) ; aile droite longue : valider.
+  téléphone (Spectroid, Spek...) ; X à nouveau : arrêter.
+- La réponse se saisit avec les 4 boutons (lettres majuscules, chiffres, espace) ; B long : valider.
 - Chaque défi résolu donne un morceau du flag ; « > Le flag final » l'affiche en entier quand tous sont résolus.
   La progression est gardée même après extinction.
 
 **Duel** (pierre-feuille-ciseaux) et **Bataille navale** se jouent à deux badges, par radio :
-- la page liste les cigales à portée ; flancs : choisir, aile droite : défier ;
-- l'autre badge reçoit l'invitation (bip, et la page s'ouvre depuis les menus) : aile gauche : refuser ;
-  aile droite : accepter.
-- **Duel** : à chaque manche, flancs : pierre, feuille ou ciseaux ; aile droite : jouer. Le premier à 3 manches gagne.
+- la page liste les cigales à portée ; Y / X : choisir, B : défier ;
+- l'autre badge reçoit l'invitation (bip, et la page s'ouvre depuis les menus) : A : refuser ;
+  B : accepter.
+- **Duel** : à chaque manche, Y / X : pierre, feuille ou ciseaux ; B : jouer. Le premier à 3 manches gagne.
   Aucun badge ne peut attendre le choix de l'autre pour tricher : chacun s'engage sur son choix avant de le révéler.
 - **Bataille navale** : une mer de 6 × 6 et 3 bateaux (3, 2 et 2 cases) placés au hasard. Celui qui invite tire
-  le premier, puis chacun son tour. Flancs : viser (case par case) ; aile droite : tirer.
+  le premier, puis chacun son tour. Y / X : viser (case par case) ; B : tirer.
   Le premier qui coule toute la flotte adverse gagne. À la fin, chaque badge révèle sa flotte et l'autre vérifie
   qu'il a répondu honnêtement : « Flotte OK » ou « TRICHE ! ».
-- À la fin d'une partie : aile droite : rejouer ; aile gauche : quitter.
+- À la fin d'une partie : A (appui long) : quitter ; B : rejouer.
 
 **Jeux de groupe** : **Tir à la corde**, **Mini-bolides**, **Assassin** et **Loup-garou** se jouent à plusieurs badges, par radio,
 avec le même salon :
 - « Créer une partie » (« Mener une partie » au loup-garou) : votre badge héberge la partie et liste les joueurs
-  qui la rejoignent. Aile droite : lancer (quand il y a assez de joueurs) ; aile gauche : annuler.
+  qui la rejoignent. A : annuler ; B : lancer (quand il y a assez de joueurs).
 - « Rejoindre une partie » : les parties ouvertes autour (nom de l'hôte, nombre de joueurs), la plus proche en
-  premier. Aile droite : rejoindre ; la « Salle d'attente » attend le lancement ; aile gauche : quitter.
+  premier. B : rejoindre ; la « Salle d'attente » attend le lancement ; A : quitter.
 - Une seule partie de groupe à la fois sur un badge. La partie continue pendant que vous utilisez les autres pages :
-  appui long sur l'aile gauche pour quitter la page sans quitter la partie.
+  appui long sur A pour quitter la page sans quitter la partie.
 
 **Tir à la corde** (2 joueurs au moins) : deux équipes, les **Cigales** et les **Fourmis**, tirées au hasard ;
 avec un nombre impair de joueurs, l'un d'eux est l'**arbitre** (il regarde la corde).
 - Les équipes s'affichent 5 s, puis un compte à rebours 3, 2, 1 (bips, LEDs jaune, orange, rouge), puis
-  « Tirez ! » pendant 20 s : **aile gauche puis aile droite** = une traction (les deux en même temps ne comptent pas).
+  « Tirez ! » pendant 20 s : **A puis B** = une traction (les deux en même temps ne comptent pas).
 - Le nœud de la corde se déplace selon les tractions des deux équipes, sur tous les badges. Une équipe qui prend
   20 tractions d'avance par joueur de l'équipe atteint sa marque et gagne tout de suite ; sinon, la plus forte à la
   fin des 20 s gagne.
 - Le résultat : l'équipe gagnante, le score « Cigales - Fourmis », vos tractions et le meilleur tireur ; LEDs vertes
-  pour les gagnants, rouges pour les perdants. Aile droite : revenir au choix Créer / Rejoindre ; aile gauche : retour.
+  pour les gagnants, rouges pour les perdants. A : retour ; B : revenir au choix Créer / Rejoindre.
 
 **Mini-bolides** (2 à 8 pilotes) : une course de petites voitures vues de dessus, comme Micro Machines, 3 tours
 d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
@@ -226,23 +228,23 @@ d'un circuit plus grand que l'écran (l'écran suit votre voiture, encadrée).
   aussi dans la barre de la course.
 - 3 s sur la grille (les commandes s'affichent), un compte à rebours 3, 2, 1, puis la course. Pendant la course, les
   LEDs donnent votre place : vertes en tête, rouges en dernier, orange entre les deux.
-- **Aile droite** : accélérer ; **aile gauche** : freiner puis reculer ; **flancs** : tourner (maintenus ; le flanc
-  gauche à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. Les deux ailes maintenues 1,5 s : abandonner (les autres continuent). Les points de passage 1 (côté droit), 2 (haut de l'épingle), 3 (côté gauche), en pointillés sur la piste avec leur numéro (le prochain en gras), comptent dans l'ordre :
+- **A** : freiner puis reculer ; **B** : accélérer ; **Y / X** : tourner (maintenus ; Y
+  à gauche). Hors de la piste (l'herbe), la voiture ralentit beaucoup. A et B maintenus 1,5 s : abandonner (les autres continuent). Les points de passage 1 (côté droit), 2 (haut de l'épingle), 3 (côté gauche), en pointillés sur la piste avec leur numéro (le prochain en gras), comptent dans l'ordre :
   couper par l'herbe en sautant l'un d'eux ne compte pas le tour.
 - En haut : le tour (« Tour 2/3 ») et votre place (« 1/3 »). L'écran se redessine environ 4 fois par seconde.
 - La course finit quand tout le monde est arrivé, ou 30 s après le premier ; le classement donne les temps, puis
-  le tour atteint par ceux qui ne sont pas arrivés. Aile droite : rejouer ; aile gauche : retour.
+  le tour atteint par ceux qui ne sont pas arrivés. A : retour ; B : rejouer.
 
 **Assassin** (3 joueurs au moins ; 2 quand l'hôte est en mode admin) : un jeu qui dure toute la conférence.
 - Au lancement, l'hôte tire un cercle secret : chaque joueur reçoit une **cible**, et lui-même est la cible
   d'un autre.
 - La page : « Ta cible : » et son nom, une jauge chaud - froid d'après ses signaux (« Glacial », « Froid », « Tiède »,
   « Chaud », « Brûlant ! », ou « Pas captée »), le nombre de survivants.
-- **Aile droite : éliminer**. Il faut être tout près de la cible, les badges presque collés (le badge de la cible
+- **B : éliminer**. Il faut être tout près de la cible, les badges presque collés (le badge de la cible
   vérifie la force du signal ; seuil provisoire, à régler sur place). « Cible éliminée ! » : la cible de votre victime
   devient la vôtre. « Trop loin ou absente » : réessayez plus près.
-- La victime voit « Éliminé par ... » ; sa cible passe à son tueur, puis aile droite : quitter la partie.
-- Flanc : abandonner (confirmer avec l'aile droite) : votre cible passe à votre chasseur.
+- La victime voit « Éliminé par ... » ; sa cible passe à son tueur, puis B : quitter la partie.
+- Y ou X : abandonner (confirmer avec B) : votre cible passe à votre chasseur.
 - La dernière cigale debout gagne. Les nouvelles (« Éliminé par ... », « Assassin : nouvelle cible »,
   « Assassin : victoire ! ») arrivent même depuis une autre page.
 - Le badge de l'hôte doit rester allumé ; un badge qui redémarre quitte la partie.
@@ -259,8 +261,8 @@ l'organisateur le débloque (Admin > Loup-garou (admin)).
 - La nuit, tous les joueurs vivants choisissent dans une liste (ceux qui n'ont pas le rôle font semblant) :
   personne ne devine les rôles en regardant qui appuie. Le jour, chacun vote sur son badge.
 - « Aide : les rôles » : une carte illustrée par rôle, avec son camp et ses pouvoirs.
-- Aile gauche : retour au menu, la partie continue ; aile gauche maintenue : quitter la partie ; aile droite
-  maintenue : revoir sa carte.
+- A : retour au menu, la partie continue ; appui long sur A : quitter la partie ; appui long sur B : revoir
+  sa carte.
 - Les règles, les phases, les votes et les conseils au meneur : [loup_garou.md](loup_garou.md).
 
 ### 4.3 Social
@@ -270,34 +272,34 @@ l'organisateur le débloque (Admin > Loup-garou (admin)).
 - Approchez votre badge tout près d'un autre pendant quelques secondes : vous gagnez
   des points pour chaque **nouvelle** cigale, de moins en moins (20, 18, 16, 15, 13... : 10 % de ce qui reste),
   **200 points au plus** en tout ; une cigale déjà rencontrée ne rapporte plus rien.
-- Aile droite : choisir le **nom de votre cigale** (8 caractères).
-  - Flancs : changer la lettre.
-  - Aile droite (appui court) : lettre suivante ; aile gauche : lettre précédente.
-  - Aile droite (appui long) : enregistrer.
-  - Aile gauche sur la première lettre : annuler.
-- Flanc droit : activer / couper les signaux.
+- B : choisir le **nom de votre cigale** (8 caractères).
+  - Y / X : changer la lettre.
+  - A : lettre précédente ; B (appui court) : lettre suivante.
+  - B (appui long) : enregistrer.
+  - A sur la première lettre : annuler.
+- X : activer / couper les signaux.
 
 **Messages** : des messages courts entre cigales, choisis dans une liste de 16 (« Salut ! », « Café ? »,
 « Qui fait le CTF ? »...), sans clavier.
 - La boîte de réception garde les 10 derniers messages ; « (privé) » marque ceux qui ne sont que pour vous.
 - « > Ecrire un message », puis le destinataire : « Tout le monde », une cigale voisine ou l'auteur d'un message reçu.
   Une cigale est désignée par son nom et la fin de son identifiant, par exemple « Tristan#33EC ».
-- Aile droite sur un message reçu : lui répondre.
+- B sur un message reçu : lui répondre.
 - Les autres cigales relaient le message (jusqu'à 3 fois) pour qu'il arrive à destination.
 
 **Contacts** : une carte de visite, échangée par radio avec un badge proche.
 - « Ma carte » : 13 champs (prénom, nom, téléphone, e-mail, société, poste, adresse, ville, LinkedIn, Git,
-  site web, Mastodon, commentaire). Aile droite : modifier le champ (saisie avec les 4 boutons) ;
-  aile droite (appui long) : cocher ou décocher « [x] » pour l'envoyer ou non. Seuls les champs cochés sont envoyés.
+  site web, Mastodon, commentaire). B : modifier le champ (saisie avec les 4 boutons) ;
+  B (appui long) : cocher ou décocher « [x] » pour l'envoyer ou non. Seuls les champs cochés sont envoyés.
 - « Echanger (badges proches) » : les **deux** badges doivent être sur cette page, l'échange n'a lieu qu'avec
-  votre accord. Votre carte est renvoyée toutes les 3 secondes environ ; la carte reçue s'affiche : aile droite :
-  la garder ; aile gauche : l'ignorer. Aile gauche sur la page d'échange : arrêter.
+  votre accord. Votre carte est renvoyée toutes les 3 secondes environ ; la carte reçue s'affiche : A :
+  l'ignorer ; B : la garder. A sur la page d'échange : arrêter.
 - La carte part **en clair**, au format vCard, sur le canal du « SubGHz chat » du Flipper Zero : n'importe quel
   Flipper à portée qui lance `subghz chat 433920000 0` la lit pendant l'échange. Seuls les champs cochés sont envoyés.
 - Un Flipper peut aussi **envoyer** une carte au badge en mode échange : dans `subghz chat 433920000 0`, taper les
   lignes une par une, par exemple `BEGIN:VCARD`, `N:Nom;Prénom;;;`, `TEL:0612345678`, `END:VCARD`.
 - « Contacts reçus » : les 12 dernières cartes gardées (la plus ancienne est oubliée au-delà).
-  Aile droite : voir ; aile droite (appui long) : supprimer.
+  B : voir ; B (appui long) : supprimer.
 - Sur l'ordinateur, `tools/contacts_export.py` exporte les cartes reçues en fichier vCard (`.vcf`),
   à importer dans un téléphone ou un carnet d'adresses.
 - Vos compétences (ci-dessous) partent avec la carte (ligne `CATEGORIES` de la vCard) dès qu'au moins une est
@@ -306,7 +308,7 @@ l'organisateur le débloque (Admin > Loup-garou (admin)).
 **Compétences** : 20 compétences, chacune avec son pictogramme : Électronique, Flipper Zero, Android, iOS,
 Radio / SDR, Web, Réseau, Crypto, Reverse, Pentest, Forensic, OSINT, Linux, Windows, Cloud, IA, Développement, CTF,
 Lockpicking, Défense.
-- « Mes compétences » : la liste avec des cases ; aile droite : cocher / décocher. Les pictogrammes des compétences
+- « Mes compétences » : la liste avec des cases ; B : cocher / décocher. Les pictogrammes des compétences
   cochées s'affichent sur la page, sur le badge nominatif et partent dans les signaux du réseau des cigales.
 - « Qui les partage ? » : les cigales entendues qui partagent au moins une de vos compétences, avec les pictogrammes
   en commun (mis à jour toutes les 3 s).
@@ -315,27 +317,27 @@ Lockpicking, Défense.
 - Les badges d'un firmware plus ancien n'envoient pas leurs compétences.
 
 **Programme** (retiré du menu : le programme peut changer après le flashage des badges ; voir le thème Social dans
-`src/menu/main.c` pour le remettre) : le programme de la conférence, sans carte SD. Aile droite : le détail d'un talk, avec le QR code
-de son lien ; flancs : talk précédent / suivant.
+`src/menu/main.c` pour le remettre) : le programme de la conférence, sans carte SD. B : le détail d'un talk, avec le QR code
+de son lien ; Y / X : talk précédent / suivant.
 Le programme de SecSea 2026 n'est pas encore publié : les talks affichés sont provisoires.
 
 **Vote** : quand les organisateurs posent une question (« Ce talk vous a plu ? »...), la page s'ouvre.
-Flancs : choisir la réponse ; aile droite : voter. On peut changer d'avis tant que le vote est ouvert :
+Y / X : choisir la réponse ; B : voter. On peut changer d'avis tant que le vote est ouvert :
 seul le dernier vote de chaque badge compte.
 
 **Radar des cigales** : les cigales entendues, avec leur niveau (« N3 ») et la force de leur signal (en dBm, « * » pour une cigale déjà
-rencontrée). Aile droite : suivre une cigale en mode « chaud - froid » ; aile gauche : retour à la liste.
+rencontrée). A : retour à la liste ; B : suivre une cigale en mode « chaud - froid ».
 
 **Chaud - froid** : les organisateurs cachent un badge balise ; trouvez-le à la force de son signal.
 Le badge indique « Glacial », « Froid », « Tiède », « Chaud » ou « BRÛLANT ! » avec une jauge,
 les LEDs passent du bleu au rouge et les bips s'accélèrent en approchant. L'échelle est celle de la balise :
 « BRÛLANT ! » à environ 1 m par défaut (dès -74 dBm), réglable par l'organisateur (voir Admin > Balise chaud-froid).
-Aile droite : chercher une autre balise.
+B : chercher une autre balise.
 
 **Virus des cigales** : un virus (inoffensif) circule de cigale en cigale.
 - Restez trop longtemps près d'une cigale infectée et vous risquez de l'attraper ; votre badge « tousse » alors
   à son tour et peut contaminer les cigales proches.
-- Le remède : une énigme. Aile droite : se soigner, puis saisir la réponse avec les 4 boutons.
+- Le remède : une énigme. B : se soigner, puis saisir la réponse avec les 4 boutons.
   Une cigale guérie est immunisée.
 
 **Choeur** : quand un chef de choeur (un organisateur ou une télécommande) lance un morceau, les cigales autour le
@@ -343,7 +345,7 @@ chantent ensemble, chacune sa voix, avec un départ synchronisé par radio. Huit
 « Frère Jacques » (canon à 4 voix), « L'Ode à la joie » (3 voix), « Tetris (Korobeiniki) » (3 voix), « Canon de
 Pachelbel » (4 voix), « Roi de la montagne » (Grieg, 3 voix), « Row your boat » (canon à 4 voix), « Vive le vent »
 (3 voix) et « Menuet en sol » (2 voix).
-Votre badge participe par défaut ; aile droite : participer / ne plus chanter. En mode muet, le choeur est silencieux.
+Votre badge participe par défaut ; B : participer / ne plus chanter. En mode muet, le choeur est silencieux.
 
 **Annonces** : les annonces des organisateurs (pause café, prochain talk...). Une annonce est un écran construit
 par le badge : l'heure dans un bandeau noir, le texte, et souvent un QR code (un lien, un numéro de téléphone,
@@ -352,17 +354,17 @@ un réseau Wi-Fi...) à scanner avec un téléphone.
   (nette, elle reste affichée) ; n'importe quel bouton ramène au menu.
 - Sinon, le badge émet un bip et l'écrit en bas de l'écran : la prochaine ouverture de Social > Annonces
   affiche directement la nouvelle annonce.
-- La page garde les 5 dernières annonces reçues (heure et texte). Flancs : choisir ; aile droite : l'afficher ;
-  aile gauche : retour.
+- La page garde les 5 dernières annonces reçues (heure et texte). Y / X : choisir ; A : retour ;
+  B : l'afficher.
 
 **Contrebande** : la cigale contrebandière. 26 marchandises virtuelles (vivres, rhum, épices, trésors), communes,
 rares ou légendaires, à collectionner et à échanger **en douce** entre deux badges tenus l'un contre l'autre.
 - L'accueil : Cale, Échanger en douce, Donner, Collection (x / 26), Fortune (en doublons, avec un rang).
 - La cale reçoit 4 marchandises communes à la première ouverture ; chaque nouvelle cigale rencontrée donne une chance
   sur deux d'en trouver une autre (message discret en bas de l'écran, sans son).
-- « Échanger en douce » : les cigales **à portée de main** (badges collés) ; aile droite : proposer une affaire.
-  L'autre reçoit « Psst... » et accepte (aile droite) ou refuse (aile gauche) ; chacun choisit sa marchandise, les deux
-  offres s'affichent, aile droite : conclure. « Donner » offre une marchandise sans rien en retour.
+- « Échanger en douce » : les cigales **à portée de main** (badges collés) ; B : proposer une affaire.
+  L'autre reçoit « Psst... » et refuse (A) ou accepte (B) ; chacun choisit sa marchandise, les deux
+  offres s'affichent, B : conclure. « Donner » offre une marchandise sans rien en retour.
 - Le détail des pages, des marchandises et du protocole : [contrebande.md](contrebande.md).
 
 
@@ -370,28 +372,28 @@ rares ou légendaires, à collectionner et à échanger **en douce** entre deux 
 
 **Radio : message** envoie « SecSea <nom de votre cigale> coucou #<numéro> », que l'on peut lire avec l'application
 « SubGHz chat » d'un Flipper Zero (433,92 MHz).
-Un **appui long sur l'aile droite** lance le **mode test** : un message toutes les 5 secondes.
-- Flancs : pause plus courte / plus longue (1 seconde au minimum, sans maximum). En maintenant, les valeurs défilent de plus en plus vite.
-- Aile droite : pause / reprise ; aile gauche : quitter.
+Un **appui long sur B** lance le **mode test** : un message toutes les 5 secondes.
+- Y / X : pause plus courte / plus longue (1 seconde au minimum, sans maximum). En maintenant, les valeurs défilent de plus en plus vite.
+- A : quitter ; B : pause / reprise.
 
 **Radio : porteuse** émet un signal continu pendant 30 s (visible avec l'analyseur de fréquence d'un Flipper Zero).
 
 **Décodeur 433 MHz** (réception seule) : les dernières trames entendues, avec leur âge : télécommandes Princeton,
-CAME, Nice FLO, sondes météo. Une trame reçue plusieurs fois est suivie de « x2 », « x3 »... Aile droite : effacer.
+CAME, Nice FLO, sondes météo. Une trame reçue plusieurs fois est suivie de « x2 », « x3 »... B : effacer.
 Pendant l'écoute, le badge n'entend plus les autres cigales.
 
 **Station météo** (réception seule) : la dernière mesure de chaque sonde 433 MHz entendue (4 au plus) :
 température, humidité, protocole, canal, et « pile ! » quand la pile de la sonde est faible.
 Sondes reconnues : Nexus-TH, inFactory, ThermoPRO TX-4, GT-WT02, LaCrosse TX141TH-Bv2, Acurite 592TXR.
-Les sondes émettent toutes les 30 à 60 s : un peu de patience. Aile droite : effacer.
+Les sondes émettent toutes les 30 à 60 s : un peu de patience. B : effacer.
 
 **Envoyer une image** : choisissez l'image intégrée « SecSea » ou une image du dossier `IMAGES` ;
 elle est convertie en noir et blanc et envoyée deux fois par radio aux badges qui l'attendent (environ 17 secondes).
-Aile gauche : arrêter.
+A : arrêter.
 
 **Recevoir une image** : attendez qu'un autre badge envoie une image. Pendant la réception, la page indique
 le nombre de blocs reçus, avec une jauge ; des blocs de contrôle permettent de reconstituer ceux qui se sont perdus
-en route. Aile gauche : arrêter ; aile droite : recommencer (attendre une autre image).
+en route. A : arrêter ; B : recommencer (attendre une autre image).
 Une fois complète, l'image s'affiche comme la veille (nette, sans traces), avec « Reçue » et le nombre
 de blocs corrigés ; n'importe quel bouton ramène au menu.
 
@@ -402,18 +404,18 @@ de blocs corrigés ; n'importe quel bouton ramène au menu.
 **Chasse 433 MHz** (réception seule) : retrouvez au « chaud - froid » un émetteur 433 MHz caché (télécommande,
 sonde, brouilleur qui répète son code).
 - La page liste les codes entendus (8 au plus) : protocole et code, force de la dernière trame (dBm) et nombre
-  de trames reçues (« x3 »...). Flancs : choisir ; aile droite : le chasser ; aile gauche : retour.
+  de trames reçues (« x3 »...). Y / X : choisir ; A : retour ; B : le chasser.
 - Le badge suit alors ce code comme Social > Chaud - froid : de « Glacial » à « BRÛLANT ! », jauge, LEDs du bleu
   au rouge et bips de plus en plus rapides. La force est mesurée sur chaque trame reçue : l'émetteur doit émettre.
-  Sans trame pendant 15 s, il est « hors de portée ». Aile gauche : retour à la liste.
+  Sans trame pendant 15 s, il est « hors de portée ». A : retour à la liste.
 - Pendant la chasse, le badge n'entend plus les autres cigales.
 
 **Écouter la radio pirate** (réception seule) : le badge reçoit le son FM qu'émet un badge organisateur
 (Admin > Radio pirate) et le joue sur son buzzer.
 - La page : la fréquence, la force du signal (dBm et jauge), la correction de fréquence, la tonalité détectée,
   le niveau.
-- Flancs : canal précédent / suivant (les 5 canaux de la radio pirate, 433,920 MHz au départ) ; aile droite :
-  silencieux oui / non ; aile gauche : retour.
+- Y / X : canal précédent / suivant (les 5 canaux de la radio pirate, 433,920 MHz au départ) ; A : retour ;
+  B : silencieux oui / non.
 - Pendant l'écoute, le badge n'entend plus les autres cigales. Le principe et les essais : [radio_pirate.md](radio_pirate.md).
 
 
@@ -422,9 +424,9 @@ sonde, brouilleur qui répète son code).
 - **Badge nominatif** : « SecSea 2026 », le nom de votre cigale en grand et votre type (PARTICIPANT, ORATEUR ou STAFF)
   dans un bandeau noir, puis les pictogrammes de vos compétences (Social > Compétences, 10 au plus).
   La veille ne le remplace pas : il reste affiché, même badge éteint.
-  Le type est choisi par les organisateurs. Aile gauche : retour.
-- **Lampe** : les 2 LEDs en blanc. Flancs : moins / plus fort, par pas de 10 % (en maintenant : plus vite) ;
-  aile droite : éteindre / allumer. La luminosité est retenue et affichée dans le menu (« Lampe : 50 % »).
+  Le type est choisi par les organisateurs. A : retour.
+- **Lampe** : les 2 LEDs en blanc. Y / X : moins / plus fort, par pas de 10 % (en maintenant : plus vite) ;
+  B : éteindre / allumer. La luminosité est retenue et affichée dans le menu (« Lampe : 50 % »).
   En mode muet, les LEDs restent éteintes.
 - **Badge de talk** : pour les orateurs, les LEDs indiquent le temps de parole :
 
@@ -437,7 +439,7 @@ sonde, brouilleur qui répète son code).
   | STOP ! | rouge qui clignote vite, et la cigale chante à plein volume (même en mode muet) : on conclut ! |
 
   L'état est changé par la télécommande des organisateurs (voir [§ 4.7](#47-télécommande-et-mode-muet)) ou à la main :
-  flanc gauche : état précédent ; flanc droit ou aile droite : état suivant. Cette page fonctionne même en mode muet,
+  Y : état précédent ; X ou B : état suivant. Cette page fonctionne même en mode muet,
   et écoute la télécommande en permanence tant qu'elle est ouverte.
 - **Cigale** : active ou coupe le chant de la cigale.
 - **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, éteintes).
@@ -449,7 +451,7 @@ sonde, brouilleur qui répète son code).
 - **Identifiant sonore** : le badge joue son identifiant (« Nom#1234 ») au buzzer, en sons très aigus (16 à 17,5 kHz,
   à peine audibles), 3 fois (~2 s) ; un téléphone ou un PC le décode avec la page `docs/fsk-buzzer-link.html`
   (Chrome, les tons réglés à 16000, 16500, 17000, 17500 Hz et 2 ms dans son bandeau, bouton « Écouter », micro
-  autorisé), près du badge. Aile droite : émettre ; aile gauche : arrêter / retour. Rien en mode muet.
+  autorisé), près du badge. A : arrêter / retour ; B : émettre. Rien en mode muet.
 
 **Succès et grade** : comme le dauphin du Flipper Zero, votre cigale gagne de l'expérience (XP) : chaque succès
 donne des XP, et chaque cigale rencontrée **2 XP**. Le niveau, de 1 à 10, est un **grade de pirate** ; il se gagne
@@ -467,8 +469,8 @@ avec les XP, il ne se choisit pas :
 
 La page Succès a pour titre le grade, puis montre le niveau, les XP (sur ceux du niveau suivant) avec une jauge, le nombre de succès obtenus, puis la
 liste : d'abord les rencontres (« Rencontres : 16 x 2 = 32 XP » : chaque cigale rencontrée rapporte 2 XP), puis la valeur
-de chaque succès (« Contrebandier (+20 XP) », case pleine : obtenu). Flancs : choisir ; aile
-droite : comment l'obtenir ; aile gauche : retour.
+de chaque succès (« Contrebandier (+20 XP) », case pleine : obtenu). Y / X : choisir ; A : retour ;
+B : comment l'obtenir.
 Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou le nouveau niveau (« Niveau 3 : Matelot ! »).
 
 | Succès | Comment l'obtenir | XP |
@@ -510,7 +512,7 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 
 - **Veille de l'écran** :
   - le délai avant la veille, affiché dans le menu (« Veille : 5 min ») : 1, 2, 3, 5, 10, 15 ou 30 minutes, 1 heure, ou
-    désactivée (aile droite : le suivant) ;
+    désactivée (B : le suivant) ;
   - l'image affichée pendant la veille (la SecSea par défaut, ou une image du dossier `IMAGES`) ;
   - « Aperçu » pour l'essayer.
 
@@ -518,15 +520,15 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
   c'est l'affichage le plus stable de l'écran, l'image reste nette pendant des heures sans courant.
 
   Pendant la veille, n'importe quel bouton réveille le badge.
-- **Langue** : français ou anglais (« Langue / Language », chaque langue écrite dans sa langue ; flancs puis aile
-  droite). Badge resté dans une langue illisible : aile gauche 5 fois (retour au menu principal), puis aile
-  gauche maintenue 5 secondes : il repasse en anglais. Voir [traduction](traduction.md).
+- **Langue** : français ou anglais (« Langue / Language », chaque langue écrite dans sa langue ; Y / X puis
+  B). Badge resté dans une langue illisible : A 5 fois (retour au menu principal), puis A
+  maintenu 5 secondes : il repasse en anglais. Voir [traduction](traduction.md).
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.
 - **Infos** : 6 lignes : version du firmware (numéro et commit git, un « + » si les sources différaient du commit),
   date de compilation, version de la radio, quartz utilisé (« (mesure) » pendant sa mesure), carte SD, batterie.
-  Aile droite : les crédits.
+  B : les crédits.
 - **Crédits** : les personnes et associations derrière le badge.
 - **Réglage radio** : règle la radio automatiquement, en 3 étapes (environ 15 s) :
   1. le quartz de la radio (26 ou 27 MHz) ;
@@ -535,7 +537,7 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
      allumés.
 
   Le réglage se fait tout seul au premier démarrage du badge (et après une mise à jour qui l'apporte), puis
-  à la demande : aile droite : régler à nouveau ; aile gauche : arrêter ou revenir. La page affiche le résultat :
+  à la demande : A : arrêter ou revenir ; B : régler à nouveau. La page affiche le résultat :
   quartz, bruit, seuil des télécommandes (« Télécommandes : > −90 dBm »...), correction de fréquence, et le nombre
   de paquets d'autres cigales entendus (sans autre cigale, la fréquence n'est pas corrigée).
 - **Batterie par radio : oui / non** : le badge ajoute son niveau de batterie à ses balises (toutes les 2 s, avec son
@@ -600,8 +602,7 @@ une commande reçue deux fois n'est exécutée qu'une fois.
 
 ### 4.8 Le mode admin (organisateurs)
 
-Dans le menu principal (la liste des thèmes), tapez sur les flancs **gauche, gauche, droit, droit, gauche, droit,
-gauche, droit** en moins de 8 secondes : « Mode admin activé » s'affiche et le thème **Admin** apparaît, déjà sélectionné,
+Dans le menu principal (la liste des thèmes), tapez **Y, Y, X, X, Y, X, Y, X** en moins de 8 secondes : « Mode admin activé » s'affiche et le thème **Admin** apparaît, déjà sélectionné,
 après les autres. Le mode admin reste actif après extinction.
 Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branché en USB (voir [§ 6](#6-piloter-le-badge-depuis-un-ordinateur)).
 
@@ -610,20 +611,20 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 | **Commandes radio** | envoie une commande à tous les badges autour : mode muet, fin du mode muet, cigale, lumières du badge de talk, mise en sommeil ; dernière ligne : « Relais » (sauts du relais par les cigales, 0 à 4) |
 | **LEDs des cigales** | choisit la couleur et l'animation des LEDs de toutes les cigales autour (voir ci-dessous) |
 | **Annonces (admin)** | écrit et envoie les annonces à toutes les cigales (voir ci-dessous) |
-| **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; aile droite : fermer le vote |
+| **Vote (admin)** | ouvre une question, compte les votes (un par badge) et affiche l'histogramme ; B : fermer le vote |
 | **Choeur : lancer** | lance un morceau du choeur ; ce badge chante la première voix |
-| **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid. Flancs : l'échelle (« Brûlant dès -74 dBm » par défaut, par pas de 5 dB, gardée), envoyée aux chercheurs avec la balise : à régler sur place selon la distance voulue |
-| **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; flanc gauche : le guérir |
+| **Balise chaud-froid** | ce badge émet une balise par seconde : cachez-le, les autres le cherchent avec Social > Chaud - froid. Y / X : l'échelle (« Brûlant dès -74 dBm » par défaut, par pas de 5 dB, gardée), envoyée aux chercheurs avec la balise : à régler sur place selon la distance voulue |
+| **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie ; Y : le guérir |
 | **Loup-garou (admin)** | moins de 8 joueurs : « 8 joueurs minimum » (la règle, par défaut), « Petites parties (4+) » (1 loup-garou sous 8) ou « Test : robots » (des robots complètent jusqu'à 8) ; gardé |
-| **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge (pour débloquer une rare ou une légendaire, par exemple) : flancs : choisir, aile droite : ajouter |
+| **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge (pour débloquer une rare ou une légendaire, par exemple) : Y / X : choisir, B : ajouter |
 | **Remise à zéro** | efface les scores et la progression de ce badge (voir ci-dessous) |
 | **Batterie (calibration)** | calibre la mesure de la batterie avec un multimètre (voir § 5) |
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un fichier WAV de la carte SD en FM sur 433 MHz, à écouter avec un Flipper Zero (Sub-GHz > Read RAW, FM476, son activé), un Portapack, un SDR ou une autre cigale ; réglages : excursion (47,6 kHz « Flipper » par défaut, 5 kHz pour un récepteur NFM), gain du son x1 / x2 / x4 (voir [radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts |
 | **Mode démo** | pour un stand : le badge présente ses fonctions en boucle (voir ci-dessous) |
 | **Type du badge** | Participant, Orateur ou Staff, affiché par le badge nominatif |
 | **Batteries des cigales** | la batterie des cigales qui la diffusent (Réglages > Batterie par radio) : « 81 % », ou « ADC 2533 » pour un badge non calibré, « USB » s'il est branché à un ordinateur (un simple chargeur ne se voit pas) ; « ~72 % » : l'estimation d'un badge calibré automatiquement |
-| **Batterie (auto)** | mesure l'autonomie de la batterie, sans multimètre : D : démarrer ; 1. charger en USB jusqu'au plein (mesure stable 10 min), 2. débrancher et laisser le badge **s'éteindre tout seul** (sans l'interrupteur ni le redémarrer), 3. au redémarrage, l'autonomie est gardée dans les réglages d'usine. Ensuite, sans calibration au multimètre, le reste est estimé d'après le temps passé sur batterie depuis la dernière **charge complète** (« ~72 % », icône, Infos) ; inconnu après une charge partielle ; 10 % au plus quand la mesure chute (la fin approche). La tension de la batterie reste presque plate jusqu'aux dernières heures : elle ne dit pas le reste. D pendant les étapes : arrêter |
-| **Vider la batterie** | pour tester l'alerte de batterie faible : LEDs blanches, pings radio toutes les 500 ms, écran et processeur occupés, jusqu'à la batterie faible (le mode économie prend alors le relais) ; affiche la durée, l'ADC et les pings ; D : marche / arrêt, G : retour. À lancer débranché de l'USB (sinon la batterie ne se vide pas) |
+| **Batterie (auto)** | mesure l'autonomie de la batterie, sans multimètre : B : démarrer ; 1. charger en USB jusqu'au plein (mesure stable 10 min), 2. débrancher et laisser le badge **s'éteindre tout seul** (sans l'interrupteur ni le redémarrer), 3. au redémarrage, l'autonomie est gardée dans les réglages d'usine. Ensuite, sans calibration au multimètre, le reste est estimé d'après le temps passé sur batterie depuis la dernière **charge complète** (« ~72 % », icône, Infos) ; inconnu après une charge partielle ; 10 % au plus quand la mesure chute (la fin approche). La tension de la batterie reste presque plate jusqu'aux dernières heures : elle ne dit pas le reste. B pendant les étapes : arrêter |
+| **Vider la batterie** | pour tester l'alerte de batterie faible : LEDs blanches, pings radio toutes les 500 ms, écran et processeur occupés, jusqu'à la batterie faible (le mode économie prend alors le relais) ; affiche la durée, l'ADC et les pings ; A : retour, B : marche / arrêt. À lancer débranché de l'USB (sinon la batterie ne se vide pas) |
 | **Quitter le mode admin** | cache à nouveau le thème Admin |
 
 **Batterie faible** : quand la mesure reste sous le seuil (5 mesures de suite), le badge passe en **mode
@@ -631,29 +632,29 @@ Plus discret : la case « Mode admin » de `tools/badge_remote.py`, badge branch
 petite icône de pile vide sur l'icône de batterie et, discrète, en bas à droite de l'écran de veille. Il en sort
 quand on le branche en USB (« Batterie : mode normal »).
 
-**LEDs des cigales** : une liste de réglages ; flancs : choisir la ligne.
-- « Couleur » : ailes : couleur précédente / suivante (rouge, orange, jaune, vert, cyan, bleu, violet, rose, blanc) ;
-- « Rouge (R) », « Vert (G) », « Bleu (B) » : de 0 à 255 ; aile gauche : −, aile droite : + (en maintenant :
+**LEDs des cigales** : une liste de réglages ; Y / X : choisir la ligne.
+- « Couleur » : A / B : couleur précédente / suivante (rouge, orange, jaune, vert, cyan, bleu, violet, rose, blanc) ;
+- « Rouge (R) », « Vert (G) », « Bleu (B) » : de 0 à 255 ; A : −, B : + (en maintenant :
   de plus en plus vite) ; la couleur devient « personnalisée » ;
-- « Luminosité » : 5, 10, 25, 50 (par défaut), 75 ou 100 % de la couleur, dans tous les modes (ailes : − / +) ;
-- « Mode » : Fixe, Clignotant ou Fondu (ailes : mode précédent / suivant). En Clignotant ou Fondu, un appui long
-  sur l'aile droite ouvre les durées : allumé / éteint, ou vers la couleur / vers le noir, de 50 ms à 5 s par pas
-  de 50 ms (flancs : choisir la durée ; ailes : − / + ; appui long sur une aile : retour) ;
-- « > Envoyer aux cigales » (aile droite) : les cigales autour, et ce badge, prennent ces LEDs à la place de leur
+- « Luminosité » : 5, 10, 25, 50 (par défaut), 75 ou 100 % de la couleur, dans tous les modes (A / B : − / +) ;
+- « Mode » : Fixe, Clignotant ou Fondu (A / B : mode précédent / suivant). En Clignotant ou Fondu, un appui long
+  sur B ouvre les durées : allumé / éteint, ou vers la couleur / vers le noir, de 50 ms à 5 s par pas
+  de 50 ms (Y / X : choisir la durée ; A / B : − / + ; appui long sur A ou B : retour) ;
+- « > Envoyer aux cigales » (B) : les cigales autour, et ce badge, prennent ces LEDs à la place de leur
   animation, jusqu'à « > Rétablir leurs LEDs » ou leur redémarrage. Le mode muet éteint toujours leurs LEDs,
   et les pages qui pilotent elles-mêmes les LEDs (jeux, badge de talk) les gardent.
 
-Pendant le réglage, les LEDs de ce badge montrent la couleur et le mode choisis. Aile gauche longue (ou aile gauche
+Pendant le réglage, les LEDs de ce badge montrent la couleur et le mode choisis. Appui long sur A (ou A
 sur les deux dernières lignes) : quitter.
 
 **Annonces (admin)** : 20 annonces, gardées après extinction ; au départ, le programme de SecSea 2026 (les talks des
-deux jours, 3 emplacements libres « (vide) »). Flancs : choisir ; aile droite : l'ouvrir ; aile gauche : retour. Une annonce a 6 lignes
-(flancs : choisir ; aile gauche : retour à la liste) :
-- « Heure » (par exemple 10:30) et « Texte » (56 caractères au plus, lettres accentuées comprises) : aile droite :
+deux jours, 3 emplacements libres « (vide) »). Y / X : choisir ; A : retour ; B : l'ouvrir. Une annonce a 6 lignes
+(Y / X : choisir ; A : retour à la liste) :
+- « Heure » (par exemple 10:30) et « Texte » (56 caractères au plus, lettres accentuées comprises) : B :
   modifier, avec l'éditeur à 4 boutons (ou le clavier de l'ordinateur) ;
-- « QR code » : le type du QR code, avec les ailes : Aucun, Lien (URL), Texte, Téléphone, SMS, E-mail, Wi-Fi,
+- « QR code » : le type du QR code, avec A / B : Aucun, Lien (URL), Texte, Téléphone, SMS, E-mail, Wi-Fi,
   Position GPS ;
-- « Contenu » : ce que contient le QR code (aile droite : modifier) ; le badge le met dans la forme que
+- « Contenu » : ce que contient le QR code (B : modifier) ; le badge le met dans la forme que
   comprennent les téléphones :
 
   | Type | Contenu à saisir | QR code |
@@ -666,7 +667,7 @@ deux jours, 3 emplacements libres « (vide) »). Flancs : choisir ; aile droite 
   | Wi-Fi | `réseau;mot de passe` | `WIFI:T:WPA;S:réseau;P:mot de passe;;` (sans « ; » : réseau ouvert) |
   | Position GPS | `43.17,5.60` | `geo:43.17,5.60` |
 
-- « > Aperçu » : l'écran de l'annonce, tel que les cigales l'afficheront (une aile : retour) ;
+- « > Aperçu » : l'écran de l'annonce, tel que les cigales l'afficheront (A ou B : retour) ;
 - « > Envoyer à toutes les cigales » : l'annonce part par radio, 3 fois de suite (pour les cigales qui l'auraient
   manquée). Ce badge ne se l'affiche pas : c'est le rôle de l'aperçu.
 
@@ -675,11 +676,11 @@ et affichent « SOMMEIL : le badge a été mis en sommeil par un admin. S'il res
 organisateur. » ; un redémarrage ne les réveille pas. Sauf un badge sur sa page de **badge de talk**, et le badge
 admin qui envoie l'ordre. L'ordre passe par le réseau des badges, pas en Princeton : la télécommande Princeton d'un Flipper ne
 peut pas endormir la conférence (un fichier `.sub` du réseau fait par `tools/flipper_net_sub.py command 0x05` le peut :
-à garder pour les organisateurs). **Déblocage** (organisateurs) : 5 fois le flanc gauche, puis 5 fois le flanc droit (moins de 5 s entre
+à garder pour les organisateurs). **Déblocage** (organisateurs) : 5 fois Y, puis 5 fois X (moins de 5 s entre
 deux appuis) ; le badge redémarre normalement.
 
-**Remise à zéro** : avant l'événement ou après des essais. Flancs : choisir ; aile droite, puis **appui long sur
-l'aile droite** pour confirmer (aile gauche : non) :
+**Remise à zéro** : avant l'événement ou après des essais. Y / X : choisir ; B, puis **appui long sur
+B** pour confirmer (A : non) :
 - « Scores sociaux » : le score et les rencontres du réseau des cigales ;
 - « Records des jeux » : les records des jeux et des casse-têtes ;
 - « Défis CTF et crypto » : les flags du CTF et les défis crypto résolus ;
@@ -692,7 +693,7 @@ l'aile droite** pour confirmer (aile gauche : non) :
   sont gardés ;
 - « Annonces d'origine » : les 20 annonces du menu admin reprennent leurs textes d'origine (pas compris dans « Tout »).
 
-**Mode démo** : aile droite : lancer. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif (8 s),
+**Mode démo** : B : lancer. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif (8 s),
 succès (6 s), images de la carte SD (18 s, une nouvelle toutes les 6 s), la première vidéo (20 s), compétences (5 s),
 la première musique (10 s), démo de l'écran (15 s), programme (6 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
 infos (5 s). Sans carte SD (ou sans fichier), les images, la vidéo et la musique sont sautées. La veille ne démarre
@@ -707,11 +708,11 @@ pas pendant la démo ; **n'importe quel bouton l'arrête** (« Mode démo arrêt
   que si le badge a été calibré : sinon « non calibrée ».
 - **Calibrer** (Admin > Batterie (calibration)), une fois par badge :
   1. badge branché en USB (en charge), mesurez la tension de la batterie au multimètre ;
-  2. sur la ligne « Multimètre », réglez cette tension avec les ailes (- / +, maintenir : vite) ;
-  3. flanc : « Enregistrer le point 1 », aile droite ;
+  2. sur la ligne « Multimètre », réglez cette tension avec A / B (- / +, maintenir : vite) ;
+  3. Y / X : « Enregistrer le point 1 », B ;
   4. recommencez sur batterie, débranché depuis quelques minutes (la tension doit avoir baissé d'au moins
      0,2 V), avec « Enregistrer le point 2 » : le niveau s'affiche dès ce 2e point.
-  Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « Effacer » (aile droite deux fois) oublie la calibration.
+  Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « Effacer » (B deux fois) oublie la calibration.
   La calibration est un réglage « usine » : gardée par la Remise à zéro (même « Tout ») et par les mises à jour
   du firmware.
 
@@ -731,7 +732,7 @@ python tools/badge_remote.py
 - **Mode clavier (saisie de texte)** : quand un éditeur de texte est ouvert sur le badge (carte de visite, réponse
   à un défi...), les caractères tapés sur l'ordinateur y sont insérés au curseur ; Entrée : valider ; Échap : annuler ;
   Retour arrière : effacer. Les flèches restent les boutons. Passent par le clavier : les caractères sans accent et
-  les lettres é è ê à â ç ô î ù û ë ï É È À Ç ; les autres se choisissent avec les flancs.
+  les lettres é è ê à â ç ô î ù û ë ï É È À Ç ; les autres se choisissent avec Y / X.
 - **Mode admin** : active ou désactive le mode admin du badge (voir [§ 4.8](#48-le-mode-admin-organisateurs)) ;
   la case suit l'état du badge.
 - Un problème de connexion (badge débranché, port occupé) s'affiche dans la ligne d'état et le journal ;
@@ -832,7 +833,7 @@ copier.
 | Le badge n'est pas vu par l'ordinateur | Câble USB de données (pas un câble de charge seule) ; interrupteur sur ON. |
 | « Carte SD absente » | Carte bien enfoncée ? Formatée en FAT32 ou exFAT ? |
 | Un fichier n'apparaît pas | Bonne extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`, `.bas`) et bon dossier ? Nom de moins de 64 caractères ? |
-| Une sonnerie est marquée `(!)` | Une erreur dans la ligne : aile droite affiche la colonne et la raison (voir [sonneries.md](sonneries.md)). |
+| Une sonnerie est marquée `(!)` | Une erreur dans la ligne : B affiche la colonne et la raison (voir [sonneries.md](sonneries.md)). |
 | Pas de son | Volume à 0 ? (Médias > Volume). Le buzzer est discret : collez l'oreille. |
 | Le message radio n'arrive pas au Flipper | Le Flipper doit être sur 433,92 MHz dans « SubGHz chat ». Dans Infos, le quartz doit être 26 ou 27 MHz. |
 | Plus de son ni de LEDs | Le mode muet est peut-être actif (commande des organisateurs pendant un talk) : Réglages > Mode muet. |

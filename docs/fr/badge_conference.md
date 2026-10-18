@@ -57,7 +57,7 @@ classez-les par jour et heure.
 
 ## Sur le badge
 
-- La liste des événements : Y / X choisir, B ouvrir, A retour.
+- La liste des événements : Y / X choisir, A retour, B ouvrir.
 - Un événement : Infos, Conférences (n), Workshops (n), Exposants (n).
 - Une liste : le jour, l'heure et le titre (ou le nom de l'exposant) ; la ligne choisie défile si elle est longue.
 - Une fiche : le titre, l'orateur, la salle, le résumé (qui défile ligne à ligne) ; Y / X la fiche précédente ou

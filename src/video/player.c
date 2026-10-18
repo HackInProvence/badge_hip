@@ -8,8 +8,8 @@
  * \brief Standalone video player (the video is also available in the menu application), see video.h.
  *
  * Buttons (badge seen from the front, the keys on the USB serial port do the same):
- * - right wing (B, key 'b'): play / stop,
- * - left wing (A, key 'a'): pause / resume.
+ * - B (key 'b'): play / stop,
+ * - A (key 'a'): pause / resume.
  */
 
 #include <stdio.h>

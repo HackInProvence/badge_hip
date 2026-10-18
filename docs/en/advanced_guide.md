@@ -33,15 +33,16 @@ and page names are given as an English badge shows them, with the French label i
 
 ### 1.1 The buttons and their letters
 
-The badge is seen from the front, the head of the cicada at the top. The serial console and the scripts name the
-buttons with a letter:
+The badge is seen from the front, the head of the cicada at the top. The buttons have the name printed on the
+board, from left to right: Y, A, B, X (the same letters in every language). The serial console and the scripts
+name them with the same letter:
 
 | Button | Letter (short press) | Letter (long press) | In the menus |
 |---|---|---|---|
-| Left wing (L; G in French) | `a` | `A` | back |
-| Right wing (R; D in French) | `b` | `B` | OK |
-| Right side | `x` | `X` | down |
-| Left side | `y` | `Y` | up |
+| A (left wing) | `a` | `A` | back |
+| B (right wing) | `b` | `B` | OK |
+| Y (left side) | `y` | `Y` | up |
+| X (right side) | `x` | `X` | down |
 
 A long press lasts 0.8 s on the badge.
 
@@ -341,8 +342,8 @@ of the badge, PNG screenshots. Needs: pyserial, Tkinter. How to use it:
 | `--zoom`, `-z` | zoom of the screen, 2 to 4 (default: from the size of the PC display) |
 | `--snapshot`, `-s` `file.png` | saves the current screen and exits, no window |
 
-Keyboard (the window has the focus): up arrow / `y` = left side, down / `x` = right side, left / `a` = left wing,
-right / Enter / `b` = right wing; Shift + key = long press; F5: ask the screen again; F12: screenshot
+Keyboard (the window has the focus): up arrow / `y` = button Y, down / `x` = button X, left / `a` = button A,
+right / Enter / `b` = button B; Shift + key = long press; F5: ask the screen again; F12: screenshot
 (`badge_YYYYMMDD_HHMMSS.png` in the current folder). Buttons "Capture", "Rafraîchir" (refresh), "Diagnostic" (`!`),
 check boxes "Journal" (log), "Mode clavier (saisie de texte)" (keyboard mode) and "Mode admin".
 
@@ -640,7 +641,7 @@ characters are ignored. Turn local echo off. The badge answers with lines of tex
 
 | Key | Effect |
 |---|---|
-| `a` `b` `x` `y` | short press: left wing, right wing, right side, left side |
+| `a` `b` `x` `y` | short press: buttons A, B, X, Y |
 | `A` `B` `X` `Y` | long press of the same button |
 | `!` | diagnostic: OLED and IR, network of the cicadas (name, score, meetings, beacons sent / received, neighbours and their dBm), CTF flags, network counters (`net: sent, received, dropped`), state of the network and the radio (`net state:`), listening to the remotes (`remote state:`), remote enabled / mute / admin mode (`remote:`), `version:`, radio (CC1101 version, crystal used and measured), battery (mV, %, ADC value, or "not calibrated") and the factory calibration points |
 | `?` | sound state: open, samples played, volume, music position |
@@ -706,8 +707,8 @@ Other prefixes exist (`social:`, `contacts:`, `chorus:`, `party:`, `werewolf:`, 
 
 ### 4.1 Opening and leaving it
 
-- **Secret sequence**: in the main menu (the list of the themes, not inside a theme), tap the sides **left, left,
-  right, right, left, right, left, right** within 8 seconds. "Admin mode on" (Mode admin activé) is shown and the **Admin** theme
+- **Secret sequence**: in the main menu (the list of the themes, not inside a theme), tap the buttons **Y, Y,
+  X, X, Y, X, Y, X** (the sides) within 8 seconds. "Admin mode on" (Mode admin activé) is shown and the **Admin** theme
   appears last, already selected.
 - **Over USB**: the "Mode admin" check box of `badge_remote.py`, or Ctrl+A then `A` in a terminal.
 - The admin mode is **kept when the badge is switched off** and after a firmware update.
@@ -721,20 +722,20 @@ In the order of the menu:
 
 | Entry | Purpose | Buttons |
 |---|---|---|
-| **Radio commands** (Commandes radio) | sends a command to all the badges around: Mute (talk), Mute mode off, Cicada: sing, Talk: off / green / orange (5 min) / red (over) / angry red, Going to sleep. This badge executes it too (except the sleep) | sides: choose; R: send; L: back |
+| **Radio commands** (Commandes radio) | sends a command to all the badges around: Mute (talk), Mute mode off, Cicada: sing, Talk: off / green / orange (5 min) / red (over) / angry red, Going to sleep. This badge executes it too (except the sleep) | Y X: choose; A: back; B: send |
 | **Cicada LEDs** (LEDs des cigales) | color (9 colors or R, G, B from 0 to 255) and mode (Fixed, Blinking, Fade; times from 50 ms to 5 s) forced on the LEDs of the cicadas around, until "> Restore their LEDs" or their reboot | see the [user guide § 4.8](user_guide.md#48-admin-mode-organizers) |
-| **Notices (admin)** (Annonces (admin)) | 20 announcements (time, 56 character text, QR code: link, text, phone, SMS, e-mail, Wi-Fi, GPS position), kept in flash; preview; sent 3 times to all the cicadas | sides: choose; R: open / edit; L: back |
-| **Vote (admin)** | opens a predefined question, counts the votes (one per badge, the last one counts) and shows the histogram | R: open the vote, then R: close it |
-| **Chorus: start** (Choeur : lancer) | starts one of the 8 songs (Frère Jacques, Ode to Joy, Tetris, Pachelbel's Canon, Mountain King, Row your boat, Jingle Bells, Minuet in G); this badge sings the first voice | R: start / stop |
-| **Hot-cold beacon** (Balise chaud-froid) | this badge sends a beacon every second at +10 dBm; the others look for it with Social > Hot - cold. The scale ("Burning from -74 dBm" by default, set in 5 dB steps) is kept and sent with the beacon | R: transmit / stop; sides: scale; L: quit |
-| **Virus: patient 0** (Virus : patient zéro) | infects this badge to start the epidemic | R: infect; left side: cure this badge |
-| **Smuggling (admin)** (Contrebande (admin)) | adds a good of your choice to the cargo of this badge ([smuggler.md](smuggler.md)) | sides: choose; R: add |
-| **Werewolf (admin)** (Loup-garou (admin)) | games under 8 players: "8 players minimum" (default), "Small games (4+)", "Test: robots"; kept in flash | sides: choose; R: confirm |
-| **Reset** (Remise à zéro) | clears part of the progress of this badge (see § 4.4) | R, then long R: confirm; L: no |
+| **Notices (admin)** (Annonces (admin)) | 20 announcements (time, 56 character text, QR code: link, text, phone, SMS, e-mail, Wi-Fi, GPS position), kept in flash; preview; sent 3 times to all the cicadas | Y X: choose; A: back; B: open / edit |
+| **Vote (admin)** | opens a predefined question, counts the votes (one per badge, the last one counts) and shows the histogram | B: open the vote, then B: close it |
+| **Chorus: start** (Choeur : lancer) | starts one of the 8 songs (Frère Jacques, Ode to Joy, Tetris, Pachelbel's Canon, Mountain King, Row your boat, Jingle Bells, Minuet in G); this badge sings the first voice | B: start / stop |
+| **Hot-cold beacon** (Balise chaud-froid) | this badge sends a beacon every second at +10 dBm; the others look for it with Social > Hot - cold. The scale ("Burning from -74 dBm" by default, set in 5 dB steps) is kept and sent with the beacon | Y X: scale; A: quit; B: transmit / stop |
+| **Virus: patient 0** (Virus : patient zéro) | infects this badge to start the epidemic | Y: cure this badge; B: infect |
+| **Smuggling (admin)** (Contrebande (admin)) | adds a good of your choice to the cargo of this badge ([smuggler.md](smuggler.md)) | Y X: choose; B: add |
+| **Werewolf (admin)** (Loup-garou (admin)) | games under 8 players: "8 players minimum" (default), "Small games (4+)", "Test: robots"; kept in flash | Y X: choose; B: confirm |
+| **Reset** (Remise à zéro) | clears part of the progress of this badge (see § 4.4) | A: no; B, then long B: confirm |
 | **Battery (calibration)** (Batterie (calibration)) | calibrates the battery measure (see § 4.3) | |
 | **Pirate radio** (Radio pirate) | transmits a melody, a 1 kHz tone or a WAV of the SD card in FM on 433 MHz ([pirate_radio.md](pirate_radio.md)); low power, short tests | |
-| **Demo mode** (Mode démo) | the badge shows its features in a loop (see § 5.4) | R: start |
-| **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown in the banner of the name tag | sides: choose; R: save |
+| **Demo mode** (Mode démo) | the badge shows its features in a loop (see § 5.4) | B: start |
+| **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown in the banner of the name tag | Y X: choose; B: save |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme | |
 
 ### 4.3 Calibrating the battery
@@ -744,22 +745,21 @@ badge, with a multimeter:
 
 1. Badge plugged in USB (charging), Admin > Battery (calibration). The page shows the ADC value (refreshed every
    2 s), the measure, and points 1 and 2.
-2. Measure the voltage on the battery terminals. On the "Multimeter" row (Multimètre), set this voltage with the wings
-   (L: −, R: +, by 10 mV; held: faster and faster; from 2.50 to 4.50 V).
-3. Right side to "> Save point 1" (> Enregistrer le point 1), right wing: "Need a 2nd point".
+2. Measure the voltage on the battery terminals. On the "Multimeter" row (Multimètre), set this voltage with A and B
+   (A: −, B: +, by 10 mV; held: faster and faster; from 2.50 to 4.50 V).
+3. X to "> Save point 1" (> Enregistrer le point 1), B: "Need a 2nd point".
 4. Unplug, let the voltage drop for a few minutes (at least 0.2 V apart, 150 ADC steps), measure, set, then
    "> Save point 2": "Point 2 saved", the level is shown. "ADC too close to point 1": the ADC did not move enough,
    the level stays hidden; try again later.
 
-Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer) asks for a confirmation ("R again: clear"). On the "Multimeter"
-row, the left wing is used to set the value: leave with a long press on the left wing, or from another row.
+Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer) asks for a confirmation ("B again: clear"). On the "Multimeter"
+row, A is used to set the value: leave with a long press on A, or from another row.
 The points are **factory settings**: kept by the reset (even "All") and by the updates.
 Check from the console: `!` prints `battery: factory points ...`.
 
 ### 4.4 Reset
 
-To do before the event on badges used for tests. Each row asks for a confirmation with a **long press on the right
-wing**:
+To do before the event on badges used for tests. Each row asks for a confirmation with a **long press on B**:
 
 | Row | Clears |
 |---|---|
@@ -833,13 +833,13 @@ moment. It also opens a listening moment every 10 s for a weak remote. Hence the
   "SLEEP: The badge was put to sleep by an admin..." (SOMMEIL on a badge in French). They no longer answer the
   radio commands, a reboot or a firmware update: **the state is kept in flash**.
 - Do not fall asleep: the admin badge that sends the order, and a badge open on the talk badge page.
-- **Manual wake-up**: **left side 5 times, then right side 5 times**, less than 5 s between two presses (another
+- **Manual wake-up**: **Y 5 times, then X 5 times**, less than 5 s between two presses (another
   button starts the sequence again). The badge reboots normally. From the serial console: `yyyyyxxxxx`. The log
   follows the progress (`sleep: unlock 5/5 2/5`).
 
 ### 5.4 Demo mode
 
-For a booth: Admin > Demo mode, right wing. The badge loops, LEDs in rainbow: name tag (8 s), achievements (6 s),
+For a booth: Admin > Demo mode, B. The badge loops, LEDs in rainbow: name tag (8 s), achievements (6 s),
 pictures of the SD card (18 s, one every 6 s), the first video (20 s), skills (5 s), the first music (10 s), screen
 demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s). The media steps are skipped
 without an SD card or without a file. The screensaver does not start; **any button stops the demo**. It is not kept
@@ -991,8 +991,8 @@ are in [translation](translation.md).
 
 | Action | How |
 |---|---|
-| Choose the language | Settings > Language ("Langue / Language"): sides to choose, R to confirm |
-| Back to English from any language | left wing (L) **5 times** (back to the main menu), then the left wing **held 5 s** |
+| Choose the language | Settings > Language ("Langue / Language"): Y / X to choose, B to confirm |
+| Back to English from any language | A **5 times** (back to the main menu), then A **held 5 s** |
 | From the serial port | `E`: English; `N`: next language (log `i18n: language en (English)`) |
 | Screenshots of a language | `python tools/badge_screens.py --lang en`: `docs/screens/en/` and `docs/en/screens.md`, then the badge goes back to its language |
 | Add / fix a translation | `python tools/i18n.py update`, translate `src/menu/lang/<code>.po`, `python tools/i18n.py gen`, build |
@@ -1012,9 +1012,9 @@ menu). The serial port logs are not translated: the PC tools work whatever the l
 | A script finds the wrong badge | Several badges plugged in: give `--port` (`--ports` for the two-badge tests). |
 | "the badge does not answer: is the menu application (badge_menu) flashed?" | The badge runs a test application or another firmware: flash `badge_menu.uf2`. |
 | Nothing shows in the terminal | Normal: the badge only talks on events. Type `!`. The lines sent before the port was opened are lost. |
-| The badge shows "SLEEP" (SOMMEIL) | Put to sleep by an admin: left side 5 times then right side 5 times (§ 5.3). Neither a reboot nor a flash wakes it up. |
+| The badge shows "SLEEP" (SOMMEIL) | Put to sleep by an admin: Y 5 times then X 5 times (§ 5.3). Neither a reboot nor a flash wakes it up. |
 | No sound and no LEDs | Mute mode (command during a talk): Settings > Mute mode, or command `0x03`. |
-| The Admin theme appeared by itself | The side sequence was typed by chance: Admin > Leave admin mode. |
+| The Admin theme appeared by itself | The Y / X sequence was typed by chance: Admin > Leave admin mode. |
 | The Admin theme disappeared after a test | The test scripts switch the admin mode off at the end: switch it on again (§ 4.1). |
 | The badge does not obey the Flipper | Settings > Remote: yes; a `.sub` file (not `subghz tx`); code `0xC16Axx`; button held for a second; badge close. `O` on the console shows the decoding attempts. |
 | The badges hear each other badly, the remotes are badly received | Settings > Radio tuning on site, near other badges switched on. `!`: compare "crystal used" and "measured". |
@@ -1022,7 +1022,7 @@ menu). The serial port logs are not translated: the PC tools work whatever the l
 | No battery level | Battery not calibrated: § 4.3. |
 | "No SD card" (Pas de carte SD), `video: mount failed` | Card fully inserted, FAT32 or exFAT. |
 | A file does not show up | Right folder and extension; name of 63 bytes at most; no more than 48 entries in the folder; file not hidden. |
-| A ringtone is marked `(!)` | Right wing: line, column and reason; the console prints `rtttl: ... error ...` ([ringtones.md](ringtones.md)). |
+| A ringtone is marked `(!)` | B: line, column and reason; the console prints `rtttl: ... error ...` ([ringtones.md](ringtones.md)). |
 | A gamebook does not show up or stops | `python tools/gamebook_check.py LIVRES/book.txt`; 16 books at most. |
 | A video or a music stops before its end | `badge_media_test.py` to find it; convert it again with `video2epaper.py` / `audio2wav.py`. |
 | Sound too low | Media > Volume; WAV converted by `audio2wav.py` without `--no-filter`. |

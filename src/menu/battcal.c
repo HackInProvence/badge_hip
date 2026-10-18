@@ -4,7 +4,7 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 /* Calibration of the battery measure (Admin > Batterie (calibration)): the voltage measured with a multimeter is
- * entered with the wings and saved as a point with the ADC value of that moment, once charging and once on battery
+ * entered with A / B and saved as a point with the ADC value of that moment, once charging and once on battery
  * (battery.h). The points are factory settings: kept through the resets and the new firmwares. */
 
 #include <stdio.h>

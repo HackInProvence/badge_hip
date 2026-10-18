@@ -358,8 +358,8 @@ static void test_builtin(void) {
 
 /* The texts of gamebook.c fit in the width of the screen */
 static void test_ui_texts(void) {
-    static const char *const FOOTERS[] = {"D : choisir  G : menu", "Flancs, D : suite  G : menu", "D : ouvrir  G : quitter",
-                                          "D : choisir  G : retour", "Bravo, vous avez gagné !",
+    static const char *const FOOTERS[] = {"A : menu  B : choisir", "Y X, B : suite  A : menu", "A : quitter  B : ouvrir",
+                                          "A : retour  B : choisir", "Bravo, vous avez gagné !",
                                           "Perdu... Réessayez !", "Merci d'avoir joué !",
                                           "Aucun objet pour l'instant.", "Le dé roule... et donne 6.", "Revenir en arrière"};
     for (size_t i = 0; i < sizeof(FOOTERS) / sizeof(FOOTERS[0]); ++i) {

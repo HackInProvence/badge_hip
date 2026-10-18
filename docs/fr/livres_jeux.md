@@ -17,7 +17,7 @@ Menu : **Médias > Livres-jeux**.
 
 - Le livre intégré au badge, puis les livres du dossier `LIVRES` de la carte SD (16 au plus).
 - **Continuer : ...** en tête de liste : reprend le dernier livre là où vous l'aviez laissé.
-- Flancs : choisir un livre, **D** : l'ouvrir, **G** : quitter.
+- Y / X : choisir un livre, **A** : quitter, **B** : l'ouvrir.
 
 ### 1.2 Le menu d'un livre
 
@@ -43,17 +43,17 @@ Le titre, l'auteur, puis :
 │ > Ouvrir la porte           │  le choix sélectionné est en noir
 │ > Faire demi-tour           │
 ├─────────────────────────────┤
-│   D : choisir  G : menu     │
+│   A : menu  B : choisir     │
 └─────────────────────────────┘
 ```
 
 | Bouton | Effet |
 |---|---|
-| Flanc droit | Page suivante, puis choix suivant. |
-| Flanc gauche | Choix précédent, puis page précédente. |
-| D (aile droite) | Prendre le choix sélectionné (ou page suivante s'il n'y a pas encore de choix à l'écran). |
-| G (aile gauche) | Le menu du livre. |
-| G maintenu | Quitter les livres-jeux. |
+| Y (flanc gauche) | Choix précédent, puis page précédente. |
+| X (flanc droit) | Page suivante, puis choix suivant. |
+| A (aile gauche) | Le menu du livre. |
+| B (aile droite) | Prendre le choix sélectionné (ou page suivante s'il n'y a pas encore de choix à l'écran). |
+| A maintenu | Quitter les livres-jeux. |
 
 - Quand le livre lance un **dé**, le résultat s'affiche (« Le dé roule... et donne 4. ») et seuls les choix
   correspondants sont proposés.

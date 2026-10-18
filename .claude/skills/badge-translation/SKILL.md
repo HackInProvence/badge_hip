@@ -34,8 +34,10 @@ Read `docs/en/translation.md` (or `docs/fr/traduction.md`) and `src/menu/i18n.h`
   the small one). Same formats in the same order, same `\n`. Only characters of the fonts: ASCII + French accents
   (src/gfx/gen_fonts.py COMPOSED); a new language needing others must add them there and to FONT_EXTRA in
   tools/i18n.py, then regenerate the fonts (python src/gfx/gen_fonts.py).
-- English glossary: G/D -> L/R (wings), flancs -> sides, "G : retour" -> "L: back", "D : choisir" -> "R: choose",
-  Réglages -> Settings, Médias -> Media, Jeux solo -> Solo games, Jeux multi -> Multiplayer, Succès ->
+- Buttons: A, B, Y, X (the names printed on the board: A left wing, B right wing, Y left side, X right side) are
+  kept as they are in every language, never translated: "A : retour" -> "A: back", "A : retour  B : choisir" ->
+  "A: back  B: choose", "Y X : choisir" -> "Y X: choose". A before B, Y before X, as in the French.
+- English glossary: Réglages -> Settings, Médias -> Media, Jeux solo -> Solo games, Jeux multi -> Multiplayer, Succès ->
   Achievements, Compétences -> Skills, Rencontres -> Meetings, Contrebande -> Smuggling, Loup-garou -> Werewolf,
   Tir à la corde -> Tug of war, Sonneries -> Ringtones, Radio pirate -> Pirate radio, Livres-jeux -> Gamebooks,
   Annonces -> Announcements, Mode muet -> Mute mode, Veille -> Screensaver, cigale -> cicada. No space before

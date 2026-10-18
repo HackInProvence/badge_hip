@@ -119,7 +119,7 @@ def done_lines(a, b, trade):
 
 def back_home(t):
     t.mark()
-    t.keys('b')  # "D : continuer"
+    t.keys('b')  # "B : continuer"
     return t.expect(r'^smuggler: page home$', 3) is not None
 
 

@@ -24,10 +24,10 @@
 #define UI_VISIBLE_ROWS 7
 
 /* Buttons flags, same as btns_get_state() */
-#define UI_BTN_A 0x01  /* Left wing (G) */
-#define UI_BTN_B 0x02  /* Right wing (D) */
-#define UI_BTN_X 0x04  /* Right flank */
-#define UI_BTN_Y 0x08  /* Left flank */
+#define UI_BTN_A 0x01  /* A (left wing) */
+#define UI_BTN_B 0x02  /* B (right wing) */
+#define UI_BTN_X 0x04  /* X (right flank) */
+#define UI_BTN_Y 0x08  /* Y (left flank) */
 
 void ui_title(uint8_t *fb, const char *title);
 void ui_footer(uint8_t *fb, const char *text);
@@ -80,8 +80,8 @@ void ui_gauge(uint8_t *fb, int x, int y, int w, int h, int value, int max);
 
 
 /* ------ Text editor with the 4 buttons ------
- * Flanks: previous / next character (held: repeated by the caller), right wing: next position,
- * left wing: previous position (leave from the first one), long press on the right wing: done. */
+ * Y / X: previous / next character (held: repeated by the caller), B: next position,
+ * A: previous position (leave from the first one), long press on B: done. */
 
 #define UI_EDIT_MAX 56
 
@@ -90,7 +90,7 @@ typedef struct {
     int max_len;  /* Characters (the text is ASCII in the editor) */
     int cursor;
     const char *charset;
-    uint64_t repeat_us[2];  /* Next repetition of the held flank (left, right), time_us_64() */
+    uint64_t repeat_us[2];  /* Next repetition of the held Y or X (Y, X), time_us_64() */
 } ui_edit_t;
 
 extern const char UI_CHARSET_TEXT[];  /* Letters, digits, punctuation for names, e-mails, URLs */

@@ -221,7 +221,7 @@ static bool msg_buttons(const app_buttons_t *b, absolute_time_t now) {
         return true;
     }
     if (view == V_READ) {
-        /* A message, whole: right wing: answer its sender; the flanks: the previous / next one */
+        /* A message, whole: B: answer its sender; Y / X: the previous / next one */
         if ((b->pressed & UI_BTN_Y) && sel > 1)
             --sel;
         if ((b->pressed & UI_BTN_X) && sel < n_inbox)

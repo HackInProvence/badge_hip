@@ -8,8 +8,8 @@
  * \brief CTF challenges of the menu (see docs/idees_reseau_extensions_ctf.md).
  *
  * First challenge: the Konami code, typed with the 4 buttons in the "Saisir un code" page:
- * up up down down left right left right B A, with up = left flank (Y), down = right flank (X),
- * left = left wing (A), right = right wing (B), and B, A = the wings labeled B and A.
+ * up up down down left right left right B A, with up = Y, down = X,
+ * left = A, right = B, and B, A = the buttons B and A.
  * The flags are stored obfuscated in the firmware: finding them in a dump is another challenge.
  * */
 

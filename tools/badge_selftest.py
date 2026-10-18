@@ -249,7 +249,7 @@ PUZZLES = ['Démineur', '2048', 'Taquin', 'Sokoban', 'Mastermind', 'Pendu']
 
 
 def test_puzzles(t):
-    """Each puzzle: help page, start, a move, quit with a long press on the left wing."""
+    """Each puzzle: help page, start, a move, quit with a long press on A."""
     if not open_theme(t, 'Jeux solo'):
         return t.result('puzzles', False, 'theme "Jeux solo" not shown')
     t.keys('x' * len(GAMES))
@@ -335,7 +335,7 @@ def test_radio(t):
         if t.expect(r'^radio: message #\d+ sent', 8):
             times.append(time.time())
     period = times[1] - times[0] if len(times) == 2 else 0
-    t.keys('y')  # Left flank: 4 s
+    t.keys('y')  # Button Y: 4 s
     t.screenshot('radio_test', 1.5)
     stopped = t.press('a', 'Radio & IR')
     t.result('radio: test mode', started is not None and 4.0 <= period <= 6.0 and stopped,
@@ -408,7 +408,7 @@ ADMIN = ['Commandes radio', 'LEDs des cigales', 'Annonces (admin)', 'Vote (admin
 
 def open_admin(t):
     """From the main menu: the admin mode by the serial port (like the box of badge_remote.py), then the Admin
-    theme, selected by it (test_admin checks the secret sequence of the flanks)."""
+    theme, selected by it (test_admin checks the secret sequence of Y / X)."""
     t.mark()
     t.badge.send('\x01A')
     if not t.expect(r'^admin: on$', 3):
@@ -535,9 +535,9 @@ def test_apps(t):
 
 def test_admin(t):
     """The secret sequence shows the admin menu; mute / unmute commands; leave the admin mode."""
-    t.pump(8.5)  # The flanks pressed before don't count (the sequence must be typed within 8 s)
+    t.pump(8.5)  # The Y / X presses before don't count (the sequence must be typed within 8 s)
     t.mark()
-    t.keys('yyxxyxyx')  # Left, left, right, right, left, right, left, right: the Admin theme is selected
+    t.keys('yyxxyxyx')  # Y, Y, X, X, Y, X, Y, X: the Admin theme is selected
     on = t.expect(r'^admin: (on)$', 3)
     t.result('admin: secret sequence', on is not None)
     if not on:

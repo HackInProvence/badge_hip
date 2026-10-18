@@ -41,8 +41,8 @@ The CC1101 cannot do analog FM: it does digital modulation (2-FSK, GFSK, OOK...)
 
 The network of the cicadas is paused during the transmission (`net_pause()`), the radio is borrowed from
 `radio_tools.c` (`radio_tools_claim()` / `radio_tools_release()`) then given back to the network, which configures
-it again (GFSK profile, sync word, reception). The transmission stops at the end of the track, with the left or right
-wing, when the page is left, and after 10 minutes in any case.
+it again (GFSK profile, sync word, reception). The transmission stops at the end of the track, with A or B, when the
+page is left, and after 10 minutes in any case.
 
 ## The settings
 
@@ -51,8 +51,8 @@ The page shows, one per row: **Source**, **Frequency** (Fréquence), **Power** (
 French > Choisir le fichier, with the SD file source), and at the bottom "ISM 433 MHz: short tests" or the
 message of the last stop.
 
-Sides: previous / next row; wings: previous / next value; on the last row, right wing: transmit (or choose the
-file), left wing: back. Long press on the left wing: quit.
+Y / X: previous / next row; A / B: previous / next value; on the last row, A: back, B: transmit (or choose the
+file). Long press on A: quit.
 
 | Setting | Values | Default |
 |---|---|---|
@@ -72,8 +72,8 @@ file), left wing: back. Long press on the left wing: quit.
 - **1 kHz tone**: continuous sine at 78 % of the full scale before the gain (until stopped or the 10 minutes):
   for the measures.
 - **SD file**: the `.WAV` files of the card: it starts in the `MUSIQUE` folder (or the root) and browses the
-  folders and sub-folders (shown "Name/" first in the list; right wing: open the folder or transmit the file, left
-  wing: the parent folder, then back to the settings from the root). The files are read by the WAV player of the badge (8,
+  folders and sub-folders (shown "Name/" first in the list; A: the parent folder, then back to the settings from
+  the root; B: open the folder or transmit the file). The files are read by the WAV player of the badge (8,
   16, 24 or 32 bits, float, mono or stereo, up to 192 kHz). Recommended: mono 16 kHz, normalized (`audio2wav.py`).
   The sound is sent as is (no pre-emphasis, no filter): a very high-pitched sound widens the spectrum a little.
 
@@ -138,8 +138,8 @@ The second badge is a real receiver for this signal:
    reaches ±32 kHz without finding it, it tries the reverse polarity of the demodulator.
 
 Screen: frequency, signal (dBm and gauge), frequency correction, tone detected (only when it is a real tone:
-purity ≥ 50 % and level ≥ 5 %), level and average duty cycle, state of the squelch. Sides: previous / next channel;
-right wing: squelch on / off ("Squelch: on", Silencieux); left wing: back.
+purity ≥ 50 % and level ≥ 5 %), level and average duty cycle, state of the squelch. Y / X: previous / next channel;
+A: back; B: squelch on / off ("Squelch: on", Silencieux).
 
 On the USB serial port, one line per second (example values):
 
@@ -149,14 +149,14 @@ pirate: rx tone 1000 Hz, level 38 %, purity 1 kHz 97 %, duty 50 %, rssi -62 dBm,
 
 ## Test with two badges
 
-1. Badge A (receiver): open "Listen to pirate radio" (Écouter la radio pirate), on 433.920 MHz. Plug its USB, open the serial port.
-2. Badge B (transmitter, admin mode): Admin > Pirate radio, Source "1 kHz tone", Power **0 dBm** (the default; +10 dBm
+1. Badge 1 (receiver): open "Listen to pirate radio" (Écouter la radio pirate), on 433.920 MHz. Plug its USB, open the serial port.
+2. Badge 2 (transmitter, admin mode): Admin > Pirate radio, Source "1 kHz tone", Power **0 dBm** (the default; +10 dBm
    for a short test if the badges are far apart; at -10 dBm one measures ~-97 dBm at 1 m, at the edge of the
    sensitivity in a 406 kHz channel), Deviation 47.6 kHz and Sound gain x2 (the defaults), "> Transmit". The two badges 1 m apart.
-3. On A, within a few seconds: RSSI clearly above -100 dBm (the squelch), the correction settles, and the serial port prints
+3. On badge 1, within a few seconds: RSSI clearly above -100 dBm (the squelch), the correction settles, and the serial port prints
    `rx tone 1000 Hz` (±5 Hz) with a high purity; the speaker whistles at 1 kHz.
-4. Then the Melody (you recognize it on A), then a WAV of the SD card. Stop: left wing on B; the line `no carrier`
-   shows up on A.
+4. Then the Melody (you recognize it on badge 1), then a WAV of the SD card. Stop: button A of badge 2; the line
+   `no carrier` shows up on badge 1.
 
 ### Results
 

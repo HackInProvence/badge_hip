@@ -499,7 +499,7 @@ int app_edit_buttons(ui_edit_t *e, const app_buttons_t *b) {
         ui_edit_move(e, 1);
     if ((b->pressed & UI_BTN_A) && ! ui_edit_move(e, -1))
         return UI_EDIT_CANCEL;
-    /* Flanks: the characters, repeated while held */
+    /* Y / X: the characters, repeated while held */
     uint64_t now = time_us_64();
     for (int f = 0; f < 2; ++f) {
         uint8_t bit = f ? UI_BTN_X : UI_BTN_Y;

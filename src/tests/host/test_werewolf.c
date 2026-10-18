@@ -777,7 +777,7 @@ static void run_game(const char *name, int players, uint8_t opts, bool debug, in
         if (verbose)
             printf("    J%d: %s, %s%s\n", b, s->role, s->dead ? "dead, " : "", s->won ? "won" : "lost");
     }
-    /* Everybody leaves (long press on the left wing, then "oui") */
+    /* Everybody leaves (long press on A, then "oui") */
     for (int b = 0; b <= players; ++b) {
         in_app[b] = false;
         keys(b, "Ab");

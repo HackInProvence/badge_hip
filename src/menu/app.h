@@ -23,7 +23,7 @@
 
 #define APP_LONG_PRESS_MS 800
 
-/* The buttons, bits UI_BTN_A (left wing), UI_BTN_B (right wing), UI_BTN_X (right flank), UI_BTN_Y (left flank) */
+/* The buttons, bits UI_BTN_A, UI_BTN_B, UI_BTN_X, UI_BTN_Y (named as on the PCB, from left to right: Y, A, B, X) */
 typedef struct {
     uint8_t pressed;  /* Pressed since the last call */
     uint8_t released_short;  /* Released without a long press: use it for buttons that also have a long press */
@@ -36,9 +36,9 @@ static inline uint32_t app_held_ms(const app_buttons_t *b, uint8_t bit) {
     return b->held_ms[bit == UI_BTN_A ? 0 : bit == UI_BTN_B ? 1 : bit == UI_BTN_X ? 2 : 3];
 }
 
-/** \brief The buttons (and the PC keyboard) in the text editor of ui.h: flanks = character (held: repeated),
- * right wing = next position, left wing = previous one, long press on the right wing = done.
- * Returns UI_EDIT_DONE, UI_EDIT_CANCEL (left wing on the first position) or UI_EDIT_EDITING. */
+/** \brief The buttons (and the PC keyboard) in the text editor of ui.h: Y / X = character (held: repeated),
+ * B = next position, A = previous one, long press on B = done.
+ * Returns UI_EDIT_DONE, UI_EDIT_CANCEL (A on the first position) or UI_EDIT_EDITING. */
 int app_edit_buttons(ui_edit_t *e, const app_buttons_t *b);
 
 typedef struct {

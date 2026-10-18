@@ -68,16 +68,16 @@ Les mots de plus de 13 caractères sont coupés en morceaux de taille égale ave
 
 | Bouton | Appui court | Appui long (0,7 s, répété si maintenu) |
 |---|---|---|
-| Flanc gauche | Moins vite (-25 mots/min) | Recul de 10 s de lecture |
-| Flanc droit | Plus vite (+25 mots/min) | Avance de 10 s de lecture |
-| Aile droite | Pause / reprise (en fin de texte : relire) | |
-| Aile gauche | Quitter (la position est mémorisée) | |
+| Y (flanc gauche) | Moins vite (-25 mots/min) | Recul de 10 s de lecture |
+| X (flanc droit) | Plus vite (+25 mots/min) | Avance de 10 s de lecture |
+| A (aile gauche) | Quitter (la position est mémorisée) | |
+| B (aile droite) | Pause / reprise (en fin de texte : relire) | |
 
 - Vitesse de 100 à 900 mots/min, 250 par défaut. Au-delà de 450 mots/min l'écran utilise une forme d'onde plus rapide mais moins contrastée.
 - La vitesse et la position dans le dernier texte lu sont mémorisées (même après un redémarrage).
 - « 10 s de lecture » = le nombre de mots lus en 10 s à la vitesse actuelle. En avant, c'est exact ;
   en arrière, c'est estimé à partir de la longueur moyenne des mots déjà lus.
-- Sur le port série : `x` / `y` = appui court sur un flanc, `X` / `Y` = appui long, `b` = pause, `a` = quitter.
+- Sur le port série : `x` / `y` = appui court sur X / Y, `X` / `Y` = appui long, `b` = pause, `a` = quitter.
 
 
 ## Limites connues de la technique
@@ -85,7 +85,7 @@ Les mots de plus de 13 caractères sont coupés en morceaux de taille égale ave
 - **La compréhension baisse quand la vitesse augmente.** Au-delà de la vitesse naturelle de lecture (~250 mots/min en moyenne),
   on retient moins bien : les études n'ont pas montré de « lecture rapide » sans perte de compréhension.
 - **Pas de retour en arrière naturel** : en lecture normale, l'œil revient sur un passage mal compris ;
-  en PVSR il faut le faire volontairement (appui long sur le flanc gauche).
+  en PVSR il faut le faire volontairement (appui long sur Y).
 - **Fatigue** : on ne cligne pas des yeux pendant la lecture, il faut faire des pauses.
 - Adapté aux textes narratifs simples, moins aux textes techniques, aux tableaux ou à la poésie (la mise en page est perdue).
 

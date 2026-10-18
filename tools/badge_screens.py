@@ -150,7 +150,7 @@ class Crawler:
         print(f'  {page}{" / " + caption if caption else ""}' + (f'  [{len(checks)} problème(s)]' if checks else ''))
 
     def back_to(self, title, tries=6):
-        """Back to the menu \\p title: left wing, then its long press (games), until the menu is shown."""
+        """Back to the menu \\p title: button A, then its long press (games), until the menu is shown."""
         for k in range(tries):
             self.t.mark()
             self.t.keys('A' if k % 2 else 'a', 0.6)

@@ -180,7 +180,7 @@ const app_t app_hotcold = {
 
 /* ------ Master beacon (admin menu) ------ */
 
-/* The RSSI of "BRÛLANT", set by the admin (flanks) and saved */
+/* The RSSI of "BRÛLANT", set by the admin (Y / X) and saved */
 static int8_t hot_dbm(void) {
     int8_t v = store_get()->hot_dbm;
     return v >= HOT_MIN_DBM && v <= HOT_MAX_DBM ? v : HOT_DEFAULT_DBM;

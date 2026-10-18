@@ -214,7 +214,8 @@ Une application est un `const app_t` :
 Les boutons arrivent dans un `app_buttons_t` : `pressed` (appuyés depuis le dernier appel), `released_short`
 (relâchés sans appui long : à utiliser pour un bouton qui a aussi un appui long), `long_pressed` (maintenus
 `APP_LONG_PRESS_MS` = 800 ms, signalé une fois), `held` et `held_ms[]` (pour répéter en maintenant).
-Bits : `UI_BTN_A` (aile gauche), `UI_BTN_B` (aile droite), `UI_BTN_X` (flanc droit), `UI_BTN_Y` (flanc gauche).
+Bits : `UI_BTN_A` (bouton A, aile gauche), `UI_BTN_B` (B, aile droite), `UI_BTN_X` (X, flanc droit), `UI_BTN_Y`
+(Y, flanc gauche).
 
 Pour le son et les LEDs, utiliser `app_tone()` et `app_leds()` : ils respectent le mode muet ; `app_leds(0, 0, 0)`
 rend les LEDs à l'animation du badge. `app_open(app)` ouvre une application depuis un service (une notification).
@@ -269,10 +270,10 @@ et au remède du virus :
   texte et contenu du QR code des annonces). Dans l'éditeur, une lettre accentuée occupe une case (un octet,
   0x80 + son rang dans `ACCENTS`) ; `ui_edit_start()` la lit en UTF-8 et `ui_edit_result()` la rend en UTF-8
   (2 octets) : la destination doit avoir la place ;
-- flancs : `ui_edit_change(e, -1 / +1)` (la répétition en maintenant est à la charge de l'appelant) ;
-- aile droite (appui court) : `ui_edit_move(e, 1)` ; aile gauche : `ui_edit_move(e, -1)`, qui renvoie `false`
+- Y / X : `ui_edit_change(e, -1 / +1)` (la répétition en maintenant est à la charge de l'appelant) ;
+- B (appui court) : `ui_edit_move(e, 1)` ; A : `ui_edit_move(e, -1)`, qui renvoie `false`
   depuis la première position (annuler) ;
-- aile droite (appui long) : terminé, `ui_edit_result()` rend le texte sans les espaces de fin ;
+- B (appui long) : terminé, `ui_edit_result()` rend le texte sans les espaces de fin ;
 - `ui_edit_render()` dessine la question, le texte autour du curseur et le mode d'emploi ;
 - le clavier du PC (mode clavier de `badge_remote.py` : octet 0x02 suivi du caractère sur l'USB) **insère** le
   caractère au curseur de l'éditeur ouvert (la suite se décale, le dernier caractère est perdu si le texte est plein),
@@ -296,8 +297,8 @@ Pour une entrée gérée directement par `main.c` (les fonctions historiques) :
 
 Une application (ci-dessus) évite les étapes 3 à 5.
 
-**Mode admin** : dans le menu principal, la séquence `ADMIN_SEQUENCE` (`"LLRRLRLR"`, L = flanc gauche,
-R = flanc droit) tapée en moins de 8 s (`ADMIN_SEQUENCE_MS`) met `store_t.admin` à `STORE_ADMIN_ON` et sélectionne
+**Mode admin** : dans le menu principal, la séquence `ADMIN_SEQUENCE` (`"LLRRLRLR"`, L = Y (flanc gauche),
+R = X (flanc droit)) tapée en moins de 8 s (`ADMIN_SEQUENCE_MS`) met `store_t.admin` à `STORE_ADMIN_ON` et sélectionne
 le thème Admin ; « Quitter le mode admin » le remet à 0. Sur le port série, l'octet 0x01 suivi de `A` (marche) ou `a`
 (arrêt) fait de même (case « Mode admin » de `badge_remote.py`). Les trois passent par `set_admin()` (`main.c`),
 qui trace `admin: on` / `admin: off` et redessine le menu (le thème Admin disparaît s'il était ouvert).
@@ -315,7 +316,7 @@ Il les branche dans les `switch` de l'API. Les records sont dans `store_t.game_r
 Ajouter ensuite des tests dans [tests/host/test_games.c](../../src/tests/host/test_games.c).
 
 Les casse-têtes ([puzzles.h](../../src/menu/puzzles.h)) suivent le même principe, avec les *hooks* de `games.h` :
-appuis courts pour se déplacer, appuis longs pour agir (aile gauche longue : quitter), une page d'aide au départ.
+appuis courts pour se déplacer, appuis longs pour agir (A long : quitter), une page d'aide au départ.
 Chacun devient une application par la macro `PUZZLE_APP` de [puzzles_app.c](../../src/menu/puzzles_app.c) ;
 leurs records sont dans `store_t.puzzle_records`, leurs tests dans
 [tests/host/test_puzzles.c](../../src/tests/host/test_puzzles.c).
@@ -629,7 +630,7 @@ Une commande reçue par les deux voies n'est exécutée qu'une fois (même comma
 |---|---|---|
 | 0x01 | la cigale chante 6 s | `remote.c` |
 | 0x02 / 0x03 | mode muet / fin du mode muet | `remote.c` |
-| 0x05 | mise en sommeil : `store_t.asleep` = `STORE_ASLEEP` et redémarrage ; au démarrage, `sleep_mode()` (main.c) : radio en `SPWD` (`radio_power_down()`), page SOMMEIL (OTP), boutons seulement, jusqu'à 5 × flanc gauche puis 5 × flanc droit ; ignorée en Princeton, par le badge qui l'envoie et par la page du badge de talk | `remote.c`, `main.c` |
+| 0x05 | mise en sommeil : `store_t.asleep` = `STORE_ASLEEP` et redémarrage ; au démarrage, `sleep_mode()` (main.c) : radio en `SPWD` (`radio_power_down()`), page SOMMEIL (OTP), boutons seulement, jusqu'à 5 × Y puis 5 × X ; ignorée en Princeton, par le badge qui l'envoie et par la page du badge de talk | `remote.c`, `main.c` |
 | 0x10 à 0x14 | lumières du badge de talk : éteint, vert, orange, rouge, rouge énervé | `talk.c` (page ouverte) |
 | 0x30 + n | lance le morceau n du choeur | `chorus.c` |
 
@@ -867,8 +868,8 @@ télécommandes sont suspendues pendant les mesures (le réseau écoute en perma
 À la fin, `radio_tuned`, `radio_noise_dbm` et `radio_freq_offset` sont enregistrés, `radio_tools_set_freq_offset()`
 applique la correction et `net_reconfigure()` fait reconfigurer la radio ; `radio_tools_init()` la relit au démarrage.
 Trace : `tune: crystal ... Hz, noise ... dBm (remotes above ... dBm), frequency offset <avant> -> <après> (<n> packets,
-mean <m>)`. La page montre les étapes avec une jauge (pied de page « G : arrêter »), puis le quartz, le bruit, le
-seuil des télécommandes, la correction et le nombre de paquets entendus (« D : régler  G : retour »).
+mean <m>)`. La page montre les étapes avec une jauge (pied de page « A : arrêter »), puis le quartz, le bruit, le
+seuil des télécommandes, la correction et le nombre de paquets entendus (« A : retour  B : régler »).
 
 
 ### 6.22 LEDs des cigales (badge admin)
@@ -913,7 +914,7 @@ durées de 50 ms à 5 s par pas de 50 ms.
   s'affichera à la prochaine ouverture de Social > Annonces.
 - **Admin** (Admin > Annonces (admin), `app_announce_admin`) : 20 annonces modifiables (`STORE_ANNOUNCES`), gardées
   dans `store_ext_t` (§ 6.8), des exemples au départ (`DEFAULTS`). Lignes : Heure (éditeur `UI_CHARSET_TEXT`,
-  5 caractères), Texte et Contenu (`UI_CHARSET_LONG`, 56 caractères), type du QR code (ailes), Aperçu
+  5 caractères), Texte et Contenu (`UI_CHARSET_LONG`, 56 caractères), type du QR code (A / B), Aperçu
   (`announce_draw()` en rafraîchissement rapide), Envoyer (`announce_send()`, en tâche de fond).
 
 
@@ -969,8 +970,8 @@ fois sur un badge (une page de jeu affiche « Une partie de ... est en cours » 
 **Tir à la corde** ([tug.c](../../src/menu/tug.c), règles sans matériel dans [tug_logic.c](../../src/menu/tug_logic.c)) :
 2 joueurs au moins. `tug_teams()` tire les équipes Cigales / Fourmis avec la graine commune (Fisher-Yates, xorshift :
 les mêmes sur tous les badges), l'arbitre est le joueur en trop. Phases calculées depuis l'heure de départ commune :
-équipes 5 s, compte à rebours 3 s, tirage 20 s (`PULL_MS`), décompte final, résultat. Une traction = aile gauche
-puis aile droite (`tug_pull()`). Chaque badge envoie son total (`K_COUNT` : tractions 2 octets, drapeau « arrêté »)
+équipes 5 s, compte à rebours 3 s, tirage 20 s (`PULL_MS`), décompte final, résultat. Une traction = A
+puis B (`tug_pull()`). Chaque badge envoie son total (`K_COUNT` : tractions 2 octets, drapeau « arrêté »)
 toutes les 300 ms + 40 ms par joueur ; chaque badge additionne les totaux de chaque équipe : les écrans sont d'accord
 même loin de l'hôte. Une équipe en avance de `tug_margin()` (20 tractions par joueur de l'équipe) arrête la partie
 aussitôt (le drapeau arrête les autres). Après le résultat, le badge quitte la partie (5 s). Trace : `tug: ...`.
@@ -979,7 +980,7 @@ aussitôt (le drapeau arrête les autres). Après le résultat, le badge quitte 
 au moins (2 quand l'hôte est en mode admin, pour les essais). L'hôte tire un **cercle secret** avec son propre
 générateur (pas la graine commune) et un code secret par joueur, et envoie à chacun **sa** cible seulement
 (`K_TARGET`, masquée avec `party_mask()` de sa clé) jusqu'à l'accusé (`K_TARGET_ACK`).
-- **Élimination** : aile droite envoie `K_KILL` à la cible (toutes les 400 ms pendant 4 s) avec une preuve (hash du code
+- **Élimination** : B envoie `K_KILL` à la cible (toutes les 400 ms pendant 4 s) avec une preuve (hash du code
   de la cible et de l'id du tueur). La cible l'accepte avec une preuve juste et un RSSI ≥ `ASSASSIN_KILL_RSSI`
   (**−50 dBm**, badges presque collés, **à calibrer** : la victime trace `assassin: KILL from <nom>, rssi <n>` à chaque
   tentative ; `-DASSASSIN_KILL_RSSI=-90` pour un essai). Elle renvoie alors `K_DEAD` au tueur : sa propre cible,
@@ -1086,7 +1087,7 @@ Le badge est un port série USB (115200 bauds, sans importance en USB). Une touc
 
 | Touche | Action |
 |---|---|
-| `a` `b` `x` `y` | appui court : aile G, aile D, flanc D, flanc G |
+| `a` `b` `x` `y` | appui court : boutons A, B, X, Y |
 | `A` `B` `X` `Y` | appui long (quitter un casse-tête, enregistrer le nom, avance / recul de la lecture rapide...) |
 | `[` / `]` | envoi de l'écran à chaque changement : marche / arrêt |
 | `s` | envoi de l'écran une fois |
@@ -1175,7 +1176,7 @@ Déroulement :
 Un test est SKIP quand le matériel manque (pas de carte SD, batterie non calibrée).
 Aucun réglage du badge n'est modifié, sauf avec `--ctf` (et les records des jeux, une partie pouvant finir à 0 point).
 Les groupes `admin` et `net` activent le mode admin, le mode muet ou le virus le temps du test, puis les désactivent.
-Le groupe `admin` vérifie la séquence secrète des flancs ; les autres ouvrent le thème Admin par la commande série
+Le groupe `admin` vérifie la séquence secrète de Y / X ; les autres ouvrent le thème Admin par la commande série
 0x01 `A` (`open_admin()`), comme la case de `badge_remote.py`. Les listes `SOCIAL` et `ADMIN` du script suivent
 l'ordre des menus : à mettre à jour avec `SUBMENUS`.
 
@@ -1186,7 +1187,7 @@ Les groupes (`--only`) :
 | `diag` | diagnostic `!` : version du firmware, version du CC1101, quartz, batterie |
 | `menus` | chaque thème s'ouvre, retour aux thèmes |
 | `games` | mini-jeux, QR code du score, record (appui long) |
-| `puzzles` | chaque casse-tête : page d'aide, départ, un coup, sortie par l'appui long sur l'aile gauche |
+| `puzzles` | chaque casse-tête : page d'aide, départ, un coup, sortie par l'appui long sur A |
 | `ctf` | code Konami (seulement avec `--ctf`) |
 | `settings` | aperçu et réveil de la veille, crédits |
 | `radio` | message radio, mode test, balises du réseau des cigales |

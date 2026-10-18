@@ -58,7 +58,7 @@ sort them by day and time.
 
 ## On the badge
 
-- The list of the events: Y / X choose, B open, A back.
+- The list of the events: Y / X choose, A back, B open.
 - An event: Infos, Talks (n), Workshops (n), Exhibitors (n).
 - A list: the day, the time and the title (or the name of the exhibitor); the selected row scrolls when long.
 - An item: the title, the speaker, the room, the summary (scrolling a line at a time); Y / X the previous or next

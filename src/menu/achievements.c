@@ -152,7 +152,7 @@ void achievements_init(void) {
 }
 
 
-/* ------ The page: level, XP, then the list (right wing: how to get the selected one) ------ */
+/* ------ The page: level, XP, then the list (B: how to get the selected one) ------ */
 
 /* The rows of the list: the meetings (they bring XP too), then the achievements */
 #define LIST_ROWS (ACHV_COUNT + 1)

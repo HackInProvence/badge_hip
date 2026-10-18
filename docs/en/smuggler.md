@@ -12,16 +12,16 @@ goods.
 
 | Page | Content | Buttons |
 |---|---|---|
-| Home | Hold (Cale, number), Trade on the sly (Échanger en douce), Give (Donner), Collection (x / 26), Fortune (doubloons) | sides: choose, R: open, L: back |
-| Hold (Cale) | Grid of the icons owned, with their number; under the grid: name, rarity, value | sides: choose, R: details, L: back |
+| Home | Hold (Cale, number), Trade on the sly (Échanger en douce), Give (Donner), Collection (x / 26), Fortune (doubloons) | Y X: choose, A: back, B: open |
+| Hold (Cale) | Grid of the icons owned, with their number; under the grid: name, rarity, value | Y X: choose, A: back, B: details |
 | Collection | All the goods; those never owned as a grey silhouette with "?" | same |
-| Details | Large icon, rarity, value, number in the hold, a short story | L: back |
-| Fortune | Total value in doubloons, rank (Cabin boy, Sailor, Smuggler, Captain, Smuggling king; in French Mousse, Matelot, Contrebandier, Capitaine, Roi de la contrebande), goods, different ones, deals closed | L: back |
-| Within reach (À portée de main) | The cicadas close enough to trade (name, RSSI) | sides: choose, R: offer, L: back |
+| Details | Large icon, rarity, value, number in the hold, a short story | A: back |
+| Fortune | Total value in doubloons, rank (Cabin boy, Sailor, Smuggler, Captain, Smuggling king; in French Mousse, Matelot, Contrebandier, Capitaine, Roi de la contrebande), goods, different ones, deals closed | A: back |
+| Within reach (À portée de main) | The cicadas close enough to trade (name, RSSI) | Y X: choose, A: back, B: offer |
 | Trade (dark page) | Offer, choice of the offer, both offers side by side, closing | see below |
 
-R is the right wing, L the left wing (*D* and *G* on a badge in French).
-A long press on L leaves the page (a deal in progress is cancelled, unless your good is already sealed).
+A is the left wing, B the right wing, Y and X the left and right sides (the same letters in every language).
+A long press on A leaves the page (a deal in progress is cancelled, unless your good is already sealed).
 
 ### Getting goods
 
@@ -34,10 +34,10 @@ A long press on L leaves the page (a deal in progress is cancelled, unless your 
 ### Trading on the quiet
 
 1. Home > *Trade on the sly*: the list of the cicadas **within reach** (badges touching, see § 3).
-2. R on a cicada: it receives "Psst... *name* offers a deal on the sly" (propose une affaire en douce);
-   R accepts, L refuses.
-3. Each one chooses in its hold the good it offers (dark grid, R: offer).
-4. Both badges show both offers ("Your X for Y", Votre X contre Y): R closes the deal, L cancels.
+2. B on a cicada: it receives "Psst... *name* offers a deal on the sly" (propose une affaire en douce);
+   A refuses, B accepts.
+3. Each one chooses in its hold the good it offers (dark grid, B: offer).
+4. Both badges show both offers ("Your X for Y", Votre X contre Y): A cancels, B closes the deal.
 5. When both have closed, the trade happens on both badges: "Deal done" (Affaire conclue), with the good received.
 
 The one who was invited can no longer cancel after closing: his good is **sealed** (taken out of his hold) until
@@ -47,12 +47,12 @@ announces the good received ("Got on the sly: ...", Reçu en douce).
 ### Giving
 
 Home > *Give*: choose the good, then the cicada within reach. It sees "*name* offers you:" (vous offre :)
-with the icon, R accepts (the good goes from one hold to the other), L refuses.
+with the icon, A refuses, B accepts (the good goes from one hold to the other).
 
 ### Admin: adding a good
 
-Admin > Smuggling (admin): the 26 goods one by one (sides), with their rarity and the number in the cargo; the
-right wing adds one to the cargo of this badge (saved at once), with the achievements of a real acquisition
+Admin > Smuggling (admin): the 26 goods one by one (Y / X), with their rarity and the number in the cargo; B
+adds one to the cargo of this badge (saved at once), with the achievements of a real acquisition
 ("Treasure" for a legendary one, "Collector"). To unlock a rare good, put it in play, or prepare a demonstration
 badge. Trace: `smuggler: admin added <name> (<count>)`.
 

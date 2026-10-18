@@ -23,13 +23,13 @@ static int pz_text_max = 0;  /* Widest footer or help line drawn, checked by the
 static const char *PZ_NAMES[PUZZLE_COUNT] = {N_("Démineur"), "2048", N_("Taquin"), "Sokoban", "Mastermind",
                                              N_("Pendu")};
 
-/* Directions: the flanks go left and right, the wings up (left wing) and down (right wing) */
+/* Directions: Y / X go left and right, A / B up (A) and down (B) */
 enum { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
 static const int8_t DIR_DX[4] = {0, 1, 0, -1};
 static const int8_t DIR_DY[4] = {-1, 0, 1, 0};
 static const uint8_t DIR_BUTTONS[4] = {GAMES_BTN_A, GAMES_BTN_X, GAMES_BTN_B, GAMES_BTN_Y};
 
-/* Footers, the buttons in the order of the badge: left wing on the left */
+/* Footers, the buttons in the order of the badge: A on the left */
 #define PZ_OVER_FOOTER N_("A : menu  B : rejouer")
 #define PZ_PLAY_FOOTER N_("Long : A menu, X aide")
 
@@ -884,7 +884,7 @@ static void soko_buttons(uint8_t pressed, uint8_t long_pressed) {
             soko_move(d);
 }
 
-/* Help page: the flanks choose among the levels already reached */
+/* Help page: Y / X choose among the levels already reached */
 static void soko_choose(int delta) {
     int n = soko_levels_solved() + 1;
     if (n > SOKO_LEVELS_N)
@@ -1336,7 +1336,7 @@ void puzzles_record_text(puzzle_t p, char *buf, int len) {
         snprintf(buf, len, _("Record : %u"), r);
 }
 
-/* The game is finished: the right wing starts another one */
+/* The game is finished: B starts another one */
 static bool pz_over(void) {
     switch (pz_game) {
     case PUZZLE_MINES: return mines_state == MINES_WON || mines_state == MINES_LOST;
@@ -1401,7 +1401,7 @@ bool puzzles_buttons(uint8_t pressed, uint8_t long_pressed, absolute_time_t now)
         return true;
     pz_changed = true;
     if (long_pressed & GAMES_BTN_A)
-        return pz_leave();  /* Always: long press on the left wing */
+        return pz_leave();  /* Always: long press on A */
     if (pz_help) {
         if (pressed & GAMES_BTN_A)
             return pz_leave();

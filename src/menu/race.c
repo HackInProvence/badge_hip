@@ -6,7 +6,7 @@
 /* Mini-bolides: a race of small cars seen from above, like Micro Machines, for 2 to 8 cicadas, in the lobby of
  * party.c. Every badge drives its car on the same track (TRACK, 384 x 288 pixels: more than the screen, which follows
  * the car); LAPS laps, the checkpoints 1, 2, 3 in order (a shortcut through the grass does not count).
- * The right wing accelerates, the left one brakes then backs up, the flanks turn (left flank: left); off the road
+ * B accelerates, A brakes then backs up, Y / X turn (Y: left); off the road
  * (the grass) the car slows down.
  * Each badge sends the state of its car now and then (K_STATE, to everybody) and draws the other cars from the last
  * state received, moved on with their speed (the screen shows ~4 images per second, the physics runs at 30 Hz).
@@ -37,7 +37,7 @@
 #define SEND_BASE_MS 200  /* Period of the states: more cars, slower */
 #define SEND_PER_CAR_MS 60
 #define HELD_TIMEOUT_MS 120  /* The buttons callback comes at every turn of the loop while a button is held */
-#define GIVE_UP_MS 1500  /* Both wings held this long during the race: the player gives up */
+#define GIVE_UP_MS 1500  /* A and B held this long during the race: the player gives up */
 #define K_STATE PARTY_KIND_GAME
 
 /* The physics, in pixels and seconds */
@@ -47,7 +47,7 @@
 #define ACCEL 55.0f
 #define BRAKE 95.0f
 #define DRAG 30.0f
-#define TURN_MS 110  /* A step of the 32 directions while a wing is held */
+#define TURN_MS 110  /* A step of the 32 directions while A or B is held */
 #define DIRS 32
 
 /* The track: '#' grass, '.' road, 'S' the start line */
@@ -253,7 +253,7 @@ static void drive(car_t *c, float dt, absolute_time_t now) {
         c->speed = c->speed - BRAKE * dt > vmax ? c->speed - BRAKE * dt : vmax;  /* Into the grass: slowed down */
     if (c->speed < V_BACK)
         c->speed = V_BACK;
-    /* The flanks turn while held (the left one to the left), when the car moves or the gas / brake is held (stopped
+    /* Y / X turn while held (Y to the left), when the car moves or the gas / brake is held (stopped
      * against an edge, it must be able to turn away); backing up: the other way, like a car */
     if ((held & (UI_BTN_X | UI_BTN_Y)) && (c->speed > 4 || c->speed < -4 || gas || brake)
             && absolute_time_diff_us(turn_ts, now) >= TURN_MS * 1000) {

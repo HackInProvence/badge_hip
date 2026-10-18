@@ -24,11 +24,11 @@ ce ne sont pas ceux du jeu édité.*
 
 | Bouton | Action |
 |---|---|
-| Flancs (gauche / droit) | Monter / descendre dans les listes, changer de carte dans l'aide |
-| Aile droite (D) | Valider (un choix, « compris », « vu »...) ; dans l'aide : les détails du rôle |
-| Aile gauche (G) | Retour au menu : **la partie continue** (le badge sonne à chaque nouvelle phase) |
-| Aile gauche maintenue (G long) | Quitter la partie (une confirmation est demandée) |
-| Aile droite maintenue (D long) | Joueur : revoir sa carte (10 s). Meneur : voir les cartes de tous |
+| Y / X (flancs gauche / droit) | Monter / descendre dans les listes, changer de carte dans l'aide |
+| A (aile gauche) | Retour au menu : **la partie continue** (le badge sonne à chaque nouvelle phase) |
+| B (aile droite) | Valider (un choix, « compris », « vu »...) ; dans l'aide : les détails du rôle |
+| A maintenu (A long) | Quitter la partie (une confirmation est demandée) |
+| B maintenu (B long) | Joueur : revoir sa carte (10 s). Meneur : voir les cartes de tous |
 
 
 ## 3. Mettre en place une partie
@@ -37,12 +37,12 @@ ce ne sont pas ceux du jeu édité.*
 
 - *Préréglage* : **classique** (tous les rôles) ou **débutant** (la voyante seule) ; « à la carte » dès qu'on change
   une case.
-- Une case par rôle : **Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Capitaine, Voleur** (D coche ou
+- Une case par rôle : **Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Capitaine, Voleur** (B coche ou
   décoche). Les loups-garous et les simples villageois sont toujours en jeu.
 - *Débat* : la durée du débat de chaque jour, **2, 3 ou 5 minutes**.
 - *Loups* : rappel de la règle, **2 loups de 8 à 11 joueurs, 3 de 12 à 18**.
 - *Ouvrir la partie* : la liste des joueurs inscrits s'affiche, avec le nombre de loups correspondant.
-  **D : lancer** à partir de 8 joueurs.
+  **B : lancer** à partir de 8 joueurs.
 
 **Les joueurs** : *Jeux multi > Loup-garou > Rejoindre une partie*, puis choisir la partie du meneur. Le badge affiche les
 rôles choisis par le meneur et attend le lancement.
@@ -56,7 +56,7 @@ Le badge du meneur distribue les cartes au hasard : les loups (2 ou 3), une cart
 villageois pour compléter. **Avec le voleur, deux cartes « simple villageois » de plus** sont mélangées avec les
 autres : les deux cartes qui restent après la distribution sont celles que le voleur pourra prendre.
 
-Chaque rôle a sa carte dans l'aide (*Aide : les rôles*) : un dessin, son camp, son pouvoir, et D pour les détails.
+Chaque rôle a sa carte dans l'aide (*Aide : les rôles*) : un dessin, son camp, son pouvoir, et B pour les détails.
 
 | Carte | Camp | Pouvoir |
 |---|---|---|
@@ -75,7 +75,7 @@ Chaque rôle a sa carte dans l'aide (*Aide : les rôles*) : un dessin, son camp,
 ## 5. Déroulement
 
 Le badge du meneur enchaîne les phases tout seul ; chaque phase s'arrête au bout de son temps, ou 2 secondes après
-que tous les joueurs concernés ont choisi. Le meneur peut passer à la suite (**D**) ou ajouter 30 secondes (**X**,
+que tous les joueurs concernés ont choisi. Le meneur peut passer à la suite (**B**) ou ajouter 30 secondes (**X**,
 flanc droit). Tous les badges sonnent à chaque nouvelle phase (mélodie descendante : la nuit tombe ; montante : le
 jour se lève). Une phase n'a pas lieu si le rôle n'est pas en jeu, ou si son joueur est mort (sa mort a été
 annoncée avec sa carte). Une carte restée hors du jeu chez le voleur garde sa phase : personne ne doit savoir
@@ -127,7 +127,7 @@ chaque badge.
 - Les morts sont annoncés à l'aube et au verdict, **avec leur carte**.
 - Un joueur mort voit « Tu es mort(e) » et suit la partie, mais ne peut plus agir ni parler (sauf le chasseur pour
   son tir et le capitaine pour son successeur).
-- Un joueur qui quitte la partie (G long) est retiré comme s'il était mort (sans chagrin d'amoureux ni tir du
+- Un joueur qui quitte la partie (A long) est retiré comme s'il était mort (sans chagrin d'amoureux ni tir du
   chasseur ; s'il était capitaine, son successeur est tiré au sort).
 
 
@@ -141,17 +141,17 @@ Comme dans la règle :
   le couple forme son propre camp : il ne gagne ni avec les loups, ni avec le village.
 - Si plus personne n'est en vie (morts de chagrin), personne ne gagne.
 
-La fin montre le camp gagnant, « Gagné ! » ou « Perdu... » à chaque joueur, et (D) les cartes de tous.
+La fin montre le camp gagnant, « Gagné ! » ou « Perdu... » à chaque joueur, et (B) les cartes de tous.
 Les joueurs reçoivent les succès **Pleine lune** (avoir joué) et **Survivant** (avoir gagné).
 
 
 ## 7. Conseils au meneur
 
 - Son écran montre la phase, le temps restant, le nombre de joueurs en vie et de choix reçus, et ce qu'il faut
-  annoncer ; jamais les cartes, sauf sur la page des cartes (**D long**, G pour revenir) : à garder pour lui.
+  annoncer ; jamais les cartes, sauf sur la page des cartes (**B long**, A pour revenir) : à garder pour lui.
 - Il lit les annonces : « La nuit tombe, tout le monde choisit sur son badge... », les morts de l'aube, le
   verdict.
-- **G long** arrête la partie pour tout le monde (après confirmation).
+- **A long** arrête la partie pour tout le monde (après confirmation).
 - **Moins de 8 joueurs** : pas de partie, sauf si l'organisateur le débloque dans Admin > Loup-garou (admin) :
   « Petites parties (4+) » (dès 4 joueurs, 1 loup-garou sous 8), ou « Test : robots ».
 - **Mode test** (« Test : robots » dans Admin > Loup-garou (admin)) : une partie peut être lancée dès un joueur ; des

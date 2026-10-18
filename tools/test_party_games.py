@@ -11,11 +11,11 @@ then Jeux > Assassin. The buttons are simulated through the serial ports (see ba
 followed in the log lines of the badges ("party: ...", "tug: ...", "assassin: ...").
 
 - Tir à la corde: badge 1 creates the party, badge 2 joins it, badge 1 starts it; both show the teams (1 against 1)
-  and the countdown; badge 2 pulls (left wing, right wing...) while badge 1 does nothing: badge 2's team must win,
+  and the countdown; badge 2 pulls (A, B, A...) while badge 1 does nothing: badge 2's team must win,
   with the same result on both badges.
 - Assassin: same lobby; the assassin needs 3 players, 2 are allowed when the host is in admin mode: the script puts
   badge 1 in admin mode (and switches it back off at the end if it was off). Each badge gets the other one as its
-  target; badge 1 eliminates badge 2 (press D): the badges must be very close (ASSASSIN_KILL_RSSI in assassin.c,
+  target; badge 1 eliminates badge 2 (press B): the badges must be very close (ASSASSIN_KILL_RSSI in assassin.c,
   -50 dBm by default: lay them side by side). The RSSI measured by the victim is printed: use it to calibrate.
 
 Both badges are rebooted first ("R" key) so that the menus start from a known state.
@@ -155,7 +155,7 @@ def test_tug(d):
     if not d.result('tug: pull', all(d.expect_both(r'^tug: pull!$', 6))):
         return
     t2.screenshot('tug_pull_2', 0.2)
-    # Badge 2 pulls (left wing, right wing...) until the end, badge 1 doesn't
+    # Badge 2 pulls (A, B, A...) until the end, badge 1 doesn't
     start = time.time()
     while time.time() - start < 21:
         t2.keys('ab', 0.08)

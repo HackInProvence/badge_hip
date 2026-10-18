@@ -30,15 +30,15 @@ préparent des cartes SD pour plusieurs badges. Il ne demande pas de savoir prog
 
 ### 1.1 Les boutons et leurs lettres
 
-Le badge est vu de face, la tête de la cigale en haut. La console série et les scripts désignent les boutons
-par une lettre :
+Le badge est vu de face, la tête de la cigale en haut. Les boutons portent le nom imprimé sur le circuit, de
+gauche à droite : Y, A, B, X. La console série et les scripts les désignent par la même lettre :
 
 | Bouton | Lettre (appui court) | Lettre (appui long) | Dans les menus |
 |---|---|---|---|
-| Aile gauche (G) | `a` | `A` | retour |
-| Aile droite (D) | `b` | `B` | valider |
-| Flanc droit | `x` | `X` | descendre |
-| Flanc gauche | `y` | `Y` | monter |
+| A (aile gauche) | `a` | `A` | retour |
+| B (aile droite) | `b` | `B` | valider |
+| Y (flanc gauche) | `y` | `Y` | monter |
+| X (flanc droit) | `x` | `X` | descendre |
 
 Un appui long dure 0,8 s sur le badge.
 
@@ -338,8 +338,8 @@ badge, captures PNG. Prérequis : pyserial, Tkinter. Mode d'emploi : [guide util
 | `--zoom`, `-z` | zoom de l'écran, 2 à 4 (défaut : d'après la taille de l'écran du PC) |
 | `--snapshot`, `-s` `fichier.png` | enregistre l'écran actuel et quitte, sans fenêtre |
 
-Clavier (la fenêtre a le focus) : flèche haut / `y` = flanc gauche, bas / `x` = flanc droit, gauche / `a` = aile
-gauche, droite / Entrée / `b` = aile droite ; Maj + touche = appui long ; F5 : redemander l'écran ; F12 : capture
+Clavier (la fenêtre a le focus) : flèche haut / `y` = bouton Y, bas / `x` = bouton X, gauche / `a` = bouton A,
+droite / Entrée / `b` = bouton B ; Maj + touche = appui long ; F5 : redemander l'écran ; F12 : capture
 (`badge_AAAAMMJJ_HHMMSS.png` dans le dossier courant). Boutons « Capture », « Rafraîchir », « Diagnostic » (`!`),
 cases « Journal », « Mode clavier (saisie de texte) » et « Mode admin ».
 
@@ -640,7 +640,7 @@ PuTTY (Windows, type « Serial ») convient aussi. Chaque caractère est une com
 
 | Touche | Effet |
 |---|---|
-| `a` `b` `x` `y` | appui court : aile gauche, aile droite, flanc droit, flanc gauche |
+| `a` `b` `x` `y` | appui court : boutons A, B, X, Y |
 | `A` `B` `X` `Y` | appui long sur le même bouton |
 | `!` | diagnostic : OLED et IR, réseau des cigales (nom, score, rencontres, balises émises / reçues, voisins et leur dBm), flags du CTF, compteurs du réseau (`net: sent, received, dropped`), état du réseau et de la radio (`net state:`), écoute des télécommandes (`remote state:`), télécommande activée / mode muet / mode admin (`remote:`), `version:`, radio (version du CC1101, quartz utilisé et mesuré), batterie (mV, %, valeur ADC, ou « not calibrated ») et points de calibration usine |
 | `?` | état du son : ouvert, échantillons joués, volume, position de la musique |
@@ -706,8 +706,8 @@ voir le [guide développeur § 8](guide_developpeur.md#8-le-protocole-usb-série
 
 ### 4.1 L'ouvrir et le quitter
 
-- **Séquence secrète** : dans le menu principal (la liste des thèmes, pas dans un thème), tapez sur les flancs
-  **gauche, gauche, droit, droit, gauche, droit, gauche, droit** en moins de 8 secondes. « Mode admin activé »
+- **Séquence secrète** : dans le menu principal (la liste des thèmes, pas dans un thème), tapez sur les boutons
+  **Y, Y, X, X, Y, X, Y, X** (les flancs) en moins de 8 secondes. « Mode admin activé »
   s'affiche et le thème **Admin** apparaît en dernier, déjà sélectionné.
 - **Par l'USB** : la case « Mode admin » de `badge_remote.py`, ou Ctrl+A puis `A` dans un terminal.
 - Le mode admin est **gardé après extinction** et après une mise à jour du firmware.
@@ -721,20 +721,20 @@ Dans l'ordre du menu :
 
 | Entrée | Rôle | Boutons |
 |---|---|---|
-| **Commandes radio** | envoie une commande à tous les badges autour : Muet (conférence), Fin du mode muet, Cigale : chanter, Talk : éteint / vert / orange (5 min) / rouge (fini) / rouge énervé, Mise en sommeil. Ce badge l'exécute aussi (sauf le sommeil) | flancs : choisir ; D : envoyer ; G : retour |
+| **Commandes radio** | envoie une commande à tous les badges autour : Muet (conférence), Fin du mode muet, Cigale : chanter, Talk : éteint / vert / orange (5 min) / rouge (fini) / rouge énervé, Mise en sommeil. Ce badge l'exécute aussi (sauf le sommeil) | Y X : choisir ; A : retour ; B : envoyer |
 | **LEDs des cigales** | couleur (9 couleurs ou R, G, B de 0 à 255) et mode (Fixe, Clignotant, Fondu, durées de 50 ms à 5 s) imposés aux LEDs des cigales autour, jusqu'à « Rétablir leurs LEDs » ou leur redémarrage | voir le [guide utilisateur § 4.8](guide_utilisateur.md#48-le-mode-admin-organisateurs) |
-| **Annonces (admin)** | 20 annonces (heure, texte de 56 caractères, QR code : lien, texte, téléphone, SMS, e-mail, Wi-Fi, position GPS), gardées en flash ; aperçu ; envoi 3 fois à toutes les cigales | flancs : choisir ; D : ouvrir / modifier ; G : retour |
-| **Vote (admin)** | ouvre une question prédéfinie, compte les votes (un par badge, le dernier compte) et affiche l'histogramme | D : ouvrir le vote, puis D : fermer |
-| **Choeur : lancer** | lance un des 8 morceaux (Frère Jacques, Ode à la joie, Tetris, Canon de Pachelbel, Roi de la montagne, Row your boat, Vive le vent, Menuet en sol) ; ce badge chante la première voix | D : lancer / arrêter |
-| **Balise chaud-froid** | ce badge émet une balise par seconde à +10 dBm ; les autres le cherchent avec Social > Chaud - froid. L'échelle (« Brûlant dès -74 dBm » par défaut, réglable par pas de 5 dB) est gardée et envoyée avec la balise | D : émettre / arrêter ; flancs : échelle ; G : quitter |
-| **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie | D : infecter ; flanc gauche : guérir ce badge |
-| **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge ([contrebande.md](contrebande.md)) | flancs : choisir ; D : ajouter |
-| **Loup-garou (admin)** | parties de moins de 8 joueurs : « 8 joueurs minimum » (défaut), « Petites parties (4+) », « Test : robots » ; gardé en flash ([loup_garou.md](loup_garou.md)) | flancs : choisir ; D : valider |
-| **Remise à zéro** | efface une partie de la progression de ce badge (voir § 4.4) | D, puis D long : confirmer ; G : non |
+| **Annonces (admin)** | 20 annonces (heure, texte de 56 caractères, QR code : lien, texte, téléphone, SMS, e-mail, Wi-Fi, position GPS), gardées en flash ; aperçu ; envoi 3 fois à toutes les cigales | Y X : choisir ; A : retour ; B : ouvrir / modifier |
+| **Vote (admin)** | ouvre une question prédéfinie, compte les votes (un par badge, le dernier compte) et affiche l'histogramme | B : ouvrir le vote, puis B : fermer |
+| **Choeur : lancer** | lance un des 8 morceaux (Frère Jacques, Ode à la joie, Tetris, Canon de Pachelbel, Roi de la montagne, Row your boat, Vive le vent, Menuet en sol) ; ce badge chante la première voix | B : lancer / arrêter |
+| **Balise chaud-froid** | ce badge émet une balise par seconde à +10 dBm ; les autres le cherchent avec Social > Chaud - froid. L'échelle (« Brûlant dès -74 dBm » par défaut, réglable par pas de 5 dB) est gardée et envoyée avec la balise | Y X : échelle ; A : quitter ; B : émettre / arrêter |
+| **Virus : patient zéro** | infecte ce badge pour lancer l'épidémie | Y : guérir ce badge ; B : infecter |
+| **Contrebande (admin)** | ajoute une marchandise au choix à la cale de ce badge ([contrebande.md](contrebande.md)) | Y X : choisir ; B : ajouter |
+| **Loup-garou (admin)** | parties de moins de 8 joueurs : « 8 joueurs minimum » (défaut), « Petites parties (4+) », « Test : robots » ; gardé en flash ([loup_garou.md](loup_garou.md)) | Y X : choisir ; B : valider |
+| **Remise à zéro** | efface une partie de la progression de ce badge (voir § 4.4) | A : non ; B, puis B long : confirmer |
 | **Batterie (calibration)** | calibre la mesure de la batterie (voir § 4.3) | |
 | **Radio pirate** | émet une mélodie, une tonalité de 1 kHz ou un WAV de la carte SD en FM sur 433 MHz ([radio_pirate.md](radio_pirate.md)) ; faible puissance, essais courts | |
-| **Mode démo** | le badge présente ses fonctions en boucle (voir § 5.4) | D : lancer |
-| **Type du badge** | Participant, Orateur ou Staff, affiché dans le bandeau du badge nominatif | flancs : choisir ; D : enregistrer |
+| **Mode démo** | le badge présente ses fonctions en boucle (voir § 5.4) | B : lancer |
+| **Type du badge** | Participant, Orateur ou Staff, affiché dans le bandeau du badge nominatif | Y X : choisir ; B : enregistrer |
 | **Quitter le mode admin** | cache le thème Admin | |
 
 ### 4.3 Calibrer la batterie
@@ -744,22 +744,22 @@ fausse. Une fois par badge, avec un multimètre :
 
 1. Badge branché en USB (en charge), Admin > Batterie (calibration). La page montre la valeur ADC (rafraîchie toutes
    les 2 s), la mesure, et les points 1 et 2.
-2. Mesurez la tension aux bornes de la batterie. Sur la ligne « Multimètre », réglez cette tension avec les ailes
-   (G : −, D : +, par 10 mV ; maintenues : de plus en plus vite ; de 2,50 à 4,50 V).
-3. Flanc droit jusqu'à « > Enregistrer le point 1 », aile droite : « Il faut un 2e point ».
+2. Mesurez la tension aux bornes de la batterie. Sur la ligne « Multimètre », réglez cette tension avec A et B
+   (A : −, B : +, par 10 mV ; maintenus : de plus en plus vite ; de 2,50 à 4,50 V).
+3. X jusqu'à « > Enregistrer le point 1 », B : « Il faut un 2e point ».
 4. Débranchez, laissez la tension baisser quelques minutes (au moins 0,2 V d'écart, 150 pas d'ADC), mesurez,
    réglez, puis « > Enregistrer le point 2 » : « Point 2 enregistré », le niveau s'affiche. « ADC trop proche du
    point 1 » : l'ADC n'a pas assez bougé, le niveau reste caché ; recommencez plus tard.
 
-Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « > Effacer » demande une confirmation (D encore). Sur la ligne
-« Multimètre », l'aile gauche sert à régler : quittez par un appui long sur l'aile gauche, ou depuis une autre ligne.
+Chaque ligne enregistre son point (un point déjà enregistré est remplacé). « > Effacer » demande une confirmation (B encore). Sur la ligne
+« Multimètre », A sert à régler : quittez par un appui long sur A, ou depuis une autre ligne.
 Les points sont des **réglages usine** : gardés par la Remise à zéro (même « Tout ») et par les mises à jour.
 Vérification par la console : `!` affiche `battery: factory points ...`.
 
 ### 4.4 Remise à zéro
 
 À faire avant l'événement sur des badges qui ont servi aux essais. Chaque ligne demande une confirmation par un
-**appui long sur l'aile droite** :
+**appui long sur B** :
 
 | Ligne | Efface |
 |---|---|
@@ -836,13 +836,13 @@ radio et de maintenir le bouton.
   arrêtés, page « SOMMEIL : le badge a été mis en sommeil par un admin... ». Ils ne répondent plus aux commandes
   radio, ni à un redémarrage, ni à une mise à jour du firmware : **l'état est gardé en flash**.
 - Ne s'endorment pas : le badge admin qui envoie l'ordre, et un badge ouvert sur la page du badge de talk.
-- **Réveil manuel** : **5 fois le flanc gauche, puis 5 fois le flanc droit**, avec moins de 5 s entre deux appuis
+- **Réveil manuel** : **5 fois Y, puis 5 fois X**, avec moins de 5 s entre deux appuis
   (un autre bouton recommence la séquence). Le badge redémarre normalement. Par la console série : `yyyyyxxxxx`.
   Le journal suit la progression (`sleep: unlock 5/5 2/5`).
 
 ### 5.4 Le mode démo
 
-Pour un stand : Admin > Mode démo, aile droite. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif
+Pour un stand : Admin > Mode démo, B. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif
 (8 s), succès (6 s), images de la carte SD (18 s, une toutes les 6 s), la première vidéo (20 s), compétences (5 s),
 la première musique (10 s), démo de l'écran (15 s), programme (6 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
 infos (5 s). Les médias sautent leur étape sans carte SD ou sans fichier. La veille ne démarre pas ; **n'importe
@@ -995,8 +995,8 @@ dans [traduction](traduction.md).
 
 | Action | Comment |
 |---|---|
-| Choisir la langue | Réglages > Langue (« Langue / Language ») : flancs pour choisir, D pour valider |
-| Revenir à l'anglais depuis n'importe quelle langue | aile gauche (G) **5 fois** (retour au menu principal), puis aile gauche **maintenue 5 s** |
+| Choisir la langue | Réglages > Langue (« Langue / Language ») : Y / X pour choisir, B pour valider |
+| Revenir à l'anglais depuis n'importe quelle langue | A **5 fois** (retour au menu principal), puis A **maintenu 5 s** |
 | Par le port série | `E` : anglais ; `N` : langue suivante (trace `i18n: language en (English)`) |
 | Captures d'écran d'une langue | `python tools/badge_screens.py --lang en` : `docs/screens/en/` et `docs/en/screens.md`, puis le badge revient à sa langue |
 | Ajouter / corriger une traduction | `python tools/i18n.py update`, traduire `src/menu/lang/<code>.po`, `python tools/i18n.py gen`, compiler |
@@ -1017,9 +1017,9 @@ fonctionnent quelle que soit la langue.
 | Un script trouve le mauvais badge | Plusieurs badges branchés : préciser `--port` (`--ports` pour les tests à deux badges). |
 | « the badge does not answer: is the menu application (badge_menu) flashed? » | Le badge tourne une application de test ou un autre firmware : flasher `badge_menu.uf2`. |
 | Rien ne s'affiche dans le terminal | Normal : le badge ne parle que sur événement. Taper `!`. Les lignes émises avant l'ouverture du port sont perdues. |
-| Le badge affiche « SOMMEIL » | Mis en sommeil par un admin : 5 × flanc gauche puis 5 × flanc droit (§ 5.3). Ni un redémarrage ni un flash ne le réveillent. |
+| Le badge affiche « SOMMEIL » | Mis en sommeil par un admin : 5 × Y puis 5 × X (§ 5.3). Ni un redémarrage ni un flash ne le réveillent. |
 | Plus de son ni de LEDs | Mode muet (commande pendant un talk) : Réglages > Mode muet, ou commande `0x03`. |
-| Le thème Admin est apparu tout seul | La séquence des flancs a été tapée par hasard : Admin > Quitter le mode admin. |
+| Le thème Admin est apparu tout seul | La séquence de Y / X a été tapée par hasard : Admin > Quitter le mode admin. |
 | Le thème Admin a disparu après un test | Les scripts de test coupent le mode admin à la fin : le réactiver (§ 4.1). |
 | Le badge n'obéit pas au Flipper | Réglages > Télécommande : oui ; fichier `.sub` (pas `subghz tx`) ; code `0xC16Axx` ; bouton maintenu une seconde ; badge proche. `O` sur la console montre les tentatives de décodage. |
 | Les badges s'entendent mal, les télécommandes passent mal | Réglages > Réglage radio sur place, près d'autres badges allumés. `!` : comparer « crystal used » et « measured ». |
@@ -1027,7 +1027,7 @@ fonctionnent quelle que soit la langue.
 | Pas de niveau de batterie | Batterie non calibrée : § 4.3. |
 | « Carte SD absente », `video: mount failed` | Carte bien enfoncée, FAT32 ou exFAT. |
 | Un fichier n'apparaît pas | Bon dossier et bonne extension ; nom de 63 octets au plus ; pas plus de 48 entrées dans le dossier ; fichier non caché. |
-| Une sonnerie est marquée `(!)` | Aile droite : ligne, colonne et raison ; la console écrit `rtttl: ... error ...` ([sonneries.md](sonneries.md)). |
+| Une sonnerie est marquée `(!)` | B : ligne, colonne et raison ; la console écrit `rtttl: ... error ...` ([sonneries.md](sonneries.md)). |
 | Un livre-jeu n'apparaît pas ou s'arrête | `python tools/gamebook_check.py LIVRES/livre.txt` ; 16 livres au plus. |
 | Une vidéo ou une musique s'arrête avant la fin | `badge_media_test.py` pour la retrouver ; reconvertir avec `video2epaper.py` / `audio2wav.py`. |
 | Son trop faible | Médias > Volume ; WAV converti par `audio2wav.py` sans `--no-filter`. |

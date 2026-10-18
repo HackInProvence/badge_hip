@@ -9,8 +9,8 @@
  * - Morpion (tic tac toe) and Puissance 4 (connect four) against the cicada,
  * - Simon: repeat the sequence of sounds and lights, one pad per button,
  * - Réflexes: press as soon as the LEDs light up (the screen is too slow for that, the LEDs and the sound are instant),
- * - Snake: the flanks turn left or right.
- * At the end of a game, the flanks show the score as a signed QR code (score_code.h).
+ * - Snake: Y / X turn left or right.
+ * At the end of a game, Y / X show the score as a signed QR code (score_code.h).
  *
  * The games only draw in a frame buffer (gfx.h): the sound, the LEDs and the random numbers are given by the caller
  * (hooks), so that they can be tested on a PC (tests/host/test_games.c).
@@ -26,10 +26,10 @@
 #include "pico/time.h"
 
 /* Buttons, same bits as btns_get_state() */
-#define GAMES_BTN_A 0x01  /* Left wing: quit (an input in Simon) */
-#define GAMES_BTN_B 0x02  /* Right wing: play, validate */
-#define GAMES_BTN_X 0x04  /* Right flank: next, turn right */
-#define GAMES_BTN_Y 0x08  /* Left flank: previous, turn left */
+#define GAMES_BTN_A 0x01  /* A: quit (an input in Simon) */
+#define GAMES_BTN_B 0x02  /* B: play, validate */
+#define GAMES_BTN_X 0x04  /* X: next, turn right */
+#define GAMES_BTN_Y 0x08  /* Y: previous, turn left */
 
 /* The buttons are seen after their debounce: removed from the reaction times */
 #define GAMES_INPUT_LAG_MS 20

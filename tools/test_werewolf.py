@@ -328,7 +328,7 @@ def main():
         pl.pump(1.0)
         shot(pl, 'end_cards')
 
-        # ---- Both leave (long press on the left wing, then "oui") ----
+        # ---- Both leave (long press on A, then "oui") ----
         pl.mark()
         pl.keys('a')  # The cards page -> the end page
         pl.keys('A')

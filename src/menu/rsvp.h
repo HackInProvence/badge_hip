@@ -32,7 +32,7 @@
 #define RSVP_STEP_WPM 25
 #define RSVP_DEFAULT_WPM 250
 #define RSVP_FAST_WPM 450  /* Above, the faster waveform (less contrast) */
-#define RSVP_SEEK_S 10  /* Long press on a flank: back / forward of this reading time */
+#define RSVP_SEEK_S 10  /* Long press on Y or X: back / forward of this reading time */
 
 /** \brief Open the text and start reading (from the saved position when it is the last text read). */
 bool rsvp_start(const char *path);

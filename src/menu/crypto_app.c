@@ -95,7 +95,7 @@ static bool crypto_buttons(const app_buttons_t *b, absolute_time_t now) {
         }
         if ((b->pressed & UI_BTN_X) && crypto_ctf_morse(sel)) {
             if (morse && ultrasound) {
-                stop_morse();  /* The 19 kHz Morse loops: the flank stops it */
+                stop_morse();  /* The 19 kHz Morse loops: X stops it */
             } else {
                 morse = crypto_ctf_morse(sel);  /* Play it */
                 ultrasound = crypto_ctf_ultrasound(sel);

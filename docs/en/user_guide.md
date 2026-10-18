@@ -32,29 +32,29 @@ this is normal, it regularly "cleans" itself to avoid ghosts of previous images.
 
 ## 3. The buttons
 
-Hold the badge facing you, with the cicada's head at the top.
+Hold the badge facing you, with the cicada's head at the top. The buttons are named as printed on the board:
+**A** and **B** are on the wings (A on the left wing, B on the right wing), **Y** and **X** on the sides (Y on the left
+side, X on the right side); from left to right: Y, A, B, X.
 
 | Button | In the menus | Usual role |
 |---|---|---|
-| **Right wing** (R) | select | OK, pause, start |
-| **Left wing** (L) | back | cancel, quit |
-| **Left side** | up | previous, less |
-| **Right side** | down | next, more |
+| **A** | back | cancel, quit |
+| **B** | select | OK, pause, start |
+| **Y** | up | previous, less |
+| **X** | down | next, more |
 
 The screens are in English or in French (**Settings > Language**). The bottom of each screen reminds you of the
-useful buttons, for example "Sides: choose  R: OK  L: back": "R" is the right wing, "L" the left wing.
-On a badge in French, the same footer reads "Flancs : choix  D : OK  G : retour": "D" (*droite*) is the right wing,
-"G" (*gauche*) the left wing and "Flancs" the sides.
-In the main menu, the left wing also mutes the cicada's song and turns off the LEDs.
+useful buttons, for example "Y X: choose  A: back  B: OK" (on a badge in French: "Y X : choix  A : retour  B : OK").
+In the main menu, A also mutes the cicada's song and turns off the LEDs.
 
-Some pages also use the **long press** (about 0.8 s): in the puzzles, a long press on the left wing quits the game;
-when typing text, a long press on the right wing confirms.
+Some pages also use the **long press** (about 0.8 s): a game is left with a long press on A (a short press only shows
+"To leave: long press on A", Pour sortir : appui long sur A); when typing text, a long press on B confirms.
 
 **Typing text with 4 buttons** (business cards, answers to the challenges, cure of the virus):
-- sides: previous / next character (hold to scroll through the characters);
-- right wing (short press): next position; left wing: previous position;
-- left wing on the first position: cancel;
-- right wing (long press): confirm.
+- Y / X: previous / next character (hold to scroll through the characters);
+- B (short press): next position; A: previous position;
+- A on the first position: cancel;
+- B (long press): confirm.
 
 
 ## 4. The menus
@@ -90,48 +90,48 @@ Media files are read from the SD card (see [§ 7](#7-preparing-the-sd-card)).
 Each player shows the list of files; subfolders are marked with "> ".
 
 **Images** (`IMAGES` folder)
-- Sides: previous / next image.
-- Right wing: use this image as the sleep screen image.
-- Left wing: back to the list.
+- Y / X: previous / next image.
+- B: use this image as the sleep screen image.
+- A: back to the list.
 
 **Videos (SD card)** (Vidéos, `VIDEOS` folder)
-- Right wing: pause / resume; sides: volume; left wing: stop.
+- B: pause / resume; Y / X: volume; A: stop.
 - Sound comes out of the buzzer: recognisable, but not hi-fi.
 
 **Music (SD card)** (Musique, `MUSIQUE` folder)
-- Right wing: pause; left wing: stop; left side: quieter; right side: louder.
+- B: pause; A: stop; Y: quieter; X: louder.
 - WAV files are played as 8, 16, 24 or 32-bit PCM, or 32-bit float, mono or stereo, from 4 to 192 kHz;
   the best is still the 8-bit 16 kHz mono of `audio2wav.py` (see [§ 7.3](#73-converting-your-files)).
 
 **Ringtones** (Sonneries, `SONNERIES` or `RTTTL` folders and their sub-folders, optional): ringtones in the RTTTL format, the one of the old Nokia
 phones. 12 public domain tunes are built into the badge (Lettre à Élise (Für Elise), Ode à la joie (Ode to Joy),
 Frère Jacques, La Marseillaise, Korobeiniki...), those of the SD card follow.
-- Sides: choose; right wing: play; left wing: back. A ringtone marked `(!)` has an error: the right wing shows the
-  line, the column and the reason.
+- Y / X: choose; A: back; B: play. A ringtone marked `(!)` has an error: B shows the line, the column and the
+  reason.
 - While playing: the name, the note played, a progress bar; the LEDs light up with one colour per note.
-  Left wing: stop; sides: previous / next ringtone; right wing: start again from the beginning.
+  A: stop; B: start again from the beginning; Y / X: previous / next ringtone.
 - The format and how to add ringtones: [ringtones.md](ringtones.md).
 
 **Speed reading (RSVP)** (Lecture rapide (PVSR), `TEXTES` folder)
 - Words appear one at a time in the same spot, so your eyes no longer move: you read much faster
   (RSVP method, *PVSR* in French, see [pvsr.md](../pvsr.md)).
-- Right wing: pause / resume; left wing: quit.
-- Sides (short press): speed −/+ (from 100 to 900 words per minute, 250 at start).
-- Sides (long press): go back / forward about 10 seconds of reading.
+- A: quit; B: pause / resume.
+- Y / X (short press): speed −/+ (from 100 to 900 words per minute, 250 at start).
+- Y / X (long press): go back / forward about 10 seconds of reading.
 - Your position is remembered: a text resumes where you left it.
 
 **Gamebooks** (Livres-jeux, `LIVRES` folder, optional): books in which you are the hero. One book is built into the
 badge, "Le Trésor du capitaine Cigalon" (Captain Cigalon's treasure, in French), the `.txt` books of the SD card
 follow (16 at most).
-- The list: "Continue: ..." (Continuer : ...) resumes the last book; sides: choose; right wing: open; left wing: quit.
+- The list: "Continue: ..." (Continuer : ...) resumes the last book; Y / X: choose; A (long press): quit; B: open.
 - The menu of a book: Start (Commencer), Resume reading (Reprendre la lecture), Start over (Recommencer),
   Items (Objets), Other books (Autres livres).
-- Reading: right side: next page, then next choice; left side: previous choice, then previous page; right wing:
-  take the selected choice; left wing: the menu of the book; left wing held: quit.
+- Reading: Y: previous choice, then previous page; X: next page, then next choice; B: take the selected choice;
+  A: the menu of the book; long press on A: quit.
 - Dice, items, endings won or lost; the progress is kept even with the badge switched off (one book at a time).
 - Reading, adding and writing books: [gamebooks.md](gamebooks.md).
 
-**Volume**: each press on the right wing raises the volume (0 to 8, then back to 0) and plays a short chime.
+**Volume**: each press on B raises the volume (0 to 8, then back to 0) and plays a short chime.
 
 
 ### 4.2 Games (Jeux)
@@ -139,47 +139,46 @@ follow (16 at most).
 Two themes: **Solo games** (Jeux solo: against the cicada or alone) and **Multiplayer** (Jeux multi: between cicadas,
 by radio: duel, battleship and the group games).
 
-In the games of the table below (except Simon), **the left wing quits the game**.
-In the puzzles, it is a **long press on the left wing**.
+In the games of the table below (except Simon) and in the puzzles, **a long press on A quits the game**; a short
+press on A only shows "To leave: long press on A" (Pour sortir : appui long sur A), any other button closes it.
 
 | Game | How to play |
 |---|---|
-| **Tic-tac-toe** (Morpion) | Sides: choose the square; right wing: play. You are the crosses, the cicada the noughts. You take turns starting. The cicada makes a mistake now and then... |
-| **Connect 4** (Puissance 4) | Sides: choose the column; right wing: drop the counter. Line up 4 solid counters before the cicada's rings. |
-| **Simon** | Each button is an area of the screen, placed like the button on the badge (sides at the top, wings at the bottom), with its own colour and note. Repeat the sequence, which gets longer each round. Here the left wing is part of the game: to quit, wait until the game is over, then press the left wing. |
-| **Reflexes** (Réflexes) | When the LEDs light up green (with a beep), quickly press the right wing or a side. 5 tries, the average counts. Too early: the try starts over. |
-| **Snake** | Right wing: start / pause. Left side: turn left; right side: turn right (relative to the snake's direction). |
-| **Blind test** | Pick a music folder: tracks play in random order, without repeats. Right wing: show the title; right side: next track; left side: pause. |
+| **Tic-tac-toe** (Morpion) | Y X: choose the square; B: play. You are the crosses, the cicada the noughts. You take turns starting. The cicada makes a mistake now and then... |
+| **Connect 4** (Puissance 4) | Y X: choose the column; B: drop the counter. Line up 4 solid counters before the cicada's rings. |
+| **Simon** | Each button is an area of the screen, placed like the button on the badge (Y and X at the top, A and B at the bottom), with its own colour and note. Repeat the sequence, which gets longer each round. Here A is part of the game: to quit, wait until the sequence is shown or the game is over, then a long press on A. |
+| **Reflexes** (Réflexes) | When the LEDs light up green (with a beep), quickly press B, Y or X. 5 tries, the average counts. Too early: the try starts over. |
+| **Snake** | B: start / pause. Y: turn left; X: turn right (relative to the snake's direction). |
+| **Blind test** | Pick a music folder: tracks play in random order, without repeats. B: show the title; Y: pause; X: next track. |
 | **CTF** | A challenge: enter a famous video game code with the 4 buttons to get a "flag". |
 
 Records are kept even after the badge is switched off: best score of Simon and Snake, best average of Reflexes,
 number of wins against the cicada in Tic-tac-toe and Connect 4.
 
-**Score as a QR code**: at the end of a game, press a side to show a QR code with the game, the score, the name
+**Score as a QR code**: at the end of a game, press Y or X to show a QR code with the game, the score, the name
 of your cicada and a signature: the organizers can scan it for a leaderboard, and a score edited by hand is rejected.
 Any button closes the QR code.
-In the Solo games menu, a **long press on the right wing** on the name of a game shows the QR code of its record the same way.
+In the Solo games menu, a **long press on B** on the name of a game shows the QR code of its record the same way.
 
-At the bottom of the screen, the buttons are listed in the order they are on the badge: L (left wing) on the left,
-R (right wing) on the right (G and D on a badge in French).
+At the bottom of the screen, the buttons are listed with A before B and Y before X, the order they are on the badge.
 
 **Puzzles**: Minesweeper, 2048, 15 puzzle, Sokoban, Mastermind and Hangman are turn-based, at the pace of the screen.
 They share the same controls:
-- short presses: move. Left side: left; right side: right; left wing: up; right wing: down
-  (seen from the front, the badge has its sides at the top and its wings at the bottom);
-- long presses: act. Right wing: main action (open, confirm...); left side: secondary action (flag, undo);
-  right side: help page; left wing: quit.
+- short presses: move. Y: left; X: right; A: up; B: down
+  (seen from the front, the badge has Y and X at the top and A and B at the bottom);
+- long presses: act. A: quit; B: main action (open, confirm...); Y: secondary action (flag, undo);
+  X: help page.
 
 Each game starts on its help page (rules, controls, record).
 
 | Game | How to play |
 |---|---|
-| **Minesweeper** (Démineur) | 9 × 9 grid with 12 mines; the first cell opened is never a mine. Long right wing: open; long left side: flag. The number of a cell gives the number of mines around it. |
+| **Minesweeper** (Démineur) | 9 × 9 grid with 12 mines; the first cell opened is never a mine. Long B: open; long Y: flag. The number of a cell gives the number of mines around it. |
 | **2048** | All the tiles slide towards the button pressed; two equal tiles that touch merge. Reach the 2048 tile! |
 | **15 puzzle** (Taquin) | Put the tiles 1 to 15 back in order, the hole at the end: the tile next to the hole slides towards the button pressed. |
-| **Sokoban** | Push the boxes onto the targets, one at a time. 6 levels; long left side: undo the last move; long right wing: restart the level. |
-| **Mastermind** | Find the secret code of 4 symbols out of 6 (disc, ring, filled square, empty square, triangle, cross) in 10 tries. Sides: position; wings: symbol; long right wing: confirm. A dot: a symbol in the right place; a ring: a symbol present but in the wrong place. |
-| **Hangman** (Pendu) | Find the (French) word, letter by letter, before being hanged (8 mistakes). Sides and wings: choose the letter; long right wing: try it. |
+| **Sokoban** | Push the boxes onto the targets, one at a time. 6 levels; long B: restart the level; long Y: undo the last move. |
+| **Mastermind** | Find the secret code of 4 symbols out of 6 (disc, ring, filled square, empty square, triangle, cross) in 10 tries. A / B: symbol; Y / X: position; long B: confirm. A dot: a symbol in the right place; a ring: a symbol present but in the wrong place. |
+| **Hangman** (Pendu) | Find the (French) word, letter by letter, before being hanged (8 mistakes). A / B and Y / X: choose the letter; long B: try it. |
 
 Records kept: best time at Minesweeper, best score at 2048, fewest moves at 15 puzzle, number of levels solved at
 Sokoban, fewest tries at Mastermind, most words found in a row at Hangman.
@@ -188,45 +187,45 @@ Sokoban, fewest tries at Mastermind, most words found in a row at Hangman.
 (acrostic, Caesar, ROT13, Morse, binary, hexadecimal, base64, Atbash, scytale, XOR, Vigenère, truncated hash,
 ultrasound).
 The texts are in French.
-- The list ticks the solved challenges; right wing: open a challenge.
-- On a challenge: right wing (short press): answer; right wing (long press): a hint;
-  right side: listen to the Morse (buzzer and LEDs), for the challenges that have some. The "Ultrason"
+- The list ticks the solved challenges; B: open a challenge; long press on A: quit.
+- On a challenge: B (short press): answer; B (long press): a hint;
+  X: listen to the Morse (buzzer and LEDs), for the challenges that have some. The "Ultrason"
   challenge plays its Morse in a loop at 19 kHz, without the LEDs: hardly audible, it shows on the spectrogram
-  of a phone (Spectroid, Spek...); right side again: stop.
-- The answer is typed with the 4 buttons (capital letters, digits, space); long right wing: confirm.
+  of a phone (Spectroid, Spek...); X again: stop.
+- The answer is typed with the 4 buttons (capital letters, digits, space); long B: confirm.
 - Each solved challenge gives a piece of the flag; "> The final flag" (> Le flag final) shows it whole once all are
   solved. Progress is kept even after the badge is switched off.
 
 **Duel** (rock-paper-scissors) and **Battleship** (Bataille navale) are played by two badges, over the radio:
-- the page lists the cicadas in range; sides: choose, right wing: challenge;
-- the other badge receives the invitation (a beep, and the page opens from the menus): left wing: decline;
-  right wing: accept.
-- **Duel**: each round, sides: "Rock", "Paper" or "Scissors" (Pierre, Feuille, Ciseaux); right wing: play.
+- the page lists the cicadas in range; Y / X: choose, B: challenge;
+- the other badge receives the invitation (a beep, and the page opens from the menus): A: decline;
+  B: accept.
+- **Duel**: each round, Y / X: "Rock", "Paper" or "Scissors" (Pierre, Feuille, Ciseaux); B: play.
   The first to win 3 rounds wins. No badge can wait for the other's choice to cheat: each one commits to its choice
   before revealing it.
 - **Battleship**: a 6 × 6 sea and 3 ships (3, 2 and 2 cells) placed at random. The one who invites shoots first,
-  then each in turn. Sides: aim (cell by cell); right wing: shoot. The first to sink the whole enemy fleet wins.
+  then each in turn. Y / X: aim (cell by cell); B: shoot. The first to sink the whole enemy fleet wins.
   At the end, each badge reveals its fleet and the other one checks that it answered honestly:
   "Fleet OK" (Flotte OK) or "CHEAT!" (TRICHE !).
-- At the end of a game: right wing: play again; left wing: quit.
+- At the end of a game: long press on A: quit; B: play again.
 
 **Group games**: **Tug of war** (Tir à la corde), **Micro racers** (Mini-bolides), **Assassin** and **Werewolf** (Loup-garou) are played by several
 badges, over the radio, with the same lobby:
 - "Create a game" (Créer une partie; "Host a game", Mener une partie, at the werewolf): your badge hosts the game and
-  lists the players who join it. Right wing: start (when there are enough players); left wing: cancel.
+  lists the players who join it. A: cancel; B: start (when there are enough players).
 - "Join a game" (Rejoindre une partie): the open games around (name of the host, number of players), the closest
-  first. Right wing: join; the "Waiting room" (Salle d'attente) waits for the start; left wing: leave.
-- A single group game at a time on a badge. The game goes on while you use the other pages: long press on the left
-  wing to leave the page without leaving the game.
+  first. B: join; the "Waiting room" (Salle d'attente) waits for the start; A: leave.
+- A single group game at a time on a badge. The game goes on while you use the other pages: long press on A to
+  leave the page without leaving the game.
 
 **Tug of war** (2 players at least): two teams, the **Cicadas** (Cigales) and the **Ants** (Fourmis),
 drawn at random; with an odd number of players, one of them is the **Referee** (Arbitre: watches the rope).
 - The teams are shown for 5 s, then a countdown 3, 2, 1 (beeps, LEDs yellow, orange, red), then "Pull!" (Tirez !)
-  for 20 s: **left wing then right wing** = one pull (both at the same time do not count).
+  for 20 s: **A then B** = one pull (both at the same time do not count).
 - The knot of the rope moves with the pulls of the two teams, on every badge. A team 20 pulls ahead per player of the
   team reaches its mark and wins at once; otherwise, the strongest at the end of the 20 s wins.
 - The result: the winning team, the score "Cicadas - Ants", your pulls and the best puller; green LEDs for the
-  winners, red for the losers. Right wing: back to the choice Create / Join; left wing: back.
+  winners, red for the losers. A: back; B: back to the choice Create / Join.
 
 **Micro racers** (Mini-bolides, 2 to 8 drivers): a race of small cars seen from above, like Micro Machines, 3 laps
 of a track bigger than the screen (the screen follows your car, framed).
@@ -236,22 +235,22 @@ of a track bigger than the screen (the screen follows your car, framed).
   the bar of the race.
 - 3 s on the grid (the controls are shown), a countdown 3, 2, 1, then the race. During the race, the LEDs give your
   place: green in the lead, red last, orange in between.
-- **Right wing**: accelerate; **left wing**: brake then back up; **sides**: steer (held; the left side to the
-  left). Off the road (the grass), the car slows down a lot. Both wings held 1.5 s: give up (the others go on). The checkpoints 1 (right side), 2 (top of the hairpin), 3 (left side), dashed on the track with their number (the next one bold), count in order: cutting through the grass and
+- **A**: brake then back up; **B**: accelerate; **Y / X**: steer (held; Y to the left, X to the right).
+  Off the road (the grass), the car slows down a lot. A and B held 1.5 s: give up (the others go on). The checkpoints 1 (right side), 2 (top of the hairpin), 3 (left side), dashed on the track with their number (the next one bold), count in order: cutting through the grass and
   skipping one does not count the lap.
 - At the top: the lap ("Lap 2/3") and your place ("1/3"). The screen is drawn about 4 times per second.
 - The race ends when everybody has finished, or 30 s after the first one; the ranking gives the times, then the lap
-  reached by those who did not finish. Right wing: play again; left wing: back.
+  reached by those who did not finish. A: back; B: play again.
 
 **Assassin** (3 players at least; 2 when the host is in admin mode): a game that lasts the whole conference.
 - At the start, the host draws a secret ring: each player gets a **target**, and is himself the target of another one.
 - The page: "Target:" (Ta cible :) and its name, a hot - cold gauge from its signals ("Icy", "Cold", "Warm",
   "Hot", "Burning!", or "No signal": not heard), the number of survivors.
-- **Right wing: eliminate**. You must be very close to the target, the badges almost touching (the badge of the target
+- **B: eliminate**. You must be very close to the target, the badges almost touching (the badge of the target
   checks the strength of the signal; provisional threshold, to tune on site). "Target killed!" (Cible éliminée !):
   the target of your victim becomes yours. "Too far or absent" (Trop loin ou absente): try again closer.
-- The victim sees "Killed by ..." (Éliminé par ...); its target goes to its killer, then right wing: leave the game.
-- Side: give up (confirm with the right wing): your target goes to your hunter.
+- The victim sees "Killed by ..." (Éliminé par ...); its target goes to its killer, then B: leave the game.
+- Y or X: give up (confirm with B): your target goes to your hunter.
 - The last cicada standing wins. The news ("Killed by ...", "Assassin: new target",
   "Assassin: victory!") arrives even on another page.
 - The badge of the host must stay on; a badge that restarts leaves the game.
@@ -269,7 +268,7 @@ the organizer unlocks it (Admin > Werewolf (admin)).
 - At night, every living player chooses in a list (those without the role pretend): nobody can guess the roles by
   watching who presses buttons. During the day, each one votes on his badge.
 - "Help: the roles" (Aide : les rôles): an illustrated card per role, with its camp and its powers.
-- Left wing: back to the menu, the game goes on; left wing held: leave the game; right wing held: see your card again.
+- A: back to the menu, the game goes on; long press on A: leave the game; long press on B: see your card again.
 - The rules, the phases, the votes and the tips for the narrator: [loup_garou.md](../fr/loup_garou.md) (in French).
 
 ### 4.3 Social
@@ -279,34 +278,34 @@ the organizer unlocks it (Admin > Werewolf (admin)).
 - Hold your badge very close to another one for a few seconds: you earn
   points for each **new** cicada, fewer and fewer (20, 18, 16, 15, 13...: 10 % of what remains), **200 points at
   most** in all; a cicada already met brings nothing more.
-- Right wing: choose your **cicada's name** (8 characters).
-  - Sides: change the letter.
-  - Right wing (short press): next letter; left wing: previous letter.
-  - Right wing (long press): save.
-  - Left wing on the first letter: cancel.
-- Right side: turn the signals on / off.
+- B: choose your **cicada's name** (8 characters).
+  - Y / X: change the letter.
+  - B (short press): next letter; A: previous letter.
+  - B (long press): save.
+  - A on the first letter: cancel.
+- X: turn the signals on / off.
 
 **Messages**: short messages between cicadas, chosen from a list of 16 ("Hi!", "Coffee?",
 "Who does the CTF?"...), no keyboard needed.
 - The inbox keeps the last 10 messages; "(DM)" (privé) marks the ones that are only for you.
 - "> Write a message" (> Écrire un message), then the recipient: "Everybody" (Tout le monde), a neighbouring cicada or
   the author of a message received. A cicada is shown by its name and the end of its identifier, for example "Tristan#33EC".
-- Right wing on a message received: reply to it.
+- B on a message received: reply to it.
 - The other cicadas relay the message (up to 3 times) so that it reaches its recipient.
 
 **Contacts**: a business card, exchanged over the radio with a badge close by.
 - "My card" (Ma carte): 13 fields (first name, name, phone, e-mail, company, job, address, city, LinkedIn, Git,
-  website, Mastodon, comment). Right wing: edit the field (typed with the 4 buttons);
-  right wing (long press): tick or untick "[x]" to send it or not. Only the ticked fields are sent.
+  website, Mastodon, comment). B: edit the field (typed with the 4 buttons);
+  B (long press): tick or untick "[x]" to send it or not. Only the ticked fields are sent.
 - "Exchange cards" (Échanger les cartes): **both** badges must be on this page, the exchange
   only happens with your consent. Your card is sent again about every 3 seconds; the card received is shown:
-  right wing: keep it; left wing: ignore it. Left wing on the exchange page: stop.
+  A: ignore it; B: keep it. A on the exchange page: stop.
 - The card goes out **in clear**, as a vCard, on the channel of the Flipper Zero's "SubGHz chat": any Flipper
   in range running `subghz chat 433920000 0` reads it during the exchange. Only the ticked fields are sent.
 - A Flipper can also **send** a card to a badge in exchange mode: in `subghz chat 433920000 0`, type the lines
   one by one, for example `BEGIN:VCARD`, `N:Name;First name;;;`, `TEL:0612345678`, `END:VCARD`.
 - "Cards received" (Contacts reçus): the last 12 cards kept (beyond that, the oldest one is forgotten).
-  Right wing: view; right wing (long press): delete.
+  B: view; B (long press): delete.
 - On the computer, `tools/contacts_export.py` exports the cards received to a vCard file (`.vcf`),
   to import into a phone or an address book.
 - Your skills (below) go with the card (`CATEGORIES` line of the vCard) as soon as at least one is ticked; those of a
@@ -315,7 +314,7 @@ the organizer unlocks it (Admin > Werewolf (admin)).
 **Skills** (Compétences): 20 skills, each with its pictogram: Electronics, Flipper Zero, Android, iOS,
 Radio / SDR, Web, Network, Crypto, Reverse, Pentest, Forensic, OSINT, Linux, Windows, Cloud, AI,
 Development, CTF, Lockpicking, Defense.
-- "My skills" (Mes compétences): the list with check boxes; right wing: tick / untick. The pictograms of the ticked
+- "My skills" (Mes compétences): the list with check boxes; B: tick / untick. The pictograms of the ticked
   skills are shown on the page, on the name tag, and go out in the signals of the cicada network.
 - "Who shares them?" (Qui les partage ?): the cicadas heard that share at least one of your skills, with the
   pictograms in common (updated every 3 s).
@@ -324,27 +323,27 @@ Development, CTF, Lockpicking, Defense.
 - The badges of an older firmware do not send their skills.
 
 **Program** (Programme; removed from the menu: the program can change after the badges are flashed; see the Social theme
-in `src/menu/main.c` to bring it back): the conference program, no SD card needed. Right wing: the details of a talk, with the
-QR code of its link; sides: previous / next talk.
+in `src/menu/main.c` to bring it back): the conference program, no SD card needed. B: the details of a talk, with the
+QR code of its link; Y / X: previous / next talk.
 The SecSea 2026 program is not published yet: the talks shown are placeholders.
 
 **Vote**: when the organizers ask a question ("Liked this talk?"...), the page opens.
-Sides: choose the answer; right wing: vote. You can change your mind while the vote is open:
+Y / X: choose the answer; B: vote. You can change your mind while the vote is open:
 only the last vote of each badge counts.
 
 **Cicada radar** (Radar des cigales): the cicadas heard, with their level ("N3") and the strength of their signal (in dBm, "*" for a cicada
-already met). Right wing: follow a cicada in "hot - cold" mode; left wing: back to the list.
+already met). A: back to the list; B: follow a cicada in "hot - cold" mode.
 
 **Hot - cold** (Chaud - froid): the organizers hide a beacon badge; find it by the strength of its signal.
 The badge shows "Icy", "Cold", "Warm", "Hot" or "BURNING!" (Glacial, Froid, Tiède, Chaud, BRÛLANT !) with a
 gauge, the LEDs go from blue to red and the beeps speed up as you get closer. The scale is the beacon's: "BURNING!"
 at about 1 m by default (from -74 dBm), set by the organizer (see Admin > Hot-cold beacon).
-Right wing: look for another beacon.
+B: look for another beacon.
 
 **Cicada virus** (Virus des cigales): a (harmless) virus spreads from cicada to cicada.
 - Stay too long close to an infected cicada and you may catch it; your badge then "coughs" in turn and can infect
   the cicadas close by.
-- The cure: a riddle (in French). Right wing: get cured, then type the answer with the 4 buttons.
+- The cure: a riddle (in French). B: get cured, then type the answer with the 4 buttons.
   A cured cicada is immune.
 
 **Chorus** (Choeur): when a choir leader (an organizer or a remote control) starts a song, the cicadas around sing it
@@ -352,7 +351,7 @@ together, each one its own voice, with a start synchronized over the radio. Eigh
 Jacques" (4-voice canon), "Ode to Joy" (3 voices), "Tetris (Korobeiniki)" (3 voices), "Pachelbel's Canon" (4 voices),
 "Mountain King" (Grieg, 3 voices), "Row your boat" (4-voice round), "Jingle Bells" (3 voices) and "Minuet in G"
 (2 voices).
-Your badge takes part by default; right wing: take part / stop singing. In mute mode, the choir is silent.
+Your badge takes part by default; B: take part / stop singing. In mute mode, the choir is silent.
 
 **Announcements** (Annonces): the announcements of the organizers (coffee break, next talk...). An announcement is a
 screen built by the badge: the time in a black band, the text, and often a QR code (a link, a phone number, a Wi-Fi
@@ -361,8 +360,8 @@ network...) to scan with a phone.
   image (sharp, it stays on screen); any button goes back to the menu.
 - Otherwise, the badge beeps and writes it at the bottom of the screen: the next time Social > Announcements is opened,
   it shows the new announcement right away.
-- The page keeps the last 5 announcements received (time and text). Sides: choose; right wing: show it;
-  left wing: back.
+- The page keeps the last 5 announcements received (time and text). Y / X: choose; A: back;
+  B: show it.
 
 **Smuggling** (Contrebande): the smuggler cicada. 26 virtual goods (food, rum, spices, treasures), common, rare or
 legendary, to collect and to trade **on the quiet** between two badges held against each other.
@@ -370,9 +369,9 @@ legendary, to collect and to trade **on the quiet** between two badges held agai
   doubloons, with a rank).
 - The hold gets 4 common goods at the first opening; each new cicada met gives a one-in-two chance of finding another
   one (discreet message at the bottom of the screen, no sound).
-- "Trade on the sly": the cicadas **Within reach** (À portée de main: badges touching); right wing: offer a deal.
-  The other one gets "Psst..." and accepts (right wing) or refuses (left wing); each one chooses its good, both offers
-  are shown, right wing: close the deal. "Give" offers a good with nothing in return.
+- "Trade on the sly": the cicadas **Within reach** (À portée de main: badges touching); B: offer a deal.
+  The other one gets "Psst..." and refuses (A) or accepts (B); each one chooses its good, both offers
+  are shown, B: close the deal. "Give" offers a good with nothing in return.
 - The details of the pages, of the goods and of the protocol: [smuggler.md](smuggler.md).
 
 
@@ -380,28 +379,28 @@ legendary, to collect and to trade **on the quiet** between two badges held agai
 
 **Radio: message** (Radio : message) sends "SecSea <name of your cicada> coucou #<number>", which you can read with
 the "SubGHz chat" app on a Flipper Zero (433.92 MHz).
-A **long press on the right wing** starts the **test mode**: one message every 5 seconds.
-- Sides: shorter / longer pause (1 second minimum, no maximum). Hold a side to scroll the values faster and faster.
-- Right wing: pause / resume; left wing: quit.
+A **long press on B** starts the **test mode**: one message every 5 seconds.
+- Y / X: shorter / longer pause (1 second minimum, no maximum). Hold Y or X to scroll the values faster and faster.
+- A: quit; B: pause / resume.
 
 **Radio: carrier** (Radio : porteuse) transmits a continuous signal for 30 s (visible with a Flipper Zero's frequency analyzer).
 
 **433 MHz decoder** (Décodeur 433 MHz, receive only): the last frames heard, with their age: Princeton, CAME and
 Nice FLO remote controls, weather sensors. A frame received several times is followed by "x2", "x3"...
-Right wing: clear. While listening, the badge no longer hears the other cicadas.
+B: clear. While listening, the badge no longer hears the other cicadas.
 
 **Weather station** (Station météo, receive only): the last measure of each 433 MHz sensor heard (4 at most):
 temperature, humidity, protocol, channel, and "batt!" when the sensor's battery is low.
 Supported sensors: Nexus-TH, inFactory, ThermoPRO TX-4, GT-WT02, LaCrosse TX141TH-Bv2, Acurite 592TXR.
-The sensors transmit every 30 to 60 s: be patient. Right wing: clear.
+The sensors transmit every 30 to 60 s: be patient. B: clear.
 
 **Send an image** (Envoyer une image): choose the built-in image ("SecSea (built-in)") or an image from the `IMAGES` folder;
 it is converted to black and white and sent twice over the radio to the badges waiting for it (about 17 seconds).
-Left wing: stop.
+A: stop.
 
 **Receive an image** (Recevoir une image): wait for another badge to send an image. While it is received, the page
 shows the number of blocks received, with a gauge; parity blocks allow rebuilding the ones lost on the way.
-Left wing: stop; right wing: start again (wait for another image).
+A: stop; B: start again (wait for another image).
 Once complete, the image is shown like the screensaver (sharp, no ghost), with "Got it" (Reçue) and the number
 of blocks fixed; any button goes back to the menu.
 
@@ -412,18 +411,18 @@ of blocks fixed; any button goes back to the menu.
 **433 MHz hunt** (Chasse 433 MHz, receive only): find a hidden 433 MHz transmitter (remote control, sensor, jammer
 that repeats its code) by "hot - cold".
 - The page lists the codes heard (8 at most): protocol and code, strength of the last frame (dBm) and number of
-  frames received ("x3"...). Sides: choose; right wing: hunt it; left wing: back.
+  frames received ("x3"...). Y / X: choose; A: back; B: hunt it.
 - The badge then follows this code like Social > Hot - cold: from "Icy" to "BURNING!", gauge, LEDs from blue
   to red and faster and faster beeps. The strength is measured on each frame received: the transmitter must be
-  sending. Without a frame for 15 s, it is "out of range" (hors de portée). Left wing: back to the list.
+  sending. Without a frame for 15 s, it is "out of range" (hors de portée). A: back to the list.
 - During the hunt, the badge no longer hears the other cicadas.
 
 **Listen to pirate radio** (Écouter la radio pirate, receive only): the badge receives the FM sound sent by an
 organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - The page: the frequency, the strength of the signal (dBm and gauge), the frequency correction, the tone detected,
   the level.
-- Sides: previous / next channel (the 5 channels of the pirate radio, 433.920 MHz at first); right wing:
-  squelch on / off ("Squelch: on", Silencieux); left wing: back.
+- Y / X: previous / next channel (the 5 channels of the pirate radio, 433.920 MHz at first); A: back;
+  B: squelch on / off ("Squelch: on", Silencieux).
 - While listening, the badge no longer hears the other cicadas. How it works and the tests: [pirate_radio.md](pirate_radio.md).
 
 
@@ -432,9 +431,9 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Name tag** (Badge nominatif): "SecSea 2026", your cicada's name in large letters and your type (PARTICIPANT,
   SPEAKER (ORATEUR) or STAFF) in a black band, then the pictograms of your skills (Social > Skills, 10 at most).
   The screensaver does not replace it: it stays on screen, even with the badge switched off.
-  The type is chosen by the organizers. Left wing: back.
-- **Lamp** (Lampe): the 2 LEDs in white. Sides: dimmer / brighter, in steps of 10 % (hold: faster);
-  right wing: off / on. The brightness is remembered and shown in the menu ("Lamp: 50 %").
+  The type is chosen by the organizers. A: back.
+- **Lamp** (Lampe): the 2 LEDs in white. Y / X: dimmer / brighter, in steps of 10 % (hold: faster);
+  B: off / on. The brightness is remembered and shown in the menu ("Lamp: 50 %").
   In mute mode, the LEDs stay off.
 - **Talk badge** (Badge de talk): for the speakers, the LEDs show the speaking time:
 
@@ -447,7 +446,7 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
   | STOP! | fast blinking red, and the cicada sings at full volume (even in mute mode): time to conclude! |
 
   The state is changed by the organizers' remote control (see [§ 4.7](#47-remote-control-and-mute-mode)) or by hand:
-  left side: previous state; right side or right wing: next state. This page works even in mute mode,
+  Y: previous state; B or X: next state. This page works even in mute mode,
   and listens to the remote control all the time while it is open.
 - **Cicada** (Cigale): turns the cicada's song on or off ("Cicada: on" / "Cicada: off").
 - **LEDs**: changes the animation (rainbow, breathing, heartbeat, blinking, green, off).
@@ -460,7 +459,7 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Sound ID** (Identifiant sonore): the badge plays its identifier ("Name#1234") on the buzzer, in very high tones (16 to
   17.5 kHz, hardly audible), 3 times (~2 s); a phone or a PC decodes it with the page `docs/fsk-buzzer-link.html`
   (Chrome, the tones set to 16000, 16500, 17000, 17500 Hz and 2 ms in its strip, button "Écouter", microphone
-  allowed), near the badge. Right wing: send; left wing: stop / back. Nothing in mute mode.
+  allowed), near the badge. A: stop / back; B: send. Nothing in mute mode.
 
 **Achievements and rank**: like the dolphin of the Flipper Zero, your cicada earns experience points (XP): each
 achievement gives XP, and each cicada met **2 XP**. The level, from 1 to 10, is a **pirate rank**; it is earned with
@@ -478,8 +477,8 @@ the XP, it cannot be chosen:
 
 The Achievements page has the rank as its title, then shows the level, the XP (out of those of the next level) with a gauge, the number of achievements obtained,
 then the list: first the meetings ("Meetings: 16 x 2 = 32 XP": each cicada met brings 2 XP), then the value of each
-achievement ("Smuggler (+20 XP)", filled box: obtained). Sides: choose;
-right wing: how to get it; left wing: back.
+achievement ("Smuggler (+20 XP)", filled box: obtained). Y / X: choose;
+A: back; B: how to get it.
 A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"), or the new level
 ("Level 3: Sailor!").
 
@@ -522,7 +521,7 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
 
 - **Screensaver** (Veille de l'écran):
   - the delay before sleep ("Start after: 5 min", also shown in the menu: "Screensaver: 5 min"): 1, 2, 3, 5, 10, 15
-    or 30 minutes, 1 hour, or off (right wing: the next one);
+    or 30 minutes, 1 hour, or off (B: the next one);
   - the image shown while asleep ("SecSea (built-in)" by default, or an image from the `IMAGES` folder);
   - "Screensaver preview" (Aperçu de la veille) to try it out.
 
@@ -530,16 +529,16 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
   it is the most stable display of the screen, the image stays sharp for hours without power.
 
   While asleep, any button wakes the badge up.
-- **Language** (Langue): French or English ("Langue / Language", each language written in itself; sides then right
-  wing). A badge left in a language you can't read: left wing 5 times (back to the main menu), then the left
-  wing held for 5 seconds: it switches to English. See [translation](translation.md).
+- **Language** (Langue): French or English ("Langue / Language", each language written in itself; Y / X then
+  B). A badge left in a language you can't read: A 5 times (back to the main menu), then A held for 5 seconds:
+  it switches to English. See [translation](translation.md).
 - **Remote: yes / no** (Télécommande : oui / non): the badge obeys (or not) the radio commands of the
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mute mode: yes / no** (Mode muet : oui / non): turns off the sound and the LEDs. The organizers can switch it on
   remotely during the talks.
 - **Info** (Infos): 6 lines: firmware version (number and git commit, a "+" when the sources differed from the
   commit), build date, radio version, crystal used ("wait..." while it is being measured), SD card, battery.
-  Right wing: the credits.
+  B: the credits.
 - **Credits** (Crédits): the people and associations behind the badge.
 - **Radio tuning** (Réglage radio): tunes the radio automatically, in 3 steps (about 15 s):
   1. the crystal of the radio (26 or 27 MHz);
@@ -547,7 +546,7 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
   3. the frequency, from the packets of the other cicadas heard for 10 s: stay close to other badges switched on.
 
   The tuning runs by itself at the first start of the badge (and after an update that brings it), then on demand:
-  right wing: tune again; left wing: stop or go back. The page shows the result: crystal, noise, threshold of the
+  A: stop or go back; B: tune again. The page shows the result: crystal, noise, threshold of the
   remote controls ("Remotes: > −90 dBm"...), frequency correction, and the number of packets of other
   cicadas heard (with no other cicada, the frequency is not corrected).
 - **Radio battery: yes / no** (Batterie radio): the badge adds its battery level to its beacons (every 2 s, with its
@@ -611,7 +610,7 @@ a command received twice is executed only once.
 
 ### 4.8 Admin mode (organizers)
 
-In the main menu (the list of themes), press the sides **left, left, right, right, left, right, left, right** within
+In the main menu (the list of themes), press **Y, Y, X, X, Y, X, Y, X** within
 8 seconds: "Admin mode on" (Mode admin activé) is shown and the **Admin** theme appears, already selected, after the
 others. The admin mode stays on after the badge is switched off.
 More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the badge plugged into USB (see [§ 6](#6-controlling-the-badge-from-a-computer)).
@@ -621,11 +620,11 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Radio commands** (Commandes radio) | sends a command to all the badges around: mute, end of mute, cicada, lights of the talk badge, sleep; last row: "Relay" (hops of the relay by the cicadas, 0 to 4) |
 | **Cicada LEDs** (LEDs des cigales) | chooses the colour and the animation of the LEDs of all the cicadas around (see below) |
 | **Notices (admin)** (Annonces (admin)) | writes and sends the announcements to all the cicadas (see below) |
-| **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; right wing: close the vote |
+| **Vote (admin)** | opens a question, counts the votes (one per badge) and shows the histogram; B: close the vote |
 | **Chorus: start** (Choeur : lancer) | starts a song of the choir; this badge sings the first voice |
-| **Hot-cold beacon** (Balise chaud-froid) | this badge sends a beacon every second: hide it, the others look for it with Social > Hot - cold. Sides: the scale ("Burning from -74 dBm" by default, 5 dB steps, saved), sent to the hunters with the beacon: set it on site for the distance wanted |
-| **Virus: patient 0** (Virus : patient zéro) | infects this badge to start the epidemic; left side: cure it |
-| **Smuggling (admin)** (Contrebande (admin)) | adds a good of your choice to the cargo of this badge (to unlock a rare or a legendary one, for instance): sides: choose, right wing: add |
+| **Hot-cold beacon** (Balise chaud-froid) | this badge sends a beacon every second: hide it, the others look for it with Social > Hot - cold. Y / X: the scale ("Burning from -74 dBm" by default, 5 dB steps, saved), sent to the hunters with the beacon: set it on site for the distance wanted |
+| **Virus: patient 0** (Virus : patient zéro) | infects this badge to start the epidemic; Y: cure it |
+| **Smuggling (admin)** (Contrebande (admin)) | adds a good of your choice to the cargo of this badge (to unlock a rare or a legendary one, for instance): Y / X: choose, B: add |
 | **Werewolf (admin)** (Loup-garou (admin)) | fewer than 8 players: "8 players minimum" (the rules, the default), "Small games (4+)" (1 werewolf below 8) or "Test: robots" (robots complete up to 8); saved |
 | **Reset** (Remise à zéro) | erases the scores and the progress of this badge (see below) |
 | **Battery (calibration)** (Batterie (calibration)) | calibrates the battery measure with a multimeter (see § 5) |
@@ -633,8 +632,8 @@ More discreet: the "Mode admin" check box of `tools/badge_remote.py`, with the b
 | **Demo mode** (Mode démo) | for a stand: the badge shows its features in a loop (see below) |
 | **Badge type** (Type du badge) | Participant, Speaker (Orateur) or Staff, shown by the name tag |
 | **Cicada batteries** (Batteries des cigales) | the battery of the cicadas that share it (Settings > Battery by radio): "81 %", or "ADC 2533" for a badge not calibrated, "USB" when plugged in a computer (a charger alone is not seen); "~72 %": the estimate of a badge calibrated automatically |
-| **Battery (auto)** (Batterie (auto)) | measures the battery life, without a multimeter: R: start; 1. charge on USB until full (measure steady for 10 min), 2. unplug and let the badge **switch off by itself** (not with the switch, no reboot), 3. at the next start, the battery life is kept in the factory settings. Then, without a calibration with a multimeter, the charge left is estimated from the time on battery since the last **full charge** ("~72 %", icon, Info); unknown after a partial charge; 10 % at most when the measure falls (the end is near). The voltage of the battery stays almost flat until the last hours: it does not tell the charge left. R during the steps: stop |
-| **Battery drain** (Vider la batterie) | to test the low battery warning: white LEDs, radio pings every 500 ms, screen and processor busy, until the battery is low (the saving mode then takes over); shows the time, the ADC and the pings; R: on / off, L: back. Start it unplugged from USB (otherwise the battery does not drain) |
+| **Battery (auto)** (Batterie (auto)) | measures the battery life, without a multimeter: B: start; 1. charge on USB until full (measure steady for 10 min), 2. unplug and let the badge **switch off by itself** (not with the switch, no reboot), 3. at the next start, the battery life is kept in the factory settings. Then, without a calibration with a multimeter, the charge left is estimated from the time on battery since the last **full charge** ("~72 %", icon, Info); unknown after a partial charge; 10 % at most when the measure falls (the end is near). The voltage of the battery stays almost flat until the last hours: it does not tell the charge left. B during the steps: stop |
+| **Battery drain** (Vider la batterie) | to test the low battery warning: white LEDs, radio pings every 500 ms, screen and processor busy, until the battery is low (the saving mode then takes over); shows the time, the ADC and the pings; A: back, B: on / off. Start it unplugged from USB (otherwise the battery does not drain) |
 | **Leave admin mode** (Quitter le mode admin) | hides the Admin theme again |
 
 **Low battery** (Batterie faible): when the measure stays under the threshold (5 measures in a row), the badge
@@ -642,29 +641,29 @@ enters the **saving mode**: mute (no LEDs, no buzzer), remote control off, a "Lo
 small empty battery icon on the battery icon and, discreet, at the bottom right of the screensaver. It leaves it
 when plugged in USB ("Battery: normal mode").
 
-**Cicada LEDs** (LEDs des cigales): a list of settings; sides: choose the row.
-- "Color" (Couleur): wings: previous / next colour (red, orange, yellow, green, cyan, blue, purple, pink, white);
-- "Red (R)", "Green (G)", "Blue (B)": from 0 to 255; left wing: −, right wing: + (hold: faster and faster);
+**Cicada LEDs** (LEDs des cigales): a list of settings; Y / X: choose the row.
+- "Color" (Couleur): A / B: previous / next colour (red, orange, yellow, green, cyan, blue, purple, pink, white);
+- "Red (R)", "Green (G)", "Blue (B)": from 0 to 255; A: −, B: + (hold: faster and faster);
   the colour becomes "custom" (personnalisée);
-- "Brightness" (Luminosité): 5, 10, 25, 50 (default), 75 or 100 % of the colour, in every mode (wings: − / +);
-- "Mode": Fixed (Fixe), Blinking (Clignotant) or Fade (Fondu) (wings: previous / next mode). In Blinking or Fade,
-  a long press on the right wing opens the times: on / off, or to the colour / to black, from 50 ms to 5 s in steps
-  of 50 ms (sides: choose the time; wings: − / +; long press on a wing: back);
-- "> Send to the cicadas" (> Envoyer aux cigales, right wing): the cicadas around, and this badge, show these LEDs
+- "Brightness" (Luminosité): 5, 10, 25, 50 (default), 75 or 100 % of the colour, in every mode (A / B: − / +);
+- "Mode": Fixed (Fixe), Blinking (Clignotant) or Fade (Fondu) (A / B: previous / next mode). In Blinking or Fade,
+  a long press on B opens the times: on / off, or to the colour / to black, from 50 ms to 5 s in steps
+  of 50 ms (Y / X: choose the time; A / B: − / +; long press on A or B: back);
+- "> Send to the cicadas" (> Envoyer aux cigales, B): the cicadas around, and this badge, show these LEDs
   instead of their animation, until "> Restore their LEDs" (> Rétablir leurs LEDs) or their restart. The mute mode still
   turns their LEDs off, and the pages that drive the LEDs themselves (games, talk badge) keep them.
 
-While setting, the LEDs of this badge show the colour and the mode chosen. Long left wing (or left wing on the last
+While setting, the LEDs of this badge show the colour and the mode chosen. Long A (or A on the last
 two rows): quit.
 
 **Notices (admin)** (Annonces (admin)): 20 announcements, kept after the badge is switched off; at first, the program of
-SecSea 2026 (the talks of both days, 3 free slots "(empty)"). Sides: choose; right wing: open it; left wing: back. An announcement has 6 rows
-(sides: choose; left wing: back to the list):
-- "Time" (Heure, for example 10:30) and "Text" (Texte, at most 56 characters, accented letters included): right wing:
+SecSea 2026 (the talks of both days, 3 free slots "(empty)"). Y / X: choose; A: back; B: open it. An announcement has 6 rows
+(Y / X: choose; A: back to the list):
+- "Time" (Heure, for example 10:30) and "Text" (Texte, at most 56 characters, accented letters included): B:
   edit, with the 4-button editor (or the keyboard of the computer);
-- "QR code": the type of the QR code, with the wings: None (Aucun), Link (URL) (Lien), Text (Texte), Phone (Téléphone), SMS,
+- "QR code": the type of the QR code, with A / B: None (Aucun), Link (URL) (Lien), Text (Texte), Phone (Téléphone), SMS,
   E-mail, Wi-Fi, GPS position (Position GPS);
-- "Content" (Contenu): what the QR code contains (right wing: edit); the badge puts it in the form that phones
+- "Content" (Contenu): what the QR code contains (B: edit); the badge puts it in the form that phones
   understand:
 
   | Type | Content to type | QR code |
@@ -677,7 +676,7 @@ SecSea 2026 (the talks of both days, 3 free slots "(empty)"). Sides: choose; rig
   | Wi-Fi | `network;password` | `WIFI:T:WPA;S:network;P:password;;` (without ";": open network) |
   | GPS position | `43.17,5.60` | `geo:43.17,5.60` |
 
-- "> Preview" (> Aperçu): the screen of the announcement, as the cicadas will show it (a wing: back);
+- "> Preview" (> Aperçu): the screen of the announcement, as the cicadas will show it (A or B: back);
 - "> Send to all" (> Envoyer à tous): the announcement goes over the radio, 3 times in a row
   (for the cicadas that missed it). This badge does not show it to itself: that is what the preview is for.
 
@@ -686,11 +685,11 @@ LEDs, sound, services) and show "SLEEP: The badge was put to sleep by an admin. 
 (SOMMEIL on a badge in French); a reboot does not wake them up.
 Except a badge on its **talk badge** page, and the admin badge that sends the order. The order goes by the network of
 the badges, not in Princeton: the Princeton remote of a Flipper cannot put the conference to sleep (a network
-`.sub` file made by `tools/flipper_net_sub.py command 0x05` can: keep it for the organizers). **Unlock** (organizers): 5 times the left
-side, then 5 times the right one (less than 5 s between two presses); the badge restarts normally.
+`.sub` file made by `tools/flipper_net_sub.py command 0x05` can: keep it for the organizers). **Unlock** (organizers): 5 times Y,
+then 5 times X (less than 5 s between two presses); the badge restarts normally.
 
-**Reset** (Remise à zéro): before the event or after tests. Sides: choose; right wing, then a **long press on the
-right wing** to confirm (left wing: no):
+**Reset** (Remise à zéro): before the event or after tests. Y / X: choose; B, then a **long press on B** to
+confirm (A: no):
 - "Social scores" (Scores sociaux): the score and the encounters of the cicada network;
 - "Game records" (Records des jeux): the records of the games and the puzzles;
 - "CTF & crypto" (Défis CTF et crypto): the CTF flags and the crypto challenges solved;
@@ -704,7 +703,7 @@ right wing** to confirm (left wing: no):
 - "Announcements" (Annonces d'origine): the 20 announcements of the admin menu get their original texts back
   (not part of "All").
 
-**Demo mode** (Mode démo): right wing: start. The badge goes through, in a loop, with rainbow LEDs: name tag (8 s),
+**Demo mode** (Mode démo): B: start. The badge goes through, in a loop, with rainbow LEDs: name tag (8 s),
 achievements (6 s), images of the SD card (18 s, a new one every 6 s), the first video (20 s), skills (5 s),
 the first music (10 s), screen demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s).
 Without an SD card (or without a file), the images, the video and the music are skipped. The screensaver does not
@@ -719,11 +718,11 @@ start during the demo; **any button stops it** ("Demo mode off"), and the LEDs g
   if the badge has been calibrated; otherwise it shows "uncalibrated" (non calibrée).
 - **Calibrating** (Admin > Battery (calibration)), once per badge:
   1. with the badge on USB (charging), measure the battery voltage with a multimeter;
-  2. on the "Multimeter" line (Multimètre), set this voltage with the wings (- / +, hold: fast);
-  3. side: "> Save point 1" (> Enregistrer le point 1), right wing;
+  2. on the "Multimeter" line (Multimètre), set this voltage with A / B (- / +, hold: fast);
+  3. Y / X: "> Save point 1" (> Enregistrer le point 1), B;
   4. do it again on battery, unplugged for a few minutes (the voltage must have dropped by at least 0.2 V), with
      "> Save point 2": the level is shown from this 2nd point on.
-  Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer, right wing twice) forgets the calibration.
+  Each row saves its own point (a point already saved is replaced). "> Clear" (> Effacer, B twice) forgets the calibration.
   The calibration is a "factory" setting: kept by the Reset (even "All") and by the firmware updates.
 
 
@@ -743,7 +742,7 @@ python tools/badge_remote.py
 - **Mode clavier (saisie de texte)** (keyboard mode, text input): when a text editor is open on the badge (business
   card, answer to a challenge...), the characters typed on the computer are inserted at the cursor; Enter: done;
   Escape: cancel; Backspace: erase. The arrow keys are still the buttons. Through the keyboard: the characters
-  without accent and the letters é è ê à â ç ô î ù û ë ï É È À Ç; the others are chosen with the sides.
+  without accent and the letters é è ê à â ç ô î ù û ë ï É È À Ç; the others are chosen with Y / X.
 - **Mode admin**: turns the admin mode of the badge on or off (see [§ 4.8](#48-admin-mode-organizers));
   the box follows the state of the badge.
 - A connection problem (badge unplugged, port busy) is shown in the status line and in the log;
@@ -843,7 +842,7 @@ less clear on the buzzer.
 | The computer does not see the badge | Use a USB data cable (not a charge-only cable); switch on ON. |
 | "No SD card" or "SD card: missing" in Info (Pas de carte SD, Carte SD : absente) | Is the card pushed all the way in? Formatted as FAT32 or exFAT? |
 | A file does not show up | Right extension (`.epi`, `.epv`, `.wav`, `.txt`, `.rtttl`, `.rtx`, `.bas`) and right folder? Name shorter than 64 characters? |
-| A ringtone is marked `(!)` | An error in the line: the right wing shows the column and the reason (see [ringtones.md](ringtones.md)). |
+| A ringtone is marked `(!)` | An error in the line: B shows the column and the reason (see [ringtones.md](ringtones.md)). |
 | No sound | Volume at 0? (Media > Volume). The buzzer is quiet: put your ear close to it. |
 | The radio message does not reach the Flipper | The Flipper must be on 433.92 MHz in "SubGHz chat". In Info, the crystal must be 26 or 27 MHz. |
 | No more sound or LEDs | The mute mode may be on (command of the organizers during a talk): Settings > Mute mode. |

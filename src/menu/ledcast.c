@@ -201,7 +201,7 @@ static int clamp(int v, int lo, int hi) {
 
 static bool ledcast_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (timing) {
-        /* The times of the mode: flanks choose, wings -/+, long press on a wing: back */
+        /* The times of the mode: Y / X choose, A / B -/+, long press on A or B: back */
         if (b->long_pressed & (UI_BTN_A | UI_BTN_B)) {
             timing = false;
             return true;

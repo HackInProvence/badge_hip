@@ -13,15 +13,14 @@ you can add as many as you like on the SD card.
   its sub-folders (`Name/`), then its ringtones, with the name of the file in brackets. The files are read by pages
   of 32, in alphabetical order: the `< Previous` and `Next >` rows (`< Précédents`, `Suivants >` in French) change
   the page (so a folder can hold thousands of files).
-  Sides: up / down (held: scrolling), right wing (R): open the folder or play, left wing (L): parent folder, then
-  back to the menu.
-  A ringtone marked `(!)` has an error: R shows the line, the column and the reason.
+  Y / X: up / down (held: scrolling), A: parent folder, then back to the menu, B: open the folder or play.
+  A ringtone marked `(!)` has an error: B shows the line, the column and the reason.
 - **The settings**, at the bottom of the main list: "Volume: 6/8" (the volume of the badge) and "LEDs: 25 %" (the
-  brightness of the LEDs while playing: off, 10, 25 (default), 50 or 100 %); R: next value.
+  brightness of the LEDs while playing: off, 10, 25 (default), 50 or 100 %); B: next value.
 - **While playing**: the name, the note played (e.g. `La#5`, `Rest` (`Silence` in French); the note names stay
   French: Do = C, Ré = D, Mi = E, Fa = F, Sol = G, La = A, Si = B), a progress bar and the time.
   The LEDs light up at each note, with one colour per note (Do red, Ré orange, Mi light green, Sol cyan, La blue...).
-  L: stop, sides: previous / next ringtone, R: start again from the beginning.
+  Y / X: previous / next ringtone, A: stop, B: start again from the beginning.
 - The **mute mode** is respected: no sound nor LEDs (the playback goes on silently).
 - Playing a ringtone unlocks the **Music lover** (Mélomane) achievement.
 
@@ -46,7 +45,7 @@ SD card
 - empty lines and those starting with `#` are ignored (comments);
 - UTF-8 text (the accents of the names are shown) or ASCII; lines of 2048 characters at most;
 - in a folder: 40 sub-folders shown, any number of files (by pages of 32), 128 ringtones per page at most;
-- the playing page shows the full path of the file; the sides go to the ringtones of the same page.
+- the playing page shows the full path of the file; Y / X go to the ringtones of the same page.
 
 Examples are in [`docs/sd/SONNERIES`](../sd/SONNERIES): copy this folder to the SD card.
 
@@ -129,7 +128,7 @@ python tools/rtttl_sort.py F:/RTTTL_origine F:/RTTTL --categories categories.tsv
 
 ## The errors
 
-An invalid line stays in the list, marked `(!)`; R shows its line, its column (in bytes from the beginning of the
+An invalid line stays in the list, marked `(!)`; B shows its line, its column (in bytes from the beginning of the
 line) and the reason: `':' missing after name` (`':' manquant après le nom` in French), `':' missing before the
 notes` (`':' manquant avant les notes`), `bad d, o or b setting` (`réglage d, o ou b invalide`), `bad duration`
 (`durée invalide`), `bad note` (`note invalide`), `bad octave` (`octave invalide`), `',' expected after note`

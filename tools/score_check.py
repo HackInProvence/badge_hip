@@ -6,7 +6,7 @@
 # visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 """
-Checks the score QR codes shown by the badges at the end of the games (Jeux menu, flanks on the end page),
+Checks the score QR codes shown by the badges at the end of the games (Jeux menu, Y / X on the end page),
 e.g. for a leaderboard: scan the QR codes with a phone, paste the texts in a file, then
 
     python tools/score_check.py scores.txt --key <32 hex digits>

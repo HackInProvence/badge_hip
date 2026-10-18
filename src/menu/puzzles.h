@@ -13,10 +13,10 @@
  * - Mastermind: find the code of 4 symbols in 10 tries,
  * - Pendu (hangman): find the French word letter by letter.
  *
- * The badge seen from the front has its flanks at the top and its wings at the bottom. In every game the short presses
- * move: left flank = left, right flank = right, left wing = up, right wing = down. The long presses act:
- * right wing = main action (open, validate...), left flank = secondary action (flag, undo), right flank = the help page,
- * left wing = quit. Each game starts on its help page (rules, controls and record).
+ * The badge seen from the front has Y / X at the top and A / B at the bottom. In every game the short presses
+ * move: Y = left, X = right, A = up, B = down. The long presses act:
+ * B = main action (open, validate...), Y = secondary action (flag, undo), X = the help page,
+ * A = quit. Each game starts on its help page (rules, controls and record).
  *
  * Like games.h, the games only draw in a frame buffer and use the hooks of games.h for the sound, the LEDs and the
  * random numbers, so that they can be tested on a PC (tests/host/test_puzzles.c). Nothing blocks.
