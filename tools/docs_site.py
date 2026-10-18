@@ -39,6 +39,7 @@ except ImportError:
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UF2 = 'build/src/menu/badge_menu.uf2'
 RES = 'ressources'
+VERSION = open(os.path.join(ROOT, 'VERSION'), encoding='utf-8').read().strip()  # Of the firmware
 LANGS = {
     'fr': {'name': 'Français', 'entries': ['guide_utilisateur.md', 'guide_avance.md', 'guide_developpeur.md'],
            'title': 'Badge SecSea', 'guides': 'Guides', 'pages': 'Fonctions', 'notes': 'Notes de conception',
@@ -406,6 +407,7 @@ class Site:
 {photo}
 <div>
 <h1>Badge SecSea — la cigale</h1>
+<p>Version {VERSION}</p>
 <p>Le badge électronique de <a href="https://secsea.org/">SecSea</a>, la conférence de hacking de
 Hack In Provence à La Ciotat. Un RP2040, un écran e-Paper 200 × 200, une radio CC1101 433 MHz, deux LEDs RGB, un
 buzzer, quatre boutons, une carte micro-SD et deux ports d'extension. Les cigales se rencontrent par radio, jouent
@@ -452,7 +454,7 @@ conference, and are a teaching tool for radio and infrared.</p>
             self.files.add('hardware/kicad.zip')
         self.uf2_out = None
         if self.uf2 and os.path.exists(self.uf2):
-            self.uf2_out = 'firmware/' + os.path.basename(self.uf2)
+            self.uf2_out = f'firmware/badge_menu-{VERSION}.uf2'  # The name says its version
             os.makedirs(os.path.join(res, 'firmware'), exist_ok=True)
             shutil.copyfile(self.uf2, os.path.join(res, self.uf2_out))
         else:

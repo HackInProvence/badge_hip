@@ -59,12 +59,32 @@ Pour flasher :
 
 Autres exécutables : les applications de test de chaque module (`src/tests/*.c`, cibles `test_screen`, `test_radio`...).
 
-**Version du firmware** : `BADGE_VERSION` dans [src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt), à augmenter
-pour chaque version installée sur les badges. À chaque compilation, [version.cmake](../../src/menu/version.cmake)
+### La version du firmware
+
+Le numéro de version est dans le fichier [VERSION](../../VERSION) à la racine du dépôt (une seule ligne, `1.2.3`) :
+c'est le seul endroit où le changer. CMake le lit ([src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt)), refuse
+un numéro mal formé et se relance tout seul quand le fichier change. À chaque compilation, [version.cmake](../../src/menu/version.cmake)
 écrit `version.h` (dans le dossier de compilation) avec ce numéro, le commit git court et la date ; un « + » après le
 commit signale des sources de `src/` ou `tools/` modifiées depuis (`sans-git` si git ne répond pas). Le badge
 l'affiche dans Réglages > Infos (« Version 1.0.0 (5d95da4) » et « Compilée le 2026-09-30 »), au démarrage et avec `!`
 sur le port série (`version: 1.0.0 (5d95da4 2026-09-30)`).
+
+### Faire une nouvelle version
+
+Le numéro suit `MAJEUR.MINEUR.CORRECTIF` (détails en tête de [CHANGELOG.md](../../CHANGELOG.md)) : CORRECTIF pour des
+corrections, MINEUR pour des fonctions nouvelles compatibles avec les badges déjà flashés, MAJEUR quand le réseau radio
+ou les réglages enregistrés deviennent incompatibles.
+
+1. Écrire le numéro dans [VERSION](../../VERSION).
+2. Dans [CHANGELOG.md](../../CHANGELOG.md), renommer la section « Non publiée » en `## 1.2.3 — AAAA-MM-JJ` (et en
+   ouvrir une nouvelle vide au-dessus).
+3. Compiler, puis tester : `python src/tests/host/run_tests.py`, et sur un badge `python tools/badge_selftest.py`
+   (plus `tools/test_network.py` avec deux badges si le réseau a changé).
+4. Vérifier Réglages > Infos : `Version 1.2.3 (commit)` **sans « + »** (un « + » : des sources non commitées, ne
+   jamais distribuer ce firmware).
+5. Commiter (`Version 1.2.3`), puis poser le tag : `git tag -a v_1.2.3 -m "Version 1.2.3"` et `git push --tags`.
+6. Publier `build/src/menu/badge_menu.uf2` dans une release GitHub du tag (le renommer `badge_menu-1.2.3.uf2`), et
+   le site (`python tools/docs_site.py`, qui affiche la version).
 
 
 ## 3. Organisation du dépôt

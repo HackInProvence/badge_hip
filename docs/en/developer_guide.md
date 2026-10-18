@@ -59,12 +59,32 @@ To flash:
 
 Other executables: the per-module test applications (`src/tests/*.c`, targets `test_screen`, `test_radio`...).
 
-**Firmware version**: `BADGE_VERSION` in [src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt), to raise for
-each version installed on the badges. At each build, [version.cmake](../../src/menu/version.cmake) writes
+### The firmware version
+
+The version number is in the file [VERSION](../../VERSION) at the root of the repository (one line, `1.2.3`): the
+only place to change it. CMake reads it ([src/menu/CMakeLists.txt](../../src/menu/CMakeLists.txt)), refuses a badly
+formed number and runs again by itself when the file changes. At each build, [version.cmake](../../src/menu/version.cmake) writes
 `version.h` (in the build folder) with this number, the short git commit and the date; a "+" after the commit
 means sources of `src/` or `tools/` changed since (`sans-git` when git does not answer). The badge shows it in
 Réglages > Infos ("Version 1.0.0 (5d95da4)" and "Compilée le 2026-09-30"), at boot and with `!` on the serial port
 (`version: 1.0.0 (5d95da4 2026-09-30)`).
+
+### Making a new version
+
+The number is `MAJOR.MINOR.PATCH` (details at the top of [CHANGELOG.md](../../CHANGELOG.md), in French): PATCH for
+fixes, MINOR for new features compatible with the badges already flashed, MAJOR when the radio network or the saved
+settings become incompatible.
+
+1. Write the number in [VERSION](../../VERSION).
+2. In [CHANGELOG.md](../../CHANGELOG.md), rename the "Non publiée" section `## 1.2.3 — YYYY-MM-DD` (and open a new
+   empty one above it).
+3. Build, then test: `python src/tests/host/run_tests.py`, and on a badge `python tools/badge_selftest.py` (plus
+   `tools/test_network.py` with two badges when the network changed).
+4. Check Réglages > Infos: `Version 1.2.3 (commit)` **without "+"** (a "+": uncommitted sources, never distribute
+   that firmware).
+5. Commit (`Version 1.2.3`), then tag: `git tag -a v_1.2.3 -m "Version 1.2.3"` and `git push --tags`.
+6. Publish `build/src/menu/badge_menu.uf2` in a GitHub release of the tag (renamed `badge_menu-1.2.3.uf2`), and the
+   web site (`python tools/docs_site.py`, which shows the version).
 
 
 ## 3. Repository layout

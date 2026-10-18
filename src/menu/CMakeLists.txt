@@ -85,9 +85,16 @@ target_sources(badge_menu PRIVATE
 )
 target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 
-# Version of the firmware (menu Réglages > Infos, "!" on the serial port): raise it for each release given to the
-# badges. version.h also gets the git commit and the date of the build, at each build.
-set(BADGE_VERSION 1.0.0)
+# Version of the firmware (menu Réglages > Infos, "!" on the serial port): the file VERSION at the root of the
+# repository, the only place to change it (docs/fr/guide_developpeur.md: "Faire une nouvelle version"). version.h also
+# gets the git commit and the date of the build, at each build.
+set(BADGE_VERSION_FILE ${CMAKE_CURRENT_LIST_DIR}/../../VERSION)
+file(STRINGS ${BADGE_VERSION_FILE} BADGE_VERSION LIMIT_COUNT 1)
+string(STRIP "${BADGE_VERSION}" BADGE_VERSION)
+if(NOT BADGE_VERSION MATCHES "^[0-9]+[.][0-9]+[.][0-9]+$")
+    message(FATAL_ERROR "VERSION: a version like 1.2.3 expected, not \"${BADGE_VERSION}\"")
+endif()
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${BADGE_VERSION_FILE})  # Changed: CMake runs again
 add_custom_target(badge_version ALL
     COMMAND ${CMAKE_COMMAND} -DSRC=${CMAKE_SOURCE_DIR} -DOUT=${CMAKE_CURRENT_BINARY_DIR}/version.h
             -DVERSION=${BADGE_VERSION} -P ${CMAKE_CURRENT_LIST_DIR}/version.cmake
