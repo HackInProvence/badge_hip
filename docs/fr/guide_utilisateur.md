@@ -450,7 +450,9 @@ sonde, brouilleur qui répète son code).
 - **LEDs** : change l'animation (arc-en-ciel, respiration, battement, clignotement, vert fixe, éteintes).
 - **Démo écran** : montre les possibilités de l'écran (noir et blanc, 4 gris, animation rapide).
 - **Écran OLED** : démos sur un petit écran OLED branché sur le port gauche (étoiles, cube 3D, cigale, texte, vidéo).
-- **Succès** : les succès obtenus et le grade de votre cigale (voir ci-dessous).
+- **Succès** : les succès obtenus et le grade de votre cigale (voir ci-dessous). La dernière ligne, **Les grades**,
+  montre les 10 grades (Y / X) : portrait, nom, XP nécessaires, atteint ou non (on ne les choisit pas : ils se
+  gagnent).
 - **Mon grade** : le portrait de votre grade de pirate en grand, son nom et les XP du grade suivant ; comme le badge
   nominatif, la page reste affichée (même sans alimentation), un bouton la quitte.
 - **Identifiant sonore** : le badge joue son identifiant (« Nom#1234 ») au buzzer, en sons très aigus (16 à 17,5 kHz,

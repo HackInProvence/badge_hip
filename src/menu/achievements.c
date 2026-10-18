@@ -154,10 +154,13 @@ void achievements_init(void) {
 
 /* ------ The page: level, XP, then the list (B: how to get the selected one) ------ */
 
-/* The rows of the list: the meetings (they bring XP too), then the achievements */
-#define LIST_ROWS (ACHV_COUNT + 1)
-static int sel = 0;  /* 0: the meetings, n: the achievement n - 1 */
+/* The rows of the list: the meetings (they bring XP too), the achievements, then the ranks (all of them can be seen,
+ * none chosen: they are earned with the XP) */
+#define LIST_ROWS (ACHV_COUNT + 2)
+#define ROW_RANKS (LIST_ROWS - 1)
+static int sel = 0;  /* 0: the meetings, n: the achievement n - 1, ROW_RANKS: the ranks */
 static bool detail = false;
+static uint8_t rank_shown = 1;  /* The rank shown in the detail of ROW_RANKS */
 
 static void achv_start(absolute_time_t now) {
     (void)now;
@@ -170,12 +173,22 @@ static bool achv_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (detail) {
         if (b->pressed & (UI_BTN_A | UI_BTN_B))
             detail = false;
+        if (sel == ROW_RANKS && (b->pressed & UI_BTN_X))  /* The ranks: the next one, the previous one */
+            rank_shown = rank_shown % ACHV_LEVELS + 1;
+        if (sel == ROW_RANKS && (b->pressed & UI_BTN_Y))
+            rank_shown = (rank_shown + ACHV_LEVELS - 2) % ACHV_LEVELS + 1;
+        if (sel == ROW_RANKS && (b->pressed & (UI_BTN_X | UI_BTN_Y)))
+            printf("achv: rank %u shown\n", rank_shown);  /* badge_screens.py follows it */
         return true;
     }
     if (b->pressed & UI_BTN_A)
         return false;
-    if (b->pressed & UI_BTN_B)
+    if (b->pressed & UI_BTN_B) {
         detail = true;
+        rank_shown = achv_level();  /* The ranks: from the one of this badge */
+        if (sel == ROW_RANKS)
+            printf("achv: rank %u shown\n", rank_shown);
+    }
     if (b->pressed & UI_BTN_X)
         sel = (sel + 1) % LIST_ROWS;
     if (b->pressed & UI_BTN_Y)
@@ -195,6 +208,22 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
                  social_met_count() * XP_PER_MEETING);
         ui_lines(fb, y + 12, &gfx_font_small, text);
         ui_footer(fb, N_("A : retour"));
+        return;
+    }
+    if (detail && sel == ROW_RANKS) {
+        /* A rank: its portrait, its name, the XP it needs, reached or not */
+        /* The title: its name; the portrait (128 x 128); one line: its number, reached or the XP it needs */
+        uint8_t level = achv_level();
+        ui_title(fb, achv_level_name(rank_shown));
+        rank_draw_portrait(fb, (GFX_WIDTH - 2 * 64) / 2, UI_TITLE_H + 2, rank_shown, 2);
+        if (rank_shown <= level)
+            snprintf(text, sizeof(text), _("%u/%u : atteint !"), rank_shown, ACHV_LEVELS);
+        else
+            snprintf(text, sizeof(text), _("%u/%u : à %lu XP (tu en as %lu)"), rank_shown, ACHV_LEVELS,
+                     (unsigned long)achv_level_xp(rank_shown), (unsigned long)achv_xp());
+        ui_scroll_text(fb, GFX_WIDTH / 2, UI_TITLE_H + 132, GFX_WIDTH - 8, &gfx_font_small, text, GFX_BLACK,
+                       GFX_ALIGN_CENTER);
+        ui_footer(fb, N_("Y X : grades  A : retour"));
         return;
     }
     if (detail) {
@@ -244,6 +273,15 @@ static void achv_render(uint8_t *fb, absolute_time_t now) {
             char fitted[48];
             ui_fit(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 22 - 2);
             gfx_text(fb, 22, y + 1, &gfx_font_small, fitted, fg, GFX_ALIGN_LEFT);
+            continue;
+        }
+        if (r == ROW_RANKS) {
+            /* The ranks: a star, the rank of this badge */
+            gfx_fill_rect(fb, 11, y + 4, 2, 12, fg);
+            gfx_fill_rect(fb, 6, y + 9, 12, 2, fg);
+            gfx_fill_rect(fb, 8, y + 6, 8, 8, fg);
+            snprintf(text, sizeof(text), _("Les grades : %u / %u"), achv_level(), ACHV_LEVELS);
+            gfx_text(fb, 22, y + 1, &gfx_font_small, text, fg, GFX_ALIGN_LEFT);
             continue;
         }
         int i = r - 1;

@@ -458,7 +458,9 @@ organizer's badge (Admin > Pirate radio) and plays it on its buzzer.
 - **Screen demo** (Démo écran): shows what the screen can do (black and white, 4 greys, fast animation).
 - **OLED screen** (Écran OLED): demos on a small OLED screen plugged into the left port (Stars, 3D cube, Cicada,
   Scrolling text, Video (SD card)).
-- **Achievements** (Succès): the achievements obtained and the rank of your cicada (see below).
+- **Achievements** (Succès): the achievements obtained and the rank of your cicada (see below). The last row, **The
+  ranks**, shows the 10 ranks (Y / X): portrait, name, XP needed, reached or not (they are not chosen: they are
+  earned).
 - **My rank** (Mon grade): the portrait of your pirate rank in large, its name and the XP of the next rank; like the
   name tag, the page stays on the screen (even without power), a button leaves it.
 - **Sound ID** (Identifiant sonore): the badge plays its identifier ("Name#1234") on the buzzer, in very high tones (16 to
