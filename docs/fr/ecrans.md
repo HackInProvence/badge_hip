@@ -240,6 +240,14 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 
 ![Duel](../screens/jeux_multi_duel.png)
 
+### Duel — Un duel : choisir pierre, feuille ou ciseaux
+
+![Duel — Un duel : choisir pierre, feuille ou ciseaux](../screens/jeux_multi_duel_partie.png)
+
+### Duel — Le résultat de la manche
+
+![Duel — Le résultat de la manche](../screens/jeux_multi_duel_manche.png)
+
 ### Bataille navale
 
 ![Bataille navale](../screens/jeux_multi_bataille_navale.png)
@@ -343,6 +351,14 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Tir à la corde
 
 ![Tir à la corde](../screens/jeux_multi_tir_a_la_corde.png)
+
+### Tir à la corde — Une partie : la corde pendant que les équipes tirent
+
+![Tir à la corde — Une partie : la corde pendant que les équipes tirent](../screens/jeux_multi_tir_a_la_corde_partie.png)
+
+### Tir à la corde — Le résultat de la partie
+
+![Tir à la corde — Le résultat de la partie](../screens/jeux_multi_tir_a_la_corde_resultat.png)
 
 ### Mini-bolides
 
@@ -1000,23 +1016,3 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Vider la batterie
 
 ![Vider la batterie](../screens/admin_vider_la_batterie.png)
-
-
-## Jeux multi
-
-### Tir à la corde — Une partie : la corde pendant que les équipes tirent
-
-![Tir à la corde — Une partie : la corde pendant que les équipes tirent](../screens/jeux_multi_tir_a_la_corde_partie.png)
-
-### Tir à la corde — Le résultat de la partie
-
-![Tir à la corde — Le résultat de la partie](../screens/jeux_multi_tir_a_la_corde_resultat.png)
-
-### Duel — Un duel : choisir pierre, feuille ou ciseaux
-
-![Duel — Un duel : choisir pierre, feuille ou ciseaux](../screens/jeux_multi_duel_partie.png)
-
-### Duel — Le résultat de la manche
-
-![Duel — Le résultat de la manche](../screens/jeux_multi_duel_manche.png)
-

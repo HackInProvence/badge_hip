@@ -480,6 +480,17 @@ def battle_game(c, t, pt, game):
     c.shot('Jeux multi', game, 'partie', 'Une bataille : la grille de tir', len(t.lines))
 
 
+def after_their_page(shots, extra):
+    """The screens captured at the end (vote, games with another badge) after the other screens of their page, in
+    the order they were captured (the docs are grouped by theme and page)"""
+    out = []
+    for k, shot in enumerate(shots):
+        out.append(shot)
+        if all(s[:2] != shot[:2] for s in shots[k + 1:]):  # The last screen of its page: the extra ones
+            out += [e for e in extra if e[:2] == shot[:2]]
+    return out + [e for e in extra if all(s[:2] != e[:2] for s in shots)]
+
+
 def check_shots(c, out):
     """Every screenshot: there, not empty (the page below its title has something), not twice the same image"""
     import hashlib
@@ -632,19 +643,12 @@ def main():
         restart()
         n = len(c.shots)
         vote_screens(c, None, args.voters.split(','), args.lang)
-        # Each new screen after the other screens of its page (the docs are grouped by page)
-        for shot in c.shots[n:]:
-            c.shots.remove(shot)
-            last = max((k for k, s in enumerate(c.shots) if s[:2] == shot[:2]), default=len(c.shots) - 1)
-            c.shots.insert(last + 1, shot)
+        c.shots = after_their_page(c.shots[:n], c.shots[n:])
     if args.multi and (not only or 'Jeux multi' in only):
         print('Jeux multi (2 badges)')
         n = len(c.shots)
         multi_screens(c, args.multi, args.lang, restart)
-        for shot in c.shots[n:]:  # After the other screens of the same game
-            c.shots.remove(shot)
-            last = max((k for k, s in enumerate(c.shots) if s[:2] == shot[:2]), default=len(c.shots) - 1)
-            c.shots.insert(last + 1, shot)
+        c.shots = after_their_page(c.shots[:n], c.shots[n:])
     t.keys('U')
     restore = before if before else 'fr'
     if restore != args.lang:
