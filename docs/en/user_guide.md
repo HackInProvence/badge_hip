@@ -283,7 +283,12 @@ the organizer unlocks it (Admin > Werewolf (admin)).
 - Hold your badge very close to another one for a few seconds: you earn
   points for each **new** cicada, fewer and fewer (20, 18, 16, 15, 13...: 10 % of what remains), **200 points at
   most** in all; a cicada already met brings nothing more.
-- B: choose your **cicada's name** (8 characters).
+- **Change the name of your cicada**: **Social > Réseau cigales** (Cicada network), then **B**. 8 characters at most
+  (letters, digits, space); the name shows on the name tag, on the cicadas you meet, in the messages, the multiplayer
+  games and the contacts.
+
+  ![The name of the cicada](../screens/en/social_reseau_cigales_nom.png)
+
   - Y / X: change the letter.
   - B (short press): next letter; A: previous letter.
   - B (long press): save.

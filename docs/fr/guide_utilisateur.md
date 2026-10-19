@@ -277,7 +277,12 @@ l'organisateur le débloque (Admin > Loup-garou (admin)).
 - Approchez votre badge tout près d'un autre pendant quelques secondes : vous gagnez
   des points pour chaque **nouvelle** cigale, de moins en moins (20, 18, 16, 15, 13... : 10 % de ce qui reste),
   **200 points au plus** en tout ; une cigale déjà rencontrée ne rapporte plus rien.
-- B : choisir le **nom de votre cigale** (8 caractères).
+- **Changer le nom de votre cigale** : **Social > Réseau cigales**, puis **B**. 8 caractères au plus (lettres,
+  chiffres, espace) ; le nom s'affiche sur le badge nominatif, chez les cigales que vous croisez, dans les messages,
+  les jeux à plusieurs et les contacts.
+
+  ![Le nom de la cigale](../screens/social_reseau_cigales_nom.png)
+
   - Y / X : changer la lettre.
   - A : lettre précédente ; B (appui court) : lettre suivante.
   - B (appui long) : enregistrer.

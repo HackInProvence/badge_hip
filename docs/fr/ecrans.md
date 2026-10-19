@@ -992,35 +992,3 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Vider la batterie
 
 ![Vider la batterie](../screens/admin_vider_la_batterie.png)
-
-
-## Textes à corriger
-
-(aucun)
-
-## Lignes de listes raccourcies (aperçus : la page de la ligne montre tout)
-
-- Médias > Images : list row cut "Cigale (Hack In Provence).epi"
-- Médias > Vidéos : list row cut "Alice au pays des merveilles.EPV"
-- Médias > Vidéos : list row cut "Big Buck Bunny (bande-annonce).epv"
-- Médias > Vidéos : list row cut "Edgar, le Détective Cambrioleur.EPV"
-- Médias > Musique : list row cut "VOXSing_Joyeux anniversaire (ID 2194)_LaSonotheque.fr.wav"
-- Médias > Lecture rapide : list row cut "Declaration des droits de l'homme (1789).txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - La Cigale et la Fourmi.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - La Colombe et la Fourmi.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - La Laitière et le Pot au lait.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - La Mort et le Bûcheron.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - La Poule aux oeufs d'or.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - Le Chat, la Belette et le petit Lapin.txt"
-- Médias > Lecture rapide > Un dossier de textes : list row cut "La Fontaine - Le Chêne et le Roseau.txt"
-- Médias > Livres-jeux : list row cut "Continuer : Le Trésor du capitaine Cigalon"
-- Médias > Livres-jeux : list row cut "Le Trésor du capitaine Cigalon"
-- Médias > Livres-jeux > Un livre : list row cut "Le Trésor du capitaine Cigalon"
-- Médias > Livres-jeux > La lecture : list row cut "Le Trésor du capitaine Cigalon"
-- Badge > Badge conférence : list row cut "SSTIC 2026 - Symposium sur la sécurité des te"
-- Badge > Badge conférence : list row cut "THCon 2026 - Toulouse Hacking Convention"
-- Badge > Badge conférence : list row cut "leHACK 2026 - Brave New World"
-- Admin > Annonces (admin) : list row cut "14:45 @Maurice : On est tous dans l'annuaire"
-- Admin > Annonces (admin) : list row cut "15:30 SYSTEM_IDLE : Pause"
-- Admin > Annonces (admin) : list row cut "16:45 @Skilo : How I dumped Bob s Firmware"
-- Admin > Annonces (admin) : list row cut "17:30 Ilyes Azouni : Biométrie : usurper un visage"

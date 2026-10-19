@@ -94,6 +94,8 @@ table { border-collapse: collapse; display: block; overflow-x: auto; margin: 1em
 th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
 th { background: var(--side); }
 td.size { white-space: nowrap; text-align: right; color: var(--muted); }
+p.top { text-align: right; margin: 1.5em 0 0; font-size: 14px; }
+p.top a { text-decoration: none; }
 code { background: var(--code); padding: 1px 4px; border-radius: 4px; font-size: .92em; }
 pre { background: var(--code); padding: 12px; border-radius: 8px; overflow-x: auto; }
 pre code { padding: 0; background: none; }
@@ -134,6 +136,136 @@ def published(rel):
     return rel in USER_TOOLS or rel in USER_TOOL_MODULES or \
         rel.startswith(PUBLISHED) and not rel.startswith(NOT_PUBLISHED) or \
         (rel.startswith('docs/') and rel.count('/') == 1 and rel.endswith('.html'))
+
+
+# What each published file is (the tools: the first sentence of their docstring)
+FIXED = {
+    'docs/sd/CONFERENCES/LISTE_EVENEMENTS.txt': (
+        'Les événements hacking et cybersécurité en France (nom, ville, période, site, description)',
+        'The hacking and cybersecurity events in France (name, town, period, site, description)'),
+    'docs/sd/SONNERIES/classique.txt': ('Sonneries RTTTL : mélodies classiques du domaine public',
+                                        'RTTTL ringtones: public domain classical tunes'),
+    'docs/sd/SONNERIES/exemples.rtttl': ('Exemples du format RTTTL (durées, octaves, tempo)',
+                                         'Examples of the RTTTL format (durations, octaves, tempo)'),
+    'tools/flipper/SecSea_general.sub': ('Télécommande Princeton (C1 6A 01) : OK chante, haut muet, bas fin du muet',
+                                         'Princeton remote (C1 6A 01): OK sings, up mute, down end of mute'),
+    'tools/flipper/SecSea_talk.sub': ('Télécommande Princeton (C1 6A 11) du badge de talk : vert, orange, rouge, éteint',
+                                      'Princeton remote (C1 6A 11) of the talk badge: green, orange, red, off'),
+    'tools/flipper/SecSea_leds_vert.sub': ('Réseau des cigales : LEDs vertes (50 %), sans relais',
+                                           'Cicada network: green LEDs (50 %), not relayed'),
+    'tools/flipper/SecSea_leds_rouge.sub': ('Réseau des cigales : LEDs rouges (50 %), sans relais',
+                                            'Cicada network: red LEDs (50 %), not relayed'),
+    'tools/flipper/SecSea_leds_retablir.sub': ("Réseau des cigales : retour à l'animation habituelle des LEDs",
+                                               'Cicada network: back to the usual animation of the LEDs'),
+    'tools/flipper/SecSea_leds_vert_rouge_boucle.sub': ('Essai de portée : vert, rouge... chaque seconde, 2 min 30',
+                                                        'Range test: green, red... every second, 2 min 30'),
+    'hardware/badge_v1.0.pdf': ('Schéma électrique de la carte V1.0', 'Schematic of the V1.0 board'),
+    'hardware/badge_v1.0_TOP.png': ('Carte V1.0, face avant (vue du circuit)', 'V1.0 board, front side (layout)'),
+    'hardware/badge_v1.0_TOP2.png': ('Carte V1.0, face avant (rendu)', 'V1.0 board, front side (render)'),
+    'hardware/badge_v1.0_BOTTOM.png': ('Carte V1.0, face arrière (vue du circuit)', 'V1.0 board, back side (layout)'),
+    'hardware/badge_v1.0_BOTTOM2.png': ('Carte V1.0, face arrière (rendu)', 'V1.0 board, back side (render)'),
+    'hardware/kicad.zip': ('Projet KiCad complet de la carte V1.1 (schéma, circuit, bibliothèques)',
+                           'Full KiCad project of the V1.1 board (schematic, layout, libraries)'),
+    'imgs/badge_front.webp': ('Le badge, face avant', 'The badge, front side'),
+    'imgs/badge_back.webp': ('Le badge, face arrière', 'The badge, back side'),
+    'imgs/ecouteurs.webp': ('Brancher des écouteurs sur un Pico (GPIO28, masse) pour écouter le son',
+                            'Earphones wired to a Pico (GPIO28, ground) to listen to the sound'),
+    'imgs/prototype.png': ('Le câblage du prototype sur Raspberry Pi Pico (Fritzing)',
+                           'The wiring of the prototype on a Raspberry Pi Pico (Fritzing)'),
+    'imgs/secsea_x200a.webp': ('Le logo de SecSea, 200 × 200', 'The logo of SecSea, 200 × 200'),
+    'imgs/spi.svg': ('Schéma du bus SPI', 'Diagram of the SPI bus'),
+    'imgs/uart.svg': ('Schéma de la liaison UART', 'Diagram of the UART link'),
+    'docs/images/pirate_ranks.png': ('Les portraits des 10 grades de pirate (Badge > Mon grade)',
+                                     'The portraits of the 10 pirate ranks (Badge > Mon grade)'),
+    'docs/fsk-buzzer-link.html': ("Écouter l'identifiant sonore du badge (Badge > Identifiant sonore) avec le micro "
+                                  "d'un téléphone ou d'un PC, dans le navigateur",
+                                  'Listen to the sound ID of the badge (Badge > Identifiant sonore) with the microphone '
+                                  'of a phone or a PC, in the browser'),
+}
+CONF_FILES = {'infos.txt': ('informations (dates, lieu, site, description)', 'information (dates, place, site, description)'),
+              'conferences.txt': ('les conférences ({n})', 'the talks ({n})'),
+              'workshops.txt': ('les workshops ({n})', 'the workshops ({n})'),
+              'exposants.txt': ('les exposants ({n})', 'the exhibitors ({n})')}
+REMOTE = {'chante': ('la cigale chante', 'the cicada sings'), 'muet': ('mode muet', 'mute mode'),
+          'fin_muet': ('fin du mode muet', 'end of the mute mode'), 'talk_vert': ('talk : vert', 'talk: green'),
+          'talk_orange': ('talk : orange, 5 min', 'talk: orange, 5 min'),
+          'talk_rouge_enerve': ('talk : rouge énervé', 'talk: angry red'),
+          'talk_rouge_fini': ('talk : rouge, fini', 'talk: red, over'), 'talk_eteint': ('talk : éteint', 'talk: off')}
+
+
+def describe(rel, fr):
+    """The description of a published file, in French (\\p fr) or English; '' when unknown"""
+    i = 0 if fr else 1
+    if rel in FIXED:
+        return FIXED[rel][i]
+    path = os.path.join(ROOT, rel)
+    parts = rel.split('/')
+    if rel.startswith('docs/sd/CONFERENCES/') and len(parts) == 5 and parts[4] in CONF_FILES:
+        event = parts[3]
+        try:
+            for line in open(os.path.join(ROOT, *parts[:4], 'infos.txt'), encoding='utf-8'):
+                if line.startswith('nom:'):
+                    event = line[4:].strip()
+                    break
+            n = sum(1 for line in open(path, encoding='utf-8') if line.startswith(('titre:', 'nom:')))
+        except OSError:
+            n = 0
+        return f'{event} : ' + CONF_FILES[parts[4]][i].format(n=n) if fr else \
+            f'{event}: ' + CONF_FILES[parts[4]][i].format(n=n)
+    if rel.startswith('docs/sd/LIVRES/') and rel.endswith('.txt'):
+        lines = open(path, encoding='utf-8').read().split('\n')
+        return (f'Livre-jeu « {lines[0].strip()} », par {lines[1].strip()}' if fr else
+                f'Gamebook "{lines[0].strip()}", by {lines[1].strip()}')
+    for kind, label in (('raw', ('RAW Flipper', 'Flipper RAW')), ('player', ('RAW lecteurs simples', 'RAW simple players'))):
+        prefix = f'tools/flipper/{kind}/SecSea_{kind}_'
+        if rel.startswith(prefix) and rel[len(prefix):-4] in REMOTE:
+            return f'{REMOTE[rel[len(prefix):-4]][i]} ({label[i]})'
+    if rel.startswith('docs/color_reveal/'):
+        name = os.path.splitext(parts[-1])[0]
+        what = ('écran', 'screen') if 'screen' in name else ('impression', 'print')
+        decoy = (', avec un leurre', ', with a decoy') if 'decoy' in name else ('', '')
+        if name.endswith('_preview'):
+            return (f'Aperçu : sans filtre, filtre rouge, filtre bleu ({what[0]}{decoy[0]})' if fr else
+                    f'Preview: no filter, red filter, blue filter ({what[1]}{decoy[1]})')
+        return (f'Image à révéler par la couleur, pour {what[0]}{decoy[0]} (color_reveal.py)' if fr else
+                f'Image revealed by the color, for {what[1]}{decoy[1]} (color_reveal.py)')
+    if rel in USER_TOOLS or rel in USER_TOOL_MODULES:
+        return tool_summary(path)
+    return ''
+
+
+def lists_apart(text):
+    """A list right after a line of text: Markdown would glue it to the paragraph (the "- " on the same line): an empty
+    line before it (not in the code blocks)"""
+    out, fence, prev = [], False, ''
+    for line in text.split('\n'):
+        if line.lstrip().startswith('```'):
+            fence = not fence
+        item = re.match(r'^\s*([-*+]|\d+[.)])\s', line)
+        prev_item = re.match(r'^\s*([-*+]|\d+[.)])\s', prev) or prev.startswith(('  ', '\t'))
+        if not fence and item and not line.startswith(' ') and prev.strip() and not prev_item \
+                and not prev.lstrip().startswith(('|', '#', '>')):
+            out.append('')
+        out.append(line)
+        prev = line
+    return '\n'.join(out)
+
+
+def page_label(label):
+    """The text of a link to a page: its name, without ".md" (nor a folder)"""
+    m = re.fullmatch(r'`?(?:[\w./-]*/)?([\w-]+)\.md`?', label)
+    return m.group(1) if m else label
+
+
+TOP = {'fr': '↑ Haut de la page', 'en': '↑ Back to the top'}
+
+
+def back_to_top(body, lang):
+    """A link to the top before each section (from the second one) and at the end"""
+    link = f'<p class="top"><a href="#">{TOP.get(lang, TOP["fr"])}</a></p>'
+    parts = re.split(r'(?=<h2[ >])', body)
+    return parts[0] + ''.join((link if i else '') + part for i, part in enumerate(parts[1:])) + \
+        (link if len(parts) > 2 else '')
 
 
 def tool_summary(path):
@@ -203,6 +335,7 @@ class Site:
             if res.startswith('..'):
                 return m.group(0)
             if res in self.pages:
+                label = page_label(label)
                 return f'{bang}[{label}]({self.href(page_out, self.pages[res]["out"])}{anchor}{title})'
             if res in self.files:
                 return f'{bang}[{label}]({self.href(page_out, RES + "/" + res)}{title})'
@@ -217,6 +350,8 @@ class Site:
 
     @staticmethod
     def group_of(rel):
+        if rel.endswith('.html'):
+            return 'web'  # Pages that run in the browser
         if rel.startswith('docs/sd'):
             return 'sd'
         if rel.startswith('tools/flipper'):
@@ -289,9 +424,10 @@ class Site:
     def render(self, rel):
         p = self.pages[rel]
         text = OTHER_VERSION.sub('', p['text'])
-        body = markdown.markdown(self.rewrite(rel, text),
-                                 extensions=['tables', 'fenced_code', 'toc', 'sane_lists', 'attr_list'],
+        body = markdown.markdown(lists_apart(self.rewrite(rel, text)),
+                                 extensions=['tables', 'fenced_code', 'toc', 'sane_lists', 'attr_list', 'nl2br'],
                                  extension_configs={'toc': {'permalink': False}})
+        body = back_to_top(body, p['lang'])
         other = None
         if p['other']:
             q = self.pages[p['other']]
@@ -338,27 +474,35 @@ class Site:
                          f'carte_sd.zip</a> à la racine de la carte (FAT32).</p>',
                          f'<p>The example content of the SD card: unzip <a href="../{RES}/carte_sd.zip">'
                          f'carte_sd.zip</a> at the root of the card (FAT32).</p>'))
-        body.append(table(sd))
+        body.append(table(sd, lambda r: describe(r, fr)))
         tools = [r for r in USER_TOOLS if r in self.files]
         body.append(f'<h2 id="tools">{head("Outils du PC", "PC tools")}</h2>')
         body.append(head(f'<p>Scripts Python 3 (le détail de chacun : <code>--help</code> et le guide avancé). '
                          f'Tous ensemble : <a href="../{RES}/outils.zip">outils.zip</a>.</p>',
                          f'<p>Python 3 scripts (each one: <code>--help</code> and the advanced guide). '
                          f'All of them: <a href="../{RES}/outils.zip">outils.zip</a>.</p>'))
-        body.append(table(tools, lambda r: tool_summary(os.path.join(ROOT, r))))
+        body.append(table(tools, lambda r: describe(r, fr)))
         flipper = [r for r in self.files if r.startswith('tools/flipper/')]
         body.append(f'<h2 id="flipper">Flipper Zero</h2>')
         body.append(head('<p>Fichiers Sub-GHz (<code>.sub</code>) à copier dans <code>subghz/</code> du Flipper.</p>',
                          '<p>Sub-GHz files (<code>.sub</code>) to copy to <code>subghz/</code> on the Flipper.</p>'))
-        body.append(table(flipper))
+        body.append(table(flipper, lambda r: describe(r, fr)))
         hw = [r for r in self.files if r.startswith('hardware/')]
         body.append(f'<h2 id="hardware">{head("Matériel", "Hardware")}</h2>')
         body.append(head('<p>Schéma, vues de la carte, projet KiCad complet.</p>',
                          '<p>Schematic, views of the board, full KiCad project.</p>'))
-        body.append(table(hw))
+        body.append(table(hw, lambda r: describe(r, fr)))
+        web = [r for r in self.files if self.group_of(r) == 'web']
+        body.append(f'<h2 id="web">{head("Pages web", "Web pages")}</h2>')
+        body.append(head('<p>À ouvrir dans un navigateur (rien à installer).</p>',
+                         '<p>To open in a browser (nothing to install).</p>'))
+        body.append(table(web, lambda r: describe(r, fr)))
         imgs = [r for r in self.files if self.group_of(r) == 'images' and not r.startswith('docs/screens/')]
         body.append(f'<h2 id="images">{head("Images", "Pictures")}</h2>')
-        body.append(table(imgs))
+        body.append(table(imgs, lambda r: describe(r, fr)))
+        for r in sd + flipper + hw + web + imgs:  # Checked: every file is described
+            if not describe(r, fr):
+                print(f'warning: no description for {r}')
         return self.frame(lang, out, LANGS[lang]['res'], '\n'.join(body))
 
     def zip_dir(self, src, dst):

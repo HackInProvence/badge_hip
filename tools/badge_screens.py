@@ -120,7 +120,8 @@ PAGES = {
     'Puissance 4': [('b', 'jeu', 'La partie', None)],
     'Simon': [('b', 'jeu', 'La partie', None)],
     'Réflexes': [(reflexes, None, None, None)],
-    'Snake': [('b', 'jeu', 'La partie', None), ('............', 'fin', 'Fin de partie (dans le mur)', None),
+    'Snake': [('b', None, None, None),  # The game itself: almost the page of the game, not captured
+              ('............', 'fin', 'Fin de partie (dans le mur)', None),
               ('x', 'score', 'Le score en QR code (signé)', 'b')],
     'Démineur': [('b', 'jeu', 'La partie', None)],
     '2048': [('b', 'jeu', 'La partie', None)],
@@ -145,6 +146,7 @@ PAGES = {
     'Recevoir une image': [],
     'Infrarouge': [],
     'Chasse 433 MHz': [],
+    'Réseau cigales': [('b', 'nom', 'Changer le nom de la cigale (B)', 'a')],
     'Lampe': [('b', 'eteinte', 'La lampe éteinte (B)', 'b')],  # Not -/+: the level is kept, it may be at an end
     'Badge de talk': [('x', 'vert', 'Vert : tout va bien', None), ('x', 'orange', 'Orange : 5 min', None),
                       ('x', 'rouge', 'Rouge : fini', None), ('x', None, None, None), ('x', None, None, None)],
@@ -510,7 +512,7 @@ CAPTIONS_EN = {
     'Le score en QR code (signé)': 'The score as a QR code (signed)',
     'La partie : attendre le signal': 'The game: wait for the signal', 'Le signal : appuyer !': 'The signal: press!',
     'Le temps de réaction': 'The reaction time',
-    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer', 'La lampe éteinte (B)': 'The lamp off (B)',
+    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer', 'Changer le nom de la cigale (B)': 'Change the name of the cicada (B)', 'La lampe éteinte (B)': 'The lamp off (B)',
     'Un morceau : deviner le titre': 'A track: guess the title', 'La réponse': 'The answer',
     "Une cigale qui vote (l'autre a choisi une autre réponse)": 'A cicada voting (the other one chose another answer)',
     'Le résultat des deux cigales qui votent': 'The result of the two cicadas voting', "L'aide pendant la partie": 'The help during the game',
@@ -567,10 +569,7 @@ def write_docs(c, lang_run, out, docs=True):
                     lines.append(f'- ⚠ {ch}')
             if checks:
                 lines.append('')
-        lines += ['', f'## {t_problems}', '']
-        lines += [f'- {ch}' for ch in problems] or ['(aucun)' if lang == 'fr' else '(none)']
-        lines += ['', f'## {t_rows}', '']
-        lines += [f'- {ch}' for ch in rows] or ['(aucune)' if lang == 'fr' else '(none)']
+        # The texts to fix and the rows cut are in checks.txt (for the developers), not in the page of the users
         with open(path, 'w', encoding='utf-8', newline='\n') as f:
             f.write('\n'.join(lines) + '\n')
     print(f'{len(c.shots)} écrans, {len(problems)} texte(s) à corriger, {len(rows)} ligne(s) de liste raccourcie(s)')
