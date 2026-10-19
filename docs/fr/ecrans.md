@@ -133,10 +133,6 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 
 ![Snake](../screens/jeux_solo_snake.png)
 
-### Snake — La partie
-
-![Snake — La partie](../screens/jeux_solo_snake_jeu.png)
-
 ### Snake — Fin de partie (dans le mur)
 
 ![Snake — Fin de partie (dans le mur)](../screens/jeux_solo_snake_fin.png)
@@ -248,6 +244,10 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 
 ![Bataille navale](../screens/jeux_multi_bataille_navale.png)
 
+### Bataille navale — Une bataille : la grille de tir
+
+![Bataille navale — Une bataille : la grille de tir](../screens/jeux_multi_bataille_navale_partie.png)
+
 ### Loup-garou
 
 ![Loup-garou](../screens/jeux_multi_loup_garou.png)
@@ -356,6 +356,10 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 
 ![Mini-bolides — Rejoindre une partie : la recherche](../screens/jeux_multi_mini_bolides_recherche.png)
 
+### Mini-bolides — Une course : sa voiture (encadrée), l'autre, les points de passage
+
+![Mini-bolides — Une course : sa voiture (encadrée), l'autre, les points de passage](../screens/jeux_multi_mini_bolides_partie.png)
+
 
 ## Social
 
@@ -366,6 +370,10 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Réseau cigales
 
 ![Réseau cigales](../screens/social_reseau_cigales.png)
+
+### Réseau cigales — Changer le nom de la cigale (B)
+
+![Réseau cigales — Changer le nom de la cigale (B)](../screens/social_reseau_cigales_nom.png)
 
 ### Messages
 
@@ -992,3 +1000,23 @@ Généré par `tools/badge_screens.py` (captures du badge par le port série, mo
 ### Vider la batterie
 
 ![Vider la batterie](../screens/admin_vider_la_batterie.png)
+
+
+## Jeux multi
+
+### Tir à la corde — Une partie : la corde pendant que les équipes tirent
+
+![Tir à la corde — Une partie : la corde pendant que les équipes tirent](../screens/jeux_multi_tir_a_la_corde_partie.png)
+
+### Tir à la corde — Le résultat de la partie
+
+![Tir à la corde — Le résultat de la partie](../screens/jeux_multi_tir_a_la_corde_resultat.png)
+
+### Duel — Un duel : choisir pierre, feuille ou ciseaux
+
+![Duel — Un duel : choisir pierre, feuille ou ciseaux](../screens/jeux_multi_duel_partie.png)
+
+### Duel — Le résultat de la manche
+
+![Duel — Le résultat de la manche](../screens/jeux_multi_duel_manche.png)
+

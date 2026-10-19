@@ -62,7 +62,7 @@ IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp')
 LINK = re.compile(r'(!?)\[([^\]]*)\]\(([^)\s]+)(\s+"[^"]*")?\)')
 OTHER_VERSION = re.compile(r'^\*(English version|Version française)\s*:.*\*\s*$', re.M)
 GALLERY = ['menu_accueil', 'social_reseau_cigales', 'jeux_solo_menu', 'medias_livres_jeux_lecture',
-           'radio_ir_station_meteo', 'badge_badge_de_talk', 'social_radar_des_cigales', 'jeux_solo_snake_jeu']
+           'radio_ir_station_meteo', 'badge_badge_de_talk', 'social_radar_des_cigales', 'jeux_multi_mini_bolides_partie']
 
 CSS = """
 :root { --bg: #fdfcf8; --fg: #1d1d1b; --muted: #6b6a64; --line: #e3e0d6; --accent: #8a5a00; --code: #f2efe6;
