@@ -74,7 +74,7 @@ Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs 
 
 **Notifications** : quand un message, une question de vote, une invitation à jouer ou une annonce des organisateurs
 arrive, le badge émet un bip et l'écrit en bas de l'écran. Depuis les menus ou la veille, la page concernée s'ouvre
-directement (vote, programme, virus, invitation au duel, à la bataille navale ou à une affaire de contrebande,
+directement (vote, virus, invitation au duel, à la bataille navale ou à une affaire de contrebande,
 nouvelles de l'assassin et du loup-garou, annonce en plein écran).
 Un nouveau succès (« Succès : Sociable ») ou un nouveau niveau s'affiche aussi en bas de l'écran, avec un carillon.
 
@@ -320,11 +320,6 @@ Lockpicking, Défense.
 - Quand une cigale qui partage une compétence s'approche (aussi près que pour une rencontre), le badge l'annonce
   en bas de l'écran, avec un carillon : « Marius aime aussi : Radio / SDR » (une fois par visite).
 - Les badges d'un firmware plus ancien n'envoient pas leurs compétences.
-
-**Programme** (retiré du menu : le programme peut changer après le flashage des badges ; voir le thème Social dans
-`src/menu/main.c` pour le remettre) : le programme de la conférence, sans carte SD. B : le détail d'un talk, avec le QR code
-de son lien ; Y / X : talk précédent / suivant.
-Le programme de SecSea 2026 n'est pas encore publié : les talks affichés sont provisoires.
 
 **Vote** : quand les organisateurs posent une question (« Ce talk vous a plu ? »...), la page s'ouvre.
 Y / X : choisir la réponse ; B : voter. On peut changer d'avis tant que le vote est ouvert :
@@ -706,7 +701,7 @@ B** pour confirmer (A : non) :
 
 **Mode démo** : B : lancer. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif (8 s),
 succès (6 s), images de la carte SD (18 s, une nouvelle toutes les 6 s), la première vidéo (20 s), compétences (5 s),
-la première musique (10 s), démo de l'écran (15 s), programme (6 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
+la première musique (10 s), démo de l'écran (15 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
 infos (5 s). Sans carte SD (ou sans fichier), les images, la vidéo et la musique sont sautées. La veille ne démarre
 pas pendant la démo ; **n'importe quel bouton l'arrête** (« Mode démo arrêté »), et les LEDs reprennent leur animation.
 

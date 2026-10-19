@@ -202,7 +202,7 @@ Générer un QR code sur l'écran : contact, flag, lien vers un talk. L'e-Paper 
 
 ## 7. Utilitaires
 
-- **U1. Programme de la conférence** *(fait : dans le firmware, annonce du talk suivant)* : planning sur la SD, « prochain talk » en page d'accueil, rappel par les LEDs 5 min avant. *Facile.*
+- **U1. Programme de la conférence** *(fait : Badge > Badge conférence, le programme de n'importe quel événement depuis la carte SD)* : planning sur la SD, « prochain talk » en page d'accueil, rappel par les LEDs 5 min avant. *Facile.*
 - **U2. Minuteur / chronomètre** : pour les orateurs et les ateliers. *Facile.*
 - **U3. Horloge** : l'heure, réglée par l'application PC ou par une balise radio de l'orga, et la veille qui affiche l'heure. *Facile.*
 - **U4. Veilleuse** *(fait : Badge > Lampe)* : les 2 LEDs en blanc, pour se repérer dans un couloir sombre (pas une vraie lampe de poche). *Facile.*

@@ -100,7 +100,7 @@ src/
 ├── images/     image2epi.py (.EPI images for the SD card)
 ├── radio/      CC1101 driver, 433 MHz OOK decoders (ookdec.c: remote controls, weather sensors)
 ├── ir/         infrared: reception, 38 kHz transmission, NEC decoding
-├── qrcode/     Project Nayuki's qrcodegen (QR codes of the scores and of the program)
+├── qrcode/     Project Nayuki's qrcodegen (QR codes of the scores, of the announcements, of the links of the conferences)
 ├── oled/       SSD1306 I2C OLED display
 ├── leds/       WS2812 and animations
 ├── btns/       buttons
@@ -186,7 +186,7 @@ game...), the pages drawn into a frame buffer, and the button actions.
 | `ook_rx.c`, `radio433.c` | 433 MHz OOK receiver; 433 MHz decoder and weather station pages (§ 6.14) |
 | `radio_tools.c` | radio message and carrier, GFSK profile, crystal measurement, frequency correction |
 | `radio_tune.c` | automatic tuning of the radio: crystal, noise, frequency (§ 6.21) |
-| `messages.c`, `contacts.c`, `vcard.c`, `program.c`, `vote.c` | relayed messages, business cards and their vCard format (§ 6.20), program, votes |
+| `messages.c`, `contacts.c`, `vcard.c`, `vote.c` | relayed messages, business cards and their vCard format (§ 6.20), votes; the program of an event: `conference.c` (Conference badge) |
 | `hotcold.c`, `infection.c`, `chorus.c` | hot - cold hunt, radar and 433 MHz hunt (§ 6.14), cicada virus, choir (§ 6.15) |
 | `ledcast.c`, `announce.c` | LEDs of the cicadas driven by an admin badge (§ 6.22), announcements (§ 6.23) |
 | `duel.c`, `battle.c` | rock-paper-scissors and battleship between two badges (§ 6.16) |
@@ -1074,7 +1074,7 @@ purity 95 %, level 95 % (before, 122 kHz PWM and 5 kHz deviation: 32 % / 17 % at
 
 Admin > Mode démo ([demo.c](../../src/menu/demo.c)) explains, then calls `demo_start()` of `main.c`: the loop goes
 through the steps of `DEMO_STEPS` (name, duration): name tag 8 s, achievements 6 s, images 18 s (`image_next()`
-every 6 s), video 20 s, skills 5 s, music 10 s, screen demo 15 s, program 6 s, radar 6 s, gamebooks 5 s, credits
+every 6 s), video 20 s, skills 5 s, music 10 s, screen demo 15 s, radar 6 s, gamebooks 5 s, credits
 6 s, info 5 s, then again. The media play the first file of the browser (or of its first folder); without an SD card
 or a file, the step is skipped (`demo: <step> skipped`). `demo_back()` goes back to the menu step by step (a video
 stops in several loops). Any button stops the demo (the press is not given to the page); the LEDs (rainbow during the

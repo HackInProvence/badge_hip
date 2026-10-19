@@ -24,7 +24,6 @@ target_sources(badge_menu PRIVATE
     messages.c
     nametag.c
     rank.c
-    program.c
     vote.c
     talk.c
     remote.c

@@ -79,7 +79,7 @@ An eighth theme, **Admin**, is hidden: it is for the organizers (see [§ 4.8](#4
 
 **Notifications**: when a message, a vote question, an invitation to play or an announcement of the organizers
 arrives, the badge beeps and writes it at the bottom of the screen. From the menus or the screensaver, the relevant
-page opens directly (vote, program, virus, invitation to a duel, a battleship game or a smuggling deal, news of the
+page opens directly (vote, virus, invitation to a duel, a battleship game or a smuggling deal, news of the
 assassin and werewolf games, full-screen announcement).
 A new achievement ("Unlocked: Sociable") or a new level is also shown at the bottom of the screen, with a chime.
 
@@ -326,11 +326,6 @@ Development, CTF, Lockpicking, Defense.
 - When a cicada sharing a skill comes close (as close as for an encounter), the badge says so at the bottom of the
   screen, with a chime: "Marius likes Radio / SDR too" (once per visit).
 - The badges of an older firmware do not send their skills.
-
-**Program** (Programme; removed from the menu: the program can change after the badges are flashed; see the Social theme
-in `src/menu/main.c` to bring it back): the conference program, no SD card needed. B: the details of a talk, with the
-QR code of its link; Y / X: previous / next talk.
-The SecSea 2026 program is not published yet: the talks shown are placeholders.
 
 **Vote**: when the organizers ask a question ("Liked this talk?"...), the page opens.
 Y / X: choose the answer; B: vote. You can change your mind while the vote is open:
@@ -716,7 +711,7 @@ confirm (A: no):
 
 **Demo mode** (Mode démo): B: start. The badge goes through, in a loop, with rainbow LEDs: name tag (8 s),
 achievements (6 s), images of the SD card (18 s, a new one every 6 s), the first video (20 s), skills (5 s),
-the first music (10 s), screen demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s).
+the first music (10 s), screen demo (15 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s).
 Without an SD card (or without a file), the images, the video and the music are skipped. The screensaver does not
 start during the demo; **any button stops it** ("Demo mode off"), and the LEDs go back to their animation.
 

@@ -32,7 +32,6 @@ typedef enum {
     APP_RADAR,
     APP_VOTE,
     APP_VOTE_ADMIN,
-    APP_PROGRAM,
     APP_INFECTION,
     APP_INFECTION_ZERO,
     APP_MESSAGES,

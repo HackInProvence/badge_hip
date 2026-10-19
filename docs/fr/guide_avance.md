@@ -844,7 +844,7 @@ radio et de maintenir le bouton.
 
 Pour un stand : Admin > Mode démo, B. Le badge enchaîne en boucle, LEDs en arc-en-ciel : badge nominatif
 (8 s), succès (6 s), images de la carte SD (18 s, une toutes les 6 s), la première vidéo (20 s), compétences (5 s),
-la première musique (10 s), démo de l'écran (15 s), programme (6 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
+la première musique (10 s), démo de l'écran (15 s), radar (6 s), livres-jeux (5 s), crédits (6 s),
 infos (5 s). Les médias sautent leur étape sans carte SD ou sans fichier. La veille ne démarre pas ; **n'importe
 quel bouton arrête la démo**. Elle n'est pas gardée après un redémarrage.
 

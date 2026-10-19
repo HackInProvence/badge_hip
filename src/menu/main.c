@@ -70,10 +70,6 @@ void contacts_export(void);  /* contacts.c: the cards received as vCards on USB 
 
 
 /* Buttons flags from btns_get_state() */
-/* Social > Programme (program.c): hidden, the program of the conference can change after the badges are flashed
- * (the page and its code stay in the firmware). 1: back in the demo mode; the menu: see the Social theme below */
-#define MENU_PROGRAM 0
-
 #define BTN_A 0x01  /* A */
 #define BTN_B 0x02  /* B */
 #define BTN_X 0x04  /* X */
@@ -491,7 +487,7 @@ bool assassin_event(char *buf, int len);
 void werewolf_service(absolute_time_t now);
 bool werewolf_event(char *buf, int len);
 
-/* The services of the social features (vote.c, program.c, infection.c, messages.c) */
+/* The services of the social features (vote.c, infection.c, messages.c) */
 void vote_task(absolute_time_t now);
 bool vote_new(void);
 void infection_init(void);
@@ -741,8 +737,6 @@ static const submenu_t SUBMENUS[] = {
                        M_CTF, M_APP(APP_CRYPTO)}},
     {N_("Jeux multi"), 6, {M_APP(APP_DUEL), M_APP(APP_BATTLE), M_APP(APP_WEREWOLF), M_APP(APP_ASSASSIN),
                            M_APP(APP_TUG), M_APP(APP_RACE)}},
-    /* Programme (program.c) is not in the menu: the program of the conference can change after the badges are
-     * flashed. To put it back: M_APP(APP_PROGRAM) after APP_SKILLS, 12 entries, and MENU_PROGRAM 1 (the demo mode) */
     {N_("Social"), 12, {M_SOCIAL, M_APP(APP_MESSAGES), M_APP(APP_CONTACTS), M_APP(APP_SKILLS),
                     M_APP(APP_VOTE), M_APP(APP_RADAR), M_APP(APP_HOTCOLD), M_APP(APP_INFECTION), M_APP(APP_CHORUS),
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER), M_APP(APP_DETECTOR)}},
@@ -2292,7 +2286,7 @@ static void cancel(void) {
 /* ------ Mode démo (Admin > Mode démo, demo.c): the features one after the other, in a loop, for a stand;
  * any button stops it. The pages of the SD card are skipped when there is no card. ------ */
 
-typedef enum { D_NAMETAG, D_ACHIEVEMENTS, D_IMAGES, D_VIDEO, D_SKILLS, D_MUSIC, D_SCREEN_DEMO, D_PROGRAM, D_RADAR,
+typedef enum { D_NAMETAG, D_ACHIEVEMENTS, D_IMAGES, D_VIDEO, D_SKILLS, D_MUSIC, D_SCREEN_DEMO, D_RADAR,
                D_GAMEBOOK, D_CREDITS, D_INFO, D_STEPS } demo_step_t;
 static const struct {
     const char *name;
@@ -2300,7 +2294,7 @@ static const struct {
 } DEMO_STEPS[D_STEPS] = {
     [D_NAMETAG] = {"badge nominatif", 8}, [D_ACHIEVEMENTS] = {"succès", 6}, [D_IMAGES] = {"images", 18},
     [D_VIDEO] = {"vidéo", 20}, [D_SKILLS] = {"compétences", 5}, [D_MUSIC] = {"musique", 10},
-    [D_SCREEN_DEMO] = {"démo écran", 15}, [D_PROGRAM] = {"programme", 6}, [D_RADAR] = {"radar", 6},
+    [D_SCREEN_DEMO] = {"démo écran", 15}, [D_RADAR] = {"radar", 6},
     [D_GAMEBOOK] = {"livres-jeux", 5}, [D_CREDITS] = {"crédits", 6}, [D_INFO] = {"infos", 5},
 };
 #define DEMO_IMAGE_MS 6000
@@ -2371,12 +2365,6 @@ static void demo_start_step(absolute_time_t now) {
     case D_NAMETAG: app_open(APPS[APP_NAMETAG]); break;
     case D_ACHIEVEMENTS: app_open(APPS[APP_ACHIEVEMENTS]); break;
     case D_SKILLS: app_open(APPS[APP_SKILLS]); break;
-    case D_PROGRAM:
-        if (MENU_PROGRAM)
-            app_open(APPS[APP_PROGRAM]);
-        else
-            shown = false;  /* Not in the menus: not in the demo either */
-        break;
     case D_RADAR: app_open(APPS[APP_RADAR]); break;
     case D_GAMEBOOK: app_open(APPS[APP_GAMEBOOK]); break;
     case D_IMAGES: shown = demo_media(B_IMAGE); break;

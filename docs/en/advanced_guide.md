@@ -841,7 +841,7 @@ moment. It also opens a listening moment every 10 s for a weak remote. Hence the
 
 For a booth: Admin > Demo mode, B. The badge loops, LEDs in rainbow: name tag (8 s), achievements (6 s),
 pictures of the SD card (18 s, one every 6 s), the first video (20 s), skills (5 s), the first music (10 s), screen
-demo (15 s), program (6 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s). The media steps are skipped
+demo (15 s), radar (6 s), gamebooks (5 s), credits (6 s), info (5 s). The media steps are skipped
 without an SD card or without a file. The screensaver does not start; **any button stops the demo**. It is not kept
 after a reboot.
 

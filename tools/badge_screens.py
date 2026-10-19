@@ -136,7 +136,6 @@ PAGES = {
     'Contacts': [('b', 'carte', 'Ma carte (champs cochés : envoyés)', None),
                  ('b', 'saisie', 'Saisie d\'un champ', 'a'), ('a', None, None, None),
                  ('xb', 'echange', 'Echange des cartes', 'a'), ('xb', 'recus', 'Contacts reçus', 'a')],
-    'Programme': [('b', 'talk', 'Un talk (et son QR code)', 'a')],
     'Radar des cigales': [],
     'Virus des cigales': [],
     'Choeur': [],

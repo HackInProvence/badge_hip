@@ -100,7 +100,7 @@ src/
 ├── images/     image2epi.py (images .EPI pour la carte SD)
 ├── radio/      pilote CC1101, décodeurs OOK 433 MHz (ookdec.c : télécommandes, sondes météo)
 ├── ir/         infrarouge : réception, émission 38 kHz, décodage NEC
-├── qrcode/     qrcodegen de Project Nayuki (QR codes des scores et du programme)
+├── qrcode/     qrcodegen de Project Nayuki (QR codes des scores, des annonces, des liens des conférences)
 ├── oled/       écran OLED SSD1306 en I2C
 ├── leds/       WS2812 et animations
 ├── btns/       boutons
@@ -186,7 +186,7 @@ jeu...), les pages dessinées dans un frame buffer, les actions des boutons.
 | `ook_rx.c`, `radio433.c` | récepteur OOK 433 MHz ; pages Décodeur 433 MHz et Station météo (§ 6.14) |
 | `radio_tools.c` | message et porteuse radio, profil GFSK, mesure du quartz, correction de fréquence |
 | `radio_tune.c` | réglage automatique de la radio : quartz, bruit, fréquence (§ 6.21) |
-| `messages.c`, `contacts.c`, `vcard.c`, `program.c`, `vote.c` | messages relayés, cartes de visite et leur format vCard (§ 6.20), programme, votes |
+| `messages.c`, `contacts.c`, `vcard.c`, `vote.c` | messages relayés, cartes de visite et leur format vCard (§ 6.20), votes ; le programme d'un événement : `conference.c` (Badge conférence) |
 | `hotcold.c`, `infection.c`, `chorus.c` | chasse chaud - froid, radar et Chasse 433 MHz (§ 6.14), virus des cigales, choeur (§ 6.15) |
 | `ledcast.c`, `announce.c` | LEDs des cigales pilotées par un badge admin (§ 6.22), annonces (§ 6.23) |
 | `duel.c`, `battle.c` | pierre-feuille-ciseaux et bataille navale entre deux badges (§ 6.16) |
@@ -1082,7 +1082,7 @@ SDR : [radio_pirate.md](radio_pirate.md).
 
 Admin > Mode démo ([demo.c](../../src/menu/demo.c)) explique puis appelle `demo_start()` de `main.c` : la boucle
 enchaîne les étapes de `DEMO_STEPS` (nom, durée) : badge nominatif 8 s, succès 6 s, images 18 s (`image_next()`
-toutes les 6 s), vidéo 20 s, compétences 5 s, musique 10 s, démo écran 15 s, programme 6 s, radar 6 s,
+toutes les 6 s), vidéo 20 s, compétences 5 s, musique 10 s, démo écran 15 s, radar 6 s,
 livres-jeux 5 s, crédits 6 s, infos 5 s, puis recommence. Les médias jouent le premier fichier du navigateur (ou de
 son premier dossier) ; sans carte SD ni fichier, l'étape est sautée (`demo: <étape> skipped`). `demo_back()` revient
 au menu pas à pas (une vidéo s'arrête en plusieurs tours). N'importe quel bouton arrête la démo (l'appui n'est pas
