@@ -298,6 +298,188 @@ def vote_screens(c, admin_ports, voter_ports, lang='fr'):
     del vstart
 
 
+MULTI = ['Duel', 'Bataille navale', 'Loup-garou', 'Assassin', 'Tir à la corde', 'Mini-bolides']  # main.c
+
+
+def partner_badge(port, lang, out_dir):
+    """The other badge of a game, restarted, in the language of the capture"""
+    b = Badge(port)
+    b.start()
+    while not b.connected():
+        time.sleep(0.1)
+    pt = st.Tester(b, out_dir, False)
+    pt.mark()
+    pt.keys('R')
+    pt.expect(r'^--- disconnected', 5)
+    while not b.connected():
+        time.sleep(0.2)
+    pt.pump(8)
+    pt.lang_before = badge_lang(pt, lang)
+    return pt
+
+
+def open_multi(t, game):
+    """From the main menu: Jeux multi, then the game"""
+    t.mark()
+    t.keys('x' * st.THEMES.index('Jeux multi') + 'b', 0.4)
+    t.keys('x' * MULTI.index(game) + 'b', 0.5)
+
+
+def join_party(pt, prefix, timeout=20):
+    """The partner: Rejoindre une partie, then the first party heard"""
+    pt.keys('xb', 0.5)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        pt.mark()
+        pt.keys('b', 0.5)
+        if pt.expect(rf'^{prefix}: joining', 1.5):
+            return pt.expect(r'^party: joined', 10) is not None
+        pt.pump(1)
+    return False
+
+
+def badge_name(t):
+    """The name of a badge (its "!" diagnostic)"""
+    t.mark()
+    t.keys('!')
+    m = t.expect(r'^social: \w+, ([^,]+),', 4)
+    return m.group(1) if m else None
+
+
+def neighbour_index(t, name):
+    """The row of the cicada name in the cicadas near the badge (the "!" diagnostic: the order of the lists of the games)"""
+    t.mark()
+    t.keys('!')
+    t.pump(1.5)
+    rows = [re.match(r'^  (.+?) -?\d+ dBm', l) for l in t.lines[t.cursor:]]
+    names = [m.group(1) for m in rows if m]
+    return names.index(name) if name in names else None
+
+
+def invite(t, pt, prefix, timeout=30):
+    """Duel, naval battle: the host invites the partner (its row in the list of the cicadas near), it accepts"""
+    partner = badge_name(pt)
+    pt.mark()  # Before the invitation: it comes at once
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        i = neighbour_index(t, partner)
+        if i is None:
+            t.pump(2)  # The beacons of the partner, heard soon
+            continue
+        t.mark()
+        t.keys('x' * i + 'b', 0.5)
+        m = t.expect(rf'^{prefix}: inviting (.+)$', 2)
+        if m and m.group(1).startswith(partner):
+            break
+        print(f'    invited {m.group(1) if m else "nobody"}, not {partner}')
+        return False
+    else:
+        return False
+    deadline = time.time() + 10
+    while time.time() < deadline:
+        if pt.expect(rf'^{prefix}: invited by', 1):
+            pt.keys('b', 0.5)
+            return pt.expect(rf'^{prefix}: accepted', 5) is not None
+    return False
+
+
+def multi_screens(c, port, lang, restart):
+    """A game in progress for the multiplayer games, with another badge (\\p port)"""
+    t = c.t
+    games = [('Tir à la corde', tug_game), ('Mini-bolides', race_game), ('Duel', duel_game),
+             ('Bataille navale', battle_game)]
+    pt = None
+    for game, run in games:
+        print(f'  {game} (2 badges)')
+        restart()
+        if pt is None:
+            pt = partner_badge(port, lang, t.out_dir)
+        else:
+            pt.mark()
+            pt.keys('R')
+            pt.expect(r'^--- disconnected', 5)
+            while not pt.badge.connected():
+                time.sleep(0.2)
+            pt.pump(8)
+        open_multi(t, game)
+        open_multi(pt, game)
+        try:
+            run(c, t, pt, game)
+        except Exception as e:  # A game that went wrong: the next one from restarted badges
+            print(f'    {game}: {type(e).__name__}: {e}')
+    if pt is not None:
+        if pt.lang_before and pt.lang_before != lang:
+            badge_lang(pt, pt.lang_before)
+        pt.mark()
+        pt.keys('R')
+        pt.badge.stop()
+
+
+def tug_game(c, t, pt, game):
+    t.mark()
+    t.keys('b', 0.5)  # Créer une partie
+    if not join_party(pt, 'tug'):
+        print('    no party joined')
+        return
+    t.expect(r'^party: .* joined', 10)
+    t.mark()
+    t.keys('b', 0.5)  # Lancer
+    if not t.expect(r'^tug: pull!$', 20):
+        print('    no start')
+        return
+    end = time.time() + 1.5
+    while time.time() < end:  # The partner pulls
+        pt.keys('ab', 0.08)
+    start = len(t.lines)
+    c.shot('Jeux multi', game, 'partie', 'Une partie : la corde pendant que les équipes tirent', start, settle=0.3)
+    end = time.time() + 20
+    while time.time() < end and not any('tug: result' in l for l in t.lines[start:]):
+        pt.keys('ab', 0.08)
+        t.pump()
+    t.expect(r'^tug: result', 10)
+    c.shot('Jeux multi', game, 'resultat', 'Le résultat de la partie', len(t.lines))
+
+
+def race_game(c, t, pt, game):
+    t.mark()
+    t.keys('b', 0.5)
+    if not join_party(pt, 'race'):
+        print('    no party joined')
+        return
+    t.expect(r'^party: .* joined', 10)
+    t.mark()
+    t.keys('b', 0.5)
+    if not t.expect(r'^race: \d+ cars', 15):
+        print('    no start')
+        return
+    t.pump(7)  # The grid and the countdown
+    for _ in range(6):  # A few gas presses: the car leaves the grid
+        t.keys('b', 0.25)
+    c.shot('Jeux multi', game, 'partie', 'Une course : sa voiture (encadrée), l\'autre, les points de passage',
+           len(t.lines), settle=0.5)
+
+
+def duel_game(c, t, pt, game):
+    if not invite(t, pt, 'duel'):
+        print('    no duel')
+        return
+    t.pump(1)
+    c.shot('Jeux multi', game, 'partie', 'Un duel : choisir pierre, feuille ou ciseaux', len(t.lines))
+    t.mark()
+    t.keys('b', 0.5)
+    pt.keys('xb', 0.5)
+    if t.expect(r'^duel: round', 10):
+        c.shot('Jeux multi', game, 'manche', 'Le résultat de la manche', len(t.lines), settle=0.5)
+
+
+def battle_game(c, t, pt, game):
+    if not invite(t, pt, 'battle'):
+        print('    no battle')
+        return
+    t.pump(3)
+    c.shot('Jeux multi', game, 'partie', 'Une bataille : la grille de tir', len(t.lines))
+
+
 def check_shots(c, out):
     """Every screenshot: there, not empty (the page below its title has something), not twice the same image"""
     import hashlib
@@ -330,6 +512,8 @@ def main():
     parser.add_argument('--port', default=None)
     parser.add_argument('--only', default=None, help='comma separated themes (French names)')
     parser.add_argument('--lang', default='fr', help='language of the badge during the capture (fr, en...)')
+    parser.add_argument('--multi', default=None, help='another badge (COM13): a game in progress for the '
+                        'multiplayer games')
     parser.add_argument('--voters', default=None, help='two more badges (COM11,COM13): the screens of a vote')
     parser.add_argument('--out', default=None, help='folder of the screenshots and checks.txt, the docs not written '
                         '(to check the texts of a language)')
@@ -453,6 +637,14 @@ def main():
             c.shots.remove(shot)
             last = max((k for k, s in enumerate(c.shots) if s[:2] == shot[:2]), default=len(c.shots) - 1)
             c.shots.insert(last + 1, shot)
+    if args.multi and (not only or 'Jeux multi' in only):
+        print('Jeux multi (2 badges)')
+        n = len(c.shots)
+        multi_screens(c, args.multi, args.lang, restart)
+        for shot in c.shots[n:]:  # After the other screens of the same game
+            c.shots.remove(shot)
+            last = max((k for k, s in enumerate(c.shots) if s[:2] == shot[:2]), default=len(c.shots) - 1)
+            c.shots.insert(last + 1, shot)
     t.keys('U')
     restore = before if before else 'fr'
     if restore != args.lang:
@@ -512,7 +704,13 @@ CAPTIONS_EN = {
     'Le score en QR code (signé)': 'The score as a QR code (signed)',
     'La partie : attendre le signal': 'The game: wait for the signal', 'Le signal : appuyer !': 'The signal: press!',
     'Le temps de réaction': 'The reaction time',
-    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer', 'Changer le nom de la cigale (B)': 'Change the name of the cicada (B)', 'La lampe éteinte (B)': 'The lamp off (B)',
+    'La partie : attendre le signal (les LEDs)': 'The game: wait for the signal (the LEDs)', 'Moins fort': 'Dimmer',
+    'Une partie : la corde pendant que les équipes tirent': 'A game: the rope while the teams pull',
+    'Le résultat de la partie': 'The result of the game',
+    "Une course : sa voiture (encadrée), l'autre, les points de passage":
+        'A race: its car (framed), the other one, the checkpoints',
+    'Un duel : choisir pierre, feuille ou ciseaux': 'A duel: choose rock, paper or scissors',
+    'Le résultat de la manche': 'The result of the round', 'Une bataille : la grille de tir': 'A battle: the grid of the shots', 'Changer le nom de la cigale (B)': 'Change the name of the cicada (B)', 'La lampe éteinte (B)': 'The lamp off (B)',
     'Un morceau : deviner le titre': 'A track: guess the title', 'La réponse': 'The answer',
     "Une cigale qui vote (l'autre a choisi une autre réponse)": 'A cicada voting (the other one chose another answer)',
     'Le résultat des deux cigales qui votent': 'The result of the two cicadas voting', "L'aide pendant la partie": 'The help during the game',
