@@ -49,7 +49,8 @@ typedef enum {
     NET_ANNOUNCE = 0x0D,  /* An announcement: time, text, QR code (announce.c) */
     NET_PARTY = 0x0E,  /* The group games: lobby (party.c), then the game (werewolf.c, assassin.c, tug.c) */
     NET_PING = 0x0F,  /* Diagnostic ("P" key on the USB serial port): the badges that hear it print it */
-    NET_TYPES = 0x10,
+    NET_SEEK = 0x10,  /* Finding a cicada: the radar asks it to answer fast, to blink, to sing (seek.c) */
+    NET_TYPES = 0x11,
 } net_type_t;
 
 /* Flags of net_send() */

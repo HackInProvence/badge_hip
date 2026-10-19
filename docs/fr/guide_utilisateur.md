@@ -332,6 +332,12 @@ seul le dernier vote de chaque badge compte.
 
 **Radar des cigales** : les cigales entendues, avec leur niveau (« N3 ») et la force de leur signal (en dBm, « * » pour une cigale déjà
 rencontrée). A : retour à la liste ; B : suivre une cigale en mode « chaud - froid ».
+- Pendant le suivi, la cigale suivie répond environ 4 fois par seconde (au lieu d'une balise toutes les 2 s) : la
+  jauge suit vite, on peut tourner sur soi pour trouver la direction (le corps fait écran au signal).
+- Y : ses yeux clignotent en vert (pour qu'elle sache qu'on la cherche) ; X : elle chante (pour la retrouver à
+  l'oreille). Elle affiche « Une cigale te cherche ! ». Tout s'arrête 2 à 3 s après avoir quitté le suivi.
+  Une cigale en mode muet ne clignote pas et ne chante pas ; une cigale d'un ancien firmware est suivie par ses
+  balises seulement.
 
 **Chaud - froid** : les organisateurs cachent un badge balise ; trouvez-le à la force de son signal.
 Le badge indique « Glacial », « Froid », « Tiède », « Chaud » ou « BRÛLANT ! » avec une jauge,

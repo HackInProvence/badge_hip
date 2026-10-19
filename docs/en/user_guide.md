@@ -338,6 +338,11 @@ only the last vote of each badge counts.
 
 **Cicada radar** (Radar des cigales): the cicadas heard, with their level ("N3") and the strength of their signal (in dBm, "*" for a cicada
 already met). A: back to the list; B: follow a cicada in "hot - cold" mode.
+- While following, the cicada followed answers about 4 times a second (instead of a beacon every 2 s): the gauge
+  follows fast, you can turn around to find the direction (the body blocks the signal).
+- Y: its eyes blink in green (so that it knows it is sought); X: it sings (to find it by ear). It shows "A cicada
+  is looking for you!". Everything stops 2 to 3 s after leaving the follow view. A cicada in mute mode does not
+  blink nor sing; a cicada with an older firmware is followed by its beacons only.
 
 **Hot - cold** (Chaud - froid): the organizers hide a beacon badge; find it by the strength of its signal.
 The badge shows "Icy", "Cold", "Warm", "Hot" or "BURNING!" (Glacial, Froid, Tiède, Chaud, BRÛLANT !) with a

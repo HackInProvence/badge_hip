@@ -606,6 +606,7 @@ All the features that talk to other badges share the CC1101 through [net.h](../.
 | 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), part, number of parts \| 0x80, TTL, origin (4), at most 46 bytes, relayed part by part (`relay.c`); the older format (number of parts without 0x80, 48 bytes, no TTL) is still received; the whole 3 times (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, then `tug.c`, `assassin.c`, `werewolf.c` | game, session (2), kind, recipient (4, 0 = everybody), at most 47 bytes (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | number (`P` key) |
+| 0x10 | `NET_SEEK` | `seek.c` | the radar following a cicada, every second: 1, flags (1 green eyes, 2 song), id of the cicada (4); it answers 5 times, every 200 ms: 2, number |
 
 Messages are relayed by flooding: each badge sends a message it has not seen yet (origin + uid) once more,
 with the TTL decremented, with `NET_MEDIUM | NET_JITTER`, down to TTL 0 (3 at the start).

@@ -5,7 +5,8 @@
 
 /* Hot / cold: a master badge (admin menu) sends a beacon every second, the other badges find it with the strength
  * of its signal: text, gauge, LEDs from blue to red and beeps faster and faster (like a Geiger counter).
- * The radar (S9) follows a neighbour of the network of the cicadas the same way. */
+ * The radar (S9) follows a neighbour of the network of the cicadas the same way: it asks it to answer ~5 times a
+ * second (seek.c), and if wanted to blink its eyes in green (Y) and to sing (X). */
 
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +17,7 @@
 #include "net.h"
 #include "ook_rx.h"
 #include "remote.h"
+#include "seek.h"
 #include "social.h"
 #include "store.h"
 
@@ -254,7 +256,10 @@ static int n_near = 0, radar_sel = 0;
 static uint32_t followed = 0;
 static char followed_name[9];
 static signal_t follow;
-static absolute_time_t radar_ts = 0;
+static absolute_time_t radar_ts = 0, follow_redraw_ts = 0;
+static uint8_t seek_flags = 0;  /* SEEK_EYES, SEEK_SING asked to the cicada followed */
+static bool follow_changed = false;
+#define FOLLOW_REDRAW_MS 300  /* The answers come ~5 times a second: the page follows them */
 
 static void radar_label(int i, char *buf, size_t len) {
     char level[8] = "";
@@ -282,11 +287,18 @@ static bool radar_buttons(const app_buttons_t *b, absolute_time_t now) {
         if (! followed)
             return false;
         followed = 0;  /* Back to the list */
+        seek_follow(0, 0);
         app_leds(0, 0, 0);
         return true;
     }
-    if (followed)
+    if (followed) {
+        /* Y: its eyes blink in green, X: it sings */
+        if (b->pressed & (UI_BTN_Y | UI_BTN_X)) {
+            seek_flags ^= (b->pressed & UI_BTN_Y) ? SEEK_EYES : SEEK_SING;
+            seek_follow(followed, seek_flags);
+        }
         return true;
+    }
     if (n_near && (b->pressed & UI_BTN_Y))
         radar_sel = (radar_sel + n_near - 1) % n_near;
     if (n_near && (b->pressed & UI_BTN_X))
@@ -296,11 +308,29 @@ static bool radar_buttons(const app_buttons_t *b, absolute_time_t now) {
         snprintf(followed_name, sizeof(followed_name), "%s", near[radar_sel].name);
         memset(&follow, 0, sizeof(follow));
         signal_add(&follow, near[radar_sel].rssi, now);
+        seek_flags = 0;
+        seek_follow(followed, seek_flags);
     }
     return true;
 }
 
 static bool radar_task(absolute_time_t now) {
+    if (followed) {
+        /* The fast answers of the cicada followed (seek.c): less smoothing than the beacons, to turn and see */
+        int16_t rssi;
+        if (seek_heard(&rssi)) {
+            follow.rssi = follow.valid ? (follow.rssi + rssi) / 2 : rssi;
+            follow.seen = now;
+            follow.valid = true;
+            follow_changed = true;
+        }
+        signal_feedback(&follow, now);
+        if (follow_changed && absolute_time_diff_us(follow_redraw_ts, now) >= FOLLOW_REDRAW_MS * 1000) {
+            follow_changed = false;
+            follow_redraw_ts = now;
+            return true;
+        }
+    }
     if (absolute_time_diff_us(radar_ts, now) < 1000000)
         return false;
     radar_ts = now;
@@ -312,9 +342,8 @@ static bool radar_task(absolute_time_t now) {
         radar_sel = n_near ? n_near - 1 : 0;
     if (followed) {
         for (int i = 0; i < n_near; ++i)
-            if (near[i].id == followed && absolute_time_diff_us(follow.seen, now) > 500000)
-                signal_add(&follow, near[i].rssi, now);
-        signal_feedback(&follow, now);
+            if (near[i].id == followed && absolute_time_diff_us(follow.seen, now) > 1500000)
+                signal_add(&follow, near[i].rssi, now);  /* Its beacons: an older firmware does not answer */
     }
     return true;
 }
@@ -325,7 +354,11 @@ static void radar_render(uint8_t *fb, absolute_time_t now) {
         snprintf(title, sizeof(title), _("Radar : %s"), followed_name);
         ui_title(fb, title);
         signal_render(fb, &follow, now, followed_name);
-        ui_footer(fb, N_("A : retour à la liste"));
+        char text[48];
+        snprintf(text, sizeof(text), _("Yeux verts : %s  Chant : %s"), seek_flags & SEEK_EYES ? _("oui") : _("non"),
+                 seek_flags & SEEK_SING ? _("oui") : _("non"));
+        ui_lines(fb, 152, &gfx_font_small, text);
+        ui_footer(fb, N_("Y : yeux  X : chant  A : liste"));
         return;
     }
     ui_title(fb, N_("Radar des cigales"));
@@ -338,6 +371,8 @@ static void radar_render(uint8_t *fb, absolute_time_t now) {
 }
 
 static void radar_stop(void) {
+    followed = 0;
+    seek_follow(0, 0);
     app_leds(0, 0, 0);
 }
 

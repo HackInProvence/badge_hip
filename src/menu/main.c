@@ -58,6 +58,7 @@
 #include "party.h"
 #include "sd_list.h"
 #include "sd_serial.h"
+#include "seek.h"
 #include "social.h"
 #include "store.h"
 #include "i18n.h"
@@ -354,9 +355,13 @@ static const char *LED_NAMES[] = {N_("éteintes"), N_("arc-en-ciel"), N_("respir
                                    N_("clignotement"), N_("vert fixe")};
 #define N_LED_MODES (sizeof(LED_NAMES)/sizeof(LED_NAMES[0]))
 
+static bool buzzer_claimed = false;  /* An application drives the buzzer (app_buzzer_claim()) */
+
 static void set_sound(bool on) {
     sound_on = on;
-    noise_gen_set_enabled(on && ! remote_muted());
+    /* A cicada seeks this one (seek.c): it sings, unless the buzzer plays something else */
+    bool sought = (seek_sought() & SEEK_SING) && ! buzzer_claimed && ! audio_is_open();
+    noise_gen_set_enabled((on || sought) && ! remote_muted());
 }
 
 bool ledcast_show(void);
@@ -365,6 +370,10 @@ static void set_leds(unsigned mode) {
     led_mode = mode % N_LED_MODES;
     if (remote_muted()) {
         leds_cancel_anim(true);  /* Mute mode: the LED mode is kept for later */
+        return;
+    }
+    if (seek_sought() & SEEK_EYES) {
+        leds_anim_blink(LED_RGB(0, 255, 0), 250000, 250000);  /* A cicada seeks this one (seek.c) */
         return;
     }
     if (ledcast_show())
@@ -1783,7 +1792,6 @@ static void play_chime(void) {
 }
 
 /* Sound of the games: a square wave, like the chime */
-static bool buzzer_claimed = false;  /* An application drives the buzzer (app_buzzer_claim()) */
 
 /* A game (the games of games.c, the applications with confirm_exit) left by a short press on A: a message asks for a
  * long press (a game is not left by mistake); a long press on A leaves, any other press closes the message */
@@ -2537,6 +2545,7 @@ int main() {
     chorus_init();
     contacts_init();
     duel_init();
+    seek_init();
     smuggler_init();
     image_radio_init();
     ledcast_init();
@@ -2876,6 +2885,19 @@ int main() {
             detect_leds_off = 0;
             if (! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
                 set_leds(led_mode);
+        }
+        /* A cicada seeks this one (seek.c, the radar): its eyes blink in green, it sings (set_leds(), set_sound()) */
+        seek_task(now);
+        if (seek_event(notif, sizeof(notif)))
+            notify(NULL, notif);
+        static uint8_t seek_shown = 0;
+        if (seek_sought() != seek_shown) {
+            uint8_t changed = seek_sought() ^ seek_shown;
+            seek_shown = seek_sought();
+            if ((changed & SEEK_EYES) && ! (app == A_APP && cur_app->owns_leds) && app != A_GAME)
+                set_leds(led_mode);
+            if (changed & SEEK_SING)
+                set_sound(sound_on);
         }
         announce_task(now);
         if (announce_new(notif, sizeof(notif))) {

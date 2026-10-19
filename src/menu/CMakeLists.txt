@@ -50,6 +50,7 @@ target_sources(badge_menu PRIVATE
     fsk_link.c
     fsk_id.c
     detector.c
+    seek.c
     conference.c
     sd_list.c
     sd_serial.c

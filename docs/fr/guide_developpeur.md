@@ -606,6 +606,7 @@ Toutes les fonctions qui parlent aux autres badges partagent le CC1101 par [net.
 | 0x0D | `NET_ANNOUNCE` | `announce.c` | nonce (2), morceau, nombre de morceaux \| 0x80, TTL, origine (4), 46 octets au plus, relayé morceau par morceau (`relay.c`) ; l'ancien format (nombre de morceaux sans 0x80, 48 octets, pas de TTL) est encore reçu ; le tout 3 fois (§ 6.23) |
 | 0x0E | `NET_PARTY` | `party.c`, puis `tug.c`, `assassin.c`, `werewolf.c` | jeu, session (2), genre, destinataire (4, 0 = tous), 47 octets au plus (§ 6.25) |
 | 0x0F | `NET_PING` | `net.c` | numéro (touche `P`) |
+| 0x10 | `NET_SEEK` | `seek.c` | le radar qui suit une cigale, chaque seconde : 1, drapeaux (1 yeux verts, 2 chant), id de la cigale (4) ; elle répond 5 fois, toutes les 200 ms : 2, numéro |
 
 Les messages sont relayés par inondation : chaque badge renvoie une fois un message pas encore vu (origine + uid),
 TTL décrémenté, avec `NET_MEDIUM | NET_JITTER`, jusqu'à TTL 0 (3 au départ).
