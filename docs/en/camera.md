@@ -58,11 +58,14 @@ the row.
 **Programming**:
 
 1. Plug the flasher in USB: it shows as a serial port (CH340: driver included in Windows 10/11, macOS, Linux).
-2. `cd esp32cam`, then `pio run -t upload --upload-port COMx` (PlatformIO: `pip install platformio`).
-3. When PlatformIO shows "Connecting...": hold the **FLASH** button of the flasher (IO0 to ground) and press the
+2. Find its port (`pio device list`: "USB-SERIAL CH340") and put it in `upload_port` and `monitor_port` of
+   `esp32cam/platformio.ini`. Without it, PlatformIO takes the first port it sees, often a badge.
+3. `cd esp32cam`, then `pio run -t upload` (PlatformIO: `pip install platformio`; if `pio` is not found, it is in
+   `%USERPROFILE%\.platformio\penv\Scripts` on Windows, `~/.platformio/penv/bin` elsewhere).
+4. When PlatformIO shows "Connecting...": hold the **FLASH** button of the flasher (IO0 to ground) and press the
    **RST** button of the ESP32-CAM, then release. The flasher cannot restart the ESP32-CAM by itself: its RST pin is
    not connected.
-4. At the end, press **RST** on the ESP32-CAM: the firmware starts.
+5. At the end, press **RST** on the ESP32-CAM: the firmware starts.
 
 The 3.3 V of the flasher (~400 mA) is enough to program and try the camera on the desk, **without the flash** (the flash
 LED draws too much).
@@ -127,4 +130,8 @@ Host test: `python src/tests/host/run_tests.py camlink`.
 
 - The GPIOs really on each SAO port of the V1.2 board (its schematic is not in the repository): the automatic search
   covers the possible cases; to confirm for the documentation.
-- The measures: frames per second of the viewfinder, current during a photo with the flash, time to send a photo.
+- The current during a photo with the flash.
+
+**Tried on a V1.2 cicada (2026-10-19)**: the module found on **UART0 GPIO16/17** (pins 3 and 4 of the SAO port); the
+viewfinder; an 800 × 600 photo in **2.1 s** from the button to the file (JPEG 17 KB and its .epi); a video of **~3.5
+frames per second** (32 frames in 9 s).

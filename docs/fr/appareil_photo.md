@@ -86,11 +86,14 @@ bloc et la broche de même nom de la rangée) avant de brancher. En cas de doute
 
 1. Brancher le flasheur en USB : il apparaît comme un port série (CH340 : pilote inclus dans Windows 10/11, macOS,
    Linux).
-2. `cd esp32cam`, puis `pio run -t upload --upload-port COMx` (PlatformIO : `pip install platformio`).
-3. Quand PlatformIO affiche « Connecting... » : maintenir le bouton **FLASH** du flasheur (IO0 à la masse) et appuyer
+2. Repérer son port (`pio device list` : « USB-SERIAL CH340 ») et le mettre dans `upload_port` et `monitor_port` de
+   `esp32cam/platformio.ini`. Sans cela, PlatformIO prend le premier port venu, souvent un badge.
+3. `cd esp32cam`, puis `pio run -t upload` (PlatformIO : `pip install platformio` ; si `pio` n'est pas trouvé, il est
+   dans `%USERPROFILE%\.platformio\penv\Scripts` sous Windows, `~/.platformio/penv/bin` ailleurs).
+4. Quand PlatformIO affiche « Connecting... » : maintenir le bouton **FLASH** du flasheur (IO0 à la masse) et appuyer
    sur le bouton **RST** de l'ESP32-CAM, puis relâcher. Le flasheur ne peut pas redémarrer l'ESP32-CAM tout seul :
    sa broche RST n'est pas reliée.
-4. À la fin, appuyer sur **RST** de l'ESP32-CAM : le firmware démarre. `pio device monitor` montre son texte de boot
+5. À la fin, appuyer sur **RST** de l'ESP32-CAM : le firmware démarre. `pio device monitor` montre son texte de boot
    puis des trames binaires (la liaison avec le badge).
 
 Le 3,3 V du flasheur (~400 mA) suffit pour programmer et essayer la caméra sur la table, **sans le flash** (la LED de
@@ -214,4 +217,8 @@ boot, tramages).
 
 - Les GPIO réellement présents sur chaque port SAO de la carte V1.2 (le schéma de la V1.2 n'est pas dans le dépôt) :
   la recherche automatique couvre les cas possibles ; à confirmer pour la documentation.
-- Les mesures : images par seconde du viseur, courant pendant une photo avec le flash, durée d'envoi d'une photo.
+- Le courant pendant une photo avec le flash.
+
+**Essayé sur une cigale V1.2 (2026-10-19)** : le module trouvé sur **UART0 GPIO16/17** (broches 3 et 4 du port
+SAO) ; le viseur ; une photo 800 × 600 en **2,1 s** du bouton à l'enregistrement (JPEG 17 Ko et son .epi) ; une vidéo
+de **~3,5 images par seconde** (32 images en 9 s).
