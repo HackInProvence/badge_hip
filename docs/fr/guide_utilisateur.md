@@ -84,9 +84,17 @@ Un nouveau succès (« Succès : Sociable ») ou un nouveau niveau s'affiche aus
 Les médias sont lus sur la carte SD (voir [§ 7](#7-préparer-la-carte-sd)).
 Chaque lecteur affiche la liste des fichiers ; les sous-dossiers sont précédés de « > ».
 
+**Renommer, effacer un fichier** : un appui long sur B, sur un fichier de la liste ou sur l'image affichée, ouvre
+Renommer / Effacer / Retour.
+- Renommer : l'éditeur de texte (Y / X : lettre, B : suivante, A : précédente, B long : valider), l'extension est
+  gardée. Un nom déjà pris ou vide est refusé.
+- Effacer : demande confirmation (B : oui, A : non).
+- Une photo de l'appareil photo (dossier `IMAGES/PHOTOS`) va avec son JPEG (`PHOTOS`) : les deux sont renommés
+  ou effacés ensemble. Si c'était l'image de veille, la veille suit le nouveau nom (ou revient à la SecSea).
+
 **Images** (dossier `IMAGES`)
 - Y / X : image précédente / suivante.
-- B : choisir cette image comme image de veille.
+- B : choisir cette image comme image de veille ; B long : renommer, effacer.
 - A : retour à la liste.
 
 **Vidéos** (dossier `VIDEOS`)

@@ -95,6 +95,21 @@ SCL of the I2C0: pins 3 and 4), UART1 on GPIO20/21 (pins 5 and 6 if these are th
 - The log of the badge (USB serial port) says where the module was found: `camera: module esp32cam 0.1, protocol 1,
   on UART0 GPIO16/17`.
 
+### Sharpness (focus)
+
+The OV2640 of the ESP32-CAM has a **fixed focus**: no autofocus, nothing to set by the program. The focus is set
+**by hand**, by screwing or unscrewing the lens:
+
+1. Remove the clear protective film on the lens, if it is still there (a frequent cause of blurry pictures).
+2. The lens is often locked by a dab of glue: hold it by its knurled ring with fine pliers and turn gently to break
+   the glue (without pulling on the ribbon cable of the sensor).
+3. Turn in small steps while looking at the viewfinder of the badge: counter-clockwise, the focus comes closer
+   (portraits, objects at 20-50 cm); clockwise, further away.
+4. Once sharp, a drop of nail polish or glue locks it, if needed.
+
+The viewfinder is small (200 × 200, 1 bit): check on a JPEG photo (`PHOTOS` folder, on the computer). In low light,
+the exposure is long and the photo blurred by motion: add light, or the "Flash" setting.
+
 
 ## 2. On the badge: Badge > Appareil photo
 
@@ -104,6 +119,7 @@ SCL of the I2C0: pins 3 and 4), UART1 on GPIO20/21 (pins 5 and 6 if these are th
 - **B**: a **photo**. The module sends the JPEG at the size chosen, then a 200 × 200 version in 4 gray levels:
   - `PHOTOS/IMG_0001.JPG`: the photo (for a computer);
   - `IMAGES/PHOTOS/IMG_0001.EPI`: the same, to view on the badge (**Médias > Images**, folder PHOTOS).
+    A long press on B, in the list or on the photo shown: rename it or delete it (with its JPEG).
 - **Long B**: a **video** (long B again: stop). 4 frames per second, black and white, no sound:
   `VIDEOS/PHOTOS/VID_0001.EPV`, to view in **Médias > Vidéos**.
 - **X**: the **settings** (kept); Y / X choose, B change the value, A back to the viewfinder: photo size (320x240 to

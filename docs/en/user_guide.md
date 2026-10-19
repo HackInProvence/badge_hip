@@ -89,9 +89,17 @@ A new achievement ("Unlocked: Sociable") or a new level is also shown at the bot
 Media files are read from the SD card (see [§ 7](#7-preparing-the-sd-card)).
 Each player shows the list of files; subfolders are marked with "> ".
 
+**Renaming, deleting a file**: a long press on B, on a file of the list or on the image shown, opens Rename /
+Delete / Back (Renommer / Effacer / Retour).
+- Rename: the text editor (Y / X: letter, B: next, A: previous, long B: done), the extension is kept. A name already
+  taken or empty is refused.
+- Delete: asks for confirmation (B: yes, A: no).
+- A photo of the camera (`IMAGES/PHOTOS` folder) goes with its JPEG (`PHOTOS`): both are renamed or deleted
+  together. If it was the screensaver image, the screensaver follows the new name (or goes back to the SecSea one).
+
 **Images** (`IMAGES` folder)
 - Y / X: previous / next image.
-- B: use this image as the sleep screen image.
+- B: use this image as the sleep screen image; long B: rename, delete.
 - A: back to the list.
 
 **Videos (SD card)** (Vidéos, `VIDEOS` folder)

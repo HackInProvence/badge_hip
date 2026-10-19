@@ -52,6 +52,8 @@ target_sources(badge_menu PRIVATE
     detector.c
     conference.c
     sd_list.c
+    file_ops.c
+    file_names.c
     camera.c
     ${CMAKE_CURRENT_LIST_DIR}/../shared/camlink/camlink.c
     sd_serial.c

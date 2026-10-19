@@ -57,6 +57,7 @@
 #include "ook_rx.h"
 #include "party.h"
 #include "sd_list.h"
+#include "file_ops.h"
 #include "sd_serial.h"
 #include "social.h"
 #include "store.h"
@@ -438,6 +439,9 @@ typedef enum {
     A_SAVER,  /* Screensaver: the image, then the screen sleeps. Any button wakes up */
     A_START_IMAGE,  /* Image viewer: waiting for the screen */
     A_IMAGE,  /* Image viewer: the image is shown */
+    A_FILE_MENU,  /* Long press on B on a file (Médias): rename it, delete it */
+    A_FILE_RENAME,  /* Its new name in the editor */
+    A_FILE_DELETE,  /* Delete it? */
     A_CARRIER,
     A_INFO,
     A_PAGE,  /* A message page (e.g. an error), back to the menu with A or B */
@@ -590,6 +594,11 @@ static void set_status(const char *msg) {
     snprintf(status, sizeof(status), "%s", msg);
     status_ts = get_absolute_time();
     redraw = true;
+}
+
+/* A status set less than STATUS_MS ago */
+static bool status_fresh(void) {
+    return status[0] && absolute_time_diff_us(status_ts, get_absolute_time()) < STATUS_MS*1000ll;
 }
 
 /* For the automatic tests (tools/badge_selftest.py): "ui: <title>" when the page shown changes */
@@ -878,7 +887,7 @@ static void render_browser(void) {
         draw_title(BROWSE_TITLES[browsing]);  /* Short; the "ui:" log stays in French (the tools read it) */
     }
     draw_list(sd_list_rows(&browse), browse.sel, file_label);
-    draw_footer(N_("A : retour  B : ouvrir"));
+    draw_footer(status_fresh() ? status : N_("A : retour  B : ouvrir"));  /* "Renommé", "Effacé" */
 }
 
 static void render_bt_folders(void) {
@@ -1660,6 +1669,180 @@ static void play_selected(void) {
         page_back = A_BROWSE;
         app = A_PAGE;
     }
+}
+
+/* ------ Long press on B on a file (the image viewer, the lists of Médias): rename it, delete it ------
+ * A photo of the camera goes with its JPEG (file_ops.h). */
+
+static char file_target[PATH_MAX_LEN];  /* The file of the actions */
+static app_state_t file_back = A_BROWSE;  /* A_IMAGE or A_BROWSE */
+static int file_action = 0;
+static bool file_b_armed = false;  /* B went down on this page: its release or its long press is for it */
+static ui_edit_t file_edit;
+static const char *FILE_ACTIONS[] = {N_("Renommer"), N_("Effacer"), N_("Retour")};
+#define N_FILE_ACTIONS 3
+
+/* A page where a long press on B opens the actions of a file */
+static bool file_actions_here(void) {
+    if (app == A_IMAGE)
+        return true;
+    if (app != A_BROWSE)
+        return false;
+    int e = sd_list_entry(&browse, browse.sel);
+    return e >= 0 && e < (int)n_files && ! file_is_dir[e];
+}
+
+static void play_chime(void);
+
+static void image_set_saver(void) {
+    join_path(path, sizeof(path), dir, files[image_index]);
+    snprintf(store_get()->saver_image, STORE_SAVER_IMAGE_LEN, "%s", path);
+    store_changed();
+    play_chime();
+    printf("image: %s is now the screensaver image\n", path);
+}
+
+static void file_menu_open(void) {
+    int i = app == A_IMAGE ? image_index : sd_list_entry(&browse, browse.sel);
+    join_path(file_target, sizeof(file_target), dir, files[i]);
+    file_back = app == A_IMAGE ? A_IMAGE : A_BROWSE;
+    file_action = 0;
+    display_invalidate();  /* The image left the screen asleep */
+    printf("file: actions on %s\n", file_target);
+    app = A_FILE_MENU;
+}
+
+/* Back to the page of the file, on \p name (NULL: deleted) */
+static void file_return(const char *name) {
+    int old = file_back == A_IMAGE ? image_index : -1;
+    bool first_page = ! browse.page.prev;
+    load_browser();
+    app = A_BROWSE;
+    int found = -1;
+    for (int i = 0; i < (int)n_files; ++i)
+        if (! file_is_dir[i] && ((name && ! strcmp(files[i], name)) || (! name && first_page && i >= old && old >= 0))) {
+            found = i;
+            break;
+        }
+    if (found < 0 && ! name && first_page && old >= 0)  /* The last image was deleted: the one before it */
+        for (int i = (int)n_files - 1; i >= 0 && found < 0; --i)
+            if (! file_is_dir[i])
+                found = i;
+    if (found >= 0) {
+        browse.sel = found + browse.page.prev;
+        if (file_back == A_IMAGE) {
+            image_index = found;
+            app = A_START_IMAGE;
+        }
+    }
+    if (n_files == 0)
+        open_browser(browsing);  /* The folder is empty */
+}
+
+static void file_action_label(int i, char *buf, size_t len) {
+    snprintf(buf, len, "%s", FILE_ACTIONS[i]);
+}
+
+static void render_file_menu(void) {
+    char name[SD_NAME_MAX + 4];
+    display_name(file_target, name, sizeof(name));
+    char title[32];
+    fit_text_font(&gfx_font_medium, title, sizeof(title), name, GFX_WIDTH - 8);
+    gfx_clear(fb, GFX_WHITE);
+    draw_title(title);
+    draw_list(N_FILE_ACTIONS, file_action, file_action_label);
+    draw_footer(N_("A : retour  B : choisir"));
+}
+
+static void render_file_delete(void) {
+    char name[SD_NAME_MAX + 4], other[PATH_MAX_LEN], text[200];
+    display_name(file_target, name, sizeof(name));
+    if (file_companion(file_target, other, sizeof(other)))
+        snprintf(text, sizeof(text), _("Effacer %s ?\n\nSa photo JPEG\n(dossier PHOTOS)\nest effacée aussi."), name);
+    else
+        snprintf(text, sizeof(text), _("Effacer %s ?"), name);
+    render_page(N_("Effacer"), text, N_("A : non  B : oui, effacer"));
+}
+
+static void render_file_rename(void) {
+    char base[SD_NAME_MAX], ext[16], prompt[48];
+    file_name_split(file_target, base, sizeof(base), ext, sizeof(ext));
+    snprintf(prompt, sizeof(prompt), _("Nouveau nom (%s) :"), ext);
+    gfx_clear(fb, GFX_WHITE);
+    ui_edit_render(fb, &file_edit, N_("Renommer"), prompt);
+    if (status_fresh())
+        draw_footer(status);  /* "Nom invalide", "Ce nom existe déjà" */
+}
+
+static void file_choose(void) {
+    if (file_action == 0) {
+        char base[SD_NAME_MAX], ext[16];
+        file_name_split(file_target, base, sizeof(base), ext, sizeof(ext));
+        int max = SD_NAME_MAX - 1 - (int)strlen(ext);
+        ui_edit_start(&file_edit, base, max < UI_EDIT_MAX ? max : UI_EDIT_MAX, FILE_NAME_CHARS);
+        app = A_FILE_RENAME;
+    } else if (file_action == 1) {
+        app = A_FILE_DELETE;
+    } else {
+        file_return(strrchr(file_target, '/') ? strrchr(file_target, '/') + 1 : file_target);
+    }
+}
+
+/* The screensaver showed this image: it follows it (renamed) or goes back to the SecSea image (deleted) */
+static void file_saver_follow(const char *new_path) {
+    if (strcasecmp(saver_image(), file_target))
+        return;
+    snprintf(store_get()->saver_image, STORE_SAVER_IMAGE_LEN, "%s", new_path ? new_path : "");
+    store_changed();
+}
+
+static void file_rename_done(void) {
+    char base[UI_EDIT_MAX + 1], new_path[PATH_MAX_LEN];
+    ui_edit_result(&file_edit, base, sizeof(base));
+    file_result_t r = file_rename(file_target, base, new_path, sizeof(new_path));
+    if (r == FILE_BAD_NAME) {
+        set_status(N_("Nom invalide"));
+        return;  /* Stay in the editor */
+    }
+    if (r == FILE_EXISTS) {
+        set_status(N_("Ce nom existe déjà"));
+        return;
+    }
+    if (r == FILE_ERROR) {
+        set_status(N_("Erreur de la carte SD"));
+        file_return(NULL);
+        return;
+    }
+    file_saver_follow(new_path);
+    set_status(N_("Renommé"));
+    file_return(strrchr(new_path, '/') ? strrchr(new_path, '/') + 1 : new_path);
+}
+
+static void file_rename_buttons(const app_buttons_t *ev) {
+    /* A held Y or X repeats: the page changes while it is held */
+    if (ev->pressed || ev->released_short || ev->long_pressed || ui_edit_typed_pending() || (ev->held & (UI_BTN_X | UI_BTN_Y)))
+        redraw = true;
+    switch (app_edit_buttons(&file_edit, ev)) {
+    case UI_EDIT_DONE:
+        file_rename_done();
+        break;
+    case UI_EDIT_CANCEL:
+        printf("file: rename cancelled\n");
+        app = A_FILE_MENU;
+        break;
+    default:
+        break;
+    }
+}
+
+static void file_delete_confirmed(void) {
+    if (file_delete(file_target) != FILE_OK) {
+        set_status(N_("Erreur de la carte SD"));
+    } else {
+        file_saver_follow(NULL);
+        set_status(N_("Effacé"));
+    }
+    file_return(NULL);
 }
 
 /* Blind test: choice of the directory, "Tout" or a sub-directory of MUSIQUE */
@@ -2688,6 +2871,40 @@ int main() {
             }
         } else if (long_item_selected() && ((pressed & BTN_OK) || long_ok_pending)) {
             long_item_ok(pressed, now);
+        } else if (file_actions_here() && ((pressed & BTN_OK)
+                                           || (file_b_armed && ((app_ev.long_pressed | btn_released) & BTN_OK)))) {
+            /* A file: short B = open it (the image: the screensaver), long B = its actions (at once) */
+            if (pressed & BTN_OK)
+                file_b_armed = true;
+            if (app_ev.long_pressed & BTN_OK) {
+                file_b_armed = false;
+                file_menu_open();
+            } else if (btn_released & BTN_OK) {
+                file_b_armed = false;
+                if (app == A_IMAGE)
+                    image_set_saver();
+                else
+                    play_selected();
+            }
+            redraw = true;
+        } else if (app == A_FILE_MENU) {
+            if (pressed & (BTN_UP | BTN_DOWN))
+                file_action = (file_action + ((pressed & BTN_UP) ? -1 : 1) + N_FILE_ACTIONS) % N_FILE_ACTIONS;
+            else if (app_ev.released_short & BTN_OK)  /* Not the release of the long press that opened it */
+                file_choose();
+            else if (pressed & BTN_CANCEL)
+                file_return(strrchr(file_target, '/') ? strrchr(file_target, '/') + 1 : file_target);
+            if (pressed || app_ev.released_short)
+                redraw = true;
+        } else if (app == A_FILE_RENAME) {
+            file_rename_buttons(&app_ev);
+        } else if (app == A_FILE_DELETE) {
+            if (app_ev.released_short & BTN_OK)
+                file_delete_confirmed();
+            else if (pressed & BTN_CANCEL)
+                app = A_FILE_MENU;
+            if (pressed || app_ev.released_short)
+                redraw = true;
         } else if (pressed & BTN_CANCEL) {
             cancel();
         } else if (pressed & BTN_OK) {
@@ -2713,12 +2930,6 @@ int main() {
                     printf("ir: sending slot %d\n", ir_selected);
                 }
                 redraw = true;
-            } else if (app == A_IMAGE) {
-                join_path(path, sizeof(path), dir, files[image_index]);
-                snprintf(store_get()->saver_image, STORE_SAVER_IMAGE_LEN, "%s", path);
-                store_changed();
-                play_chime();
-                printf("image: %s is now the screensaver image\n", path);
             } else if (app == A_SETTINGS) {
                 settings_validate();
             } else if (app == A_SAVER_IMAGES) {
@@ -2884,7 +3095,7 @@ int main() {
         }
         if (vote_new())
             notify(APPS[APP_VOTE], N_("Vote ouvert : Social > Vote"));
-        if (app != A_APP && app != A_NAME_EDIT)
+        if (app != A_APP && app != A_NAME_EDIT && app != A_FILE_RENAME)
             ui_edit_typed_clear();  /* Typed on the PC keyboard, but no text editor on the screen */
         if (admin_request >= 0) {
             set_admin(admin_request);
@@ -3186,6 +3397,12 @@ int main() {
                     render_oled();
                 else if (app == A_CTF)
                     render_ctf();
+                else if (app == A_FILE_MENU)
+                    render_file_menu();
+                else if (app == A_FILE_RENAME)
+                    render_file_rename();
+                else if (app == A_FILE_DELETE)
+                    render_file_delete();
                 else if (app == A_CTF_CODE)
                     render_ctf_code();
                 else if (app == A_SETTINGS)

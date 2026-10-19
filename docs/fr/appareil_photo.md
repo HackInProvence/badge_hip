@@ -140,6 +140,21 @@ Le câblage (4 fils) :
 - La trace du badge (port série USB) dit où le module a été trouvé : `camera: module esp32cam 0.1, protocol 1, on
   UART0 GPIO16/17`.
 
+### La netteté (mise au point)
+
+L'OV2640 de l'ESP32-CAM est à **mise au point fixe** : pas d'autofocus, rien à régler par le programme. La netteté
+se règle **à la main**, en vissant ou dévissant l'objectif :
+
+1. Retirer le film de protection transparent sur l'objectif, s'il y est encore (une cause fréquente d'image floue).
+2. L'objectif est souvent bloqué par un point de colle : le tenir avec une pince fine par sa bague crantée et tourner
+   doucement pour casser la colle (sans tirer sur la nappe du capteur).
+3. Tourner par petits pas en regardant le viseur du badge : dans le sens inverse des aiguilles d'une montre, la
+   netteté vient plus près (portraits, objets à 20-50 cm) ; dans le sens des aiguilles, plus loin.
+4. Une fois net, un point de vernis à ongles ou de colle le bloque, si besoin.
+
+Le viseur est petit (200 × 200, 1 bit) : vérifier sur une photo JPEG (dossier `PHOTOS`, sur l'ordinateur). Avec peu
+de lumière, la pose est longue et la photo floue de bougé : éclairer, ou le réglage « Flash ».
+
 
 ## 2. Sur le badge : Badge > Appareil photo
 
@@ -149,6 +164,7 @@ Le câblage (4 fils) :
 - **B** : une **photo**. Le module envoie le JPEG à la taille choisie, puis une version 200 × 200 en 4 niveaux de gris :
   - `PHOTOS/IMG_0001.JPG` : la photo (pour un ordinateur) ;
   - `IMAGES/PHOTOS/IMG_0001.EPI` : la même, à voir sur le badge (**Médias > Images**, dossier PHOTOS).
+    Un appui long sur B, dans la liste ou sur la photo affichée : la renommer ou l'effacer (avec son JPEG).
 - **B long** : une **vidéo** (B long à nouveau : arrêt). 4 images par seconde, noir et blanc, sans son :
   `VIDEOS/PHOTOS/VID_0001.EPV`, à voir dans **Médias > Vidéos**.
 - **X** : les **réglages** (gardés) ; Y / X choisir, B changer la valeur, A retour au viseur :
