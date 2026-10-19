@@ -1344,14 +1344,16 @@ msgstr "Broadcast: %s"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
+#: src/menu/camera.c:184
+#: src/menu/camera.c:221
 #: src/menu/main.c:682
 #: src/menu/main.c:683
-#: src/menu/pirate_radio.c:550
 msgid "non"
 msgstr "no"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
+#: src/menu/camera.c:221
 #: src/menu/main.c:682
 #: src/menu/main.c:683
 #: src/menu/pirate_radio.c:550
@@ -1396,6 +1398,163 @@ msgstr ""
 "On the badge to follow:\n"
 "Settings > Battery\n"
 "by radio: yes."
+
+#: src/menu/camera.c:167
+msgid "Taille des photos"
+msgstr "Photo size"
+
+#: src/menu/camera.c:168
+msgid "Qualité JPEG"
+msgstr "JPEG quality"
+
+#: src/menu/camera.c:169
+msgid "Luminosité"
+msgstr "Brightness"
+
+#: src/menu/camera.c:170
+msgid "Contraste"
+msgstr "Contrast"
+
+#: src/menu/camera.c:171
+msgid "Saturation"
+msgstr "Saturation"
+
+#: src/menu/camera.c:172
+msgid "Effet"
+msgstr "Effect"
+
+#: src/menu/camera.c:173
+msgid "Miroir"
+msgstr "Mirror"
+
+#: src/menu/camera.c:174
+msgid "Retourner"
+msgstr "Flip"
+
+#: src/menu/camera.c:175
+msgid "Flash"
+msgstr "Flash"
+
+#: src/menu/camera.c:176
+msgid "Trame du viseur"
+msgstr "Viewfinder dither"
+
+#: src/menu/camera.c:181
+msgid "aucun"
+msgstr "none"
+
+#: src/menu/camera.c:181
+msgid "bleu"
+msgstr "blue"
+
+#: src/menu/camera.c:181
+msgid "gris"
+msgstr "gray"
+
+#: src/menu/camera.c:181
+msgid "négatif"
+msgstr "negative"
+
+#: src/menu/camera.c:181
+msgid "rouge"
+msgstr "red"
+
+#: src/menu/camera.c:181
+msgid "vert"
+msgstr "green"
+
+#: src/menu/camera.c:182
+msgid "sépia"
+msgstr "sepia"
+
+#: src/menu/camera.c:183
+msgid "basse"
+msgstr "low"
+
+#: src/menu/camera.c:183
+msgid "haute"
+msgstr "high"
+
+#: src/menu/camera.c:183
+msgid "maximale"
+msgstr "maximum"
+
+#: src/menu/camera.c:183
+msgid "moyenne"
+msgstr "medium"
+
+#: src/menu/camera.c:184
+msgid "pour la photo"
+msgstr "for the photo"
+
+#: src/menu/camera.c:184
+msgid "toujours (lampe)"
+msgstr "always (lamp)"
+
+#: src/menu/camera.c:185
+msgid "seuil"
+msgstr "threshold"
+
+#: src/menu/camera.c:295
+#: src/menu/camera.c:534
+#: src/menu/conference.c:464
+#: src/menu/main.c:1578
+#: src/menu/main.c:1669
+msgid "Pas de carte SD."
+msgstr "No SD card."
+
+#: src/menu/camera.c:305
+msgid "Écriture impossible"
+msgstr "Cannot write"
+
+#: src/menu/camera.c:331
+msgid "Vidéo : %lu images"
+msgstr "Video: %lu frames"
+
+#: src/menu/camera.c:423
+msgid "Photo IMG_%04d"
+msgstr "Photo IMG_%04d"
+
+#: src/menu/camera.c:538
+msgid "Photo..."
+msgstr "Photo..."
+
+#: src/menu/camera.c:553
+msgid "Réglages photo"
+msgstr "Camera settings"
+
+#: src/menu/camera.c:555
+msgid "Y X : choisir  A : retour  B : changer"
+msgstr "Y X: choose  A: back  B: change"
+
+#: src/menu/camera.c:563
+msgid "REC %lu  B long : stop"
+msgstr "REC %lu  B long: stop"
+
+#: src/menu/camera.c:565
+msgid "B photo  B long vidéo  X"
+msgstr "B photo  B long video  X"
+
+#: src/menu/camera.c:569
+#: src/menu/camera.c:584
+msgid "Appareil photo"
+msgstr "Camera"
+
+#: src/menu/camera.c:570
+msgid "Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?)."
+msgstr "The module answers but its camera does not start (the camera ribbon?)."
+
+#: src/menu/camera.c:571
+msgid "Module trouvé, la première image arrive..."
+msgstr "Module found, the first picture is coming..."
+
+#: src/menu/camera.c:572
+msgid "Recherche du module ESP32-CAM sur le port J2 (UART0)..."
+msgstr "Looking for the ESP32-CAM module on the port J2 (UART0)..."
+
+#: src/menu/camera.c:576
+msgid "A : retour  X : réglages"
+msgstr "A: back  X: settings"
 
 #: src/menu/chorus.c:210
 msgid "Frère Jacques"
@@ -1558,12 +1717,6 @@ msgstr "Conference badge"
 #: src/menu/main.c:881
 msgid "A : retour  B : ouvrir"
 msgstr "A: back  B: open"
-
-#: src/menu/conference.c:464
-#: src/menu/main.c:1578
-#: src/menu/main.c:1669
-msgid "Pas de carte SD."
-msgstr "No SD card."
 
 #: src/menu/conference.c:465
 msgid "Aucun événement : copier un dossier par événement dans CONFERENCES sur la carte SD."

@@ -1344,14 +1344,16 @@ msgstr "Senden: %s"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
+#: src/menu/camera.c:184
+#: src/menu/camera.c:221
 #: src/menu/main.c:682
 #: src/menu/main.c:683
-#: src/menu/pirate_radio.c:550
 msgid "non"
 msgstr "aus"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
+#: src/menu/camera.c:221
 #: src/menu/main.c:682
 #: src/menu/main.c:683
 #: src/menu/pirate_radio.c:550
@@ -1396,6 +1398,163 @@ msgstr ""
 "Am Badge, dem du folgst:\n"
 "Optionen > Akku per\n"
 "Funk: an."
+
+#: src/menu/camera.c:167
+msgid "Taille des photos"
+msgstr "Fotogröße"
+
+#: src/menu/camera.c:168
+msgid "Qualité JPEG"
+msgstr "JPEG-Qualität"
+
+#: src/menu/camera.c:169
+msgid "Luminosité"
+msgstr "Helligkeit"
+
+#: src/menu/camera.c:170
+msgid "Contraste"
+msgstr "Kontrast"
+
+#: src/menu/camera.c:171
+msgid "Saturation"
+msgstr "Sättigung"
+
+#: src/menu/camera.c:172
+msgid "Effet"
+msgstr "Effekt"
+
+#: src/menu/camera.c:173
+msgid "Miroir"
+msgstr "Spiegeln"
+
+#: src/menu/camera.c:174
+msgid "Retourner"
+msgstr "Umdrehen"
+
+#: src/menu/camera.c:175
+msgid "Flash"
+msgstr "Blitz"
+
+#: src/menu/camera.c:176
+msgid "Trame du viseur"
+msgstr "Sucher-Raster"
+
+#: src/menu/camera.c:181
+msgid "aucun"
+msgstr "keiner"
+
+#: src/menu/camera.c:181
+msgid "bleu"
+msgstr "blau"
+
+#: src/menu/camera.c:181
+msgid "gris"
+msgstr "grau"
+
+#: src/menu/camera.c:181
+msgid "négatif"
+msgstr "negativ"
+
+#: src/menu/camera.c:181
+msgid "rouge"
+msgstr "rot"
+
+#: src/menu/camera.c:181
+msgid "vert"
+msgstr "grün"
+
+#: src/menu/camera.c:182
+msgid "sépia"
+msgstr "Sepia"
+
+#: src/menu/camera.c:183
+msgid "basse"
+msgstr "niedrig"
+
+#: src/menu/camera.c:183
+msgid "haute"
+msgstr "hoch"
+
+#: src/menu/camera.c:183
+msgid "maximale"
+msgstr "maximal"
+
+#: src/menu/camera.c:183
+msgid "moyenne"
+msgstr "mittel"
+
+#: src/menu/camera.c:184
+msgid "pour la photo"
+msgstr "für das Foto"
+
+#: src/menu/camera.c:184
+msgid "toujours (lampe)"
+msgstr "immer (Lampe)"
+
+#: src/menu/camera.c:185
+msgid "seuil"
+msgstr "Schwelle"
+
+#: src/menu/camera.c:295
+#: src/menu/camera.c:534
+#: src/menu/conference.c:464
+#: src/menu/main.c:1578
+#: src/menu/main.c:1669
+msgid "Pas de carte SD."
+msgstr "Keine SD-Karte."
+
+#: src/menu/camera.c:305
+msgid "Écriture impossible"
+msgstr "Schreiben unmöglich"
+
+#: src/menu/camera.c:331
+msgid "Vidéo : %lu images"
+msgstr "Video: %lu Bilder"
+
+#: src/menu/camera.c:423
+msgid "Photo IMG_%04d"
+msgstr "Foto IMG_%04d"
+
+#: src/menu/camera.c:538
+msgid "Photo..."
+msgstr "Foto..."
+
+#: src/menu/camera.c:553
+msgid "Réglages photo"
+msgstr "Foto-Einstellungen"
+
+#: src/menu/camera.c:555
+msgid "Y X : choisir  A : retour  B : changer"
+msgstr "Y X: wählen  A: zurück  B: ändern"
+
+#: src/menu/camera.c:563
+msgid "REC %lu  B long : stop"
+msgstr "REC %lu  B lang: Stopp"
+
+#: src/menu/camera.c:565
+msgid "B photo  B long vidéo  X"
+msgstr "B Foto  B lang Video  X"
+
+#: src/menu/camera.c:569
+#: src/menu/camera.c:584
+msgid "Appareil photo"
+msgstr "Kamera"
+
+#: src/menu/camera.c:570
+msgid "Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?)."
+msgstr "Das Modul antwortet, aber seine Kamera startet nicht (das Kamerakabel?)."
+
+#: src/menu/camera.c:571
+msgid "Module trouvé, la première image arrive..."
+msgstr "Modul gefunden, das erste Bild kommt..."
+
+#: src/menu/camera.c:572
+msgid "Recherche du module ESP32-CAM sur le port J2 (UART0)..."
+msgstr "Suche nach dem ESP32-CAM-Modul am Port J2 (UART0)..."
+
+#: src/menu/camera.c:576
+msgid "A : retour  X : réglages"
+msgstr "A: zurück  X: Einstellungen"
 
 #: src/menu/chorus.c:210
 msgid "Frère Jacques"
@@ -1558,12 +1717,6 @@ msgstr "Konferenz-Badge"
 #: src/menu/main.c:881
 msgid "A : retour  B : ouvrir"
 msgstr "A: zurück  B: öffnen"
-
-#: src/menu/conference.c:464
-#: src/menu/main.c:1578
-#: src/menu/main.c:1669
-msgid "Pas de carte SD."
-msgstr "Keine SD-Karte."
 
 #: src/menu/conference.c:465
 msgid "Aucun événement : copier un dossier par événement dans CONFERENCES sur la carte SD."

@@ -52,6 +52,8 @@ target_sources(badge_menu PRIVATE
     detector.c
     conference.c
     sd_list.c
+    camera.c
+    ${CMAKE_CURRENT_LIST_DIR}/../shared/camlink/camlink.c
     sd_serial.c
     shared_buf.c
     tug_logic.c
@@ -82,7 +84,7 @@ target_sources(badge_menu PRIVATE
     social.c
     store.c
 )
-target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/../shared/camlink)
 
 # Version of the firmware (menu Réglages > Infos, "!" on the serial port): the file VERSION at the root of the
 # repository, the only place to change it (docs/fr/guide_developpeur.md: "Faire une nouvelle version"). version.h also
