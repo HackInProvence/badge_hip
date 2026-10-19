@@ -131,6 +131,12 @@ def test_remote_help(work):
         (f', not in main.c: {extra}' if extra else '')
 
 
+def test_camlink(work):
+    # The link with the camera module (shared/camlink): packets, COBS, CRC, errors; the pictures for the e-Paper
+    return c_test('test_camlink', ['shared/camlink/camlink.c', 'shared/camlink/campix.c'],
+                  [os.path.join(SRC, 'shared', 'camlink')], work)
+
+
 def test_fsk(work):
     # The encoder of the acoustic link (fsk_link.c) gives the same symbols as buildFrame() of the receiver,
     # docs/fsk-buzzer-link.html (its JavaScript run by node)
@@ -339,7 +345,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('camlink', test_camlink), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 
