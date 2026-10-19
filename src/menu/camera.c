@@ -28,7 +28,20 @@
 #include "shared_buf.h"
 #include "store.h"
 
-#define CAM_UART uart0
+/* Where the module may be plugged: the pins of a UART reaching a port of the badge. Searching, the badge says hello on
+ * each one in turn and keeps the one that answers (the TX of the badge to U0R of the ESP32, its RX to U0T) */
+static const struct {
+    uint8_t uart, tx, rx;
+    const char *where;
+} PORTS[] = {
+    {0, 16, 17, "UART0 GPIO16/17"},  /* The I2C0 pins of the SAO port (SDA = TX, SCL = RX) */
+    {1, 20, 21, "UART1 GPIO20/21"},  /* The two GPIO of an SAO port */
+    {0, BADGE_UART0_TX, BADGE_UART0_RX, "UART0 GPIO12/13"},  /* The 2 x 6 port J2 of the V1.1 board */
+};
+#define N_PORTS ((int)(sizeof(PORTS) / sizeof(PORTS[0])))
+static int port = 0;
+#define CAM_UART (PORTS[port].uart ? uart1 : uart0)
+#define CAM_IRQ (PORTS[port].uart ? UART1_IRQ : UART0_IRQ)
 _Static_assert(CLS_COUNT == STORE_CAMERA_SETTINGS, "the settings of the camera in the store");
 #define RING_SIZE 3072  /* ~33 ms of the UART at 921600 bauds: more than the longest pause of the main loop */
 #define HELLO_MS 1000
@@ -61,23 +74,24 @@ static void uart_irq(void) {
 
 static void link_open(void) {
     uart_init(CAM_UART, CAMLINK_BAUD);
-    gpio_set_function(BADGE_UART0_TX, GPIO_FUNC_UART);
-    gpio_set_function(BADGE_UART0_RX, GPIO_FUNC_UART);
-    gpio_pull_up(BADGE_UART0_RX);  /* No module: no noise on the line */
+    gpio_set_function(PORTS[port].tx, GPIO_FUNC_UART);
+    gpio_set_function(PORTS[port].rx, GPIO_FUNC_UART);
+    gpio_pull_up(PORTS[port].rx);  /* No module: no noise on the line */
     uart_set_fifo_enabled(CAM_UART, true);
     ring_head = ring_tail = 0;
-    irq_set_exclusive_handler(UART0_IRQ, uart_irq);
-    irq_set_enabled(UART0_IRQ, true);
+    irq_set_exclusive_handler(CAM_IRQ, uart_irq);
+    irq_set_enabled(CAM_IRQ, true);
     uart_set_irq_enables(CAM_UART, true, false);
 }
 
 static void link_close(void) {
     uart_set_irq_enables(CAM_UART, false, false);
-    irq_set_enabled(UART0_IRQ, false);
-    irq_remove_handler(UART0_IRQ, uart_irq);
+    irq_set_enabled(CAM_IRQ, false);
+    irq_remove_handler(CAM_IRQ, uart_irq);
     uart_deinit(CAM_UART);
-    gpio_set_function(BADGE_UART0_TX, GPIO_FUNC_NULL);
-    gpio_set_function(BADGE_UART0_RX, GPIO_FUNC_NULL);
+    gpio_disable_pulls(PORTS[port].rx);
+    gpio_set_function(PORTS[port].tx, GPIO_FUNC_NULL);
+    gpio_set_function(PORTS[port].rx, GPIO_FUNC_NULL);
 }
 
 /* ------ The state of the page; the big buffers in shared_buf (this page is alone on the screen) ------ */
@@ -348,7 +362,8 @@ static void handle_packet(absolute_time_t now) {
     case CL_HELLO:
         if (state == L_SEARCHING) {
             snprintf(module_name, sizeof(module_name), "%.*s", (int)(rx.len > 1 ? rx.len - 1 : 0), rx.payload + 1);
-            printf("camera: module %s, protocol %u\n", module_name, rx.len ? rx.payload[0] : 0);
+            printf("camera: module %s, protocol %u, on %s\n", module_name, rx.len ? rx.payload[0] : 0,
+                   PORTS[port].where);
             state = L_READY;
             send_settings();
             uint8_t on = 1;
@@ -474,7 +489,11 @@ static bool cam_task(absolute_time_t now) {
             handle_packet(now);
     }
     if (state == L_SEARCHING && absolute_time_diff_us(hello_ts, now) > HELLO_MS * 1000ll) {
-        hello_ts = now;  /* The module may start after the page: asked again */
+        hello_ts = now;  /* The module may start after the page: asked again, on the next possible port */
+        link_close();
+        port = (port + 1) % N_PORTS;
+        camlink_rx_init(&rx);
+        link_open();
         uint8_t hello[] = {CAMLINK_PROTO, 'b', 'a', 'd', 'g', 'e'};
         send_packet(CL_HELLO, ++out_seq, hello, sizeof(hello));
     }
@@ -569,10 +588,12 @@ static void cam_render(uint8_t *fb, absolute_time_t now) {
     ui_title(fb, N_("Appareil photo"));
     const char *t = state == L_NO_CAMERA ? N_("Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?).")
                     : state == L_READY ? N_("Module trouvé, la première image arrive...")
-                    : N_("Recherche du module ESP32-CAM sur le port J2 (UART0)...");
+                    : N_("Recherche du module ESP32-CAM sur les ports d'extension...");
     int y = ui_wrapped(fb, UI_TITLE_H + 16, &gfx_font_small, t, 5);
     if (module_name[0])
         ui_lines(fb, y + 8, &gfx_font_small, module_name);
+    else if (state == L_SEARCHING)
+        ui_lines(fb, y + 8, &gfx_font_small, PORTS[port].where);  /* The port tried now */
     ui_footer(fb, N_("A : retour  X : réglages"));
 }
 

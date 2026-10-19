@@ -1344,8 +1344,8 @@ msgstr "Broadcast: %s"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
-#: src/menu/camera.c:184
-#: src/menu/camera.c:221
+#: src/menu/camera.c:198
+#: src/menu/camera.c:235
 #: src/menu/main.c:682
 #: src/menu/main.c:683
 msgid "non"
@@ -1353,7 +1353,7 @@ msgstr "no"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
-#: src/menu/camera.c:221
+#: src/menu/camera.c:235
 #: src/menu/main.c:682
 #: src/menu/main.c:683
 #: src/menu/pirate_radio.c:550
@@ -1399,160 +1399,160 @@ msgstr ""
 "Settings > Battery\n"
 "by radio: yes."
 
-#: src/menu/camera.c:167
+#: src/menu/camera.c:181
 msgid "Taille des photos"
 msgstr "Photo size"
 
-#: src/menu/camera.c:168
+#: src/menu/camera.c:182
 msgid "Qualité JPEG"
 msgstr "JPEG quality"
 
-#: src/menu/camera.c:169
+#: src/menu/camera.c:183
 msgid "Luminosité"
 msgstr "Brightness"
 
-#: src/menu/camera.c:170
+#: src/menu/camera.c:184
 msgid "Contraste"
 msgstr "Contrast"
 
-#: src/menu/camera.c:171
+#: src/menu/camera.c:185
 msgid "Saturation"
 msgstr "Saturation"
 
-#: src/menu/camera.c:172
+#: src/menu/camera.c:186
 msgid "Effet"
 msgstr "Effect"
 
-#: src/menu/camera.c:173
+#: src/menu/camera.c:187
 msgid "Miroir"
 msgstr "Mirror"
 
-#: src/menu/camera.c:174
+#: src/menu/camera.c:188
 msgid "Retourner"
 msgstr "Flip"
 
-#: src/menu/camera.c:175
+#: src/menu/camera.c:189
 msgid "Flash"
 msgstr "Flash"
 
-#: src/menu/camera.c:176
+#: src/menu/camera.c:190
 msgid "Trame du viseur"
 msgstr "Viewfinder dither"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "aucun"
 msgstr "none"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "bleu"
 msgstr "blue"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "gris"
 msgstr "gray"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "négatif"
 msgstr "negative"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "rouge"
 msgstr "red"
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:195
 msgid "vert"
 msgstr "green"
 
-#: src/menu/camera.c:182
+#: src/menu/camera.c:196
 msgid "sépia"
 msgstr "sepia"
 
-#: src/menu/camera.c:183
+#: src/menu/camera.c:197
 msgid "basse"
 msgstr "low"
 
-#: src/menu/camera.c:183
+#: src/menu/camera.c:197
 msgid "haute"
 msgstr "high"
 
-#: src/menu/camera.c:183
+#: src/menu/camera.c:197
 msgid "maximale"
 msgstr "maximum"
 
-#: src/menu/camera.c:183
+#: src/menu/camera.c:197
 msgid "moyenne"
 msgstr "medium"
 
-#: src/menu/camera.c:184
+#: src/menu/camera.c:198
 msgid "pour la photo"
 msgstr "for the photo"
 
-#: src/menu/camera.c:184
+#: src/menu/camera.c:198
 msgid "toujours (lampe)"
 msgstr "always (lamp)"
 
-#: src/menu/camera.c:185
+#: src/menu/camera.c:199
 msgid "seuil"
 msgstr "threshold"
 
-#: src/menu/camera.c:295
-#: src/menu/camera.c:534
+#: src/menu/camera.c:309
+#: src/menu/camera.c:553
 #: src/menu/conference.c:464
 #: src/menu/main.c:1578
 #: src/menu/main.c:1669
 msgid "Pas de carte SD."
 msgstr "No SD card."
 
-#: src/menu/camera.c:305
+#: src/menu/camera.c:319
 msgid "Écriture impossible"
 msgstr "Cannot write"
 
-#: src/menu/camera.c:331
+#: src/menu/camera.c:345
 msgid "Vidéo : %lu images"
 msgstr "Video: %lu frames"
 
-#: src/menu/camera.c:423
+#: src/menu/camera.c:438
 msgid "Photo IMG_%04d"
 msgstr "Photo IMG_%04d"
 
-#: src/menu/camera.c:538
+#: src/menu/camera.c:557
 msgid "Photo..."
 msgstr "Photo..."
 
-#: src/menu/camera.c:553
+#: src/menu/camera.c:572
 msgid "Réglages photo"
 msgstr "Camera settings"
 
-#: src/menu/camera.c:555
+#: src/menu/camera.c:574
 msgid "Y X : choisir  A : retour  B : changer"
 msgstr "Y X: choose  A: back  B: change"
 
-#: src/menu/camera.c:563
+#: src/menu/camera.c:582
 msgid "REC %lu  B long : stop"
 msgstr "REC %lu  B long: stop"
 
-#: src/menu/camera.c:565
+#: src/menu/camera.c:584
 msgid "B photo  B long vidéo  X"
 msgstr "B photo  B long video  X"
 
-#: src/menu/camera.c:569
-#: src/menu/camera.c:584
+#: src/menu/camera.c:588
+#: src/menu/camera.c:605
 msgid "Appareil photo"
 msgstr "Camera"
 
-#: src/menu/camera.c:570
+#: src/menu/camera.c:589
 msgid "Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?)."
 msgstr "The module answers but its camera does not start (the camera ribbon?)."
 
-#: src/menu/camera.c:571
+#: src/menu/camera.c:590
 msgid "Module trouvé, la première image arrive..."
 msgstr "Module found, the first picture is coming..."
 
-#: src/menu/camera.c:572
-msgid "Recherche du module ESP32-CAM sur le port J2 (UART0)..."
-msgstr "Looking for the ESP32-CAM module on the port J2 (UART0)..."
+#: src/menu/camera.c:591
+msgid "Recherche du module ESP32-CAM sur les ports d'extension..."
+msgstr "Looking for the ESP32-CAM module on the extension ports..."
 
-#: src/menu/camera.c:576
+#: src/menu/camera.c:597
 msgid "A : retour  X : réglages"
 msgstr "A: back  X: settings"
 
@@ -6889,6 +6889,9 @@ msgstr "Invalid .EPV file"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Video format not supported"
+
+#~ msgid "Recherche du module ESP32-CAM sur le port J2 (UART0)..."
+#~ msgstr "Looking for the ESP32-CAM module on the port J2 (UART0)..."
 
 #~ msgid "Accueil et café"
 #~ msgstr "Welcome, coffee"

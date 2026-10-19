@@ -2,8 +2,8 @@
 
 *Version française : [appareil_photo.md](../fr/appareil_photo.md).*
 
-An **ESP32-CAM** (AI-Thinker: ESP32, OV2640 2 Mpx camera, 4 MB PSRAM, flash LED) plugged on the port **J2** turns the
-cicada into a camera: **Badge > Appareil photo** (Camera). The e-Paper is the viewfinder, the photos and the videos go
+An **ESP32-CAM** (AI-Thinker: ESP32, OV2640 2 Mpx camera, 4 MB PSRAM, flash LED) plugged on an extension port (SAO) turns
+the cicada into a camera: **Badge > Appareil photo** (Camera). The e-Paper is the viewfinder, the photos and the videos go
 to the SD card of the badge.
 
 - **The firmware of the ESP32**: [esp32cam/](../../esp32cam) (PlatformIO, Arduino).
@@ -30,51 +30,67 @@ Two rows of 8 pins; the names are printed on the back of the board (check yours)
 
 The UART0 (U0R, U0T) is used both to **program** the ESP32 and to **talk to the badge**.
 
-### Programming the ESP32-CAM
+### Programming the ESP32-CAM with the ESP Flasher (Rev6)
 
-The ESP32-CAM has no USB port: it is programmed through its UART0, with a USB-serial adapter (here the **ESP
-Flasher v6.1**). The exact wiring of the ESP Flasher (its row of pins, its 2 × 4 block) is still to be written: see
-§ 6.
+The ESP32-CAM has no USB port: it is programmed through its UART0. The **ESP Flasher Rev6** (KSEC / April Brother) is a
+USB-C → serial adapter (**CH340**) at **3.3 V** (MIC5219 regulator, ~400 mA), with a RESET button, a FLASH button
+(GPIO0) and an automatic boot circuit on its RST and GPIO0 pins.
 
-The principle, with any **3.3 V** USB-serial adapter:
+**With the row of pins** (the names are printed next to each pin):
 
-| Adapter | ESP32-CAM |
-|---|---|
-| 5V | 5V (the ESP32-CAM has its own 3.3 V regulator; the camera and the Wi-Fi draw current) |
-| GND | GND |
-| TX | U0R |
-| RX | U0T |
-| — | IO0 tied to GND **while it boots** (a wire or a jumper) |
-
-1. Tie IO0 to GND, plug the adapter (or press the RST button of the ESP32-CAM): programming mode.
-2. `cd esp32cam`, then `pio run -t upload --upload-port COMx` (PlatformIO: `pip install platformio`).
-3. Remove the IO0-GND wire, press RST: the firmware starts.
-
-### Plugging the ESP32-CAM on the cicada (port J2)
-
-| J2 (cicada) | Signal | ESP32-CAM |
+| ESP Flasher | ESP32-CAM | |
 |---|---|---|
-| 1 | +3.3 V | **3V3** (not 5V: the badge has no 5 V) |
-| 11 or 12 | GND | GND |
-| 9 | UART0 TX (GPIO12) | U0R (IO3) |
-| 7 | UART0 RX (GPIO13) | U0T (IO1) |
+| VCC | **3V3** | the flasher gives 3.3 V: never on the 5V pin of the ESP32-CAM |
+| GND | GND | |
+| TXD | U0R (IO3) | the transmit of one on the receive of the other |
+| RXD | U0T (IO1) | |
+| GPIO0 | IO0 | the programming mode, driven by the flasher (or its FLASH button) |
+| RST | — | not connected: the ESP32-CAM has no reset pin, only its RST button |
+| CH_EN | — | not connected |
 
-```
-   Cicada, port J2 (2 x 6)                ESP32-CAM
-   ┌─────────────────────┐
-   │  1 +3.3V ●──────────┼──────────────── 3V3
-   │  7 RX    ●──────────┼──────────────── U0T (IO1)
-   │  9 TX    ●──────────┼──────────────── U0R (IO3)
-   │ 11 GND   ●──────────┼──────────────── GND
-   └─────────────────────┘
-```
+**With the 2 × 4 block**: it is the socket of an ESP-01 module (ESP8266). The usual pinout of the ESP-01, seen from the
+top, the antenna up: first row GND, GPIO2, GPIO0, RXD; second row TXD, CH_PD, RST, VCC (RXD and TXD of the module).
+Wire VCC → 3V3, GND → GND, RXD (the receive of the module) → U0R, TXD (the transmit of the module) → U0T, GPIO0 → IO0;
+GPIO2, CH_PD and RST not connected. The maker does not publish the pinout of the block: **check it with a multimeter**
+(continuity between each pin of the block and the pin of the same name on the row) before wiring; when in doubt, use
+the row.
+
+**Programming**:
+
+1. Plug the flasher in USB: it shows as a serial port (CH340: driver included in Windows 10/11, macOS, Linux).
+2. `cd esp32cam`, then `pio run -t upload --upload-port COMx` (PlatformIO: `pip install platformio`).
+3. When PlatformIO shows "Connecting...": hold the **FLASH** button of the flasher (IO0 to ground) and press the
+   **RST** button of the ESP32-CAM, then release. The flasher cannot restart the ESP32-CAM by itself: its RST pin is
+   not connected.
+4. At the end, press **RST** on the ESP32-CAM: the firmware starts.
+
+The 3.3 V of the flasher (~400 mA) is enough to program and try the camera on the desk, **without the flash** (the flash
+LED draws too much).
+
+### Plugging the ESP32-CAM on the cicada (SAO extension port)
+
+The extension ports of the cicada are **SAO** ports (2 × 3 pins, keyed): 1 3.3V, 2 GND, 3 SDA, 4 SCL, 5 GPIO1,
+6 GPIO2.
+
+The badge does not need to know where the ESP32-CAM is plugged: while looking for it, it tries each possible serial
+link of the ports (one per second, shown on the screen) and keeps the one that answers: UART0 on GPIO16/17 (the SDA and
+SCL of the I2C0: pins 3 and 4), UART1 on GPIO20/21 (pins 5 and 6 if these are the GPIOs), UART0 on GPIO12/13 (the old
+2 × 6 port of the V1.1 board).
+
+| SAO port | ESP32-CAM |
+|---|---|
+| 1 (3.3 V) | **3V3** (not 5V: the badge has no 5 V) |
+| 2 (GND) | GND |
+| 3 (SDA) or 5 (GPIO1): the transmit of the badge | U0R (IO3) |
+| 4 (SCL) or 6 (GPIO2): the receive of the badge | U0T (IO1) |
 
 - **IO0 not connected** (it has a pull-up on the board): the ESP32 starts its firmware.
 - **Current**: the camera and the PSRAM draw ~150-250 mA; the 3.3 V regulator of the badge (TPS63000) gives ~1 A.
   The Wi-Fi is not used. The **flash LED** draws a lot: setting "Flash" at "non" (off) by default.
-- **Port J2** also carries the infrared board (GPIO17, GPIO20): both at once need a Y cable or a common extension
-  board.
+- The infrared board and the OLED screen must not be plugged on the same port.
 - At boot, the ESP32 writes its boot text on the UART0 (115,200 bauds): the badge ignores it (COBS frames).
+- The log of the badge (USB serial port) says where the module was found: `camera: module esp32cam 0.1, protocol 1,
+  on UART0 GPIO16/17`.
 
 
 ## 2. On the badge: Badge > Appareil photo
@@ -109,6 +125,6 @@ Host test: `python src/tests/host/run_tests.py camlink`.
 
 ## 4. To be completed
 
-- The pinout of the **ESP Flasher v6.1** (its row of pins and its 2 × 4 block): exact wiring, and whether it drives IO0
-  and the reset by itself.
+- The GPIOs really on each SAO port of the V1.2 board (its schematic is not in the repository): the automatic search
+  covers the possible cases; to confirm for the documentation.
 - The measures: frames per second of the viewfinder, current during a photo with the flash, time to send a photo.
