@@ -83,8 +83,10 @@ ou les réglages enregistrés deviennent incompatibles.
 4. Vérifier Réglages > Infos : `Version 1.2.3 (commit)` **sans « + »** (un « + » : des sources non commitées, ne
    jamais distribuer ce firmware).
 5. Commiter (`Version 1.2.3`), puis poser le tag : `git tag -a v_1.2.3 -m "Version 1.2.3"` et `git push --tags`.
-6. Publier `build/src/menu/badge_menu.uf2` dans une release GitHub du tag (le renommer `badge_menu-1.2.3.uf2`), et
-   le site (`python tools/docs_site.py`, qui affiche la version).
+6. Publier `build/src/menu/badge_menu-1.2.3.uf2` dans une release GitHub du tag, et le site
+   (`python tools/docs_site.py`, qui affiche la version). Chaque compilation écrit ce fichier à côté de
+   `badge_menu.uf2`, nommé d'après [VERSION](../../VERSION) (règle de `src/menu/CMakeLists.txt`) : le compiler
+   après le commit de la version, pour qu'il n'ait pas de « + ».
 
 
 ## 3. Organisation du dépôt

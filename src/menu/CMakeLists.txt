@@ -103,6 +103,13 @@ add_custom_target(badge_version ALL
 add_dependencies(badge_menu badge_version)
 target_include_directories(badge_menu PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 pico_add_extra_outputs(badge_menu)
+# The firmware to publish, named after its version: badge_menu-1.2.3.uf2 next to badge_menu.uf2 (kept for the tools
+# and the docs that flash it), written again at each build (after the .uf2 of pico_add_extra_outputs)
+set(BADGE_RELEASE_UF2 badge_menu-${BADGE_VERSION}.uf2)
+add_custom_command(TARGET badge_menu POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy badge_menu.uf2 ${BADGE_RELEASE_UF2}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Firmware to publish: ${BADGE_RELEASE_UF2}")
 
 target_link_libraries(badge_menu PRIVATE
     audio

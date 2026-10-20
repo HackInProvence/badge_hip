@@ -83,8 +83,10 @@ settings become incompatible.
 4. Check Réglages > Infos: `Version 1.2.3 (commit)` **without "+"** (a "+": uncommitted sources, never distribute
    that firmware).
 5. Commit (`Version 1.2.3`), then tag: `git tag -a v_1.2.3 -m "Version 1.2.3"` and `git push --tags`.
-6. Publish `build/src/menu/badge_menu.uf2` in a GitHub release of the tag (renamed `badge_menu-1.2.3.uf2`), and the
-   web site (`python tools/docs_site.py`, which shows the version).
+6. Publish `build/src/menu/badge_menu-1.2.3.uf2` in a GitHub release of the tag, and the web site
+   (`python tools/docs_site.py`, which shows the version). Each build writes that file next to `badge_menu.uf2`,
+   named after [VERSION](../../VERSION) (a rule of `src/menu/CMakeLists.txt`): build it after the commit of the
+   version, so that it has no "+".
 
 
 ## 3. Repository layout

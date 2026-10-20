@@ -9,7 +9,12 @@ Format : `MAJEUR.MINEUR.CORRECTIF`.
 - **MAJEUR** : incompatible : le réseau radio des cigales change, ou les réglages enregistrés sont remis à zéro.
 
 
-## 1.1.0 — en préparation (pas encore de tag)
+## Non publiée
+
+Rien pour l'instant.
+
+
+## 1.1.0 — 2026-10-20
 
 Depuis `v_1.0.0` :
 
@@ -19,6 +24,8 @@ Depuis `v_1.0.0` :
 - **Mini-bolides** : course de petites voitures de 2 à 8 badges, 4 circuits choisis par le créateur de la partie
   (facile à expert). Les LEDs donnent la place, puis le gagnant (vert clignotant) et les autres (rouge en fondu).
 - **Détecteur de cigales** (Social) : chaque cigale captée est signalée (son, LEDs, message).
+- **Radar des cigales** : la cigale suivie répond environ 4 fois par seconde (on trouve la direction en tournant sur
+  soi) ; Y fait clignoter ses yeux en vert, X la fait chanter (« Une cigale te cherche ! »).
 - **Identifiant sonore** (Badge) : le nom du badge joué en FSK sur le buzzer.
 - **Mon grade** : 10 grades de pirate gagnés avec l'expérience, avec leur portrait.
 - **Chœur** : 6 nouvelles chansons à plusieurs voix.
@@ -45,8 +52,10 @@ Depuis `v_1.0.0` :
 - Loup-garou : la description du rôle s'ouvrait toute seule ; dessins du villageois, du voleur et de Cupidon refaits.
 - Le record d'un jeu (appui long sur B dans le menu) se ferme de nouveau avec n'importe quel bouton.
 
-**À vérifier avant de publier** : le réseau entre un badge 1.0.0 et un badge de cette version (le modem radio a
-changé de réglages).
+**Non vérifié** : le réseau entre un badge 1.0.0 et un badge 1.1.0 (le modem radio a changé de réglages) : mettre
+à jour tous les badges en 1.1.0.
+
+Firmware : `badge_menu-1.1.0.uf2` (tag `v_1.1.0`).
 
 
 ## 1.0.0 — 2026-10-04
