@@ -42,6 +42,7 @@ Depuis `v_1.0.0` :
 - Réseau : écoute avant d'émettre, période des balises adaptée à l'occupation, 32 voisines, débit réglable pour les
   essais de portée (10 kbit/s par défaut : la meilleure portée).
 - Radar des cigales : échelle chaud / froid plus large ; radio pirate : meilleure portée.
+- Radio : fréquence du quartz du CC1101 par défaut à 26 MHz (`CC1101_fXOSC`) : environ 1 m de portée en plus.
 - Annonces : 20 emplacements, le programme de SecSea 2026 par défaut.
 - `badge_remote.py` : écran redimensionnable, choix du badge, débit radio.
 - Documentation : guides mis à jour, site web (`tools/docs_site.py`), étude et idées pour un module ESP32,
