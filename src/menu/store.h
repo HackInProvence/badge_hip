@@ -23,6 +23,7 @@
 #include "ir.h"
 
 #define STORE_MAX_MET 200
+#define STORE_CAMERA_SETTINGS 10  /* CLS_COUNT of src/shared/camlink/camlink.h */
 #define STORE_IR_SLOTS 4
 #define STORE_NAME_LEN 12
 #define STORE_SAVER_IMAGE_LEN 80
@@ -98,10 +99,13 @@ typedef struct {
     uint8_t net_rate;  /* Bit rate of the network: index + 1 in radio_tools.c RATES (0, 0xFF: default, 10 kbit/s) */
     uint8_t detector;  /* STORE_DETECTOR: the cigale detector is on (Social > Détecteur de cigales) */
     uint8_t display_clean;  /* display_clean_t + 1 (Réglages > Veille de l'écran > Nettoyage); 0, 0xFF: discreet */
+    uint8_t camera_set;  /* STORE_CAMERA_SET: camera[] is set (Badge > Appareil photo > réglages) */
+    uint8_t camera[STORE_CAMERA_SETTINGS];  /* The settings of the camera module (camlink_setting_t) */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1
 #define STORE_DETECTOR 0xD7
+#define STORE_CAMERA_SET 0xCA
 
 #define STORE_ASLEEP 0x5A
 
