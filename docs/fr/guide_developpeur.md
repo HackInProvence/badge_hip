@@ -87,6 +87,12 @@ ou les réglages enregistrés deviennent incompatibles.
    (`python tools/docs_site.py`, qui affiche la version). Chaque compilation écrit ce fichier à côté de
    `badge_menu.uf2`, nommé d'après [VERSION](../../VERSION) (règle de `src/menu/CMakeLists.txt`) : le compiler
    après le commit de la version, pour qu'il n'ait pas de « + ».
+7. Le paquet à publier avec la release : `python tools/make_dist.py` écrit `build/dist/badge_secsea-1.2.3/` et son
+   `.zip` : `LISEZ-MOI.html` (par où commencer), le firmware, le contenu de la carte SD, les outils du PC et leur
+   `requirements.txt`, les fichiers du Flipper Zero, `fsk-buzzer-link.html`, la documentation en HTML (celle de
+   `docs_site.py`), `CHANGELOG.md`, `LICENSE` et `SHA256SUMS.txt`. Il refuse un firmware d'une autre version ou
+   avec un « + » (`--allow-dirty` : un paquet d'essai, nommé `-test`) et signale un firmware compilé d'un autre
+   commit que le tag ; `--build` compile d'abord.
 
 
 ## 3. Organisation du dépôt

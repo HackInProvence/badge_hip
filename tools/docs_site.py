@@ -160,6 +160,7 @@ FIXED = {
     'tools/flipper/SecSea_leds_vert_rouge_boucle.sub': ('Essai de portée : vert, rouge... chaque seconde, 2 min 30',
                                                         'Range test: green, red... every second, 2 min 30'),
     'hardware/badge_v1.0.pdf': ('Schéma électrique de la carte V1.0', 'Schematic of the V1.0 board'),
+    'hardware/badge_v1.2.pdf': ('Schéma électrique de la carte V1.2', 'Schematic of the V1.2 board'),
     'hardware/badge_v1.0_TOP.png': ('Carte V1.0, face avant (vue du circuit)', 'V1.0 board, front side (layout)'),
     'hardware/badge_v1.0_TOP2.png': ('Carte V1.0, face avant (rendu)', 'V1.0 board, front side (render)'),
     'hardware/badge_v1.0_BOTTOM.png': ('Carte V1.0, face arrière (vue du circuit)', 'V1.0 board, back side (layout)'),

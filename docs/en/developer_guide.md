@@ -87,6 +87,12 @@ settings become incompatible.
    (`python tools/docs_site.py`, which shows the version). Each build writes that file next to `badge_menu.uf2`,
    named after [VERSION](../../VERSION) (a rule of `src/menu/CMakeLists.txt`): build it after the commit of the
    version, so that it has no "+".
+7. The package to publish with the release: `python tools/make_dist.py` writes `build/dist/badge_secsea-1.2.3/` and
+   its `.zip`: `LISEZ-MOI.html` (where to start), the firmware, the content of the SD card, the PC tools and their
+   `requirements.txt`, the Flipper Zero files, `fsk-buzzer-link.html`, the documentation in HTML (the one of
+   `docs_site.py`), `CHANGELOG.md`, `LICENSE` and `SHA256SUMS.txt`. It refuses a firmware of another version or with
+   a "+" (`--allow-dirty`: a test package, named `-test`) and says when the firmware is built from another commit
+   than the tag; `--build` builds first.
 
 
 ## 3. Repository layout
