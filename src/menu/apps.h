@@ -75,6 +75,7 @@ typedef enum {
     APP_DETECTOR,
     APP_CONFERENCE,
     APP_CAMERA,
+    APP_REMOTE,
     APP_COUNT,
 } app_id_t;
 

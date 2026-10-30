@@ -182,13 +182,53 @@ de lumière, la pose est longue et la photo floue de bougé : éclairer, ou le r
 - **A** : quitter (arrête la vidéo en cours).
 
 
-## 3. La liaison (src/shared/camlink)
+## 3. La télécommande web : Badge > Télécommande
+
+Le module ESP32-CAM sert une page web qui pilote le badge depuis un téléphone (ou un ordinateur) : l'**écran du
+badge** en direct (les 4 gris compris), ses **4 boutons Y A B X** (appui long : maintenir le bouton) et un **champ de
+texte** pour ses éditeurs (nom, messages...). La page n'envoie que les boutons et le texte : ni carte SD, ni
+redémarrage, ni mode admin, contrairement au port USB.
+
+**Démarrer** : Badge > Télécommande > « Télécommande : oui ». Elle reste active en arrière-plan (A revient aux menus,
+on navigue partout depuis le téléphone) jusqu'à « Télécommande : non » ou le redémarrage du badge.
+
+**Le point d'accès (par défaut)** : le module crée son propre Wi-Fi « Cigale-<nom> », protégé par un mot de passe
+tiré au hasard à chaque démarrage. « Se connecter » affiche un **QR code Wi-Fi** : le téléphone le scanne, rejoint le
+réseau et la page s'ouvre toute seule (portail captif) ; sinon : `http://192.168.4.1`. Ce mot de passe suffit : qui
+le lit sur l'écran du badge a déjà le badge en main.
+
+**Un réseau** : sur la page (depuis le point d'accès), « Wi-Fi du module » : le nom (SSID) et le mot de passe d'un
+réseau, et une clé admin facultative ; le module les garde. Puis sur le badge : « Wi-Fi : réseau ». « Se connecter »
+affiche l'adresse du module sur ce réseau (et son QR code) et un **code à 6 chiffres** (nouveau à chaque démarrage)
+que la page demande avant de piloter le badge : les autres personnes du réseau ne peuvent pas le piloter. Le nom
+`http://cigale-<nom>.local` marche aussi sur la plupart des ordinateurs. Si le réseau ne répond pas (15 s), le module
+revient à son point d'accès (« Réseau introuvable »), pour corriger les réglages.
+
+**La page admin** (`/admin` sur n'importe quel module du réseau) : l'écran de **toutes les cigales du réseau** côte à
+côte, en lecture seule. Les modules se signalent entre eux (UDP, port 4210) ; la page demande la clé admin, la même
+sur tous les modules (réglée dans « Wi-Fi du module »).
+
+**Mettre à jour le module** depuis la carte SD du badge : copier `esp32cam/.pio/build/esp32cam/firmware.bin` (ou le
+fichier du paquet de distribution) sous le nom **`ESP32/ESP32CAM.BIN`** sur la carte, puis Badge > Télécommande >
+« Mettre à jour le module » > B. Le badge l'envoie par la liaison (~1 Mo, environ une minute), le module le vérifie
+puis redémarre dessus ; son nouveau nom de version s'affiche. Il faut que le module ait déjà un firmware avec la
+télécommande (protocole 2) : la première fois, le flasher avec l'ESP Flasher (§ 1).
+
+- **Le courant** : le Wi-Fi tire des pointes de ~300 mA ; la batterie du badge se vide plus vite, arrêter la
+  télécommande quand elle ne sert pas.
+- Le badge n'envoie son écran que lorsqu'une page le regarde.
+
+
+## 4. La liaison (src/shared/camlink)
 
 - UART à **921 600 bauds**, 8N1.
 - Paquet : `[type][seq][longueur sur 2 octets][données][CRC-16]`, encodé en **COBS**, terminé par un octet 0.
 - Les données du module (viseur, fichiers, vidéo) attendent l'**ACK** du badge avant le paquet suivant (renvoyées
   après 300 ms) : le badge peut être occupé par son écran ou sa carte SD sans rien perdre.
 - Une image du viseur : 200 × 200 en 1 bit = 5 000 octets, en 5 paquets de 1 000.
+- Les données du badge (son écran, la mise à jour du module) attendent de même l'ACK du module.
+- Côté badge, la liaison est un service partagé par l'appareil photo et la télécommande (`src/menu/camport.c`) ; sans
+  la page de l'appareil photo, son récepteur est petit (96 octets : les touches, l'état du Wi-Fi) pour la RAM.
 
 | Type | Sens | Contenu |
 |---|---|---|
@@ -201,13 +241,18 @@ de lumière, la pose est longue et la photo floue de bougé : éclairer, ou le r
 | FILE_OPEN / FILE_DATA / FILE_CLOSE | module → badge | un fichier de la photo (JPEG, puis .epi) |
 | VIDEO | badge → module | vidéo marche / arrêt, images par seconde |
 | VFRAME | module → badge | une partie d'une image de la vidéo |
-| STATUS | module → badge | prêt, ou caméra absente |
+| STATUS | module → badge | prêt, caméra absente, résultat de la mise à jour |
+| WEB | badge → module | télécommande marche / arrêt, point d'accès ou réseau, son nom, son mot de passe, le code |
+| WEB_STATE | module → badge | pages ouvertes, état du Wi-Fi, adresse IP, réseau enregistré |
+| SCREEN | badge → module | une partie de l'écran du badge (1 plan, ou 2 pour les 4 gris) |
+| KEY | module → badge | un bouton de la page, ou un caractère tapé |
+| OTA_BEGIN / OTA_DATA / OTA_END | badge → module | un nouveau firmware du module, depuis la carte SD |
 
 Test sur le PC : `python src/tests/host/run_tests.py camlink` (aller-retour COBS, erreurs, reprise après le texte de
 boot, tramages).
 
 
-## 4. Côté ESP32 (esp32cam/)
+## 5. Côté ESP32 (esp32cam/)
 
 - La caméra en **JPEG 320 × 240** pour le viseur : décodée en gris, le carré central réduit à 200 × 200, contraste
   étiré, tramé en 1 bit (la trame choisie), envoyé.
@@ -216,10 +261,15 @@ boot, tramages).
   en `.epi`.
 - La **vidéo** : une image par période (4 par seconde), tramée en Bayer (stable d'une image à l'autre : moins de
   rémanence sur l'e-Paper).
+- La **télécommande** : le Wi-Fi (point d'accès avec portail captif, ou réseau enregistré dans la flash :
+  `Preferences` « webremote »), un serveur web dans sa propre tâche (`esp_http_server`) : `/` la page, `/screen`,
+  `/key`, `/type`, `/info`, `/config`, `/admin`, `/peers.json` ; les pages dans `esp32cam/src/web_pages.h`.
+- La **mise à jour** : la bibliothèque `Update`, dans l'autre partition OTA (`min_spiffs.csv` : deux applications de
+  1,9 Mo).
 - Rien d'autre sur l'UART0 (`CORE_DEBUG_LEVEL=0`).
 
 
-## 5. Essais
+## 6. Essais
 
 1. Programmer l'ESP32-CAM (§ 1), le brancher sur un port SAO (4 fils).
 2. Badge > Appareil photo : « Module trouvé », puis le viseur.
@@ -229,7 +279,7 @@ boot, tramages).
    `camera: photo 1 saved`, `camera: video saved, N frames`.
 
 
-## 6. À compléter
+## 7. À compléter
 
 - Les GPIO réellement présents sur chaque port SAO de la carte V1.2 (le schéma de la V1.2 n'est pas dans le dépôt) :
   la recherche automatique couvre les cas possibles ; à confirmer pour la documentation.

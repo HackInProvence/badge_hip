@@ -32,9 +32,9 @@ static int feed_all(camlink_rx_t *rx, const uint8_t *b, size_t n) {
 }
 
 static void test_round_trips(void) {
-    static uint8_t payload[CAMLINK_MAX_PAYLOAD], enc[CAMLINK_ENCODED_MAX];
+    static uint8_t payload[CAMLINK_MAX_PAYLOAD], enc[CAMLINK_ENCODED_MAX], buf[CAMLINK_ENCODED_MAX];
     camlink_rx_t rx;
-    camlink_rx_init(&rx);
+    camlink_rx_init(&rx, buf, sizeof(buf));
     size_t lens[] = {0, 1, 2, 253, 254, 255, 508, 1000, CAMLINK_MAX_PAYLOAD};
     for (int k = 0; k < 300; ++k) {
         size_t len = k < 9 ? lens[k] : rnd() % (CAMLINK_MAX_PAYLOAD + 1);
@@ -54,11 +54,11 @@ static void test_round_trips(void) {
 }
 
 static void test_errors(void) {
-    uint8_t payload[100], enc[CAMLINK_ENCODED_MAX];
+    static uint8_t payload[100], enc[CAMLINK_ENCODED_MAX], buf[CAMLINK_ENCODED_MAX];
     for (int i = 0; i < 100; ++i)
         payload[i] = (uint8_t)(i * 7);
     camlink_rx_t rx;
-    camlink_rx_init(&rx);
+    camlink_rx_init(&rx, buf, sizeof(buf));
     /* The boot text of the ESP32 before the first frame, then a frame: read */
     const char *boot = "ets Jul 29 2019 12:21:46\r\nrst:0x1 (POWERON_RESET),boot:0x13\r\n";
     feed_all(&rx, (const uint8_t *)boot, strlen(boot));
@@ -91,6 +91,47 @@ static void test_errors(void) {
     CHECK(feed_all(&rx, enc, n) == 1, "no frame after an endless one");
     /* The known CRC of "123456789" (CRC-16/CCITT-FALSE) */
     CHECK(camlink_crc16((const uint8_t *)"123456789", 9) == 0x29B1, "crc %04x", camlink_crc16((const uint8_t *)"123456789", 9));
+}
+
+/* camlink_write() in two pieces (a header and a body, as the screen of the badge) gives the bytes of camlink_encode()
+ * of the whole payload; a small receiver takes the short packets and drops the long ones */
+typedef struct {
+    uint8_t *p;
+    size_t max_piece;
+} out_t;
+
+static void out_bytes(const uint8_t *data, size_t len, void *ctx) {
+    out_t *o = (out_t *)ctx;
+    memcpy(o->p, data, len);
+    o->p += len;
+    if (len > o->max_piece)
+        o->max_piece = len;
+}
+
+static void test_write_pieces(void) {
+    static uint8_t payload[CAMLINK_MAX_PAYLOAD], enc[CAMLINK_ENCODED_MAX], streamed[CAMLINK_ENCODED_MAX];
+    for (int k = 0; k < 200; ++k) {
+        size_t len = 5 + rnd() % (CAMLINK_MAX_PAYLOAD - 4), head = k % 6;
+        for (size_t i = 0; i < len; ++i)
+            payload[i] = k % 3 == 0 ? 0 : (uint8_t)rnd();
+        size_t n = camlink_encode(CL_SCREEN, (uint8_t)k, payload, len, enc);
+        out_t o = {streamed, 0};
+        size_t m = camlink_write(CL_SCREEN, (uint8_t)k, payload, head, payload + head, len - head, out_bytes, &o);
+        CHECK(n == m && (size_t)(o.p - streamed) == m && memcmp(enc, streamed, n) == 0,
+              "write in pieces differs (len %zu, head %zu)", len, head);
+        CHECK(o.max_piece <= 255, "a piece of %zu bytes", o.max_piece);
+    }
+    uint8_t small[64];
+    camlink_rx_t rx;
+    camlink_rx_init(&rx, small, sizeof(small));
+    uint8_t key[2] = {CAMLINK_KEY_TYPE, 'z'};
+    size_t n = camlink_encode(CL_KEY, 7, key, 2, enc);
+    CHECK(feed_all(&rx, enc, n) == 1 && rx.type == CL_KEY && rx.len == 2 && rx.payload[1] == 'z',
+          "a short packet in a small receiver");
+    n = camlink_encode(CL_FRAME, 8, payload, 500, enc);
+    CHECK(feed_all(&rx, enc, n) == 0 && rx.bad == 1, "a long packet in a small receiver");
+    n = camlink_encode(CL_KEY, 9, key, 1, enc);
+    CHECK(feed_all(&rx, enc, n) == 1 && rx.seq == 9, "no packet after a long one");
 }
 
 static int count_white(const uint8_t *bits) {
@@ -135,6 +176,7 @@ static void test_pictures(void) {
 int main(void) {
     test_round_trips();
     test_errors();
+    test_write_pieces();
     test_pictures();
     printf("%s: %d failure(s)\n", fails ? "FAIL" : "ok", fails);
     return fails != 0;

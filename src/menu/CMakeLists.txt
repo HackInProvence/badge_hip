@@ -56,6 +56,8 @@ target_sources(badge_menu PRIVATE
     file_ops.c
     file_names.c
     camera.c
+    camport.c
+    webremote.c
     ${CMAKE_CURRENT_LIST_DIR}/../shared/camlink/camlink.c
     sd_serial.c
     shared_buf.c

@@ -129,20 +129,62 @@ the exposure is long and the photo blurred by motion: add light, or the "Flash" 
 - **A**: leave (stops the video being recorded).
 
 
-## 3. The link (src/shared/camlink)
+## 3. The web remote control: Badge > Télécommande (Remote control)
+
+The ESP32-CAM module serves a web page that drives the badge from a phone (or a computer): the **screen of the
+badge** live (the 4 grays included), its **4 buttons Y A B X** (long press: hold the button) and a **text field** for
+its editors (name, messages...). The page only sends the buttons and the text: no SD card, no reboot, no admin mode,
+unlike the USB port.
+
+**Start**: Badge > Télécommande > "Remote control: yes". It stays on in the background (A goes back to the menus,
+you browse everything from the phone) until "Remote control: no" or a restart of the badge.
+
+**The access point (default)**: the module creates its own Wi-Fi "Cigale-<name>", protected by a password drawn at
+random at each start. "Connect" shows a **Wi-Fi QR code**: the phone scans it, joins the network and the page opens
+by itself (captive portal); otherwise: `http://192.168.4.1`. That password is enough: whoever reads it on the screen
+of the badge already holds the badge.
+
+**A network**: on the page (from the access point), "Wi-Fi du module": the name (SSID) and the password of a
+network, and an optional admin key; the module keeps them. Then on the badge: "Wi-Fi: network". "Connect" shows the
+address of the module on that network (and its QR code) and a **6-digit code** (new at each start) that the page asks
+before driving the badge: the other people of the network cannot drive it. The name `http://cigale-<name>.local`
+works too on most computers. When the network does not answer (15 s), the module goes back to its access point
+("Network not found"), to fix the settings.
+
+**The admin page** (`/admin` on any module of the network): the screen of **every cicada of the network** side by
+side, read only. The modules tell each other they are there (UDP, port 4210); the page asks the admin key, the same
+on every module (set in "Wi-Fi du module").
+
+**Updating the module** from the SD card of the badge: copy `esp32cam/.pio/build/esp32cam/firmware.bin` (or the file
+of the distribution package) as **`ESP32/ESP32CAM.BIN`** on the card, then Badge > Télécommande > "Update the module"
+> B. The badge sends it through the link (~1 MB, about a minute), the module checks it then restarts on it; its new
+version shows up. The module must already run a firmware with the remote control (protocol 2): the first time,
+flash it with the ESP Flasher (§ 1).
+
+- **Current**: the Wi-Fi draws peaks of ~300 mA; the battery of the badge empties faster, stop the remote control
+  when it is not used.
+- The badge sends its screen only while a page looks at it.
+
+
+## 4. The link (src/shared/camlink)
 
 - UART at **921,600 bauds**, 8N1.
 - Packet: `[type][seq][length on 2 bytes][data][CRC-16]`, **COBS** encoded, ended by a 0 byte.
 - The data of the module (viewfinder, files, video) waits for the **ACK** of the badge before the next packet (sent
   again after 300 ms): the badge may be busy with its screen or its SD card without losing anything.
 - A frame of the viewfinder: 200 × 200 at 1 bit = 5,000 bytes, in 5 packets of 1,000.
-- The types: HELLO, ACK, SETTINGS, PREVIEW, FRAME, SHOT, FILE_OPEN / FILE_DATA / FILE_CLOSE, VIDEO, VFRAME, STATUS
-  (details in [camlink.h](../../src/shared/camlink/camlink.h)).
+- The types: HELLO, ACK, SETTINGS, PREVIEW, FRAME, SHOT, FILE_OPEN / FILE_DATA / FILE_CLOSE, VIDEO, VFRAME, STATUS,
+  and for the remote control WEB, WEB_STATE, SCREEN, KEY, OTA_BEGIN / OTA_DATA / OTA_END (details in
+  [camlink.h](../../src/shared/camlink/camlink.h)).
+- On the badge, the link is a service shared by the camera and the remote control (`src/menu/camport.c`); without
+  the camera page its receiver is small (96 bytes: the keys, the state of the Wi-Fi), for the RAM.
+- On the module: the pages in `esp32cam/src/web_pages.h`, a web server in its own task, the Wi-Fi settings saved in
+  its flash, the update in the other OTA partition (`min_spiffs.csv`).
 
 Host test: `python src/tests/host/run_tests.py camlink`.
 
 
-## 4. To be completed
+## 5. To be completed
 
 - The GPIOs really on each SAO port of the V1.2 board (its schematic is not in the repository): the automatic search
   covers the possible cases; to confirm for the documentation.

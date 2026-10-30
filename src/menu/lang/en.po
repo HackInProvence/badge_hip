@@ -539,7 +539,7 @@ msgid "Commandes radio"
 msgstr "Radio commands"
 
 #: src/menu/admin.c:76
-#: src/menu/main.c:1147
+#: src/menu/main.c:1180
 msgid "A : retour  B : changer"
 msgstr "A: back  B: change"
 
@@ -580,8 +580,8 @@ msgstr ""
 #: src/menu/assassin.c:947
 #: src/menu/gamebook.c:746
 #: src/menu/lang.c:47
-#: src/menu/main.c:1154
-#: src/menu/main.c:1763
+#: src/menu/main.c:1187
+#: src/menu/main.c:1796
 msgid "A : retour  B : choisir"
 msgstr "A: back  B: choose"
 
@@ -821,7 +821,7 @@ msgstr "At least %d players needed."
 
 #: src/menu/assassin.c:818
 #: src/menu/assassin.c:823
-#: src/menu/main.c:3417
+#: src/menu/main.c:3452
 #: src/menu/race.c:909
 #: src/menu/smuggler.c:536
 #: src/menu/smuggler.c:553
@@ -1344,8 +1344,8 @@ msgstr "Broadcast: %s"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
-#: src/menu/camera.c:198
-#: src/menu/camera.c:235
+#: src/menu/camera.c:94
+#: src/menu/camera.c:131
 #: src/menu/hotcold.c:358
 #: src/menu/hotcold.c:359
 msgid "non"
@@ -1353,10 +1353,10 @@ msgstr "no"
 
 #: src/menu/battradio.c:59
 #: src/menu/battradio.c:70
-#: src/menu/camera.c:235
+#: src/menu/camera.c:131
 #: src/menu/hotcold.c:358
 #: src/menu/hotcold.c:359
-#: src/menu/main.c:700
+#: src/menu/main.c:705
 msgid "oui"
 msgstr "yes"
 
@@ -1399,160 +1399,160 @@ msgstr ""
 "Settings > Battery\n"
 "by radio: yes."
 
-#: src/menu/camera.c:181
+#: src/menu/camera.c:77
 msgid "Taille des photos"
 msgstr "Photo size"
 
-#: src/menu/camera.c:182
+#: src/menu/camera.c:78
 msgid "Qualité JPEG"
 msgstr "JPEG quality"
 
-#: src/menu/camera.c:183
+#: src/menu/camera.c:79
 msgid "Luminosité"
 msgstr "Brightness"
 
-#: src/menu/camera.c:184
+#: src/menu/camera.c:80
 msgid "Contraste"
 msgstr "Contrast"
 
-#: src/menu/camera.c:185
+#: src/menu/camera.c:81
 msgid "Saturation"
 msgstr "Saturation"
 
-#: src/menu/camera.c:186
+#: src/menu/camera.c:82
 msgid "Effet"
 msgstr "Effect"
 
-#: src/menu/camera.c:187
+#: src/menu/camera.c:83
 msgid "Miroir"
 msgstr "Mirror"
 
-#: src/menu/camera.c:188
+#: src/menu/camera.c:84
 msgid "Retourner"
 msgstr "Flip"
 
-#: src/menu/camera.c:189
+#: src/menu/camera.c:85
 msgid "Flash"
 msgstr "Flash"
 
-#: src/menu/camera.c:190
+#: src/menu/camera.c:86
 msgid "Trame du viseur"
 msgstr "Viewfinder dither"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "aucun"
 msgstr "none"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "bleu"
 msgstr "blue"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "gris"
 msgstr "gray"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "négatif"
 msgstr "negative"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "rouge"
 msgstr "red"
 
-#: src/menu/camera.c:195
+#: src/menu/camera.c:91
 msgid "vert"
 msgstr "green"
 
-#: src/menu/camera.c:196
+#: src/menu/camera.c:92
 msgid "sépia"
 msgstr "sepia"
 
-#: src/menu/camera.c:197
+#: src/menu/camera.c:93
 msgid "basse"
 msgstr "low"
 
-#: src/menu/camera.c:197
+#: src/menu/camera.c:93
 msgid "haute"
 msgstr "high"
 
-#: src/menu/camera.c:197
+#: src/menu/camera.c:93
 msgid "maximale"
 msgstr "maximum"
 
-#: src/menu/camera.c:197
+#: src/menu/camera.c:93
 msgid "moyenne"
 msgstr "medium"
 
-#: src/menu/camera.c:198
+#: src/menu/camera.c:94
 msgid "pour la photo"
 msgstr "for the photo"
 
-#: src/menu/camera.c:198
+#: src/menu/camera.c:94
 msgid "toujours (lampe)"
 msgstr "always (lamp)"
 
-#: src/menu/camera.c:199
+#: src/menu/camera.c:95
 msgid "seuil"
 msgstr "threshold"
 
-#: src/menu/camera.c:309
-#: src/menu/camera.c:553
+#: src/menu/camera.c:205
+#: src/menu/camera.c:412
 #: src/menu/conference.c:464
-#: src/menu/main.c:1596
-#: src/menu/main.c:1861
+#: src/menu/main.c:1629
+#: src/menu/main.c:1894
 msgid "Pas de carte SD."
 msgstr "No SD card."
 
-#: src/menu/camera.c:319
+#: src/menu/camera.c:215
 msgid "Écriture impossible"
 msgstr "Cannot write"
 
-#: src/menu/camera.c:345
+#: src/menu/camera.c:241
 msgid "Vidéo : %lu images"
 msgstr "Video: %lu frames"
 
-#: src/menu/camera.c:438
+#: src/menu/camera.c:316
 msgid "Photo IMG_%04d"
 msgstr "Photo IMG_%04d"
 
-#: src/menu/camera.c:557
+#: src/menu/camera.c:416
 msgid "Photo..."
 msgstr "Photo..."
 
-#: src/menu/camera.c:572
+#: src/menu/camera.c:431
 msgid "Réglages photo"
 msgstr "Camera settings"
 
-#: src/menu/camera.c:574
+#: src/menu/camera.c:433
 msgid "Y X : choisir  A : retour  B : changer"
 msgstr "Y X: choose  A: back  B: change"
 
-#: src/menu/camera.c:582
+#: src/menu/camera.c:441
 msgid "REC %lu  B long : stop"
 msgstr "REC %lu  B long: stop"
 
-#: src/menu/camera.c:584
+#: src/menu/camera.c:443
 msgid "B photo  B long vidéo  X"
 msgstr "B photo  B long video  X"
 
-#: src/menu/camera.c:588
-#: src/menu/camera.c:605
+#: src/menu/camera.c:447
+#: src/menu/camera.c:465
 msgid "Appareil photo"
 msgstr "Camera"
 
-#: src/menu/camera.c:589
+#: src/menu/camera.c:449
 msgid "Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?)."
 msgstr "The module answers but its camera does not start (the camera ribbon?)."
 
-#: src/menu/camera.c:590
+#: src/menu/camera.c:450
 msgid "Module trouvé, la première image arrive..."
 msgstr "Module found, the first picture is coming..."
 
-#: src/menu/camera.c:591
+#: src/menu/camera.c:451
 msgid "Recherche du module ESP32-CAM sur les ports d'extension..."
 msgstr "Looking for the ESP32-CAM module on the extension ports..."
 
-#: src/menu/camera.c:597
+#: src/menu/camera.c:457
 msgid "A : retour  X : réglages"
 msgstr "A: back  X: settings"
 
@@ -1657,8 +1657,8 @@ msgstr ""
 
 #: src/menu/chorus.c:550
 #: src/menu/demo.c:32
-#: src/menu/main.c:906
-#: src/menu/main.c:1454
+#: src/menu/main.c:911
+#: src/menu/main.c:1487
 msgid "A : retour  B : lancer"
 msgstr "A: back  B: start"
 
@@ -1667,8 +1667,8 @@ msgid "Conférences (%d)"
 msgstr "Talks (%d)"
 
 #: src/menu/conference.c:39
-#: src/menu/main.c:698
-#: src/menu/main.c:1531
+#: src/menu/main.c:703
+#: src/menu/main.c:1564
 msgid "Infos"
 msgstr "Info"
 
@@ -1714,7 +1714,7 @@ msgstr "Conference badge"
 #: src/menu/conference.c:482
 #: src/menu/contacts.c:330
 #: src/menu/crypto_app.c:194
-#: src/menu/main.c:899
+#: src/menu/main.c:904
 msgid "A : retour  B : ouvrir"
 msgstr "A: back  B: open"
 
@@ -1821,7 +1821,7 @@ msgstr ""
 
 #: src/menu/contacts.c:352
 #: src/menu/fsk_id.c:162
-#: src/menu/main.c:3440
+#: src/menu/main.c:3475
 #: src/menu/pirate_radio.c:603
 #: src/menu/radio_tune.c:196
 msgid "A : arrêter"
@@ -2270,6 +2270,7 @@ msgid "A : menu  B : choisir"
 msgstr "A: menu  B: choose"
 
 #: src/menu/gamebook.c:719
+#: src/menu/webremote.c:473
 #: src/menu/werewolf.c:1711
 #: src/menu/werewolf.c:1718
 #: src/menu/werewolf.c:1755
@@ -2477,7 +2478,7 @@ msgid "Pause  B : reprendre"
 msgstr "Pause  B: resume"
 
 #: src/menu/games.c:1106
-#: src/menu/main.c:2253
+#: src/menu/main.c:2286
 #: src/menu/puzzles.c:1324
 msgid "Pas encore de record"
 msgstr "No record yet"
@@ -2627,7 +2628,7 @@ msgid "A : retour  B : le chasser"
 msgstr "A: back  B: hunt it"
 
 #: src/menu/image_radio.c:211
-#: src/menu/main.c:1136
+#: src/menu/main.c:1169
 msgid "SecSea (intégrée)"
 msgstr "SecSea (built-in)"
 
@@ -3041,392 +3042,393 @@ msgstr ""
 msgid "A : retour  B : marche / arrêt"
 msgstr "A: back  B: on / off"
 
-#: src/menu/main.c:355
+#: src/menu/main.c:360
 msgid "arc-en-ciel"
 msgstr "rainbow"
 
-#: src/menu/main.c:355
+#: src/menu/main.c:360
 msgid "battement"
 msgstr "heartbeat"
 
-#: src/menu/main.c:355
+#: src/menu/main.c:360
 msgid "respiration"
 msgstr "breathing"
 
-#: src/menu/main.c:355
+#: src/menu/main.c:360
 msgid "éteintes"
 msgstr "off"
 
-#: src/menu/main.c:356
+#: src/menu/main.c:361
 msgid "clignotement"
 msgstr "blinking"
 
-#: src/menu/main.c:356
+#: src/menu/main.c:361
 msgid "vert fixe"
 msgstr "green"
 
-#: src/menu/main.c:553
-#: src/menu/main.c:691
-#: src/menu/main.c:3259
+#: src/menu/main.c:558
+#: src/menu/main.c:696
+#: src/menu/main.c:3294
 msgid "Images"
 msgstr "Images"
 
-#: src/menu/main.c:553
-#: src/menu/main.c:3310
+#: src/menu/main.c:558
+#: src/menu/main.c:3345
 msgid "Lecture rapide"
 msgstr "Speed reading"
 
-#: src/menu/main.c:553
-#: src/menu/main.c:1547
-#: src/menu/main.c:1676
+#: src/menu/main.c:558
+#: src/menu/main.c:1580
+#: src/menu/main.c:1709
 msgid "Musique"
 msgstr "Music"
 
-#: src/menu/main.c:553
+#: src/menu/main.c:558
 msgid "Vidéos"
 msgstr "Videos"
 
-#: src/menu/main.c:556
+#: src/menu/main.c:561
 msgid "un fichier texte"
 msgstr "a text file"
 
-#: src/menu/main.c:674
+#: src/menu/main.c:679
 msgid "Cigale : %s"
 msgstr "Cicada: %s"
 
-#: src/menu/main.c:674
+#: src/menu/main.c:679
 msgid "activée"
 msgstr "on"
 
-#: src/menu/main.c:674
+#: src/menu/main.c:679
 msgid "coupée"
 msgstr "off"
 
-#: src/menu/main.c:675
+#: src/menu/main.c:680
 msgid "LEDs : %s"
 msgstr "LEDs: %s"
 
-#: src/menu/main.c:676
+#: src/menu/main.c:681
 msgid "Démo écran"
 msgstr "Screen demo"
 
-#: src/menu/main.c:677
+#: src/menu/main.c:682
 msgid "Vidéos (carte SD)"
 msgstr "Videos (SD card)"
 
-#: src/menu/main.c:678
+#: src/menu/main.c:683
 msgid "Musique (carte SD)"
 msgstr "Music (SD card)"
 
-#: src/menu/main.c:679
-#: src/menu/main.c:904
-#: src/menu/main.c:912
-#: src/menu/main.c:1860
-#: src/menu/main.c:1922
-#: src/menu/main.c:1947
+#: src/menu/main.c:684
+#: src/menu/main.c:909
+#: src/menu/main.c:917
+#: src/menu/main.c:1893
+#: src/menu/main.c:1955
+#: src/menu/main.c:1980
 msgid "Blind test"
 msgstr "Blind test"
 
-#: src/menu/main.c:680
+#: src/menu/main.c:685
 msgid "Réseau cigales : %lu pts"
 msgstr "Cicada network: %lu pts"
 
-#: src/menu/main.c:681
-#: src/menu/main.c:1441
-#: src/menu/main.c:3414
+#: src/menu/main.c:686
+#: src/menu/main.c:1474
+#: src/menu/main.c:3449
 msgid "Infrarouge"
 msgstr "Infrared"
 
-#: src/menu/main.c:682
-#: src/menu/main.c:1452
-#: src/menu/main.c:2314
+#: src/menu/main.c:687
+#: src/menu/main.c:1485
+#: src/menu/main.c:2347
 msgid "Écran OLED"
 msgstr "OLED screen"
 
-#: src/menu/main.c:683
+#: src/menu/main.c:688
 msgid "CTF : %d/%d flags"
 msgstr "CTF: %d/%d flags"
 
-#: src/menu/main.c:684
+#: src/menu/main.c:689
 msgid "Lecture rapide (PVSR)"
 msgstr "Speed reading (RSVP)"
 
-#: src/menu/main.c:688
-#: src/menu/main.c:1119
+#: src/menu/main.c:693
+#: src/menu/main.c:1152
 msgid "Veille : %s"
 msgstr "Screensaver: %s"
 
-#: src/menu/main.c:695
+#: src/menu/main.c:700
 #: src/menu/rtttl.c:760
 msgid "Volume : %u/%u"
 msgstr "Volume: %u/%u"
 
-#: src/menu/main.c:696
+#: src/menu/main.c:701
 msgid "Radio : message"
 msgstr "Radio: message"
 
-#: src/menu/main.c:697
+#: src/menu/main.c:702
 msgid "Radio : porteuse"
 msgstr "Radio: carrier"
 
-#: src/menu/main.c:699
+#: src/menu/main.c:704
 msgid "Crédits"
 msgstr "Credits"
 
-#: src/menu/main.c:700
+#: src/menu/main.c:705
+#: src/menu/webremote.c:256
 msgid "Télécommande : %s"
 msgstr "Remote: %s"
 
-#: src/menu/main.c:701
+#: src/menu/main.c:706
 msgid "Mode muet : %s"
 msgstr "Mute mode: %s"
 
-#: src/menu/main.c:702
+#: src/menu/main.c:707
 msgid "Quitter le mode admin"
 msgstr "Leave admin mode"
 
-#: src/menu/main.c:728
+#: src/menu/main.c:733
 #: src/menu/reset.c:19
 msgid "Tout"
 msgstr "All"
 
-#: src/menu/main.c:752
+#: src/menu/main.c:757
 msgid "Médias"
 msgstr "Media"
 
-#: src/menu/main.c:753
+#: src/menu/main.c:758
 msgid "Jeux solo"
 msgstr "Solo games"
 
-#: src/menu/main.c:756
+#: src/menu/main.c:761
 msgid "Jeux multi"
 msgstr "Multiplayer"
 
-#: src/menu/main.c:758
+#: src/menu/main.c:763
 msgid "Social"
 msgstr "Social"
 
-#: src/menu/main.c:761
+#: src/menu/main.c:766
 msgid "Radio & IR"
 msgstr "Radio & IR"
 
-#: src/menu/main.c:763
+#: src/menu/main.c:768
 msgid "Badge"
 msgstr "Badge"
 
-#: src/menu/main.c:766
+#: src/menu/main.c:771
 msgid "Réglages"
 msgstr "Settings"
 
-#: src/menu/main.c:768
+#: src/menu/main.c:773
 msgid "Admin"
 msgstr "Admin"
 
-#: src/menu/main.c:826
+#: src/menu/main.c:831
 msgid "Mode admin activé"
 msgstr "Admin mode on"
 
-#: src/menu/main.c:826
+#: src/menu/main.c:831
 msgid "Mode admin désactivé"
 msgstr "Admin mode off"
 
-#: src/menu/main.c:884
+#: src/menu/main.c:889
 msgid "Y X : choix  A : retour  B : OK"
 msgstr "Y X: choose  A: back  B: OK"
 
-#: src/menu/main.c:913
+#: src/menu/main.c:918
 msgid "Morceau %u / %u"
 msgstr "Track %u / %u"
 
-#: src/menu/main.c:934
+#: src/menu/main.c:939
 msgid "Lecture..."
 msgstr "Playing..."
 
-#: src/menu/main.c:934
-#: src/menu/main.c:1545
+#: src/menu/main.c:939
+#: src/menu/main.c:1578
 #: src/menu/rsvp.c:720
 msgid "Pause"
 msgstr "Pause"
 
-#: src/menu/main.c:934
+#: src/menu/main.c:939
 msgid "Terminé"
 msgstr "Done"
 
-#: src/menu/main.c:936
+#: src/menu/main.c:941
 msgid "B : titre  X : suivant"
 msgstr "B: title  X: next"
 
-#: src/menu/main.c:942
+#: src/menu/main.c:947
 msgid "Réseau cigales"
 msgstr "Cicada network"
 
-#: src/menu/main.c:943
+#: src/menu/main.c:948
 msgid "%s : %lu pts, %u rencontres"
 msgstr "%s: %lu pts, %u meetings"
 
-#: src/menu/main.c:947
+#: src/menu/main.c:952
 msgid "Balises : actives"
 msgstr "Beacons: on"
 
-#: src/menu/main.c:947
+#: src/menu/main.c:952
 msgid "Balises : coupées"
 msgstr "Beacons: off"
 
-#: src/menu/main.c:953
+#: src/menu/main.c:958
 msgid "Aucune cigale à portée"
 msgstr "No cicada in range"
 
-#: src/menu/main.c:963
+#: src/menu/main.c:968
 msgid "B : nom  X : balises"
 msgstr "B: name  X: beacons"
 
-#: src/menu/main.c:968
+#: src/menu/main.c:973
 msgid "Nom de la cigale"
 msgstr "Cicada name"
 
-#: src/menu/main.c:984
+#: src/menu/main.c:989
 msgid "Y X : changer la lettre"
 msgstr "Y X: change the letter"
 
-#: src/menu/main.c:985
+#: src/menu/main.c:990
 msgid "B : case suivante"
 msgstr "B: next cell"
 
-#: src/menu/main.c:986
+#: src/menu/main.c:991
 msgid "A : case précédente"
 msgstr "A: previous cell"
 
-#: src/menu/main.c:987
+#: src/menu/main.c:992
 msgid "B long : enregistrer"
 msgstr "Hold B: save"
 
-#: src/menu/main.c:991
+#: src/menu/main.c:996
 msgid "A ici : annuler"
 msgstr "A: cancel"
 
-#: src/menu/main.c:991
+#: src/menu/main.c:996
 msgid "Espace = effacer une lettre"
 msgstr "Space = erase a letter"
 
-#: src/menu/main.c:1041
+#: src/menu/main.c:1074
 msgid "Version %s"
 msgstr "Version %s"
 
-#: src/menu/main.c:1084
+#: src/menu/main.c:1117
 msgid "désactivée"
 msgstr "off"
 
-#: src/menu/main.c:1086
+#: src/menu/main.c:1119
 msgid "%u h"
 msgstr "%u h"
 
-#: src/menu/main.c:1088
+#: src/menu/main.c:1121
 msgid "%u min"
 msgstr "%u min"
 
-#: src/menu/main.c:1107
+#: src/menu/main.c:1140
 msgid "complet"
 msgstr "full"
 
-#: src/menu/main.c:1107
+#: src/menu/main.c:1140
 msgid "discret"
 msgstr "discreet"
 
-#: src/menu/main.c:1107
+#: src/menu/main.c:1140
 msgid "désactivé"
 msgstr "off"
 
-#: src/menu/main.c:1119
+#: src/menu/main.c:1152
 msgid "Veille après : %s"
 msgstr "Start after: %s"
 
-#: src/menu/main.c:1123
+#: src/menu/main.c:1156
 msgid "Image : %s"
 msgstr "Image: %s"
 
-#: src/menu/main.c:1126
+#: src/menu/main.c:1159
 msgid "Nettoyage : %s"
 msgstr "Cleaning: %s"
 
-#: src/menu/main.c:1129
+#: src/menu/main.c:1162
 msgid "Aperçu de la veille"
 msgstr "Screensaver preview"
 
-#: src/menu/main.c:1145
+#: src/menu/main.c:1178
 msgid "Veille de l'écran"
 msgstr "Screensaver"
 
-#: src/menu/main.c:1152
+#: src/menu/main.c:1185
 msgid "Image de veille"
 msgstr "Saver image"
 
-#: src/menu/main.c:1425
+#: src/menu/main.c:1458
 msgid "Enregistrer un signal"
 msgstr "Record a signal"
 
-#: src/menu/main.c:1432
+#: src/menu/main.c:1465
 msgid "%d : vide"
 msgstr "%d: empty"
 
-#: src/menu/main.c:1434
+#: src/menu/main.c:1467
 msgid "%d : NEC %04X / %02X"
 msgstr "%d: NEC %04X / %02X"
 
-#: src/menu/main.c:1436
+#: src/menu/main.c:1469
 msgid "%d : brut, %u impulsions"
 msgstr "%d: raw, %u pulses"
 
-#: src/menu/main.c:1443
+#: src/menu/main.c:1476
 msgid "B : enregistrer/émettre"
 msgstr "B: record/send"
 
-#: src/menu/main.c:1443
+#: src/menu/main.c:1476
 msgid "Emission..."
 msgstr "Sending..."
 
-#: src/menu/main.c:1459
+#: src/menu/main.c:1492
 msgid "Saisir un code"
 msgstr "Enter a code"
 
-#: src/menu/main.c:1461
+#: src/menu/main.c:1494
 msgid "Flags trouvés : %d/%d"
 msgstr "Flags found: %d/%d"
 
-#: src/menu/main.c:1468
+#: src/menu/main.c:1501
 #: src/menu/race.c:978
 #: src/menu/tug.c:541
 msgid "A : retour  B : OK"
 msgstr "A: back  B: OK"
 
-#: src/menu/main.c:1475
+#: src/menu/main.c:1508
 msgid "Code secret"
 msgstr "Secret code"
 
-#: src/menu/main.c:1476
+#: src/menu/main.c:1509
 msgid "Tapez le code avec"
 msgstr "Type the code with"
 
-#: src/menu/main.c:1477
+#: src/menu/main.c:1510
 msgid "les 4 boutons."
 msgstr "the 4 buttons."
 
-#: src/menu/main.c:1479
+#: src/menu/main.c:1512
 msgid "Attendre 8 s : annuler"
 msgstr "Wait 8 s: cancel"
 
-#: src/menu/main.c:1511
+#: src/menu/main.c:1544
 msgid "~%d %% (estimation)"
 msgstr "~%d %% (estimate)"
 
-#: src/menu/main.c:1513
+#: src/menu/main.c:1546
 msgid "non calibrée"
 msgstr "uncalibrated"
 
-#: src/menu/main.c:1517
+#: src/menu/main.c:1550
 msgid "mesure..."
 msgstr "wait..."
 
-#: src/menu/main.c:1526
+#: src/menu/main.c:1559
 msgid ""
 "Version %s (%s)\n"
 "Compilée le %s\n"
@@ -3442,19 +3444,19 @@ msgstr ""
 "SD card: %s\n"
 "Battery: %s"
 
-#: src/menu/main.c:1530
+#: src/menu/main.c:1563
 msgid "absente"
 msgstr "missing"
 
-#: src/menu/main.c:1530
+#: src/menu/main.c:1563
 msgid "prête"
 msgstr "ready"
 
-#: src/menu/main.c:1531
+#: src/menu/main.c:1564
 msgid "A : retour  B : crédits"
 msgstr "A: back  B: credits"
 
-#: src/menu/main.c:1544
+#: src/menu/main.c:1577
 msgid ""
 "%s\n"
 "\n"
@@ -3468,15 +3470,15 @@ msgstr ""
 "\n"
 "Volume: %s"
 
-#: src/menu/main.c:1545
+#: src/menu/main.c:1578
 msgid "Lecture"
 msgstr "Playing"
 
-#: src/menu/main.c:1547
+#: src/menu/main.c:1580
 msgid "Y X : - +  A : stop  B : pause"
 msgstr "Y X: - +  A: stop  B: pause"
 
-#: src/menu/main.c:1598
+#: src/menu/main.c:1631
 msgid ""
 "Aucun fichier %s dans\n"
 "/%s ni à la racine.\n"
@@ -3488,21 +3490,21 @@ msgstr ""
 "\n"
 "See %s."
 
-#: src/menu/main.c:1691
-#: src/menu/main.c:1773
+#: src/menu/main.c:1724
+#: src/menu/main.c:1806
 msgid "Effacer"
 msgstr "Delete"
 
-#: src/menu/main.c:1691
-#: src/menu/main.c:1781
+#: src/menu/main.c:1724
+#: src/menu/main.c:1814
 msgid "Renommer"
 msgstr "Rename"
 
-#: src/menu/main.c:1691
+#: src/menu/main.c:1724
 msgid "Retour"
 msgstr "Back"
 
-#: src/menu/main.c:1770
+#: src/menu/main.c:1803
 msgid ""
 "Effacer %s ?\n"
 "\n"
@@ -3516,40 +3518,40 @@ msgstr ""
 "(PHOTOS folder)\n"
 "is deleted too."
 
-#: src/menu/main.c:1772
+#: src/menu/main.c:1805
 msgid "Effacer %s ?"
 msgstr "Delete %s?"
 
-#: src/menu/main.c:1773
+#: src/menu/main.c:1806
 msgid "A : non  B : oui, effacer"
 msgstr "A: no  B: yes, delete"
 
-#: src/menu/main.c:1779
+#: src/menu/main.c:1812
 msgid "Nouveau nom (%s) :"
 msgstr "New name (%s):"
 
-#: src/menu/main.c:1813
+#: src/menu/main.c:1846
 msgid "Nom invalide"
 msgstr "Invalid name"
 
-#: src/menu/main.c:1817
+#: src/menu/main.c:1850
 msgid "Ce nom existe déjà"
 msgstr "This name is taken"
 
-#: src/menu/main.c:1821
-#: src/menu/main.c:1849
+#: src/menu/main.c:1854
+#: src/menu/main.c:1882
 msgid "Erreur de la carte SD"
 msgstr "SD card error"
 
-#: src/menu/main.c:1826
+#: src/menu/main.c:1859
 msgid "Renommé"
 msgstr "Renamed"
 
-#: src/menu/main.c:1852
+#: src/menu/main.c:1885
 msgid "Effacé"
 msgstr "Deleted"
 
-#: src/menu/main.c:1923
+#: src/menu/main.c:1956
 msgid ""
 "Aucun fichier .WAV ici.\n"
 "\n"
@@ -3559,7 +3561,7 @@ msgstr ""
 "\n"
 "See audio2wav.py."
 
-#: src/menu/main.c:1948
+#: src/menu/main.c:1981
 msgid ""
 "Terminé !\n"
 "\n"
@@ -3569,7 +3571,7 @@ msgstr ""
 "\n"
 "%u tracks played."
 
-#: src/menu/main.c:1983
+#: src/menu/main.c:2016
 msgid ""
 "Pour sortir :\n"
 "appui long sur A"
@@ -3577,56 +3579,56 @@ msgstr ""
 "To leave:\n"
 "long press on A"
 
-#: src/menu/main.c:2188
+#: src/menu/main.c:2221
 msgid "%lu s"
 msgstr "%lu s"
 
-#: src/menu/main.c:2190
+#: src/menu/main.c:2223
 msgid "%lu min"
 msgstr "%lu min"
 
-#: src/menu/main.c:2190
+#: src/menu/main.c:2223
 msgid "%lu min %02lu s"
 msgstr "%lu min %02lu s"
 
-#: src/menu/main.c:2193
+#: src/menu/main.c:2226
 msgid "%lu h %02lu min"
 msgstr "%lu h %02lu min"
 
-#: src/menu/main.c:2199
+#: src/menu/main.c:2232
 msgid "Test radio"
 msgstr "Radio test"
 
-#: src/menu/main.c:2200
+#: src/menu/main.c:2233
 msgid "Un message toutes les"
 msgstr "One message every"
 
-#: src/menu/main.c:2203
+#: src/menu/main.c:2236
 msgid "Y X : - / +  (maintenir : vite)"
 msgstr "Y X: - / +  (hold: fast)"
 
-#: src/menu/main.c:2205
+#: src/menu/main.c:2238
 msgid "Messages envoyés : %u"
 msgstr "Messages sent: %u"
 
-#: src/menu/main.c:2216
+#: src/menu/main.c:2249
 msgid "En pause"
 msgstr "Paused"
 
-#: src/menu/main.c:2221
+#: src/menu/main.c:2254
 msgid "Prochain dans %s"
 msgstr "Next in %s"
 
-#: src/menu/main.c:2224
+#: src/menu/main.c:2257
 msgid "A : quitter  B : pause"
 msgstr "A: quit  B: pause"
 
-#: src/menu/main.c:2224
+#: src/menu/main.c:2257
 #: src/menu/rsvp.c:722
 msgid "A : quitter  B : reprendre"
 msgstr "A: quit  B: resume"
 
-#: src/menu/main.c:2316
+#: src/menu/main.c:2349
 msgid ""
 "Aucun écran détecté.\n"
 "\n"
@@ -3642,33 +3644,33 @@ msgstr ""
 "SDA pin 4, SCL pin 3,\n"
 "3.3 V pin 1, GND 11."
 
-#: src/menu/main.c:2367
+#: src/menu/main.c:2400
 #: src/menu/pirate_radio.c:311
 #: src/menu/pirate_radio.c:950
 msgid "Radio occupée"
 msgstr "Radio busy"
 
-#: src/menu/main.c:2392
+#: src/menu/main.c:2425
 msgid "Son et LEDs coupés"
 msgstr "Sound and LEDs off"
 
-#: src/menu/main.c:2598
+#: src/menu/main.c:2631
 msgid "Mode démo arrêté"
 msgstr "Demo mode off"
 
-#: src/menu/main.c:2634
+#: src/menu/main.c:2667
 msgid "SOMMEIL"
 msgstr "SLEEP"
 
-#: src/menu/main.c:2635
+#: src/menu/main.c:2668
 msgid "Le badge a été mis en sommeil par un admin. S'il reste coincé, rapprochez-vous d'un organisateur."
 msgstr "The badge was put to sleep by an admin. If it stays stuck, see an organizer."
 
-#: src/menu/main.c:2763
+#: src/menu/main.c:2796
 msgid "Langue : English"
 msgstr "Language: English"
 
-#: src/menu/main.c:2871
+#: src/menu/main.c:2904
 msgid ""
 "Bravo, code Konami !\n"
 "\n"
@@ -3680,7 +3682,7 @@ msgstr ""
 "Flag:\n"
 "%s"
 
-#: src/menu/main.c:2876
+#: src/menu/main.c:2909
 msgid ""
 "Code incorrect.\n"
 "\n"
@@ -3692,35 +3694,35 @@ msgstr ""
 "Hint: a famous code\n"
 "of video games..."
 
-#: src/menu/main.c:2958
+#: src/menu/main.c:2991
 msgid "Flags trouvés"
 msgstr "Flags found"
 
-#: src/menu/main.c:2960
+#: src/menu/main.c:2993
 msgid "Aucun pour l'instant."
 msgstr "None yet."
 
-#: src/menu/main.c:3056
+#: src/menu/main.c:3089
 msgid "Batterie faible : économie"
 msgstr "Low battery: saving"
 
-#: src/menu/main.c:3058
+#: src/menu/main.c:3091
 msgid "Batterie : mode normal"
 msgstr "Battery: normal mode"
 
-#: src/menu/main.c:3119
+#: src/menu/main.c:3154
 msgid "Vote ouvert : Social > Vote"
 msgstr "Vote open: Social > Vote"
 
-#: src/menu/main.c:3136
+#: src/menu/main.c:3171
 msgid "Kof kof ! (virus des cigales)"
 msgstr "Cough cough! (cicada virus)"
 
-#: src/menu/main.c:3140
+#: src/menu/main.c:3175
 msgid "Vous êtes infecté !"
 msgstr "You are infected!"
 
-#: src/menu/main.c:3260
+#: src/menu/main.c:3295
 msgid ""
 "%s\n"
 "\n"
@@ -3732,11 +3734,11 @@ msgstr ""
 "Invalid .EPI image\n"
 "(see image2epi.py)."
 
-#: src/menu/main.c:3296
+#: src/menu/main.c:3331
 msgid "Vidéo"
 msgstr "Video"
 
-#: src/menu/main.c:3415
+#: src/menu/main.c:3450
 msgid ""
 "Enregistrement...\n"
 "\n"
@@ -3750,11 +3752,11 @@ msgstr ""
 "port) with the remote\n"
 "and press a key."
 
-#: src/menu/main.c:3437
+#: src/menu/main.c:3472
 msgid "Porteuse"
 msgstr "Carrier"
 
-#: src/menu/main.c:3438
+#: src/menu/main.c:3473
 msgid ""
 "433,92 MHz + 19 kHz\n"
 "en continu, +10 dBm\n"
@@ -3770,7 +3772,7 @@ msgstr ""
 "frequency analyzer.\n"
 "Auto stop after 30 s."
 
-#: src/menu/main.c:3442
+#: src/menu/main.c:3477
 msgid "A ou B : retour"
 msgstr "A or B: back"
 
@@ -6064,6 +6066,120 @@ msgstr "A: back  B: close the vote"
 #: src/menu/vote.c:306
 msgid "Vote (admin)"
 msgstr "Vote (admin)"
+
+#: src/menu/webremote.c:130
+msgid "Module mis à jour : il redémarre."
+msgstr "Module updated: it restarts."
+
+#: src/menu/webremote.c:135
+msgid "Le module refuse ce firmware."
+msgstr "The module refuses this firmware."
+
+#: src/menu/webremote.c:259
+msgid "Wi-Fi : réseau %s"
+msgstr "Wi-Fi: network %s"
+
+#: src/menu/webremote.c:261
+msgid "Wi-Fi : point d'accès"
+msgstr "Wi-Fi: hotspot"
+
+#: src/menu/webremote.c:263
+#: src/menu/webremote.c:435
+msgid "Se connecter"
+msgstr "Connect"
+
+#: src/menu/webremote.c:264
+msgid "Mettre à jour le module"
+msgstr "Update the module"
+
+#: src/menu/webremote.c:271
+msgid "Recherche du module ESP32-CAM..."
+msgstr "Looking for the ESP32-CAM module..."
+
+#: src/menu/webremote.c:273
+msgid "Module trop ancien : le flasher une fois avec le flasheur (docs)."
+msgstr "Module too old: flash it once with the flasher (docs)."
+
+#: src/menu/webremote.c:274
+msgid "Module %s"
+msgstr "Module %s"
+
+#: src/menu/webremote.c:286
+msgid "Module absent ou trop ancien."
+msgstr "Module missing or too old."
+
+#: src/menu/webremote.c:291
+msgid "Fichier absent de la carte SD."
+msgstr "File not on the SD card."
+
+#: src/menu/webremote.c:311
+msgid "Module perdu pendant la mise à jour."
+msgstr "Module lost during the update."
+
+#: src/menu/webremote.c:330
+msgid "Lecture de la carte SD impossible."
+msgstr "Cannot read the SD card."
+
+#: src/menu/webremote.c:344
+msgid "Pas de réponse du module."
+msgstr "No answer from the module."
+
+#: src/menu/webremote.c:438
+msgid "La télécommande est arrêtée : B dans le menu pour la démarrer."
+msgstr "The remote control is off: B in the menu to start it."
+
+#: src/menu/webremote.c:449
+msgid "Réseau %s  Code : %s"
+msgstr "Network %s  Code: %s"
+
+#: src/menu/webremote.c:452
+msgid "Connexion au réseau %s..."
+msgstr "Joining the network %s..."
+
+#: src/menu/webremote.c:455
+msgid "Le Wi-Fi du module démarre..."
+msgstr "The Wi-Fi of the module starts..."
+
+#: src/menu/webremote.c:464
+msgid "Réseau introuvable : point d'accès"
+msgstr "Network not found: hotspot"
+
+#: src/menu/webremote.c:465
+msgid "%s  mot de passe :"
+msgstr "%s  password:"
+
+#: src/menu/webremote.c:471
+msgid "%d page(s) ouverte(s)  A : menu"
+msgstr "%d page(s) open  A: menu"
+
+#: src/menu/webremote.c:479
+msgid "Mise à jour du module"
+msgstr "Module update"
+
+#: src/menu/webremote.c:481
+msgid "Le firmware du module ESP32-CAM depuis la carte SD :"
+msgstr "The firmware of the ESP32-CAM module from the SD card:"
+
+#: src/menu/webremote.c:486
+msgid "%lu / %lu Ko"
+msgstr "%lu / %lu KB"
+
+#: src/menu/webremote.c:486
+msgid "Vérification par le module..."
+msgstr "The module checks it..."
+
+#: src/menu/webremote.c:489
+msgid "Ne pas débrancher"
+msgstr "Do not unplug"
+
+#: src/menu/webremote.c:495
+msgid "A : retour  B : mettre à jour"
+msgstr "A: back  B: update"
+
+#: src/menu/webremote.c:508
+#: src/menu/webremote.c:519
+msgid "Télécommande"
+msgstr "Remote control"
 
 #: src/menu/werewolf.c:105
 msgid "Début"

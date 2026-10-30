@@ -101,11 +101,14 @@ typedef struct {
     uint8_t display_clean;  /* display_clean_t + 1 (Réglages > Veille de l'écran > Nettoyage); 0, 0xFF: discreet */
     uint8_t camera_set;  /* STORE_CAMERA_SET: camera[] is set (Badge > Appareil photo > réglages) */
     uint8_t camera[STORE_CAMERA_SETTINGS];  /* The settings of the camera module (camlink_setting_t) */
+    uint8_t web_network;  /* STORE_WEB_NETWORK: the remote control uses the network saved in the module (Badge >
+                           * Télécommande), otherwise its own access point */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1
 #define STORE_DETECTOR 0xD7
 #define STORE_CAMERA_SET 0xCA
+#define STORE_WEB_NETWORK 0xE7
 
 #define STORE_ASLEEP 0x5A
 

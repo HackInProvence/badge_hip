@@ -3,49 +3,27 @@
  * To view a copy of this license,
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
-/* Badge > Appareil photo: the camera module (an ESP32-CAM on the port J2, docs/fr/appareil_photo.md) through the UART0
- * (GPIO12 TX, GPIO13 RX) at CAMLINK_BAUD, the link of src/shared/camlink/camlink.h:
+/* Badge > Appareil photo: the camera module (an ESP32-CAM on an extension port, docs/fr/appareil_photo.md) through
+ * the link of camport.h (src/shared/camlink/camlink.h), shared with the remote control:
  * - the viewfinder: the frames of the module (1 bit, 200 x 200) shown as they come (fast refresh);
  * - B: a photo, the module sends its JPEG (PHOTOS/IMG_nnnn.JPG) then its .epi (IMAGES/PHOTOS/IMG_nnnn.EPI: in
  *   Médias > Images); long B: a video, its frames in an .epv (VIDEOS/PHOTOS/VID_nnnn.EPV: in Médias > Vidéos);
  * - X: the settings of the camera, saved, sent to the module.
- * The UART is read by an interrupt into a ring buffer (the main loop can be busy with the screen); every packet of
- * data of the module is acknowledged once written, the module waits for it. */
+ * Every packet of data of the module is acknowledged once written (camport.c), the module waits for it. */
 
 #include <stdio.h>
 #include <string.h>
 
-#include "hardware/gpio.h"
-#include "hardware/irq.h"
-#include "hardware/uart.h"
-
 #include "app.h"
 #include "camlink.h"
+#include "camport.h"
 #include "ff.h"
 #include "i18n.h"
-#include "pinouts.h"
 #include "sd.h"
 #include "shared_buf.h"
 #include "store.h"
 
-/* Where the module may be plugged: the pins of a UART reaching a port of the badge. Searching, the badge says hello on
- * each one in turn and keeps the one that answers (the TX of the badge to U0R of the ESP32, its RX to U0T) */
-static const struct {
-    uint8_t uart, tx, rx;
-    const char *where;
-} PORTS[] = {
-    {0, 16, 17, "UART0 GPIO16/17"},  /* The I2C0 pins of the SAO port (SDA = TX, SCL = RX) */
-    {1, 20, 21, "UART1 GPIO20/21"},  /* The two GPIO of an SAO port */
-    {0, BADGE_UART0_TX, BADGE_UART0_RX, "UART0 GPIO12/13"},  /* The 2 x 6 port J2 of the V1.1 board */
-};
-#define N_PORTS ((int)(sizeof(PORTS) / sizeof(PORTS[0])))
-static int port = 0;
-#define CAM_UART (PORTS[port].uart ? uart1 : uart0)
-#define CAM_IRQ (PORTS[port].uart ? UART1_IRQ : UART0_IRQ)
 _Static_assert(CLS_COUNT == STORE_CAMERA_SETTINGS, "the settings of the camera in the store");
-#define RING_SIZE 3072  /* ~33 ms of the UART at 921600 bauds: more than the longest pause of the main loop */
-#define HELLO_MS 1000
-#define LINK_LOST_MS 4000
 #define MESSAGE_MS 3000
 #define PHOTO_DIR "PHOTOS"
 #define EPI_DIR "IMAGES/PHOTOS"
@@ -53,67 +31,20 @@ _Static_assert(CLS_COUNT == STORE_CAMERA_SETTINGS, "the settings of the camera i
 #define VIDEO_FPS 4
 #define EPV_HEADER 512
 
-/* ------ The UART: an interrupt fills the ring ------ */
-
-static uint8_t ring[RING_SIZE];
-static volatile uint16_t ring_head = 0, ring_tail = 0;
-static volatile uint32_t ring_lost = 0;
-
-static void uart_irq(void) {
-    while (uart_is_readable(CAM_UART)) {
-        uint8_t c = uart_getc(CAM_UART);
-        uint16_t next = (ring_head + 1) % RING_SIZE;
-        if (next == ring_tail)
-            ++ring_lost;
-        else {
-            ring[ring_head] = c;
-            ring_head = next;
-        }
-    }
-}
-
-static void link_open(void) {
-    uart_init(CAM_UART, CAMLINK_BAUD);
-    gpio_set_function(PORTS[port].tx, GPIO_FUNC_UART);
-    gpio_set_function(PORTS[port].rx, GPIO_FUNC_UART);
-    gpio_pull_up(PORTS[port].rx);  /* No module: no noise on the line */
-    uart_set_fifo_enabled(CAM_UART, true);
-    ring_head = ring_tail = 0;
-    irq_set_exclusive_handler(CAM_IRQ, uart_irq);
-    irq_set_enabled(CAM_IRQ, true);
-    uart_set_irq_enables(CAM_UART, true, false);
-}
-
-static void link_close(void) {
-    uart_set_irq_enables(CAM_UART, false, false);
-    irq_set_enabled(CAM_IRQ, false);
-    irq_remove_handler(CAM_IRQ, uart_irq);
-    uart_deinit(CAM_UART);
-    gpio_disable_pulls(PORTS[port].rx);
-    gpio_set_function(PORTS[port].tx, GPIO_FUNC_NULL);
-    gpio_set_function(PORTS[port].rx, GPIO_FUNC_NULL);
-}
-
 /* ------ The state of the page; the big buffers in shared_buf (this page is alone on the screen) ------ */
 
 typedef struct {
     uint8_t shown[CAMLINK_FRAME_BYTES];  /* The viewfinder: its parts written as they come (no second copy: RAM) */
-    camlink_rx_t rx;  /* The receiver, with the packet received */
-    uint8_t enc[CAMLINK_ENCODED_MAX];  /* A packet to send */
+    uint8_t rx[CAMLINK_ENCODED_MAX];  /* The receiver of camport.c: the long packets of the module */
 } cam_buf_t;
 _Static_assert(sizeof(cam_buf_t) <= SHARED_BUF_SIZE, "cam_buf_t does not fit in shared_buf");
 #define B ((cam_buf_t *)shared_buf)
 
-#define rx (B->rx)
 static FIL file;  /* The photo or the video being written */
 static bool file_open = false;
 
-typedef enum { L_SEARCHING, L_READY, L_NO_CAMERA } link_state_t;
-static link_state_t state;
-static char module_name[32];
-static absolute_time_t hello_ts, last_rx_ts, message_ts;
-static uint8_t out_seq = 0;
-static int last_in_seq = -1;  /* The last data packet written: sent again (its ACK lost), only acknowledged */
+static bool no_camera = false;  /* The module answers, its camera does not start */
+static absolute_time_t message_ts;
 static bool have_frame = false, changed = false;
 static uint16_t frame_id = 0, parts_got = 0;
 static bool settings_page = false;
@@ -128,48 +59,13 @@ static uint32_t video_frames = 0;
 static uint16_t video_frame_id = 0;
 static uint16_t video_parts = 0;
 
-/* The commands waiting for their ACK (sent again every CAMLINK_ACK_MS) */
-#define PENDING 4
-static struct {
-    uint8_t type, seq, len, data[CLS_COUNT * 2];
-    absolute_time_t ts;
-    int tries;
-} pending[PENDING];
-static int n_pending = 0;
-
-static void send_packet(uint8_t type, uint8_t seq, const uint8_t *payload, size_t len) {
-    size_t n = camlink_encode(type, seq, payload, len, B->enc);
-    uart_write_blocking(CAM_UART, B->enc, n);
-}
-
 static void command(uint8_t type, const uint8_t *data, uint8_t len) {
-    if (n_pending == PENDING)
-        return;
-    pending[n_pending].type = type;
-    pending[n_pending].seq = ++out_seq;
-    pending[n_pending].len = len;
-    memcpy(pending[n_pending].data, data, len);
-    pending[n_pending].tries = 0;
-    pending[n_pending].ts = nil_time;  /* Sent at once (pump_commands) */
-    ++n_pending;
+    camport_send(type, data, len, NULL, 0);  /* Sent again until the module acknowledges it */
 }
 
-static void pump_commands(absolute_time_t now) {
-    if (! n_pending)
-        return;
-    if (absolute_time_diff_us(pending[0].ts, now) < CAMLINK_ACK_MS * 1000ll && pending[0].tries)
-        return;
-    if (++pending[0].tries > 10) {  /* No module: given up */
-        memmove(&pending[0], &pending[1], sizeof(pending[0]) * --n_pending);
-        return;
-    }
-    send_packet(pending[0].type, pending[0].seq, pending[0].data, pending[0].len);
-    pending[0].ts = now;
-}
-
-static void acked(uint8_t seq) {
-    if (n_pending && pending[0].seq == seq)
-        memmove(&pending[0], &pending[1], sizeof(pending[0]) * --n_pending);
+/* The module found, ready for the viewfinder */
+static bool ready(void) {
+    return camport_state() == CAMPORT_READY && ! no_camera;
 }
 
 /* ------ The settings: saved in the store, sent to the module ------ */
@@ -350,122 +246,98 @@ static void video_stop(absolute_time_t now) {
     changed = true;
 }
 
-/* ------ The packets of the module ------ */
+/* ------ The packets of the module (camport.c acknowledges the data once it is handled) ------ */
 
-static void handle_packet(absolute_time_t now) {
-    last_rx_ts = now;
-    switch (rx.type) {
-    case CL_ACK:
-        if (rx.len)
-            acked(rx.payload[0]);
-        return;
-    case CL_HELLO:
-        if (state == L_SEARCHING) {
-            snprintf(module_name, sizeof(module_name), "%.*s", (int)(rx.len > 1 ? rx.len - 1 : 0), rx.payload + 1);
-            printf("camera: module %s, protocol %u, on %s\n", module_name, rx.len ? rx.payload[0] : 0,
-                   PORTS[port].where);
-            state = L_READY;
-            send_settings();
-            uint8_t on = 1;
-            command(CL_PREVIEW, &on, 1);
-            changed = true;
-        }
-        return;
+static void cam_ready(void) {
+    no_camera = false;
+    send_settings();
+    uint8_t on = 1;
+    command(CL_PREVIEW, &on, 1);
+    changed = true;
+}
+
+static void cam_packet(const camlink_rx_t *rx, absolute_time_t now) {
+    UINT n;
+    switch (rx->type) {
     case CL_STATUS:
-        if (rx.len && rx.payload[0] == CAMLINK_ST_NO_CAMERA) {
-            state = L_NO_CAMERA;
+        if (rx->len && rx->payload[0] == CAMLINK_ST_NO_CAMERA) {
+            no_camera = true;
             changed = true;
         }
-        return;
+        break;
+    case CL_FRAME:
+    case CL_VFRAME:
+        if (rx->len == 4 + CAMLINK_PART && rx->payload[2] < CAMLINK_FRAME_BYTES / CAMLINK_PART) {
+            uint16_t id = rx->payload[0] | rx->payload[1] << 8;
+            int part = rx->payload[2], parts = rx->payload[3];
+            if (id != frame_id) {
+                frame_id = id;
+                parts_got = 0;
+            }
+            memcpy(B->shown + part * CAMLINK_PART, rx->payload + 4, CAMLINK_PART);
+            parts_got |= 1 << part;
+            if (rx->type == CL_VFRAME && recording && file_open) {  /* Written as it comes, at its place */
+                if (id != video_frame_id) {
+                    video_frame_id = id;
+                    video_parts = 0;
+                }
+                f_lseek(&file, EPV_HEADER + video_frames * CAMLINK_FRAME_BYTES + part * CAMLINK_PART);
+                f_write(&file, rx->payload + 4, CAMLINK_PART, &n);
+                video_parts |= 1 << part;
+                if (video_parts == (1 << parts) - 1) {
+                    ++video_frames;
+                    video_parts = 0;
+                }
+            }
+            if (parts_got == (1 << parts) - 1) {  /* A whole frame: drawn */
+                have_frame = changed = true;
+                parts_got = 0;
+            }
+        }
+        break;
+    case CL_FILE_OPEN:
+        if (rx->len >= 5)
+            file_start(rx->payload[0]);
+        break;
+    case CL_FILE_DATA:
+        if (file_open && rx->len > 4) {
+            uint32_t off = rx->payload[0] | rx->payload[1] << 8 | (uint32_t)rx->payload[2] << 16 |
+                           (uint32_t)rx->payload[3] << 24;
+            f_lseek(&file, off);
+            f_write(&file, rx->payload + 4, rx->len - 4, &n);
+        }
+        break;
+    case CL_FILE_CLOSE:
+        if (file_open) {
+            f_close(&file);
+            file_open = false;
+            if (file_kind == CAMLINK_FILE_EPI) {
+                char text[48];
+                snprintf(text, sizeof(text), _("Photo IMG_%04d"), photo_n);
+                show_message(text, now);
+                printf("camera: photo %d saved\n", photo_n);
+            }
+        }
+        break;
     default:
         break;
     }
-    /* The data: acknowledged (the module waits for it), written once */
-    uint8_t seq = rx.seq;
-    bool again = seq == last_in_seq;
-    last_in_seq = seq;
-    if (! again) {
-        UINT n;
-        switch (rx.type) {
-        case CL_FRAME:
-        case CL_VFRAME:
-            if (rx.len == 4 + CAMLINK_PART && rx.payload[2] < CAMLINK_FRAME_BYTES / CAMLINK_PART) {
-                uint16_t id = rx.payload[0] | rx.payload[1] << 8;
-                int part = rx.payload[2], parts = rx.payload[3];
-                if (id != frame_id) {
-                    frame_id = id;
-                    parts_got = 0;
-                }
-                memcpy(B->shown + part * CAMLINK_PART, rx.payload + 4, CAMLINK_PART);
-                parts_got |= 1 << part;
-                if (rx.type == CL_VFRAME && recording && file_open) {  /* Written as it comes, at its place */
-                    if (id != video_frame_id) {
-                        video_frame_id = id;
-                        video_parts = 0;
-                    }
-                    f_lseek(&file, EPV_HEADER + video_frames * CAMLINK_FRAME_BYTES + part * CAMLINK_PART);
-                    f_write(&file, rx.payload + 4, CAMLINK_PART, &n);
-                    video_parts |= 1 << part;
-                    if (video_parts == (1 << parts) - 1) {
-                        ++video_frames;
-                        video_parts = 0;
-                    }
-                }
-                if (parts_got == (1 << parts) - 1) {  /* A whole frame: drawn */
-                    have_frame = changed = true;
-                    parts_got = 0;
-                }
-            }
-            break;
-        case CL_FILE_OPEN:
-            if (rx.len >= 5)
-                file_start(rx.payload[0]);
-            break;
-        case CL_FILE_DATA:
-            if (file_open && rx.len > 4) {
-                uint32_t off = rx.payload[0] | rx.payload[1] << 8 | (uint32_t)rx.payload[2] << 16 |
-                               (uint32_t)rx.payload[3] << 24;
-                f_lseek(&file, off);
-                f_write(&file, rx.payload + 4, rx.len - 4, &n);
-            }
-            break;
-        case CL_FILE_CLOSE:
-            if (file_open) {
-                f_close(&file);
-                file_open = false;
-                if (file_kind == CAMLINK_FILE_EPI) {
-                    char text[48];
-                    snprintf(text, sizeof(text), _("Photo IMG_%04d"), photo_n);
-                    show_message(text, now);
-                    printf("camera: photo %d saved\n", photo_n);
-                }
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    send_packet(CL_ACK, 0, &seq, 1);
 }
 
 /* ------ The page ------ */
 
 static void cam_start(absolute_time_t now) {
-    camlink_rx_init(&rx);
-    link_open();
-    state = L_SEARCHING;
-    hello_ts = nil_time;
-    last_rx_ts = now;
+    (void)now;
     message_ts = nil_time;
     message[0] = 0;
-    module_name[0] = 0;
-    n_pending = 0;
-    last_in_seq = -1;
+    no_camera = false;
     have_frame = false;
     settings_page = false;
     recording = false;
     file_open = false;
     changed = true;
+    camport_big_buffer(B->rx, sizeof(B->rx));  /* Before the link opens: the long packets of the viewfinder */
+    camport_want(CAMPORT_CAMERA, true, cam_packet, cam_ready);
 }
 
 static void cam_stop(void) {
@@ -477,33 +349,20 @@ static void cam_stop(void) {
         file_open = false;
     }
     uint8_t off = 0;
-    send_packet(CL_PREVIEW, ++out_seq, &off, 1);  /* Once: the module stops by itself if it does not hear us */
-    link_close();
+    camport_send_once(CL_PREVIEW, &off, 1);  /* At once (the link may close now), then until acknowledged */
+    command(CL_PREVIEW, &off, 1);
+    camport_want(CAMPORT_CAMERA, false, NULL, NULL);
+    camport_big_buffer(NULL, 0);  /* shared_buf goes to the next page */
 }
 
 static bool cam_task(absolute_time_t now) {
-    while (ring_tail != ring_head) {
-        uint8_t c = ring[ring_tail];
-        ring_tail = (ring_tail + 1) % RING_SIZE;
-        if (camlink_feed(&rx, c))
-            handle_packet(now);
-    }
-    if (state == L_SEARCHING && absolute_time_diff_us(hello_ts, now) > HELLO_MS * 1000ll) {
-        hello_ts = now;  /* The module may start after the page: asked again, on the next possible port */
-        link_close();
-        port = (port + 1) % N_PORTS;
-        camlink_rx_init(&rx);
-        link_open();
-        uint8_t hello[] = {CAMLINK_PROTO, 'b', 'a', 'd', 'g', 'e'};
-        send_packet(CL_HELLO, ++out_seq, hello, sizeof(hello));
-    }
-    if (state != L_SEARCHING && absolute_time_diff_us(last_rx_ts, now) > LINK_LOST_MS * 1000ll) {
-        state = L_SEARCHING;  /* Unplugged, restarted: found again */
-        if (recording)
-            video_stop(now);
+    static camport_state_t last = CAMPORT_OFF;
+    if (camport_state() != last) {
+        if (last == CAMPORT_READY && recording)
+            video_stop(now);  /* The module lost */
+        last = camport_state();
         changed = true;
     }
-    pump_commands(now);
     if (message[0] && absolute_time_diff_us(message_ts, now) > MESSAGE_MS * 1000ll) {
         message[0] = 0;
         changed = true;
@@ -526,7 +385,7 @@ static bool cam_buttons(const app_buttons_t *b, absolute_time_t now) {
         if (b->pressed & UI_BTN_B) {  /* The next value */
             int8_t v = setting(settings_sel) + 1;
             set_setting(settings_sel, v > SETTINGS[settings_sel].max ? SETTINGS[settings_sel].min : v);
-            if (state == L_READY)
+            if (ready())
                 send_settings();
             changed = true;
         }
@@ -541,7 +400,7 @@ static bool cam_buttons(const app_buttons_t *b, absolute_time_t now) {
         settings_page = true;
         changed = true;
     }
-    if (state != L_READY)
+    if (! ready())
         return true;
     if (b->long_pressed & UI_BTN_B) {  /* A video: on, off */
         if (recording)
@@ -574,7 +433,7 @@ static void cam_render(uint8_t *fb, absolute_time_t now) {
         ui_footer(fb, N_("Y X : choisir  A : retour  B : changer"));
         return;
     }
-    if (state == L_READY && have_frame) {
+    if (ready() && have_frame) {
         memcpy(fb, B->shown, CAMLINK_FRAME_BYTES);  /* The viewfinder, the whole screen */
         /* A band at the bottom: the message, or what the buttons do */
         gfx_fill_rect(fb, 0, GFX_HEIGHT - 18, GFX_WIDTH, 18, GFX_BLACK);
@@ -586,19 +445,20 @@ static void cam_render(uint8_t *fb, absolute_time_t now) {
         return;
     }
     ui_title(fb, N_("Appareil photo"));
-    const char *t = state == L_NO_CAMERA ? N_("Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?).")
-                    : state == L_READY ? N_("Module trouvé, la première image arrive...")
+    bool found = camport_state() == CAMPORT_READY;
+    const char *t = found && no_camera ? N_("Le module répond mais sa caméra ne démarre pas (nappe de la caméra ?).")
+                    : found ? N_("Module trouvé, la première image arrive...")
                     : N_("Recherche du module ESP32-CAM sur les ports d'extension...");
     int y = ui_wrapped(fb, UI_TITLE_H + 16, &gfx_font_small, t, 5);
-    if (module_name[0])
-        ui_lines(fb, y + 8, &gfx_font_small, module_name);
-    else if (state == L_SEARCHING)
-        ui_lines(fb, y + 8, &gfx_font_small, PORTS[port].where);  /* The port tried now */
+    if (camport_module()[0])
+        ui_lines(fb, y + 8, &gfx_font_small, camport_module());
+    else if (! found)
+        ui_lines(fb, y + 8, &gfx_font_small, camport_where());  /* The port tried now */
     ui_footer(fb, N_("A : retour  X : réglages"));
 }
 
 static bool cam_calm(void) {
-    return settings_page || state != L_READY;  /* The viewfinder changes all the time: no full refresh then */
+    return settings_page || ! ready();  /* The viewfinder changes all the time: no full refresh then */
 }
 
 const app_t app_camera = {

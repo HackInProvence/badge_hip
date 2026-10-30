@@ -6,7 +6,9 @@
     badge_secsea-1.2.3/
       LISEZ-MOI.html            start here (French, English): flash, SD card, tools, documentation
       firmware/                 badge_menu-1.2.3.uf2 (copied on the RPI-RP2 disk of the badge)
-      carte_sd/                 the example content of the SD card (docs/sd), to copy at its root
+      carte_sd/                 the example content of the SD card (docs/sd), to copy at its root, with
+                                ESP32/ESP32CAM.BIN: the firmware of the ESP32-CAM module (when built), that the badge
+                                installs (Badge > Télécommande > Mettre à jour le module)
       outils/                   the PC tools of a user (badge_remote.py, sd_files.py, image2epi.py...), requirements.txt
       flipper/                  the commands of the badges for a Flipper Zero (tools/flipper)
       documentation/            the documentation in HTML (tools/docs_site.py: the guides, the features, the
@@ -45,6 +47,8 @@ NAME = 'badge_secsea'
 FSK_PAGE = 'docs/fsk-buzzer-link.html'
 FLIPPER = 'tools/flipper'
 SD = 'docs/sd'
+ESP_BIN = os.path.join(ROOT, 'esp32cam', '.pio', 'build', 'esp32cam', 'firmware.bin')  # pio run in esp32cam/
+ESP_ON_SD = 'ESP32/ESP32CAM.BIN'  # src/menu/webremote.h WEBREMOTE_OTA_FILE
 # The Python packages of the user tools (docs_site.USER_TOOLS): serial port, images, videos
 REQUIREMENTS = '''# The Python packages of the tools of the badge: pip install -r requirements.txt
 pyserial          # badge_remote.py, sd_files.py, contacts_export.py (the USB serial port of the badge)
@@ -208,6 +212,13 @@ def main():
     site.write()
 
     copy_tree(SD, os.path.join(out, 'carte_sd'))
+    if os.path.exists(ESP_BIN):
+        dst = os.path.join(out, 'carte_sd', ESP_ON_SD)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copyfile(ESP_BIN, dst)
+    else:
+        print(f'warning: no firmware of the ESP32-CAM module ({os.path.relpath(ESP_BIN, ROOT)}): '
+              'cd esp32cam, pio run')
     copy_tree(FLIPPER, os.path.join(out, 'flipper'))
     tools = os.path.join(out, 'outils')
     os.makedirs(tools)

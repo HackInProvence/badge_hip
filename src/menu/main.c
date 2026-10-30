@@ -60,6 +60,8 @@
 #include "file_ops.h"
 #include "sd_serial.h"
 #include "seek.h"
+#include "camport.h"
+#include "webremote.h"
 #include "social.h"
 #include "store.h"
 #include "i18n.h"
@@ -160,7 +162,10 @@ static uint8_t buttons_pressed(absolute_time_t now) {
             if (pressed & b)
                 btn_down_ts[btn_index(b)] = now;
     }
-    switch (getchar_timeout_us(0)) {
+    int key = getchar_timeout_us(0);
+    if (key < 0)
+        key = webremote_key();  /* The buttons of the remote control page (Badge > Télécommande) */
+    switch (key) {
     case 0x01: {
         /* Admin mode from badge_remote.py: 0x01 then A (on) or a (off) */
         int c = getchar_timeout_us(50000);
@@ -760,9 +765,9 @@ static const submenu_t SUBMENUS[] = {
                     M_APP(APP_ANNOUNCES), M_APP(APP_SMUGGLER), M_APP(APP_DETECTOR)}},
     {N_("Radio & IR"), 9, {M_RADIO_MSG, M_RADIO_CARRIER, M_APP(APP_DECODER), M_APP(APP_WEATHER), M_APP(APP_IMAGE_SEND),
                        M_APP(APP_IMAGE_RECV), M_IR, M_APP(APP_HUNT433), M_APP(APP_PIRATE_LISTEN)}},
-    {N_("Badge"), 12, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
+    {N_("Badge"), 13, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS), M_APP(APP_RANK), M_APP(APP_FSK_ID),
-                  M_APP(APP_CONFERENCE), M_APP(APP_CAMERA)}},
+                  M_APP(APP_CONFERENCE), M_APP(APP_CAMERA), M_APP(APP_REMOTE)}},
     {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
     {N_("Admin"), 18, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
@@ -3127,6 +3132,8 @@ int main() {
         }
         /* A cicada seeks this one (seek.c, the radar): its eyes blink in green, it sings (set_leds(), set_sound()) */
         seek_task(now);
+        camport_task(now);  /* The ESP32-CAM module: the camera, the remote control */
+        webremote_task(now);
         if (seek_event(notif, sizeof(notif)))
             notify(NULL, notif);
         static uint8_t seek_shown = 0;

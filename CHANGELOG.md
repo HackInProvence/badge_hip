@@ -14,6 +14,27 @@ Format : `MAJEUR.MINEUR.CORRECTIF`.
 Rien pour l'instant.
 
 
+## 1.3.0 — en préparation (pas encore de tag)
+
+Depuis 1.2.0 :
+
+**Nouveautés**
+- **Télécommande** (Badge) : avec le module ESP32-CAM, une page web pilote le badge depuis un téléphone (son écran en
+  direct, ses 4 boutons, un champ de texte). Point d'accès Wi-Fi du module par défaut (QR code, portail captif), ou
+  un réseau enregistré dans le module (un code à 6 chiffres protège le pilotage) ; page `/admin` : les écrans de
+  toutes les cigales du réseau.
+- **Mise à jour du module ESP32-CAM depuis la carte SD du badge** (`ESP32/ESP32CAM.BIN`) ; le paquet de distribution
+  le contient.
+
+**Améliorations**
+- La liaison avec le module est un service partagé (appareil photo, télécommande) ; protocole 2 (le badge reste
+  compatible avec un module en protocole 1 pour l'appareil photo).
+
+**À vérifier avant de publier** : tout sur le matériel (module flashé une fois avec l'ESP Flasher : nouvelle table
+des partitions) : la télécommande en point d'accès et en réseau, la page admin avec deux modules, la mise à jour
+depuis la carte SD, l'appareil photo après le passage au service partagé.
+
+
 ## 1.2.0 — en préparation (pas encore de tag)
 
 Depuis `v_1.1.0` :
