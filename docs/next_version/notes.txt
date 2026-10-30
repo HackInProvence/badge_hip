@@ -1,0 +1,4 @@
+Notes pour la prochaine version :
+
+Pilotage de l'alimentation des connecteurs externes : pour pouvoir couper l'alimentation via un GPIO du pico.
+Ajouter une capa pour l'alimentation d'un module externe et éviter les chuttes de tension ?
