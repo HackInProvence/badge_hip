@@ -14,6 +14,19 @@ Format : `MAJEUR.MINEUR.CORRECTIF`.
 Rien pour l'instant.
 
 
+## 1.2.0 — en préparation (pas encore de tag)
+
+Depuis `v_1.1.0` :
+
+**Nouveautés**
+- **Appareil photo** (Badge) : un module ESP32-CAM branché sur un port d'extension (SAO) : viseur sur l'écran,
+  photos (JPEG et image pour le badge), vidéos, réglages ; le badge trouve tout seul le port du module
+  ([docs/fr/appareil_photo.md](docs/fr/appareil_photo.md)). Un petit appareil photo à côté de la cigale au démarrage.
+- **Médias** : appui long sur B sur un fichier (la liste ou l'image affichée) : le renommer ou l'effacer ; une photo
+  de l'appareil va avec son JPEG.
+- `tools/make_dist.py` : le paquet d'une version (firmware, carte SD, outils, documentation HTML, sommes de contrôle).
+
+
 ## 1.1.0 — 2026-10-20
 
 Depuis `v_1.0.0` :

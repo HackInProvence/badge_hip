@@ -1034,8 +1034,36 @@ static void name_edit_save(void) {
 extern const uint8_t hip_bw[];  /* The logo (tests/imgs/hip_bw.png, built by badge_images, in screen_demo.c) */
 
 /* Shown for SPLASH_MS during the initialization (the only time the main loop may wait) */
+/* A small camera (the camera module, Badge > Appareil photo), white on the black of the splash: '#' = white */
+static const char *const CAMERA_ICON[] = {
+    "........######.....##...",
+    ".......########....##...",
+    ".######################.",
+    "########################",
+    "##########....##########",
+    "########........########",
+    "#######...####...#######",
+    "######...######...######",
+    "######..########..######",
+    "######..########..######",
+    "######...######...######",
+    "#######...####...#######",
+    "########........########",
+    "##########....##########",
+    "########################",
+    ".######################.",
+};
+
+static void draw_camera_icon(int x0, int y0) {
+    for (int y = 0; y < (int)(sizeof(CAMERA_ICON) / sizeof(CAMERA_ICON[0])); ++y)
+        for (int x = 0; CAMERA_ICON[y][x]; ++x)
+            if (CAMERA_ICON[y][x] == '#')
+                gfx_pixel(fb, x0 + x, y0 + y, GFX_WHITE);
+}
+
 static void show_splash(void) {
     memcpy(fb, hip_bw, GFX_FB_SIZE);  /* Same format as the frame buffer: 1 = white */
+    draw_camera_icon(168, 30);  /* Above the head of the cicada, where the logo is black */
     gfx_fill_rect(fb, 0, 146, GFX_WIDTH, GFX_HEIGHT - 146, GFX_BLACK);  /* Below the cicada: the version */
     char text[40];
     snprintf(text, sizeof(text), _("Version %s"), BADGE_VERSION);
