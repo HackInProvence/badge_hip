@@ -9,6 +9,12 @@
 #include "../../menu/games.c"
 #include "test.h"
 
+/* The title bar of ui.c (its SecSea look) */
+gfx_color_t ui_title_bar(uint8_t *fb, int h) {
+    gfx_fill_rect(fb, 0, 0, GFX_WIDTH, h, GFX_BLACK);
+    return GFX_WHITE;
+}
+
 uint64_t host_time_us = 0;
 bool host_gpio[32];
 uint8_t host_spi_log[65536];

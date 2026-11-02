@@ -68,7 +68,7 @@ Le menu principal regroupe les fonctions par thème :
 | **Social** | Réseau des cigales, Messages, Contacts, Compétences, Vote, Radar des cigales, Chaud - froid, Virus des cigales, Choeur, Annonces, Contrebande |
 | **Radio & IR** | Message radio, porteuse radio, Décodeur 433 MHz, Station météo, Envoyer une image, Recevoir une image, Infrarouge, Chasse 433 MHz, Écouter la radio pirate |
 | **Badge** | Badge nominatif, Lampe, Badge de talk, son de la cigale, animations des LEDs, démo de l'écran, écran OLED, Succès, Mon grade, Identifiant sonore, Badge conférence ([badge_conference.md](badge_conference.md)), Appareil photo et Télécommande (avec le module ESP32-CAM : [appareil_photo.md](appareil_photo.md)) |
-| **Réglages** | Veille de l'écran, Langue, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
+| **Réglages** | Veille de l'écran, Langue, Thème, Télécommande, Mode muet, Infos, Crédits, Réglage radio |
 
 Un huitième thème, **Admin**, est caché : il est réservé aux organisateurs (voir [§ 4.8](#48-le-mode-admin-organisateurs)).
 
@@ -548,6 +548,15 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
 - **Langue** : français ou anglais (« Langue / Language », chaque langue écrite dans sa langue ; Y / X puis
   B). Badge resté dans une langue illisible : A 5 fois (retour au menu principal), puis A
   maintenu 5 secondes : il repasse en anglais. Voir [traduction](traduction.md).
+- **Thème : SecSea / Flipper Zero** : un clin d'œil au Flipper Zero. Les menus prennent son style (titres noir sur
+  blanc, ligne choisie arrondie) et sa page d'accueil devient celle du badge : un Flipper dessiné avec, sur son
+  écran, les animations de son dauphin (au démarrage, et A dans le menu principal ; B : le menu, Y / X : une autre
+  animation). Elles sont choisies au hasard selon le niveau du dauphin, ici le grade du badge (Mon grade : 1 à 4,
+  5 à 7, 8 à 10), avec leurs bulles de texte ; batterie faible : l'animation de la batterie vide. La veille montre
+  le dauphin endormi. Les animations sont sur la carte SD, dossier `FLIPPER/` (fourni avec la carte d'exemple ;
+  refait par `python tools/flipper_anims.py` depuis le firmware du Flipper Zero) : © Flipper Devices Inc., licence
+  GNU GPL v3 (`FLIPPER/COPYING.TXT`) ; le firmware du badge n'en contient aucune. Rien d'autre du Flipper : le badge
+  n'en a pas le matériel.
 - **Télécommande : oui / non** : le badge obéit (ou non) aux commandes radio des organisateurs et du Flipper Zero
   (voir [§ 4.7](#47-télécommande-et-mode-muet)). Activée par défaut.
 - **Mode muet : oui / non** : coupe le son et les LEDs. Les organisateurs peuvent l'activer à distance pendant les talks.

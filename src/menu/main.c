@@ -62,6 +62,7 @@
 #include "seek.h"
 #include "camport.h"
 #include "webremote.h"
+#include "flipper.h"
 #include "social.h"
 #include "store.h"
 #include "i18n.h"
@@ -423,6 +424,7 @@ typedef enum {
     M_CREDITS,
     M_REMOTE_TOGGLE,  /* Settings: obey the remote commands */
     M_MUTE_TOGGLE,  /* Settings: mute mode */
+    M_THEME,  /* Settings: SecSea or Flipper Zero (flipper.h) */
     M_ADMIN_OFF,  /* Admin menu: leave the admin mode */
     N_ITEMS,
 } menu_item_t;
@@ -627,8 +629,8 @@ static void ui_trace(const char *title) {
 static void draw_title(const char *title) {
     ui_trace(title);
     ui_check_width(&gfx_font_medium, title, GFX_WIDTH - 2, "title");
-    gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
+    gfx_color_t color = ui_title_bar(fb, TITLE_H);  /* Black, or in the style of the Flipper (Réglages > Thème) */
+    gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, color, GFX_ALIGN_CENTER);
 }
 
 static void draw_footer(const char *text) {
@@ -658,8 +660,8 @@ static void draw_list(int count, int sel, void (*label)(int, char *, size_t)) {
         ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);  /* File names: cut expected */
         if (i == sel) {
             /* The selected row: whole, scrolling if needed */
-            gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, ROW_H-1, GFX_BLACK);
-            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_LEFT);
+            gfx_color_t color = ui_row_selected(fb, 2, y, GFX_WIDTH-8, ROW_H-1);
+            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, color, GFX_ALIGN_LEFT);
         } else {
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
@@ -668,7 +670,7 @@ static void draw_list(int count, int sel, void (*label)(int, char *, size_t)) {
     if (count > VISIBLE_ROWS) {
         int h = VISIBLE_ROWS * ROW_H;
         int bar = h * VISIBLE_ROWS / count;
-        gfx_fill_rect(fb, GFX_WIDTH - 4, TITLE_H + 3 + (h - bar) * first / (count - VISIBLE_ROWS), 3, bar, GFX_BLACK);
+        ui_scroll_bar(fb, TITLE_H + 3, h, TITLE_H + 3 + (h - bar) * first / (count - VISIBLE_ROWS), bar);
     }
 }
 
@@ -704,6 +706,7 @@ static void item_label(int item, char *buf, size_t len) {
     case M_CREDITS: snprintf(buf, len, N_("Crédits")); break;
     case M_REMOTE_TOGGLE: snprintf(buf, len, _("Télécommande : %s"), remote_enabled() ? _("oui") : _("non")); break;
     case M_MUTE_TOGGLE: snprintf(buf, len, _("Mode muet : %s"), remote_muted() ? _("oui") : _("non")); break;
+    case M_THEME: snprintf(buf, len, _("Thème : %s"), flipper_theme() ? "Flipper Zero" : "SecSea"); break;
     case M_ADMIN_OFF: snprintf(buf, len, N_("Quitter le mode admin")); break;
     default:
         if (item >= M_APP(0) && item < M_APP(APP_COUNT)) {
@@ -768,7 +771,7 @@ static const submenu_t SUBMENUS[] = {
     {N_("Badge"), 13, {M_APP(APP_NAMETAG), M_APP(APP_LAMP), M_APP(APP_TALK), M_SOUND, M_LEDS, M_SCREEN_DEMO, M_OLED,
                   M_APP(APP_ACHIEVEMENTS), M_APP(APP_RANK), M_APP(APP_FSK_ID),
                   M_APP(APP_CONFERENCE), M_APP(APP_CAMERA), M_APP(APP_REMOTE)}},
-    {N_("Réglages"), 8, {M_SETTINGS, M_APP(APP_LANG), M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
+    {N_("Réglages"), 9, {M_SETTINGS, M_APP(APP_LANG), M_THEME, M_REMOTE_TOGGLE, M_MUTE_TOGGLE, M_INFO, M_CREDITS,
                      M_APP(APP_RADIO_TUNE), M_APP(APP_BATT_SHARE)}},
     {N_("Admin"), 18, {M_APP(APP_ADMIN_COMMANDS), M_APP(APP_LEDCAST), M_APP(APP_ANNOUNCE_ADMIN),
                    M_APP(APP_VOTE_ADMIN), M_APP(APP_CHORUS_LEAD),
@@ -854,24 +857,25 @@ static void draw_low_battery(uint8_t *buf, int x, int y, gfx_color_t color) {
 }
 
 static void draw_battery(void) {
+    gfx_color_t c = ui_flipper ? GFX_BLACK : GFX_WHITE;  /* On the title bar (Réglages > Thème) */
     if (battery_low()) {
-        draw_low_battery(fb, GFX_WIDTH - 27, 8, GFX_WHITE);
+        draw_low_battery(fb, GFX_WIDTH - 27, 8, c);
         return;
     }
     int bars = battery_bars();
     if (bars < 0)
         return;
     int x = GFX_WIDTH - 27, y = 8;
-    gfx_rect(fb, x, y, 22, 12, GFX_WHITE);
-    gfx_fill_rect(fb, x + 22, y + 3, 2, 6, GFX_WHITE);
+    gfx_rect(fb, x, y, 22, 12, c);
+    gfx_fill_rect(fb, x + 22, y + 3, 2, 6, c);
     for (int i = 0; i < bars; ++i)
-        gfx_fill_rect(fb, x + 2 + i*5, y + 2, 4, 8, GFX_WHITE);
+        gfx_fill_rect(fb, x + 2 + i*5, y + 2, 4, 8, c);
     if (battery_charging()) {
         /* Lightning bolt on the left */
         static const int8_t BOLT[][2] = {{4, 0}, {3, 1}, {2, 2}, {1, 3}, {0, 4}, {1, 4}, {2, 4}, {3, 4}, {3, 5}, {2, 6},
                                          {1, 7}, {0, 8}, {1, 8}, {2, 9}, {3, 10}};
         for (unsigned i = 0; i < sizeof(BOLT)/sizeof(BOLT[0]); ++i)
-            gfx_fill_rect(fb, x - 9 + BOLT[i][0], y + BOLT[i][1], 2, 1, GFX_WHITE);
+            gfx_fill_rect(fb, x - 9 + BOLT[i][0], y + BOLT[i][1], 2, 1, c);
     }
 }
 
@@ -1103,7 +1107,7 @@ static void start_saver(app_state_t back) {
     app = A_START_SAVER;
 }
 
-static uint8_t saver_planes[2][GFX_FB_SIZE];
+static uint8_t saver_planes[2][GFX_FB_SIZE] __attribute__((aligned(4)));  /* [1]: the scratch of flipper.c */
 
 static unsigned saver_minutes(void) {
     uint8_t m = store_get()->saver_minutes;
@@ -1302,6 +1306,16 @@ static void show_saver(void) {
         still_render(saver_planes[0]);
         screen_show_image_bw_otp(saver_planes[0]);
         printf("saver: still page\n");
+        return;
+    }
+    if (flipper_saver_render(saver_planes[0], saver_planes[1], sizeof(saver_planes[1]))) {
+        /* Réglages > Thème : Flipper Zero: the dolphin asleep */
+        if (battery_low()) {
+            gfx_fill_rect(saver_planes[0], GFX_WIDTH - 30, GFX_HEIGHT - 18, 30, 18, GFX_WHITE);
+            draw_low_battery(saver_planes[0], GFX_WIDTH - 27, GFX_HEIGHT - 15, GFX_BLACK);
+        }
+        screen_show_image_bw_otp(saver_planes[0]);
+        printf("saver: on (Flipper)\n");
         return;
     }
     const char *p = saver_image();
@@ -2387,6 +2401,11 @@ static void validate(void) {
     case M_MUTE_TOGGLE:
         remote_set_muted(! remote_muted());
         break;
+    case M_THEME:
+        flipper_set_theme(! flipper_theme());
+        if (flipper_theme())
+            set_status(N_("A au menu principal : le dauphin"));
+        break;
     case M_ADMIN_OFF:
         set_admin(false);
         break;
@@ -2419,6 +2438,8 @@ static void cancel(void) {
     case A_MENU:
         if (menu_level == 1) {
             menu_level = 0;  /* Back to the themes */
+        } else if (flipper_theme()) {
+            app_open(&app_flipper);  /* The desktop of the Flipper, the home page of its theme */
         } else {
             set_sound(false);
             set_leds(0);
@@ -2749,6 +2770,7 @@ int main() {
     display_init();
     store_init();  /* Before the services: they read their settings (mute, infection, contacts...) */
     display_set_clean(clean_mode());  /* Réglages > Veille de l'écran > Nettoyage */
+    flipper_init();  /* Réglages > Thème: the style of the menus */
     i18n_init();  /* The language of the texts */
     show_splash();
     if (store_get()->asleep == STORE_ASLEEP)
@@ -2779,6 +2801,8 @@ int main() {
     printf("badge menu ready\n");
     if (radio_tune_needed())
         app_open(APPS[APP_RADIO_TUNE]);  /* First start (or an update that brings the tuning): tune the radio */
+    else if (flipper_theme())
+        app_open(&app_flipper);  /* The home page of the Flipper theme */
 
     bool was_measuring = false;
     uint32_t sent_shot = 0;
@@ -2790,7 +2814,8 @@ int main() {
             printf("buttons pressed: 0x%02x\n", pressed);
         if (! (btn_stable & BTN_A)) {
             lang_hold_done = false;
-        } else if (app == A_MENU && menu_level == 0 && ! lang_hold_done && btn_held_ms(BTN_A, now) >= LANG_HOLD_MS) {
+        } else if (((app == A_MENU && menu_level == 0) || (app == A_APP && cur_app == &app_flipper)) && ! lang_hold_done
+                   && btn_held_ms(BTN_A, now) >= LANG_HOLD_MS) {
             lang_hold_done = true;
             i18n_set(i18n_find("en"), true);  /* Back to English */
             set_status(N_("Langue : English"));

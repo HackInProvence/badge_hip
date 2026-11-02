@@ -32,6 +32,15 @@
 void ui_title(uint8_t *fb, const char *title);
 void ui_footer(uint8_t *fb, const char *text);
 
+/* Réglages > Thème : Flipper Zero (flipper.h): the titles and the lists drawn in the style of the Flipper Zero */
+extern bool ui_flipper;
+/** \brief Draws the background of a title bar of height \p h, returns the color of its text. */
+gfx_color_t ui_title_bar(uint8_t *fb, int h);
+/** \brief Draws the background of the selected row of a list, returns the color of its text. */
+gfx_color_t ui_row_selected(uint8_t *fb, int x, int y, int w, int h);
+/** \brief The scroll bar of a list at the right of the screen: the list from \p top, \p h high, the bar. */
+void ui_scroll_bar(uint8_t *fb, int top, int h, int bar_y, int bar_h);
+
 /* ------ Slow scroll: a text wider than its place is never cut, it scrolls (a character every UI_SCROLL_STEP_MS,
  * a pause at both ends); a paragraph longer than its lines scrolls a line at a time. The main loop draws the page
  * again while something scrolls (ui_scroll_frame(), ui_scroll_due()). */

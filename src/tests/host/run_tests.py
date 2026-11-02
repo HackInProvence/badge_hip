@@ -251,6 +251,32 @@ def test_rsvp(work):
                   defines=I18N_DEFINES)
 
 
+def test_flipper(work):
+    """The Flipper theme (flipper.c) with the animations of docs/sd/FLIPPER (tools/flipper_anims.py)"""
+    stubs = os.path.join(STUBS, 'flipper')
+    for root, _, names in os.walk(stubs):
+        for h in names:
+            dst = os.path.join(work, os.path.relpath(root, stubs))
+            os.makedirs(dst, exist_ok=True)
+            shutil.copy(os.path.join(root, h), dst)
+    for f in ('flipper.c', 'flipper.h'):
+        shutil.copy(os.path.join(SRC, 'menu', f), work)
+    exe = os.path.join(work, 'test_flipper' + ('.exe' if os.name == 'nt' else ''))
+    sources = [os.path.join(work, 'flipper.c')] + [os.path.join(SRC, s) for s in
+                                                   ['menu/ui.c', 'menu/shared_buf.c', 'gfx/gfx.c', 'gfx/gfx_fonts.c'] + I18N]
+    r = run([ARGS.cc] + CFLAGS + ['-D' + d for d in I18N_DEFINES] +
+            ['-I' + i for i in [work, STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), HERE]] +
+            ['-include', os.path.join(work, 'host_time.h'), os.path.join(HERE, 'test_flipper.c')] + sources +
+            ['-o', exe])
+    if r.returncode:
+        return False, 'compilation failed:\n' + r.stdout + r.stderr
+    sd =os.path.join(SRC, '..', 'docs', 'sd')
+    if not os.path.isdir(os.path.join(sd, 'FLIPPER')):
+        return True, 'skipped: no docs/sd/FLIPPER (python tools/flipper_anims.py)'
+    r = run([exe], cwd=sd)
+    return r.returncode == 0, r.stdout + r.stderr
+
+
 def test_party_games(work):
     return c_test('test_party_games', ['menu/tug_logic.c', 'menu/assassin_logic.c'], [os.path.join(SRC, 'menu')], work)
 
@@ -350,7 +376,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('camlink', test_camlink), ('file_ops', test_file_ops), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('camlink', test_camlink), ('file_ops', test_file_ops), ('flipper', test_flipper), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 

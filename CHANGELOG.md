@@ -25,6 +25,10 @@ Depuis 1.2.0 :
   toutes les cigales du réseau.
 - **Mise à jour du module ESP32-CAM depuis la carte SD du badge** (`ESP32/ESP32CAM.BIN`) ; le paquet de distribution
   le contient.
+- **Thème Flipper Zero** (Réglages > Thème) : un clin d'œil au Flipper Zero : les menus dans son style, et pour page
+  d'accueil un Flipper dessiné avec les animations de son dauphin (selon le grade du badge, avec leurs bulles) ; la
+  veille montre le dauphin endormi. Les animations sont sur la carte SD (`FLIPPER/`, © Flipper Devices Inc., GPL v3),
+  converties par `tools/flipper_anims.py`.
 
 **Améliorations**
 - La liaison avec le module est un service partagé (appareil photo, télécommande) ; protocole 2 (le badge reste
@@ -32,7 +36,8 @@ Depuis 1.2.0 :
 
 **À vérifier avant de publier** : tout sur le matériel (module flashé une fois avec l'ESP Flasher : nouvelle table
 des partitions) : la télécommande en point d'accès et en réseau, la page admin avec deux modules, la mise à jour
-depuis la carte SD, l'appareil photo après le passage au service partagé.
+depuis la carte SD, l'appareil photo après le passage au service partagé ; le thème Flipper (la rémanence de
+l'écran pendant les animations, la veille).
 
 
 ## 1.2.0 — en préparation (pas encore de tag)

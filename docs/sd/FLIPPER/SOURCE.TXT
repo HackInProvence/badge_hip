@@ -1,0 +1,9 @@
+Les animations du dauphin du Flipper Zero, pour le thème Flipper du badge SecSea
+(Réglages > Thème). The animations of the dolphin of the Flipper Zero, for the Flipper theme of
+the SecSea badge (Settings > Theme).
+
+(c) Flipper Devices Inc., GNU GPL v3 (COPYING.TXT), from:
+https://github.com/flipperdevices/flipperzero-firmware.git (assets/dolphin), commit 9981d9d4aa5ec7b14bb46cf15763dd293a7dec6a 2026-10-30
+
+Converted by tools/flipper_anims.py of the badge (frames in 1 bit, see the .FZA format in it).
+Unofficial: the badge is not related to Flipper Devices Inc.

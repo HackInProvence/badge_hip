@@ -58,6 +58,7 @@ target_sources(badge_menu PRIVATE
     camera.c
     camport.c
     webremote.c
+    flipper.c
     ${CMAKE_CURRENT_LIST_DIR}/../shared/camlink/camlink.c
     sd_serial.c
     shared_buf.c

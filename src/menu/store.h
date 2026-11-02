@@ -103,6 +103,7 @@ typedef struct {
     uint8_t camera[STORE_CAMERA_SETTINGS];  /* The settings of the camera module (camlink_setting_t) */
     uint8_t web_network;  /* STORE_WEB_NETWORK: the remote control uses the network saved in the module (Badge >
                            * Télécommande), otherwise its own access point */
+    uint8_t theme;  /* STORE_THEME_FLIPPER (flipper.c): Réglages > Thème : Flipper Zero; other values: SecSea */
 } store_t;
 
 #define STORE_BATT_SHARE 0xB1

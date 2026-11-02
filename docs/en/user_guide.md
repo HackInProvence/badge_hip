@@ -69,7 +69,7 @@ The main menu groups the features by theme:
 | **Social** | Cicada network, Messages, Contacts, Skills, Vote, Cicada radar, Hot - cold, Cicada virus, Chorus, Announcements, Smuggling |
 | **Radio & IR** | Radio: message, Radio: carrier, 433 MHz decoder, Weather station, Send an image, Receive an image, Infrared, 433 MHz hunt, Listen to pirate radio |
 | **Badge** | Name tag, Lamp, Talk badge, Cicada (its song), LEDs, Screen demo, OLED screen, Achievements, My rank, Sound ID, Conference badge ([conference_badge.md](conference_badge.md)), Camera and Remote control (with the ESP32-CAM module: [camera.md](camera.md)) |
-| **Settings** (Réglages) | Screensaver, Language, Remote, Mute mode, Info, Credits, Radio tuning |
+| **Settings** (Réglages) | Screensaver, Language, Theme, Remote, Mute mode, Info, Credits, Radio tuning |
 
 Some entries show their value in the menu: "Volume: 4/8", "Cicada network: 12 pts", "CTF: 0/1 flags",
 "Lamp: 50 %", "Cicada: on", "LEDs: rainbow", "Screensaver: 5 min", "Language: English", "Remote: yes",
@@ -556,6 +556,15 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
 - **Language** (Langue): French or English ("Langue / Language", each language written in itself; Y / X then
   B). A badge left in a language you can't read: A 5 times (back to the main menu), then A held for 5 seconds:
   it switches to English. See [translation](translation.md).
+- **Theme: SecSea / Flipper Zero** (Thème): a wink at the Flipper Zero. The menus take its style (black on white
+  titles, rounded selected row) and its home page becomes the one of the badge: a drawn Flipper with the
+  animations of its dolphin on its screen (at the start, and A in the main menu; B: the menu, Y / X: another
+  animation). They are chosen at random by the level of the dolphin, here the rank of the badge (My rank: 1 to 4,
+  5 to 7, 8 to 10), with their text bubbles; low battery: the animation of the empty battery. The screensaver shows
+  the dolphin asleep. The animations are on the SD card, folder `FLIPPER/` (given with the example card; made again
+  by `python tools/flipper_anims.py` from the firmware of the Flipper Zero): © Flipper Devices Inc., GNU GPL v3
+  license (`FLIPPER/COPYING.TXT`); the firmware of the badge contains none of them. Nothing else of the Flipper:
+  the badge does not have its hardware.
 - **Remote: yes / no** (Télécommande : oui / non): the badge obeys (or not) the radio commands of the
   organizers and of the Flipper Zero (see [§ 4.7](#47-remote-control-and-mute-mode)). Enabled by default.
 - **Mute mode: yes / no** (Mode muet : oui / non): turns off the sound and the LEDs. The organizers can switch it on

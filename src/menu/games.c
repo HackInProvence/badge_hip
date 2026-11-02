@@ -8,6 +8,7 @@
 
 #include "games.h"
 #include "gfx.h"
+#include "ui.h"
 #include "i18n.h"
 #include "score_code.h"
 
@@ -65,8 +66,8 @@ static void add_win(game_t g) {
 }
 
 static void draw_title(uint8_t *fb, const char *title) {
-    gfx_fill_rect(fb, 0, 0, GFX_WIDTH, TITLE_H, GFX_BLACK);
-    gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, GFX_WHITE, GFX_ALIGN_CENTER);
+    gfx_color_t color = ui_title_bar(fb, TITLE_H);
+    gfx_text(fb, GFX_WIDTH/2, (TITLE_H - gfx_font_medium.height)/2, &gfx_font_medium, title, color, GFX_ALIGN_CENTER);
 }
 
 static void draw_footer(uint8_t *fb, const char *text) {

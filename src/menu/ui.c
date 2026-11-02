@@ -140,11 +140,49 @@ void ui_scroll_text(uint8_t *fb, int x, int y, int width, const gfx_font_t *font
 }
 
 
+bool ui_flipper = false;
+
+gfx_color_t ui_title_bar(uint8_t *fb, int h) {
+    if (! ui_flipper) {
+        gfx_fill_rect(fb, 0, 0, GFX_WIDTH, h, GFX_BLACK);
+        return GFX_WHITE;
+    }
+    /* Flipper: black on white, above a line */
+    gfx_fill_rect(fb, 0, 0, GFX_WIDTH, h, GFX_WHITE);
+    gfx_fill_rect(fb, 0, h - 2, GFX_WIDTH, 1, GFX_BLACK);
+    return GFX_BLACK;
+}
+
+gfx_color_t ui_row_selected(uint8_t *fb, int x, int y, int w, int h) {
+    gfx_fill_rect(fb, x, y, w, h, GFX_BLACK);
+    if (ui_flipper) {
+        /* Flipper: rounded corners */
+        static const int8_t CORNER[][2] = {{0, 0}, {1, 0}, {0, 1}};
+        for (unsigned i = 0; i < sizeof(CORNER) / sizeof(CORNER[0]); ++i) {
+            int dx = CORNER[i][0], dy = CORNER[i][1];
+            gfx_pixel(fb, x + dx, y + dy, GFX_WHITE);
+            gfx_pixel(fb, x + w - 1 - dx, y + dy, GFX_WHITE);
+            gfx_pixel(fb, x + dx, y + h - 1 - dy, GFX_WHITE);
+            gfx_pixel(fb, x + w - 1 - dx, y + h - 1 - dy, GFX_WHITE);
+        }
+    }
+    return GFX_WHITE;
+}
+
+void ui_scroll_bar(uint8_t *fb, int top, int h, int bar_y, int bar_h) {
+    if (ui_flipper) {
+        /* Flipper: a dotted line, the bar on it */
+        for (int y = top; y < top + h; y += 2)
+            gfx_pixel(fb, GFX_WIDTH - 3, y, GFX_BLACK);
+    }
+    gfx_fill_rect(fb, GFX_WIDTH - 4, bar_y, 3, bar_h, GFX_BLACK);
+}
+
 void ui_title(uint8_t *fb, const char *title) {
     ui_check_width(&gfx_font_medium, title, GFX_WIDTH - 2, "title");
-    gfx_fill_rect(fb, 0, 0, GFX_WIDTH, UI_TITLE_H, GFX_BLACK);
+    gfx_color_t color = ui_title_bar(fb, UI_TITLE_H);
     ui_scroll_text(fb, GFX_WIDTH/2, (UI_TITLE_H - gfx_font_medium.height)/2, GFX_WIDTH - 6, &gfx_font_medium, title,
-                   GFX_WHITE, GFX_ALIGN_CENTER);
+                   color, GFX_ALIGN_CENTER);
 }
 
 
@@ -251,8 +289,8 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
         ui_fit_preview(&gfx_font_small, fitted, sizeof(fitted), text, GFX_WIDTH - 20);
         if (i == sel) {
             /* The selected row: whole, scrolling if needed (the others: a preview with "...") */
-            gfx_fill_rect(fb, 2, y, GFX_WIDTH-8, UI_ROW_H-1, GFX_BLACK);
-            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, GFX_WHITE, GFX_ALIGN_LEFT);
+            gfx_color_t color = ui_row_selected(fb, 2, y, GFX_WIDTH-8, UI_ROW_H-1);
+            ui_scroll_text(fb, 8, y + 1, GFX_WIDTH - 20, &gfx_font_small, text, color, GFX_ALIGN_LEFT);
         } else {
             gfx_text(fb, 8, y + 1, &gfx_font_small, fitted, GFX_BLACK, GFX_ALIGN_LEFT);
         }
@@ -261,7 +299,7 @@ void ui_list(uint8_t *fb, int count, int sel, void (*label)(int, char *, size_t)
     if (count > UI_VISIBLE_ROWS) {
         int h = UI_VISIBLE_ROWS * UI_ROW_H;
         int bar = h * UI_VISIBLE_ROWS / count;
-        gfx_fill_rect(fb, GFX_WIDTH - 4, UI_TITLE_H + 3 + (h - bar) * first / (count - UI_VISIBLE_ROWS), 3, bar, GFX_BLACK);
+        ui_scroll_bar(fb, UI_TITLE_H + 3, h, UI_TITLE_H + 3 + (h - bar) * first / (count - UI_VISIBLE_ROWS), bar);
     }
 }
 
