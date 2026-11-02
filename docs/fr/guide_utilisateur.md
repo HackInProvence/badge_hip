@@ -549,8 +549,8 @@ Un nouveau succès s'annonce en bas de l'écran (« Succès : Sociable »), ou l
   B). Badge resté dans une langue illisible : A 5 fois (retour au menu principal), puis A
   maintenu 5 secondes : il repasse en anglais. Voir [traduction](traduction.md).
 - **Thème : SecSea / Flipper Zero** : un clin d'œil au Flipper Zero. Les menus prennent son style (titres noir sur
-  blanc, ligne choisie arrondie) et sa page d'accueil devient celle du badge : un Flipper dessiné avec, sur son
-  écran, les animations de son dauphin (au démarrage, et A dans le menu principal ; B : le menu, Y / X : une autre
+  blanc, ligne choisie arrondie) et sa page d'accueil devient celle du badge : les animations de son dauphin, sur
+  l'écran du badge (agrandies 1,5 fois), le nom de la cigale au-dessus (au démarrage, et A dans le menu principal ; B : le menu, Y / X : une autre
   animation). Elles sont choisies au hasard selon le niveau du dauphin, ici le grade du badge (Mon grade : 1 à 4,
   5 à 7, 8 à 10), avec leurs bulles de texte ; batterie faible : l'animation de la batterie vide. La veille montre
   le dauphin endormi. Les animations sont sur la carte SD, dossier `FLIPPER/` (fourni avec la carte d'exemple ;

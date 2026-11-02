@@ -266,7 +266,7 @@ def test_flipper(work):
                                                    ['menu/ui.c', 'menu/shared_buf.c', 'gfx/gfx.c', 'gfx/gfx_fonts.c'] + I18N]
     r = run([ARGS.cc] + CFLAGS + ['-D' + d for d in I18N_DEFINES] +
             ['-I' + i for i in [work, STUBS, os.path.join(SRC, 'gfx'), os.path.join(SRC, 'menu'), HERE]] +
-            ['-include', os.path.join(work, 'host_time.h'), os.path.join(HERE, 'test_flipper.c')] + sources +
+            ['-DFLIPPER_TEST', '-include', os.path.join(work, 'host_time.h'), os.path.join(HERE, 'test_flipper.c')] + sources +
             ['-o', exe])
     if r.returncode:
         return False, 'compilation failed:\n' + r.stdout + r.stderr

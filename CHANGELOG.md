@@ -26,7 +26,7 @@ Depuis 1.2.0 :
 - **Mise à jour du module ESP32-CAM depuis la carte SD du badge** (`ESP32/ESP32CAM.BIN`) ; le paquet de distribution
   le contient.
 - **Thème Flipper Zero** (Réglages > Thème) : un clin d'œil au Flipper Zero : les menus dans son style, et pour page
-  d'accueil un Flipper dessiné avec les animations de son dauphin (selon le grade du badge, avec leurs bulles) ; la
+  d'accueil les animations de son dauphin (selon le grade du badge, avec leurs bulles) ; la
   veille montre le dauphin endormi. Les animations sont sur la carte SD (`FLIPPER/`, © Flipper Devices Inc., GPL v3),
   converties par `tools/flipper_anims.py`.
 

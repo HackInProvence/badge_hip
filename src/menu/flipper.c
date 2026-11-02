@@ -32,11 +32,11 @@
 #define SLEEP_ANIM "L1_Sleep.FZA"  /* The screensaver */
 #define BATTERY_ANIM "L1_BadBattery.FZA"  /* When the battery is low */
 
-/* Where the screen of the Flipper is drawn on the page (128 x 64, as on the Flipper) */
-#define SCR_X 26
-#define SCR_Y 80
-#define BODY_Y 68  /* The body of the Flipper, below the bubbles */
-#define BODY_H 106
+/* Where the animation (128 x 64 on the Flipper) is drawn on the page: zoomed 1.5 times, above the footer */
+#define ANIM_W 192
+#define ANIM_H 96
+#define ANIM_X ((GFX_WIDTH - ANIM_W) / 2)
+#define ANIM_Y (UI_FOOTER_Y - 2 - ANIM_H)
 
 typedef struct {
     FIL f;
@@ -205,10 +205,10 @@ static void round_rect(uint8_t *fb, int x, int y, int w, int h, int r) {
     arc(fb, x + w - 1 - r, y + h - 1 - r, r, 8);
 }
 
-static void line(uint8_t *fb, int x0, int y0, int x1, int y1) {
+static void line(uint8_t *fb, int x0, int y0, int x1, int y1, gfx_color_t c) {
     int dx = abs(x1 - x0), dy = -abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx + dy;
     for (;;) {
-        gfx_pixel(fb, x0, y0, GFX_BLACK);
+        gfx_pixel(fb, x0, y0, c);
         if (x0 == x1 && y0 == y1)
             break;
         int e2 = 2 * err;
@@ -223,65 +223,28 @@ static void line(uint8_t *fb, int x0, int y0, int x1, int y1) {
     }
 }
 
-/* A closed outline: n points (x, y) */
-static void polygon(uint8_t *fb, const uint8_t (*p)[2], int n, int dy) {
-    for (int i = 0; i < n; ++i) {
-        const uint8_t *a = p[i], *b = p[(i + 1) % n];
-        line(fb, a[0], a[1] + dy, b[0], b[1] + dy);
-    }
-}
-
-/* The outline of the Flipper (as the picture of qFlipper, narrowed around its screen drawn 1:1): the point on the
- * left, the cut corner at the top right; y from the top of the body */
-static const uint8_t BODY[][2] = {{21, 0}, {186, 0}, {199, 17}, {199, 96},
-                                 {195, 102}, {190, 104}, {31, 104}, {1, 51}, {1, 43}};
-/* The line inside it, around the screen and the buttons; "FLIPPER" below it */
-static const uint8_t INNER[][2] = {{26, 4}, {184, 4}, {195, 19}, {195, 78},
-                                  {191, 82}, {23, 82}, {5, 50}, {5, 44}, {22, 8}};
-
-/* The Flipper drawn around its screen: the body, the frame of the screen, the D-pad and the back button */
-static void draw_device(uint8_t *fb) {
-    polygon(fb, BODY, sizeof(BODY) / sizeof(BODY[0]), BODY_Y);
-    polygon(fb, INNER, sizeof(INNER) / sizeof(INNER[0]), BODY_Y);
-    /* The edge of the body is thick: a second line inside, along the top and the bottom */
-    gfx_fill_rect(fb, 22, BODY_Y + 1, 165, 1, GFX_BLACK);
-    gfx_fill_rect(fb, 31, BODY_Y + 103, 160, 1, GFX_BLACK);
-    round_rect(fb, SCR_X - 3, SCR_Y - 3, 128 + 6, 64 + 6, 3);
-    gfx_rect(fb, SCR_X - 1, SCR_Y - 1, 128 + 2, 64 + 2, GFX_BLACK);
-    gfx_text(fb, SCR_X + 64, BODY_Y + 86, &gfx_font_small, "F L I P P E R", GFX_BLACK, GFX_ALIGN_CENTER);
-    /* The D-pad: its ring, the OK button, the arrows */
-    const int cx = 176, cy = SCR_Y + 31;
-    arc(fb, cx, cy, 17, 15);
-    arc(fb, cx, cy, 5, 15);
-    for (int i = 0; i < 3; ++i) {
-        gfx_fill_rect(fb, cx - i, cy - 13 + i, 2 * i + 1, 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx - i, cy + 13 - i, 2 * i + 1, 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx - 13 + i, cy - i, 1, 2 * i + 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx + 13 - i, cy - i, 1, 2 * i + 1, GFX_BLACK);
-    }
-    /* The LED */
-    gfx_fill_rect(fb, 162, SCR_Y + 58, 2, 2, GFX_BLACK);
-    /* The back button, with its arrow */
-    const int bx = 188, by = SCR_Y + 57;
-    arc(fb, bx, by, 6, 15);
-    gfx_fill_rect(fb, bx - 2, by - 2, 5, 1, GFX_BLACK);
-    gfx_fill_rect(fb, bx + 2, by - 2, 1, 4, GFX_BLACK);
-    gfx_fill_rect(fb, bx - 1, by + 1, 4, 1, GFX_BLACK);
-    gfx_pixel(fb, bx - 1, by - 3, GFX_BLACK);
-    gfx_pixel(fb, bx - 1, by - 1, GFX_BLACK);
-}
-
-/* A frame of the animation on the screen of the Flipper, at the bottom as on the Flipper */
+/* A frame of the animation, zoomed 1.5 times, at the bottom of its place as on the Flipper */
 static void draw_frame(uint8_t *fb, const anim_io_t *io, const fza_t *a) {
-    int stride = (a->w + 7) / 8, y0 = SCR_Y + 64 - a->h, x0 = SCR_X + (128 - a->w) / 2;
-    for (int y = 0; y < a->h; ++y)
-        for (int x = 0; x < a->w; ++x)
-            if (io->frame[y * stride + x / 8] & (0x80 >> (x % 8)))
+    int stride = (a->w + 7) / 8, w = a->w * 3 / 2, h = a->h * 3 / 2;
+    int x0 = ANIM_X + (ANIM_W - w) / 2, y0 = ANIM_Y + ANIM_H - h;
+    for (int y = 0; y < h; ++y) {
+        const uint8_t *row = io->frame + (y * 2 / 3) * stride;
+        for (int x = 0; x < w; ++x) {
+            int sx = x * 2 / 3;
+            if (row[sx / 8] & (0x80 >> (sx % 8)))
                 gfx_pixel(fb, x0 + x, y0 + y, GFX_BLACK);
+        }
+    }
 }
 
-/* A bubble of text above the Flipper, its tail to \p anchor_x (the dolphin) */
-static void draw_bubble(uint8_t *fb, const char *text, int len, int anchor_x) {
+#ifdef FLIPPER_TEST
+int flipper_bubbles_drawn;
+#endif
+
+/* A bubble of text as the Flipper draws it (elements_bubble_str()): its top left corner at (x, y) of the screen of
+ * the Flipper, its tail on the side given by the alignment (horizontal: 0 left, 1 center, 2 right; vertical << 4:
+ * 0 top, 1 center, 2 bottom) */
+static void draw_bubble(uint8_t *fb, const char *text, int len, int x, int y, uint8_t align) {
     char lines[4][40];
     int n = 0, w = 0;
     const char *p = text, *end = text + len;
@@ -300,56 +263,69 @@ static void draw_bubble(uint8_t *fb, const char *text, int len, int anchor_x) {
     }
     if (! n)
         return;
-    const int line_h = gfx_font_small.height + 1, tail = 7;
+#ifdef FLIPPER_TEST
+    ++flipper_bubbles_drawn;
+#endif
+    const int line_h = gfx_font_small.height + 1, tail = 6;
     int bw = w + 12, bh = n * line_h + 6;
-    if (bw > GFX_WIDTH - 2)
-        bw = GFX_WIDTH - 2;
-    int by = BODY_Y - tail - bh;
-    int bx = anchor_x - bw / 2;
-    if (bx < 1)
-        bx = 1;
-    if (bx + bw > GFX_WIDTH - 1)
-        bx = GFX_WIDTH - 1 - bw;
-    if (anchor_x < bx + 8)
-        anchor_x = bx + 8;
-    if (anchor_x > bx + bw - 9)
-        anchor_x = bx + bw - 9;
-    gfx_fill_rect(fb, bx, by, bw, bh, GFX_WHITE);
-    round_rect(fb, bx, by, bw, bh, 4);
+    int bx = ANIM_X + x * 3 / 2, by = ANIM_Y + y * 3 / 2;
+    /* Our font is not the one of the Flipper: the bubble kept on the page, in the place of the animation */
+    if (bw > GFX_WIDTH - 2 * tail - 2)
+        bw = GFX_WIDTH - 2 * tail - 2;
+    if (bx + bw + tail > GFX_WIDTH - 1)
+        bx = GFX_WIDTH - 1 - tail - bw;
+    if (bx < tail + 1)
+        bx = tail + 1;
+    if (by + bh + tail > ANIM_Y + ANIM_H)
+        by = ANIM_Y + ANIM_H - tail - bh;
+    if (by < ANIM_Y + tail)
+        by = ANIM_Y + tail;
+    gfx_fill_rect(fb, bx + 1, by + 1, bw - 2, bh - 2, GFX_WHITE);  /* Inside the rounded corners */
+    round_rect(fb, bx, by, bw, bh, 3);
     for (int i = 0; i < n; ++i)
         gfx_text(fb, bx + 6, by + 3 + i * line_h, &gfx_font_small, lines[i], GFX_BLACK, GFX_ALIGN_LEFT);
-    /* The tail: a triangle down to the body of the Flipper */
-    for (int dy = 0; dy < tail; ++dy) {
-        int half = 5 * (tail - dy) / tail;
-        gfx_fill_rect(fb, anchor_x - half + 1, by + bh - 1 + dy, 2 * half - 1, 1, GFX_WHITE);
-        gfx_pixel(fb, anchor_x - half, by + bh - 1 + dy, GFX_BLACK);
-        gfx_pixel(fb, anchor_x + half, by + bh - 1 + dy, GFX_BLACK);
+    /* The tail: a triangle from a side of the bubble (b1, b2) to its point (ax, ay) */
+    int h = align & 0x0F, v = align >> 4, r = bx + bw - 1, bot = by + bh - 1, cy = by + (bh - 1) / 2;
+    int b1x, b1y, b2x, b2y, ax, ay;
+    if (h != 1) {
+        int sx = h == 0 ? bx : r, dir = h == 0 ? -1 : 1;
+        b1x = b2x = sx;
+        ax = sx + dir * tail;
+        if (v == 0) {
+            b1y = by;
+            b2y = by + tail;
+            ay = by;
+        } else if (v == 1) {
+            b1y = cy - tail;
+            b2y = cy + tail;
+            ay = cy;
+        } else {
+            b1y = bot - tail;
+            b2y = bot;
+            ay = bot;
+        }
+    } else if (v != 1) {
+        int cx = bx + (bw - 1) / 2, sy = v == 0 ? by : bot;
+        b1y = b2y = sy;
+        b1x = cx - tail;
+        b2x = cx + tail;
+        ax = cx;
+        ay = sy + (v == 0 ? -tail : tail);
+    } else {
+        return;  /* Centered: no tail */
     }
+    int steps = b2x - b1x + b2y - b1y;  /* One of both is 0 */
+    for (int i = 0; i <= steps; ++i)
+        line(fb, b1x == b2x ? b1x : b1x + i, b1y == b2y ? b1y : b1y + i, ax, ay, GFX_WHITE);
+    line(fb, b1x, b1y, ax, ay, GFX_BLACK);
+    line(fb, ax, ay, b2x, b2y, GFX_BLACK);
 }
 
-/* Where the bubble of the Flipper points (its corner given by its alignment), on the page */
-static int bubble_anchor(const bubble_t *b) {
-    /* The size of the bubble on the Flipper: its font is about 5 x 9 pixels */
-    int chars = 0, cur = 0;
-    for (int i = 0; i < b->len; ++i) {
-        cur = b->text[i] == '\n' ? 0 : cur + 1;
-        if (cur > chars)
-            chars = cur;
-    }
-    int w = chars * 5 + 6, x;
-    switch (b->align & 3) {
-    case 0: x = b->x - 4; break;  /* Left: the dolphin on the left of the bubble */
-    case 1: x = b->x + w / 2; break;
-    default: x = b->x + w + 4; break;  /* Right */
-    }
-    return SCR_X + x;
-}
-
-/* The name of the cicada above the Flipper, when there is no bubble */
+/* The name of the cicada above the animation */
 static void draw_name(uint8_t *fb) {
     char name[24];
     ui_fit(&gfx_font_medium, name, sizeof(name), social_name(), GFX_WIDTH - 8);
-    gfx_text(fb, GFX_WIDTH / 2, (BODY_Y - gfx_font_medium.height) / 2, &gfx_font_medium, name, GFX_BLACK,
+    gfx_text(fb, GFX_WIDTH / 2, (ANIM_Y - gfx_font_medium.height) / 2, &gfx_font_medium, name, GFX_BLACK,
              GFX_ALIGN_CENTER);
 }
 
@@ -361,14 +337,12 @@ bool flipper_saver_render(uint8_t *fb, uint8_t *scratch, size_t scratch_len) {
     anim_io_t *io = (anim_io_t *)scratch;
     fza_t a;
     gfx_clear(fb, GFX_WHITE);
-    draw_device(fb);
+    draw_name(fb);
     if (fza_open(io, SLEEP_ANIM, &a)) {
         if (fza_read_frame(io, &a, fza_order(io, &a, 0)))
             draw_frame(fb, io, &a);
         fza_close(io);
-        draw_bubble(fb, "Zzz...", 6, SCR_X + 90);
-    } else {
-        draw_name(fb);
+        draw_bubble(fb, "Zzz...", 6, 62, 2, 0x20);  /* Its tail down to the left, to the head of the dolphin */
     }
     printf("flipper: saver\n");
     return true;
@@ -578,8 +552,7 @@ static bool flipper_task(absolute_time_t now) {
 static void flipper_render(uint8_t *fb, absolute_time_t now) {
     (void)now;
     gfx_clear(fb, GFX_WHITE);
-    draw_device(fb);
-    bool bubble = false;
+    draw_name(fb);
     if (d.open) {
         draw_frame(fb, &DESK->io, &d.a);
         if (d.phase == ACTIVE && d.slot != 0xFF) {
@@ -587,21 +560,18 @@ static void flipper_render(uint8_t *fb, absolute_time_t now) {
             bubble_t b = {0};
             for (int i = 0; i < d.a.n_bubbles && fza_bubble(&DESK->io, &d.a, i, &b); ++i)
                 if (b.slot == d.slot && b.start <= t && t <= b.end) {
-                    draw_bubble(fb, b.text, b.len, bubble_anchor(&b));
-                    bubble = true;
+                    draw_bubble(fb, b.text, b.len, b.x, b.y, b.align);
                     break;
                 }
         }
     } else {
-        /* No animation: what to copy on the card, on the screen of the Flipper */
-        ui_scroll_text(fb, SCR_X + 64, SCR_Y + 8, 124, &gfx_font_small, d.no_card ? N_("Pas d'animation :")
+        /* No animation: what to copy on the card */
+        ui_scroll_text(fb, GFX_WIDTH / 2, ANIM_Y + 30, GFX_WIDTH - 8, &gfx_font_small, d.no_card ? N_("Pas d'animation :")
                        : N_("Erreur de lecture"), GFX_BLACK, GFX_ALIGN_CENTER);
         if (d.no_card)
-            ui_scroll_text(fb, SCR_X + 64, SCR_Y + 28, 124, &gfx_font_small, N_("FLIPPER/ sur la carte SD"),
+            ui_scroll_text(fb, GFX_WIDTH / 2, ANIM_Y + 50, GFX_WIDTH - 8, &gfx_font_small, N_("FLIPPER/ sur la carte SD"),
                            GFX_BLACK, GFX_ALIGN_CENTER);
     }
-    if (! bubble)
-        draw_name(fb);
     ui_footer(fb, d.n_names > 1 ? N_("Y X : animation  B : menu") : N_("B : menu"));
 }
 

@@ -4,7 +4,7 @@
  * visit https://creativecommons.org/licenses/by-nc-sa/4.0/ */
 
 /* Test of the Flipper theme (flipper.c) with the animations of docs/sd/FLIPPER: run from docs/sd (run_tests.py).
- * Every animation is played (no read error, the dolphin on the screen of the Flipper, the bubbles), then the
+ * Every animation is played (no read error, the dolphin on the screen, the bubbles), then the
  * screensaver. With the environment variable FLIPPER_DUMP=<dir>: pages saved as PBM images, to look at them. */
 
 #include <stdio.h>
@@ -23,6 +23,7 @@ store_t host_store;
 const char *host_name = "";
 bool host_battery_low = false;
 uint8_t host_level = 1;
+extern int flipper_bubbles_drawn;
 
 uint32_t get_rand_32(void) {
     static uint32_t s = 12345;
@@ -87,7 +88,7 @@ int main(void) {
     app_flipper.start(host_time_us);
     render();
     dump("desktop");
-    CHECK(black(26, 80, 128, 64) > 50);  /* The dolphin on the screen of the Flipper */
+    CHECK(black(4, 82, 192, 96) > 50);  /* The dolphin on the screen */
     int animations = 0, bubbles = 0, empty_frames = 0, dumped = 0;
     for (int a = 0; a < 40; ++a) {
         bool bubble = false;
@@ -95,9 +96,10 @@ int main(void) {
             host_time_us += 500000;  /* 2 frames per second */
             app_flipper.task(host_time_us);
             render();
-            if (black(26, 80, 128, 64) < 20)
+            if (black(4, 82, 192, 96) < 20)
                 ++empty_frames;
-            if (black(0, 0, GFX_WIDTH, 60)) {  /* No name: something above the Flipper is a bubble */
+            if (flipper_bubbles_drawn) {
+                flipper_bubbles_drawn = 0;
                 bubble = true;
                 if (dumped < 6 && step % 50 == 0) {
                     char name[32];
@@ -124,7 +126,7 @@ int main(void) {
     host_name = "Cigale42";
     app_flipper.start(host_time_us);
     render();
-    CHECK(black(0, 0, GFX_WIDTH, 60) > 0);
+    CHECK(black(0, 0, GFX_WIDTH, 60) > 0);  /* Above the animation */
     app_flipper.stop();
 
     /* The low battery: its animation */
@@ -132,15 +134,16 @@ int main(void) {
     app_flipper.start(host_time_us);
     render();
     dump("battery");
-    CHECK(black(26, 80, 128, 64) > 50);
+    CHECK(black(4, 82, 192, 96) > 50);
     app_flipper.stop();
     host_battery_low = false;
 
     /* The screensaver: the dolphin asleep */
+    flipper_bubbles_drawn = 0;
     CHECK(flipper_saver_render(fb, scratch, sizeof(scratch)));
     dump("saver");
-    CHECK(black(26, 80, 128, 64) > 50);
-    CHECK(black(0, 0, GFX_WIDTH, 60) > 0);  /* "Zzz..." */
+    CHECK(black(4, 82, 192, 96) > 50);
+    CHECK(flipper_bubbles_drawn == 1);  /* "Zzz..." */
 
     /* A list in the style of the Flipper: black on white title, rounded selected row */
     gfx_clear(fb, GFX_WHITE);

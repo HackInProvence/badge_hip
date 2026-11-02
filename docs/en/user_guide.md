@@ -557,8 +557,8 @@ A new achievement is announced at the bottom of the screen ("Unlocked: Sociable"
   B). A badge left in a language you can't read: A 5 times (back to the main menu), then A held for 5 seconds:
   it switches to English. See [translation](translation.md).
 - **Theme: SecSea / Flipper Zero** (Thème): a wink at the Flipper Zero. The menus take its style (black on white
-  titles, rounded selected row) and its home page becomes the one of the badge: a drawn Flipper with the
-  animations of its dolphin on its screen (at the start, and A in the main menu; B: the menu, Y / X: another
+  titles, rounded selected row) and its home page becomes the one of the badge: the animations of its dolphin,
+  on the screen of the badge (zoomed 1.5 times), the name of the cicada above them (at the start, and A in the main menu; B: the menu, Y / X: another
   animation). They are chosen at random by the level of the dolphin, here the rank of the badge (My rank: 1 to 4,
   5 to 7, 8 to 10), with their text bubbles; low battery: the animation of the empty battery. The screensaver shows
   the dolphin asleep. The animations are on the SD card, folder `FLIPPER/` (given with the example card; made again
