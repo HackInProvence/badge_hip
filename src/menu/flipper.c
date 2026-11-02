@@ -6,6 +6,7 @@
 /* The Flipper Zero theme: see flipper.h. The format of the .FZA files: tools/flipper_anims.py. */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "pico/rand.h"
@@ -32,8 +33,8 @@
 #define BATTERY_ANIM "L1_BadBattery.FZA"  /* When the battery is low */
 
 /* Where the screen of the Flipper is drawn on the page (128 x 64, as on the Flipper) */
-#define SCR_X 10
-#define SCR_Y 88
+#define SCR_X 26
+#define SCR_Y 80
 #define BODY_Y 68  /* The body of the Flipper, below the bubbles */
 #define BODY_H 106
 
@@ -204,25 +205,64 @@ static void round_rect(uint8_t *fb, int x, int y, int w, int h, int r) {
     arc(fb, x + w - 1 - r, y + h - 1 - r, r, 8);
 }
 
+static void line(uint8_t *fb, int x0, int y0, int x1, int y1) {
+    int dx = abs(x1 - x0), dy = -abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx + dy;
+    for (;;) {
+        gfx_pixel(fb, x0, y0, GFX_BLACK);
+        if (x0 == x1 && y0 == y1)
+            break;
+        int e2 = 2 * err;
+        if (e2 >= dy) {
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+/* A closed outline: n points (x, y) */
+static void polygon(uint8_t *fb, const uint8_t (*p)[2], int n, int dy) {
+    for (int i = 0; i < n; ++i) {
+        const uint8_t *a = p[i], *b = p[(i + 1) % n];
+        line(fb, a[0], a[1] + dy, b[0], b[1] + dy);
+    }
+}
+
+/* The outline of the Flipper (as the picture of qFlipper, narrowed around its screen drawn 1:1): the point on the
+ * left, the cut corner at the top right; y from the top of the body */
+static const uint8_t BODY[][2] = {{21, 0}, {186, 0}, {199, 17}, {199, 96},
+                                 {195, 102}, {190, 104}, {31, 104}, {1, 51}, {1, 43}};
+/* The line inside it, around the screen and the buttons; "FLIPPER" below it */
+static const uint8_t INNER[][2] = {{26, 4}, {184, 4}, {195, 19}, {195, 78},
+                                  {191, 82}, {23, 82}, {5, 50}, {5, 44}, {22, 8}};
+
 /* The Flipper drawn around its screen: the body, the frame of the screen, the D-pad and the back button */
 static void draw_device(uint8_t *fb) {
-    round_rect(fb, 1, BODY_Y, GFX_WIDTH - 2, BODY_H, 14);
-    round_rect(fb, 3, BODY_Y + 2, GFX_WIDTH - 6, BODY_H - 4, 12);
-    round_rect(fb, SCR_X - 4, SCR_Y - 4, 128 + 8, 64 + 8, 4);
+    polygon(fb, BODY, sizeof(BODY) / sizeof(BODY[0]), BODY_Y);
+    polygon(fb, INNER, sizeof(INNER) / sizeof(INNER[0]), BODY_Y);
+    /* The edge of the body is thick: a second line inside, along the top and the bottom */
+    gfx_fill_rect(fb, 22, BODY_Y + 1, 165, 1, GFX_BLACK);
+    gfx_fill_rect(fb, 31, BODY_Y + 103, 160, 1, GFX_BLACK);
+    round_rect(fb, SCR_X - 3, SCR_Y - 3, 128 + 6, 64 + 6, 3);
     gfx_rect(fb, SCR_X - 1, SCR_Y - 1, 128 + 2, 64 + 2, GFX_BLACK);
-    const int cx = 170, cy = SCR_Y + 30;
-    arc(fb, cx, cy, 22, 15);
-    arc(fb, cx, cy, 21, 15);
-    arc(fb, cx, cy, 8, 15);
-    /* The arrows of the D-pad */
-    for (int i = 0; i < 4; ++i) {
-        gfx_fill_rect(fb, cx - i, cy - 17 + i, 2 * i + 1, 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx - i, cy + 17 - i, 2 * i + 1, 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx - 17 + i, cy - i, 1, 2 * i + 1, GFX_BLACK);
-        gfx_fill_rect(fb, cx + 17 - i, cy - i, 1, 2 * i + 1, GFX_BLACK);
+    gfx_text(fb, SCR_X + 64, BODY_Y + 86, &gfx_font_small, "F L I P P E R", GFX_BLACK, GFX_ALIGN_CENTER);
+    /* The D-pad: its ring, the OK button, the arrows */
+    const int cx = 176, cy = SCR_Y + 31;
+    arc(fb, cx, cy, 17, 15);
+    arc(fb, cx, cy, 5, 15);
+    for (int i = 0; i < 3; ++i) {
+        gfx_fill_rect(fb, cx - i, cy - 13 + i, 2 * i + 1, 1, GFX_BLACK);
+        gfx_fill_rect(fb, cx - i, cy + 13 - i, 2 * i + 1, 1, GFX_BLACK);
+        gfx_fill_rect(fb, cx - 13 + i, cy - i, 1, 2 * i + 1, GFX_BLACK);
+        gfx_fill_rect(fb, cx + 13 - i, cy - i, 1, 2 * i + 1, GFX_BLACK);
     }
+    /* The LED */
+    gfx_fill_rect(fb, 162, SCR_Y + 58, 2, 2, GFX_BLACK);
     /* The back button, with its arrow */
-    const int bx = 188, by = BODY_Y + BODY_H - 18;
+    const int bx = 188, by = SCR_Y + 57;
     arc(fb, bx, by, 6, 15);
     gfx_fill_rect(fb, bx - 2, by - 2, 5, 1, GFX_BLACK);
     gfx_fill_rect(fb, bx + 2, by - 2, 1, 4, GFX_BLACK);

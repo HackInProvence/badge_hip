@@ -87,7 +87,7 @@ int main(void) {
     app_flipper.start(host_time_us);
     render();
     dump("desktop");
-    CHECK(black(10, 88, 128, 64) > 50);  /* The dolphin on the screen of the Flipper */
+    CHECK(black(26, 80, 128, 64) > 50);  /* The dolphin on the screen of the Flipper */
     int animations = 0, bubbles = 0, empty_frames = 0, dumped = 0;
     for (int a = 0; a < 40; ++a) {
         bool bubble = false;
@@ -95,7 +95,7 @@ int main(void) {
             host_time_us += 500000;  /* 2 frames per second */
             app_flipper.task(host_time_us);
             render();
-            if (black(10, 88, 128, 64) < 20)
+            if (black(26, 80, 128, 64) < 20)
                 ++empty_frames;
             if (black(0, 0, GFX_WIDTH, 60)) {  /* No name: something above the Flipper is a bubble */
                 bubble = true;
@@ -132,14 +132,14 @@ int main(void) {
     app_flipper.start(host_time_us);
     render();
     dump("battery");
-    CHECK(black(10, 88, 128, 64) > 50);
+    CHECK(black(26, 80, 128, 64) > 50);
     app_flipper.stop();
     host_battery_low = false;
 
     /* The screensaver: the dolphin asleep */
     CHECK(flipper_saver_render(fb, scratch, sizeof(scratch)));
     dump("saver");
-    CHECK(black(10, 88, 128, 64) > 50);
+    CHECK(black(26, 80, 128, 64) > 50);
     CHECK(black(0, 0, GFX_WIDTH, 60) > 0);  /* "Zzz..." */
 
     /* A list in the style of the Flipper: black on white title, rounded selected row */
