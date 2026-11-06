@@ -2404,7 +2404,7 @@ static void validate(void) {
     case M_THEME:
         flipper_set_theme(! flipper_theme());
         if (flipper_theme())
-            set_status(N_("A au menu principal : le dauphin"));
+            set_status(N_("A au menu : le dauphin"));
         break;
     case M_ADMIN_OFF:
         set_admin(false);

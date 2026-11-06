@@ -2142,27 +2142,27 @@ msgstr "Y X: elegir  B: jugar"
 msgid "Duel"
 msgstr "Duelo"
 
-#: src/menu/flipper.c:557
+#: src/menu/flipper.c:569
 msgid "Pas d'animation :"
 msgstr "Sin animación:"
 
-#: src/menu/flipper.c:558
+#: src/menu/flipper.c:570
 msgid "Erreur de lecture"
 msgstr "Error de lectura"
 
-#: src/menu/flipper.c:560
+#: src/menu/flipper.c:572
 msgid "FLIPPER/ sur la carte SD"
 msgstr "FLIPPER/ en la SD"
 
-#: src/menu/flipper.c:565
+#: src/menu/flipper.c:575
 msgid "B : menu"
 msgstr "B: menú"
 
-#: src/menu/flipper.c:565
+#: src/menu/flipper.c:575
 msgid "Y X : animation  B : menu"
 msgstr "Y X: animación  B: menú"
 
-#: src/menu/flipper.c:573
+#: src/menu/flipper.c:583
 msgid "Flipper Zero"
 msgstr "Flipper Zero"
 
@@ -3674,8 +3674,8 @@ msgstr ""
 "3,3 V pin 1, GND 11."
 
 #: src/menu/main.c:2407
-msgid "A au menu principal : le dauphin"
-msgstr "A en el menú principal: el delfín"
+msgid "A au menu : le dauphin"
+msgstr "A en el menú: el delfín"
 
 #: src/menu/main.c:2419
 #: src/menu/pirate_radio.c:311
@@ -7110,6 +7110,9 @@ msgstr ".EPV no válido"
 #: src/video/video.c:111
 msgid "Format de vidéo non supporté"
 msgstr "Formato de vídeo no admitido"
+
+#~ msgid "A au menu principal : le dauphin"
+#~ msgstr "A en el menú principal: el delfín"
 
 #~ msgid "Accueil et café"
 #~ msgstr "Recepción y café"

@@ -504,8 +504,10 @@ static bool flipper_buttons(const app_buttons_t *b, absolute_time_t now) {
     if (b->pressed & UI_BTN_B)
         return false;  /* The menu (A does nothing, as Back on the desktop of the Flipper) */
     if (d.n_names && (b->pressed & (UI_BTN_X | UI_BTN_Y))) {
-        int delta = b->pressed & UI_BTN_X ? 1 : -1;
-        play((d.cur + delta + d.n_names) % d.n_names, now);
+        int delta = b->pressed & UI_BTN_X ? 1 : -1, i = (d.cur + delta + d.n_names) % d.n_names;
+        if (i == find_name(BATTERY_ANIM) && d.n_names > 1)
+            i = (i + delta + d.n_names) % d.n_names;  /* The empty battery: only when the battery is low */
+        play(i, now);
     }
     return true;
 }
