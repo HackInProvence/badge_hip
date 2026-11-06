@@ -96,6 +96,9 @@ class Card:
     def close(self):
         self.ser.close()
 
+    def _write(self, data):
+        self.ser.write(data)
+
     def _line(self, deadline):
         while b'\n' not in self.buf:
             if time.time() > deadline:
@@ -106,7 +109,7 @@ class Card:
 
     def command(self, text, timeout=10.0):
         """Sends a command, returns the lines "@SD E ..." and the final "@SD OK ..." (without "@SD ")."""
-        self.ser.write(b'\x05' + text.encode('utf-8') + b'\n')
+        self._write(b'\x05' + text.encode('utf-8') + b'\n')
         entries = []
         deadline = time.time() + timeout
         while True:
@@ -243,6 +246,31 @@ class Card:
             os.utime(dst, (t, t))
 
 
+class LinkCard(Card):
+    """The card through the connection of a badge_remote.Badge (badge_studio.py: the screen and the files at the
+    same time on one serial port): the Badge thread reads the port, its "@SD" lines come in its queue sd_lines."""
+
+    def __init__(self, badge, verbose=False):
+        self.badge = badge
+        self.verbose = verbose
+        while not badge.sd_lines.empty():  # Answers of an older command (one stopped by a lost connection)
+            badge.sd_lines.get_nowait()
+        self.command(f'T {to_card_time(time.time())}')
+
+    def close(self):
+        pass  # The connection is the one of the badge
+
+    def _write(self, data):
+        if not self.badge.write_raw(data):
+            raise SdError('badge not connected')
+
+    def _line(self, deadline):
+        try:
+            return self.badge.sd_lines.get(timeout=max(0.01, deadline - time.time()))
+        except queue.Empty:
+            raise SdError('no answer from the badge (is the menu firmware running?)') from None
+
+
 def human(n):
     for unit in ('B', 'KB', 'MB', 'GB'):
         if n < 1024 or unit == 'GB':
@@ -365,13 +393,36 @@ def shell(card):
 
 def gui(port_arg):
     import tkinter as tk
-    from tkinter import filedialog, messagebox, simpledialog, ttk
 
     root = tk.Tk()
     root.title('Carte SD du badge')
     root.geometry('1000x620')
     root.minsize(700, 400)
+    frame = tk.Frame(root)
+    frame.pack(fill='both', expand=True)
+    panel = files_panel(frame, port_arg)
 
+    def on_close():
+        panel.close()
+        root.destroy()
+    root.protocol('WM_DELETE_WINDOW', on_close)
+    root.mainloop()
+
+
+class FilesPanel:
+    """What badge_studio.py does with the panel: connect(), disconnect() when its badge changes, close()."""
+
+    def __init__(self, connect, disconnect, close, connected):
+        self.connect, self.disconnect, self.close, self.connected = connect, disconnect, close, connected
+
+
+def files_panel(root, port_arg=None, link=None):
+    """The file manager in the frame root. Without link: its own serial port (the list of the badges and Connecter);
+    with link (a badge_remote.Badge, already connected): the card through it (LinkCard), connect() when asked."""
+    import tkinter as tk
+    from tkinter import filedialog, messagebox, simpledialog, ttk
+
+    top = root.winfo_toplevel()
     jobs = queue.Queue()  # Work for the thread of the card: functions taking the card
     events = queue.Queue()  # Its results for the window: functions to call
     state = {'card': None, 'busy': False, 'pc': os.path.expanduser('~'), 'sd': ''}
@@ -391,12 +442,12 @@ def gui(port_arg):
             return
         state['busy'] = True
         status.set(text)
-        root.config(cursor='watch')
+        top.config(cursor='watch')
         jobs.put(job)
 
     def done():
         state['busy'] = False
-        root.config(cursor='')
+        top.config(cursor='')
 
     def poll():
         while not events.empty():
@@ -411,12 +462,13 @@ def gui(port_arg):
         events.put(lambda: status.set(text))
 
     # --- The bar of the badge
-    top = ttk.Frame(root, padding=6)
-    top.pack(fill='x')
-    ttk.Label(top, text='Badge :').pack(side='left')
+    bar_top = ttk.Frame(root, padding=6)
+    bar_top.pack(fill='x')
     port_var = tk.StringVar()
-    ports = ttk.Combobox(top, textvariable=port_var, width=32, state='readonly')
-    ports.pack(side='left', padx=4)
+    if not link:
+        ttk.Label(bar_top, text='Badge :').pack(side='left')
+        ports = ttk.Combobox(bar_top, textvariable=port_var, width=32, state='readonly')
+        ports.pack(side='left', padx=4)
     free_var = tk.StringVar()
 
     def refresh_ports():
@@ -427,16 +479,19 @@ def gui(port_arg):
             port_var.set(wanted[0] if wanted else found[0][1])
 
     def connect():
-        label = port_var.get()
-        if not label:
-            return
-        port = label.split()[0]
+        if link:
+            port = link.port_name or 'badge'
+        else:
+            label = port_var.get()
+            if not label:
+                return
+            port = label.split()[0]
 
         def job():
             if state['card']:
                 state['card'].close()
                 state['card'] = None
-            card = Card(port)
+            card = LinkCard(link) if link else Card(port)
             state['card'] = card
             free, total = card.df()
             entries = card.ls(state['sd'])
@@ -444,9 +499,10 @@ def gui(port_arg):
                                 show_sd(entries), status.set(f'Connecté à {port}, heure du PC envoyée')))
         run(job, f'Connexion à {port}...')
 
-    ttk.Button(top, text='Rechercher', command=refresh_ports).pack(side='left')
-    ttk.Button(top, text='Connecter', command=connect).pack(side='left', padx=4)
-    ttk.Label(top, textvariable=free_var).pack(side='right')
+    if not link:
+        ttk.Button(bar_top, text='Rechercher', command=refresh_ports).pack(side='left')
+        ttk.Button(bar_top, text='Connecter', command=connect).pack(side='left', padx=4)
+    ttk.Label(bar_top, textvariable=free_var).pack(side='right')
 
     # --- The two lists
     panes = ttk.PanedWindow(root, orient='horizontal')
@@ -574,7 +630,7 @@ def gui(port_arg):
     def new_folder():
         if not state['card']:
             return
-        name = simpledialog.askstring('Nouveau dossier', 'Nom du dossier :', parent=root)
+        name = simpledialog.askstring('Nouveau dossier', 'Nom du dossier :', parent=top)
         if name:
             path = posixpath.join(state['sd'], name)
             run(lambda: (state['card'].mkdir(path), reload_sd_now()), 'Création...')
@@ -587,7 +643,7 @@ def gui(port_arg):
         names = selected(sd_tree)
         if len(names) != 1 or not state['card']:
             return
-        new = simpledialog.askstring('Renommer', 'Nouveau nom :', initialvalue=names[0], parent=root)
+        new = simpledialog.askstring('Renommer', 'Nouveau nom :', initialvalue=names[0], parent=top)
         if new and new != names[0]:
             old, path = posixpath.join(state['sd'], names[0]), posixpath.join(state['sd'], new)
             run(lambda: (state['card'].mv(old, path), reload_sd_now()), 'Renommage...')
@@ -609,7 +665,7 @@ def gui(port_arg):
         run(job, 'Suppression...')
 
     def choose_pc_folder():
-        path = filedialog.askdirectory(initialdir=state['pc'], parent=root)
+        path = filedialog.askdirectory(initialdir=state['pc'], parent=top)
         if path:
             state['pc'] = os.path.normpath(path)
             show_pc()
@@ -628,21 +684,33 @@ def gui(port_arg):
     bottom.pack(fill='x')
     bar = ttk.Progressbar(bottom, length=200)
     bar.pack(side='right')
-    status = tk.StringVar(value='Choisir le badge, puis Connecter (fermer badge_remote.py avant)')
+    status = tk.StringVar(value='Connexion au badge...' if link else
+                          'Choisir le badge, puis Connecter (fermer badge_remote.py avant)')
     ttk.Label(bottom, textvariable=status, anchor='w').pack(side='left', fill='x', expand=True)
 
-    def on_close():
+    def close():
         if state['card']:
             state['card'].close()
-        root.destroy()
-    root.protocol('WM_DELETE_WINDOW', on_close)
 
-    refresh_ports()
+    def disconnect(text):
+        """badge_studio.py: another badge chosen, or not by the USB: no card until connect()"""
+        def job():
+            close()
+            state['card'] = None
+        jobs.put(job)
+        state['sd'] = ''
+        fill(sd_tree, [], False)
+        sd_path.set('')
+        free_var.set('')
+        status.set(text)
+
     show_pc()
     poll()
-    if port_var.get():
-        root.after(200, connect)
-    root.mainloop()
+    if not link:
+        refresh_ports()
+        if port_var.get():
+            root.after(200, connect)
+    return FilesPanel(connect, disconnect, close, lambda: state['card'] is not None)
 
 
 def main():

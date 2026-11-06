@@ -131,6 +131,12 @@ def test_remote_help(work):
         (f', not in main.c: {extra}' if extra else '')
 
 
+def test_studio(work):
+    # tools/badge_studio.py without a badge: the screen by the Wi-Fi, a fake module, the SD card on a shared connection
+    r = run([sys.executable, os.path.join(HERE, 'test_studio.py')])
+    return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+
 def test_camlink(work):
     # The link with the camera module (shared/camlink): packets, COBS, CRC, errors; the pictures for the e-Paper
     return c_test('test_camlink', ['shared/camlink/camlink.c', 'shared/camlink/campix.c'],
@@ -376,7 +382,7 @@ def test_audio2wav(work):
     return ok, f'{params[0]} channel, {params[1] * 8} bits, {params[2]} Hz, {n} samples, amplitude {max(frames) - min(frames)}'
 
 
-TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('fsk', test_fsk), ('camlink', test_camlink), ('file_ops', test_file_ops), ('flipper', test_flipper), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
+TESTS = [('gfx', test_gfx), ('ir', test_ir), ('games', test_games), ('puzzles', test_puzzles), ('score', test_score), ('crypto', test_crypto), ('ookdec', test_ookdec), ('vcard', test_vcard), ('werewolf', test_werewolf), ('rsvp', test_rsvp), ('gamebook', test_gamebook), ('rtttl', test_rtttl), ('i18n', test_i18n), ('remote_help', test_remote_help), ('studio', test_studio), ('fsk', test_fsk), ('camlink', test_camlink), ('file_ops', test_file_ops), ('flipper', test_flipper), ('screen', test_screen), ('party_games', test_party_games), ('smuggler', test_smuggler),
          ('image2epi', test_image2epi), ('video2epaper', test_video2epaper), ('audio2wav', test_audio2wav)]
 
 

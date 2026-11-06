@@ -29,6 +29,10 @@ Depuis 1.2.0 :
   d'accueil les animations de son dauphin (selon le grade du badge, avec leurs bulles) ; la
   veille montre le dauphin endormi. Les animations sont sur la carte SD (`FLIPPER/`, © Flipper Devices Inc., GPL v3),
   converties par `tools/flipper_anims.py`.
+- **`tools/badge_studio.py`** : la télécommande et le gestionnaire de fichiers de la carte SD dans une seule fenêtre,
+  comme qFlipper (onglets Écran et Fichiers, sur une seule connexion USB) ; le badge par l'USB ou par le Wi-Fi de son
+  module ESP32-CAM (son point d'accès, les modules trouvés sur le réseau). `badge_remote.py` et `sd_files.py`
+  marchent toujours seuls.
 
 **Améliorations**
 - La liaison avec le module est un service partagé (appareil photo, télécommande) ; protocole 2 (le badge reste
@@ -37,7 +41,8 @@ Depuis 1.2.0 :
 **À vérifier avant de publier** : tout sur le matériel (module flashé une fois avec l'ESP Flasher : nouvelle table
 des partitions) : la télécommande en point d'accès et en réseau, la page admin avec deux modules, la mise à jour
 depuis la carte SD, l'appareil photo après le passage au service partagé ; le thème Flipper (la rémanence de
-l'écran pendant les animations, la veille).
+l'écran pendant les animations, la veille) ; `badge_studio.py` avec un badge (les copies pendant que l'écran
+change, le Wi-Fi d'un vrai module).
 
 
 ## 1.2.0 — en préparation (pas encore de tag)

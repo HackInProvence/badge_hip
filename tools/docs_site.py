@@ -55,7 +55,7 @@ PUBLISHED = ('docs/screens/', 'docs/images/', 'docs/color_reveal/', 'docs/sd/', 
 NOT_PUBLISHED = ('docs/analyses/', 'hardware/kicad/')
 # The scripts useful to a user of the badge (not the ones of the development: tests, files of the firmware...), and
 # the modules they need; published at their path, and together (flat) in outils.zip
-USER_TOOLS = ('tools/badge_remote.py', 'tools/sd_files.py', 'tools/contacts_export.py', 'src/images/image2epi.py',
+USER_TOOLS = ('tools/badge_studio.py', 'tools/badge_remote.py', 'tools/sd_files.py', 'tools/contacts_export.py', 'src/images/image2epi.py',
               'src/video/video2epaper.py', 'src/audio/audio2wav.py', 'tools/rtttl_sort.py', 'tools/gamebook_check.py')
 USER_TOOL_MODULES = ('tools/rtttl_lib.py',)
 IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp')

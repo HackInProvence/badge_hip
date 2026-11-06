@@ -330,6 +330,21 @@ Exit code 1 on errors. Writing a book: [gamebooks.md](gamebooks.md).
 
 ### 2.3 During the event
 
+#### `tools/badge_studio.py` — the whole badge in one window
+
+`badge_remote.py` and `sd_files.py` together, like qFlipper: the "Badge" list (USB, or the Wi-Fi of the ESP32-CAM
+module: its access point, the modules found on the network by UDP, an address typed), the **Écran** tab (the remote
+control below) and the **Fichiers (carte SD)** tab (§ 6.5), on one serial connection: the screen and the copies at
+the same time. Through the Wi-Fi: the screen, the buttons and the text only. Needs: pyserial, Tkinter. How to use
+it: [user guide § 6](user_guide.md#6-controlling-the-badge-from-a-computer).
+
+| Option | Purpose |
+|---|---|
+| `--port`, `-p` | serial port (default: the first badge plugged in) |
+| `--wifi`, `-w` `address` | the module through the Wi-Fi (`192.168.4.1`: its access point; `cigale-<name>.local`) |
+| `--pin` | on a network: the PIN shown by the badge (Télécommande > Se connecter) |
+| `--zoom`, `-z` | zoom of the screen |
+
 #### `tools/badge_remote.py` — the screen of the badge on the PC
 
 Shows the screen of the badge in big, updated each time it draws, and drives it with the keyboard or the mouse; log
@@ -910,7 +925,8 @@ at the top and "Suivants >" (next) at the bottom of the page.
 
 ### 6.5 Copying files through the USB
 
-Without taking the card out: `tools/sd_files.py`, badge on and plugged in USB (close `badge_remote.py` first).
+Without taking the card out: `tools/sd_files.py`, badge on and plugged in USB (close `badge_remote.py` first), or
+the Fichiers tab of `tools/badge_studio.py` (with the screen at the same time).
 Without argument, a **window**: the files of the PC on the left, the ones of the card on the right (double click:
 open a folder), and the buttons Send to the card, Fetch to the PC, New folder, Rename, Delete (several files or
 folders at once). The same operations from the command line:

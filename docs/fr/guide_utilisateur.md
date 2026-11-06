@@ -753,13 +753,29 @@ pas pendant la démo ; **n'importe quel bouton l'arrête** (« Mode démo arrêt
 
 ## 6. Piloter le badge depuis un ordinateur
 
-Branché en USB, le badge apparaît comme un port série. L'application `tools/badge_remote.py` affiche l'écran du badge
-en grand sur l'ordinateur et le pilote au clavier (flèches = boutons, Maj + flèche = appui long).
+Branché en USB, le badge apparaît comme un port série. **`tools/badge_studio.py`** réunit tout dans une fenêtre,
+comme qFlipper pour le Flipper Zero :
+
+- **Badge :** en haut, le badge à piloter : ceux branchés en **USB**, ou par le **Wi-Fi** de son module ESP32-CAM
+  (Badge > Télécommande sur le badge) : le point d'accès du module (192.168.4.1), ou les modules trouvés sur le
+  réseau (sur un réseau : l'adresse et le code PIN affiché par le badge, puis Connecter) ;
+- l'onglet **Écran** : la télécommande décrite ci-dessous ;
+- l'onglet **Fichiers (carte SD)** : les fichiers du PC et de la carte, comme `tools/sd_files.py`
+  ([§ 7](#7-préparer-la-carte-sd)), en même temps que l'écran. Par l'USB seulement : le module ne transporte pas
+  les fichiers.
+
+Par le Wi-Fi : l'écran, les boutons et le texte (sans accents) ; le journal, le diagnostic, le mode admin et le
+débit radio demandent l'USB.
 
 ```bash
 pip install pyserial
-python tools/badge_remote.py
+python tools/badge_studio.py
+python tools/badge_studio.py --wifi 192.168.4.1
 ```
+
+Les deux outils marchent aussi seuls : `tools/badge_remote.py` (l'écran, par l'USB) et `tools/sd_files.py` (les
+fichiers). L'écran du badge s'affiche en grand et se pilote au clavier (flèches = boutons, Maj + flèche = appui
+long).
 
 - Les boutons de la fenêtre simulent ceux du badge ; sous chacun, « appui long ».
 - **Badge :** la liste des badges branchés, pour choisir celui à piloter quand il y en a plusieurs.

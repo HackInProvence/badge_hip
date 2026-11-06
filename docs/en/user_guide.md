@@ -761,14 +761,29 @@ start during the demo; **any button stops it** ("Demo mode off"), and the LEDs g
 
 ## 6. Controlling the badge from a computer
 
-When plugged into USB, the badge shows up as a serial port. The `tools/badge_remote.py` application displays the badge's
-screen in large on the computer and lets you control it from the keyboard (arrow keys = buttons,
-Shift + arrow = long press).
+When plugged into USB, the badge shows up as a serial port. **`tools/badge_studio.py`** puts everything in one
+window, like qFlipper for the Flipper Zero:
+
+- **Badge:** at the top, the badge to drive: the ones plugged in **USB**, or through the **Wi-Fi** of its ESP32-CAM
+  module (Badge > Télécommande on the badge): the access point of the module (192.168.4.1), or the modules found on
+  the network (on a network: the address and the PIN shown by the badge, then Connecter);
+- the **Écran** (screen) tab: the remote control described below;
+- the **Fichiers (carte SD)** (files) tab: the files of the PC and of the card, as `tools/sd_files.py`
+  ([§ 7](#7-preparing-the-sd-card)), at the same time as the screen. Through the USB only: the module does not carry
+  files.
+
+Through the Wi-Fi: the screen, the buttons and the text (no accents); the log, the diagnostic, the admin mode and the
+bit rate of the radio need the USB.
 
 ```bash
 pip install pyserial
-python tools/badge_remote.py
+python tools/badge_studio.py
+python tools/badge_studio.py --wifi 192.168.4.1
 ```
+
+Both tools also work alone: `tools/badge_remote.py` (the screen, through the USB) and `tools/sd_files.py` (the
+files). The screen of the badge is shown in large and driven from the keyboard (arrow keys = buttons,
+Shift + arrow = long press).
 
 - The buttons of the window simulate those of the badge; under each one, "appui long" (long press).
 - **Badge :** the list of the badges plugged in, to choose the one to control when there are several.

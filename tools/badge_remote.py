@@ -156,7 +156,10 @@ def decode_frame(line):
 
 
 class Badge(threading.Thread):
-    """Reads the serial port in the background: frames and log lines go to queues, reconnects when needed."""
+    """Reads the serial port in the background: frames, answers of the SD card ("@SD ...", for sd_files.LinkCard) and
+    log lines go to queues, reconnects when needed."""
+
+    usb = True  # Every command of the serial port (the Wi-Fi of badge_studio.py: only the buttons and the text)
 
     def __init__(self, port=None):
         super().__init__(daemon=True)
@@ -164,6 +167,7 @@ class Badge(threading.Thread):
         self.ser = None
         self.frames = queue.Queue()
         self.logs = queue.Queue()
+        self.sd_lines = queue.Queue()
         self.running = True
         self.lock = threading.Lock()
         self.error = ''  # Last connection problem, for the status line ('' when connected)
@@ -171,14 +175,20 @@ class Badge(threading.Thread):
 
     def send(self, keys):
         """Never raises: a lost port (unplugged badge, permission taken back...) is handled by the thread."""
+        self.write_raw(keys.encode('latin-1'))  # One byte per character (0x80+: accents of the editor)
+
+    def write_raw(self, data):
+        """Bytes to the badge in one piece (a command of the SD card is never cut by a button); False when lost."""
         with self.lock:
             ser = self.ser
             if not ser:
-                return
+                return False
             try:
-                ser.write(keys.encode('latin-1'))  # One byte per character (0x80+: accents of the editor)
+                ser.write(data)
+                return True
             except Exception as e:  # serial.SerialException, OSError, PermissionError...
                 self.error = f'envoi impossible : {e}'
+                return False
 
     def connected(self):
         return self.ser is not None
@@ -245,6 +255,8 @@ class Badge(threading.Thread):
             frame = decode_frame(line)
             if frame:
                 self.frames.put(frame)
+        elif line.startswith('@SD '):
+            self.sd_lines.put(line)
         else:
             self.logs.put(line)
 
@@ -304,11 +316,7 @@ def snapshot(port, path, timeout=5):
 
 # ------ Window ------
 
-def run_window(port, zoom, on_ready=None):
-    """on_ready(root, badge): called when the window is created (for the tests)."""
-    import tkinter as tk
-    from tkinter import ttk
-
+def dpi_aware():
     if sys.platform == 'win32':
         # Sharp pixels on scaled displays (otherwise Windows stretches the window and blurs the screen of the badge)
         try:
@@ -317,12 +325,44 @@ def run_window(port, zoom, on_ready=None):
         except (AttributeError, OSError):
             pass
 
+
+def run_window(port, zoom, on_ready=None):
+    """on_ready(root, badge): called when the window is created (for the tests)."""
+    import tkinter as tk
+
+    dpi_aware()
     badge = Badge(port)
     badge.start()
 
     root = tk.Tk()
     root.title('Badge SecSea - télécommande')
     root.configure(padx=10, pady=10)
+    panel = tk.Frame(root)
+    panel.pack(fill='both', expand=True)
+    remote_panel(panel, badge, zoom)
+    # An error in a callback of the window goes to the log instead of a traceback
+    root.report_callback_exception = lambda kind, value, tb: badge.logs.put(f'--- error: {value!r}')
+
+    def on_close():
+        try:
+            badge.stop()
+        finally:
+            root.destroy()
+    root.protocol('WM_DELETE_WINDOW', on_close)
+    root.focus_set()
+    if on_ready:
+        root.after(0, on_ready, root, badge)
+    root.mainloop()
+
+
+def remote_panel(root, badge, zoom=0, choose_port=True):
+    """The remote control in the frame root: the screen, the buttons, the tools, the log (and the list of the badges
+    plugged in when choose_port). badge: a Badge, or what behaves like it (badge_studio.py: USB or Wi-Fi; its
+    attribute usb False: only the buttons and the text, the commands of the serial port are disabled)."""
+    import tkinter as tk
+    from tkinter import ttk
+
+    top = root.winfo_toplevel()
     # The screen of the badge is the only row that grows or shrinks with the window: the buttons, the log and the list
     # of the badges stay visible; its zoom is a whole number (sharp pixels), the biggest that fits (--zoom: fixed)
     fixed_zoom = zoom
@@ -397,7 +437,9 @@ def run_window(port, zoom, on_ready=None):
     keyboard = tk.BooleanVar(value=False)
     ttk.Button(tools, text='Capture (F12)', command=screenshot).pack(side='left')
     ttk.Button(tools, text='Rafraîchir (F5)', command=lambda: badge.send('s')).pack(side='left', padx=4)
-    ttk.Button(tools, text='Diagnostic', command=lambda: badge.send('!')).pack(side='left')
+    serial_only = []  # The tools of the serial port: disabled through the Wi-Fi (badge.usb False)
+    serial_only.append(ttk.Button(tools, text='Diagnostic', command=lambda: badge.send('!')))
+    serial_only[-1].pack(side='left')
 
     def show_help(_event=None):
         win = tk.Toplevel(root)
@@ -418,13 +460,13 @@ def run_window(port, zoom, on_ready=None):
             if not item:
                 return
             key = table.item(item, 'values')[0]
-            if len(key) == 1:  # The commands with an argument (0x01, 0x02) are in the main window
+            if len(key) == 1 and badge.usb:  # The commands with an argument (0x01, 0x02) are in the main window
                 badge.send(key)
                 badge.logs.put(f'--- sent: {key}')
         table.bind('<Double-1>', send_selected)
         ttk.Button(win, text='Fermer', command=win.destroy).pack(pady=(6, 0))
     ttk.Button(tools, text='?', width=3, command=show_help).pack(side='left', padx=4)
-    root.bind('<F1>', show_help)
+    top.bind('<F1>', lambda e: show_help() if root.winfo_ismapped() else None, add='+')
     ttk.Checkbutton(tools, text='Journal', variable=log_visible,
                     command=lambda: log.grid() if log_visible.get() else log.grid_remove()).pack(side='right')
     ttk.Checkbutton(tools, text='Mode clavier (saisie de texte)', variable=keyboard,
@@ -436,7 +478,8 @@ def run_window(port, zoom, on_ready=None):
     def admin_clicked():
         badge.send('\x01' + ('A' if admin.get() else 'a'))
         root.focus_set()
-    ttk.Checkbutton(tools, text='Mode admin', variable=admin, command=admin_clicked).pack(side='right', padx=8)
+    serial_only.append(ttk.Checkbutton(tools, text='Mode admin', variable=admin, command=admin_clicked))
+    serial_only[-1].pack(side='right', padx=8)
     # The bit rate of the network (range tests): 0x04 + index; the list follows the badge ("net: rate", "!")
     rate = tk.StringVar(value='')
 
@@ -448,13 +491,15 @@ def run_window(port, zoom, on_ready=None):
     rate_box = ttk.Combobox(tools, textvariable=rate, values=RATES, state='readonly', width=11)
     rate_box.bind('<<ComboboxSelected>>', rate_chosen)
     rate_box.pack(side='right')
+    serial_only.append(rate_box)
     tk.Label(tools, text='Débit radio :').pack(side='right', padx=(8, 2))
     was_connected = [False]
     diag_port = [None]  # The port of the badge whose diagnostic was asked last
 
     # Several badges plugged in: choose the one to drive
     ports_bar = tk.Frame(root)
-    ports_bar.grid(row=5, column=0, columnspan=4, sticky='we', pady=(6, 0))
+    if choose_port:
+        ports_bar.grid(row=5, column=0, columnspan=4, sticky='we', pady=(6, 0))
     tk.Label(ports_bar, text='Badge :').pack(side='left')
     port_choice = tk.StringVar()
     port_box = ttk.Combobox(ports_bar, textvariable=port_choice, state='readonly', width=40)
@@ -475,7 +520,8 @@ def run_window(port, zoom, on_ready=None):
         except Exception as e:
             badge.logs.put(f'--- ports: {e}')
         finally:
-            root.after(2000, refresh_ports)
+            if choose_port:
+                root.after(2000, refresh_ports)
 
     def on_port(_event):
         device = port_labels.get(port_choice.get())
@@ -490,16 +536,16 @@ def run_window(port, zoom, on_ready=None):
     log.grid(row=4, column=0, columnspan=4, sticky='we', pady=(6, 0))
 
     # The first size: the biggest whole zoom with which the whole window fits on the screen (the task bar too)
-    root.update_idletasks()
+    top.update_idletasks()
     if not fixed_zoom:
-        others = root.winfo_reqheight() - canvas.winfo_reqheight()
+        others = top.winfo_reqheight() - canvas.winfo_reqheight()
         free_h = root.winfo_screenheight() - others - 120
         free_w = root.winfo_screenwidth() - 60
         zoom_now[0] = max(1, min(4, free_h // HEIGHT, free_w // WIDTH))
         zoomed[0] = image.zoom(zoom_now[0])
         canvas.itemconfigure(canvas_image, image=zoomed[0])
         canvas.configure(width=WIDTH * zoom_now[0], height=HEIGHT * zoom_now[0])
-    root.minsize(root.winfo_reqwidth() // 2, others + HEIGHT + 30 if not fixed_zoom else 0)
+    top.minsize(top.winfo_reqwidth() // 2, others + HEIGHT + 30 if not fixed_zoom else 0)
 
     # Keyboard
     keys = {'Up': ('y', 'Y'), 'Down': ('x', 'X'), 'Left': ('a', 'A'), 'Right': ('b', 'B'), 'Return': ('b', 'B'),
@@ -512,6 +558,11 @@ def run_window(port, zoom, on_ready=None):
     accents = 'éèêàâçôîùûëïÉÈÀÇ'
 
     def on_key(event):
+        # Only when this panel is shown, and not in a field of the window (badge_studio.py: its PIN, its address)
+        widget = event.widget if hasattr(event.widget, 'winfo_class') else None
+        if not root.winfo_ismapped() or widget and widget.winfo_class() in ('Entry', 'TEntry', 'TCombobox', 'Text',
+                                                                        'Spinbox', 'TSpinbox'):
+            return None
         if keyboard.get() and event.keysym not in ('Up', 'Down', 'Left', 'Right', 'F5', 'F12'):
             c = text_keys.get(event.keysym, event.char)
             if c and len(c) == 1 and c in accents:
@@ -526,7 +577,7 @@ def run_window(port, zoom, on_ready=None):
             badge.send('s')
         elif event.keysym == 'F12':
             screenshot()
-    root.bind('<Key>', on_key)
+    top.bind('<Key>', on_key, add='+')
 
     def poll():
         try:
@@ -543,6 +594,8 @@ def run_window(port, zoom, on_ready=None):
             rows = badge.frames.get_nowait()
         if rows:
             show(rows)
+        for w in serial_only:
+            w.state(['!disabled'] if badge.usb else ['disabled'])
         if badge.connected() and (not was_connected[0] or badge.port_name != diag_port[0]):
             # Connected, or another badge chosen in the list: its diagnostic ("!") updates the settings shown (admin
             # mode, bit rate of the radio...)
@@ -571,20 +624,9 @@ def run_window(port, zoom, on_ready=None):
         state = 'connecté' if badge.connected() else ('⚠ ' + badge.error if badge.error else 'recherche du badge...')
         status.set(state + f'   —   {fps:.1f} images/s   —   ' + help_)
 
-    # An error in a callback of the window goes to the log instead of a traceback
-    root.report_callback_exception = lambda kind, value, tb: badge.logs.put(f'--- error: {value!r}')
-
-    def on_close():
-        try:
-            badge.stop()
-        finally:
-            root.destroy()
-    root.protocol('WM_DELETE_WINDOW', on_close)
     root.focus_set()
     poll()
-    if on_ready:
-        root.after(0, on_ready, root, badge)
-    root.mainloop()
+    return screenshot
 
 
 if __name__ == '__main__':

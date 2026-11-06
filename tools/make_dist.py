@@ -9,7 +9,7 @@
       carte_sd/                 the example content of the SD card (docs/sd), to copy at its root, with
                                 ESP32/ESP32CAM.BIN: the firmware of the ESP32-CAM module (when built), that the badge
                                 installs (Badge > Télécommande > Mettre à jour le module)
-      outils/                   the PC tools of a user (badge_remote.py, sd_files.py, image2epi.py...), requirements.txt
+      outils/                   the PC tools of a user (badge_studio.py, badge_remote.py, sd_files.py, image2epi.py...), requirements.txt
       flipper/                  the commands of the badges for a Flipper Zero (tools/flipper)
       documentation/            the documentation in HTML (tools/docs_site.py: the guides, the features, the
                                 resources), open documentation/index.html
@@ -51,11 +51,11 @@ ESP_BIN = os.path.join(ROOT, 'esp32cam', '.pio', 'build', 'esp32cam', 'firmware.
 ESP_ON_SD = 'ESP32/ESP32CAM.BIN'  # src/menu/webremote.h WEBREMOTE_OTA_FILE
 # The Python packages of the user tools (docs_site.USER_TOOLS): serial port, images, videos
 REQUIREMENTS = '''# The Python packages of the tools of the badge: pip install -r requirements.txt
-pyserial          # badge_remote.py, sd_files.py, contacts_export.py (the USB serial port of the badge)
+pyserial          # badge_studio.py, badge_remote.py, sd_files.py, contacts_export.py (the USB serial port)
 Pillow            # image2epi.py, video2epaper.py
 numpy             # video2epaper.py
 # audio2wav.py and video2epaper.py also need ffmpeg in the PATH (https://ffmpeg.org)
-# badge_remote.py and sd_files.py use tkinter (included with Python on Windows and macOS; python3-tk on Linux)
+# badge_studio.py, badge_remote.py and sd_files.py use tkinter (included with Python on Windows and macOS; python3-tk on Linux)
 '''
 
 

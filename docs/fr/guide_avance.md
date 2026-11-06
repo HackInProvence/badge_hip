@@ -327,6 +327,21 @@ Code de sortie 1 en cas d'erreur. Écrire un livre : [livres_jeux.md](livres_jeu
 
 ### 2.3 Pendant l'événement
 
+#### `tools/badge_studio.py` — tout le badge dans une fenêtre
+
+`badge_remote.py` et `sd_files.py` réunis, comme qFlipper : la liste « Badge » (USB, ou le Wi-Fi du module ESP32-CAM :
+son point d'accès, les modules trouvés sur le réseau par UDP, une adresse tapée), l'onglet **Écran** (la
+télécommande ci-dessous) et l'onglet **Fichiers (carte SD)** (§ 6.5), sur une seule connexion série : l'écran et les
+copies en même temps. Par le Wi-Fi : l'écran, les boutons et le texte seulement. Prérequis : pyserial, Tkinter.
+Mode d'emploi : [guide utilisateur § 6](guide_utilisateur.md#6-piloter-le-badge-depuis-un-ordinateur).
+
+| Option | Rôle |
+|---|---|
+| `--port`, `-p` | port série (défaut : le premier badge branché) |
+| `--wifi`, `-w` `adresse` | le module par le Wi-Fi (`192.168.4.1` : son point d'accès ; `cigale-<nom>.local`) |
+| `--pin` | sur un réseau : le code PIN affiché par le badge (Télécommande > Se connecter) |
+| `--zoom`, `-z` | zoom de l'écran |
+
 #### `tools/badge_remote.py` — l'écran du badge sur le PC
 
 Affiche l'écran du badge en grand, mis à jour à chaque dessin, et le pilote au clavier ou à la souris ; journal du
@@ -913,7 +928,8 @@ par ordre alphabétique), avec « < Précédents » en haut et « Suivants > » 
 
 ### 6.5 Copier des fichiers par l'USB
 
-Sans sortir la carte : `tools/sd_files.py`, badge allumé et branché en USB (fermer `badge_remote.py` avant).
+Sans sortir la carte : `tools/sd_files.py`, badge allumé et branché en USB (fermer `badge_remote.py` avant), ou
+l'onglet Fichiers de `tools/badge_studio.py` (avec l'écran en même temps).
 Sans argument, une **fenêtre** : les fichiers du PC à gauche, ceux de la carte à droite (double-clic : ouvrir un
 dossier), et les boutons Envoyer sur la carte, Récupérer sur le PC, Nouveau dossier, Renommer, Supprimer
 (plusieurs fichiers ou dossiers à la fois). Les mêmes opérations en ligne de commande :
