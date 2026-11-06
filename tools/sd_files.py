@@ -409,6 +409,18 @@ def gui(port_arg):
     root.mainloop()
 
 
+def explain(error):
+    """The error of the card for the window: the common ones in words"""
+    text = str(error)
+    if text.endswith(': 3 not ready') or text.endswith(': 1 disk error'):
+        return 'pas de carte SD dans le badge, ou elle est illisible (la remettre, puis Actualiser)'
+    if 'no answer from the badge' in text:
+        return 'le badge ne répond pas (est-il allumé, sur le firmware du menu ?)'
+    if 'badge not connected' in text:
+        return 'badge déconnecté'
+    return text
+
+
 class FilesPanel:
     """What badge_studio.py does with the panel: connect(), disconnect() when its badge changes, close()."""
 
@@ -433,7 +445,8 @@ def files_panel(root, port_arg=None, link=None):
             try:
                 job()
             except (SdError, OSError, serial.SerialException) as e:
-                events.put(lambda e=e: (status.set(f'Erreur : {e}'), messagebox.showerror('Carte SD', str(e))))
+                text = explain(e)
+                events.put(lambda text=text: (status.set(f'Erreur : {text}'), messagebox.showerror('Carte SD', text)))
             events.put(lambda: done())
     threading.Thread(target=worker, daemon=True).start()
 
@@ -570,6 +583,8 @@ def files_panel(root, port_arg=None, link=None):
                                 free_var.set(f'{human(free * 1024)} libres sur {human(total * 1024)}')))
         if state['card']:
             run(job, 'Lecture de la carte...')
+        else:
+            connect()  # Actualiser after a failed connection
 
     def pc_open(_event=None):
         sel = pc_tree.focus()
