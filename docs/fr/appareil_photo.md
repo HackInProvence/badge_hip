@@ -10,8 +10,48 @@ vont sur la carte SD du badge.
 - **La liaison** : [src/shared/camlink/](../../src/shared/camlink) (commune aux deux firmwares, testée sur le PC).
 - **La page du badge** : [src/menu/camera.c](../../src/menu/camera.c).
 
+Sommaire : [1. Comment ça marche](#1-comment-ça-marche) · [2. Le matériel](#2-le-matériel) (programmer le module,
+[le brancher sur la cigale](#brancher-lesp32-cam-sur-la-cigale-ports-sao-de-la-carte-v12)) ·
+[3. Sur le badge](#3-sur-le-badge--badge--appareil-photo) · [4. La télécommande web](#4-la-télécommande-web--badge--télécommande) ·
+[5. La liaison](#5-la-liaison-srcsharedcamlink) · [6. Côté ESP32](#6-côté-esp32-esp32cam) · [7. Essais](#7-essais) ·
+[8. Dépannage](#8-dépannage) · [9. À compléter](#9-à-compléter)
 
-## 1. Le matériel
+
+## 1. Comment ça marche
+
+Le badge ne sait pas lire une caméra : c'est l'ESP32 du module qui fait tout le travail d'image. Le badge lui donne
+les ordres, affiche ce qu'il reçoit et l'écrit sur sa carte SD. Les deux parlent par une **liaison série** (2 fils,
+921 600 bauds) :
+
+```
+  ┌──────────────────── ESP32-CAM ────────────────────┐                ┌──────────────── badge (RP2040) ───────────────┐
+  │ caméra OV2640 ──JPEG──► ESP32 (240 MHz, 4 Mo PSRAM)│   liaison      │ camport.c (le service de la liaison)          │
+  │                         · décode, réduit à 200×200 │   série        │   ├─ camera.c : la page Appareil photo        │
+  │ LED de flash (IO4) ◄──  · trame en 1 bit / 4 gris  │ ◄────────────► │   │   ├─► écran e-Paper (le viseur)           │
+  │                         · garde le JPEG de la photo│  U0T → RX      │   │   └─► carte SD : PHOTOS, IMAGES, VIDEOS   │
+  │ Wi-Fi ◄──► téléphone    · serveur web (télécommande│  U0R ← TX      │   └─ webremote.c : la Télécommande           │
+  └────────────────────────────────────────────────────┘ + 3,3 V, masse └───────────────────────────────────────────────┘
+```
+
+- **La recherche** : à l'ouverture de la page, le badge essaie chaque liaison possible de ses ports d'extension, une
+  par seconde, en envoyant un bonjour (HELLO) ; le module répond avec son nom et sa version, le badge garde cette
+  liaison. Rien à configurer : le module peut être branché sur l'un ou l'autre port (§ 2).
+- **Le viseur** : le badge demande le viseur (PREVIEW) ; le module prend des images JPEG 320 × 240, les décode, garde
+  le carré central réduit à 200 × 200, étire le contraste et les trame en noir et blanc (5 000 octets), envoyés en 5
+  paquets. Le badge affiche chaque image en rafraîchissement rapide de l'e-Paper : **2 à 3 images par seconde**.
+- **La photo** (B) : le module passe à la taille des réglages, allume le flash si demandé, jette 3 images (le temps
+  que l'exposition s'adapte), envoie le **JPEG** (le badge l'écrit dans `PHOTOS/`), puis une version 200 × 200 en
+  **4 gris** (`.epi`, dans `IMAGES/PHOTOS/`) pour la voir sur le badge. Environ **2 s** du bouton à l'enregistrement.
+- **La vidéo** (B long) : le module envoie une image tramée par période (Bayer : stable d'une image à l'autre, moins de
+  rémanence) ; le badge les ajoute au fichier `.epv` (`VIDEOS/PHOTOS/`) en les affichant. **~3,5 images par
+  seconde**, sans son.
+- **Rien ne se perd** : chaque paquet de données attend l'accusé de réception de l'autre côté (renvoyé après 300 ms) ;
+  le badge peut être occupé par son écran ou sa carte SD pendant ce temps.
+- **La télécommande** (§ 4) passe par la même liaison : le badge envoie son écran au module, le module lui renvoie les
+  boutons appuyés sur la page web.
+
+
+## 2. Le matériel
 
 ### Les broches de l'ESP32-CAM
 
@@ -99,46 +139,71 @@ bloc et la broche de même nom de la rangée) avant de brancher. En cas de doute
 Le 3,3 V du flasheur (~400 mA) suffit pour programmer et essayer la caméra sur la table, **sans le flash** (la LED de
 flash tire trop).
 
-### Brancher l'ESP32-CAM sur la cigale (port d'extension SAO)
+### Brancher l'ESP32-CAM sur la cigale (ports SAO de la carte V1.2)
 
-Les ports d'extension de la cigale sont au format **SAO** (2 × 3 broches, avec un détrompeur) :
+La carte V1.2 a deux ports d'extension **SAO** (2 × 3 broches au pas de 2,54 mm), d'après son schéma
+([hardware/badge_v1.2.pdf](../../hardware/badge_v1.2.pdf)) :
+
+| Broche | SAO0 | SAO1 |
+|---|---|---|
+| 1 | **masse** | **masse** |
+| 2 | **+3,3 V** | **+3,3 V** |
+| 3 | I2C0 SCL (GPIO17) | I2C1 SCL (GPIO3) |
+| 4 | I2C0 SDA (GPIO16) | I2C1 SDA (GPIO2) |
+| 5 | GPIO19 | UART0 RX (GPIO13) : la réception du badge |
+| 6 | GPIO20 | UART0 TX (GPIO12) : l'émission du badge |
 
 ```
-   Port SAO (vu de face, le détrompeur en haut)
+   Port SAO (numéros du schéma)       la broche 1 est repérée sur la carte (pastille carrée ou marque)
    ┌─────────┬─────────┐
-   │ 1  3,3V │ 2   GND │
+   │ 1 masse │ 2 3,3 V │
    ├─────────┼─────────┤
-   │ 3   SDA │ 4   SCL │
+   │ 3   SCL │ 4   SDA │
    ├─────────┼─────────┤
-   │ 5 GPIO1 │ 6 GPIO2 │
+   │ 5       │ 6       │
    └─────────┴─────────┘
 ```
 
-Le badge n'a pas besoin de savoir où l'ESP32-CAM est branché : pendant la recherche, il essaie chaque liaison série
-possible des ports (une par seconde, affichée à l'écran) et garde celle qui répond :
+> **Attention à l'alimentation** : sur cette carte, la broche 1 est la **masse** et la broche 2 le **+3,3 V** (le
+> contraire du standard SAO habituel). Avant de brancher, vérifier au multimètre : continuité entre la broche 1 et
+> la masse du badge (le blindage de la prise USB-C, par exemple), 3,3 V entre les broches 2 et 1 badge allumé. Une
+> inversion détruit l'ESP32-CAM.
 
-| Liaison | Badge → ESP32-CAM U0R | ESP32-CAM U0T → badge | Sur le port |
-|---|---|---|---|
-| UART0 GPIO16/17 | GPIO16 (SDA de l'I2C0) | GPIO17 (SCL de l'I2C0) | broches 3 et 4 du port qui porte l'I2C0 |
-| UART1 GPIO20/21 | GPIO20 | GPIO21 | broches 5 et 6, si ce sont ces GPIO |
-| UART0 GPIO12/13 | GPIO12 | GPIO13 | l'ancien port 2 × 6 de la carte V1.1 |
+**Deux façons de brancher le module**, au choix ; le badge trouve tout seul celle qui est câblée (4 fils dans les deux
+cas) :
 
-Le câblage (4 fils) :
+| ESP32-CAM | Sur SAO1 (conseillé) | Sur SAO0 |
+|---|---|---|
+| **3V3** (surtout pas 5V : le badge n'a pas de 5 V) | broche 2 | broche 2 |
+| **GND** | broche 1 | broche 1 |
+| **U0R** (IO3, la réception du module) | broche 6 (UART0 TX, GPIO12) | broche 4 (SDA, GPIO16) |
+| **U0T** (IO1, l'émission du module) | broche 5 (UART0 RX, GPIO13) | broche 3 (SCL, GPIO17) |
+| Trace du badge | `on UART0 GPIO12/13` | `on UART0 GPIO16/17` |
 
-| Port SAO | ESP32-CAM |
-|---|---|
-| 1 (3,3 V) | **3V3** (pas 5V : le badge n'a pas de 5 V) |
-| 2 (GND) | GND |
-| 3 (SDA) ou 5 (GPIO1) : l'émission du badge | U0R (IO3) |
-| 4 (SCL) ou 6 (GPIO2) : la réception du badge | U0T (IO1) |
+```
+   SAO1 du badge                     ESP32-CAM
+   1 masse  ●────────────────────── GND
+   2 3,3 V  ●────────────────────── 3V3
+   5 RX     ●────────────────────── U0T (IO1)    l'émission de l'un sur la réception de l'autre
+   6 TX     ●────────────────────── U0R (IO3)
+   3, 4     (libres)                IO0 : non relié
+```
 
+- **SAO1** : ses broches 5 et 6 sont l'UART0 du RP2040, faites pour une liaison série ; SAO0 reste libre pour la carte
+  infrarouge (GPIO17, GPIO20). Les broches 3 et 4 de SAO1 (I2C1) servent à l'écran OLED : pas d'OLED en même temps
+  sur ce port.
+- **SAO0** : le badge détourne les broches de l'I2C0 en liaison série (GPIO16 en émission, GPIO17 en réception) ;
+  c'est le branchement essayé en premier. Pas de carte infrarouge sur ce port en même temps.
 - **IO0 non relié** (il a une résistance de tirage sur la carte) : l'ESP32 démarre son firmware.
-- **Le courant** : la caméra et la PSRAM tirent ~150-250 mA ; le régulateur 3,3 V du badge (TPS63000) donne ~1 A.
-  Le Wi-Fi n'est pas utilisé. La **LED de flash** tire beaucoup : réglage « Flash » à « non » par défaut.
-- La carte infrarouge et l'écran OLED ne doivent pas être branchés sur le même port.
+- **Le courant** : la caméra et la PSRAM tirent ~150-250 mA, le Wi-Fi de la télécommande des pointes de ~300 mA ; le
+  régulateur 3,3 V du badge (TPS63000) donne ~1 A. La **LED de flash** tire beaucoup : réglage « Flash » à « non » par
+  défaut.
 - Au démarrage, l'ESP32 écrit son texte de boot sur l'UART0 (115 200 bauds) : le badge l'ignore (trames COBS).
-- La trace du badge (port série USB) dit où le module a été trouvé : `camera: module esp32cam 0.1, protocol 1, on
-  UART0 GPIO16/17`.
+- La trace du badge (port série USB) dit où le module a été trouvé : `camera: module esp32cam 0.2, protocol 2, on
+  UART0 GPIO12/13`.
+- **Cartes V1.0 / V1.1** (connecteurs 2 × 6 J2, J3 : [electronique.md § 10](electronique.md#cartes-v10-v11--j2-j3)) :
+  U0R sur J2 broche 9 (UART0 TX, GPIO12), U0T sur J2 broche 7 (UART0 RX, GPIO13), 3V3 sur J2 broche 1, GND sur J2
+  broche 11.
 
 ### La netteté (mise au point)
 
@@ -156,7 +221,7 @@ Le viseur est petit (200 × 200, 1 bit) : vérifier sur une photo JPEG (dossier 
 de lumière, la pose est longue et la photo floue de bougé : éclairer, ou le réglage « Flash ».
 
 
-## 2. Sur le badge : Badge > Appareil photo
+## 3. Sur le badge : Badge > Appareil photo
 
 - **Recherche du module** : le badge envoie un bonjour chaque seconde ; le module répond (son nom et sa version).
 - **Le viseur** : l'image de la caméra en plein écran, rafraîchie dès qu'elle arrive (rafraîchissement rapide de
@@ -182,7 +247,7 @@ de lumière, la pose est longue et la photo floue de bougé : éclairer, ou le r
 - **A** : quitter (arrête la vidéo en cours).
 
 
-## 3. La télécommande web : Badge > Télécommande
+## 4. La télécommande web : Badge > Télécommande
 
 Le module ESP32-CAM sert une page web qui pilote le badge depuis un téléphone (ou un ordinateur) : l'**écran du
 badge** en direct (les 4 gris compris), ses **4 boutons Y A B X** (appui long : maintenir le bouton) et un **champ de
@@ -212,14 +277,14 @@ sur tous les modules (réglée dans « Wi-Fi du module »).
 fichier du paquet de distribution) sous le nom **`ESP32/ESP32CAM.BIN`** sur la carte, puis Badge > Télécommande >
 « Mettre à jour le module » > B. Le badge l'envoie par la liaison (~1 Mo, environ une minute), le module le vérifie
 puis redémarre dessus ; son nouveau nom de version s'affiche. Il faut que le module ait déjà un firmware avec la
-télécommande (protocole 2) : la première fois, le flasher avec l'ESP Flasher (§ 1).
+télécommande (protocole 2) : la première fois, le flasher avec l'ESP Flasher (§ 2).
 
 - **Le courant** : le Wi-Fi tire des pointes de ~300 mA ; la batterie du badge se vide plus vite, arrêter la
   télécommande quand elle ne sert pas.
 - Le badge n'envoie son écran que lorsqu'une page le regarde.
 
 
-## 4. La liaison (src/shared/camlink)
+## 5. La liaison (src/shared/camlink)
 
 - UART à **921 600 bauds**, 8N1.
 - Paquet : `[type][seq][longueur sur 2 octets][données][CRC-16]`, encodé en **COBS**, terminé par un octet 0.
@@ -252,7 +317,7 @@ Test sur le PC : `python src/tests/host/run_tests.py camlink` (aller-retour COBS
 boot, tramages).
 
 
-## 5. Côté ESP32 (esp32cam/)
+## 6. Côté ESP32 (esp32cam/)
 
 - La caméra en **JPEG 320 × 240** pour le viseur : décodée en gris, le carré central réduit à 200 × 200, contraste
   étiré, tramé en 1 bit (la trame choisie), envoyé.
@@ -269,9 +334,9 @@ boot, tramages).
 - Rien d'autre sur l'UART0 (`CORE_DEBUG_LEVEL=0`).
 
 
-## 6. Essais
+## 7. Essais
 
-1. Programmer l'ESP32-CAM (§ 1), le brancher sur un port SAO (4 fils).
+1. Programmer l'ESP32-CAM (§ 2), le brancher sur un port SAO (4 fils, § 2).
 2. Badge > Appareil photo : « Module trouvé », puis le viseur.
 3. Une photo (B) : le message « Photo IMG_0001 » ; Médias > Images > PHOTOS.
 4. Une vidéo (B long, quelques secondes, B long) : Médias > Vidéos > PHOTOS.
@@ -279,12 +344,25 @@ boot, tramages).
    `camera: photo 1 saved`, `camera: video saved, N frames`.
 
 
-## 7. À compléter
+## 8. Dépannage
 
-- Les GPIO réellement présents sur chaque port SAO de la carte V1.2 (le schéma de la V1.2 n'est pas dans le dépôt) :
-  la recherche automatique couvre les cas possibles ; à confirmer pour la documentation.
+| Ce qu'on voit | Pourquoi, et quoi faire |
+|---|---|
+| « Recherche du module » sans fin | Pas de réponse sur aucune liaison : U0R et U0T inversés (les croiser : l'émission de l'un sur la réception de l'autre), un fil sur la mauvaise broche, le module sans firmware (le programmer, § 2), IO0 relié à la masse (mode programmation). La trace du badge liste les liaisons essayées. |
+| Le module trouvé, puis perdu ; le module redémarre | Alimentation trop faible : fils longs ou fins, batterie basse, le flash. Brancher le badge en USB pour essayer, raccourcir les fils, « Flash : non ». |
+| « Caméra absente » | La nappe de la caméra mal enfoncée dans son connecteur (le volet noir doit être fermé), ou une caméra défectueuse. |
+| Image floue | Le film de protection sur l'objectif, ou la mise au point (§ 2, « La netteté »). |
+| Image très sombre ou très claire | Peu de lumière (pose longue) ; les réglages Luminosité, Contraste ; le flash. |
+| Viseur lent | Normal : 2 à 3 images par seconde, la limite du rafraîchissement rapide de l'e-Paper. |
+| Photo non enregistrée | Pas de carte SD, ou carte pleine ou protégée : Médias doit pouvoir la lire. |
+| La télécommande ne s'ouvre pas | Voir § 4 : le module doit avoir le firmware du protocole 2 (`esp32cam 0.2` dans la trace). |
+
+
+## 9. À compléter
+
 - Le courant pendant une photo avec le flash.
+- Le branchement sur SAO1 (UART0 GPIO12/13) n'a pas encore été essayé sur une carte V1.2.
 
-**Essayé sur une cigale V1.2 (2026-10-19)** : le module trouvé sur **UART0 GPIO16/17** (broches 3 et 4 du port
-SAO) ; le viseur ; une photo 800 × 600 en **2,1 s** du bouton à l'enregistrement (JPEG 17 Ko et son .epi) ; une vidéo
-de **~3,5 images par seconde** (32 images en 9 s).
+**Essayé sur une cigale V1.2 (2026-10-19)** : le module trouvé sur **UART0 GPIO16/17** (broches 3 et 4 de SAO0) ; le
+viseur ; une photo 800 × 600 en **2,1 s** du bouton à l'enregistrement (JPEG 17 Ko et son .epi) ; une vidéo de **~3,5
+images par seconde** (32 images en 9 s).

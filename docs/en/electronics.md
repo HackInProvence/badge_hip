@@ -162,7 +162,30 @@ From left to right on the board: **Y A B X**. SW1 (RESET) and SW6 (BOOTSEL) are 
 - **D1** (1N4148): flyback diode across the buzzer (absorbs the surge of the coil at each cut).
 
 
-## 10. The extension ports (J2, J3)
+## 10. The extension ports
+
+### V1.2 board: SAO0, SAO1
+
+Two **SAO** 2 × 3 headers at 2.54 mm pitch (HC-PM254-8.5H-2X3PS), from the schematic
+[hardware/badge_v1.2.pdf](../../hardware/badge_v1.2.pdf):
+
+| Pin | SAO0 | SAO1 |
+|---|---|---|
+| 1 | ground | ground |
+| 2 | +3.3 V | +3.3 V |
+| 3 | I2C0 SCL (GPIO17) | I2C1 SCL (GPIO3) |
+| 4 | I2C0 SDA (GPIO16) | I2C1 SDA (GPIO2) |
+| 5 | GPIO19 | UART0 RX (GPIO13) |
+| 6 | GPIO20 | UART0 TX (GPIO12) |
+
+- **Careful**: pin 1 is ground and pin 2 is +3.3 V, the opposite of the usual SAO standard; check with a multimeter
+  before plugging a module bought elsewhere.
+- **SAO0**: the infrared board (send GPIO17, receive GPIO20), or I2C0.
+- **SAO1**: I2C1 (the OLED screen, Badge > Écran OLED) and UART0 (the ESP32-CAM module:
+  [camera.md](camera.md#plugging-the-esp32-cam-on-the-cicada-sao-ports-of-the-v12-board)).
+- No SPI chip selects nor screen signals on the ports any more, unlike J2 / J3.
+
+### V1.0, V1.1 boards: J2, J3
 
 Two female 2 × 6 headers at 2.54 mm pitch.
 

@@ -103,6 +103,7 @@ Tout le détail (architecture, mécanismes, formats, protocole série, tests, no
 | Électronique | [L'électronique du badge](docs/fr/electronique.md) | [Electronics](docs/en/electronics.md) |
 | Tous les écrans | [Écrans](docs/fr/ecrans.md) | [Screens](docs/en/screens.md) |
 | Badge conférence | [Badge conférence](docs/fr/badge_conference.md) | [Conference badge](docs/en/conference_badge.md) |
+| Appareil photo, télécommande Wi-Fi (module ESP32-CAM) : fonctionnement, branchement | [Appareil photo](docs/fr/appareil_photo.md) | [Camera](docs/en/camera.md) |
 | Traduire | [Traduction](docs/fr/traduction.md) | [Translation](docs/en/translation.md) |
 
 Notes de conception : [réseau, extensions et CTF](docs/idees_reseau_extensions_ctf.md),

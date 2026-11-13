@@ -167,7 +167,30 @@ De gauche à droite sur la carte : **Y A B X**. SW1 (RESET) et SW6 (BOOTSEL) son
 - **D1** (1N4148) : diode de roue libre aux bornes du buzzer (absorbe la surtension de la bobine à chaque coupure).
 
 
-## 10. Les ports d'extension (J2, J3)
+## 10. Les ports d'extension
+
+### Carte V1.2 : SAO0, SAO1
+
+Deux connecteurs **SAO** 2 × 3 au pas de 2,54 mm (HC-PM254-8.5H-2X3PS), d'après le schéma
+[hardware/badge_v1.2.pdf](../../hardware/badge_v1.2.pdf) :
+
+| Broche | SAO0 | SAO1 |
+|---|---|---|
+| 1 | masse | masse |
+| 2 | +3,3 V | +3,3 V |
+| 3 | I2C0 SCL (GPIO17) | I2C1 SCL (GPIO3) |
+| 4 | I2C0 SDA (GPIO16) | I2C1 SDA (GPIO2) |
+| 5 | GPIO19 | UART0 RX (GPIO13) |
+| 6 | GPIO20 | UART0 TX (GPIO12) |
+
+- **Attention** : la broche 1 est la masse et la broche 2 le +3,3 V, le contraire du standard SAO habituel ; vérifier
+  au multimètre avant de brancher un module du commerce.
+- **SAO0** : la carte infrarouge (émission GPIO17, réception GPIO20), ou l'I2C0.
+- **SAO1** : l'I2C1 (l'écran OLED, Badge > Écran OLED) et l'UART0 (le module ESP32-CAM :
+  [appareil_photo.md](appareil_photo.md#brancher-lesp32-cam-sur-la-cigale-ports-sao-de-la-carte-v12)).
+- Plus de chip-selects SPI ni de signaux de l'écran sur les ports, contrairement à J2 / J3.
+
+### Cartes V1.0, V1.1 : J2, J3
 
 Deux connecteurs femelles 2 × 6 au pas de 2,54 mm.
 
