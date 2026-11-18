@@ -84,7 +84,8 @@ ou les réglages enregistrés deviennent incompatibles.
    jamais distribuer ce firmware).
 5. Commiter (`Version 1.2.3`), puis poser le tag : `git tag -a v_1.2.3 -m "Version 1.2.3"` et `git push --tags`.
 6. Publier `build/src/menu/badge_menu-1.2.3.uf2` dans une release GitHub du tag, et le site
-   (`python tools/docs_site.py`, qui affiche la version). Chaque compilation écrit ce fichier à côté de
+   (`python tools/docs_site.py`, qui affiche la version et ses nouveautés, et garde en secours le firmware des
+   versions précédentes dont le paquet est dans `build/dist`, ou ceux donnés par `--previous`). Chaque compilation écrit ce fichier à côté de
    `badge_menu.uf2`, nommé d'après [VERSION](../../VERSION) (règle de `src/menu/CMakeLists.txt`) : le compiler
    après le commit de la version, pour qu'il n'ait pas de « + ».
 7. Le paquet à publier avec la release : `python tools/make_dist.py` écrit `build/dist/badge_secsea-1.2.3/` et son
@@ -1280,7 +1281,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # co
 | `tools/gamebook_check.py` | vérifie un livre-jeu (erreurs, remarques), `--pages`, `--play` (y jouer dans le terminal), `--c` (écrit le livre intégré) (§ 6.28) |
 | `tools/test_party_games.py`, `tools/test_werewolf.py`, `tools/test_smuggler.py` | tests à deux badges (§ 9.3) |
 | `tools/sd_files.py` | gestionnaire de fichiers de la carte SD par l'USB, fenêtre (sans argument) ou `ls`, `tree`, `get`, `put` (dossiers compris), `rm [-r]`, `mkdir`, `mv`, `df`, `shell` ; protocole `0x05` de `sd_serial.c` (lecture ~85 Ko/s, écriture ~40 Ko/s) |
-| `tools/docs_site.py` | le site web du badge dans `build/docs_site/` (`--out`, `--repo`, `--uf2`) : page d'accueil, toute la documentation `.md` en HTML (guides, fonctions, notes de `docs/` ; jamais `docs/analyses`), et dans `ressources/` le firmware, la carte SD (`carte_sd.zip`), les outils utiles à un utilisateur (`outils.zip` : télécommande, fichiers de la carte SD, contacts, conversions des médias, sonneries, livres-jeux ; pas ceux du développement), les fichiers Flipper, le matériel (KiCad en `.zip`) ; il faut `pip install markdown` |
+| `tools/docs_site.py` | le site web du badge dans `build/docs_site/` (`--out`, `--repo`, `--uf2`, `--previous`) : page d'accueil avec les nouveautés de la version, toute la documentation `.md` en HTML (guides, fonctions, notes de `docs/` ; jamais `docs/analyses`), et dans `ressources/` le firmware, la carte SD (`carte_sd.zip`), les outils utiles à un utilisateur (`outils.zip` : télécommande, fichiers de la carte SD, contacts, conversions des médias, sonneries, livres-jeux ; pas ceux du développement), les fichiers Flipper, le matériel (KiCad en `.zip`) ; il faut `pip install markdown` |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | vidéo → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sons → WAV 8 bits 16 kHz (jokers, dossiers, `--no-filter`, `--start`, `--duration`) |

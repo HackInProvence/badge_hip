@@ -3,9 +3,11 @@
 Every .md of docs/fr, docs/en and docs/ (the design notes) is converted to HTML, with a menu of the pages, a link to
 the same page in the other language (the line "*English version: [...](../en/x.md).*" of each page), and the images
 they show. The resources go in the ressources/ sub-folder, with their own page in each language: the firmware
-(.uf2, when built), the content of the SD card (docs/sd, also as a .zip), the PC tools useful to a user
+(.uf2, when built, and the previous versions kept as a backup: --previous, by default the firmware of the
+packages of the older versions in build/dist), the content of the SD card (docs/sd, also as a .zip), the PC tools useful to a user
 (USER_TOOLS: remote control, SD files, contacts, media conversions...; not the ones of the development), the
-Flipper Zero files, the hardware (schematic, pictures, KiCad project as a .zip), the pictures. Links to other files of the
+Flipper Zero files, the hardware (schematic, pictures, KiCad project as a .zip), the pictures. The history of the versions
+(CHANGELOG.md) is a page, the news of the current version are on the home page. Links to other files of the
 repository (source code) point to the repository on the web. docs/analyses (local notes) is never published.
 
     python tools/docs_site.py                    (writes build/docs_site/)
@@ -23,6 +25,7 @@ package "markdown" (pip install markdown).
 
 import argparse
 import ast
+import glob
 import html
 import os
 import posixpath
@@ -38,6 +41,8 @@ except ImportError:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UF2 = 'build/src/menu/badge_menu.uf2'
+CHANGELOG = 'CHANGELOG.md'  # A page of the site (French), its news on the home page
+CHANGELOG_OUT = 'fr/historique.html'
 RES = 'ressources'
 VERSION = open(os.path.join(ROOT, 'VERSION'), encoding='utf-8').read().strip()  # Of the firmware
 LANGS = {
@@ -105,6 +110,7 @@ h2 { border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-top: 2em;
 .hero { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
 .hero img { width: 320px; max-width: 100%; border-radius: 12px; }
 .hero div { flex: 1; min-width: 260px; }
+.news { margin: 4px 0 0; padding-left: 20px; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 24px 0; }
 .cards a { display: block; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px;
            text-decoration: none; color: var(--fg); background: var(--side); }
@@ -217,6 +223,19 @@ def describe(rel, fr):
         lines = open(path, encoding='utf-8').read().split('\n')
         return (f'Livre-jeu « {lines[0].strip()} », par {lines[1].strip()}' if fr else
                 f'Gamebook "{lines[0].strip()}", by {lines[1].strip()}')
+    if rel.startswith('docs/sd/FLIPPER/'):
+        name = os.path.splitext(parts[-1])[0]
+        if name == 'COPYING':
+            return ('Licence GNU GPL v3 des animations du Flipper Zero' if fr else
+                    'GNU GPL v3 license of the Flipper Zero animations')
+        if name == 'SOURCE':
+            return ('Origine des animations (dépôt et commit du firmware du Flipper Zero)' if fr else
+                    'Origin of the animations (repository and commit of the Flipper Zero firmware)')
+        m = re.match(r'L(\d)_(.+)', name)
+        if m:
+            what = m.group(2).replace('_', ' ')
+            return (f'Animation du dauphin « {what} », niveau {m.group(1)} (thème Flipper Zero)' if fr else
+                    f'Dolphin animation "{what}", level {m.group(1)} (Flipper Zero theme)')
     for kind, label in (('raw', ('RAW Flipper', 'Flipper RAW')), ('player', ('RAW lecteurs simples', 'RAW simple players'))):
         prefix = f'tools/flipper/{kind}/SecSea_{kind}_'
         if rel.startswith(prefix) and rel[len(prefix):-4] in REMOTE:
@@ -280,10 +299,11 @@ def tool_summary(path):
 
 
 class Site:
-    def __init__(self, out, repo, uf2):
+    def __init__(self, out, repo, uf2, previous=()):
         self.out = out
         self.repo = repo.rstrip('/')
         self.uf2 = uf2
+        self.previous = list(previous)  # The firmware of older versions, kept as a backup
         self.pages = {}  # repo path of the .md -> {'out', 'lang', 'title', 'text', 'other'}
         self.files = set()  # repo paths copied under ressources/
 
@@ -299,6 +319,9 @@ class Site:
                 out = f'{lang}/{os.path.splitext(name)[0]}.html'
                 self.pages[rel] = {'out': out, 'lang': lang, 'title': page_title(text, name), 'text': text,
                                    'other': None}
+        text = open(os.path.join(ROOT, CHANGELOG), encoding='utf-8').read()
+        self.pages[CHANGELOG] = {'out': CHANGELOG_OUT, 'lang': 'fr', 'title': page_title(text, CHANGELOG),
+                                 'text': text, 'other': None}
         for rel, p in self.pages.items():
             m = OTHER_VERSION.search(p['text'])
             link = LINK.search(m.group(0)) if m else None
@@ -465,7 +488,21 @@ class Site:
                 'disque <code>RPI-RP2</code>.</p>',
                 '<p>Badge off, hold the BOOTSEL button while plugging the USB cable, then copy the file to the '
                 '<code>RPI-RP2</code> drive.</p>'))
-            body.append(table([self.uf2_out]))
+            body.append(table([self.uf2_out], lambda r: head(f'Version {VERSION}, la dernière', f'Version {VERSION}, the latest')))
+            body.append(head(f'<p>Les nouveautés de la version {VERSION} : <a href="{self.href(out, CHANGELOG_OUT)}">'
+                             f'historique des versions</a>.</p>',
+                             f'<p>What is new in version {VERSION}: <a href="{self.href(out, CHANGELOG_OUT)}">'
+                             f'history of the versions</a> (French).</p>'))
+            if self.previous_out:
+                body.append(f'<h3 id="backup">{head("Version précédente, en secours", "Previous version, as a backup")}'
+                            f'</h3>')
+                body.append(head('<p>En cas de problème avec la nouvelle version : se flashe de la même façon. Les '
+                                 'réglages et les données du badge sont gardés.</p>',
+                                 '<p>In case of a problem with the new version: flashed the same way. The settings '
+                                 'and the data of the badge are kept.</p>'))
+                body.append(table(self.previous_out, lambda r: head(
+                    'Version ' + re.sub(r'^badge_menu-|\.uf2$', '', posixpath.basename(r)) + ', en secours',
+                    'Version ' + re.sub(r'^badge_menu-|\.uf2$', '', posixpath.basename(r)) + ', as a backup')))
         else:
             body.append(head('<p>Pas encore publié : à compiler (guide développeur).</p>',
                              '<p>Not published yet: build it (developer guide).</p>'))
@@ -516,6 +553,27 @@ class Site:
 
     # ------ The home page
 
+    def news(self):
+        """The titles of the news of the current version (CHANGELOG.md, its section "**Nouveautés**")"""
+        text = self.pages[CHANGELOG]['text']
+        m = re.search(r'^## ' + re.escape(VERSION) + r'\b.*?$(.*?)(?=^## |\Z)', text, re.M | re.S)
+        if not m:
+            return []
+        part = m.group(1).split('**Nouveautés**', 1)[-1].split('\n\n', 1)[0]
+        return [t.replace('`', '') for t in re.findall(r'^- \*\*(.+?)\*\*', part, re.M)]
+
+    def version_box(self):
+        items = ''.join(f'<li>{html.escape(t)}</li>' for t in self.news())
+        files = []
+        if self.uf2_out:
+            files.append(f'<a href="{RES}/{self.uf2_out}">firmware {VERSION}</a>')
+        for rel in self.previous_out:
+            v = re.sub(r'^badge_menu-|\.uf2$', '', os.path.basename(rel))
+            files.append(f'<a href="{RES}/{rel}">{html.escape(v)} (secours / backup)</a>')
+        return (f'<p><b>Version {VERSION}</b> — <a href="{CHANGELOG_OUT}">nouveautés / what is new</a>'
+                + (' — ' + ' · '.join(files) if files else '') + '</p>'
+                + (f'<ul class="news">{items}</ul>' if items else ''))
+
     def index(self):
         def page(lang, entry):
             rel = f'docs/{lang}/{entry}'
@@ -528,6 +586,8 @@ class Site:
                     cards.append(f'<a href="{o}"><b>{info["name"]}</b><br>'
                                  f'{html.escape(self.pages[f"docs/{lang}/{e}"]["title"])}</a>')
             cards.append(f'<a href="{lang}/{info["res_page"]}"><b>{info["name"]}</b><br>{info["res"]}</a>')
+        cards.append(f'<a href="{CHANGELOG_OUT}"><b>Français</b><br>'
+                     f'{html.escape(self.pages[CHANGELOG]["title"])}</a>')
         notes = sorted((r for r, p in self.pages.items() if p['lang'] == NOTES),
                        key=lambda r: self.pages[r]['title'].lower())
         if notes:
@@ -552,7 +612,7 @@ class Site:
 {photo}
 <div>
 <h1>Badge SecSea — la cigale</h1>
-<p>Version {VERSION}</p>
+{self.version_box()}
 <p>Le badge électronique de <a href="https://secsea.org/">SecSea</a>, la conférence de hacking de
 Hack In Provence à La Ciotat. Un RP2040, un écran e-Paper 200 × 200, une radio CC1101 433 MHz, deux LEDs RGB, un
 buzzer, quatre boutons, une carte micro-SD et deux ports d'extension. Les cigales se rencontrent par radio, jouent
@@ -604,6 +664,14 @@ conference, and are a teaching tool for radio and infrared.</p>
             shutil.copyfile(self.uf2, os.path.join(res, self.uf2_out))
         else:
             print(f'warning: no firmware ({self.uf2}): build it first')
+        self.previous_out = []
+        for path in self.previous:
+            rel = f'firmware/{os.path.basename(path)}'
+            if rel == self.uf2_out:
+                continue
+            os.makedirs(os.path.join(res, 'firmware'), exist_ok=True)
+            shutil.copyfile(path, os.path.join(res, rel))
+            self.previous_out.append(rel)
         for rel, p in self.pages.items():
             with open(os.path.join(self.out, p['out']), 'w', encoding='utf-8') as f:
                 f.write(self.render(rel))
@@ -628,8 +696,16 @@ def main():
     parser.add_argument('--repo', default='https://github.com/HackInProvence/badge_hip',
                         help='URL of the repository, for the links to the source code')
     parser.add_argument('--uf2', default=os.path.join(ROOT, UF2), help='the firmware published (default: the build)')
+    parser.add_argument('--previous', action='append', metavar='UF2',
+                        help='the firmware of an older version, kept as a backup (several: repeat; default: the '
+                             'firmware of the packages of the older versions, build/dist/badge_secsea-*/firmware)')
     args = parser.parse_args()
-    site = Site(args.out, args.repo, args.uf2)
+    previous = args.previous
+    if previous is None:
+        found = glob.glob(os.path.join(ROOT, 'build', 'dist', 'badge_secsea-*', 'firmware', 'badge_menu-*.uf2'))
+        previous = sorted((f for f in found if not os.path.basename(os.path.dirname(os.path.dirname(f))).endswith(
+            '-test') and os.path.basename(f) != f'badge_menu-{VERSION}.uf2'), reverse=True)
+    site = Site(args.out, args.repo, args.uf2, previous)
     site.collect()
     site.write()
 

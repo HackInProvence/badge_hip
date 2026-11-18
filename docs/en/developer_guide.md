@@ -84,7 +84,8 @@ settings become incompatible.
    that firmware).
 5. Commit (`Version 1.2.3`), then tag: `git tag -a v_1.2.3 -m "Version 1.2.3"` and `git push --tags`.
 6. Publish `build/src/menu/badge_menu-1.2.3.uf2` in a GitHub release of the tag, and the web site
-   (`python tools/docs_site.py`, which shows the version). Each build writes that file next to `badge_menu.uf2`,
+   (`python tools/docs_site.py`, which shows the version and its news, and keeps as a backup the firmware of the
+   previous versions whose package is in `build/dist`, or the ones given with `--previous`). Each build writes that file next to `badge_menu.uf2`,
    named after [VERSION](../../VERSION) (a rule of `src/menu/CMakeLists.txt`): build it after the commit of the
    version, so that it has no "+".
 7. The package to publish with the release: `python tools/make_dist.py` writes `build/dist/badge_secsea-1.2.3/` and
@@ -1272,7 +1273,7 @@ python tools/test_smuggler.py --ports COM9 COM11                            # sm
 | `tools/gamebook_check.py` | checks a gamebook (errors, warnings), `--pages`, `--play` (play it in the terminal), `--c` (writes the built-in book) (§ 6.28) |
 | `tools/test_party_games.py`, `tools/test_werewolf.py`, `tools/test_smuggler.py` | two-badge tests (§ 9.3) |
 | `tools/sd_files.py` | file manager of the SD card through the USB, a window (no argument) or `ls`, `tree`, `get`, `put` (folders too), `rm [-r]`, `mkdir`, `mv`, `df`, `shell`; protocol `0x05` of `sd_serial.c` (reading ~85 KB/s, writing ~40 KB/s) |
-| `tools/docs_site.py` | the web site of the badge in `build/docs_site/` (`--out`, `--repo`, `--uf2`): home page, all the `.md` documentation in HTML (guides, features, notes of `docs/`; never `docs/analyses`), and in `ressources/` the firmware, the SD card (`carte_sd.zip`), the tools useful to a user (`outils.zip`: remote control, SD card files, contacts, media conversions, ringtones, gamebooks; not the development ones), the Flipper files, the hardware (KiCad as a `.zip`); needs `pip install markdown` |
+| `tools/docs_site.py` | the web site of the badge in `build/docs_site/` (`--out`, `--repo`, `--uf2`, `--previous`): home page with the news of the version, all the `.md` documentation in HTML (guides, features, notes of `docs/`; never `docs/analyses`), and in `ressources/` the firmware, the SD card (`carte_sd.zip`), the tools useful to a user (`outils.zip`: remote control, SD card files, contacts, media conversions, ringtones, gamebooks; not the development ones), the Flipper files, the hardware (KiCad as a `.zip`); needs `pip install markdown` |
 | `src/images/image2epi.py` | images → `.EPI` (options `--fit`, `--bw`, `--contrast`, `--equalize`, `--preview`) |
 | `src/video/video2epaper.py` | video → `.EPV` (`--fps`, `--fit`, `--dither bayer\|fs\|threshold`, `--start`, `--duration`, `--no-audio`, `--preview`) |
 | `src/audio/audio2wav.py` | sounds → 8-bit 16 kHz WAV (wildcards, folders, `--no-filter`, `--start`, `--duration`) |
